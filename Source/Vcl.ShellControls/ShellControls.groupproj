@@ -1,0 +1,44 @@
+﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+    <PropertyGroup>
+        <ProjectGuid>{34F18A6C-E4E3-4827-8EFA-DEE5C0B4F0A5}</ProjectGuid>
+    </PropertyGroup>
+    <ItemGroup>
+        <Projects Include="Vcl.ShellControls.dproj">
+            <Dependencies/>
+        </Projects>
+    </ItemGroup>
+    <ProjectExtensions>
+        <Borland.Personality>Default.Personality.12</Borland.Personality>
+        <Borland.ProjectType/>
+        <BorlandProject>
+            <Default.Personality/>
+        </BorlandProject>
+    </ProjectExtensions>
+    <Target Name="Vcl_ShellControls">
+        <MSBuild Projects="Vcl.ShellControls.dproj"/>
+    </Target>
+    <Target Name="Vcl_ShellControls:Clean">
+        <MSBuild Projects="Vcl.ShellControls.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="Vcl_ShellControls:Make">
+        <MSBuild Projects="Vcl.ShellControls.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="Build">
+        <CallTarget Targets="Vcl_ShellControls"/>
+    </Target>
+    <Target Name="Clean">
+        <CallTarget Targets="Vcl_ShellControls:Clean"/>
+    </Target>
+    <Target Name="Make">
+        <CallTarget Targets="Vcl_ShellControls:Make"/>
+    </Target>
+    <Import Project="$(BDS)\Bin\CodeGear.Group.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')"/>
+    <ItemGroup Condition="'$(BuildGroup)'=='WIN32_WIN64_RELEASE'">
+        <BuildGroupProject Include="Vcl.ShellControls.dproj">
+            <ProjectGuid>{EC805AB7-456C-475B-BE5E-8E81FC3A8838}</ProjectGuid>
+            <Configurations>Release</Configurations>
+            <Platforms>Win32;Win64</Platforms>
+            <Enabled>True</Enabled>
+        </BuildGroupProject>
+    </ItemGroup>
+</Project>

@@ -12,6 +12,6 @@ This updated source addresses the following issues.
 
  To achieve this the source had to be modified quite a lot. Dont expect a flawless product.
 
- See also the read me files for Developers and Users
+ See also the ReadMe files for Developers and Users in the Docs directory.
 
  Frank Bijnen
