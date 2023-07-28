@@ -7,10 +7,16 @@ I have tested this version with Windows 10, but it still works with Windows 8.1 
   The standard Microsoft Codecs installed with Windows 10 should work. Please check. I use DNG and JPG myself, so these are tested.
 - The internal browser used for OSM map relies on Edge. To use this the 'WebView2Loader.dll' should be placed alongside the executable. If you dont install this dll, 
   the progam will still work, but the OSM map will not be available.
-  
-   More info: https://docwiki.embarcadero.com/RADStudio/Sydney/en/Using_TEdgeBrowser_Component_and_Changes_to_the_TWebBrowser_Component
+    
+  How to get the WebView2Loader.dll?
+  Browse to https://www.nuget.org/packages/Microsoft.Web.WebView2, select the version (Eg. 1.0.1988-prerelease) and click on Download package. (on the Right) 
+  This will get you a file named like 'microsoft.web.webview2.1.0.1988-prerelease.nupkg'. 
+  Open this file with an archiver. (Winrar https://www.win-rar.com/ and 7-Zip https://www.7-zip.org/ are known to work)
+  From this nupkg file extract the file 'runtimes\win-x86\native\WebView2Loader.dll' to the directory where you save the ExifToolGui.exe.	
+ 	
+  More info: https://docwiki.embarcadero.com/RADStudio/Sydney/en/Using_TEdgeBrowser_Component_and_Changes_to_the_TWebBrowser_Component
 
-   To use the browser on pre Windows 10 download and install the Edge Canaray: https://www.microsoft.com/nl-nl/edge/download/insider?form=MA13FJ
+  To use the browser on pre Windows 10 download and install the Edge Canaray: https://www.microsoft.com/nl-nl/edge/download/insider?form=MA13FJ
 
 Usage Notes:
 
