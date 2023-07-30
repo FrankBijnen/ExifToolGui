@@ -21,7 +21,6 @@ I have tested this version with Windows 10, but it still works with Windows 8.1 
 Usage Notes:
 
 The thumbnails are now being created in separate background threads. You can see in the statubar a message 'Remaining thumbnails to generate xx'.
-While this process is busy you can not change to a different folder.
 
 The menu Program/Gui Color/Silver, Blue, Green have been replaced by styles. Check out the menu Progam/Style. A list is presented with all available styles. 
 Changing to a different style means recreating and repainting the forms on the fly. It is recommended to restart the program after changing a style.

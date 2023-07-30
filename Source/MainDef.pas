@@ -761,8 +761,7 @@ var SR: TSearchRec;
     I: integer;
     W: word;
 begin
-  if StartDir[length(StartDir)] <> '\' then
-    StartDir := StartDir + '\';
+  StartDir := IncludeTrailingBackslash(StartDir);
   DoSub := subDir;
   // Build a list of the files in directory StartDir -not the directories!
   IsFound := FindFirst(StartDir + FileMask, faAnyFile - faDirectory, SR) = 0;

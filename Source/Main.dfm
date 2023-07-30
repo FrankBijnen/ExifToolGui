@@ -119,7 +119,6 @@ object FMain: TFMain
           ShowRoot = False
           TabOrder = 0
           OnClick = ShellTreeClick
-          OnChanging = ShellTreeChanging
           OnChange = ShellTreeChange
           ExplicitHeight = 325
         end
@@ -157,7 +156,7 @@ object FMain: TFMain
     Top = 0
     Width = 320
     Height = 581
-    ActivePage = AdvTabOSMMap
+    ActivePage = AdvTabMetadata
     Align = alRight
     DoubleBuffered = True
     ParentDoubleBuffered = False
