@@ -16,24 +16,25 @@ uses
 // The ShellListview and TThumbTask should probably be in a separate unit. But this was easier.
 // Extend ShellListview, keeping the same Type
 
-const CM_ThumbStart = WM_USER + 1;
-const CM_ThumbEnd = WM_USER + 2;
-const CM_ThumbError = WM_USER + 3;
-const CM_ThumbRefresh = WM_USER + 4;
+const CM_ThumbEnd = WM_USER + 1;
+const CM_ThumbError = WM_USER + 2;
+const CM_ThumbRefresh = WM_USER + 3;
 
 type
   THeaderSortState = (hssNone, hssAscending, hssDescending);
 
-  TThumbGenStatus = (Started, Ended, Error);
+  TThumbGenStatus = (Started, Ended);
+  TThumbErrorEvent = procedure(Sender: TObject; Item: TListItem; E: Exception) of object;
   TThumbGenerateEvent = procedure(Sender: TObject; Item: TListItem; Status: TThumbGenStatus; Total, Remaining: integer) of object;
   TPopulateBeforeEvent = procedure(Sender: TObject; var DoDefault: boolean) of object;
   TOwnerDataFetchEvent = procedure(Sender: TObject; Item: TListItem; Request: TItemRequest; Afolder: TShellFolder) of object;
 
+  TThumbTask = class;
+
   TShellListView = class(Vcl.Shell.ShellCtrls.TShellListView)
   private
     FThreadPool: TThreadPool;
-    //TODO: Need to cancel active tasks before changing dir
-    // FTasks: array of ITask;
+    FThumbTasks: Tlist;
     FDoDefault: boolean;
 
     FonColumnResized: TNotifyEvent;
@@ -51,6 +52,7 @@ type
     // = 0 The index needs to be generated
     // < 1 A temporary icon to display, until the thumbnail is generated. The actual index in FThumbNails is * -1
     FThumbNailCache: array of integer;
+    FOnNotifyErrorEvent: TThumbErrorEvent;
     FOnNotifyGenerateEvent: TThumbGenerateEvent;
     FOnPopulateBeforeEvent: TPopulateBeforeEvent;
     FOnEnumColumnsBeforeEvent: TNotifyEvent;
@@ -58,7 +60,6 @@ type
     FOnOwnerDataFetchEvent: TOwnerDataFetchEvent;
     procedure SetColumnSorted(AValue: boolean);
     procedure SetThumbNailSize(AValue: integer);
-    procedure CMThumbStart(var Message: TMessage); message CM_ThumbStart;
     procedure CMThumbEnd(var Message: TMessage); message CM_ThumbEnd;
     procedure CMThumbError(var Message: TMessage); message CM_ThumbError;
     procedure CMThumbRefresh(var Message: TMessage); message CM_ThumbRefresh;
@@ -75,6 +76,9 @@ type
 
     function OwnerDataFetch(Item: TListItem; Request: TItemRequest): boolean; override;
     procedure Add2ThumbNails(ABmp: HBITMAP; ANitemIndex: integer; NeedsGenerating: boolean);
+    procedure CancelThumbTasks;
+    procedure RemoveThumbTask(ItemIndex: integer);
+
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
@@ -88,6 +92,7 @@ type
     property SortState: THeaderSortState read FSortState write FSortState;
 
     property ThumbNailSize: integer read FThumbNailSize write SetThumbNailSize;
+    property OnThumbError: TThumbErrorEvent read FOnNotifyErrorEvent write FOnNotifyErrorEvent;
     property OnThumbGenerate: TThumbGenerateEvent read FOnNotifyGenerateEvent write FOnNotifyGenerateEvent;
     property Generating: integer read FGenerating;
     property OnPopulateBeforeEvent: TPopulateBeforeEvent read FOnPopulateBeforeEvent write FOnPopulateBeforeEvent;
@@ -98,18 +103,21 @@ type
 
   TThumbTask = class(TTask, ITask)
   private
-    FThreadPool: TThreadPool;
     FItemIndex: integer;
     FListView: TShellListView;
+    FPitemIDList: pointer;
+    FThreadPool: TThreadPool;
+    FPathName: string;
     procedure DoExecute;
   public
     constructor Create(const AItemIndex: integer;
-      const AListView: TShellListView; const AThreadPool: TThreadPool);
-      reintroduce;
-
+                       const AListView: TShellListView;
+                       const APitemIDList: pointer;
+                       const AThreadPool: TThreadPool); reintroduce;
     destructor Destroy; override;
     function Start: ITask; reintroduce;
   end;
+
 
   TFMain = class(TForm)
     MainMenu: TMainMenu;
@@ -330,7 +338,6 @@ type
     procedure EditMapFindChange(Sender: TObject);
     procedure EditMapFindKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
     procedure SpeedBtn_MapSetHomeClick(Sender: TObject);
-    procedure MapTrackBarChange(Sender: TObject);
     procedure QuickPopUp_AddDetailsUserClick(Sender: TObject);
     procedure MImportMetaSingleClick(Sender: TObject);
     procedure QuickPopUp_CopyTagClick(Sender: TObject);
@@ -347,7 +354,6 @@ type
     procedure SpeedBtn_ETclearClick(Sender: TObject);
     procedure MGUIStyleClick(Sender: TObject);
     procedure ShellTreeClick(Sender: TObject);
-    procedure ShellTreeChanging(Sender: TObject; Node: TTreeNode; var AllowChange: boolean);
     procedure ShellListColumnClick(Sender: TObject; Column: TListColumn);
     procedure AdvRadioGroup1Click(Sender: TObject);
     procedure Spb_GoBackClick(Sender: TObject);
@@ -364,6 +370,7 @@ type
     procedure ShowPreview;
     procedure WMEndSession(var Msg: TWMEndSession); message WM_ENDSESSION;
     function TranslateTagName(xMeta, xName: string): string;
+    procedure ShellistThumbError(Sender: TObject; Item: TListItem; E: Exception);
     procedure ShellistThumbGenerate(Sender: TObject; Item: TListItem; Status: TThumbGenStatus; Total, Remaining: integer);
     procedure ShellListBeforePopulate(Sender: TObject; var DoDefault: boolean);
     procedure ShellListBeforeEnumColumns(Sender: TObject);
@@ -459,11 +466,15 @@ end;
 // TThumbTask. Generates Thumbnail in a separate thread.
 
 constructor TThumbTask.Create(const AItemIndex: integer;
-  const AListView: TShellListView; const AThreadPool: TThreadPool);
+                              const AListView: TShellListView;
+                              const APitemIDList: pointer;
+                              const AThreadPool: TThreadPool);
 begin
   FItemIndex := AItemIndex;
   FListView := AListView;
+  FPitemIDList := APitemIDList;
   FThreadPool := AThreadPool;
+  FPathName := AListView.Folders[FItemIndex].PathName;
 
   inherited Create(nil, TNotifyEvent(nil), DoExecute, FThreadPool, nil, []);
 end;
@@ -471,6 +482,7 @@ end;
 // Future use
 destructor TThumbTask.Destroy;
 begin
+  SetLength(FPathName, 0);
   inherited;
 end;
 
@@ -485,11 +497,12 @@ begin
     Hr := S_FALSE;
     Flags := SIIGBF_THUMBNAILONLY;
     Tries := 3; // Try a few times.
-    while (Tries > 0) and (Hr <> S_OK) do
+    while (Tries > 0) and
+          (Hr <> S_OK) and
+          (GetStatus <> TTaskStatus.Canceled) do
     begin
       dec(Tries);
-      Hr := GetThumbCache(FListView.Folders[FItemIndex].PathName, HBmp, Flags,
-        FListView.FThumbNails.Width, FListView.FThumbNails.Height);
+      Hr := GetThumbCache(FPathName, HBmp, Flags, FListView.FThumbNails.Width, FListView.FThumbNails.Height);
       if (Hr <> S_OK) then
       begin
         DeleteObject(HBmp); // Not sure if this is needed
@@ -497,24 +510,26 @@ begin
       end;
     end;
 
-    FListView.FGeneratingLock.Acquire;
-    try
-      if (Hr = S_OK) then
-        // We must update the imagelist in the main thread, send a meessage
-        PostMessage(FListView.Handle, CM_ThumbRefresh, FItemIndex, HBmp);
-
-      dec(FListView.FGenerating);
-      PostMessage(FListView.Handle, CM_ThumbEnd, FItemIndex,
-        FListView.FGenerating);
-    finally
-      FListView.FGeneratingLock.Release;
+    // The current path has changed. Dont send any messages, but delete bitmap.
+    if (FPitemIDList <> FListView.RootFolder.AbsoluteID) then
+    begin
+      DeleteObject(HBmp);
+      exit;
     end;
+
+    if (Hr = S_OK) then
+      // We must update the imagelist in the main thread, send a message
+      PostMessage(FListView.Handle, CM_ThumbRefresh, FItemIndex, HBmp);
+
+    // Sendmessage that task has finished.
+    // We must wait for this message, to be sure that the Task object does not get freed to soon.
+    PostMessage(FListView.Handle, CM_ThumbEnd, 0, 0);
 
   except
     on E: Exception do
     begin
-      dec(FListView.FGenerating);
-      PostMessage(FListView.Handle, CM_ThumbError, FItemIndex, 0);
+      // Sendmessage that task is in error
+      SendMessage(FListView.Handle, CM_ThumbError, FItemIndex, LPARAM(E));
     end;
   end;
 end;
@@ -638,22 +653,18 @@ begin
   FThreadPool.SetMaxWorkerThreads(MaxThreads);
 end;
 
-procedure TShellListView.CMThumbStart(var Message: TMessage);
-begin
-  if (Assigned(FOnNotifyGenerateEvent)) then
-    FOnNotifyGenerateEvent(Self, Items[Message.WParam], TThumbGenStatus.Started, Items.Count, FGenerating);
-end;
-
 procedure TShellListView.CMThumbEnd(var Message: TMessage);
 begin
+  RemoveThumbTask(Message.WParam);
   if (Assigned(FOnNotifyGenerateEvent)) then
     FOnNotifyGenerateEvent(Self, Items[Message.WParam], TThumbGenStatus.Ended, Items.Count, FGenerating);
 end;
 
 procedure TShellListView.CMThumbError(var Message: TMessage);
 begin
-  if (Assigned(FOnNotifyGenerateEvent)) then
-    FOnNotifyGenerateEvent(Self, Items[Message.WParam], TThumbGenStatus.Error, Items.Count, FGenerating);
+  RemoveThumbTask(Message.WParam);
+  if (Assigned(FOnNotifyErrorEvent)) then
+    FOnNotifyErrorEvent(Self, Items[Message.WParam], Exception(Message.LParam));
 end;
 
 procedure TShellListView.CMThumbRefresh(var Message: TMessage);
@@ -666,11 +677,10 @@ begin
 end;
 
 procedure TShellListView.GetThumbNails;
-var
-  ANitem: TListItem;
-  Hr: HRESULT;
-  HBmp: HBITMAP;
-  ItemIndx: integer;
+var ANitem: TListItem;
+    Hr: HRESULT;
+    HBmp: HBITMAP;
+    ItemIndx: integer;
 begin
   if (ViewStyle = vsIcon) and
      (FThumbNailSize > 0) then
@@ -684,13 +694,13 @@ begin
     // Adjust the size of the cache
     SetLength(FThumbNailCache, Items.Count);
 
-    // create a threadpool.
-    ResetPool;
-
     // Add the Thumbnails that Windows has already cached to our imagelist.
     // If not in cache, we show an Icon, and mark it in the cache as negative *-1  (Needs generating = true)
-    // Only the thumbnails in view (visible) are genenarated.  See: OwnerDataFetch
+    // Only the thumbnails in view (visible) are generated. See: OwnerDataFetch
+    CancelThumbTasks;
     FGenerating := 0;
+    SendMessage(Self.Handle, CM_ThumbEnd, -1, 0);
+
     for ANitem in Items do
     begin
       ItemIndx := ANitem.Index;
@@ -704,8 +714,7 @@ begin
       begin
         // No thumbnail in cache.
         // Show the Icon. That is reasonably fast.
-        Hr := GetThumbCache(Folders[ItemIndx].PathName, HBmp, SIIGBF_ICONONLY,
-          FThumbNails.Width, FThumbNails.Height);
+        Hr := GetThumbCache(Folders[ItemIndx].PathName, HBmp, SIIGBF_ICONONLY, FThumbNails.Width, FThumbNails.Height);
         if (Hr = S_OK) then
           Add2ThumbNails(HBmp, ItemIndx, true);
       end;
@@ -723,14 +732,6 @@ begin
   if not Enabled then
     exit;
   // until here
-
-  //TODO: Kill all tasks first.
-  // Dont allow when still generating. This should not happen, because AllowChanges is set to false in
-  // ShellTreeChanging.
-  if (ViewStyle = vsIcon) and
-     (FThumbNailSize > 0) and
-     (FGenerating > 0) then
-    abort;
 
   // Force initialization of array with zeroes
   SetLength(FThumbNailCache, 0);
@@ -754,8 +755,7 @@ function TShellListView.OwnerDataFetch(Item: TListItem;
   Request: TItemRequest): boolean;
 
   procedure DoIcon;
-  var
-    ItemIndx: integer;
+  var ItemIndx, TaskId: integer;
   begin
     if not(irImage in Request) then
       exit;
@@ -784,13 +784,16 @@ function TShellListView.OwnerDataFetch(Item: TListItem;
     FGeneratingLock.Acquire;
     try
       inc(FGenerating);
+      // Add to list of thumbnails to generate
+      TaskId := FThumbTasks.Add(nil);
+      FThumbTasks[TaskId] := TThumbTask.Create(ItemIndx, Self, Self.RootFolder.AbsoluteID, FThreadPool);
     finally
       FGeneratingLock.Release;
     end;
 
-    // The task will create a HBITMAP, and send a message to the window.
+    // Actually start the task.  It will create a HBITMAP, and send a message to the ShellListView window.
     // Updating the imagelist must be done in the main thread.
-    TThumbTask.Create(ItemIndx, Self, FThreadPool).Start;
+    TThumbTask(FThumbTasks[TaskId]).Start;
   end;
 
 begin
@@ -811,24 +814,59 @@ end;
 constructor TShellListView.Create(AOwner: TComponent);
 begin
   Inherited Create(AOwner);
+
+  FThumbNailSize := 0;
+  FGenerating := 0;
+
   InitSortSpec(0, THeaderSortState.hssNone);
   FGeneratingLock := TMutex.Create;
+  FThumbTasks := TList.Create;
   FThumbNails := TImageList.Create(Self);
-  FThumbNailSize := 0;
   SetLength(FThumbNailCache, 0);
+  ResetPool; // create a threadpool.
 end;
 
 destructor TShellListView.Destroy;
 begin
-  if (Assigned(FThumbNails)) then
-    FThumbNails.Free;
-
+  CancelThumbTasks;
+  FThumbTasks.Free;
   FGeneratingLock.Free;
+  FThumbNails.Free;
   SetLength(FThumbNailCache, 0);
-  if (Assigned(FThreadPool)) then
-    FreeAndNil(FThreadPool);
+  FreeAndNil(FThreadPool);
 
   inherited;
+end;
+
+procedure TShellListView.CancelThumbTasks;
+var ATask: TThumbTask;
+begin
+  for ATask in FThumbTasks do
+    ATask.Cancel;
+  FThumbTasks.Clear;
+  FGenerating := 0;
+end;
+
+procedure TShellListView.RemoveThumbTask(ItemIndex: integer);
+var Indx: integer;
+begin
+  if (ItemIndex >= 0) then
+  begin
+    FGeneratingLock.Acquire;
+    try
+      dec(FGenerating);
+      for Indx := 0 to FThumbTasks.Count -1 do
+      begin
+        if (TThumbTask(FThumbTasks[Indx]).FItemIndex = ItemIndex) then
+        begin
+          FThumbTasks.Delete(Indx);
+          break;
+        end;
+      end;
+    finally
+      FGeneratingLock.Release;
+    end;
+  end;
 end;
 
 function TShellListView.FileName(ItemIndex: integer = -1): string;
@@ -2751,6 +2789,7 @@ begin
   ShellList.OnOwnerDataFetchEvent := ShellListOwnerDataFetch;
   ShellList.OnColumnResized := ShellListColumnResized;
   ShellList.OnThumbGenerate := ShellistThumbGenerate;
+  ShellList.OnThumbError := ShellistThumbError;
   ShellList.ColumnSorted := ShellList.Sorted; // Enable Column sorting if Sorted = true. Disables Sorted.
 
   CBoxFileFilter.Text := SHOWALL;
@@ -3144,18 +3183,9 @@ begin
 end;
 
 procedure TFMain.ShellTreeChange(Sender: TObject; Node: TTreeNode);
-begin
-  ShellTreeClick(Sender);
-end;
-
-procedure TFMain.ShellTreeChanging(Sender: TObject; Node: TTreeNode; var AllowChange: boolean);
 var I, N: smallint;
     NewPath: string;
 begin
-  AllowChange := (ShellList.Generating < 1);
-  if not(AllowChange) then
-    exit;
-
   NewPath := TShellFolder(Node.Data).PathName;
   if not ValidDir(NewPath) then
     exit;
@@ -3177,6 +3207,7 @@ begin
       MProgram.Items[I].Enabled := false;
     end;
   end;
+  ShellTreeClick(Sender);
 end;
 
 procedure TFMain.ShellTreeClick(Sender: TObject);
@@ -3604,11 +3635,6 @@ begin // prevent NewSize=0 (disappearing Preview panel)
     NewSize := Splitter3.MinSize + 1;
 end;
 
-procedure TFMain.MapTrackBarChange(Sender: TObject);
-begin
-//  MapZoom(IntToStr(MapTrackBar.Position));
-end;
-
 procedure TFMain.SetGuiColor;
 var
   AStyleService: TCustomStyleServices;
@@ -3617,16 +3643,18 @@ begin
   GUIcolor := AStyleService.GetStyleColor(scWindow);
 end;
 
-procedure TFMain.ShellistThumbGenerate(Sender: TObject; Item: TListItem;
-  Status: TThumbGenStatus; Total, Remaining: integer);
+procedure TFMain.ShellistThumbError(Sender: TObject; Item: TListItem; E: Exception);
 begin
-  if (Status = TThumbGenStatus.Error) then
-    raise Exception.Create('Error creating thumbnail for :' + ShellList.Folders
-      [Item.Index].PathName);
+  raise Exception.Create(Format('Error %s %s creating thumbnail for : %s', [E.Message, #10, ShellList.Folders[Item.Index].PathName]));
+end;
 
+procedure TFMain.ShellistThumbGenerate(Sender: TObject;
+                                       Item: TListItem;
+                                       Status: TThumbGenStatus;
+                                       Total, Remaining: integer);
+begin
   if (Remaining <> 0) then
-    StatusBar.Panels[1].Text := 'Remaining Thumbnails to generate: ' +
-      IntToStr(Remaining)
+    StatusBar.Panels[1].Text := 'Remaining Thumbnails to generate: ' + IntToStr(Remaining)
   else
     StatusBar.Panels[1].Text := '';
 end;
