@@ -12,8 +12,8 @@ I have tested this version with Windows 10, but it still works with Windows 8.1 
   Browse to https://www.nuget.org/packages/Microsoft.Web.WebView2, select the version (Eg. 1.0.1988-prerelease) and click on Download package. (on the Right) 
   This will get you a file named like 'microsoft.web.webview2.1.0.1988-prerelease.nupkg'. 
   Open this file with an archiver. (Winrar https://www.win-rar.com/ and 7-Zip https://www.7-zip.org/ are known to work)
-  From this nupkg file extract the file 'runtimes\win-x86\native\WebView2Loader.dll' to the directory where you save the ExifToolGui.exe.	
- 	
+  From this nupkg file extract the file 'runtimes\win-x86\native\WebView2Loader.dll' to the directory where you save the ExifToolGui.exe.       
+        
   More info: https://docwiki.embarcadero.com/RADStudio/Sydney/en/Using_TEdgeBrowser_Component_and_Changes_to_the_TWebBrowser_Component
 
   To use the browser on pre Windows 10 download and install the Edge Canaray: https://www.microsoft.com/nl-nl/edge/download/insider?form=MA13FJ
@@ -27,7 +27,13 @@ Changing to a different style means recreating and repainting the forms on the f
 
 The OSM Map works different from the Google Map. Because I could not get the Google Map working I had to look at the docs to see how it should work. It is
 worth mentioning 2 things.
-1. The Find works only for GPS coordinates, you cant search for places. (E.g. Madrid)
+1. The Find for places has been re-enabled as of version 6.0.2
+   Type in the name of the City, optionally followed by a comma and the country. (E.g. Madrid or Madrid, Spain)
+   If exactly 1 hit is found the coordinates will be filled in the textbox, and the map will reposition.
+   Else a selection list is displayed, where you can choose the city.
+   Notes: The queries are handled by https://geocode.maps.co. They allow 2 queries per second.
+          At least 5 characters are required to start then search.
+
 2. Use Ctrl + Click on the map to get the coordinates. These are shown in the text box.
 
 Frank Bijnen
