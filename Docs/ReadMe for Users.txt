@@ -27,7 +27,7 @@ Changing to a different style means recreating and repainting the forms on the f
 
 The OSM Map works different from the Google Map. Because I could not get the Google Map working I had to look at the docs to see how it should work. It is
 worth mentioning 2 things.
-1. The Find for places has been re-enabled as of version 6.0.2
+1. The Find for places has been re-enabled as of version 6.0.3
    Type in the name of the City, optionally followed by a comma and the country. (E.g. Madrid or Madrid, Spain)
    If exactly 1 hit is found the coordinates will be filled in the textbox, and the map will reposition.
    Else a selection list is displayed, where you can choose the city.
