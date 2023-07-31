@@ -14,7 +14,7 @@ type
     ETMinorError: string;
     ETGpsFormat: string;
     ETShowNumber: string;
-    // ETuseLang: boolean;
+    procedure SetGpsFormat(UseDecimal: boolean);
   end;
 
 const
@@ -65,6 +65,20 @@ var
   ETShowCounter: boolean = false;
   ETEvent: TEvent;
   ExecNum: byte;
+
+// Degrees not shown, but a diamond with a ?
+// Old code was in 2 place. Main and MainDef
+//      if MShowGPSdecimal.Checked then
+//        ETGPSformat := '-c' + CRLF + '%.6f°' + CRLF
+//      else
+//        ETGPSformat := '-c' + CRLF + '%d°%.4f' + CRLF;
+procedure ET_OptionsRec.SetGpsFormat(UseDecimal: boolean);
+begin
+  if UseDecimal then
+    ETGPSformat := '-c' + CRLF + '%.6f' + #$C2#$B0 + CRLF
+  else
+    ETGPSformat := '-c' + CRLF + '%d' + #$C2#$B0 + '%.4f' + CRLF;
+end;
 
   // ============================== ET_Open mode ==================================
 function ET_StayOpen(WorkDir: string): boolean;
@@ -232,7 +246,6 @@ begin
         end
         else
           break;
-        // Application.ProcessMessages;
       until EndReady;
       ETstream.Position := 0;
       ETout.LoadFromStream(ETstream);

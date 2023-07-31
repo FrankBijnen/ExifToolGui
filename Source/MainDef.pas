@@ -1,4 +1,5 @@
 unit MainDef;
+{$WARN SYMBOL_PLATFORM OFF}
 
 interface
 
@@ -275,10 +276,7 @@ begin
         if MIgnoreErrors.Checked then
           ETMinorError := '-m' + CRLF;
         MShowGPSdecimal.Checked := ReadBool(Ini_Options, 'GPSinDecimal', true);
-        if MShowGPSdecimal.Checked then
-          ETGPSformat := '-c' + CRLF + '%.6f°' + CRLF
-        else
-          ETGPSformat := '-c' + CRLF + '%d°%.4f' + CRLF;
+        ET_Options.SetGpsFormat(MShowGPSdecimal.Checked);
         MShowSorted.Checked := ReadBool(Ini_Options, 'ShowSorted', false);
         MShowComposite.Checked := ReadBool(Ini_Options, 'ShowComposite', false);
         MNotDuplicated.Checked := ReadBool(Ini_Options, 'NotDuplicated', false);
