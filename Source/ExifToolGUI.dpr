@@ -17,12 +17,13 @@ uses
   Geomap in 'Geomap.pas',
   CopyMetaSingle in 'CopyMetaSingle.pas' {FCopyMetaSingle},
   FileDateTime in 'FileDateTime.pas' {FFileDateTime},
-  UFrmStyle in 'UFrmStyle.pas' {FrmStyle},
+  UFrmPlaces in 'UFrmPlaces.pas' {FrmPlaces},
   ExifToolsGUI_Utils in 'ExifToolsGUI_Utils.pas',
   ExifInfo in 'ExifInfo.pas',
   ExifTool in 'ExifTool.pas',
   Vcl.Themes,
-  Vcl.Styles;
+  Vcl.Styles,
+  UFrmStyle in 'UFrmStyle.pas' {FrmStyle};
 
 {$R *.res}
 
@@ -45,6 +46,7 @@ begin
   Application.CreateForm(TFRemoveMeta, FRemoveMeta);
   Application.CreateForm(TFCopyMetaSingle, FCopyMetaSingle);
   Application.CreateForm(TFFileDateTime, FFileDateTime);
+  Application.CreateForm(TFrmPlaces, FrmPlaces);
   Application.CreateForm(TFrmStyle, FrmStyle);
   Application.Run;
 end.

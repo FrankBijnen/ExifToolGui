@@ -1268,7 +1268,7 @@ procedure TFMain.EditMapFindKeyDown(Sender: TObject; var Key: Word; Shift: TShif
 begin
   if (Key = VK_Return) and (EditMapFind.Text <> '') then
   begin
-    MapGotoPlace(EdgeBrowser1, EditMapFind.Text, 'Find');
+    EditMapFind.Text := MapGotoPlace(EdgeBrowser1, EditMapFind.Text, 'Find');
     EditMapFind.Font.Color := clBlue;
   end;
 end;

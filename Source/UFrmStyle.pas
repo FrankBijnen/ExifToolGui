@@ -26,11 +26,8 @@ type
 
   public
     { Public declarations }
-  var
-    CurPath: string;
-
-  var
-    CurStyle: string;
+    var CurPath: string;
+    var CurStyle: string;
   end;
 
 var

@@ -5,11 +5,13 @@ interface
 
 uses Vcl.Edge, System.Classes, System.SysUtils, System.Generics.Collections;
 
-procedure OsmMapInit(Browser: TEdgeBrowser; const LatLon, Desc: string);
+procedure OsmMapInit(Browser: TEdgeBrowser; const Lat, Lon, Desc: string); overload;
+procedure OsmMapInit(Browser: TEdgeBrowser; const LatLon, Desc: string); overload;
 procedure ShowImagesOnMap(Browser: TEdgeBrowser; Apath, ETOuts: string);
 procedure MapGetLocation(Browser: TEdgeBrowser);
-procedure MapGoToPlace(Browser: TEdgeBrowser; Place, Desc: string);
+function MapGoToPlace(Browser: TEdgeBrowser; Place, Desc: string): string;
 procedure ParseJsonMessage(const Message: string; var Msg, Parm1, Parm2: string);
+function ValidLatLon(const Lat, Lon: string): boolean;
 procedure ParseLatLon(const LatLon: string; var Lat, Lon: string);
 procedure AdjustLatLon(var Lat, Lon: string);
 
@@ -38,7 +40,10 @@ type
 
 implementation
 
-uses MainDef, ExifToolsGUI_Utils, System.Variants, Winapi.Windows, ExifTool, System.JSON;
+uses MainDef, UFrmPlaces, ExifToolsGUI_Utils, System.Variants, Winapi.Windows, ExifTool, System.JSON,
+     REST.Types, REST.Client, System.NetEncoding;
+
+var CoordFormatSettings: TFormatSettings; // for StrToFloatDef -see Initialization
 
 constructor TOSMHelper.Create(const APathName: string);
 begin
@@ -198,13 +203,11 @@ begin
 end;
 
 // ==============================================================================
-procedure OsmMapInit(Browser: TEdgeBrowser; const LatLon, Desc: string);
+procedure OsmMapInit(Browser: TEdgeBrowser; const Lat, Lon, Desc: string);
 var OsmHelper: TOSMHelper;
-    Lat, Lon: string;
 begin
   OsmHelper := TOSMHelper.Create(GetHtmlTmp);
   try
-    ParseLatLon(LatLon, Lat, Lon);
     OsmHelper.WriteHeader;
     Osmhelper.WritePointsStart;
     OsmHelper.WritePoint(Lat, Lon, Desc);
@@ -214,6 +217,13 @@ begin
     OsmHelper.Free;
   end;
   Browser.Navigate(GetHtmlTmp);
+end;
+
+procedure OsmMapInit(Browser: TEdgeBrowser; const LatLon, Desc: string);
+var Lat, Lon: string;
+begin
+  ParseLatLon(LatLon, Lat, Lon);
+  OsmMapInit(Browser, Lat, Lon, Desc);
 end;
 // ==============================================================================
 
@@ -254,14 +264,88 @@ begin
   Browser.Navigate(GetHtmlTmp);
 end;
 
-procedure MapGoToPlace(Browser: TEdgeBrowser; Place, Desc: string);
+procedure GetCoordsOfPLace(const Place: string; var Lat, Lon: string);
+var RESTClient: TRESTClient;
+    RESTRequest: TRESTRequest;
+    RESTResponse: TRESTResponse;
+    JValue: TJSONValue;
+    Places: TJSONArray;
+    City, Country: string;
+    UrlEncode: System.NetEncoding.TURLEncoding;
 begin
-  OsmMapInit(Browser, Place, Desc);
+  Lat := '';
+  Lon := '';
+  if (Length(Trim(Place)) < 5) then
+    exit;
+  UrlEncode := System.NetEncoding.TURLEncoding.Create;
+  Country := Place;
+  City := Trim(NextField(Country, ','));
+
+  City := UrlEncode.EncodeQuery(Trim(City));
+  Country := UrlEncode.EncodeQuery(Trim(Country));
+
+  RESTClient := TRESTClient.Create('https://geocode.maps.co');
+  RESTResponse := TRESTResponse.Create(nil);
+  RESTRequest := TRESTRequest.Create(nil);
+  RESTRequest.Client := RESTClient;
+  RESTRequest.Resource := 'search';
+  RESTRequest.Response := RESTResponse;
+  try
+    RESTRequest.params.Clear;
+    RESTRequest.params.AddItem('city', City, TRESTRequestParameterKind.pkGETorPOST);
+    RESTRequest.params.AddItem('country', Country, TRESTRequestParameterKind.pkGETorPOST);
+    RESTRequest.Execute;
+    Places := RESTResponse.JSONValue as TJSONArray;
+    if (places.Count = 1) then
+    begin
+      JValue := Places[0];
+      Lat := JValue.GetValue<string>('lat');
+      Lon := JValue.GetValue<string>('lon');
+    end
+    else
+    with FrmPlaces do
+    begin
+      Listview1.Items.Clear;
+      for JValue in Places do
+      begin
+        AddPlace2LV(JValue.GetValue<string>('display_name'),
+                    JValue.GetValue<string>('lat'),
+                    JValue.GetValue<string>('lon'));
+      end;
+      if (ShowModal <> IDOK) then
+        exit;
+      if (Listview1.Selected = nil) then
+        exit;
+      Lat := Listview1.Selected.Caption;
+      Lon := Listview1.Selected.Subitems[0];
+    end;
+  finally
+    RESTResponse.Free;
+    RESTRequest.Free;
+    RESTClient.Free;
+    UrlEncode.Free;
+  end;
 end;
 
 procedure MapGetLocation(Browser: TEdgeBrowser);
 begin
   Browser.ExecuteScript('GetLocation();');
+end;
+
+function MapGoToPlace(Browser: TEdgeBrowser; Place, Desc: string): string;
+var Lat, Lon: string;
+begin
+  result := Place;
+  ParseLatLon(Place, Lat, Lon);
+  if not (ValidLatLon(Lat, Lon)) then
+  begin
+    GetCoordsOfPLace(Place, Lat, Lon);
+    if not (ValidLatLon(Lat, Lon)) then
+      exit;
+    AdjustLatLon(Lat, Lon);
+    result := Lat + ', ' + Lon;
+  end;
+  OsmMapInit(Browser, Lat, Lon, Desc);
 end;
 
 procedure ParseJsonMessage(const Message: string; var Msg, Parm1, Parm2: string);
@@ -275,6 +359,15 @@ begin
    finally
      JsonValue.Free;
    end;
+end;
+
+function ValidLatLon(const Lat, Lon: string): boolean;
+var ADouble: Double;
+begin
+  result := TryStrToFloat(Lat, ADouble, CoordFormatSettings);
+  result := result and (Abs(ADouble) <= 90);
+  result := result and TryStrToFloat(Lon, ADouble, CoordFormatSettings);
+  result := result and (Abs(ADouble) <= 180);
 end;
 
 procedure AdjustLatLon(var Lat, Lon: string);
@@ -291,6 +384,12 @@ begin
   Lon := LatLon;
   Lat := Trim(NextField(Lon, ','));
   Lon := Trim(Lon);
+end;
+
+initialization
+begin
+  CoordFormatSettings.ThousandSeparator := ',';
+  CoordFormatSettings.DecimalSeparator := '.';
 end;
 
 end.
