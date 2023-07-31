@@ -2042,11 +2042,7 @@ begin
       else
         ETShowNumber := '';
   if Sender = MShowGPSdecimal then
-    with ET_Options do
-      if MShowGPSdecimal.Checked then
-        ETGPSformat := '-c' + CRLF + '%.6f°' + CRLF
-      else
-        ETGPSformat := '-c' + CRLF + '%d°%.4f' + CRLF;
+    ET_Options.SetGpsFormat(MShowGPSdecimal.Checked);
   // + used by MShowHexID, MGroup_g4, MShowComposite, MShowSorted, MNotDuplicated
   ShellList.Refresh;
   ShowMetadata;
