@@ -2,6 +2,6 @@ Version:        Description             Issue
 6.0.0.0         Initial commit         
 6.0.1.0         Fix Issue #1            Allow changing directory while thumbnails are being created
 6.0.2.0         Fix Issue #5            Degree sign in GPS coordinates not displayed correctly
-                Fix Issue #3            Enable places in the find function of the OSM map
+6.0.3.0         Fix Issue #3            Enable places in the find function of the OSM map
                 Fix Issue #6            Access violations when closing program, or changing directory, while thumbnails are being generated
                                         These started to happen after issue #1. Added a few failsafe's in the code. Issue remains open

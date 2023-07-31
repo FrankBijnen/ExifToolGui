@@ -281,8 +281,8 @@ begin
   Country := Place;
   City := Trim(NextField(Country, ','));
 
-  City := UrlEncode.EncodeQuery(Trim(City));
-  Country := UrlEncode.EncodeQuery(Trim(Country));
+  City := UrlEncode.EncodeForm(Trim(City));
+  Country := UrlEncode.EncodeForm(Trim(Country));
 
   RESTClient := TRESTClient.Create('https://geocode.maps.co');
   RESTResponse := TRESTResponse.Create(nil);
