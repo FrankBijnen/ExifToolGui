@@ -510,8 +510,10 @@ begin
       end;
     end;
 
-    // The current path has changed. Dont send any messages, but delete bitmap.
-    if (FPitemIDList <> FListView.RootFolder.AbsoluteID) then
+    // The task is canceled, or the current path has changed.
+    // Dont send any messages, but delete bitmap. If the handle is invalid, doesn't matter
+    if (GetStatus = TTaskStatus.Canceled) or
+       (FPitemIDList <> FListView.RootFolder.AbsoluteID) then
     begin
       DeleteObject(HBmp);
       exit;
@@ -523,7 +525,7 @@ begin
 
     // Sendmessage that task has finished.
     // We must wait for this message, to be sure that the Task object does not get freed to soon.
-    PostMessage(FListView.Handle, CM_ThumbEnd, 0, 0);
+    SendMessage(FListView.Handle, CM_ThumbEnd, 0, 0);
 
   except
     on E: Exception do
@@ -698,6 +700,7 @@ begin
     // If not in cache, we show an Icon, and mark it in the cache as negative *-1  (Needs generating = true)
     // Only the thumbnails in view (visible) are generated. See: OwnerDataFetch
     CancelThumbTasks;
+
     FGenerating := 0;
     SendMessage(Self.Handle, CM_ThumbEnd, -1, 0);
 
@@ -841,10 +844,15 @@ end;
 procedure TShellListView.CancelThumbTasks;
 var ATask: TThumbTask;
 begin
-  for ATask in FThumbTasks do
-    ATask.Cancel;
-  FThumbTasks.Clear;
-  FGenerating := 0;
+  FGeneratingLock.Acquire;
+  try
+    for ATask in FThumbTasks do
+      ATask.Cancel;
+    FThumbTasks.Clear;
+    FGenerating := 0;
+  finally
+    FGeneratingLock.Release;
+  end;
 end;
 
 procedure TShellListView.RemoveThumbTask(ItemIndex: integer);
