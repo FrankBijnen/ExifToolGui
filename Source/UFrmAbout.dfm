@@ -128,13 +128,13 @@ object FrmAbout: TFrmAbout
     Height = 29
     Align = alBottom
     TabOrder = 0
-    ExplicitTop = 208
+    ExplicitTop = 223
     ExplicitWidth = 368
     DesignSize = (
       376
       29)
     object BtnOk: TBitBtn
-      Left = 278
+      Left = 270
       Top = 2
       Width = 75
       Height = 25
@@ -160,7 +160,7 @@ object FrmAbout: TFrmAbout
       ModalResult = 1
       NumGlyphs = 2
       TabOrder = 0
-      ExplicitLeft = 270
+      ExplicitLeft = 262
     end
   end
 end
