@@ -3,7 +3,7 @@ unit MainDef;
 
 interface
 
-uses Classes; // ShlObj;
+uses Classes;
 
 const
   SHOWALL = 'Show All Files';
@@ -114,11 +114,25 @@ const
   Ini_ETGUI = 'ExifToolGUI';
   Ini_Settings = 'GUIsettings';
   Ini_Options = 'EToptions';
+  IniVersion = 'V6';
+  PrevIniVersion = 'V5';
 
 var
   GUIini: TIniFile;
   TmpItems: TStrings;
   lg_StartFolder: string;
+
+function GetIniFile(AllowPrevVer: boolean): string;
+var CurVer, PrevVer: string;
+begin
+  CurVer := ChangeFileExt(Application.ExeName, IniVersion + '.ini');
+  PrevVer := ChangeFileExt(Application.ExeName, PrevIniVersion + '.ini');
+  result := CurVer;
+  if AllowPrevVer and
+     (not FileExists(CurVer)) and
+     (FileExists(PrevVer)) then
+    result := PrevVer;
+end;
 
 constructor FListColDefRec.Create(AListColUsrRec: FListColUsrRec);
 begin
@@ -155,7 +169,7 @@ var
 
 begin
   TmpItems := TStringList.Create;
-  GUIini := TIniFile.Create(ChangeFileExt(Application.ExeName, 'v5.ini'));
+  GUIini := TIniFile.Create(GetIniFile(True));
   try
     with GUIini, FMain do
     begin
@@ -454,7 +468,7 @@ end;
 
 procedure ReadGUILog;
 begin
-  GUIini := TIniFile.Create(ChangeFileExt(Application.ExeName, 'v5.ini'));
+  GUIini := TIniFile.Create(GetIniFile(false));
   try
     with GUIini, FLogWin do
       begin
@@ -474,7 +488,7 @@ var I, N: smallint;
 begin
   // ^- EraseSection used instead
   try
-    GUIini := TIniFile.Create(ChangeFileExt(Application.ExeName, 'v5.ini'));
+    GUIini := TIniFile.Create(GetIniFile(false));
     try
       with GUIini, FMain do
       begin
