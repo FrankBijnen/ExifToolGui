@@ -396,7 +396,7 @@ var
 implementation
 
 uses StrUtils, ExifTool, ExifInfo, MainDef, LogWin, Preferences, EditFFilter,
-  EditFCol, UFrmStyle,
+  EditFCol, UFrmStyle, UFrmAbout,
   QuickMngr, DateTimeShift, DateTimeEqual, CopyMeta, RemoveMeta, Geotag, Geomap,
   ClipBrd, CopyMetaSingle, FileDateTime, ShellApi, Winapi.ShlObj,
   System.Math, System.Masks, Winapi.CommCtrl, System.UITypes,
@@ -809,6 +809,7 @@ function TShellListView.OwnerDataFetch(Item: TListItem; Request: TItemRequest): 
 
 begin
   result := true; // The inherited always return true!
+
   if not (FDoDefault) and
      not(csDesigning in ComponentState) and
      Assigned(FOnOwnerDataFetchEvent) then
@@ -1290,78 +1291,8 @@ begin
 end;
 
 procedure TFMain.MAboutClick(Sender: TObject);
-var
-  txt, Output: string;
-  i, X, Y: smallint;
-
-  function GetFileVersionNumber(Fname: string; vShort: boolean): string;
-  var
-    v, verInfoSize, verValueSize: longword;
-    minor: Word;
-    verInfo: pointer;
-    VerValue: PVSFixedFileInfo;
-  begin
-    if vShort then
-    begin
-      v := GetFileVersion(Fname);
-      minor := v and $FFFF;
-      result := IntToStr(v shr 16) + '.';
-      if minor < 10 then
-        result := result + '0';
-      result := result + IntToStr(minor);
-    end
-    else
-    begin
-      result := '-.-.-.-';
-      verInfoSize := GetFileVersionInfoSize(@Fname[1], v);
-      if verInfoSize = 0 then
-        exit;
-      GetMem(verInfo, verInfoSize);
-      GetFileVersionInfo(@Fname[1], 0, verInfoSize, verInfo);
-      VerQueryValue(verInfo, '\', pointer(VerValue), verValueSize);
-      with VerValue^ do
-      begin
-        result := IntToStr(dwFileVersionMS shr 16);
-        result := result + '.' + IntToStr(dwFileVersionMS and $FFFF);
-        result := result + '.' + IntToStr(dwFileVersionLS shr 16);
-        result := result + '.' + IntToStr(dwFileVersionLS and $FFFF);
-      end;
-      FreeMem(verInfo, verInfoSize);
-    end;
-  end;
-
 begin
-  txt := 'ExifToolGUI v' + GetFileVersionNumber(Application.ExeName, false);
-  txt := txt + ' by Bogdan Hrastnik. Adapted for RAD11, Frank B';
-  txt := txt + #10#13 + 'http://u88.n24.queensu.ca/exiftool/forum/   ';
-  txt := txt + #10#13 + '---' + #10#13 + 'ExifTool by Phil Harvey ';
-  if ExecET('exiftool -ver', '', '', Output) then
-    txt := txt + 'v' + Output
-  else
-    txt := txt + 'MISSING!';
-  txt := txt + #10#13 + '---' + #10#13 + 'jhead.exe=';
-  if ExecCMD('jhead', '') then
-    txt := txt + 'ready'
-  else
-    txt := txt + 'missing';
-  txt := txt + ',  jpegtran.exe=';
-  if ExecCMD('jpegtran', '') then
-    txt := txt + 'ready'
-  else
-    txt := txt + 'missing';
-  txt := txt + #10#13 + '---' + #10#13;
-  X := Screen.Width;
-  Y := Screen.Height;
-  i := Screen.PixelsPerInch;
-  txt := txt + 'Screen resolution: ' + IntToStr(X) + 'x' + IntToStr(Y) + ' at '
-    + IntToStr(i) + 'DPI';
-  with CreateMessageDialog(txt, mtInformation, [mbOk]) do
-  begin
-    Caption := 'About';
-    ShowModal;
-    Free;
-    txt := '';
-  end;
+  FrmAbout.ShowModal;
 end;
 
 procedure TFMain.MDontBackupClick(Sender: TObject);

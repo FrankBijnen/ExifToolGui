@@ -23,7 +23,8 @@ uses
   ExifTool in 'ExifTool.pas',
   Vcl.Themes,
   Vcl.Styles,
-  UFrmStyle in 'UFrmStyle.pas' {FrmStyle};
+  UFrmStyle in 'UFrmStyle.pas' {FrmStyle},
+  UFrmAbout in 'UFrmAbout.pas' {FrmAbout};
 
 {$R *.res}
 
@@ -48,5 +49,6 @@ begin
   Application.CreateForm(TFFileDateTime, FFileDateTime);
   Application.CreateForm(TFrmPlaces, FrmPlaces);
   Application.CreateForm(TFrmStyle, FrmStyle);
+  Application.CreateForm(TFrmAbout, FrmAbout);
   Application.Run;
 end.
