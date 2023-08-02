@@ -3,5 +3,8 @@ Version:        Description             Issue
 6.0.1.0         Fix Issue #1            Allow changing directory while thumbnails are being created
 6.0.2.0         Fix Issue #5            Degree sign in GPS coordinates not displayed correctly
 6.0.3.0         Fix Issue #3            Enable places in the find function of the OSM map
-                Fix Issue #6            Access violations when closing program, or changing directory, while thumbnails are being generated
-                                        These started to happen after issue #1. Added a few failsafe's in the code. Issue remains open
+                Fix Issue #6            Access violations when closing program, or changing directory, while thumbnails are being generated.
+                                        These started to happen after issue #1. Added a few failsafe's in the code. Issue remains open.
+6.0.4.0         Fix Issue #2            Add 'paste' to the context-menu of the shelllist. And solve AV's after pasting.
+                Fix Issue #11           Use INI file with V6 in the name. Maybe with the option to transfer settings from V5.
+                Fix Issue #12           About should point to exiftool.org instead of queensu.ca and to the github repo.

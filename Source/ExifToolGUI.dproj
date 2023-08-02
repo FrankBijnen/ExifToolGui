@@ -105,8 +105,7 @@
     <PropertyGroup Condition="'$(Cfg_1_Win32)'!=''">
         <DCC_WIDECHAR_REDUCED>false</DCC_WIDECHAR_REDUCED>
         <DCC_HIDDEN_VIRTUAL>false</DCC_HIDDEN_VIRTUAL>
-        <VerInfo_Keys>CompanyName=;FileDescription=GUI for ExifTool;FileVersion=6.16.0.0;InternalName=;LegalCopyright=2007-2015 Bogdan Hrastnik;LegalTrademarks=;OriginalFilename=ExifToolGUI.exe;ProductName=ExifToolGUI;ProductVersion=6.0.0.0;Comments=;ProgramID=com.embarcadero.$(MSBuildProjectName)</VerInfo_Keys>
-        <VerInfo_MinorVer>16</VerInfo_MinorVer>
+        <VerInfo_Keys>CompanyName=;FileDescription=GUI for ExifTool;FileVersion=6.0.4.0;InternalName=;LegalCopyright=2007-2015 Bogdan Hrastnik;LegalTrademarks=;OriginalFilename=ExifToolGUI.exe;ProductName=ExifToolGUI;ProductVersion=6.0.4.0;Comments=;ProgramID=com.embarcadero.$(MSBuildProjectName)</VerInfo_Keys>
         <VerInfo_MajorVer>6</VerInfo_MajorVer>
         <Icon_MainIcon>ExifToolGUI.ico</Icon_MainIcon>
         <DCC_DebugInfoInExe>false</DCC_DebugInfoInExe>
@@ -117,6 +116,7 @@
         <DCC_RemoteDebug>false</DCC_RemoteDebug>
         <BT_BuildType>Debug</BT_BuildType>
         <VerInfo_PreRelease>true</VerInfo_PreRelease>
+        <VerInfo_Release>4</VerInfo_Release>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_1_Win64)'!=''">
         <AppDPIAwarenessMode>PerMonitorV2</AppDPIAwarenessMode>
@@ -131,11 +131,11 @@
         <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
         <VerInfo_MajorVer>6</VerInfo_MajorVer>
         <VerInfo_Locale>1033</VerInfo_Locale>
-        <VerInfo_Keys>CompanyName=;FileVersion=6.0.3.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProductVersion=6.0.3.0;Comments=;ProgramID=com.embarcadero.$(MSBuildProjectName);FileDescription=$(MSBuildProjectName);ProductName=$(MSBuildProjectName)</VerInfo_Keys>
+        <VerInfo_Keys>CompanyName=;FileVersion=6.0.4.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProductVersion=6.0.4.0;Comments=;ProgramID=com.embarcadero.$(MSBuildProjectName);FileDescription=$(MSBuildProjectName);ProductName=$(MSBuildProjectName)</VerInfo_Keys>
         <VerInfo_PreRelease>true</VerInfo_PreRelease>
         <BT_BuildType>Debug</BT_BuildType>
         <Icon_MainIcon>ExifToolGUI.ico</Icon_MainIcon>
-        <VerInfo_Release>3</VerInfo_Release>
+        <VerInfo_Release>4</VerInfo_Release>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_2_Win64)'!=''">
         <AppDPIAwarenessMode>PerMonitorV2</AppDPIAwarenessMode>
@@ -207,6 +207,10 @@
         <DCCReference Include="ExifTool.pas"/>
         <DCCReference Include="UFrmStyle.pas">
             <Form>FrmStyle</Form>
+            <FormType>dfm</FormType>
+        </DCCReference>
+        <DCCReference Include="UFrmAbout.pas">
+            <Form>FrmAbout</Form>
             <FormType>dfm</FormType>
         </DCCReference>
         <BuildConfiguration Include="Base">
