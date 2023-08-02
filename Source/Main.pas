@@ -68,20 +68,17 @@ type
     procedure WMNotify(var Msg: TWMNotify); message WM_NOTIFY;
     procedure InitSortSpec(SortColumn: integer; SortState: THeaderSortState);
     procedure ColumnSort; virtual;
-
     procedure EnumColumns; override;
-
     procedure GetThumbNails; virtual;
     procedure Populate; override;
-
     function OwnerDataFetch(Item: TListItem; Request: TItemRequest): boolean; override;
     procedure Add2ThumbNails(ABmp: HBITMAP; ANitemIndex: integer; NeedsGenerating: boolean);
     procedure CancelThumbTasks;
     procedure RemoveThumbTask(ItemIndex: integer);
-
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
+    procedure Invalidate; override;
     function FileName(ItemIndex: integer = -1): string;
     function FileExt(ItemIndex: integer = -1): string;
     procedure ColumnClick(Column: TListColumn);
@@ -620,6 +617,18 @@ begin
   end;
 end;
 
+// Calling Invalidate creates a new window handle. We must store that handle in the Folders.
+// In the standard it is done in LoadColumnDetails.
+// See also: OnEnumColumnsAfterEvent
+procedure TShellListview.Invalidate;
+var Indx: integer;
+begin
+  inherited;
+
+  for Indx := 0 to Items.Count -1 do
+    Folders[Indx].ViewHandle := Handle;
+end;
+
 procedure TShellListView.EnumColumns;
 begin
   if Assigned(FOnEnumColumnsBeforeEvent) then
@@ -754,8 +763,7 @@ end;
 // When in vsReport mode, calls the OwnerDataFetch event to get the item.caption and subitems.
 //
 // Sets the Item.ImageIndex when the listview is in vsIcon mode. When not avail (<0) it start the generating.
-function TShellListView.OwnerDataFetch(Item: TListItem;
-  Request: TItemRequest): boolean;
+function TShellListView.OwnerDataFetch(Item: TListItem; Request: TItemRequest): boolean;
 
   procedure DoIcon;
   var ItemIndx, TaskId: integer;
@@ -801,12 +809,10 @@ function TShellListView.OwnerDataFetch(Item: TListItem;
 
 begin
   result := true; // The inherited always return true!
-  if not (FDoDefault) then
-  begin
-    if not(csDesigning in ComponentState) and
-       Assigned(FOnOwnerDataFetchEvent) then
-      FOnOwnerDataFetchEvent(Self, Item, Request, Folders[Item.Index]);
-  end
+  if not (FDoDefault) and
+     not(csDesigning in ComponentState) and
+     Assigned(FOnOwnerDataFetchEvent) then
+    FOnOwnerDataFetchEvent(Self, Item, Request, Folders[Item.Index])
   else
     result := inherited;
 
@@ -2929,8 +2935,8 @@ var
   FilterItem, Filter: string;
   FilterMatches: boolean;
 begin
-  CanAdd := not FrmStyle.Showing and
-            TShellListView(Sender).Enabled and
+  CanAdd := TShellListView(Sender).Enabled and
+            not FrmStyle.Showing and
             ValidFile(AFolder);
   FolderName := ExtractFileName(AFolder.PathName);
   if (CBoxFileFilter.Text <> SHOWALL) then
@@ -3046,21 +3052,17 @@ procedure TFMain.ShellListAfterEnumColumns(Sender: TObject);
   end;
 
 begin
+
   case CBoxDetails.ItemIndex of
-    0:
-      AdjustColumns(FListStdColWidth);
-    1:
-      AddColumns(FListColDef1);
-    2:
-      AddColumns(FListColDef2);
-    3:
-      AddColumns(FListColDef3);
-    4:
-      AddColumns(FListColUsr);
+    0: AdjustColumns(FListStdColWidth);
+    1: AddColumns(FListColDef1);
+    2: AddColumns(FListColDef2);
+    3: AddColumns(FListColDef3);
+    4: AddColumns(FListColUsr);
   end;
 
   SendMessage(TShellListView(Sender).Handle, WM_SETREDRAW, 1, 0);
-  TShellListView(Sender).Invalidate;
+  TShellListView(Sender).Invalidate; // Creates new window handle!
 end;
 
 procedure TFMain.ShellListOwnerDataFetch(Sender: TObject; Item: TListItem;
@@ -3071,6 +3073,9 @@ var
   Indx: integer;
   Details: TStrings;
 begin
+  if (Item.Index < 0) then
+    exit;
+
   AShellList := TShellListView(Sender);
   if (AShellList.ViewStyle <> vsReport) then
     exit;
@@ -3080,7 +3085,8 @@ begin
     exit;
 
   // The Item.Caption and Item.ImageIndex (for small icons) should always be set
-  Item.Caption := Afolder.DisplayName;
+  if (irText in Request) then
+    Item.Caption := Afolder.DisplayName;
   if (irImage in Request) then
     Item.ImageIndex := Afolder.ImageIndex(AShellList.ViewStyle = vsIcon);
 
