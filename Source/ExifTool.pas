@@ -48,11 +48,10 @@ function ExecCMD(xCmd, WorkDir: AnsiString): boolean; overload;
 
 implementation
 
-uses Main, Windows, Forms, SysUtils, ExifToolsGUI_Utils, System.SyncObjs;
+uses Main, MainDef, Windows, Forms, SysUtils, ExifToolsGUI_Utils, System.SyncObjs;
 
 const
   szPipeBuffer = 65535;
-  ETTimeOut = 5000; // 5 Seconds.
 
 var
   ETprocessInfo: TProcessInformation;
@@ -88,7 +87,7 @@ var
   PWorkDir: PChar;
   ETcmd: WideString;
 begin
-  ETcmd := 'exiftool -stay_open True -@ -';
+  ETcmd := GUIsettings.ETOverrideDir + 'exiftool -stay_open True -@ -';
   if ETrunning then
     ET_OpenExit; // -changing WorkDir OnTheFly requires Exit first
   FillChar(ETprocessInfo, SizeOf(TProcessInformation), #0);
@@ -164,8 +163,7 @@ begin
 
   if ETrunning and (Length(ETcmd) > 1) then
   begin
-    //TODO Create parameter
-    Wr := ETEvent.WaitFor(ETTimeOut);
+    Wr := ETEvent.WaitFor(GUIsettings.ETTimeOut);
     if (Wr <> wrSignaled) then
     begin
       ETEvent.SetEvent;
@@ -368,7 +366,7 @@ begin
     else
       PWorkDir := PAnsiChar(WorkDir);
 
-    ETprm := 'exiftool -v0 ';
+    ETprm := GUIsettings.ETOverrideDir + 'exiftool -v0 ';
     with ET_Options do
     begin
       if ETLangDef <> '' then
@@ -550,8 +548,7 @@ begin
 
       CloseHandle(PipeErrRead);
       // ----------------------------------------------
-      //TODO Create parameter
-      WaitForSingleObject(ProcessInfo.hProcess, ETTimeOut); // msec=5sec /or INFINITE
+      WaitForSingleObject(ProcessInfo.hProcess, GUIsettings.ETTimeOut); // msec=5sec /or INFINITE
       CloseHandle(ProcessInfo.hThread);
       CloseHandle(ProcessInfo.hProcess);
     end;

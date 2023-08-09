@@ -24,6 +24,8 @@ type
     GuiStyle: string;
     ETdirDefCmd: smallint;
     InitialDir: AnsiString;
+    ETOverrideDir: AnsiString;
+    ETTimeOut: integer;
   end;
 
   FListColUsrRec = record
@@ -264,16 +266,16 @@ begin
         DefStartupDir := ReadString(Ini_Settings, 'DefStartupDir', 'c:\');
         if DefStartupUse and ValidDir(DefStartupDir) then
           GUIsettings.InitialDir := DefStartupDir;
+        GUIsettings.ETOverrideDir := ReadString(Ini_Settings, 'ETOverrideDir', '');
+        // Note: Not configurable by user, only in INI
+        GUIsettings.ETTimeOut := ReadInteger(Ini_Settings, 'ETTimeOut', 5000);
         DefExportUse := ReadBool(Ini_Settings, 'DefExportUse', false);
         DefExportDir := ReadString(Ini_Settings, 'DefExportDir', '');
         ThumbSize := ReadInteger(Ini_Settings, 'ThumbsSize', 0);
         case ThumbSize of
-          0:
-            i := 96;
-          1:
-            i := 128;
-          2:
-            i := 160;
+          0: i := 96;
+          1: i := 128;
+          2: i := 160;
         else
           i := 96;
         end;
@@ -584,6 +586,8 @@ begin
           WriteString(Ini_Settings, 'FileFilters', Tx);
           WriteBool(Ini_Settings, 'DefStartupUse', DefStartupUse);
           WriteString(Ini_Settings, 'DefStartupDir', DefStartupDir);
+          WriteString(Ini_Settings, 'ETOverrideDir', ETOverrideDir);
+          WriteInteger(Ini_Settings, 'ETTimeOut', ETTimeOut);
           WriteBool(Ini_Settings, 'DefExportUse', DefExportUse);
           WriteString(Ini_Settings, 'DefExportDir', DefExportDir);
           WriteInteger(Ini_Settings, 'ThumbsSize', ThumbSize);

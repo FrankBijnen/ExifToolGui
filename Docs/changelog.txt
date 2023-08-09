@@ -8,3 +8,6 @@ Version:        Description             Issue
 6.0.4.0         Fix Issue #2            Add 'paste' to the context-menu of the shelllist. And solve AV's after pasting.
                 Fix Issue #11           Use INI file with V6 in the name. Maybe with the option to transfer settings from V5.
                 Fix Issue #12           About should point to exiftool.org instead of queensu.ca and to the github repo.
+6.0.5.0         Fix Issue #15           Still Access Violations changing directory in thumbnail mode.
+                Fix Issue #16           Change the location of the Ini file.
+                Fix Issue #17           Add the possibility to override the ExifTool.exe location in the Preference.
