@@ -14,6 +14,8 @@ procedure DebugMsg(const Msg: array of variant);
 // FileSystem
 function ValidDir(ADir: string): boolean;
 function ValidFile(AFolder: TShellFolder): boolean;
+function GetINIPath: string;
+function GetAppPath: string;
 function GetTempDirectory: string;
 function GetExifToolTmp: string;
 function GetHtmlTmp: string;
@@ -32,7 +34,7 @@ procedure ResizeBitmapCanvas(Bitmap: TBitmap; W, H: Integer; BackColor: TColor);
 
 implementation
 
-uses Winapi.ShellAPI, Vcl.Forms;
+uses Winapi.ShellAPI, Winapi.KnownFolders, System.IOUtils;
 
 var GlobalImgFact: IWICImagingFactory;
     TempDirectory: string;
@@ -91,6 +93,25 @@ begin
   result := SFGAO_FILESYSTEM and Flags <> 0;
 end;
 
+function GetINIPath: string;
+var NameBuffer: PChar;
+begin
+  result := '';
+  if SUCCEEDED(SHGetKnownFolderPath(FOLDERID_RoamingAppData, 0, 0, NameBuffer)) then
+  begin
+    result := IncludeTrailingPathDelimiter(StrPas(NameBuffer)) +
+              IncludeTrailingPathDelimiter(TPath.GetFileNameWithoutExtension(Application.ExeName));
+    CoTaskMemFree(NameBuffer);
+    if not DirectoryExists(result) then
+      CreateDir(result);
+  end;
+end;
+
+function GetAppPath: string;
+begin
+  result := IncludeTrailingPathDelimiter(ExtractFileDir(Application.ExeName));
+end;
+
 function GetTempDirectory: string;
 begin
   result := TempDirectory;
@@ -147,7 +168,6 @@ begin
     raise Exception.Create(Format('Remove directory failed code %u', [ShResult]));
   result := (ShResult = 0);
 end;
-
 
 // String
 function NextField(var AString: string; const ADelimiter: string): string;

@@ -2031,8 +2031,7 @@ begin
 end;
 
 procedure TFMain.MWorkspaceSaveClick(Sender: TObject);
-var
-  DoSave, IsOK: boolean;
+var DoSave, IsOK: boolean;
 begin
   with SaveFileDlg do
   begin
@@ -2046,7 +2045,7 @@ begin
       InitialDir := ExtractFileDir(FileName);
       if DoSave then
       begin
-        IsOK := (ExtractFileName(FileName) <> 'ExifToolGUIv5.ini');
+        IsOK := (ExtractFileName(FileName) <> ExtractFileName(GetIniFilePath(false)));
         if not IsOK then
           ShowMessage('Use another name for Workspace definition file!');
       end;
@@ -2819,7 +2818,7 @@ begin
 
   I := CBoxDetails.Items.Count - 1;
   SpeedBtnColumnEdit.Enabled := (CBoxDetails.ItemIndex = I);
-  WrkIniDir := ExtractFileDir(Application.ExeName);
+  WrkIniDir := GetAppPath;
   if GUIsettings.UseExitDetails then
     CBoxDetailsChange(Sender);
 
@@ -2874,10 +2873,9 @@ begin
 end;
 
 procedure TFMain.ShellListAddItem(Sender: TObject; AFolder: TShellFolder; var CanAdd: boolean);
-var
-  FolderName: string;
-  FilterItem, Filter: string;
-  FilterMatches: boolean;
+var FolderName: string;
+    FilterItem, Filter: string;
+    FilterMatches: boolean;
 begin
   CanAdd := TShellListView(Sender).Enabled and
             not FrmStyle.Showing and
@@ -2904,8 +2902,7 @@ begin
 end;
 
 procedure TFMain.ShellListClick(Sender: TObject);
-var
-  I: smallint;
+var I: smallint;
 begin
   I := ShellList.SelCount;
   MExportImport.Enabled := (I > 0);
