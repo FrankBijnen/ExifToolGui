@@ -14,4 +14,19 @@ This updated source addresses the following issues.
 
  See also the ReadMe files for Developers and Users in the Docs directory.
 
+# Useful links
+
+Obtaining Exiftool.
+
+1) The original version by Phil Harvey. https://exiftool.org/exiftool-12.64.zip
+   Unzip the exe file in the same directory as 'ExifToolGui.exe', and rename it to 'exiftool.exe'. (Without the quotes)
+
+2) An installer provided by Oliver Betz. https://oliverbetz.de/pages/Artikel/ExifTool-for-Windows
+
+Documentation.
+
+ Online documentation is available at https://exiftool.org/gui/
+ It is written with V5 in mind, but most of it still applies. 
+
+
  Frank Bijnen
