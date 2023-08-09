@@ -16,9 +16,10 @@ uses
 // The ShellListview and TThumbTask should probably be in a separate unit. But this was easier.
 // Extend ShellListview, keeping the same Type
 
-const CM_ThumbEnd = WM_USER + 1;
-const CM_ThumbError = WM_USER + 2;
-const CM_ThumbRefresh = WM_USER + 3;
+const CM_ThumbStart = WM_USER + 1;
+const CM_ThumbEnd = WM_USER + 2;
+const CM_ThumbError = WM_USER + 3;
+const CM_ThumbRefresh = WM_USER + 4;
 
 type
   THeaderSortState = (hssNone, hssAscending, hssDescending);
@@ -60,6 +61,7 @@ type
     FOnOwnerDataFetchEvent: TOwnerDataFetchEvent;
     procedure SetColumnSorted(AValue: boolean);
     procedure SetThumbNailSize(AValue: integer);
+    procedure CMThumbStart(var Message: TMessage); message CM_ThumbStart;
     procedure CMThumbEnd(var Message: TMessage); message CM_ThumbEnd;
     procedure CMThumbError(var Message: TMessage); message CM_ThumbError;
     procedure CMThumbRefresh(var Message: TMessage); message CM_ThumbRefresh;
@@ -664,6 +666,12 @@ begin
   FThreadPool.SetMaxWorkerThreads(MaxThreads);
 end;
 
+procedure TShellListView.CMThumbStart(var Message: TMessage);
+begin
+  if (Assigned(FOnNotifyGenerateEvent)) then
+    FOnNotifyGenerateEvent(Self, Items[Message.WParam], TThumbGenStatus.Started, Items.Count, FGenerating);
+end;
+
 procedure TShellListView.CMThumbEnd(var Message: TMessage);
 begin
   RemoveThumbTask(Message.WParam);
@@ -805,6 +813,9 @@ function TShellListView.OwnerDataFetch(Item: TListItem; Request: TItemRequest): 
     // Actually start the task.  It will create a HBITMAP, and send a message to the ShellListView window.
     // Updating the imagelist must be done in the main thread.
     TThumbTask(FThumbTasks[TaskId]).Start;
+
+    // Send a message that generating begins.
+    PostMessage(Self.Handle, CM_ThumbStart, 0, 0);
   end;
 
 begin
@@ -854,11 +865,13 @@ begin
   FGeneratingLock.Acquire;
   try
     for ATask in FThumbTasks do
-      ATask.Cancel;
-    FThumbTasks.Clear;
-    FGenerating := 0;
+      if Assigned(ATask) and                // Checks to avoid AV's generating thumbs
+         Assigned(ATask.FControlFlag) then
+        ATask.Cancel;
   finally
     FGeneratingLock.Release;
+    FThumbTasks.Clear;
+    FGenerating := 0;
   end;
 end;
 
@@ -2996,13 +3009,11 @@ begin
   TShellListView(Sender).Invalidate; // Creates new window handle!
 end;
 
-procedure TFMain.ShellListOwnerDataFetch(Sender: TObject; Item: TListItem;
-  Request: TItemRequest; Afolder: TShellFolder);
-var
-  AShellList: TShellListView;
-  ETcmd, Tx, ETouts, ETerrs, ADetail: String;
-  Indx: integer;
-  Details: TStrings;
+procedure TFMain.ShellListOwnerDataFetch(Sender: TObject; Item: TListItem; Request: TItemRequest; Afolder: TShellFolder);
+var AShellList: TShellListView;
+    ETcmd, Tx, ETouts, ETerrs, ADetail: String;
+    Indx: integer;
+    Details: TStrings;
 begin
   if (Item.Index < 0) then
     exit;
@@ -3112,7 +3123,6 @@ begin // event is executed for each deleted file -so make it fast!
   MetadataList.Strings.Clear;
 end;
 
-//TODO Copy works in contextmenu, but no paste
 procedure TFMain.ShellListKeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
 begin
   if (Key = VK_UP) or (Key = VK_DOWN) then // Up-Down arrow
@@ -3594,7 +3604,7 @@ procedure TFMain.ShellistThumbGenerate(Sender: TObject;
                                        Status: TThumbGenStatus;
                                        Total, Remaining: integer);
 begin
-  if (Remaining <> 0) then
+  if (Remaining > 0) then
     StatusBar.Panels[1].Text := 'Remaining Thumbnails to generate: ' + IntToStr(Remaining)
   else
     StatusBar.Panels[1].Text := '';
