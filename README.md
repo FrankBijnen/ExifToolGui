@@ -19,7 +19,8 @@ This updated source addresses the following issues.
 Obtaining Exiftool.
 
 1) The original version by Phil Harvey. https://exiftool.org/exiftool-12.64.zip
-   Unzip the exe file in the same directory as 'ExifToolGui.exe', and rename it to 'exiftool.exe'. (Without the quotes)
+   Unzip the exe file in a directory that Windows searches, and rename it to 'exiftool.exe'. (Without the quotes)
+   Can be the directory where 'ExifToolGui.exe' is located.
 
 2) An installer provided by Oliver Betz. https://oliverbetz.de/pages/Artikel/ExifTool-for-Windows
 
