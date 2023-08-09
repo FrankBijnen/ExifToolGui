@@ -93,6 +93,7 @@ var
   GpsXmpDir: string = '';
   WrkIniDir: string = '';
 
+function GetIniFilePath(AllowPrevVer: boolean): string;
 procedure ReadGUILog;
 procedure ReadGUIini;
 procedure SaveGUIini;
@@ -122,16 +123,33 @@ var
   TmpItems: TStrings;
   lg_StartFolder: string;
 
-function GetIniFile(AllowPrevVer: boolean): string;
-var CurVer, PrevVer: string;
+// This function returns the name of the INI file.
+// If it doesn't exist, but a previous version exists it returns that name.
+function GetIniFilePath(AllowPrevVer: boolean): string;
+var CurVer, PrevVer, PrevPath: string;
 begin
-  CurVer := ChangeFileExt(Application.ExeName, IniVersion + '.ini');
-  PrevVer := ChangeFileExt(Application.ExeName, PrevIniVersion + '.ini');
-  result := CurVer;
-  if AllowPrevVer and
-     (not FileExists(CurVer)) and
-     (FileExists(PrevVer)) then
-    result := PrevVer;
+// Default is ExifToolGuiV6.ini in Profile %AppData%\ExifToolGui
+  CurVer := ChangeFileExt(ExtractFileName(Application.ExeName), IniVersion + '.ini');
+  result := GetINIPath + CurVer;
+  if (FileExists(result)) then
+    exit;
+
+// Allow import of previous version. Used when reading ini file
+  if not AllowPrevVer then
+    exit;
+
+  PrevVer := ChangeFileExt(ExtractFileName(Application.ExeName), PrevIniVersion + '.ini');
+// Maybe in AppDir V6 ?
+  PrevPath := GetAppPath + CurVer;
+  if (FileExists(PrevPath)) then
+    exit(PrevPath);
+
+// Maybe in AppDir V5 ?
+  PrevPath := GetAppPath + PrevVer;
+  if (FileExists(PrevPath)) then
+    exit(PrevPath);
+
+// If we get here, the default result is returned.
 end;
 
 constructor FListColDefRec.Create(AListColUsrRec: FListColUsrRec);
@@ -169,7 +187,7 @@ var
 
 begin
   TmpItems := TStringList.Create;
-  GUIini := TIniFile.Create(GetIniFile(True));
+  GUIini := TIniFile.Create(GetIniFilePath(True));
   try
     with GUIini, FMain do
     begin
@@ -468,7 +486,7 @@ end;
 
 procedure ReadGUILog;
 begin
-  GUIini := TIniFile.Create(GetIniFile(false));
+  GUIini := TIniFile.Create(GetIniFilePath(false));
   try
     with GUIini, FLogWin do
       begin
@@ -488,7 +506,7 @@ var I, N: smallint;
 begin
   // ^- EraseSection used instead
   try
-    GUIini := TIniFile.Create(GetIniFile(false));
+    GUIini := TIniFile.Create(GetIniFilePath(false));
     try
       with GUIini, FMain do
       begin
