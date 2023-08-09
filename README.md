@@ -1,7 +1,8 @@
 # ExifToolGui
 A GUI for ExifTool
 
-Current version: V6.0.5 updated August 9, 2023
+Current version: V6.0.5 updated August 9, 2023<br>
+Note: The Executable is no longer uploaded to Win32/Release. You have to get it from 'Releases' (At the right)
 
 This is an updated version of the ExifToolGui program created by Bogdan Hrastnik. Many thanks go out to him.
 
