@@ -5,7 +5,7 @@ interface
 
 uses Winapi.ShlObj, Winapi.ActiveX, Winapi.Wincodec, Winapi.Windows,
   System.Classes, System.SysUtils, System.Variants, System.StrUtils, System.Math,
-  Vcl.Shell.ShellCtrls, Vcl.Graphics;
+  Vcl.Forms, Vcl.Dialogs, Vcl.Shell.ShellCtrls, Vcl.Graphics;
 
 // Debug
 procedure BreakPoint;
@@ -31,6 +31,10 @@ function IsJpeg(Filename: string): boolean;
 function WicPreview(AImg: string; Rotate, MaxW, MaxH: cardinal): IWICBitmapSource;
 function GetBitmapFromWic(const FWicBitmap: IWICBitmapSource): TBitmap;
 procedure ResizeBitmapCanvas(Bitmap: TBitmap; W, H: Integer; BackColor: TColor);
+
+// Message dialog that allows for caption and doesn't wrap lines at spaces.
+function MessageDlgEx(const AMsg, ACaption: string;
+                      ADlgType: TMsgDlgType; AButtons: TMsgDlgButtons; AParent: TForm): integer;
 
 implementation
 
@@ -365,6 +369,23 @@ begin
     Bitmap.Assign(Bmp);
   finally
     Bmp.Free;
+  end;
+end;
+
+function MessageDlgEx(const AMsg, ACaption: string;
+                      ADlgType: TMsgDlgType; AButtons: TMsgDlgButtons; AParent: TForm): integer;
+var MsgFrm: TForm;
+begin
+  MsgFrm := CreateMessageDialog(AMsg, ADlgType, AButtons);
+  try
+    MsgFrm.Caption := ACaption;
+    MsgFrm.Position := poDefaultSizeOnly;
+    MsgFrm.FormStyle := fsStayOnTop;
+    MsgFrm.Left := AParent.Left + (AParent.Width - MsgFrm.Width) div 2;
+    MsgFrm.Top := AParent.Top + (AParent.Height - MsgFrm.Height) div 2;
+    Result := MsgFrm.ShowModal;
+  finally
+    MsgFrm.Free
   end;
 end;
 

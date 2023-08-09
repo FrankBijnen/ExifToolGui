@@ -23,7 +23,7 @@ object FPreferences: TFPreferences
     DoubleBuffered = True
     ParentDoubleBuffered = False
     TabOrder = 0
-    ExplicitHeight = 384
+    ExplicitHeight = 390
     object AdvTabSheet1: TTabSheet
       Caption = 'General'
       object Label1: TLabel
@@ -49,7 +49,7 @@ object FPreferences: TFPreferences
         Caption = '-in preview, let GUI temporary rotate images'
         TabOrder = 1
       end
-      object RadioGroup1: TRadioGroup
+      object RgStartupFolder: TRadioGroup
         Left = 16
         Top = 102
         Width = 385
@@ -62,23 +62,23 @@ object FPreferences: TFPreferences
         TabOrder = 2
         OnClick = RadioGroupClick
       end
-      object Edit1: TEdit
+      object EdStartupFolder: TEdit
         Left = 87
         Top = 145
         Width = 264
         Height = 21
         TabOrder = 3
       end
-      object Button1: TButton
+      object BtnStartupFolder: TButton
         Left = 357
         Top = 145
         Width = 28
         Height = 22
         Caption = '...'
         TabOrder = 4
-        OnClick = Button1Click
+        OnClick = BtnBrowseFolder
       end
-      object RadioGroup2: TRadioGroup
+      object RgExportMetaFolder: TRadioGroup
         Left = 16
         Top = 193
         Width = 385
@@ -91,21 +91,21 @@ object FPreferences: TFPreferences
         TabOrder = 5
         OnClick = RadioGroupClick
       end
-      object Edit2: TEdit
+      object EdExportMetaFolder: TEdit
         Left = 87
         Top = 236
         Width = 264
         Height = 21
         TabOrder = 6
       end
-      object Button2: TButton
+      object BtnExportMetaFolder: TButton
         Left = 357
         Top = 236
         Width = 28
         Height = 22
         Caption = '...'
         TabOrder = 7
-        OnClick = Button1Click
+        OnClick = BtnBrowseFolder
       end
       object LabeledEdit1: TLabeledEdit
         Left = 16
@@ -155,6 +155,19 @@ object FPreferences: TFPreferences
     end
     object AdvTabSheet2: TTabSheet
       Caption = 'Other'
+      object RgETOverride: TRadioGroup
+        Left = 16
+        Top = 62
+        Width = 385
+        Height = 73
+        Caption = 'ExifTool.exe location'
+        ItemIndex = 0
+        Items.Strings = (
+          '-Default search (See Windows documentation on CreateProcess)'
+          '-Specify')
+        TabOrder = 1
+        OnClick = RadioGroupClick
+      end
       object CheckBox4: TCheckBox
         Left = 16
         Top = 16
@@ -162,6 +175,22 @@ object FPreferences: TFPreferences
         Height = 17
         Caption = '-Workspace: move focus to next tag/line after value is entered'
         TabOrder = 0
+      end
+      object EdETOverride: TEdit
+        Left = 87
+        Top = 105
+        Width = 264
+        Height = 21
+        TabOrder = 2
+      end
+      object BtnETOverride: TButton
+        Left = 357
+        Top = 105
+        Width = 28
+        Height = 22
+        Caption = '...'
+        TabOrder = 3
+        OnClick = BtnBrowseFolder
       end
     end
   end

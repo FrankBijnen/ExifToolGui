@@ -367,6 +367,7 @@ type
     procedure ImageDrop(var Msg: TWMDROPFILES); message WM_DROPFILES;
     procedure ShowMetadata; // (const LogErr:boolean=true);
     procedure ShowPreview;
+    procedure EnableMenus(Enable: boolean);
     procedure WMEndSession(var Msg: TWMEndSession); message WM_ENDSESSION;
     function TranslateTagName(xMeta, xName: string): string;
     procedure ShellistThumbError(Sender: TObject; Item: TListItem; E: Exception);
@@ -1826,8 +1827,7 @@ var
   b: Word;
   ETcmd, ETout, ETerr: string;
 begin
-  b := MessageDlg('Create JPG files in subfolder?', mtConfirmation,
-    mbYesNoCancel, 0);
+  b := MessageDlg('Create JPG files in subfolder?', mtConfirmation, mbYesNoCancel, 0);
   if b <> mrCancel then
   begin
     ETcmd := '-w' + CRLF;
@@ -1955,6 +1955,7 @@ procedure TFMain.MPreferencesClick(Sender: TObject);
 begin
   if FPreferences.ShowModal = mrOK then
   begin
+    EnableMenus(ET_StayOpen(ShellTree.Path)); // Recheck Exiftool.exe.
     ShowMetadata;
     ShellList.Refresh;
   end;
@@ -3130,31 +3131,47 @@ begin
     ShellListClick(Sender);
 end;
 
-procedure TFMain.ShellTreeChange(Sender: TObject; Node: TTreeNode);
-var I, N: smallint;
-    NewPath: string;
+procedure TFMain.EnableMenus(Enable: boolean);
+var I: smallint;
 begin
+  AdvPageMetadata.Enabled := Enable;
+  AdvPanelETdirect.Enabled := Enable;
+  AdvPanelFileTop.Enabled := Enable;
+  MOptions.Enabled := Enable;
+  MExportImport.Enabled := Enable;
+  MModify.Enabled := Enable;
+  MVarious.Enabled := Enable;
+  for I := 0 to MProgram.Count-1 do
+  begin // dont disable About, Exit or Preferences menu
+    if (MProgram.Items[I].Tag <> 0) then
+      continue;
+    MProgram.Items[I].Enabled := Enable;
+  end;
+
+  if not Enable then
+    MessageDlgEx('ERROR: ExifTool not found!' + #10 + #10 + #10 +
+                   'To resolve this you can:' + #10 +
+                   '- Install Exiftool in: ' + GetAppPath + #10 +
+                   '- Install Exiftool in a directory in the Windows search sequence.' + #10 +
+                   #9 + 'For example in a directory specified in the PATH environment variable.' + #10 +
+                   #9 + 'For more info see the documentation on the CreateProcess function.' + #10 +
+                   '- Locate Exiftool.exe and specify the location in Preferences/Other.' + #10 + #10 +
+                   'For info on obtaining Exiftool, follow the link in the About box to Github.' + #10 + #10 +
+                   'Metadata operations disabled.',
+                   'ExifToolGUI',
+                 TMsgDlgType.mtError, [mbOK], Self);
+end;
+
+procedure TFMain.ShellTreeChange(Sender: TObject; Node: TTreeNode);
+var NewPath: string;
+begin
+  if not ShellList.Enabled then // We will get back here
+    exit;
   NewPath := TShellFolder(Node.Data).PathName;
   if not ValidDir(NewPath) then
     exit;
 
-  if not ET_StayOpen(NewPath) then
-  begin
-    Application.MessageBox('ERROR: ExifTool not found!' + #10#13 +
-      'Metadata operations disabled.', 'ExifToolGUI', MB_OK or MB_ICONSTOP);
-    AdvPageMetadata.Enabled := false;
-    AdvPanelETdirect.Enabled := false;
-    AdvPanelFileTop.Enabled := false;
-    MOptions.Enabled := false;
-    MExportImport.Enabled := false;
-    MModify.Enabled := false;
-    MVarious.Enabled := false;
-    N := MProgram.Count;
-    for I := 1 to N - 2 do
-    begin // dont disable Exit menu
-      MProgram.Items[I].Enabled := false;
-    end;
-  end;
+  EnableMenus(ET_StayOpen(NewPath));
   ShellTreeClick(Sender);
 end;
 

@@ -673,7 +673,7 @@ object FMain: TFMain
         object EditETdirect: TLabeledEdit
           Left = 2
           Top = 50
-          Width = 284
+          Width = 280
           Height = 23
           Anchors = [akLeft, akTop, akRight]
           AutoSelect = False
@@ -690,7 +690,7 @@ object FMain: TFMain
           Text = ''
           OnChange = EditETdirectChange
           OnKeyDown = EditETdirectKeyDown
-          ExplicitWidth = 280
+          ExplicitWidth = 276
         end
         object CBoxETdirect: TComboBox
           Left = 2
@@ -869,10 +869,12 @@ object FMain: TFMain
     object MProgram: TMenuItem
       Caption = 'Program'
       object MAbout: TMenuItem
+        Tag = 1
         Caption = 'About...'
         OnClick = MAboutClick
       end
       object MPreferences: TMenuItem
+        Tag = 1
         Caption = 'Preferences...'
         OnClick = MPreferencesClick
       end
@@ -900,6 +902,7 @@ object FMain: TFMain
         Caption = '-'
       end
       object MExit: TMenuItem
+        Tag = 1
         Caption = 'Exit'
         OnClick = MExitClick
       end

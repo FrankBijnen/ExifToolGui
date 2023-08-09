@@ -1,4 +1,5 @@
 unit Preferences;
+{$WARN SYMBOL_PLATFORM OFF}
 
 interface
 
@@ -17,21 +18,24 @@ type
     BtnCancel: TButton;
     BtnSave: TButton;
     CheckBox1: TCheckBox;
-    RadioGroup1: TRadioGroup;
-    Edit1: TEdit;
-    Button1: TButton;
-    RadioGroup2: TRadioGroup;
-    Edit2: TEdit;
-    Button2: TButton;
+    RgStartupFolder: TRadioGroup;
+    EdStartupFolder: TEdit;
+    BtnStartupFolder: TButton;
+    RgExportMetaFolder: TRadioGroup;
+    EdExportMetaFolder: TEdit;
+    BtnExportMetaFolder: TButton;
     LabeledEdit1: TLabeledEdit;
     RadioGroup3: TRadioGroup;
     CheckBox2: TCheckBox;
     CheckBox3: TCheckBox;
     AdvTabSheet2: TTabSheet;
     CheckBox4: TCheckBox;
+    RgETOverride: TRadioGroup;
+    EdETOverride: TEdit;
+    BtnETOverride: TButton;
     procedure FormShow(Sender: TObject);
     procedure BtnSaveClick(Sender: TObject);
-    procedure Button1Click(Sender: TObject);
+    procedure BtnBrowseFolder(Sender: TObject);
     procedure RadioGroupClick(Sender: TObject);
   private
     { Private declarations }
@@ -70,10 +74,13 @@ begin
   with GUIsettings do
   begin
     AutoRotatePreview := CheckBox1.Checked;
-    DefStartupDir := Edit1.Text;
-    DefStartupUse := (RadioGroup1.ItemIndex = 1);
-    DefExportDir := Edit2.Text;
-    DefExportUse := (RadioGroup2.ItemIndex = 1);
+    DefStartupDir := EdStartupFolder.Text;
+    DefStartupUse := (RgStartupFolder.ItemIndex = 1);
+    DefExportDir := EdExportMetaFolder.Text;
+    DefExportUse := (RgExportMetaFolder.ItemIndex = 1);
+    ETOverrideDir := '';
+    if (RgETOverride.ItemIndex = 1) then
+      ETOverrideDir := IncludeTrailingBackslash(EdETOverride.Text);
   end;
   with LabeledEdit1 do
   begin
@@ -83,12 +90,9 @@ begin
   end;
 
   case RadioGroup3.ItemIndex of
-    0:
-      i := 96;
-    1:
-      i := 128;
-    2:
-      i := 160;
+    0: i := 96;
+    1: i := 128;
+    2: i := 160;
   end;
   FMain.ShellList.ThumbNailSize := i;
   GUIsettings.ThumbSize := RadioGroup3.ItemIndex;
@@ -97,21 +101,26 @@ begin
   GUIsettings.AutoIncLine := CheckBox4.Checked;
 end;
 
-procedure TFPreferences.Button1Click(Sender: TObject);
-var
-  xDir: string;
+procedure TFPreferences.BtnBrowseFolder(Sender: TObject);
+var xDir: string;
 begin
-  if Sender = Button1 then
+  if Sender = BtnStartupFolder then
   begin
     xDir := BrowseFolderDlg('Select default startup folder', 0);
     if xDir <> '' then
-      Edit1.Text := xDir;
+      EdStartupFolder.Text := xDir;
   end;
-  if Sender = Button2 then
+  if Sender = BtnExportMetaFolder then
   begin
     xDir := BrowseFolderDlg('Select default export folder', 0);
     if xDir <> '' then
-      Edit2.Text := xDir;
+      EdExportMetaFolder.Text := xDir;
+  end;
+  if Sender = BtnETOverride then
+  begin
+    xDir := BrowseFolderDlg('Select ExifTool folder to use', 0);
+    if xDir <> '' then
+      EdETOverride.Text := xDir;
   end;
 end;
 
@@ -158,23 +167,32 @@ begin
     with GUIsettings do
     begin
       CheckBox1.Checked := AutoRotatePreview;
-      Edit1.Text := DefStartupDir;
-      Edit2.Text := DefExportDir;
-      with RadioGroup1 do
+      EdStartupFolder.Text := DefStartupDir;
+      EdExportMetaFolder.Text := DefExportDir;
+      with RgStartupFolder do
       begin
         if DefStartupUse then
           ItemIndex := 1
         else
           ItemIndex := 0;
-        RadioGroupClick(RadioGroup1);
+        RadioGroupClick(RgStartupFolder);
       end;
-      with RadioGroup2 do
+      with RgExportMetaFolder do
       begin
         if DefExportUse then
           ItemIndex := 1
         else
           ItemIndex := 0;
-        RadioGroupClick(RadioGroup2);
+        RadioGroupClick(RgExportMetaFolder);
+      end;
+      with RgETOverride do
+      begin
+        EdETOverride.Text := ETOverrideDir;
+        if (Trim(ETOverrideDir) <> '') then
+          ItemIndex := 1
+        else
+          ItemIndex := 0;
+        RadioGroupClick(RgETOverride);
       end;
     end;
     tx := ET_Options.ETSeparator;
@@ -193,10 +211,21 @@ end;
 
 procedure TFPreferences.RadioGroupClick(Sender: TObject);
 begin
-  if Sender = RadioGroup1 then
-    Edit1.Enabled := RadioGroup1.ItemIndex = 1;
-  if Sender = RadioGroup2 then
-    Edit2.Enabled := RadioGroup2.ItemIndex = 1;
+  if Sender = RgStartupFolder then
+  begin
+    EdStartupFolder.Enabled := RgStartupFolder.ItemIndex = 1;
+    BtnStartupFolder.Enabled := EdStartupFolder.Enabled;
+  end;
+  if Sender = RgExportMetaFolder then
+  begin
+    EdExportMetaFolder.Enabled := RgExportMetaFolder.ItemIndex = 1;
+    BtnExportMetaFolder.Enabled := EdExportMetaFolder.Enabled;
+  end;
+  if Sender = RgETOverride then
+  begin
+    EdETOverride.Enabled := RgETOverride.ItemIndex = 1;
+    BtnETOverride.Enabled := EdETOverride.Enabled;
+  end;
 end;
 
 end.
