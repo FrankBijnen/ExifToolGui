@@ -492,46 +492,51 @@ var Flags: TSIIGBF;
     Hr: HRESULT;
     Tries: integer;
 begin
+  CoInitialize(nil);
   try
-    Hr := S_FALSE;
-    Flags := SIIGBF_THUMBNAILONLY;
-    Tries := 3; // Try a few times.
-    while (Tries > 0) and
-          (Hr <> S_OK) and
-          (GetStatus <> TTaskStatus.Canceled) do
-    begin
-      dec(Tries);
-      Hr := GetThumbCache(FPathName, HBmp, Flags, FListView.FThumbNails.Width, FListView.FThumbNails.Height);
-      if (Hr <> S_OK) then
+    try
+      Hr := S_FALSE;
+      Flags := SIIGBF_THUMBNAILONLY;
+      Tries := 3; // Try a few times.
+      while (Tries > 0) and
+            (Hr <> S_OK) and
+            (GetStatus <> TTaskStatus.Canceled) do
       begin
-        DeleteObject(HBmp); // Not sure if this is needed
-        Sleep(50);
+        dec(Tries);
+        Hr := GetThumbCache(FPathName, HBmp, Flags, FListView.FThumbNails.Width, FListView.FThumbNails.Height);
+        if (Hr <> S_OK) then
+        begin
+          DeleteObject(HBmp); // Not sure if this is needed
+          Sleep(50);
+        end;
+      end;
+
+      // The task is canceled, or the current path has changed.
+      // Dont send any messages, but delete bitmap. If the handle is invalid, doesn't matter
+      if (GetStatus = TTaskStatus.Canceled) or
+         (FPitemIDList <> FListView.RootFolder.AbsoluteID) then
+      begin
+        DeleteObject(HBmp);
+        exit;
+      end;
+
+      if (Hr = S_OK) then
+        // We must update the imagelist in the main thread, send a message
+        PostMessage(FListView.Handle, CM_ThumbRefresh, FItemIndex, HBmp);
+
+      // Sendmessage that task has finished.
+      // We must wait for this message, to be sure that the Task object does not get freed to soon.
+      SendMessage(FListView.Handle, CM_ThumbEnd, 0, 0);
+
+    except
+      on E: Exception do
+      begin
+        // Sendmessage that task is in error
+        SendMessage(FListView.Handle, CM_ThumbError, FItemIndex, LPARAM(E));
       end;
     end;
-
-    // The task is canceled, or the current path has changed.
-    // Dont send any messages, but delete bitmap. If the handle is invalid, doesn't matter
-    if (GetStatus = TTaskStatus.Canceled) or
-       (FPitemIDList <> FListView.RootFolder.AbsoluteID) then
-    begin
-      DeleteObject(HBmp);
-      exit;
-    end;
-
-    if (Hr = S_OK) then
-      // We must update the imagelist in the main thread, send a message
-      PostMessage(FListView.Handle, CM_ThumbRefresh, FItemIndex, HBmp);
-
-    // Sendmessage that task has finished.
-    // We must wait for this message, to be sure that the Task object does not get freed to soon.
-    SendMessage(FListView.Handle, CM_ThumbEnd, 0, 0);
-
-  except
-    on E: Exception do
-    begin
-      // Sendmessage that task is in error
-      SendMessage(FListView.Handle, CM_ThumbError, FItemIndex, LPARAM(E));
-    end;
+  finally
+    CoUninitialize;
   end;
 end;
 
