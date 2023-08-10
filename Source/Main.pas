@@ -487,11 +487,10 @@ begin
 end;
 
 procedure TThumbTask.DoExecute;
-var
-  Flags: TSIIGBF;
-  HBmp: HBITMAP;
-  Hr: HRESULT;
-  Tries: integer;
+var Flags: TSIIGBF;
+    HBmp: HBITMAP;
+    Hr: HRESULT;
+    Tries: integer;
 begin
   try
     Hr := S_FALSE;
@@ -727,15 +726,17 @@ begin
       ItemIndx := ANitem.Index;
 
       Hr := GetThumbCache(Folders[ItemIndx].PathName, HBmp,
-        SIIGBF_THUMBNAILONLY or SIIGBF_INCACHEONLY, FThumbNails.Width,
-        FThumbNails.Height);
+                          SIIGBF_THUMBNAILONLY or SIIGBF_INCACHEONLY,
+                          FThumbNails.Width, FThumbNails.Height);
       if (Hr = S_OK) then
         Add2ThumbNails(HBmp, ItemIndx, false)
       else
       begin
         // No thumbnail in cache.
         // Show the Icon. That is reasonably fast.
-        Hr := GetThumbCache(Folders[ItemIndx].PathName, HBmp, SIIGBF_ICONONLY, FThumbNails.Width, FThumbNails.Height);
+        Hr := GetThumbCache(Folders[ItemIndx].PathName, HBmp,
+                            SIIGBF_ICONONLY,
+                            FThumbNails.Width, FThumbNails.Height);
         if (Hr = S_OK) then
           Add2ThumbNails(HBmp, ItemIndx, true);
       end;
@@ -982,10 +983,8 @@ begin
   try
     ABitMap.TransparentColor := FThumbNails.BkColor;
     ABitMap.Handle := ABmp;
-    ResizeBitmapCanvas(ABitMap, FThumbNails.Width, FThumbNails.Height,
-      FThumbNails.BkColor);
-    Items[ANitemIndex].ImageIndex := FThumbNails.AddMasked(ABitMap,
-      FThumbNails.BkColor);
+    ResizeBitmapCanvas(ABitMap, FThumbNails.Width, FThumbNails.Height, FThumbNails.BkColor);
+    Items[ANitemIndex].ImageIndex := FThumbNails.AddMasked(ABitMap, FThumbNails.BkColor);
     if (NeedsGenerating) then
       FThumbNailCache[ANitemIndex] := (Items[ANitemIndex].ImageIndex + 1) * -1
     else

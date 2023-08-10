@@ -4,8 +4,8 @@ unit ExifToolsGUI_Utils;
 interface
 
 uses Winapi.ShlObj, Winapi.ActiveX, Winapi.Wincodec, Winapi.Windows,
-  System.Classes, System.SysUtils, System.Variants, System.StrUtils, System.Math,
-  Vcl.Forms, Vcl.Dialogs, Vcl.Shell.ShellCtrls, Vcl.Graphics;
+     System.Classes, System.SysUtils, System.Variants, System.StrUtils, System.Math,
+     Vcl.Forms, Vcl.Dialogs, Vcl.Shell.ShellCtrls, Vcl.Graphics;
 
 // Debug
 procedure BreakPoint;
@@ -74,11 +74,10 @@ end;
 
 // Directories
 function ValidDir(ADir: string): boolean;
-var
-  AShell: IShellFolder;
-  P: PWideChar;
-  Flags, NumChars: LongWord;
-  NewPIDL: PItemIDList;
+var AShell: IShellFolder;
+    P: PWideChar;
+    Flags, NumChars: LongWord;
+    NewPIDL: PItemIDList;
 begin
   SHGetDesktopFolder(AShell);
   P := StringToOleStr(ADir);
@@ -205,28 +204,30 @@ function GetThumbCache(AFilePath: string; var hBmp: HBITMAP; Flags: TSIIGBF;
 var FileShellItemImage: IShellItemImageFactory;
     S: TSize;
 begin
-  result := SHCreateItemFromParsingName(PChar(AFilePath), nil,
-    IShellItemImageFactory, FileShellItemImage);
+  CoInitialize(nil); // Function fails on Windows 7 when not called in main thread
+  try
+    result := SHCreateItemFromParsingName(PChar(AFilePath), nil, IShellItemImageFactory, FileShellItemImage);
 
-  if Succeeded(result) then
-  begin
-    S.cx := AMaxX;
-    S.cy := AMaxY;
-    result := FileShellItemImage.GetImage(S, Flags, hBmp);
+    if Succeeded(result) then
+    begin
+      S.cx := AMaxX;
+      S.cy := AMaxY;
+      result := FileShellItemImage.GetImage(S, Flags, hBmp);
+    end;
+  finally
+    CoUninitialize;
   end;
 end;
 
 function WicPreview(AImg: string; Rotate, MaxW, MaxH: cardinal): IWICBitmapSource;
-var
-  IwD: IWICBitmapDecoder;
-  IwdR: IWICBitmapFlipRotator;
-  IwdS: IWICBitmapScaler;
-  W, H, NewW, NewH: cardinal;
+var IwD: IWICBitmapDecoder;
+    IwdR: IWICBitmapFlipRotator;
+    IwdS: IWICBitmapScaler;
+    W, H, NewW, NewH: cardinal;
 begin
   result := nil;
   GlobalImgFact.CreateDecoderFromFilename(PWideChar(AImg),
-    GUID_VendorMicrosoftBuiltIn,
-    // Use only buitln codecs. No additional installs needed.
+    GUID_VendorMicrosoftBuiltIn, // Use only buitln codecs. No additional installs needed.
     GENERIC_READ, WICDecodeMetadataCacheOnDemand, IwD);
   if IwD = nil then
     exit;
@@ -242,7 +243,8 @@ begin
     exit;
 
   result.GetSize(W, H);
-  if (W = 0) or (H = 0) then
+  if (W = 0) or
+     (H = 0) then
     exit;
   if (H < W) then
   begin
@@ -254,8 +256,7 @@ begin
     NewH := MaxH;
     NewW := Round((MaxH * W) / H);
   end;
-  IwdS.Initialize(result, NewW, NewH,
-    WICBitmapInterpolationModeNearestNeighbor);
+  IwdS.Initialize(result, NewW, NewH, WICBitmapInterpolationModeNearestNeighbor);
   result := IwdS;
 
   if (Rotate <> 0) then
@@ -264,35 +265,30 @@ begin
     if (IwdR = nil) then
       exit;
     case Rotate of
-      90:
-        IwdR.Initialize(result, WICBitmapTransformRotate90);
-      180:
-        IwdR.Initialize(result, WICBitmapTransformRotate180);
-      270:
-        IwdR.Initialize(result, WICBitmapTransformRotate270);
+      90:  IwdR.Initialize(result, WICBitmapTransformRotate90);
+      180: IwdR.Initialize(result, WICBitmapTransformRotate180);
+      270: IwdR.Initialize(result, WICBitmapTransformRotate270);
     end;
     result := IwdR;
   end;
 end;
 
 function GetBitmapFromWic(const FWicBitmap: IWICBitmapSource): TBitmap;
-var
-  LWicBitmap: IWICBitmapSource;
-  Stride: cardinal;
-  Buffer: array of Byte;
-  BitmapInfo: TBitmapInfo;
-  FWidth, FHeight: UINT;
-  prc: WICRect;
+var LWicBitmap: IWICBitmapSource;
+    Stride: cardinal;
+    Buffer: array of Byte;
+    BitmapInfo: TBitmapInfo;
+    FWidth, FHeight: UINT;
+    Prc: WICRect;
 
-  procedure copyPixels;
+  procedure CopyPixels;
   begin
-    LWicBitmap.copyPixels(@prc, Stride, Length(Buffer), @Buffer[0]);
+    LWicBitmap.CopyPixels(@Prc, Stride, Length(Buffer), @Buffer[0]);
   end;
 
-  procedure setDibBits;
+  procedure SetDibBits;
   begin
-    SetDIBits(result.Canvas.Handle, result.Handle, 0, FHeight, @Buffer[0],
-      BitmapInfo, DIB_RGB_COLORS);
+    SetDIBits(result.Canvas.Handle, result.Handle, 0, FHeight, @Buffer[0], BitmapInfo, DIB_RGB_COLORS);
   end;
 
 begin
@@ -310,7 +306,7 @@ begin
     exit;
 
   SetLength(Buffer, Stride * FHeight);
-  with prc do
+  with Prc do
   begin
     X := 0;
     Y := 0;
@@ -320,7 +316,7 @@ begin
 
   WICConvertBitmapSource(GUID_WICPixelFormat24bppBGR, FWicBitmap, LWicBitmap);
 
-  copyPixels;
+  CopyPixels;
 
   FillChar(BitmapInfo, sizeof(BitmapInfo), 0);
   with BitmapInfo do
@@ -335,16 +331,15 @@ begin
   result.PixelFormat := pf24bit;
 
   result.SetSize(FWidth, FHeight);
-  setDibBits;
+  SetDibBits;
   SetLength(Buffer, 0);
   result.AlphaFormat := afDefined;
 end;
 
 procedure ResizeBitmapCanvas(Bitmap: TBitmap; W, H: Integer; BackColor: TColor);
-var
-  Bmp: TBitmap;
-  Source, Dest: TRect;
-  Xshift, Yshift: Integer;
+var Bmp: TBitmap;
+    Source, Dest: TRect;
+    Xshift, Yshift: Integer;
 begin
   Xshift := (Bitmap.Width - W) div 2;
   Yshift := (Bitmap.Height - H) div 2;
