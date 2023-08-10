@@ -204,18 +204,13 @@ function GetThumbCache(AFilePath: string; var hBmp: HBITMAP; Flags: TSIIGBF;
 var FileShellItemImage: IShellItemImageFactory;
     S: TSize;
 begin
-  CoInitialize(nil); // Function fails on Windows 7 when not called in main thread
-  try
-    result := SHCreateItemFromParsingName(PChar(AFilePath), nil, IShellItemImageFactory, FileShellItemImage);
+  result := SHCreateItemFromParsingName(PChar(AFilePath), nil, IShellItemImageFactory, FileShellItemImage);
 
-    if Succeeded(result) then
-    begin
-      S.cx := AMaxX;
-      S.cy := AMaxY;
-      result := FileShellItemImage.GetImage(S, Flags, hBmp);
-    end;
-  finally
-    CoUninitialize;
+  if Succeeded(result) then
+  begin
+    S.cx := AMaxX;
+    S.cy := AMaxY;
+    result := FileShellItemImage.GetImage(S, Flags, hBmp);
   end;
 end;
 
