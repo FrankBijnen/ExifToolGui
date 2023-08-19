@@ -36,7 +36,8 @@ type
     procedure DisplayHint(Sender: TObject);
   public
     { Public declarations }
-    var ETouts, ETerrs: string;
+  var
+    ETouts, ETerrs: string;
   end;
 
 var
@@ -91,8 +92,7 @@ end;
 
 procedure TFDateTimeShift.CheckBox1Click(Sender: TObject);
 begin
-  Button2.Enabled := (CheckBox1.Checked) or (CheckBox2.Checked) or
-    (CheckBox3.Checked);
+  Button2.Enabled := (CheckBox1.Checked) or (CheckBox2.Checked) or (CheckBox3.Checked);
 end;
 
 procedure TFDateTimeShift.CheckBox4Click(Sender: TObject);
@@ -125,8 +125,7 @@ begin
       Label1.Caption := 'Backup: ON';
     Application.OnHint := DisplayHint;
 
-    ETcmd := '-s3' + CRLF + '-f' + CRLF + CmdDateOriginal + CRLF + CmdDateCreate
-      + CRLF + CmdDateModify;
+    ETcmd := '-s3' + CRLF + '-f' + CRLF + CmdDateOriginal + CRLF + CmdDateCreate + CRLF + CmdDateModify;
     ET_OpenExec(ETcmd, FMain.GetFirstSelectedFile, ETResult);
     // .SelectedFiles[0]);
 

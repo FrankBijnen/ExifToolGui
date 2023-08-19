@@ -3,9 +3,9 @@ unit ExifToolsGUI_Utils;
 
 interface
 
-uses Winapi.ShlObj, Winapi.ActiveX, Winapi.Wincodec, Winapi.Windows,
-     System.Classes, System.SysUtils, System.Variants, System.StrUtils, System.Math,
-     Vcl.Forms, Vcl.Dialogs, Vcl.Shell.ShellCtrls, Vcl.Graphics;
+uses Winapi.ShlObj, Winapi.ActiveX, Winapi.Wincodec, Winapi.Windows, Winapi.Messages,
+  System.Classes, System.SysUtils, System.Variants, System.StrUtils, System.Math, System.Threading,
+  Vcl.Forms, Vcl.Dialogs, Vcl.Shell.ShellCtrls, Vcl.Graphics;
 
 // Debug
 procedure BreakPoint;
@@ -20,33 +20,41 @@ function GetTempDirectory: string;
 function GetExifToolTmp: string;
 function GetHtmlTmp: string;
 function GetEdgeUserData: string;
+function GetNrOfFiles(StartDir, FileMask: string; subDir: boolean): integer;
 
 // String
 function NextField(var AString: string; const ADelimiter: string): string;
 
 // Image
-function GetThumbCache(AFilePath: string; var hBmp: HBITMAP; Flags: TSIIGBF;
-                       AMaxX: longint = 120; AMaxY: longint = 120): HRESULT;
+function GetThumbCache(AFilePath: string; var hBmp: HBITMAP; Flags: TSIIGBF; AMaxX: longint; AMaxY: longint): HRESULT;
 function IsJpeg(Filename: string): boolean;
+function GetBitmapFromWic(const FWicBitmapSource: IWICBitmapSource): TBitmap;
 function WicPreview(AImg: string; Rotate, MaxW, MaxH: cardinal): IWICBitmapSource;
-function GetBitmapFromWic(const FWicBitmap: IWICBitmapSource): TBitmap;
-procedure ResizeBitmapCanvas(Bitmap: TBitmap; W, H: Integer; BackColor: TColor);
+procedure ResizeBitmapCanvas(Bitmap: TBitmap; W, H: integer; BackColor: TColor);
 
 // Message dialog that allows for caption and doesn't wrap lines at spaces.
-function MessageDlgEx(const AMsg, ACaption: string;
-                      ADlgType: TMsgDlgType; AButtons: TMsgDlgButtons; AParent: TForm): integer;
+function MessageDlgEx(const AMsg, ACaption: string; ADlgType: TMsgDlgType; AButtons: TMsgDlgButtons; AParent: TForm = nil): integer;
 
 implementation
 
-uses Winapi.ShellAPI, Winapi.KnownFolders, System.IOUtils;
+uses Winapi.ShellAPI, Winapi.KnownFolders, System.IOUtils, System.Win.Registry, System.UITypes,
+  UFrmGenerate, MainDef;
 
-var GlobalImgFact: IWICImagingFactory;
-    TempDirectory: string;
+var
+  GlobalImgFact: IWICImagingFactory;
+  TempDirectory: string;
 
-const TempPrefix = 'ExT';
-const ExifToolTempFileName = 'ExifToolGUI.tmp';
-const HtmlTempFileName     = 'ExifToolGUI.html';
-const EdgeUserDataDir      = 'Edge';
+const
+  TempPrefix = 'ExT';
+
+const
+  ExifToolTempFileName = 'ExifToolGUI.tmp';
+
+const
+  HtmlTempFileName = 'ExifToolGUI.html';
+
+const
+  EdgeUserDataDir = 'Edge';
 
 procedure BreakPoint;
 {$IFDEF DEBUG}
@@ -59,11 +67,10 @@ end;
 procedure DebugMsg(const Msg: array of variant);
 {$IFDEF DEBUG}
 var
-  I: Integer;
+  I: integer;
   FMsg: string;
 begin
-  FMsg := Format('%s %s %s', ['ExiftoolGUI', Paramstr(0),
-    IntToStr(GetCurrentThreadId)]);
+  FMsg := Format('%s %s %s', ['ExiftoolGUI', Paramstr(0), IntToStr(GetCurrentThreadId)]);
   for I := 0 to high(Msg) do
     FMsg := Format('%s,%s', [FMsg, VarToStr(Msg[I])]);
   OutputDebugString(PChar(FMsg));
@@ -74,10 +81,11 @@ end;
 
 // Directories
 function ValidDir(ADir: string): boolean;
-var AShell: IShellFolder;
-    P: PWideChar;
-    Flags, NumChars: LongWord;
-    NewPIDL: PItemIDList;
+var
+  AShell: IShellFolder;
+  P: PWideChar;
+  Flags, NumChars: LongWord;
+  NewPIDL: PItemIDList;
 begin
   SHGetDesktopFolder(AShell);
   P := StringToOleStr(ADir);
@@ -87,8 +95,9 @@ begin
 end;
 
 function ValidFile(AFolder: TShellFolder): boolean;
-var Flags: LongWord;
-    PIDL: PitemIDlist;
+var
+  Flags: LongWord;
+  PIDL: PItemIDList;
 begin
   PIDL := AFolder.RelativeID;
   Flags := SFGAO_FILESYSTEM;
@@ -97,13 +106,13 @@ begin
 end;
 
 function GetINIPath: string;
-var NameBuffer: PChar;
+var
+  NameBuffer: PChar;
 begin
   result := '';
   if SUCCEEDED(SHGetKnownFolderPath(FOLDERID_RoamingAppData, 0, 0, NameBuffer)) then
   begin
-    result := IncludeTrailingPathDelimiter(StrPas(NameBuffer)) +
-              IncludeTrailingPathDelimiter(TPath.GetFileNameWithoutExtension(Application.ExeName));
+    result := IncludeTrailingPathDelimiter(StrPas(NameBuffer)) + IncludeTrailingPathDelimiter(TPath.GetFileNameWithoutExtension(Application.ExeName));
     CoTaskMemFree(NameBuffer);
     if not DirectoryExists(result) then
       CreateDir(result);
@@ -136,7 +145,8 @@ begin
 end;
 
 function TempFilename(const Prefix: string): string;
-var AName, ADir: array [0 .. MAX_PATH] of char;
+var
+  AName, ADir: array [0 .. MAX_PATH] of char;
 begin
   GetTempPath(MAX_PATH, ADir);
   GetTempFilename(ADir, PChar(Prefix), 0, AName);
@@ -152,8 +162,9 @@ begin
 end;
 
 function RemovePath(const ADir: string; const AFlags: FILEOP_FLAGS = FOF_NO_UI): boolean;
-var ShOp: TSHFileOpStruct;
-    ShResult: Integer;
+var
+  ShOp: TSHFileOpStruct;
+  ShResult: integer;
 begin
   result := false;
   if not(DirectoryExists(ADir)) then
@@ -166,16 +177,56 @@ begin
   ShOp.fFlags := AFlags;
 
   ShResult := SHFileOperation(ShOp);
-  if (ShResult <> 0) and
-     (ShOp.fAnyOperationsAborted = false) then
+  if (ShResult <> 0) and (ShOp.fAnyOperationsAborted = false) then
     raise Exception.Create(Format('Remove directory failed code %u', [ShResult]));
   result := (ShResult = 0);
 end;
 
+function GetNrOfFiles(StartDir, FileMask: string; subDir: boolean): integer;
+var
+  SR: TSearchRec;
+  DirList: TStringList;
+  IsFound, doSub: boolean;
+  I, x: integer;
+begin
+  if StartDir[Length(StartDir)] <> '\' then
+    StartDir := StartDir + '\';
+  doSub := subDir;
+  x := 0;
+  // Count files in directory
+  IsFound := FindFirst(StartDir + FileMask, faAnyFile - faDirectory, SR) = 0;
+  while IsFound do
+  begin
+    inc(x);
+    IsFound := FindNext(SR) = 0;
+  end;
+  FindClose(SR);
+
+  // Build a list of subdirectories
+  if doSub then
+  begin
+    DirList := TStringList.Create;
+    IsFound := FindFirst(StartDir + '*.*', faAnyFile, SR) = 0;
+    while IsFound do
+    begin
+      if ((SR.Attr and faDirectory) <> 0) and (SR.Name[1] <> '.') then
+        DirList.Add(StartDir + SR.Name);
+      IsFound := FindNext(SR) = 0;
+    end;
+    FindClose(SR);
+    // Scan the list of subdirectories
+    for I := 0 to DirList.Count - 1 do
+      x := x + GetNrOfFiles(DirList[I], FileMask, doSub);
+    DirList.Free;
+  end;
+  result := x;
+end;
+
 // String
 function NextField(var AString: string; const ADelimiter: string): string;
-var Indx: Integer;
-    L: integer;
+var
+  Indx: integer;
+  L: integer;
 begin
   L := Length(ADelimiter);
   Indx := Pos(ADelimiter, AString);
@@ -186,27 +237,28 @@ begin
   end
   else
   begin
-    result := Copy(AString, 1, Indx -1);
-    Delete(AString, 1, Indx +L -1);
+    result := Copy(AString, 1, Indx - 1);
+    Delete(AString, 1, Indx + L - 1);
   end;
 end;
 
 // Image
 function IsJpeg(Filename: string): boolean;
-var Ext: string;
+var
+  Ext: string;
 begin
   Ext := ';' + ExtractFileExt(Filename) + ';';
   result := (ContainsText(';.jpg;.jpeg;', Ext));
 end;
 
-function GetThumbCache(AFilePath: string; var hBmp: HBITMAP; Flags: TSIIGBF;
-                       AMaxX: longint = 120; AMaxY: longint = 120): HRESULT;
-var FileShellItemImage: IShellItemImageFactory;
-    S: TSize;
+function GetThumbCache(AFilePath: string; var hBmp: HBITMAP; Flags: TSIIGBF; AMaxX: longint; AMaxY: longint): HRESULT;
+var
+  FileShellItemImage: IShellItemImageFactory;
+  S: TSize;
 begin
   result := SHCreateItemFromParsingName(PChar(AFilePath), nil, IShellItemImageFactory, FileShellItemImage);
 
-  if Succeeded(result) then
+  if SUCCEEDED(result) then
   begin
     S.cx := AMaxX;
     S.cy := AMaxY;
@@ -214,15 +266,78 @@ begin
   end;
 end;
 
-function WicPreview(AImg: string; Rotate, MaxW, MaxH: cardinal): IWICBitmapSource;
-var IwD: IWICBitmapDecoder;
-    IwdR: IWICBitmapFlipRotator;
-    IwdS: IWICBitmapScaler;
-    W, H, NewW, NewH: cardinal;
+// Get a bitmap from WIC
+function GetBitmapFromWic(const FWicBitmapSource: IWICBitmapSource): TBitmap;
+var
+  FWICBitmapConvert: IWICBitmapSource;
+  FWICBitmap: IWICBitmap;
+  LWicBitmap: IWICBitmapLock;
+  BitmapInfo: TBitmapInfo;
+  FWidth, FHeight: UINT;
+  Prc: WICRect;
+  LockedSize: UINT;
+  LockedArea: WICInProcPointer;
+
+  function LockBitmap: boolean;
+  begin
+    FWICBitmap.GetSize(FWidth, FHeight);
+    with Prc do
+    begin
+      x := 0;
+      Y := 0;
+      Width := FWidth;
+      Height := FHeight;
+    end;
+
+    result := (FWICBitmap.Lock(Prc, WICBitmapLockRead, LWicBitmap) = S_OK);
+    if result then
+      LWicBitmap.GetDataPointer(LockedSize, LockedArea);
+  end;
+
 begin
   result := nil;
-  GlobalImgFact.CreateDecoderFromFilename(PWideChar(AImg),
-    GUID_VendorMicrosoftBuiltIn, // Use only buitln codecs. No additional installs needed.
+  // Convert to 24 Bits
+  WICConvertBitmapSource(GUID_WICPixelFormat24bppBGR, FWicBitmapSource, FWICBitmapConvert);
+
+  // And create a bitmap
+  GlobalImgFact.CreateBitmapFromSource(FWICBitmapConvert, WICBitmapNoCache, FWICBitmap);
+  if (FWICBitmap = nil) then // Succeeded?
+    exit;
+
+  // Lock in Memory
+  if not LockBitmap then
+    exit;
+
+  // Create a bitmap
+  result := TBitmap.Create;
+
+  // Set the info of the bitmap
+  FillChar(BitmapInfo, sizeof(BitmapInfo), 0);
+  with BitmapInfo do
+  begin
+    bmiHeader.biSize := sizeof(BitmapInfo);
+    bmiHeader.biWidth := FWidth;
+    bmiHeader.biHeight := -FHeight;
+    bmiHeader.biPlanes := 1;
+    bmiHeader.biBitCount := 24;
+  end;
+  result.PixelFormat := pf24bit;
+  result.SetSize(FWidth, FHeight);
+  result.AlphaFormat := afDefined;
+
+  // And set the bits
+  SetDIBits(0, result.Handle, 0, FHeight, LockedArea, BitmapInfo, DIB_RGB_COLORS);
+end;
+
+function WicPreview(AImg: string; Rotate, MaxW, MaxH: cardinal): IWICBitmapSource;
+var
+  IwD: IWICBitmapDecoder;
+  IwdR: IWICBitmapFlipRotator;
+  IwdS: IWICBitmapScaler;
+  W, H, NewW, NewH: cardinal;
+begin
+  result := nil;
+  GlobalImgFact.CreateDecoderFromFilename(PWideChar(AImg), GUID_VendorMicrosoftBuiltIn, // Use only buitln codecs. No additional installs needed.
     GENERIC_READ, WICDecodeMetadataCacheOnDemand, IwD);
   if IwD = nil then
     exit;
@@ -238,8 +353,7 @@ begin
     exit;
 
   result.GetSize(W, H);
-  if (W = 0) or
-     (H = 0) then
+  if (W = 0) or (H = 0) then
     exit;
   if (H < W) then
   begin
@@ -260,81 +374,22 @@ begin
     if (IwdR = nil) then
       exit;
     case Rotate of
-      90:  IwdR.Initialize(result, WICBitmapTransformRotate90);
-      180: IwdR.Initialize(result, WICBitmapTransformRotate180);
-      270: IwdR.Initialize(result, WICBitmapTransformRotate270);
+      90:
+        IwdR.Initialize(result, WICBitmapTransformRotate90);
+      180:
+        IwdR.Initialize(result, WICBitmapTransformRotate180);
+      270:
+        IwdR.Initialize(result, WICBitmapTransformRotate270);
     end;
     result := IwdR;
   end;
 end;
 
-function GetBitmapFromWic(const FWicBitmap: IWICBitmapSource): TBitmap;
-var LWicBitmap: IWICBitmapSource;
-    Stride: cardinal;
-    Buffer: array of Byte;
-    BitmapInfo: TBitmapInfo;
-    FWidth, FHeight: UINT;
-    Prc: WICRect;
-
-  procedure CopyPixels;
-  begin
-    LWicBitmap.CopyPixels(@Prc, Stride, Length(Buffer), @Buffer[0]);
-  end;
-
-  procedure SetDibBits;
-  begin
-    SetDIBits(0, result.Handle, 0, FHeight, @Buffer[0], BitmapInfo, DIB_RGB_COLORS);
-  end;
-
-begin
-  result := nil;
-  if (FWicBitmap = nil) then
-    exit;
-
-  result := TBitmap.Create;
-  FWicBitmap.GetSize(FWidth, FHeight);
-  FWidth := FWidth - (FWidth mod 4); // Ensure Width is modulo 4!
-  Stride := FWidth * 3;
-
-  if (FWidth = 0) or // Causes AV!
-    (FHeight = 0) then
-    exit;
-
-  SetLength(Buffer, Stride * FHeight);
-  with Prc do
-  begin
-    X := 0;
-    Y := 0;
-    Width := FWidth;
-    Height := FHeight;
-  end;
-
-  WICConvertBitmapSource(GUID_WICPixelFormat24bppBGR, FWicBitmap, LWicBitmap);
-
-  CopyPixels;
-
-  FillChar(BitmapInfo, sizeof(BitmapInfo), 0);
-  with BitmapInfo do
-  begin
-    bmiHeader.biSize := sizeof(BitmapInfo);
-    bmiHeader.biWidth := FWidth;
-    bmiHeader.biHeight := -FHeight;
-    bmiHeader.biPlanes := 1;
-    bmiHeader.biBitCount := 24;
-  end;
-
-  result.PixelFormat := pf24bit;
-
-  result.SetSize(FWidth, FHeight);
-  SetDibBits;
-  SetLength(Buffer, 0);
-  result.AlphaFormat := afDefined;
-end;
-
-procedure ResizeBitmapCanvas(Bitmap: TBitmap; W, H: Integer; BackColor: TColor);
-var Bmp: TBitmap;
-    Source, Dest: TRect;
-    Xshift, Yshift: Integer;
+procedure ResizeBitmapCanvas(Bitmap: TBitmap; W, H: integer; BackColor: TColor);
+var
+  Bmp: TBitmap;
+  Source, Dest: TRect;
+  Xshift, Yshift: integer;
 begin
   Xshift := (Bitmap.Width - W) div 2;
   Yshift := (Bitmap.Height - H) div 2;
@@ -362,30 +417,60 @@ begin
   end;
 end;
 
-function MessageDlgEx(const AMsg, ACaption: string;
-                      ADlgType: TMsgDlgType; AButtons: TMsgDlgButtons; AParent: TForm): integer;
-var MsgFrm: TForm;
+function MessageDlgEx(const AMsg, ACaption: string; ADlgType: TMsgDlgType; AButtons: TMsgDlgButtons; AParent: TForm = nil): integer;
+var
+  MsgFrm: TForm;
 begin
   MsgFrm := CreateMessageDialog(AMsg, ADlgType, AButtons);
   try
-    MsgFrm.Caption := ACaption;
+    if (ACaption = '') then
+      MsgFrm.Caption := Application.Title
+    else
+      MsgFrm.Caption := ACaption;
     MsgFrm.Position := poDefaultSizeOnly;
     MsgFrm.FormStyle := fsStayOnTop;
-    MsgFrm.Left := AParent.Left + (AParent.Width - MsgFrm.Width) div 2;
-    MsgFrm.Top := AParent.Top + (AParent.Height - MsgFrm.Height) div 2;
-    Result := MsgFrm.ShowModal;
+    if (AParent <> nil) then
+    begin
+      MsgFrm.Left := AParent.Left + (AParent.Width - MsgFrm.Width) div 2;
+      MsgFrm.Top := AParent.Top + (AParent.Height - MsgFrm.Height) div 2;
+    end;
+    result := MsgFrm.ShowModal;
   finally
     MsgFrm.Free
   end;
 end;
 
+function GetEnvVarValue(const VarName: string): string;
+var
+  BufSize: integer; // buffer size required for value
+begin
+  result := '';
+  // Get required buffer size (inc. terminal #0)
+  BufSize := GetEnvironmentVariable(PChar(VarName), nil, 0);
+  if BufSize > 0 then
+  begin
+    // Read env var value into result string
+    SetLength(result, BufSize - 1);
+    GetEnvironmentVariable(PChar(VarName), PChar(result), BufSize);
+  end;
+end;
+
+function GetComSpec: string;
+begin
+  result := GetEnvVarValue('ComSpec');
+  if (result = '') then
+    result := 'cmd.exe';
+end;
+
 initialization
+
 begin
   TempDirectory := IncludeTrailingBackslash(CreateTempPath(TempPrefix));
   CoCreateInstance(CLSID_WICImagingFactory, nil, CLSCTX_INPROC_SERVER or CLSCTX_LOCAL_SERVER, IUnknown, GlobalImgFact);
 end;
 
 finalization
+
 begin
   RemovePath(TempDirectory);
 end;

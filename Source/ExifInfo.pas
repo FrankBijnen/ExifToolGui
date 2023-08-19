@@ -26,9 +26,6 @@ type
   end;
 
   IFD0rec = packed record
-    // ImageWidth,ImageHeight: word;
-    // DocumentName: string[64];
-    // ImageDescription: string[64];
     Make, Model: String[64];
     PreviewOffset, PreviewSize: longint;
     Orientation: word; // 1=Normal, 3=180, 6=90right, 8=90left, else=Mirror
@@ -47,14 +44,9 @@ type
     ISO: string[5];
     DateTimeOriginal, DateTimeDigitized: string[19];
     ExposureBias: string[7];
-    // MaxAperture: string[5];
     Flash: word; // if (ExifIFD.Flash and 1)=1 then 'Flash=Yes'
     FocalLength: string[7];
-    // UserComment: string[63];
-    // SubSecTime,SubSecTimeOriginal,SubSecTimeDigitized: string[3];
     ColorSpace: string[13];
-    // ExifImageWidth,ExifImageHeight: word;
-    // ExposureMode,WhiteBalance: string[7];
     FLin35mm: string[7];
     LensInfo: string[23];
     LensMake: string[23];
@@ -84,16 +76,10 @@ type
     Date: string[19];
     PhotoType: AnsiString;
     Title, Event: AnsiString;
-    // Description: AnsiString;
     CountryShown, ProvinceShown, CityShown, LocationShown: ShortString;
     PersonInImage: ShortString;
     Keywords: ShortString; // =Subject
     Rating: string[1];
-    (*
-      Headline, Category: AnsiString;
-      Country,State,City,Location: AnsiString;
-      DateCreated: string[19];
-    *)
   end;
 
   ICCrec = packed record
@@ -146,7 +132,7 @@ var
   TIFFoffset, ExifIFDoffset, GPSoffset: longint; // MakernoteOffset: longint;
   ICCoffset, InteropOffset, JPGfromRAWoffset: longint;
 
-  // ****************************QUICK METADATA ACCESS*************************
+// ****************************QUICK METADATA ACCESS*************************
 function SwapL(L: longword): longword;
 asm
   mov eax,L
@@ -888,8 +874,7 @@ begin
   repeat
     BlockRead(FotoF, APPmark, 2);
     APPmark := Swap(APPmark);
-    if (APPmark = $FFE0) or (APPmark = $FFE1) or (APPmark = $FFE2) or
-      (APPmark = $FFED) then
+    if (APPmark = $FFE0) or (APPmark = $FFE1) or (APPmark = $FFE2) or (APPmark = $FFED) then
     begin
       BlockRead(FotoF, APPsize, 2);
       APPsize := Swap(APPsize);
@@ -963,8 +948,7 @@ begin
       // ---------------------------------------------------
       Seek(FotoF, APPmarkNext);
     end;
-  until (APPmark <> $FFE0) and (APPmark <> $FFE1) and (APPmark <> $FFE2) and
-    (APPmark <> $FFED);
+  until (APPmark <> $FFE0) and (APPmark <> $FFE1) and (APPmark <> $FFE2) and (APPmark <> $FFED);
 end;
 
 // ==============================================================================
@@ -1110,14 +1094,10 @@ begin
     Title := GetAltData('<dc:title>');
     Event := GetAltData('<Iptc4xmpExt:Event>');
     // Description:=GetAltData('<dc:description>');
-    CountryShown := GetStructTag('<Iptc4xmpExt:LocationShown>',
-      '<Iptc4xmpExt:CountryName>');
-    ProvinceShown := GetStructTag('<Iptc4xmpExt:LocationShown>',
-      '<Iptc4xmpExt:ProvinceState>');
-    CityShown := GetStructTag('<Iptc4xmpExt:LocationShown>',
-      '<Iptc4xmpExt:City>');
-    LocationShown := GetStructTag('<Iptc4xmpExt:LocationShown>',
-      '<Iptc4xmpExt:Sublocation>');
+    CountryShown := GetStructTag('<Iptc4xmpExt:LocationShown>', '<Iptc4xmpExt:CountryName>');
+    ProvinceShown := GetStructTag('<Iptc4xmpExt:LocationShown>', '<Iptc4xmpExt:ProvinceState>');
+    CityShown := GetStructTag('<Iptc4xmpExt:LocationShown>', '<Iptc4xmpExt:City>');
+    LocationShown := GetStructTag('<Iptc4xmpExt:LocationShown>', '<Iptc4xmpExt:Sublocation>');
     PersonInImage := GetBagData('<Iptc4xmpExt:PersonInImage>');
     Keywords := GetBagData('<dc:subject>');
     Rating := GetTagData('<xmp:Rating>');
@@ -1255,8 +1235,7 @@ begin
         repeat
           BlockRead(FotoF, AppMarker, 2);
           AppMarker := Swap(AppMarker);
-          if (AppMarker = $FFE0) or (AppMarker = $FFE1) or (AppMarker = $FFED)
-          then
+          if (AppMarker = $FFE0) or (AppMarker = $FFE1) or (AppMarker = $FFED) then
           begin
             BlockRead(FotoF, APPsize, 2);
             APPsize := Swap(APPsize);
@@ -1273,8 +1252,7 @@ begin
               break;
             Seek(FotoF, NextAPPmarker);
           end;
-        until (AppMarker <> $FFE0) and (AppMarker <> $FFE1) and
-          (AppMarker <> $FFED);
+        until (AppMarker <> $FFE0) and (AppMarker <> $FFE1) and (AppMarker <> $FFED);
       end;
     end;
   end;

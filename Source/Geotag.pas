@@ -99,8 +99,7 @@ var
   ETcmd, ETout, ETerr: string;
 begin
   if CheckBox1.Checked then
-    ETcmd := ExtractFilePath(LabeledEdit1.Text) + '*' +
-      ExtractFileExt(LabeledEdit1.Text)
+    ETcmd := ExtractFilePath(LabeledEdit1.Text) + '*' + ExtractFileExt(LabeledEdit1.Text)
   else
     ETcmd := LabeledEdit1.Text;
   ETcmd := '-geotag' + CRLF + ETcmd + CRLF;

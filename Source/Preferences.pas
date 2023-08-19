@@ -7,12 +7,12 @@ uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants,
   System.Classes, Vcl.Graphics,
   Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls,
-  Vcl.ComCtrls, Vcl.ExtCtrls, Vcl.Mask;
+  Vcl.ComCtrls, Vcl.ExtCtrls, Vcl.Mask, Vcl.Buttons;
 
 type
   TFPreferences = class(TForm)
     AdvPageControl1: TPageControl;
-    AdvTabSheet1: TTabSheet;
+    AdvTabGeneral: TTabSheet;
     Label1: TLabel;
     ComboBox1: TComboBox;
     BtnCancel: TButton;
@@ -25,18 +25,29 @@ type
     EdExportMetaFolder: TEdit;
     BtnExportMetaFolder: TButton;
     LabeledEdit1: TLabeledEdit;
-    RadioGroup3: TRadioGroup;
     CheckBox2: TCheckBox;
     CheckBox3: TCheckBox;
-    AdvTabSheet2: TTabSheet;
+    AdvTabOther: TTabSheet;
     CheckBox4: TCheckBox;
     RgETOverride: TRadioGroup;
     EdETOverride: TEdit;
     BtnETOverride: TButton;
+    AdvTabSheetThumbs: TTabSheet;
+    RadioGroup3: TRadioGroup;
+    ChkThumbAutoGenerate: TCheckBox;
+    BtnSetupClean: TBitBtn;
+    EdThumbCleanset: TMaskEdit;
+    Label2: TLabel;
+    BtnClean: TBitBtn;
+    GpxCleanThumbNails: TGroupBox;
+    BtnGenThumbs: TBitBtn;
     procedure FormShow(Sender: TObject);
     procedure BtnSaveClick(Sender: TObject);
     procedure BtnBrowseFolder(Sender: TObject);
     procedure RadioGroupClick(Sender: TObject);
+    procedure BtnSetupCleanClick(Sender: TObject);
+    procedure BtnCleanClick(Sender: TObject);
+    procedure BtnGenThumbsClick(Sender: TObject);
   private
     { Private declarations }
   public
@@ -48,7 +59,8 @@ var
 
 implementation
 
-uses Main, ExifTool, MainDef;
+uses Main, ExifTool, MainDef,
+  ExifToolsGUI_Utils, ExifToolsGUI_Thumbnails;
 
 {$R *.dfm}
 
@@ -90,19 +102,70 @@ begin
   end;
 
   case RadioGroup3.ItemIndex of
-    0: i := 96;
-    1: i := 128;
-    2: i := 160;
+    0:
+      i := 96;
+    1:
+      i := 128;
+    2:
+      i := 160;
   end;
   FMain.ShellList.ThumbNailSize := i;
   GUIsettings.ThumbSize := RadioGroup3.ItemIndex;
+
+  FMain.ShellList.ThumbAutoGenerate := ChkThumbAutoGenerate.Checked;
+  GUIsettings.ThumbAutoGenerate := ChkThumbAutoGenerate.Checked;
+  GUIsettings.ThumbCleanSet := EdThumbCleanset.EditText;
+
   GUIsettings.EnableGMap := CheckBox2.Checked;
   GUIsettings.UseExitDetails := CheckBox3.Checked;
   GUIsettings.AutoIncLine := CheckBox4.Checked;
 end;
 
+procedure TFPreferences.BtnSetupCleanClick(Sender: TObject);
+var
+  SetupOK: boolean;
+  Parm: string;
+begin
+  SetupOK := ExistsSageSet(EdThumbCleanset.EditText);
+  if not SetupOK then
+    SetupOK := (MessageDlgEx(Format('Overwrite Existing setting %s?', [EdThumbCleanset.EditText]), '', TMsgDlgType.mtWarning,
+      [TMsgDlgBtn.mbYes, TMsgDlgBtn.mbNo]) = idYes)
+  else
+    MessageDlgEx('Make sure that you only check ''Thumbnails'' in the next dialog.', '', TMsgDlgType.mtInformation, [TMsgDlgBtn.mbOK]);
+  if (SetupOK) then
+  begin
+    Parm := Format('CleanMgr /sageset:%s', [EdThumbCleanset.EditText]);
+    if not RunAsAdmin(Handle, GetComSpec, '/c' + Parm, SW_HIDE) then
+      MessageDlgEx(Format('Run ''%s'' as Admin failed.', [Parm]), '', TMsgDlgType.mtError, [mbOK]);
+  end;
+end;
+
+procedure TFPreferences.BtnCleanClick(Sender: TObject);
+var
+  Parm: string;
+begin
+  Parm := Format('CleanMgr /sagerun:%s', [EdThumbCleanset.EditText]);
+  if not RunAsAdmin(Handle, GetComSpec, '/c' + Parm, SW_HIDE) then
+    MessageDlgEx(Format('Run ''%s'' as Admin failed.', [Parm]), '', TMsgDlgType.mtError, [mbOK]);
+end;
+
+procedure TFPreferences.BtnGenThumbsClick(Sender: TObject);
+var
+  xDir: string;
+begin
+  xDir := BrowseFolderDlg('Folder, including subfolders, to generate thumbnails for.' + #10 +
+                          'Generating will be done in the background.', 0,
+                           FMain.ShellTree.Path);
+  if (xDir <> '') then
+  begin
+    GenerateThumbs(xDir, true, FMain.ShellList.ThumbNailSize);
+    Close;
+  end;
+end;
+
 procedure TFPreferences.BtnBrowseFolder(Sender: TObject);
-var xDir: string;
+var
+  xDir: string;
 begin
   if Sender = BtnStartupFolder then
   begin
@@ -200,10 +263,13 @@ begin
     SetLength(tx, 1);
     LabeledEdit1.Text := tx;
     RadioGroup3.ItemIndex := GUIsettings.ThumbSize;
+    ChkThumbAutoGenerate.Checked := GUIsettings.ThumbAutoGenerate;
+    EdThumbCleanset.Text := GUIsettings.ThumbCleanSet;
+
     CheckBox2.Checked := GUIsettings.EnableGMap;
     CheckBox3.Checked := GUIsettings.UseExitDetails;
     CheckBox4.Checked := GUIsettings.AutoIncLine;
-    AdvPageControl1.ActivePage := AdvTabSheet1;
+    AdvPageControl1.ActivePage := AdvTabGeneral;
   finally
     ETResult.Free;
   end;

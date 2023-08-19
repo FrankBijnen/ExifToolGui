@@ -26,8 +26,11 @@ type
 
   public
     { Public declarations }
-    var CurPath: string;
-    var CurStyle: string;
+  var
+    CurPath: string;
+
+  var
+    CurStyle: string;
   end;
 
 var
@@ -58,12 +61,13 @@ end;
 
 procedure TFrmStyle.RequestClose;
 begin
-  Close;  // First close this form, so items can be added again to the shellist
-  Fmain.ShellTree.Path := CurPath; //restore path
+  Close; // First close this form, so items can be added again to the shellist
+  Fmain.ShellTree.Path := CurPath; // restore path
 end;
 
 procedure TFrmStyle.FormShow(Sender: TObject);
-var Indx: integer;
+var
+  Indx: integer;
 begin
   Indx := LstStyles.Items.IndexOf(GUIsettings.GuiStyle);
   if (Indx > -1) then
