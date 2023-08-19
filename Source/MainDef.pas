@@ -167,7 +167,8 @@ var
 
   procedure SetQuickTag(var x: smallint; const Name: string; Cmd: string);
   begin
-    with QuickTags[x] do
+  	SetLength(QuickTags, X +1);
+	with QuickTags[x] do
     begin
       Caption := Name;
       n := pos('^', Cmd);
@@ -425,7 +426,6 @@ begin
       end
       else
       begin
-        SetLength(QuickTags, 27);
         i := 0;
         SetQuickTag(i, 'EXIF', '-GUI-SEP');
         SetQuickTag(i, 'Make', '-exif:Make');
@@ -456,7 +456,7 @@ begin
         SetQuickTag(i, 'City', '-xmp:LocationShownCity');
         SetQuickTag(i, 'Location', '-xmp:LocationShownSublocation');
       end;
-      for i := 0 to length(QuickTags) - 1 do
+      for i := 0 to Length(QuickTags) - 1 do
       begin
         tx := QuickTags[i].Caption;
         QuickTags[i].NoEdit := (RightStr(tx, 1) = '?');
