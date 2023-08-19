@@ -447,8 +447,8 @@ begin
 
         SetQuickTag(i, 'About photo', '-GUI-SEP');
         SetQuickTag(i, 'Type±', '-xmp-dc:Type^[Landscape] or [Studio+Portrait] ..');
-        SetQuickTag(i, 'Rating','-xmp-xmp:Rating^Integer value [ 0 ] .. [ 5 ]');
-        SetQuickTag(i, 'Subject','-xmp-xmp:Subject');
+        SetQuickTag(i, 'Rating', '-xmp-xmp:Rating^Integer value [ 0 ] .. [ 5 ]');
+        //SetQuickTag(i, 'Title','-xmp-dc:Title');
         SetQuickTag(i, 'Event', '-xmp-iptcExt:Event^[Vacations] or [Trip] ..');
         SetQuickTag(i, 'PersonInImage±', '-xmp:PersonInImage^[Phil] or [Harry+Sally] or [-Peter] ..');
         SetQuickTag(i, 'Keywords±', '-xmp-dc:Subject^[tree] or [flower+rose] or [-fish] or [+bird-fish] ..');
