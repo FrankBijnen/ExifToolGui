@@ -283,7 +283,7 @@ var LWicBitmap: IWICBitmapSource;
 
   procedure SetDibBits;
   begin
-    SetDIBits(result.Canvas.Handle, result.Handle, 0, FHeight, @Buffer[0], BitmapInfo, DIB_RGB_COLORS);
+    SetDIBits(0, result.Handle, 0, FHeight, @Buffer[0], BitmapInfo, DIB_RGB_COLORS);
   end;
 
 begin

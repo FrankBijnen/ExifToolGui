@@ -101,8 +101,7 @@ procedure ReadGUIini;
 procedure SaveGUIini;
 function LoadWorkspaceIni(IniFName: string): boolean;
 function SaveWorkspaceIni(IniFName: string): boolean;
-function BrowseFolderDlg(const Title: string; iFlag: integer;
-  const StartFolder: string = ''): string;
+function BrowseFolderDlg(const Title: string; iFlag: integer; const StartFolder: string = ''): string;
 procedure ChartFindFiles(StartDir, FileMask: string; subDir: boolean);
 function GetNrOfFiles(StartDir, FileMask: string; subDir: boolean): integer;
 
@@ -750,16 +749,14 @@ begin
 end;
 
 // ------------------------------------------------------------------------------
-function BrowseFolderCallBack(Wnd: HWND; uMsg: UINT; lParam, lpData: lParam)
-  : integer stdcall;
+function BrowseFolderCallBack(Wnd: HWND; uMsg: UINT; lParam, lpData: lParam): integer stdcall;
 begin
   if uMsg = BFFM_INITIALIZED then
-    SendMessage(Wnd, BFFM_SETSELECTION, 1, integer(@lg_StartFolder[1]));
+    SendMessage(Wnd, BFFM_SETSELECTION, 1, NativeInt(@lg_StartFolder[1]));
   result := 0;
 end;
 
-function BrowseFolderDlg(const Title: string; iFlag: integer;
-  const StartFolder: string = ''): string;
+function BrowseFolderDlg(const Title: string; iFlag: integer; const StartFolder: string = ''): string;
 var
   lpItemID: PItemIDList;
   BrowseInfo: TBrowseInfo;
