@@ -13,7 +13,7 @@ type
     BtnCancel: TBitBtn;
     ListView1: TListView;
     procedure FormShow(Sender: TObject);
-    private
+  private
     { Private declarations }
   public
     { Public declarations }
@@ -32,8 +32,8 @@ begin
   with ListView1.Items.Add do
   begin
     Caption := Lat;
-    Subitems.add(Lon);
-    Subitems.add(Place);
+    Subitems.Add(Lon);
+    Subitems.Add(PLace);
   end;
 end;
 
@@ -43,4 +43,3 @@ begin
 end;
 
 end.
-

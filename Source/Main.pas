@@ -1,123 +1,24 @@
 unit Main;
 {$WARN SYMBOL_PLATFORM OFF}
+// Note all code formatted with Delphi formatter, Right margin 80->150
 
 interface
 
 uses
-  Winapi.Windows, Winapi.Messages, System.ImageList, System.Threading,
-  System.SyncObjs,
-  System.SysUtils, System.Variants, System.Classes,
-  Vcl.Graphics, Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.Grids, Vcl.Mask, Vcl.ValEdit, Vcl.ImgList,
-  Vcl.ComCtrls, Vcl.ExtCtrls, Vcl.Menus, Vcl.Buttons, Vcl.StdCtrls, Vcl.ExtDlgs, Vcl.OleCtrls,
-  Vcl.Shell.ShellCtrls, // Shellcontrols
+  Winapi.Windows, Winapi.Messages, System.ImageList, System.SysUtils,
+  System.Variants, System.Classes,
+  Vcl.Graphics, Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.Grids, Vcl.Mask,
+  Vcl.ValEdit, Vcl.ImgList,
+  Vcl.ComCtrls, Vcl.ExtCtrls, Vcl.Menus, Vcl.Buttons, Vcl.StdCtrls, Vcl.ExtDlgs,
+  Vcl.Shell.ShellCtrls, // Embarcadero ShellTreeView and ShellListView
   Winapi.WebView2, Winapi.ActiveX, Vcl.Edge, // Edgebrowser
-  VclTee.TeeGDIPlus, VCLTee.TeEngine, VCLTee.TeeProcs, VCLTee.Chart, VCLTee.Series; // Chart
-
-// The ShellListview and TThumbTask should probably be in a separate unit. But this was easier.
-// Extend ShellListview, keeping the same Type
-
-const CM_ThumbStart = WM_USER + 1;
-const CM_ThumbEnd = WM_USER + 2;
-const CM_ThumbError = WM_USER + 3;
-const CM_ThumbRefresh = WM_USER + 4;
+  VclTee.TeeGDIPlus, VclTee.TeEngine, VclTee.TeeProcs, VclTee.Chart,
+  VclTee.Series, // Chart
+  ExifToolsGUI_ShellList, // Extension of ShellListView
+  ExifToolsGUI_Thumbnails, // Thumbnails
+  ExifToolsGUI_Utils; // Various
 
 type
-  THeaderSortState = (hssNone, hssAscending, hssDescending);
-
-  TThumbGenStatus = (Started, Ended);
-  TThumbErrorEvent = procedure(Sender: TObject; Item: TListItem; E: Exception) of object;
-  TThumbGenerateEvent = procedure(Sender: TObject; Item: TListItem; Status: TThumbGenStatus; Total, Remaining: integer) of object;
-  TPopulateBeforeEvent = procedure(Sender: TObject; var DoDefault: boolean) of object;
-  TOwnerDataFetchEvent = procedure(Sender: TObject; Item: TListItem; Request: TItemRequest; Afolder: TShellFolder) of object;
-
-  TThumbTask = class;
-
-  TShellListView = class(Vcl.Shell.ShellCtrls.TShellListView)
-  private
-    FThreadPool: TThreadPool;
-    FThumbTasks: Tlist;
-    FDoDefault: boolean;
-
-    FonColumnResized: TNotifyEvent;
-    FColumnSorted: boolean;
-    FSortColumn: integer;
-    FSortState: THeaderSortState;
-
-    FGeneratingLock: TMutex;
-    FThumbNails: TImageList;
-    FThumbNailSize: integer;
-    FGenerating: integer;
-    // Thumbnail cache. An index for every item in FThumbNails
-    //
-    // > 1 The index to use for FThumbNails. Minus 1!
-    // = 0 The index needs to be generated
-    // < 1 A temporary icon to display, until the thumbnail is generated. The actual index in FThumbNails is * -1
-    FThumbNailCache: array of integer;
-    FOnNotifyErrorEvent: TThumbErrorEvent;
-    FOnNotifyGenerateEvent: TThumbGenerateEvent;
-    FOnPopulateBeforeEvent: TPopulateBeforeEvent;
-    FOnEnumColumnsBeforeEvent: TNotifyEvent;
-    FOnEnumColumnsAfterEvent: TNotifyEvent;
-    FOnOwnerDataFetchEvent: TOwnerDataFetchEvent;
-    procedure SetColumnSorted(AValue: boolean);
-    procedure SetThumbNailSize(AValue: integer);
-    procedure CMThumbStart(var Message: TMessage); message CM_ThumbStart;
-    procedure CMThumbEnd(var Message: TMessage); message CM_ThumbEnd;
-    procedure CMThumbError(var Message: TMessage); message CM_ThumbError;
-    procedure CMThumbRefresh(var Message: TMessage); message CM_ThumbRefresh;
-    procedure ResetPool(const Threads: integer = -1);
-  protected
-    procedure WMNotify(var Msg: TWMNotify); message WM_NOTIFY;
-    procedure InitSortSpec(SortColumn: integer; SortState: THeaderSortState);
-    procedure ColumnSort; virtual;
-    procedure EnumColumns; override;
-    procedure GetThumbNails; virtual;
-    procedure Populate; override;
-    function OwnerDataFetch(Item: TListItem; Request: TItemRequest): boolean; override;
-    procedure Add2ThumbNails(ABmp: HBITMAP; ANitemIndex: integer; NeedsGenerating: boolean);
-    procedure CancelThumbTasks;
-    procedure RemoveThumbTask(ItemIndex: integer);
-  public
-    constructor Create(AOwner: TComponent); override;
-    destructor Destroy; override;
-    procedure Invalidate; override;
-    function FileName(ItemIndex: integer = -1): string;
-    function FileExt(ItemIndex: integer = -1): string;
-    procedure ColumnClick(Column: TListColumn);
-
-    property OnColumnResized: TNotifyEvent read FOnColumnResized write FonColumnResized;
-    property ColumnSorted: boolean read FColumnSorted write SetColumnSorted;
-    property SortColumn: integer read FSortColumn write FSortColumn;
-    property SortState: THeaderSortState read FSortState write FSortState;
-
-    property ThumbNailSize: integer read FThumbNailSize write SetThumbNailSize;
-    property OnThumbError: TThumbErrorEvent read FOnNotifyErrorEvent write FOnNotifyErrorEvent;
-    property OnThumbGenerate: TThumbGenerateEvent read FOnNotifyGenerateEvent write FOnNotifyGenerateEvent;
-    property Generating: integer read FGenerating;
-    property OnPopulateBeforeEvent: TPopulateBeforeEvent read FOnPopulateBeforeEvent write FOnPopulateBeforeEvent;
-    property OnEnumColumnsBeforeEvent: TNotifyEvent read FOnEnumColumnsBeforeEvent write FOnEnumColumnsBeforeEvent;
-    property OnEnumColumnsAfterEvent: TNotifyEvent read FOnEnumColumnsAfterEvent write FOnEnumColumnsAfterEvent;
-    property OnOwnerDataFetchEvent: TOwnerDataFetchEvent read FOnOwnerDataFetchEvent write FOnOwnerDataFetchEvent;
-  end;
-
-  TThumbTask = class(TTask, ITask)
-  private
-    FItemIndex: integer;
-    FListView: TShellListView;
-    FPitemIDList: pointer;
-    FThreadPool: TThreadPool;
-    FPathName: string;
-    procedure DoExecute;
-  public
-    constructor Create(const AItemIndex: integer;
-                       const AListView: TShellListView;
-                       const APitemIDList: pointer;
-                       const AThreadPool: TThreadPool); reintroduce;
-    destructor Destroy; override;
-    function Start: ITask; reintroduce;
-  end;
-
-
   TFMain = class(TForm)
     MainMenu: TMainMenu;
     MProgram: TMenuItem;
@@ -137,7 +38,8 @@ type
     AdvPanelMetaTop: TPanel;
     AdvPanelMetaBottom: TPanel;
     ShellTree: TShellTreeView;
-    ShellList: TShellListView;
+    // Need to create our own version!
+    ShellList: ExifToolsGUI_ShellList.TShellListView;
     MetadataList: TValueListEditor;
     SpeedBtnExif: TSpeedButton;
     SpeedBtnIptc: TSpeedButton;
@@ -258,6 +160,9 @@ type
     Spb_GoBack: TSpeedButton;
     Spb_Forward: TSpeedButton;
     SpeedBtn_GetLoc: TSpeedButton;
+    PopupIcon: TPopupMenu;
+    GenerateThumbnails1: TMenuItem;
+    GenerateThumbnailsIinclSubdirs1: TMenuItem;
     procedure ShellListClick(Sender: TObject);
     procedure ShellListKeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
     procedure ShellTreeChange(Sender: TObject; Node: TTreeNode);
@@ -268,8 +173,7 @@ type
     procedure SpeedBtnDetailsClick(Sender: TObject);
     procedure RotateImgResize(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
-    procedure EditETdirectKeyDown(Sender: TObject; var Key: Word;
-      Shift: TShiftState);
+    procedure EditETdirectKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
     procedure SpeedBtn_ETdirectClick(Sender: TObject);
     procedure CBoxETdirectChange(Sender: TObject);
     procedure SpeedBtn_ETeditClick(Sender: TObject);
@@ -280,22 +184,17 @@ type
     procedure BtnETdirectAddClick(Sender: TObject);
     procedure BtnFListRefreshClick(Sender: TObject);
     procedure CBoxFileFilterChange(Sender: TObject);
-    procedure MetadataListDrawCell(Sender: TObject; ACol, ARow: integer;
-      Rect: TRect; State: TGridDrawState);
-    procedure MetadataListSelectCell(Sender: TObject; ACol, ARow: integer;
-      var CanSelect: boolean);
-    procedure MetadataListKeyDown(Sender: TObject; var Key: Word;
-      Shift: TShiftState);
+    procedure MetadataListDrawCell(Sender: TObject; ACol, ARow: integer; Rect: TRect; State: TGridDrawState);
+    procedure MetadataListSelectCell(Sender: TObject; ACol, ARow: integer; var CanSelect: boolean);
+    procedure MetadataListKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
     procedure MetadataListExit(Sender: TObject);
     procedure EditQuickEnter(Sender: TObject);
     procedure EditQuickExit(Sender: TObject);
-    procedure EditQuickKeyDown(Sender: TObject; var Key: Word;
-      Shift: TShiftState);
+    procedure EditQuickKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
     procedure BtnQuickSaveClick(Sender: TObject);
     procedure MPreferencesClick(Sender: TObject);
     procedure BtnFilterEditClick(Sender: TObject);
-    procedure CBoxFileFilterKeyDown(Sender: TObject; var Key: Word;
-      Shift: TShiftState);
+    procedure CBoxFileFilterKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
     procedure BtnColumnEditClick(Sender: TObject);
     procedure BtnShowLogClick(Sender: TObject);
     procedure ShellListDeletion(Sender: TObject; Item: TListItem);
@@ -359,6 +258,8 @@ type
     procedure EdgeBrowser1WebMessageReceived(Sender: TCustomEdgeBrowser; Args: TWebMessageReceivedEventArgs);
     procedure Spb_ForwardClick(Sender: TObject);
     procedure SpeedBtn_GetLocClick(Sender: TObject);
+    procedure GenerateThumbnails1Click(Sender: TObject);
+    procedure GenerateThumbnailsIinclSubdirs1Click(Sender: TObject);
   private
     { Private declarations }
     ETBarSeriesFocal: TBarSeries;
@@ -370,12 +271,14 @@ type
     procedure EnableMenus(Enable: boolean);
     procedure WMEndSession(var Msg: TWMEndSession); message WM_ENDSESSION;
     function TranslateTagName(xMeta, xName: string): string;
+
     procedure ShellistThumbError(Sender: TObject; Item: TListItem; E: Exception);
+    procedure ShellListOnGenerateReady(Sender: TObject);
     procedure ShellistThumbGenerate(Sender: TObject; Item: TListItem; Status: TThumbGenStatus; Total, Remaining: integer);
     procedure ShellListBeforePopulate(Sender: TObject; var DoDefault: boolean);
     procedure ShellListBeforeEnumColumns(Sender: TObject);
     procedure ShellListAfterEnumColumns(Sender: TObject);
-    procedure ShellListOwnerDataFetch(Sender: TObject; Item: TListItem; Request: TItemRequest; Afolder: TShellFolder);
+    procedure ShellListOwnerDataFetch(Sender: TObject; Item: TListItem; Request: TItemRequest; AFolder: TShellFolder);
     procedure ShellListColumnResized(Sender: TObject);
   public
     { Public declarations }
@@ -383,13 +286,11 @@ type
     function GetSelectedFiles(forETopen: boolean = true): string;
     procedure UpdateLogWin(ETouts, ETerrs: string);
     procedure UpdateStatusBar_FilesShown;
+    procedure SetGuiColor;
 
   var
     GUIBorderWidth, GUIBorderHeight: integer; // Initialized in OnShow
-
-  var
     GUIcolor: TColor;
-    procedure SetGuiColor;
 
   end;
 
@@ -398,612 +299,28 @@ var
 
 implementation
 
-uses StrUtils, ExifTool, ExifInfo, MainDef, LogWin, Preferences, EditFFilter,
-  EditFCol, UFrmStyle, UFrmAbout,
-  QuickMngr, DateTimeShift, DateTimeEqual, CopyMeta, RemoveMeta, Geotag, Geomap,
-  ClipBrd, CopyMetaSingle, FileDateTime, ShellApi, Winapi.ShlObj,
-  System.Math, System.Masks, Winapi.CommCtrl, System.UITypes,
-  System.AnsiStrings,
-  Vcl.Themes,
-  Vcl.Styles,
-  Vcl.Shell.ShellConsts,
-  ExifToolsGUI_Utils;
+uses System.StrUtils, System.Math, System.Masks, System.UITypes, System.AnsiStrings,
+  Vcl.ClipBrd, Winapi.ShlObj, Winapi.ShellAPI, Vcl.Shell.ShellConsts, Vcl.Themes, Vcl.Styles,
+  ExifTool, ExifInfo, MainDef, LogWin, Preferences, EditFFilter, EditFCol, UFrmStyle, UFrmAbout,
+  QuickMngr, DateTimeShift, DateTimeEqual, CopyMeta, RemoveMeta, Geotag, Geomap, CopyMetaSingle, FileDateTime;
 
 {$R *.dfm}
 
-const GUI_SEP = '-GUI-SEP';
+const
+  GUI_SEP = '-GUI-SEP';
 
-//TODO Add to ini file
-//Colors of the Bar charts.
-const CLFNumber = $C0DCC0;
-const CLFocal   = $FFDAB6;
-const CLISO     = $D0D0D0;
+  // TODO Add to ini file
+  // Colors of the Bar charts.
+const
+  CLFNumber = $C0DCC0;
 
-// Listview Sort
+const
+  CLFocal = $FFDAB6;
 
-function GetListHeaderSortState(HeaderLView: TCustomListView; Column: TListColumn): THeaderSortState;
-var
-  Header: HWND;
-  Item: THDItem;
-begin
-  Header := ListView_GetHeader(HeaderLView.Handle);
-  ZeroMemory(@Item, SizeOf(Item));
-  Item.Mask := HDI_FORMAT;
-  Header_GetItem(Header, Column.Index, Item);
-  if Item.fmt and HDF_SORTUP <> 0 then
-    Result := hssAscending
-  else if Item.fmt and HDF_SORTDOWN <> 0 then
-    Result := hssDescending
-  else
-    Result := hssNone;
-end;
+const
+  CLISO = $D0D0D0;
 
-procedure SetListHeaderSortState(HeaderLView: TCustomListView; Column: TListColumn; Value: THeaderSortState);
-var
-  Header: HWND;
-  Item: THDItem;
-begin
-  Header := ListView_GetHeader(HeaderLView.Handle);
-  ZeroMemory(@Item, SizeOf(Item));
-  Item.Mask := HDI_FORMAT;
-  Header_GetItem(Header, Column.Index, Item);
-  Item.fmt := Item.fmt and not (HDF_SORTUP or HDF_SORTDOWN); //remove both flags
-  case Value of
-    hssAscending:
-    begin
-      Column.Caption := Column.Caption + ' ' +#$25b2; // Add an arrow to the caption. Using styles dont show the arrows in the header
-      Item.fmt := Item.fmt or HDF_SORTUP;
-    end;
-    hssDescending:
-    begin
-      Column.Caption := Column.Caption + ' ' +#$25bc; // Add an arrow to the caption.
-      Item.fmt := Item.fmt or HDF_SORTDOWN;
-    end;
-  end;
-  Header_SetItem(Header, Column.Index, Item);
-end;
-
-// TThumbTask. Generates Thumbnail in a separate thread.
-
-constructor TThumbTask.Create(const AItemIndex: integer;
-                              const AListView: TShellListView;
-                              const APitemIDList: pointer;
-                              const AThreadPool: TThreadPool);
-begin
-  FItemIndex := AItemIndex;
-  FListView := AListView;
-  FPitemIDList := APitemIDList;
-  FThreadPool := AThreadPool;
-  FPathName := AListView.Folders[FItemIndex].PathName;
-
-  inherited Create(nil, TNotifyEvent(nil), DoExecute, FThreadPool, nil, []);
-end;
-
-// Future use
-destructor TThumbTask.Destroy;
-begin
-  SetLength(FPathName, 0);
-  inherited;
-end;
-
-procedure TThumbTask.DoExecute;
-var Flags: TSIIGBF;
-    HBmp: HBITMAP;
-    Hr: HRESULT;
-    Tries: integer;
-begin
-  CoInitialize(nil);
-  try
-    try
-      Hr := S_FALSE;
-      Flags := SIIGBF_THUMBNAILONLY;
-      Tries := 3; // Try a few times.
-      while (Tries > 0) and
-            (Hr <> S_OK) and
-            (GetStatus <> TTaskStatus.Canceled) do
-      begin
-        dec(Tries);
-        Hr := GetThumbCache(FPathName, HBmp, Flags, FListView.FThumbNails.Width, FListView.FThumbNails.Height);
-        if (Hr <> S_OK) then
-        begin
-          DeleteObject(HBmp); // Not sure if this is needed
-          Sleep(50);
-        end;
-      end;
-
-      // The task is canceled, or the current path has changed.
-      // Dont send any messages, but delete bitmap. If the handle is invalid, doesn't matter
-      if (GetStatus = TTaskStatus.Canceled) or
-         (FPitemIDList <> FListView.RootFolder.AbsoluteID) then
-      begin
-        DeleteObject(HBmp);
-        exit;
-      end;
-
-      if (Hr = S_OK) then
-        // We must update the imagelist in the main thread, send a message
-        PostMessage(FListView.Handle, CM_ThumbRefresh, FItemIndex, HBmp);
-
-      // Sendmessage that task has finished.
-      // We must wait for this message, to be sure that the Task object does not get freed to soon.
-      SendMessage(FListView.Handle, CM_ThumbEnd, 0, 0);
-
-    except
-      on E: Exception do
-      begin
-        // Sendmessage that task is in error
-        SendMessage(FListView.Handle, CM_ThumbError, FItemIndex, LPARAM(E));
-      end;
-    end;
-  finally
-    CoUninitialize;
-  end;
-end;
-
-function TThumbTask.Start: ITask;
-begin
-  result := inherited;
-end;
-
-// ShellListview. Extended to support:
-//  Thumbnails.
-//  User defined columns.
-//  Column sorting.
-// Extends the 'standard' Vcl.ShellCtrls from Embarcadero. You need to make some modifications. See the readme in the Vcl.ShellCtrls dir.
-
-procedure TShellListview.WMNotify(var Msg: TWMNotify);
-var Column: TListColumn;
-    ResizedColumn: integer;
-begin
-  inherited;
-
-  case Msg.NMHdr^.code of
-    HDN_ENDTRACK:
-      begin
-        if (Assigned(FonColumnResized)) then
-        begin
-          ResizedColumn := pHDNotify(Msg.NMHdr)^.Item;
-          Column := Columns[ResizedColumn];
-          FonColumnResized(Column);
-        end;
-      end;
-    HDN_BEGINTRACK: ;
-    HDN_TRACK:  ;
-  end;
-end;
-
-procedure TShellListview.InitSortSpec(SortColumn: integer; SortState: THeaderSortState);
-begin
-  FSortColumn := SortColumn;
-  FSortState := SortState;
-end;
-
-procedure TShellListView.ColumnSort;
-var ANitem: TListItem;
-begin
-  if (ViewStyle = vsReport) and
-      FColumnSorted then
-   begin
-    if (FSortColumn < Columns.Count) then
-      SetListHeaderSortState(Self, Columns[FSortColumn], FSortState);
-
-    if (SortColumn <> 0) then
-      for ANitem in Items do; // Need to get all the details of the items
-    // Use an anonymous method. So we can test for FDoDefault, SortColumn and SortState
-    // See also method ListSortFunc in Vcl.Shell.ShellCtrls.pas
-    FoldersList.SortList(function (Item1, Item2: Pointer): Integer
-
-      const R: array[Boolean] of Byte = (0, 1);
-      begin
-        result := R[TShellFolder(Item2).IsFolder] - R[TShellFolder(Item1).IsFolder];
-        if (result = 0) then
-        begin
-          if (FDoDefault) or
-             (SortColumn = 0) then  // Use the standard compare
-          begin
-            if (TShellFolder(Item1).ParentShellFolder <> nil) then
-              result := Smallint(TShellFolder(Item1).ParentShellFolder.CompareIDs(
-                                  SortColumn,
-                                  TShellFolder(Item1).RelativeID,
-                                  TShellFolder(Item2).RelativeID)
-                                );
-          end
-          else
-          begin                      // Compare the values from DetailStrings. Always text.
-            if (SortColumn <= TShellFolder(Item1).DetailStrings.Count) and
-               (SortColumn <= TShellFolder(Item2).DetailStrings.Count) then
-              result := CompareText(TShellFolder(Item1).Details[SortColumn],
-                                    TShellFolder(Item2).Details[SortColumn]);
-          end;
-        end;
-
-        if (SortState = THeaderSortState.hssDescending) then
-          result := result * -1;
-      end
-    );
-  end;
-end;
-
-// Calling Invalidate creates a new window handle. We must store that handle in the Folders.
-// In the standard it is done in LoadColumnDetails.
-// See also: OnEnumColumnsAfterEvent
-procedure TShellListview.Invalidate;
-var Indx: integer;
-begin
-  inherited;
-
-  for Indx := 0 to Items.Count -1 do
-    Folders[Indx].ViewHandle := Handle;
-end;
-
-procedure TShellListView.EnumColumns;
-begin
-  if Assigned(FOnEnumColumnsBeforeEvent) then
-    FOnEnumColumnsBeforeEvent(Self);
-
-  if (FDoDefault) then
-    inherited;
-
-  if Assigned(FOnEnumColumnsAfterEvent) then
-    FOnEnumColumnsAfterEvent(Self);
-
-  ColumnSort;
-end;
-
-// Create a thread pool using nr. of cores available
-procedure TShellListView.ResetPool(const Threads: integer = -1);
-var
-  MinThreads, MaxThreads: integer;
-begin
-  if (Assigned(FThreadPool)) then
-    FreeAndNil(FThreadPool);
-  FThreadPool := TThreadPool.Create;
-
-  MinThreads := (Threads + 1) div 2;
-  MaxThreads := Threads;
-  if (Threads = -1) then
-  begin
-    MinThreads := (CPUCount + 1) div 2;
-    MaxThreads := CPUCount;
-  end;
-
-  FThreadPool.SetMinWorkerThreads(MinThreads);
-  FThreadPool.SetMaxWorkerThreads(MaxThreads);
-end;
-
-procedure TShellListView.CMThumbStart(var Message: TMessage);
-begin
-  if (Assigned(FOnNotifyGenerateEvent)) then
-    FOnNotifyGenerateEvent(Self, Items[Message.WParam], TThumbGenStatus.Started, Items.Count, FGenerating);
-end;
-
-procedure TShellListView.CMThumbEnd(var Message: TMessage);
-begin
-  RemoveThumbTask(Message.WParam);
-  if (Assigned(FOnNotifyGenerateEvent)) then
-    FOnNotifyGenerateEvent(Self, Items[Message.WParam], TThumbGenStatus.Ended, Items.Count, FGenerating);
-end;
-
-procedure TShellListView.CMThumbError(var Message: TMessage);
-begin
-  RemoveThumbTask(Message.WParam);
-  if (Assigned(FOnNotifyErrorEvent)) then
-    FOnNotifyErrorEvent(Self, Items[Message.WParam], Exception(Message.LParam));
-end;
-
-procedure TShellListView.CMThumbRefresh(var Message: TMessage);
-begin
-  if (Message.WParam < WParam(Items.Count)) then
-  begin
-    Add2ThumbNails(Message.LParam, Message.WParam, false);
-    Items[Message.WParam].Update;
-  end;
-end;
-
-procedure TShellListView.GetThumbNails;
-var ANitem: TListItem;
-    Hr: HRESULT;
-    HBmp: HBITMAP;
-    ItemIndx: integer;
-begin
-  if (ViewStyle = vsIcon) and
-     (FThumbNailSize > 0) then
-  begin
-
-    FThumbNails.Clear;
-
-    // Set the imagelist to our thumbnail list.
-    SendMessage(Handle, LVM_SETIMAGELIST, LVSIL_NORMAL, FThumbNails.Handle);
-
-    // Adjust the size of the cache
-    SetLength(FThumbNailCache, Items.Count);
-
-    // Add the Thumbnails that Windows has already cached to our imagelist.
-    // If not in cache, we show an Icon, and mark it in the cache as negative *-1  (Needs generating = true)
-    // Only the thumbnails in view (visible) are generated. See: OwnerDataFetch
-    CancelThumbTasks;
-
-    FGenerating := 0;
-    SendMessage(Self.Handle, CM_ThumbEnd, -1, 0);
-
-    for ANitem in Items do
-    begin
-      ItemIndx := ANitem.Index;
-
-      Hr := GetThumbCache(Folders[ItemIndx].PathName, HBmp,
-                          SIIGBF_THUMBNAILONLY or SIIGBF_INCACHEONLY,
-                          FThumbNails.Width, FThumbNails.Height);
-      if (Hr = S_OK) then
-        Add2ThumbNails(HBmp, ItemIndx, false)
-      else
-      begin
-        // No thumbnail in cache.
-        // Show the Icon. That is reasonably fast.
-        Hr := GetThumbCache(Folders[ItemIndx].PathName, HBmp,
-                            SIIGBF_ICONONLY,
-                            FThumbNails.Width, FThumbNails.Height);
-        if (Hr = S_OK) then
-          Add2ThumbNails(HBmp, ItemIndx, true);
-      end;
-    end;
-  end;
-end;
-
-procedure TShellListView.Populate;
-begin
-  // Prevent flicker by skipping populate when not yet needed.
-  if (csLoading in ComponentState) then
-    exit;
-  if not HandleAllocated then
-    exit;
-  if not Enabled then
-    exit;
-  // until here
-
-  // Force initialization of array with zeroes
-  SetLength(FThumbNailCache, 0);
-
-  if Assigned(FOnPopulateBeforeEvent) then
-    FOnPopulateBeforeEvent(Self, FDoDefault);
-
-  inherited;
-
-  // Optimize memory allocation
-  AllocBy := Items.Count;
-
-  // Get Thumbnails and load in imagelist.
-  GetThumbNails;
-end;
-
-// When in vsReport mode, calls the OwnerDataFetch event to get the item.caption and subitems.
-//
-// Sets the Item.ImageIndex when the listview is in vsIcon mode. When not avail (<0) it start the generating.
-function TShellListView.OwnerDataFetch(Item: TListItem; Request: TItemRequest): boolean;
-
-  procedure DoIcon;
-  var ItemIndx, TaskId: integer;
-  begin
-    if not(irImage in Request) then
-      exit;
-    ItemIndx := Item.Index;
-
-    // Index in cache?
-    if (ItemIndx > High(FThumbNailCache)) then
-      exit;
-
-    // Update the item with the imageindex of our cached thumbnail (-1 here)
-    if (FThumbNailCache[ItemIndx] > 0) then
-    // The bitmap in the cache is a thumbnail
-    begin
-      Item.ImageIndex := FThumbNailCache[ItemIndx] - 1;
-      exit;
-    end;
-
-    if (FThumbNailCache[ItemIndx] < 0) then
-    // The bitmap in the cache is a temporary ICON.
-    begin
-      Item.ImageIndex := (FThumbNailCache[ItemIndx] * -1) - 1;
-      FThumbNailCache[ItemIndx] := Item.ImageIndex + 1; // Just try it once.
-    end;
-
-    // Generate the thumbnail asynchronously
-    FGeneratingLock.Acquire;
-    try
-      inc(FGenerating);
-      // Add to list of thumbnails to generate
-      TaskId := FThumbTasks.Add(nil);
-      FThumbTasks[TaskId] := TThumbTask.Create(ItemIndx, Self, Self.RootFolder.AbsoluteID, FThreadPool);
-    finally
-      FGeneratingLock.Release;
-    end;
-
-    // Actually start the task.  It will create a HBITMAP, and send a message to the ShellListView window.
-    // Updating the imagelist must be done in the main thread.
-    TThumbTask(FThumbTasks[TaskId]).Start;
-
-    // Send a message that generating begins.
-    PostMessage(Self.Handle, CM_ThumbStart, 0, 0);
-  end;
-
-begin
-  result := true; // The inherited always return true!
-
-  if not (FDoDefault) and
-     not(csDesigning in ComponentState) and
-     Assigned(FOnOwnerDataFetchEvent) then
-    FOnOwnerDataFetchEvent(Self, Item, Request, Folders[Item.Index])
-  else
-    result := inherited;
-
-  if (ViewStyle = vsIcon) then
-    DoIcon;
-end;
-
-constructor TShellListView.Create(AOwner: TComponent);
-begin
-  Inherited Create(AOwner);
-
-  FThumbNailSize := 0;
-  FGenerating := 0;
-
-  InitSortSpec(0, THeaderSortState.hssNone);
-  FGeneratingLock := TMutex.Create;
-  FThumbTasks := TList.Create;
-  FThumbNails := TImageList.Create(Self);
-  SetLength(FThumbNailCache, 0);
-  ResetPool; // create a threadpool.
-end;
-
-destructor TShellListView.Destroy;
-begin
-  CancelThumbTasks;
-  FThumbTasks.Free;
-  FGeneratingLock.Free;
-  FThumbNails.Free;
-  SetLength(FThumbNailCache, 0);
-  FreeAndNil(FThreadPool);
-
-  inherited;
-end;
-
-procedure TShellListView.CancelThumbTasks;
-var ATask: TThumbTask;
-begin
-  FGeneratingLock.Acquire;
-  try
-    for ATask in FThumbTasks do
-      if Assigned(ATask) and                // Checks to avoid AV's generating thumbs
-         Assigned(ATask.FControlFlag) then
-        ATask.Cancel;
-  finally
-    FGeneratingLock.Release;
-    FThumbTasks.Clear;
-    FGenerating := 0;
-  end;
-end;
-
-procedure TShellListView.RemoveThumbTask(ItemIndex: integer);
-var Indx: integer;
-begin
-  if (ItemIndex >= 0) then
-  begin
-    FGeneratingLock.Acquire;
-    try
-      dec(FGenerating);
-      for Indx := 0 to FThumbTasks.Count -1 do
-      begin
-        if (TThumbTask(FThumbTasks[Indx]).FItemIndex = ItemIndex) then
-        begin
-          FThumbTasks.Delete(Indx);
-          break;
-        end;
-      end;
-    finally
-      FGeneratingLock.Release;
-    end;
-  end;
-end;
-
-function TShellListView.FileName(ItemIndex: integer = -1): string;
-begin
-  result := '';
-  if (ItemIndex = -1) and
-     (Selected <> nil) then
-    result := ExtractFileName(Folders[Selected.Index].PathName)
-  else
-    if (ItemIndex > -1) and
-       (ItemIndex < Items.Count) then
-      result := ExtractFileName(Folders[ItemIndex].PathName);
-end;
-
-function TShellListView.FileExt(ItemIndex: integer = -1): string;
-begin
-  result := '';
-  if (ItemIndex = -1) and
-     (Selected <> nil) then
-    result := ExtractFileExt(Folders[Selected.Index].PathName)
-  else
-    if (ItemIndex > -1) and
-       (ItemIndex < Items.Count) then
-      result := ExtractFileExt(Folders[ItemIndex].PathName);
-end;
-
-procedure TShellListView.ColumnClick(Column: TListColumn);
-var
-  I: Integer;
-  Ascending: Boolean;
-  State: THeaderSortState;
-begin
-  Ascending := GetListHeaderSortState(Self, Column)<>hssAscending;
-  for I := 0 to Columns.Count-1 do
-  begin
-    if Columns[I] = Column then
-    begin
-      if Ascending then
-        State := hssAscending
-      else
-        State := hssDescending;
-      InitSortSpec(Column.Index, State);
-    end
-    else
-      State := hssNone;
-    SetListHeaderSortState(Self, Columns[I], State);
-  end;
-  Refresh;
-end;
-
-procedure TShellListView.SetColumnSorted(AValue: boolean);
-begin
-  if (FColumnSorted <> AValue) then
-  begin
-    FColumnSorted := AValue;
-  end;
-  if FColumnSorted then
-    Sorted := false;
-end;
-
-procedure TShellListView.SetThumbNailSize(AValue: integer);
-begin
-  if (FThumbNailSize <> AValue) then
-  begin
-    FThumbNailSize := AValue;
-    FThumbNails.Clear;
-    if (AValue <> 0) then
-    begin
-      FThumbNails.Width := FThumbNailSize;
-      FThumbNails.Height := FThumbNailSize;
-      FThumbNails.BlendColor := clBlack;
-      FThumbNails.BkColor := clBlack;
-    end;
-  end;
-end;
-
-procedure TShellListView.Add2ThumbNails(ABmp: HBITMAP; ANitemIndex: integer;
-  NeedsGenerating: boolean);
-var
-  ABitMap: TBitmap;
-begin
-  ABitMap := TBitmap.Create;
-  ABitMap.Canvas.Lock;
-  try
-    ABitMap.TransparentColor := FThumbNails.BkColor;
-    ABitMap.Handle := ABmp;
-    ResizeBitmapCanvas(ABitMap, FThumbNails.Width, FThumbNails.Height, FThumbNails.BkColor);
-    Items[ANitemIndex].ImageIndex := FThumbNails.AddMasked(ABitMap, FThumbNails.BkColor);
-    if (NeedsGenerating) then
-      FThumbNailCache[ANitemIndex] := (Items[ANitemIndex].ImageIndex + 1) * -1
-    else
-      FThumbNailCache[ANitemIndex] := Items[ANitemIndex].ImageIndex + 1;
-  finally
-    ABitMap.Canvas.Unlock;
-    DeleteObject(ABmp);
-    ABitMap.Free;
-  end;
-end;
-
-// End TShellListView
-
-// Start Main
+  // Start Main
 
 procedure TFMain.WMEndSession(var Msg: TWMEndSession);
 begin // for Windows Shutdown/Log-off while GUI is open
@@ -1023,7 +340,8 @@ begin
 end;
 
 procedure TFMain.AdvRadioGroup2Click(Sender: TObject);
-var LeftInc: double;
+var
+  LeftInc: double;
 begin
   with ETChart do
   begin
@@ -1240,8 +558,7 @@ end;
 procedure TFMain.CBoxDetailsChange(Sender: TObject);
 begin
   with CBoxDetails do
-    SpeedBtnColumnEdit.Enabled := SpeedBtnDetails.Down and
-      (ItemIndex = Items.Count - 1);
+    SpeedBtnColumnEdit.Enabled := SpeedBtnDetails.Down and (ItemIndex = Items.Count - 1);
 
   with ShellList do
   begin
@@ -1251,6 +568,16 @@ begin
   end;
   ShowMetadata;
   ShowPreview;
+end;
+
+procedure TFMain.GenerateThumbnails1Click(Sender: TObject);
+begin
+  GenerateThumbs(ShellTree.Path, false, ShellList.ThumbNailSize, ShellListOnGenerateReady);
+end;
+
+procedure TFMain.GenerateThumbnailsIinclSubdirs1Click(Sender: TObject);
+begin
+  GenerateThumbs(ShellTree.Path, true, ShellList.ThumbNailSize, ShellListOnGenerateReady);
 end;
 
 function TFMain.GetFirstSelectedFile: string;
@@ -1266,16 +593,17 @@ function TFMain.GetSelectedFiles(forETopen: boolean = true): string;
 var
   F: TextFile;
   TempFile: string;
-  ANitem: TListItem;
+  AnItem: TListItem;
 begin
   result := '';
   TempFile := GetExifToolTmp;
   AssignFile(F, TempFile);
   Rewrite(F); // Create file (delete old if exist)
-  for ANitem in ShellList.Items do
+  for AnItem in ShellList.Items do
   begin
-    if ANitem.Selected then
-      Writeln(F, ShellList.FileName(ANitem.Index)); // -writes Ansi encoded lines
+    if AnItem.Selected then
+      Writeln(F, ShellList.FileName(AnItem.Index));
+    // -writes Ansi encoded lines
   end;
   CloseFile(F);
   if forETopen then
@@ -1322,8 +650,7 @@ begin
       ETBackupMode := '';
 end;
 
-procedure TFMain.MetadataListDrawCell(Sender: TObject; ACol, ARow: integer;
-  Rect: TRect; State: TGridDrawState);
+procedure TFMain.MetadataListDrawCell(Sender: TObject; ACol, ARow: integer; Rect: TRect; State: TGridDrawState);
 var
   CellTx, KeyTx, WorkTx: string[127];
   NewColor, TxtColor: TColor;
@@ -1410,14 +737,12 @@ begin // remember last selected row
     MetadataList.Tag := MetadataList.Row;
 end;
 
-procedure TFMain.MetadataListKeyDown(Sender: TObject; var Key: Word;
-  Shift: TShiftState);
+procedure TFMain.MetadataListKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
 var
   i: smallint;
 begin
   i := MetadataList.Row;
-  if (Key = VK_Return) and SpeedBtnQuick.Down and not(QuickTags[i - 1].NoEdit)
-  then
+  if (Key = VK_Return) and SpeedBtnQuick.Down and not(QuickTags[i - 1].NoEdit) then
   begin
     if SpeedBtnLarge.Down then
       MemoQuick.SetFocus
@@ -1429,7 +754,8 @@ begin
 end;
 
 procedure TFMain.MetadataListMouseDown(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: integer);
-var XCol, XRow: Integer;
+var
+  XCol, XRow: integer;
 begin
   if Button = mbRight then
     with MetadataList do
@@ -1439,8 +765,7 @@ begin
     end;
 end;
 
-procedure TFMain.MetadataListSelectCell(Sender: TObject; ACol, ARow: integer;
-  var CanSelect: boolean);
+procedure TFMain.MetadataListSelectCell(Sender: TObject; ACol, ARow: integer; var CanSelect: boolean);
 begin
   EditQuick.Text := '';
   MemoQuick.Text := '';
@@ -1488,9 +813,8 @@ procedure TFMain.MExifLensFromMakerClick(Sender: TObject);
 var
   ETcmd, ETout, ETerr: string;
 begin
-  if MessageDlg('This will fill Exif:LensInfo of selected files with relevant' +
-    #10#13 + 'values from Makernotes data (where possible).' + #10#13#10#13 +
-    'OK to proceed?', mtInformation, [mbOk, mbCancel], 0) = mrOK then
+  if MessageDlg('This will fill Exif:LensInfo of selected files with relevant' + #10#13 + 'values from Makernotes data (where possible).' +
+    #10#13#10#13 + 'OK to proceed?', mtInformation, [mbOk, mbCancel], 0) = mrOK then
   begin
     ETcmd := '-Exif:LensInfo<LensID' + CRLF + '-Exif:LensModel<LensID';
     ET_OpenExec(ETcmd, GetSelectedFiles, ETout, ETerr);
@@ -1527,8 +851,7 @@ begin
   if Sender = MExportMetaXMP then
     ETcmd := '-o' + CRLF + xDir + '%f.xmp' + CRLF + '-Xmp:All';
   if Sender = MExportMetaEXIF then
-    ETcmd := '-TagsFromFile' + CRLF + '@' + CRLF + '-All:All' + CRLF + '-o' +
-      CRLF + '%f.exif';
+    ETcmd := '-TagsFromFile' + CRLF + '@' + CRLF + '-All:All' + CRLF + '-o' + CRLF + '%f.exif';
   if Sender = MExportMetaHTM then
     ETcmd := '-w' + CRLF + xDir + '%f.html' + CRLF + '-htmldump';
 
@@ -1542,12 +865,10 @@ procedure TFMain.MFileDateFromExifClick(Sender: TObject);
 var
   ETout, ETerr: string;
 begin
-  if MessageDlg('This will set "Date modified" of selected files' + #10#13 +
-    'according to Exif:DateTimeOriginal value.' + #10#13#10#13 +
+  if MessageDlg('This will set "Date modified" of selected files' + #10#13 + 'according to Exif:DateTimeOriginal value.' + #10#13#10#13 +
     'OK to proceed?', mtInformation, [mbOk, mbCancel], 0) = mrOK then
   begin
-    ET_OpenExec('-FileModifyDate<Exif:DateTimeOriginal', GetSelectedFiles,
-      ETout, ETerr);
+    ET_OpenExec('-FileModifyDate<Exif:DateTimeOriginal', GetSelectedFiles, ETout, ETerr);
     UpdateLogWin(ETout, ETerr);
     ShellList.Refresh;
     ShowMetadata;
@@ -1583,12 +904,9 @@ begin
   begin
     j := ShellList.SelCount;
     if j > 1 then // message appears only if multi files selected
-      if MessageDlg('This will copy ALL metadata from any source into' + #10#13 +
-        'currently *selected* ' + DstExt + ' files.' + #10#13 +
-        'Only those selected files will be processed,' + #10#13 +
-        'where source and destination filename is equal.' + #10#13#10#13 +
-        'Next: Select source file. OK to proceed?', mtInformation,
-        [mbOk, mbCancel], 0) <> mrOK then
+      if MessageDlg('This will copy ALL metadata from any source into' + #10#13 + 'currently *selected* ' + DstExt + ' files.' + #10#13 +
+        'Only those selected files will be processed,' + #10#13 + 'where source and destination filename is equal.' + #10#13#10#13 +
+        'Next: Select source file. OK to proceed?', mtInformation, [mbOk, mbCancel], 0) <> mrOK then
         j := 0;
     if j <> 0 then
     begin
@@ -1645,10 +963,8 @@ end;
 
 procedure TFMain.MImportMetaSingleClick(Sender: TObject);
 begin
-  if MessageDlg('This will copy metadata from single source file,' + #10 + #13 +
-    'into currently selected files.' + #10 + #13 + #10 + #13 +
-    'Next: 1.Select source file,  2.Select metadata to copy' + #10 + #13 +
-    'OK to proceed?', mtInformation, [mbOk, mbCancel], 0) = mrOK then
+  if MessageDlg('This will copy metadata from single source file,' + #10 + #13 + 'into currently selected files.' + #10 + #13 + #10 + #13 +
+    'Next: 1.Select source file,  2.Select metadata to copy' + #10 + #13 + 'OK to proceed?', mtInformation, [mbOk, mbCancel], 0) = mrOK then
   begin
     with OpenPictureDlg do
     begin
@@ -1680,12 +996,9 @@ begin
   Delete(DstExt, 1, 1);
   if (DstExt = 'jpg') or (DstExt = 'tif') then
   begin
-    i := MessageDlg('This will copy metadata from files in another folder' +
-      #10#13 + 'into *all* ' + UpperCase(DstExt) +
-      ' files inside currently *selected* folder.' + #10#13 +
-      'Only those files will be processed, where' + #10#13 +
-      'source and destination filename is equal.' + #10#13#10#13 +
-      'Should files in subfolders also be processed?', mtInformation,
+    i := MessageDlg('This will copy metadata from files in another folder' + #10#13 + 'into *all* ' + UpperCase(DstExt) +
+      ' files inside currently *selected* folder.' + #10#13 + 'Only those files will be processed, where' + #10#13 +
+      'source and destination filename is equal.' + #10#13#10#13 + 'Should files in subfolders also be processed?', mtInformation,
       [mbYes, mbNo, mbCancel], 0);
     if i <> mrCancel then
     begin
@@ -1699,8 +1012,7 @@ begin
       end;
       if OpenPictureDlg.Execute then
       begin
-        ETcmd := '-TagsFromFile' + CRLF +
-          ExtractFilePath(OpenPictureDlg.FileName); // incl. slash
+        ETcmd := '-TagsFromFile' + CRLF + ExtractFilePath(OpenPictureDlg.FileName); // incl. slash
         if i = mrYes then
           ETcmd := ETcmd + '%d\';
         ETcmd := ETcmd + '%f' + ExtractFileExt(OpenPictureDlg.FileName);
@@ -1712,15 +1024,13 @@ begin
           with FCopyMetadata do
           begin
             if not CheckBox1.Checked then
-              ETcmd := ETcmd + '--exif:ExifImageWidth' + CRLF +
-                '--exif:ExifImageHeight' + CRLF;
+              ETcmd := ETcmd + '--exif:ExifImageWidth' + CRLF + '--exif:ExifImageHeight' + CRLF;
             if not CheckBox2.Checked then
               ETcmd := ETcmd + '--exif:Orientation' + CRLF;
             if not CheckBox3.Checked then
               ETcmd := ETcmd + '--exif:Xresolution' + CRLF + '--exif:Yresolution' + CRLF + '--exif:ResolutionUnit' + CRLF;
             if not CheckBox4.Checked then
-              ETcmd := ETcmd + '--exif:ColorSpace' + CRLF +
-                '--exif:InteropIndex' + CRLF;
+              ETcmd := ETcmd + '--exif:ColorSpace' + CRLF + '--exif:InteropIndex' + CRLF;
             if not CheckBox5.Checked then
               ETcmd := ETcmd + '--Makernotes' + CRLF;
             if not CheckBox6.Checked then
@@ -1750,19 +1060,15 @@ procedure TFMain.MImportXMPLogClick(Sender: TObject);
 var
   SrcDir, ETcmd, ETout, ETerr: string;
 begin
-  if MessageDlg('This will import GPS data from XMP sidecar files into' + #10#13 +
-    'Exif GPS region of currently selected files.' + #10#13 +
-    'Only those selected files will be processed, where' + #10#13 +
-    'source and destination filename is equal.' + #10#13#10#13 +
-    'Next: Select folder containing XMP files. OK to proceed?', mtInformation,
-    [mbOk, mbCancel], 0) = mrOK then
+  if MessageDlg('This will import GPS data from XMP sidecar files into' + #10#13 + 'Exif GPS region of currently selected files.' + #10#13 +
+    'Only those selected files will be processed, where' + #10#13 + 'source and destination filename is equal.' + #10#13#10#13 +
+    'Next: Select folder containing XMP files. OK to proceed?', mtInformation, [mbOk, mbCancel], 0) = mrOK then
   begin
     if GpsXmpDir <> '' then
       SrcDir := GpsXmpDir
     else
       SrcDir := ShellTree.Path;
-    SrcDir := BrowseFolderDlg('Choose folder containing XMP sidecar files',
-      1, SrcDir);
+    SrcDir := BrowseFolderDlg('Choose folder containing XMP sidecar files', 1, SrcDir);
     if SrcDir <> '' then
     begin
       if SrcDir[length(SrcDir)] <> '\' then
@@ -1785,22 +1091,19 @@ end;
 procedure TFMain.MJPGAutorotateClick(Sender: TObject);
 var
   Img, FileName: string;
-  ANitem: TListItem;
+  AnItem: TListItem;
 begin
-  if MessageDlg('This will rotate selected JPG files according to' + #10#13 +
-    'existing Exif:Orientation value.' + #10#13 +
-    'In case menu Preserve Date modified is checked,' + #10#13 +
-    'Exif DateTime values (on ALL selected files) will' + #10#13 +
-    'be used for this purpose.' + #10#13#10#13 + 'OK to proceed?',
-    mtInformation, [mbOk, mbCancel], 0) = mrOK then
+  if MessageDlg('This will rotate selected JPG files according to' + #10#13 + 'existing Exif:Orientation value.' + #10#13 +
+    'In case menu Preserve Date modified is checked,' + #10#13 + 'Exif DateTime values (on ALL selected files) will' + #10#13 +
+    'be used for this purpose.' + #10#13#10#13 + 'OK to proceed?', mtInformation, [mbOk, mbCancel], 0) = mrOK then
   begin
 
     Img := '';
-    for ANitem in ShellList.Items do
+    for AnItem in ShellList.Items do
     begin
-      if (ShellList.SelCount = 0) or (ANitem.Selected) then
+      if (ShellList.SelCount = 0) or (AnItem.Selected) then
       begin
-        FileName := ShellList.FileName(ANitem.Index);
+        FileName := ShellList.FileName(AnItem.Index);
         if IsJpeg(FileName) then
           Img := Img + ' "' + FileName + '"';
       end;
@@ -1860,18 +1163,14 @@ var
   n, W, H, c: Word;
   dirJPG, Img, tx, outs, errs: string;
 begin
-  n := MessageDlg('Only those JPG images will be embedded into selected'#10#13 +
-    'CR2 files, where:' + #10#13 + '- CR2/JPG filenames are equal,' + #10#13 +
-    '- JPG width or height is min 512pix,' + #10#13 +
-    '- JPG width & height is multiple of 8.' + #10#13 +
-    'Metadata of imported JPG files will be deleted.' + #10#13#10#13 +
-    'Next: Select folder containing JPG files. OK to proceed?', mtInformation,
+  n := MessageDlg('Only those JPG images will be embedded into selected'#10#13 + 'CR2 files, where:' + #10#13 + '- CR2/JPG filenames are equal,' +
+    #10#13 + '- JPG width or height is min 512pix,' + #10#13 + '- JPG width & height is multiple of 8.' + #10#13 +
+    'Metadata of imported JPG files will be deleted.' + #10#13#10#13 + 'Next: Select folder containing JPG files. OK to proceed?', mtInformation,
     [mbOk, mbCancel], 0);
   j := ShellList.SelCount;
   if (n = mrOK) and (j > 0) then
   begin
-    dirJPG := BrowseFolderDlg('Select folder containing JPG images', 1,
-      ShellTree.Path);
+    dirJPG := BrowseFolderDlg('Select folder containing JPG images', 1, ShellTree.Path);
     if dirJPG <> '' then
     begin
       if dirJPG[length(dirJPG)] <> '\' then
@@ -1889,8 +1188,7 @@ begin
           SetLength(Img, n); // filename ending with dot (without extension)
           if FileExists(dirJPG + Img + 'jpg') then
           begin
-            ET_OpenExec('-s3' + CRLF + '-ImageSize', dirJPG + Img + 'jpg',
-              outs, errs);
+            ET_OpenExec('-s3' + CRLF + '-ImageSize', dirJPG + Img + 'jpg', outs, errs);
             tx := outs;
             n := pos('x', tx);
             SetLength(tx, n - 1);
@@ -1934,8 +1232,7 @@ begin
         end;
       end;
       LabelCounter.Visible := false;
-      StatusBar.Panels[1].Text := IntToStr(c) + ' of ' + IntToStr(j) +
-        ' files updated.';
+      StatusBar.Panels[1].Text := IntToStr(c) + ' of ' + IntToStr(j) + ' files updated.';
       if length(errs) > 0 then
       begin
         errs := errs + '<-END-';
@@ -2036,7 +1333,8 @@ begin
 end;
 
 procedure TFMain.MWorkspaceSaveClick(Sender: TObject);
-var DoSave, IsOK: boolean;
+var
+  DoSave, IsOK: boolean;
 begin
   with SaveFileDlg do
   begin
@@ -2077,8 +1375,7 @@ begin
   QuickPopUp_UndoEdit.Visible := (pos('*', tx) = 1);
   IsSep := (length(tx) = 0);
 
-  QuickPopUp_AddQuick.Visible := not IsSep and
-    (SpeedBtnExif.Down or SpeedBtnXmp.Down or SpeedBtnIptc.Down);
+  QuickPopUp_AddQuick.Visible := not IsSep and (SpeedBtnExif.Down or SpeedBtnXmp.Down or SpeedBtnIptc.Down);
   QuickPopUp_AddCustom.Visible := not(SpeedBtnQuick.Down or SpeedBtnCustom.Down or IsSep);
   QuickPopUp_DelCustom.Visible := SpeedBtnCustom.Down and not(IsSep);
   QuickPopUp_AddDetailsUser.Visible := not IsSep and (SpeedBtnExif.Down or SpeedBtnXmp.Down or SpeedBtnIptc.Down);
@@ -2344,60 +1641,60 @@ end;
 
 procedure TFMain.QuickPopUp_MarkTagClick(Sender: TObject);
 var
-  I, J: smallint;
-  Tx: string;
+  i, j: smallint;
+  tx: string;
 begin
   with MetadataList do
-    Tx := Keys[Row];
-  I := pos(' ', Tx);
-  if I > 0 then
-    Delete(Tx, 1, I); // if Show HexID exist
-  if length(Tx) > 0 then
+    tx := Keys[Row];
+  i := pos(' ', tx);
+  if i > 0 then
+    Delete(tx, 1, i); // if Show HexID exist
+  if length(tx) > 0 then
   begin
-    I := pos(Tx, MarkedTags);
-    if I > 0 then
+    i := pos(tx, MarkedTags);
+    if i > 0 then
     begin // tag allready marked: unmark it
-      J := I;
+      j := i;
       repeat
-        inc(J);
-      until MarkedTags[J] = ' ';
-      Delete(MarkedTags, I, J - I + 1);
+        inc(j);
+      until MarkedTags[j] = ' ';
+      Delete(MarkedTags, i, j - i + 1);
       if length(MarkedTags) = 0 then
         MarkedTags := 'Artist ';
     end
     else
-      MarkedTags := MarkedTags + Tx + ' '; // mark tag
+      MarkedTags := MarkedTags + tx + ' '; // mark tag
   end;
 end;
 
 procedure TFMain.QuickPopUp_UndoEditClick(Sender: TObject);
 var
-  I, N, X: smallint;
-  Tx, ETouts, ETerrs: string;
+  i, n, X: smallint;
+  tx, ETouts, ETerrs: string;
 begin
-  I := MetadataList.Row;
-  MetadataList.Keys[I] := QuickTags[I - 1].Caption;
-  Tx := '-s3' + CRLF + '-f' + CRLF + QuickTags[I - 1].Command;
-  ET_OpenExec(Tx, ShellList.FileName, ETouts, ETerrs);
-  MetadataList.Cells[1, I] := ETouts;
-  N := MetadataList.RowCount - 1;
+  i := MetadataList.Row;
+  MetadataList.Keys[i] := QuickTags[i - 1].Caption;
+  tx := '-s3' + CRLF + '-f' + CRLF + QuickTags[i - 1].Command;
+  ET_OpenExec(tx, ShellList.FileName, ETouts, ETerrs);
+  MetadataList.Cells[1, i] := ETouts;
+  n := MetadataList.RowCount - 1;
   X := 0;
-  for I := 1 to N do
-    if pos('*', MetadataList.Keys[I]) = 1 then
+  for i := 1 to n do
+    if pos('*', MetadataList.Keys[i]) = 1 then
       inc(X);
   SpeedBtnQuickSave.Enabled := (X > 0);
 end;
 
 procedure TFMain.UpdateLogWin(ETouts, ETerrs: string);
 var
-  I: smallint;
+  i: smallint;
 begin
   with FLogWin do
   begin
     MemoLog.Lines.Text := ETouts;
-    I := MemoLog.Lines.Count;
-    if I > 0 then
-      StatusBar.Panels[1].Text := MemoLog.Lines[I - 1];
+    i := MemoLog.Lines.Count;
+    if i > 0 then
+      StatusBar.Panels[1].Text := MemoLog.Lines[i - 1];
     MemoLog.Lines.Append(ETerrs);
     if ETerrs <> '' then
       Show;
@@ -2407,15 +1704,16 @@ end;
 
 procedure TFMain.UpdateStatusBar_FilesShown;
 var
-  I: smallint;
+  i: smallint;
 begin
-  I := ShellList.Items.Count;
-  StatusBar.Panels[0].Text := 'Files: ' + IntToStr(I);
+  i := ShellList.Items.Count;
+  StatusBar.Panels[0].Text := 'Files: ' + IntToStr(i);
 end;
 
 procedure TFMain.EdgeBrowser1WebMessageReceived(Sender: TCustomEdgeBrowser; Args: TWebMessageReceivedEventArgs);
-var Message: PChar;
-    Msg, Parm1, Parm2: string;
+var
+  Message: PChar;
+  Msg, Parm1, Parm2: string;
 begin
   Args.ArgsInterface.Get_webMessageAsJson(Message);
   ParseJsonMessage(Message, Msg, Parm1, Parm2);
@@ -2455,8 +1753,7 @@ begin
   end;
 end;
 
-procedure TFMain.EditETdirectKeyDown(Sender: TObject; var Key: Word;
-  Shift: TShiftState);
+procedure TFMain.EditETdirectKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
 var
   IsUtf8, IsRecursive: boolean;
   i: smallint;
@@ -2536,27 +1833,26 @@ begin
   StatusBar.Panels[2].Text := '';
 end;
 
-procedure TFMain.EditQuickKeyDown(Sender: TObject; var Key: Word;
-  Shift: TShiftState);
+procedure TFMain.EditQuickKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
 var
-  I: smallint;
-  Tx: string;
+  i: smallint;
+  tx: string;
 begin
-  I := MetadataList.Row;
-  if (Key = VK_Return) and not(QuickTags[I - 1].NoEdit) then
+  i := MetadataList.Row;
+  if (Key = VK_Return) and not(QuickTags[i - 1].NoEdit) then
     with MetadataList do
     begin
       if Sender = EditQuick then
-        Tx := trim(EditQuick.Text) // delete leading and trailing
+        tx := trim(EditQuick.Text) // delete leading and trailing
       else
-        Tx := trim(MemoQuick.Text);
-      Cells[1, I] := Tx;
-      Tx := Keys[I];
-      if Tx[1] <> '*' then
-        Keys[I] := '*' + Tx; // mark tag value changed
+        tx := trim(MemoQuick.Text);
+      Cells[1, i] := tx;
+      tx := Keys[i];
+      if tx[1] <> '*' then
+        Keys[i] := '*' + tx; // mark tag value changed
       if GUIsettings.AutoIncLine and // select next row
-        (I < RowCount - 1) then
-        Row := I + 1;
+        (i < RowCount - 1) then
+        Row := i + 1;
       Refresh;
       SetFocus;
       SpeedBtnQuickSave.Enabled := true;
@@ -2567,26 +1863,26 @@ begin
     begin
       if Sender = EditQuick then
       begin
-        if QuickTags[I - 1].NoEdit then
+        if QuickTags[i - 1].NoEdit then
           EditQuick.Text := ''
         else
         begin
-          if RightStr(Keys[I], 1) = #177 then
+          if RightStr(Keys[i], 1) = #177 then
             EditQuick.Text := '+'
           else
-            EditQuick.Text := Cells[1, I];
+            EditQuick.Text := Cells[1, i];
         end;
       end
       else
       begin
-        if QuickTags[I - 1].NoEdit then
+        if QuickTags[i - 1].NoEdit then
           MemoQuick.Text := ''
         else
         begin
-          if RightStr(Keys[I], 1) = #177 then
+          if RightStr(Keys[i], 1) = #177 then
             MemoQuick.Text := '+'
           else
-            MemoQuick.Text := Cells[1, I];
+            MemoQuick.Text := Cells[1, i];
         end;
       end;
       SetFocus;
@@ -2596,7 +1892,7 @@ end;
 procedure TFMain.ShowPreview;
 var
   Rotate: integer;
-  fPath: string;
+  FPath: string;
   ABitMap: TBitmap;
   HBmp: HBITMAP;
 begin
@@ -2605,11 +1901,11 @@ begin
   begin
     Screen.Cursor := crHourGlass;
     try
-      fPath := IncludeTrailingBackslash(ShellTree.Path) + ShellList.FileName;
+      FPath := IncludeTrailingBackslash(ShellTree.Path) + ShellList.FileName;
       Rotate := 0;
       if GUIsettings.AutoRotatePreview then
       begin
-        Case GetOrientationValue(fPath) of
+        Case GetOrientationValue(FPath) of
           0, 1:
             Rotate := 0; // no tag or don't rotate
           3:
@@ -2621,12 +1917,10 @@ begin
         end;
       end;
 
-      ABitMap := GetBitmapFromWic(WicPreview(fPath, Rotate, RotateImg.Width,
-        RotateImg.Height));
+      ABitMap := GetBitmapFromWic(WicPreview(FPath, Rotate, RotateImg.Width, RotateImg.Height));
       if (ABitMap = nil) then
       begin
-        if (GetThumbCache(fPath, HBmp, SIIGBF_THUMBNAILONLY, RotateImg.Width,
-          RotateImg.Height) = S_OK) then
+        if (GetThumbCache(FPath, HBmp, SIIGBF_THUMBNAILONLY, RotateImg.Width, RotateImg.Height) = S_OK) then
         begin
           ABitMap := TBitmap.Create;
           ABitMap.Handle := HBmp;
@@ -2634,8 +1928,7 @@ begin
       end;
       if (ABitMap <> nil) then
       begin
-        ResizeBitmapCanvas(ABitMap, RotateImg.Width, RotateImg.Height,
-          GUIcolor);
+        ResizeBitmapCanvas(ABitMap, RotateImg.Width, RotateImg.Height, GUIcolor);
         RotateImg.Picture.Bitmap := ABitMap;
         ABitMap.Free;
       end;
@@ -2647,12 +1940,12 @@ end;
 
 procedure TFMain.CBoxETdirectChange(Sender: TObject);
 var
-  I: smallint;
+  i: smallint;
 begin
-  I := CBoxETdirect.ItemIndex;
-  if I >= 0 then
+  i := CBoxETdirect.ItemIndex;
+  if i >= 0 then
   begin
-    EditETdirect.Text := ETdirectCmd[I];
+    EditETdirect.Text := ETdirectCmd[i];
     EditETdirect.Modified := false;
     EditETcmdName.Text := CBoxETdirect.Text;
     EditETcmdName.Modified := false;
@@ -2667,19 +1960,18 @@ end;
 
 procedure TFMain.CBoxFileFilterChange(Sender: TObject);
 var
-  I: smallint;
+  i: smallint;
 begin
-  I := CBoxFileFilter.ItemIndex;
-  if I >= 0 then
+  i := CBoxFileFilter.ItemIndex;
+  if i >= 0 then
   begin
-    SpeedBtnFilterEdit.Enabled := (I <> 0);
+    SpeedBtnFilterEdit.Enabled := (i <> 0);
     ShellList.Refresh;
     ShellList.SetFocus;
   end;
 end;
 
-procedure TFMain.CBoxFileFilterKeyDown(Sender: TObject; var Key: Word;
-  Shift: TShiftState);
+procedure TFMain.CBoxFileFilterKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
 begin
   if Key = VK_Return then
   begin
@@ -2690,13 +1982,13 @@ begin
 end;
 
 procedure TFMain.FormCanResize(Sender: TObject; var NewWidth, NewHeight: integer; var Resize: boolean);
-var N, X: integer;
+var
+  n, X: integer;
 begin
   if WindowState <> wsMinimized then
   begin
-    N := GUIBorderWidth + AdvPanelBrowse.Width + AdvPageMetadata.Width +
-      Splitter1.Width;
-    X := N + Splitter2.MinSize + Splitter2.Width;
+    n := GUIBorderWidth + AdvPanelBrowse.Width + AdvPageMetadata.Width + Splitter1.Width;
+    X := n + Splitter2.MinSize + Splitter2.Width;
     if NewWidth < X then
       Resize := false;
 
@@ -2707,7 +1999,7 @@ begin
     if Resize then
     begin
       with StatusBar do
-        Panels[1].Width := NewWidth - N;
+        Panels[1].Width := NewWidth - n;
     end;
   end;
 
@@ -2748,7 +2040,9 @@ begin
   ShellList.OnColumnResized := ShellListColumnResized;
   ShellList.OnThumbGenerate := ShellistThumbGenerate;
   ShellList.OnThumbError := ShellistThumbError;
-  ShellList.ColumnSorted := ShellList.Sorted; // Enable Column sorting if Sorted = true. Disables Sorted.
+  // Enable Column sorting if Sorted = true. Disables Sorted.
+  ShellList.ColumnSorted := ShellList.Sorted;
+  ShellList.IconPopup := PopupIcon;
 
   CBoxFileFilter.Text := SHOWALL;
 end;
@@ -2759,7 +2053,7 @@ var
   NumFiles: longint;
   Buffer: array [0 .. MAX_PATH] of char;
   Fname: string;
-  ANitem: TListItem;
+  AnItem: TListItem;
 begin
   NumFiles := DragQueryFile(Msg.Drop, $FFFFFFFF, nil, 0);
   if NumFiles > 1 then
@@ -2771,11 +2065,11 @@ begin
     ShellTree.Path := ExtractFileDir(Buffer);
     Fname := ExtractFileName(Buffer);
     ShellList.ItemIndex := -1;
-    for ANitem in ShellList.Items do
+    for AnItem in ShellList.Items do
     begin
-      if ShellList.FileName(ANitem.Index) = Fname then
+      if ShellList.FileName(AnItem.Index) = Fname then
       begin
-        ShellList.ItemIndex := ANitem.Index;
+        ShellList.ItemIndex := AnItem.Index;
         break;
       end;
     end;
@@ -2788,15 +2082,15 @@ end;
 
 procedure TFMain.FormShow(Sender: TObject);
 var
-  ANitem: TListItem;
+  AnItem: TListItem;
   Param: string;
-  I: smallint;
+  i: smallint;
 begin
   ETCounterLabel := LabelCounter;
-  I := Screen.PixelsPerInch;
-  AdvPanelETdirect.Height := MulDiv(32, I, 96);
-  AdvPanelMetaBottom.Height := MulDiv(32, I, 96);
-  MetadataList.DefaultRowHeight := MulDiv(19, I, 96);
+  i := Screen.PixelsPerInch;
+  AdvPanelETdirect.Height := MulDiv(32, i, 96);
+  AdvPanelMetaBottom.Height := MulDiv(32, i, 96);
+  MetadataList.DefaultRowHeight := MulDiv(19, i, 96);
   // This must be in OnShow event -for OnCanResize event (probably bug in XE2):
   GUIBorderWidth := Width - ClientWidth;
   GUIBorderHeight := Height - ClientHeight;
@@ -2821,13 +2115,13 @@ begin
     CBoxDetails.Enabled := false;
   end;
 
-  I := CBoxDetails.Items.Count - 1;
-  SpeedBtnColumnEdit.Enabled := (CBoxDetails.ItemIndex = I);
+  i := CBoxDetails.Items.Count - 1;
+  SpeedBtnColumnEdit.Enabled := (CBoxDetails.ItemIndex = i);
   WrkIniDir := GetAppPath;
   if GUIsettings.UseExitDetails then
     CBoxDetailsChange(Sender);
 
-//// The shellList is initally disabled. Now enable and refresh
+  /// / The shellList is initally disabled. Now enable and refresh
   ShellList.Enabled := true;
   if ValidDir(GUIsettings.InitialDir) then
     ShellTree.Path := GUIsettings.InitialDir;
@@ -2847,11 +2141,11 @@ begin
         ShellTree.Path := ExtractFileDir(Param);
         Param := ExtractFileName(Param);
         ShellList.ItemIndex := -1;
-        for ANitem in ShellList.Items do
+        for AnItem in ShellList.Items do
         begin
-          if SameText(ShellList.FileName(ANitem.Index), Param) then
+          if SameText(ShellList.FileName(AnItem.Index), Param) then
           begin
-            ShellList.ItemIndex := ANitem.Index;
+            ShellList.ItemIndex := AnItem.Index;
             break;
           end;
         end;
@@ -2878,13 +2172,12 @@ begin
 end;
 
 procedure TFMain.ShellListAddItem(Sender: TObject; AFolder: TShellFolder; var CanAdd: boolean);
-var FolderName: string;
-    FilterItem, Filter: string;
-    FilterMatches: boolean;
+var
+  FolderName: string;
+  FilterItem, Filter: string;
+  FilterMatches: boolean;
 begin
-  CanAdd := TShellListView(Sender).Enabled and
-            not FrmStyle.Showing and
-            ValidFile(AFolder);
+  CanAdd := TShellListView(Sender).Enabled and not FrmStyle.Showing and ValidFile(AFolder);
   FolderName := ExtractFileName(AFolder.PathName);
   if (CBoxFileFilter.Text <> SHOWALL) then
   begin
@@ -2907,12 +2200,13 @@ begin
 end;
 
 procedure TFMain.ShellListClick(Sender: TObject);
-var I: smallint;
+var
+  i: smallint;
 begin
-  I := ShellList.SelCount;
-  MExportImport.Enabled := (I > 0);
-  MModify.Enabled := (I > 0);
-  MVarious.Enabled := (I > 0);
+  i := ShellList.SelCount;
+  MExportImport.Enabled := (i > 0);
+  MModify.Enabled := (i > 0);
+  MVarious.Enabled := (i > 0);
   SpeedBtnQuickSave.Enabled := false;
   ShowMetadata;
   ShowPreview;
@@ -2924,43 +2218,49 @@ begin
 end;
 
 procedure TFMain.ShellListColumnResized(Sender: TObject);
-var ColIndex: integer;
+var
+  ColIndex: integer;
 begin
-  ColIndex := TlistColumn(Sender).Index;
+  ColIndex := TListColumn(Sender).Index;
   if (ColIndex = 0) then // Name field
-    FListStdColWidth[ColIndex] := TlistColumn(Sender).Width
+    FListStdColWidth[ColIndex] := TListColumn(Sender).Width
   else
   begin
     case CBoxDetails.ItemIndex of
-      0: FListStdColWidth[ColIndex]      := TlistColumn(Sender).Width;
-      1: FListColDef1[ColIndex -1].Width := TlistColumn(Sender).Width;
-      2: FListColDef2[ColIndex -1].Width := TlistColumn(Sender).Width;
-      3: FListColDef3[ColIndex -1].Width := TlistColumn(Sender).Width;
-      4: FListColUsr[ColIndex -1].Width  := TlistColumn(Sender).Width;
+      0:
+        FListStdColWidth[ColIndex] := TListColumn(Sender).Width;
+      1:
+        FListColDef1[ColIndex - 1].Width := TListColumn(Sender).Width;
+      2:
+        FListColDef2[ColIndex - 1].Width := TListColumn(Sender).Width;
+      3:
+        FListColDef3[ColIndex - 1].Width := TListColumn(Sender).Width;
+      4:
+        FListColUsr[ColIndex - 1].Width := TListColumn(Sender).Width;
     end;
   end;
 end;
 
-procedure TFMain.ShellListBeforePopulate(Sender: TObject;
-  var DoDefault: boolean);
+procedure TFMain.ShellListBeforePopulate(Sender: TObject; var DoDefault: boolean);
 begin
   DoDefault := (ShellList.ViewStyle <> vsReport) or (CBoxDetails.ItemIndex = 0);
 end;
 
 procedure TFMain.ShellListBeforeEnumColumns(Sender: TObject);
 begin
-// Prevent flickering when updating columns
+  // Prevent flickering when updating columns
   SendMessage(TShellListView(Sender).Handle, WM_SETREDRAW, 0, 0);
 end;
 
 procedure TFMain.ShellListAfterEnumColumns(Sender: TObject);
 
   procedure AdjustColumns(ColumnDefs: array of smallint);
-  var I, J: integer;
+  var
+    i, j: integer;
   begin
-    J := Min(High(ColumnDefs), ShellList.Columns.Count -1);
-    for I := 0 to J do
-      ShellList.Columns[I].Width := ColumnDefs[I];
+    j := Min(High(ColumnDefs), ShellList.Columns.Count - 1);
+    for i := 0 to j do
+      ShellList.Columns[i].Width := ColumnDefs[i];
   end;
 
   procedure AddColumn(const ACaption: string; AWidth: integer; const AAlignment: smallint = 0);
@@ -2975,24 +2275,26 @@ procedure TFMain.ShellListAfterEnumColumns(Sender: TObject);
   end;
 
   procedure AddColumns(ColumnDefs: array of FListColDefRec); overload;
-  var I: integer;
+  var
+    i: integer;
   begin
     with ShellList do
     begin
       Columns.Clear;
       AddColumn(SShellDefaultNameStr, FListStdColWidth[0]); // Name field
-      for I := 0 to High(ColumnDefs) do
-        AddColumn(ColumnDefs[I].Caption, ColumnDefs[I].Width, ColumnDefs[I].AlignR);
+      for i := 0 to High(ColumnDefs) do
+        AddColumn(ColumnDefs[i].Caption, ColumnDefs[i].Width, ColumnDefs[i].AlignR);
     end;
   end;
 
   procedure AddColumns(ColumnDefs: array of FListColUsrRec); overload;
-  var DefRecords: array of FListColDefRec;
-      I: integer;
+  var
+    DefRecords: array of FListColDefRec;
+    i: integer;
   begin
     SetLength(DefRecords, length(ColumnDefs));
-    for I := 0 to length(DefRecords) - 1 do
-      DefRecords[I] := FListColDefRec.Create(ColumnDefs[I]);
+    for i := 0 to length(DefRecords) - 1 do
+      DefRecords[i] := FListColDefRec.Create(ColumnDefs[i]);
 
     AddColumns(DefRecords);
   end;
@@ -3000,22 +2302,28 @@ procedure TFMain.ShellListAfterEnumColumns(Sender: TObject);
 begin
 
   case CBoxDetails.ItemIndex of
-    0: AdjustColumns(FListStdColWidth);
-    1: AddColumns(FListColDef1);
-    2: AddColumns(FListColDef2);
-    3: AddColumns(FListColDef3);
-    4: AddColumns(FListColUsr);
+    0:
+      AdjustColumns(FListStdColWidth);
+    1:
+      AddColumns(FListColDef1);
+    2:
+      AddColumns(FListColDef2);
+    3:
+      AddColumns(FListColDef3);
+    4:
+      AddColumns(FListColUsr);
   end;
 
   SendMessage(TShellListView(Sender).Handle, WM_SETREDRAW, 1, 0);
   TShellListView(Sender).Invalidate; // Creates new window handle!
 end;
 
-procedure TFMain.ShellListOwnerDataFetch(Sender: TObject; Item: TListItem; Request: TItemRequest; Afolder: TShellFolder);
-var AShellList: TShellListView;
-    ETcmd, Tx, ETouts, ETerrs, ADetail: String;
-    Indx: integer;
-    Details: TStrings;
+procedure TFMain.ShellListOwnerDataFetch(Sender: TObject; Item: TListItem; Request: TItemRequest; AFolder: TShellFolder);
+var
+  AShellList: TShellListView;
+  ETcmd, tx, ETouts, ETerrs, ADetail: String;
+  Indx: integer;
+  Details: TStrings;
 begin
   if (Item.Index < 0) then
     exit;
@@ -3024,41 +2332,41 @@ begin
   if (AShellList.ViewStyle <> vsReport) then
     exit;
 
-  Afolder := AShellList.Folders[Item.Index];
-  if not Assigned(Afolder) then
+  AFolder := AShellList.Folders[Item.Index];
+  if not Assigned(AFolder) then
     exit;
 
   // The Item.Caption and Item.ImageIndex (for small icons) should always be set
   if (irText in Request) then
-    Item.Caption := Afolder.DisplayName;
+    Item.Caption := AFolder.DisplayName;
   if (irImage in Request) then
-    Item.ImageIndex := Afolder.ImageIndex(AShellList.ViewStyle = vsIcon);
+    Item.ImageIndex := AFolder.ImageIndex(AShellList.ViewStyle = vsIcon);
 
-  Details := Afolder.DetailStrings;
-  if(Details.Count = 0) then
+  Details := AFolder.DetailStrings;
+  if (Details.Count = 0) then
   begin
     with Foto do
     begin
       case CBoxDetails.ItemIndex of
         1:
           begin
-            GetMetadata(Afolder.PathName, false, false, false, false);
+            GetMetadata(AFolder.PathName, false, false, false, false);
 
-            Tx := ExifIFD.ExposureTime;
-            Tx.PadLeft(7);
-            Details.Add(Tx);
-            Tx := ExifIFD.FNumber;
-            Tx.PadLeft(4);
-            Details.Add(Tx);
-            Tx := ExifIFD.ISO;
-            Tx.PadLeft(5);
-            Details.Add(Tx);
-            Tx := ExifIFD.ExposureBias;
-            Tx.PadLeft(4);
-            Details.Add(Tx);
-            Tx := ExifIFD.FocalLength;
-            Tx.PadLeft(6);
-            Details.Add(Tx);
+            tx := ExifIFD.ExposureTime;
+            tx.PadLeft(7);
+            Details.Add(tx);
+            tx := ExifIFD.FNumber;
+            tx.PadLeft(4);
+            Details.Add(tx);
+            tx := ExifIFD.ISO;
+            tx.PadLeft(5);
+            Details.Add(tx);
+            tx := ExifIFD.ExposureBias;
+            tx.PadLeft(4);
+            Details.Add(tx);
+            tx := ExifIFD.FocalLength;
+            tx.PadLeft(6);
+            Details.Add(tx);
             if (ExifIFD.Flash and $FF00) <> 0 then
             begin
               if (ExifIFD.Flash and 1) = 1 then
@@ -3081,7 +2389,7 @@ begin
           end;
         2:
           begin
-            GetMetadata(Afolder.PathName, true, false, true, false);
+            GetMetadata(AFolder.PathName, true, false, true, false);
             Details.Add(ExifIFD.DateTimeOriginal);
             if GPS.Latitude <> '' then
               Details.Add('Yes')
@@ -3094,7 +2402,7 @@ begin
           end;
         3:
           begin
-            GetMetadata(Afolder.PathName, true, false, false, false);
+            GetMetadata(AFolder.PathName, true, false, false, false);
             Details.Add(IFD0.Artist); // Xmp.Creator);
             Details.Add(Xmp.Rating);
             Details.Add(Xmp.PhotoType);
@@ -3106,7 +2414,7 @@ begin
             ETcmd := '-s3' + CRLF + '-f';
             for Indx := 0 to High(FListColUsr) do
               ETcmd := ETcmd + CRLF + FListColUsr[Indx].Command;
-            ET_OpenExec(ETcmd, ExtractFileName(Afolder.PathName), ETouts, ETerrs);
+            ET_OpenExec(ETcmd, ExtractFileName(AFolder.PathName), ETouts, ETerrs);
             if (ETerrs <> '') then
               Details.Text := ETerrs
             else
@@ -3136,7 +2444,8 @@ begin
 end;
 
 procedure TFMain.EnableMenus(Enable: boolean);
-var I: smallint;
+var
+  i: smallint;
 begin
   AdvPageMetadata.Enabled := Enable;
   AdvPanelETdirect.Enabled := Enable;
@@ -3145,29 +2454,26 @@ begin
   MExportImport.Enabled := Enable;
   MModify.Enabled := Enable;
   MVarious.Enabled := Enable;
-  for I := 0 to MProgram.Count-1 do
+  for i := 0 to MProgram.Count - 1 do
   begin // dont disable About, Exit or Preferences menu
-    if (MProgram.Items[I].Tag <> 0) then
+    if (MProgram.Items[i].Tag <> 0) then
       continue;
-    MProgram.Items[I].Enabled := Enable;
+    MProgram.Items[i].Enabled := Enable;
   end;
 
   if not Enable then
-    MessageDlgEx('ERROR: ExifTool not found!' + #10 + #10 + #10 +
-                   'To resolve this you can:' + #10 +
-                   '- Install Exiftool in: ' + GetAppPath + #10 +
-                   '- Install Exiftool in a directory in the Windows search sequence.' + #10 +
-                   #9 + 'For example in a directory specified in the PATH environment variable.' + #10 +
-                   #9 + 'For more info see the documentation on the CreateProcess function.' + #10 +
-                   '- Locate Exiftool.exe and specify the location in Preferences/Other.' + #10 + #10 +
-                   'For info on obtaining Exiftool, follow the link in the About box to Github.' + #10 + #10 +
-                   'Metadata operations disabled.',
-                   'ExifToolGUI',
-                 TMsgDlgType.mtError, [mbOK], Self);
+    MessageDlgEx('ERROR: ExifTool not found!' + #10 + #10 + #10 + 'To resolve this you can:' + #10 + '- Install Exiftool in: ' + GetAppPath + #10 +
+      '- Install Exiftool in a directory in the Windows search sequence.' + #10 + #9 +
+      'For example in a directory specified in the PATH environment variable.' + #10 + #9 +
+      'For more info see the documentation on the CreateProcess function.' + #10 +
+      '- Locate Exiftool.exe and specify the location in Preferences/Other.' + #10 + #10 +
+      'For info on obtaining Exiftool, follow the link in the About box to Github.' + #10 + #10 + 'Metadata operations disabled.', 'ExifToolGUI',
+      TMsgDlgType.mtError, [mbOk], Self);
 end;
 
 procedure TFMain.ShellTreeChange(Sender: TObject; Node: TTreeNode);
-var NewPath: string;
+var
+  NewPath: string;
 begin
   if not ShellList.Enabled then // We will get back here
     exit;
@@ -3193,9 +2499,9 @@ end;
 // =========================== Show Metadata ====================================
 procedure TFMain.ShowMetadata;
 var
-  E, N: integer;
+  E, n: integer;
   ETcmd, Item: string;
-  Tx: string;
+  tx: string;
   ETResult: TStringList;
 begin
   Item := ShellList.FileName;
@@ -3217,42 +2523,47 @@ begin
     Caption := 'ExifToolGUI - ' + Item;
     if SpeedBtnQuick.Down then
     begin
-      N := length(QuickTags) - 1;
+      n := length(QuickTags) - 1;
       ETcmd := '-s3' + CRLF + '-f';
 
-      for E := 0 to N do
+      for E := 0 to n do
       begin
-        Tx := QuickTags[E].Command;
-        if UpperCase(LeftStr(Tx, length(GUI_SEP))) = GUI_SEP then
-          Tx := GUI_SEP;
-        ETcmd := ETcmd + CRLF + Tx;
+        tx := QuickTags[E].Command;
+        if UpperCase(LeftStr(tx, length(GUI_SEP))) = GUI_SEP then
+          tx := GUI_SEP;
+        ETcmd := ETcmd + CRLF + tx;
       end;
       ET_OpenExec(ETcmd, Item, ETResult);
-      if ETResult.Count >= N then
-        with MetadataList do
+      if (ETResult.Count - 1) < n then
+      begin
+        MessageDlgEx(Format('Only %d results returned.' + #10 + 'Your workspace has %d commands.', [ETResult.Count, n + 1]), 'Check Workspace',
+          TMsgDlgType.mtWarning, [mbOk]);
+        n := Min(n, ETResult.Count - 1);
+      end;
+      with MetadataList do
+      begin
+        Strings.Clear;
+        for E := 0 to n do
         begin
-          Strings.Clear;
-          for E := 0 to N do
+          tx := QuickTags[E].Command;
+          if UpperCase(LeftStr(tx, length(GUI_SEP))) = GUI_SEP then
+            tx := '=' + QuickTags[E].Caption
+          else
           begin
-            Tx := QuickTags[E].Command;
-            if UpperCase(LeftStr(Tx, length(GUI_SEP))) = GUI_SEP then
-              Tx := '=' + QuickTags[E].Caption
-            else
+            tx := QuickTags[E].Caption;
+            if RightStr(tx, 1) = '?' then
             begin
-              Tx := QuickTags[E].Caption;
-              if RightStr(Tx, 1) = '?' then
-              begin
-                if ETResult[E] = '-' then
-                  Tx := Tx + '=*NO*'
-                else
-                  Tx := Tx + '=*YES*';
-              end
+              if ETResult[E] = '-' then
+                tx := tx + '=*NO*'
               else
-                Tx := QuickTags[E].Caption + '=' + ETResult[E];
-            end;
-            Strings.Append(Tx);
+                tx := tx + '=*YES*';
+            end
+            else
+              tx := QuickTags[E].Caption + '=' + ETResult[E];
           end;
+          Strings.Append(tx);
         end;
+      end;
     end
     else
     begin
@@ -3341,15 +2652,16 @@ begin
 end;
 
 procedure TFMain.SpeedBtnChartRefreshClick(Sender: TObject);
-var Ext: string;
-    I: integer;
+var
+  Ext: string;
+  i: integer;
 begin
-   for I := Low(ChartFLength) to High(ChartFLength) do
-    ChartFLength[I] := 0;
-  for I := Low(ChartFNumber) to High(ChartFNumber) do
-    ChartFNumber[I] := 0;
-  for I := Low(ChartISO) to High(ChartISO) do
-    ChartISO[I] := 0;
+  for i := Low(ChartFLength) to High(ChartFLength) do
+    ChartFLength[i] := 0;
+  for i := Low(ChartFNumber) to High(ChartFNumber) do
+    ChartFNumber[i] := 0;
+  for i := Low(ChartISO) to High(ChartISO) do
+    ChartISO[i] := 0;
   Ext := '*.*';
   if AdvRadioGroup1.ItemIndex > 0 then
     Ext := '*.' + AdvRadioGroup1.Items[AdvRadioGroup1.ItemIndex];
@@ -3365,45 +2677,45 @@ begin
   end;
 
   ChartMaxFLength := 0;
-  for I := Low(ChartFLength) to High(ChartFLength) do
+  for i := Low(ChartFLength) to High(ChartFLength) do
   begin
-    if ChartFLength[I] > 0 then
+    if ChartFLength[i] > 0 then
     begin
-      if ChartFLength[I] > ChartMaxFLength then
-        ChartMaxFLength := ChartFLength[I];
-      Ext := IntToStr(I);
-      if I < 100 then
+      if ChartFLength[i] > ChartMaxFLength then
+        ChartMaxFLength := ChartFLength[i];
+      Ext := IntToStr(i);
+      if i < 100 then
         Insert('.', Ext, length(Ext)) // 58->5.8
       else
         SetLength(Ext, length(Ext) - 1);
-      ETBarSeriesFocal.AddBar(ChartFLength[I], Ext, CLFocal);
+      ETBarSeriesFocal.AddBar(ChartFLength[i], Ext, CLFocal);
     end;
   end;
   ChartMaxFLength := Round(ChartMaxFLength * 1.1);
 
   ChartMaxFNumber := 0;
-  for I := Low(ChartFNumber) to High(ChartFNumber) do
+  for i := Low(ChartFNumber) to High(ChartFNumber) do
   begin
-    if ChartFNumber[I] > 0 then
+    if ChartFNumber[i] > 0 then
     begin
-      if ChartFNumber[I] > ChartMaxFNumber then
-        ChartMaxFNumber := ChartFNumber[I];
-      Ext := IntToStr(I);
+      if ChartFNumber[i] > ChartMaxFNumber then
+        ChartMaxFNumber := ChartFNumber[i];
+      Ext := IntToStr(i);
       Insert('.', Ext, length(Ext)); // 40->4.0
-      ETBarSeriesFnum.AddBar(ChartFNumber[I], Ext, CLFNumber);
+      ETBarSeriesFnum.AddBar(ChartFNumber[i], Ext, CLFNumber);
     end;
   end;
   ChartMaxFNumber := Round(ChartMaxFNumber * 1.1);
 
   ChartMaxISO := 0;
-  for I := Low(ChartISO) to High(ChartISO) do
+  for i := Low(ChartISO) to High(ChartISO) do
   begin
-    if ChartISO[I] > 0 then
+    if ChartISO[i] > 0 then
     begin
-      if ChartISO[I] > ChartMaxISO then
-        ChartMaxISO := ChartISO[I];
-      Ext := IntToStr(I) + '0'; // 80->800
-      ETBarSeriesIso.AddBar(ChartISO[I], Ext, CLISO);
+      if ChartISO[i] > ChartMaxISO then
+        ChartMaxISO := ChartISO[i];
+      Ext := IntToStr(i) + '0'; // 80->800
+      ETBarSeriesIso.AddBar(ChartISO[i], Ext, CLISO);
     end;
   end;
   ChartMaxISO := Round(ChartMaxISO * 1.1);
@@ -3440,23 +2752,23 @@ end;
 
 procedure TFMain.SpeedBtnLargeClick(Sender: TObject);
 var
-  I, F: smallint;
+  i, F: smallint;
 begin
-  I := Screen.PixelsPerInch;
+  i := Screen.PixelsPerInch;
   F := ShellList.ItemIndex;
   if SpeedBtnLarge.Down then
   begin
     MemoQuick.Clear;
     MemoQuick.Text := EditQuick.Text;
     EditQuick.Visible := false;
-    AdvPanelMetaBottom.Height := MulDiv(105, I, 96);
+    AdvPanelMetaBottom.Height := MulDiv(105, i, 96);
     if F <> -1 then
       MemoQuick.SetFocus;
   end
   else
   begin
     EditQuick.Text := MemoQuick.Text;
-    AdvPanelMetaBottom.Height := MulDiv(32, I, 96);
+    AdvPanelMetaBottom.Height := MulDiv(32, i, 96);
     EditQuick.Visible := true;
     if F <> -1 then
       EditQuick.SetFocus;
@@ -3508,11 +2820,11 @@ begin
 end;
 
 procedure TFMain.SpeedBtn_GeotagClick(Sender: TObject);
-var ETcmd, ETouts, ETerrs, Lat, Lon: string;
+var
+  ETcmd, ETouts, ETerrs, Lat, Lon: string;
 begin
   ParseLatLon(EditMapFind.Text, Lat, Lon);
-  if (Lat = '') or
-     (Lon = '') then
+  if (Lat = '') or (Lon = '') then
     raise Exception.Create('No Lat Lon coordinates selected.');
 
   if ShellList.SelectedFolder = nil then
@@ -3556,24 +2868,26 @@ begin
 end;
 
 procedure TFMain.SpeedBtn_ShowOnMapClick(Sender: TObject);
-var ETcmd : string;
-    ETouts, ETerrs: string;
+var
+  ETcmd: string;
+  ETouts, ETerrs: string;
 begin
-  if ShellList.SelectedFolder <> nil  then
+  if ShellList.SelectedFolder <> nil then
   begin
     ETcmd := '-s3' + CRLF + '-f' + CRLF + '-n' + CRLF + '-q';
     ETcmd := ETcmd + CRLF + '-Filename';
-    ETcmd := ETcmd + CRLF + '-GPS:GpsLatitude'  + CRLF + '-GPS:GpsLatitudeRef';
+    ETcmd := ETcmd + CRLF + '-GPS:GpsLatitude' + CRLF + '-GPS:GpsLatitudeRef';
     ETcmd := ETcmd + CRLF + '-GPS:GpsLongitude' + CRLF + '-GPS:GpsLongitudeRef';
     ET_OpenExec(ETcmd, GetSelectedFiles(), ETouts, ETerrs);
-    ShowImagesOnMap(EdgeBrowser1, ShellTree.Path, EtOuts);
+    ShowImagesOnMap(EdgeBrowser1, ShellTree.Path, ETouts);
   end
   else
     ShowMessage('No file selected.');
 end;
 
 procedure TFMain.Splitter1CanResize(Sender: TObject; var NewSize: integer; var Accept: boolean);
-var X: smallint;
+var
+  X: smallint;
 begin
   if NewSize <= Splitter1.Left then
   begin // limit to min. Browse panel
@@ -3608,8 +2922,10 @@ procedure TFMain.SetGuiColor;
 var
   AStyleService: TCustomStyleServices;
 begin
+  GUIcolor := clBlack;
   AStyleService := TStyleManager.Style[GUIsettings.GuiStyle];
-  GUIcolor := AStyleService.GetStyleColor(scWindow);
+  if Assigned(AStyleService) then
+    GUIcolor := AStyleService.GetStyleColor(scWindow);
 end;
 
 procedure TFMain.ShellistThumbError(Sender: TObject; Item: TListItem; E: Exception);
@@ -3617,15 +2933,21 @@ begin
   raise Exception.Create(Format('Error %s %s creating thumbnail for : %s', [E.Message, #10, ShellList.Folders[Item.Index].PathName]));
 end;
 
-procedure TFMain.ShellistThumbGenerate(Sender: TObject;
-                                       Item: TListItem;
-                                       Status: TThumbGenStatus;
-                                       Total, Remaining: integer);
+procedure TFMain.ShellistThumbGenerate(Sender: TObject; Item: TListItem; Status: TThumbGenStatus; Total, Remaining: integer);
 begin
   if (Remaining > 0) then
     StatusBar.Panels[1].Text := 'Remaining Thumbnails to generate: ' + IntToStr(Remaining)
   else
     StatusBar.Panels[1].Text := '';
+end;
+
+procedure TFMain.ShellListOnGenerateReady(Sender: TObject);
+var
+  AnItem: TListItem;
+begin
+  ShellList.Refresh;
+  for AnItem in ShellList.Items do
+    AnItem.Update;
 end;
 
 end.

@@ -17,6 +17,8 @@ type
     DefExportUse: boolean;
     DefExportDir: AnsiString;
     ThumbSize: smallint;
+    ThumbAutoGenerate: boolean;
+    ThumbCleanSet: string[4];
     UseExitDetails: boolean;
     AutoIncLine: boolean;
     EnableGMap: boolean;
@@ -53,37 +55,20 @@ var
   FListStdColWidth: array [0 .. 3] of smallint; // [Filename][Size][Type][Date modified]
 
   // Note: Default widths are in ReadGui
-  FListColDef1: array [0 .. 7] of FListColDefRec =
-  (
-    (Caption: 'ExpTime';        AlignR: 6),
-    (Caption: 'FNumber';        AlignR: 4),
-    (Caption: 'ISO';            AlignR: 5),
-    (Caption: 'ExpComp.';       AlignR: 4),
-    (Caption: 'FLength';        AlignR: 8),
-    (Caption: 'Flash';          AlignR: 0),
-    (Caption: 'ExpProgram';     AlignR: 0),
-    (Caption: 'Orientation';    AlignR: 0)
-  );
+  FListColDef1: array [0 .. 7] of FListColDefRec = (
+    (
+      Caption: 'ExpTime'; AlignR: 6), (Caption: 'FNumber'; AlignR: 4), (Caption: 'ISO'; AlignR: 5), (Caption: 'ExpComp.'; AlignR: 4),
+    (Caption: 'FLength'; AlignR: 8), (Caption: 'Flash'; AlignR: 0), (Caption: 'ExpProgram'; AlignR: 0), (Caption: 'Orientation'; AlignR: 0));
 
-  FListColDef2: array [0 .. 5] of FListColDefRec =
-  (
-    (Caption: 'DateTime';       AlignR: 0),
-    (Caption: 'GPS';            AlignR: 0),
-    (Caption: 'Country';        AlignR: 0),
-    (Caption: 'Province';       AlignR: 0),
-    (Caption: 'City';           AlignR: 0),
-    (Caption: 'Location';       AlignR: 0)
-  );
+  FListColDef2: array [0 .. 5] of FListColDefRec = (
+    (
+      Caption: 'DateTime'; AlignR: 0), (Caption: 'GPS'; AlignR: 0), (Caption: 'Country'; AlignR: 0), (Caption: 'Province'; AlignR: 0),
+    (Caption: 'City'; AlignR: 0), (Caption: 'Location'; AlignR: 0));
 
-
-  FListColDef3: array [0 .. 4] of FListColDefRec =
-  (
-    (Caption: 'Artist';         AlignR: 0),
-    (Caption: 'Rating';         AlignR: 0),
-    (Caption: 'Type';           AlignR: 0),
-    (Caption: 'Event';          AlignR: 0),
-    (Caption: 'PersonInImage';  AlignR: 0)
-  );
+  FListColDef3: array [0 .. 4] of FListColDefRec = (
+    (
+      Caption: 'Artist'; AlignR: 0), (Caption: 'Rating'; AlignR: 0), (Caption: 'Type'; AlignR: 0), (Caption: 'Event'; AlignR: 0),
+    (Caption: 'PersonInImage'; AlignR: 0));
 
   FListColUsr: array of FListColUsrRec;
 
@@ -103,7 +88,6 @@ function LoadWorkspaceIni(IniFName: string): boolean;
 function SaveWorkspaceIni(IniFName: string): boolean;
 function BrowseFolderDlg(const Title: string; iFlag: integer; const StartFolder: string = ''): string;
 procedure ChartFindFiles(StartDir, FileMask: string; subDir: boolean);
-function GetNrOfFiles(StartDir, FileMask: string; subDir: boolean): integer;
 
 implementation
 
@@ -124,33 +108,34 @@ var
   TmpItems: TStrings;
   lg_StartFolder: string;
 
-// This function returns the name of the INI file.
-// If it doesn't exist, but a previous version exists it returns that name.
+  // This function returns the name of the INI file.
+  // If it doesn't exist, but a previous version exists it returns that name.
 function GetIniFilePath(AllowPrevVer: boolean): string;
-var CurVer, PrevVer, PrevPath: string;
+var
+  CurVer, PrevVer, PrevPath: string;
 begin
-// Default is ExifToolGuiV6.ini in Profile %AppData%\ExifToolGui
+  // Default is ExifToolGuiV6.ini in Profile %AppData%\ExifToolGui
   CurVer := ChangeFileExt(ExtractFileName(Application.ExeName), IniVersion + '.ini');
   result := GetINIPath + CurVer;
   if (FileExists(result)) then
     exit;
 
-// Allow import of previous version. Used when reading ini file
+  // Allow import of previous version. Used when reading ini file
   if not AllowPrevVer then
     exit;
 
   PrevVer := ChangeFileExt(ExtractFileName(Application.ExeName), PrevIniVersion + '.ini');
-// Maybe in AppDir V6 ?
+  // Maybe in AppDir V6 ?
   PrevPath := GetAppPath + CurVer;
   if (FileExists(PrevPath)) then
     exit(PrevPath);
 
-// Maybe in AppDir V5 ?
+  // Maybe in AppDir V5 ?
   PrevPath := GetAppPath + PrevVer;
   if (FileExists(PrevPath)) then
     exit(PrevPath);
 
-// If we get here, the default result is returned.
+  // If we get here, the default result is returned.
 end;
 
 constructor FListColDefRec.Create(AListColUsrRec: FListColUsrRec);
@@ -162,29 +147,29 @@ end;
 
 procedure ReadGUIini;
 var
-  i, n, x: smallint;
-  tx, DefaultDir: string;
+  I, N, X: smallint;
+  Tx, DefaultDir: string;
 
-  procedure SetQuickTag(var x: smallint; const Name: string; Cmd: string);
+  procedure SetQuickTag(var X: smallint; const Name: string; Cmd: string);
   begin
-  	SetLength(QuickTags, X +1);
-	with QuickTags[x] do
+    SetLength(QuickTags, X +1);
+    with QuickTags[X] do
     begin
       Caption := Name;
-      n := pos('^', Cmd);
-      if n = 0 then
+      N := pos('^', Cmd);
+      if N = 0 then
       begin
         Command := Cmd;
         SetLength(Help, 0);
       end
       else
       begin
-        Command := LeftStr(Cmd, n - 1);
-        Delete(Cmd, 1, n);
+        Command := LeftStr(Cmd, N - 1);
+        Delete(Cmd, 1, N);
         Help := Cmd;
       end;
     end;
-    inc(x);
+    inc(X);
   end;
 
 begin
@@ -193,16 +178,16 @@ begin
   try
     with GUIini, FMain do
     begin
-      n := 0;
+      N := 0;
       if WindowState = wsMaximized then
-        inc(n); // check shortcut setting
+        inc(N); // check shortcut setting
       if ReadBool(Ini_ETGUI, 'StartMax', false) then
-        inc(n);
+        inc(N);
       Top := ReadInteger(Ini_ETGUI, 'WinTop', 40);
       Left := ReadInteger(Ini_ETGUI, 'WinLeft', 60);
       Width := ReadInteger(Ini_ETGUI, 'WinWidth', 1024);
       Height := ReadInteger(Ini_ETGUI, 'WinHeight', 660);
-      if n > 0 then
+      if N > 0 then
         WindowState := wsMaximized;
       AdvPanelBrowse.Width := ReadInteger(Ini_ETGUI, 'BrowseWidth', 240);
       AdvPagePreview.Height := ReadInteger(Ini_ETGUI, 'PreviewHeight', 220);
@@ -230,15 +215,15 @@ begin
 
       // Column widths Location info
       FListColDef2[0].Width := ReadInteger(Ini_ETGUI, 'Def2ColWidth0', 120);
-      FListColDef2[1].Width := ReadInteger(Ini_ETGUI, 'Def2ColWidth1',  48);
-      FListColDef2[2].Width := ReadInteger(Ini_ETGUI, 'Def2ColWidth2',  80);
-      FListColDef2[3].Width := ReadInteger(Ini_ETGUI, 'Def2ColWidth3',  80);
+      FListColDef2[1].Width := ReadInteger(Ini_ETGUI, 'Def2ColWidth1', 48);
+      FListColDef2[2].Width := ReadInteger(Ini_ETGUI, 'Def2ColWidth2', 80);
+      FListColDef2[3].Width := ReadInteger(Ini_ETGUI, 'Def2ColWidth3', 80);
       FListColDef2[4].Width := ReadInteger(Ini_ETGUI, 'Def2ColWidth4', 120);
       FListColDef2[5].Width := ReadInteger(Ini_ETGUI, 'Def2ColWidth5', 120);
 
       // Column widths About photo
       FListColDef3[0].Width := ReadInteger(Ini_ETGUI, 'Def3ColWidth0', 120);
-      FListColDef3[1].Width := ReadInteger(Ini_ETGUI, 'Def3ColWidth1',  48);
+      FListColDef3[1].Width := ReadInteger(Ini_ETGUI, 'Def3ColWidth1', 48);
       FListColDef3[2].Width := ReadInteger(Ini_ETGUI, 'Def3ColWidth2', 120);
       FListColDef3[3].Width := ReadInteger(Ini_ETGUI, 'Def3ColWidth3', 120);
       FListColDef3[4].Width := ReadInteger(Ini_ETGUI, 'Def3ColWidth4', 120);
@@ -250,18 +235,18 @@ begin
         if Language = '' then
           ET_Options.ETLangDef := '';
         AutoRotatePreview := ReadBool(Ini_Settings, 'AutoRotatePreview', false);
-        tx := ReadString(Ini_Settings, 'FileFilters', '*.JPG|*.CR2|*.JPG;*.CR2|*.JPG;*.DNG|*.JPG;*.PEF');
+        Tx := ReadString(Ini_Settings, 'FileFilters', '*.JPG|*.CR2|*.JPG;*.CR2|*.JPG;*.DNG|*.JPG;*.PEF');
         CBoxFileFilter.Items.Text := SHOWALL;
         repeat
-          i := pos('|', tx);
-          if i > 0 then
+          I := pos('|', Tx);
+          if I > 0 then
           begin
-            CBoxFileFilter.Items.Append(LeftStr(tx, i - 1));
-            Delete(tx, 1, i);
+            CBoxFileFilter.Items.Append(LeftStr(Tx, I - 1));
+            Delete(Tx, 1, I);
           end
           else
-            CBoxFileFilter.Items.Append(tx);
-        until i = 0;
+            CBoxFileFilter.Items.Append(Tx);
+        until I = 0;
         DefStartupUse := ReadBool(Ini_Settings, 'DefStartupUse', false);
         DefStartupDir := ReadString(Ini_Settings, 'DefStartupDir', 'c:\');
         if DefStartupUse and ValidDir(DefStartupDir) then
@@ -273,13 +258,19 @@ begin
         DefExportDir := ReadString(Ini_Settings, 'DefExportDir', '');
         ThumbSize := ReadInteger(Ini_Settings, 'ThumbsSize', 0);
         case ThumbSize of
-          0: i := 96;
-          1: i := 128;
-          2: i := 160;
+          0:
+            I := 96;
+          1:
+            I := 128;
+          2:
+            I := 160;
         else
-          i := 96;
+          I := 96;
         end;
-        FMain.ShellList.ThumbNailSize := i;
+        FMain.ShellList.ThumbNailSize := I;
+        ThumbAutoGenerate := ReadBool(Ini_Settings, 'ThumbAutoGenerate', True);
+        FMain.ShellList.ThumbAutoGenerate := ThumbAutoGenerate;
+        ThumbCleanSet := ReadString(Ini_Settings, 'ThumbCleanSet', '0000');
 
         EnableGMap := ReadBool(Ini_Settings, 'EnableGMap', false);
         DefGMapHome := ReadString(Ini_Settings, 'DefGMapHome', '46.55738,15.64608');
@@ -290,16 +281,15 @@ begin
         if UseExitDetails then
         begin
           FMain.CBoxDetails.ItemIndex := ReadInteger(Ini_Settings, 'DetailsSel', 0);
-          FMain.SpeedBtnDetails.Down :=
-            ReadBool(Ini_Settings, 'DetailsDown', true);
+          FMain.SpeedBtnDetails.Down := ReadBool(Ini_Settings, 'DetailsDown', True);
         end;
-        AutoIncLine := ReadBool(Ini_Settings, 'AutoIncLine', true);
+        AutoIncLine := ReadBool(Ini_Settings, 'AutoIncLine', True);
         ETdirDefCmd := ReadInteger(Ini_Settings, 'ETdirDefCmd', -1);
       end;
 
       with ET_Options do
       begin
-        MDontBackup.Checked := ReadBool(Ini_Options, 'DontBackup', true);
+        MDontBackup.Checked := ReadBool(Ini_Options, 'DontBackup', True);
         if not MDontBackup.Checked then
           ETBackupMode := '';
         MPreserveDateMod.Checked := ReadBool(Ini_Options, 'PreserveDateMod', false);
@@ -309,7 +299,7 @@ begin
         MIgnoreErrors.Checked := ReadBool(Ini_Options, 'IgnoreErrors', false);
         if MIgnoreErrors.Checked then
           ETMinorError := '-m' + CRLF;
-        MShowGPSdecimal.Checked := ReadBool(Ini_Options, 'GPSinDecimal', true);
+        MShowGPSdecimal.Checked := ReadBool(Ini_Options, 'GPSinDecimal', True);
         ET_Options.SetGpsFormat(MShowGPSdecimal.Checked);
         MShowSorted.Checked := ReadBool(Ini_Options, 'ShowSorted', false);
         MShowComposite.Checked := ReadBool(Ini_Options, 'ShowComposite', false);
@@ -318,28 +308,28 @@ begin
 
       // Custom FList columns
       ReadSectionValues('FListUserDefColumn', TmpItems);
-      i := TmpItems.Count;
-      if i > 0 then
+      I := TmpItems.Count;
+      if I > 0 then
       begin
-        SetLength(FListColUsr, i);
-        for n := 0 to i - 1 do
-          with FListColUsr[n] do
+        SetLength(FListColUsr, I);
+        for N := 0 to I - 1 do
+          with FListColUsr[N] do
           begin
-            tx := TmpItems[n];
-            x := pos('=', tx);
-            Caption := LeftStr(tx, x - 1);
-            Delete(tx, 1, x);
-            x := pos(' ', tx);
-            if x = 0 then
+            Tx := TmpItems[N];
+            X := pos('=', Tx);
+            Caption := LeftStr(Tx, X - 1);
+            Delete(Tx, 1, X);
+            X := pos(' ', Tx);
+            if X = 0 then
             begin
-              Command := tx;
+              Command := Tx;
               Width := 80;
             end
             else
             begin
-              Command := LeftStr(tx, x - 1);
-              Delete(tx, 1, x);
-              Width := StrToIntDef(tx, 80);
+              Command := LeftStr(Tx, X - 1);
+              Delete(Tx, 1, X);
+              Width := StrToIntDef(Tx, 80);
             end;
             AlignR := 0;
           end;
@@ -372,109 +362,109 @@ begin
       // --- ETdirect commands---
       ETdirectCmd.Clear;
       ReadSection('ETdirectCmd', CBoxETdirect.Items);
-      n := CBoxETdirect.Items.Count;
-      if n = 0 then
+      N := CBoxETdirect.Items.Count;
+      if N = 0 then
         with CBoxETdirect.Items do
         begin
           Append('Set Exif:Copyright to [©Year by MyName]');
           ETdirectCmd.Append('-d %Y "-Exif:Copyright<©$DateTimeOriginal by MyName"');
-          n := 2;
+          N := 2;
         end
       else
       begin
-        for i := 0 to n - 1 do
-          ETdirectCmd.Append(ReadString('ETdirectCmd', CBoxETdirect.Items[i], '?'));
+        for I := 0 to N - 1 do
+          ETdirectCmd.Append(ReadString('ETdirectCmd', CBoxETdirect.Items[I], '?'));
       end;
-      i := GUIsettings.ETdirDefCmd;
-      if i < n then
+      I := GUIsettings.ETdirDefCmd;
+      if I < N then
       begin
-        CBoxETdirect.ItemIndex := i;
-        if i <> -1 then
+        CBoxETdirect.ItemIndex := I;
+        if I <> -1 then
         begin
-          EditETdirect.Text := ETdirectCmd[i];
-          SpeedBtnETdirectDel.Enabled := true;
+          EditETdirect.Text := ETdirectCmd[I];
+          SpeedBtnETdirectDel.Enabled := True;
         end;
       end
       else
         GUIsettings.ETdirDefCmd := -1;
       // ---------------------
       ReadSectionValues('WorkspaceTags', TmpItems);
-      i := TmpItems.Count;
-      if i > 0 then
+      I := TmpItems.Count;
+      if I > 0 then
       begin
-        SetLength(QuickTags, i);
-        for n := 0 to i - 1 do
-          with QuickTags[n] do
+        SetLength(QuickTags, I);
+        for N := 0 to I - 1 do
+          with QuickTags[N] do
           begin
-            tx := TmpItems[n];
-            x := pos('=', tx);
-            Caption := LeftStr(tx, x - 1);
-            Delete(tx, 1, x);
-            x := pos('^', tx);
-            if x = 0 then
+            Tx := TmpItems[N];
+            X := pos('=', Tx);
+            Caption := LeftStr(Tx, X - 1);
+            Delete(Tx, 1, X);
+            X := pos('^', Tx);
+            if X = 0 then
             begin
-              Command := tx;
+              Command := Tx;
               SetLength(Help, 0);
             end
             else
             begin
-              Command := LeftStr(tx, x - 1);
-              Delete(tx, 1, x);
-              Help := tx;
+              Command := LeftStr(Tx, X - 1);
+              Delete(Tx, 1, X);
+              Help := Tx;
             end;
           end;
       end
       else
       begin
-        i := 0;
-        SetQuickTag(i, 'EXIF', '-GUI-SEP');
-        SetQuickTag(i, 'Make', '-exif:Make');
-        SetQuickTag(i, 'Model', '-exif:Model');
-        SetQuickTag(i, 'LensModel', '-exif:LensModel');
-        SetQuickTag(i, 'ExposureTime', '-exif:ExposureTime^[1/50] or [0.02]');
-        SetQuickTag(i, 'FNumber', '-exif:FNumber');
-        SetQuickTag(i, 'ISO', '-exif:ISO');
-        SetQuickTag(i, 'FocalLength', '-exif:FocalLength^[28] -mm not necessary');
-        SetQuickTag(i, 'Flash#', '-exif:Flash^[ 0 ]=No flash, [ 1 ]=Flash fired');
-        SetQuickTag(i, 'Orientation#', '-exif:Orientation^[ 1 ]=0°, [ 3 ]=180°, [ 6 ]=+90°, [ 8 ]=-90°');
-        SetQuickTag(i, 'DateTimeOriginal', '-exif:DateTimeOriginal^[2012:01:14 20:00:00]');
-        SetQuickTag(i, 'CreateDate', '-exif:CreateDate^[2012:01:14 20:00:00]');
-        SetQuickTag(i, 'Artist*', '-exif:Artist^Bogdan Hrastnik');
-        SetQuickTag(i, 'Copyright', '-exif:Copyright^Use Alt+0169 to get © character');
-        SetQuickTag(i, 'Software', '-exif:Software');
-        SetQuickTag(i, 'Geotagged?', '-Gps:GPSLatitude');
+        I := 0;
+        SetQuickTag(I, 'EXIF', '-GUI-SEP');
+        SetQuickTag(I, 'Make', '-exif:Make');
+        SetQuickTag(I, 'Model', '-exif:Model');
+        SetQuickTag(I, 'LensModel', '-exif:LensModel');
+        SetQuickTag(I, 'ExposureTime', '-exif:ExposureTime^[1/50] or [0.02]');
+        SetQuickTag(I, 'FNumber', '-exif:FNumber');
+        SetQuickTag(I, 'ISO', '-exif:ISO');
+        SetQuickTag(I, 'FocalLength', '-exif:FocalLength^[28] -mm not necessary');
+        SetQuickTag(I, 'Flash#', '-exif:Flash^[ 0 ]=No flash, [ 1 ]=Flash fired');
+        SetQuickTag(I, 'Orientation#', '-exif:Orientation^[ 1 ]=0°, [ 3 ]=180°, [ 6 ]=+90°, [ 8 ]=-90°');
+        SetQuickTag(I, 'DateTimeOriginal', '-exif:DateTimeOriginal^[2012:01:14 20:00:00]');
+        SetQuickTag(I, 'CreateDate', '-exif:CreateDate^[2012:01:14 20:00:00]');
+        SetQuickTag(I, 'Artist*', '-exif:Artist^Bogdan Hrastnik');
+        SetQuickTag(I, 'Copyright', '-exif:Copyright^Use Alt+0169 to get © character');
+        SetQuickTag(I, 'Software', '-exif:Software');
+        SetQuickTag(I, 'Geotagged?', '-Gps:GPSLatitude');
 
-        SetQuickTag(i, 'About photo', '-GUI-SEP');
-        SetQuickTag(i, 'Type±', '-xmp-dc:Type^[Landscape] or [Studio+Portrait] ..');
-        SetQuickTag(i, 'Rating', '-xmp-xmp:Rating^Integer value [ 0 ] .. [ 5 ]');
-        //SetQuickTag(i, 'Title','-xmp-dc:Title');
-        SetQuickTag(i, 'Event', '-xmp-iptcExt:Event^[Vacations] or [Trip] ..');
-        SetQuickTag(i, 'PersonInImage±', '-xmp:PersonInImage^[Phil] or [Harry+Sally] or [-Peter] ..');
-        SetQuickTag(i, 'Keywords±', '-xmp-dc:Subject^[tree] or [flower+rose] or [-fish] or [+bird-fish] ..');
-        SetQuickTag(i, 'Country', '-xmp:LocationShownCountryName');
-        SetQuickTag(i, 'Province', '-xmp:LocationShownProvinceState');
-        SetQuickTag(i, 'City', '-xmp:LocationShownCity');
-        SetQuickTag(i, 'Location', '-xmp:LocationShownSublocation');
+        SetQuickTag(I, 'About photo', '-GUI-SEP');
+        SetQuickTag(I, 'Type±', '-xmp-dc:Type^[Landscape] or [Studio+Portrait] ..');
+        SetQuickTag(I, 'Rating', '-xmp-xmp:Rating^Integer value [ 0 ] .. [ 5 ]');
+        // SetQuickTag(I, 'Title','-xmp-dc:Title'); // TBD
+        SetQuickTag(I, 'Event', '-xmp-iptcExt:Event^[Vacations] or [Trip] ..');
+        SetQuickTag(I, 'PersonInImage±', '-xmp:PersonInImage^[Phil] or [Harry+Sally] or [-Peter] ..');
+        SetQuickTag(I, 'Keywords±', '-xmp-dc:Subject^[tree] or [flower+rose] or [-fish] or [+bird-fish] ..');
+        SetQuickTag(I, 'Country', '-xmp:LocationShownCountryName');
+        SetQuickTag(I, 'Province', '-xmp:LocationShownProvinceState');
+        SetQuickTag(I, 'City', '-xmp:LocationShownCity');
+        SetQuickTag(I, 'Location', '-xmp:LocationShownSublocation');
       end;
-      for i := 0 to Length(QuickTags) - 1 do
+      for I := 0 to Length(QuickTags) - 1 do
       begin
-        tx := QuickTags[i].Caption;
-        QuickTags[i].NoEdit := (RightStr(tx, 1) = '?');
-        tx := UpperCase(LeftStr(QuickTags[i].Command, 4));
-        QuickTags[i].NoEdit := QuickTags[i].NoEdit or (tx = '-GUI');
+        Tx := QuickTags[I].Caption;
+        QuickTags[I].NoEdit := (RightStr(Tx, 1) = '?');
+        Tx := UpperCase(LeftStr(QuickTags[I].Command, 4));
+        QuickTags[I].NoEdit := QuickTags[I].NoEdit or (Tx = '-GUI');
       end;
       // --------------------
       MarkedTags := ReadString('TagList', 'MarkedTags', 'Artist ');
-      n := length(MarkedTags);
-      if MarkedTags[n] = '<' then
-        MarkedTags[n] := ' '
+      N := length(MarkedTags);
+      if MarkedTags[N] = '<' then
+        MarkedTags[N] := ' '
       else
         MarkedTags := 'Artist ';
       // --------------------
       CustomViewTags := ReadString('TagList', 'CustomView', '-Exif:Artist ');
-      n := length(CustomViewTags);
-      if CustomViewTags[n] = '<' then
-        CustomViewTags[n] := ' '
+      N := length(CustomViewTags);
+      if CustomViewTags[N] = '<' then
+        CustomViewTags[N] := ' '
       else
         CustomViewTags := '-Exif:Artist ';
 
@@ -490,20 +480,21 @@ begin
   GUIini := TIniFile.Create(GetIniFilePath(false));
   try
     with GUIini, FLogWin do
-      begin
-        Top := ReadInteger(Ini_ETGUI, 'LogWinTop', 106);
-        Left := ReadInteger(Ini_ETGUI, 'LogWinLeft', 108);
-        Width := ReadInteger(Ini_ETGUI, 'LogWinWidth', 580);
-        Height := ReadInteger(Ini_ETGUI, 'LogWinHeight', 200);
-      end;
+    begin
+      Top := ReadInteger(Ini_ETGUI, 'LogWinTop', 106);
+      Left := ReadInteger(Ini_ETGUI, 'LogWinLeft', 108);
+      Width := ReadInteger(Ini_ETGUI, 'LogWinWidth', 580);
+      Height := ReadInteger(Ini_ETGUI, 'LogWinHeight', 200);
+    end;
   finally
     GUIini.Free;
   end;
 end;
 
 procedure SaveGUIini;
-var I, N: smallint;
-    Tx: string;
+var
+  I, N: smallint;
+  Tx: string;
 begin
   // ^- EraseSection used instead
   try
@@ -521,7 +512,7 @@ begin
           WriteInteger(Ini_ETGUI, 'WinHeight', Height);
         end
         else
-          WriteBool(Ini_ETGUI, 'StartMax', true);
+          WriteBool(Ini_ETGUI, 'StartMax', True);
         WriteInteger(Ini_ETGUI, 'BrowseWidth', AdvPanelBrowse.Width);
         WriteInteger(Ini_ETGUI, 'PreviewHeight', AdvPagePreview.Height);
         WriteInteger(Ini_ETGUI, 'MetadataWidth', AdvPageMetadata.Width);
@@ -590,6 +581,8 @@ begin
           WriteBool(Ini_Settings, 'DefExportUse', DefExportUse);
           WriteString(Ini_Settings, 'DefExportDir', DefExportDir);
           WriteInteger(Ini_Settings, 'ThumbsSize', ThumbSize);
+          WriteBool(Ini_Settings, 'ThumbAutoGenerate', ThumbAutoGenerate);
+          WriteString(Ini_Settings, 'ThumbCleanSet', ThumbCleanSet);
 
           WriteBool(Ini_Settings, 'EnableGMap', EnableGMap);
           WriteString(Ini_Settings, 'DefGMapHome', DefGMapHome);
@@ -667,8 +660,8 @@ end;
 
 function LoadWorkspaceIni(IniFName: string): boolean;
 var
-  i, n, x: smallint;
-  tx: string;
+  I, N, X: smallint;
+  Tx: string;
 begin
   result := false;
   if FileExists(IniFName) then
@@ -678,38 +671,38 @@ begin
     with GUIini do
     begin
       ReadSectionValues('WorkspaceTags', TmpItems);
-      i := TmpItems.Count;
-      if i > 0 then
+      I := TmpItems.Count;
+      if I > 0 then
       begin
-        SetLength(QuickTags, i);
-        for n := 0 to i - 1 do
-          with QuickTags[n] do
+        SetLength(QuickTags, I);
+        for N := 0 to I - 1 do
+          with QuickTags[N] do
           begin
-            tx := TmpItems[n];
-            x := pos('=', tx);
-            Caption := LeftStr(tx, x - 1);
-            Delete(tx, 1, x);
-            x := pos('^', tx);
-            if x = 0 then
+            Tx := TmpItems[N];
+            X := pos('=', Tx);
+            Caption := LeftStr(Tx, X - 1);
+            Delete(Tx, 1, X);
+            X := pos('^', Tx);
+            if X = 0 then
             begin
-              Command := tx;
+              Command := Tx;
               SetLength(Help, 0);
             end
             else
             begin
-              Command := LeftStr(tx, x - 1);
-              Delete(tx, 1, x);
-              Help := tx;
+              Command := LeftStr(Tx, X - 1);
+              Delete(Tx, 1, X);
+              Help := Tx;
             end;
           end;
-        for i := 0 to length(QuickTags) - 1 do
+        for I := 0 to length(QuickTags) - 1 do
         begin
-          tx := QuickTags[i].Caption;
-          QuickTags[i].NoEdit := (RightStr(tx, 1) = '?');
-          tx := UpperCase(LeftStr(QuickTags[i].Command, 4));
-          QuickTags[i].NoEdit := QuickTags[i].NoEdit or (tx = '-GUI');
+          Tx := QuickTags[I].Caption;
+          QuickTags[I].NoEdit := (RightStr(Tx, 1) = '?');
+          Tx := UpperCase(LeftStr(QuickTags[I].Command, 4));
+          QuickTags[I].NoEdit := QuickTags[I].NoEdit or (Tx = '-GUI');
         end;
-        result := true;
+        result := True;
       end;
     end;
     GUIini.Free;
@@ -719,8 +712,8 @@ end;
 
 function SaveWorkspaceIni(IniFName: string): boolean;
 var
-  n: smallint;
-  tx: string;
+  N: smallint;
+  Tx: string;
   F: TextFile;
 begin
   try
@@ -730,17 +723,17 @@ begin
     GUIini := TIniFile.Create(IniFName);
     with GUIini do
     begin
-      for n := 0 to length(QuickTags) - 1 do
-        with QuickTags[n] do
+      for N := 0 to length(QuickTags) - 1 do
+        with QuickTags[N] do
         begin
-          tx := Command;
+          Tx := Command;
           if length(Help) > 0 then
-            tx := tx + '^' + Help;
-          WriteString('WorkspaceTags', Caption, tx);
+            Tx := Tx + '^' + Help;
+          WriteString('WorkspaceTags', Caption, Tx);
         end;
     end;
     GUIini.Free;
-    result := true;
+    result := True;
   except
     else
       GUIini.Free;
@@ -786,11 +779,12 @@ end;
 // ------------------------------------------------------------------------------
 
 procedure ChartFindFiles(StartDir, FileMask: string; subDir: boolean);
-var SR: TSearchRec;
-    DirList: TStringList;
-    IsFound, DoSub: boolean;
-    I: integer;
-    W: word;
+var
+  SR: TSearchRec;
+  DirList: TStringList;
+  IsFound, DoSub: boolean;
+  I: integer;
+  W: word;
 begin
   StartDir := IncludeTrailingBackslash(StartDir);
   DoSub := subDir;
@@ -850,46 +844,6 @@ begin
       ChartFindFiles(DirList[I], FileMask, DoSub);
     DirList.Free;
   end;
-end;
-
-function GetNrOfFiles(StartDir, FileMask: string; subDir: boolean): integer;
-var
-  SR: TSearchRec;
-  DirList: TStringList;
-  IsFound, doSub: boolean;
-  i, x: integer;
-begin
-  if StartDir[length(StartDir)] <> '\' then
-    StartDir := StartDir + '\';
-  doSub := subDir;
-  x := 0;
-  // Count files in directory
-  IsFound := FindFirst(StartDir + FileMask, faAnyFile - faDirectory, SR) = 0;
-  while IsFound do
-  begin
-    inc(x);
-    IsFound := FindNext(SR) = 0;
-  end;
-  SysUtils.FindClose(SR);
-
-  // Build a list of subdirectories
-  if doSub then
-  begin
-    DirList := TStringList.Create;
-    IsFound := FindFirst(StartDir + '*.*', faAnyFile, SR) = 0;
-    while IsFound do
-    begin
-      if ((SR.Attr and faDirectory) <> 0) and (SR.Name[1] <> '.') then
-        DirList.Add(StartDir + SR.Name);
-      IsFound := FindNext(SR) = 0;
-    end;
-    SysUtils.FindClose(SR);
-    // Scan the list of subdirectories
-    for i := 0 to DirList.Count - 1 do
-      x := x + GetNrOfFiles(DirList[i], FileMask, doSub);
-    DirList.Free;
-  end;
-  result := x;
 end;
 
 initialization

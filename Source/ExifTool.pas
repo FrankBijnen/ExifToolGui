@@ -6,8 +6,9 @@ uses Classes, StdCtrls;
 
 type
   ET_OptionsRec = record
-  // don't define '-a' (because of Filelist custom columns)
-    ETLangDef: string; // don't define '-e' (because of extracting previews)
+    // don't define '-a' (because of Filelist custom columns)
+    // don't define '-e' (because of extracting previews)
+    ETLangDef: string;
     ETBackupMode: string;
     ETFileDate: string;
     ETSeparator: string;
@@ -24,15 +25,12 @@ var
   ETCounterLabel: TLabel = nil;
   ETCounter: smallint = 0;
   ET_Options: ET_OptionsRec = (ETLangDef: '';
-    ETBackupMode: '-overwrite_original' + CRLF;
-    // or ='' or='overwrite_original_in_place'
-    ETFileDate: ''; // or '-P'+CRLF (preserve FileModify date)
-    ETSeparator: '-sep' + CRLF + '*' + CRLF; // or '' (for keywords etc.)
-    ETMinorError: ''; // or '-m'+CRLF
-    ETGpsFormat: '-c' + CRLF + '%d°%.4f' + CRLF;
-    // or '-c'+CRLF+'%.6f°'+CRLF (for decimal)
-    ETShowNumber: ''); // or '-n'+CRLF
-  // ETuseLang: false);
+    ETBackupMode: '-overwrite_original' + CRLF;   // or ='' or='overwrite_original_in_place'
+    ETFileDate: '';                               // or '-P'+CRLF (preserve FileModify date)
+    ETSeparator: '-sep' + CRLF + '*' + CRLF;      // or '' (for keywords etc.)
+    ETMinorError: '';                             // or '-m'+CRLF
+    ETGpsFormat: '-c' + CRLF + '%d°%.4f' + CRLF;  // or '-c'+CRLF+'%.6f°'+CRLF (for decimal)
+    ETShowNumber: '');                            // or '-n'+CRLF
 
 function ET_StayOpen(WorkDir: string): boolean;
 function ET_OpenExec(ETcmd: string; FNames: AnsiString; var ETouts, ETErrs: string; TagsFromFile: boolean = false): boolean; overload;
@@ -55,8 +53,6 @@ const
 
 var
   ETprocessInfo: TProcessInformation;
-  // ETstream: TMemoryStream;
-  // PipeBuffer: array[0..szPipeBuffer] of Byte;
   PipeInRead, PipeInWrite: THandle;
   PipeOutRead, PipeOutWrite: THandle;
   PipeErrRead, PipeErrWrite: THandle;
@@ -65,21 +61,15 @@ var
   ETEvent: TEvent;
   ExecNum: byte;
 
-// Degrees not shown, but a diamond with a ?
-// Old code was in 2 place. Main and MainDef
-//      if MShowGPSdecimal.Checked then
-//        ETGPSformat := '-c' + CRLF + '%.6f°' + CRLF
-//      else
-//        ETGPSformat := '-c' + CRLF + '%d°%.4f' + CRLF;
 procedure ET_OptionsRec.SetGpsFormat(UseDecimal: boolean);
 begin
   if UseDecimal then
-    ETGPSformat := '-c' + CRLF + '%.6f' + #$C2#$B0 + CRLF
+    ETGpsFormat := '-c' + CRLF + '%.6f' + #$C2#$B0 + CRLF
   else
-    ETGPSformat := '-c' + CRLF + '%d' + #$C2#$B0 + '%.4f' + CRLF;
+    ETGpsFormat := '-c' + CRLF + '%d' + #$C2#$B0 + '%.4f' + CRLF;
 end;
 
-  // ============================== ET_Open mode ==================================
+// ============================== ET_Open mode ==================================
 function ET_StayOpen(WorkDir: string): boolean;
 var
   SecurityAttr: TSecurityAttributes;
@@ -112,9 +102,8 @@ begin
     PWorkDir := nil
   else
     PWorkDir := PChar(WorkDir);
-  if CreateProcess(nil, PChar(ETcmd), nil, nil, true,
-    CREATE_DEFAULT_ERROR_MODE or CREATE_NEW_CONSOLE or NORMAL_PRIORITY_CLASS,
-    nil, PWorkDir, StartupInfo, ETprocessInfo) then
+  if CreateProcess(nil, PChar(ETcmd), nil, nil, true, CREATE_DEFAULT_ERROR_MODE or CREATE_NEW_CONSOLE or NORMAL_PRIORITY_CLASS, nil, PWorkDir,
+    StartupInfo, ETprocessInfo) then
   begin
     ETrunning := true;
     CloseHandle(PipeInRead);
@@ -137,20 +126,21 @@ end;
 function ET_OpenExec(ETcmd: string; FNames: AnsiString; var ETouts, ETErrs: string; TagsFromFile: boolean = false): boolean;
 // -Fnames must be of AnsiString type here, otherwise some foreign
 // characters in filenames might no be recognized by ExifTool!
-var ETstream: TMemoryStream;
-    PipeBuffer: array [0 .. szPipeBuffer] of byte;
+var
+  ETstream: TMemoryStream;
+  PipeBuffer: array [0 .. szPipeBuffer] of byte;
 
-    ETout, ETerr: TStringList;
-    ETprm: AnsiString;
-    FinalCmd: AnsiString;
-    BytesCount: Dword;
-    I: word;
-    BuffContent: ^word;
-    BuffAddress: ^Dword;
-    EndReady: boolean;
-    ThisExecNum: byte;
-    CheckNum: word;
-    Wr: TWaitResult;
+  ETout, ETerr: TStringList;
+  ETprm: AnsiString;
+  FinalCmd: AnsiString;
+  BytesCount: Dword;
+  I: word;
+  BuffContent: ^word;
+  BuffAddress: ^Dword;
+  EndReady: boolean;
+  ThisExecNum: byte;
+  CheckNum: word;
+  Wr: TWaitResult;
 begin
   result := false;
 
@@ -213,7 +203,6 @@ begin
       begin
         ETCounterLabel.Visible := true;
       end;
-
       WriteFile(PipeInWrite, FinalCmd[1], Length(FinalCmd), BytesCount, nil);
 
       Screen.Cursor := -11; // crHourglass
@@ -292,21 +281,25 @@ begin
 end;
 
 function ET_OpenExec(ETcmd: string; FNames: AnsiString; ETout: TStringList; TagsFromFile: boolean = false): boolean;
-var ETouts, ETErrs: string;
+var
+  ETouts, ETErrs: string;
 begin
   result := ET_OpenExec(ETcmd, FNames, ETouts, ETErrs, TagsFromFile);
   ETout.Text := ETouts;
 end;
 
 function ET_OpenExec(ETcmd: string; FNames: AnsiString; TagsFromFile: boolean = false): boolean;
-var ETouts, ETErrs: string;
+var
+  ETouts, ETErrs: string;
 begin
   result := ET_OpenExec(ETcmd, FNames, ETouts, ETErrs, TagsFromFile);
 end;
 
 procedure ET_OpenExit;
-const ExitCmd: Utf8string = '-stay_open' + CRLF + 'False' + CRLF;
-var BytesCount: Dword;
+const
+  ExitCmd: Utf8string = '-stay_open' + CRLF + 'False' + CRLF;
+var
+  BytesCount: Dword;
 begin
   if ETrunning then
   begin
@@ -325,19 +318,20 @@ end;
 //
 // =========================== ET classic mode ==================================
 function ExecET(ETcmd, FNames, WorkDir: AnsiString; var ETouts, ETErrs: string; UseUtf8: boolean = true): boolean;
-var ETstream: TMemoryStream;
-    PipeBuffer: array [0 .. szPipeBuffer] of byte;
-    ETout, ETerr: TStringList;
-    ProcessInfo: TProcessInformation;
-    SecurityAttr: TSecurityAttributes;
-    StartupInfo: TStartupInfoA;
-    PipeOutRead, PipeOutWrite: THandle;
-    PipeErrRead, PipeErrWrite: THandle;
-    ETprm: AnsiString;
-    PWorkDir: PAnsiChar;
-    BytesCount: Dword;
-    BuffContent: ^word;
-    I: integer;
+var
+  ETstream: TMemoryStream;
+  PipeBuffer: array [0 .. szPipeBuffer] of byte;
+  ETout, ETerr: TStringList;
+  ProcessInfo: TProcessInformation;
+  SecurityAttr: TSecurityAttributes;
+  StartupInfo: TStartupInfoA;
+  PipeOutRead, PipeOutWrite: THandle;
+  PipeErrRead, PipeErrWrite: THandle;
+  ETprm: AnsiString;
+  PWorkDir: PAnsiChar;
+  BytesCount: Dword;
+  BuffContent: ^word;
+  I: integer;
 begin
   Screen.Cursor := -11; // =crHourGlass
   ETout := TStringList.Create;
@@ -387,9 +381,8 @@ begin
       ETCounterLabel.Visible := true;
     end;
 
-    result := CreateProcessA(nil, PAnsiChar(ETcmd), nil, nil, true,
-      CREATE_DEFAULT_ERROR_MODE or CREATE_NEW_CONSOLE or NORMAL_PRIORITY_CLASS,
-      nil, PWorkDir, StartupInfo, ProcessInfo);
+    result := CreateProcessA(nil, PAnsiChar(ETcmd), nil, nil, true, CREATE_DEFAULT_ERROR_MODE or CREATE_NEW_CONSOLE or NORMAL_PRIORITY_CLASS, nil,
+      PWorkDir, StartupInfo, ProcessInfo);
 
     CloseHandle(PipeOutWrite);
     CloseHandle(PipeErrWrite);
@@ -463,7 +456,8 @@ begin
 end;
 
 function ExecET(ETcmd, FNames, WorkDir: AnsiString; var ETouts: string; UseUtf8: boolean = true): boolean;
-var ETErrs: string;
+var
+  ETErrs: string;
 begin
   result := ExecET(ETcmd, FNames, WorkDir, ETouts, ETErrs, UseUtf8);
 end;
@@ -472,16 +466,17 @@ end;
 //
 // ==============================================================================
 function ExecCMD(xCmd, WorkDir: AnsiString; var ETouts, ETErrs: string): boolean;
-var ETstream: TMemoryStream;
-    PipeBuffer: array [0 .. szPipeBuffer] of byte;
-    ETout, ETerr: TStringList;
-    ProcessInfo: TProcessInformation;
-    SecurityAttr: TSecurityAttributes;
-    StartupInfo: TStartupInfoA;
-    PipeOutRead, PipeOutWrite: THandle;
-    PipeErrRead, PipeErrWrite: THandle;
-    PWorkDir: PAnsiChar;
-    BytesCount: Dword;
+var
+  ETstream: TMemoryStream;
+  PipeBuffer: array [0 .. szPipeBuffer] of byte;
+  ETout, ETerr: TStringList;
+  ProcessInfo: TProcessInformation;
+  SecurityAttr: TSecurityAttributes;
+  StartupInfo: TStartupInfoA;
+  PipeOutRead, PipeOutWrite: THandle;
+  PipeErrRead, PipeErrWrite: THandle;
+  PWorkDir: PAnsiChar;
+  BytesCount: Dword;
 begin
   FillChar(ProcessInfo, SizeOf(TProcessInformation), #0);
   FillChar(SecurityAttr, SizeOf(TSecurityAttributes), #0);
@@ -510,9 +505,8 @@ begin
   ETstream := TMemoryStream.Create;
   Screen.Cursor := -11; // =crHourGlass
   try
-    result := CreateProcessA(nil, PAnsiChar(xCmd), nil, nil, true,
-      CREATE_DEFAULT_ERROR_MODE or CREATE_NEW_CONSOLE or NORMAL_PRIORITY_CLASS,
-      nil, PWorkDir, StartupInfo, ProcessInfo);
+    result := CreateProcessA(nil, PAnsiChar(xCmd), nil, nil, true, CREATE_DEFAULT_ERROR_MODE or CREATE_NEW_CONSOLE or NORMAL_PRIORITY_CLASS, nil,
+      PWorkDir, StartupInfo, ProcessInfo);
 
     CloseHandle(PipeOutWrite);
     CloseHandle(PipeErrWrite);

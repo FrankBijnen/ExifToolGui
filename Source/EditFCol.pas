@@ -21,8 +21,7 @@ type
     Button5: TButton;
     StatusBar1: TStatusBar;
     procedure FormShow(Sender: TObject);
-    procedure StringGrid1SelectCell(Sender: TObject; ACol, ARow: Integer;
-      var CanSelect: Boolean);
+    procedure StringGrid1SelectCell(Sender: TObject; ACol, ARow: Integer; var CanSelect: Boolean);
     procedure Button1Click(Sender: TObject);
     procedure Button2Click(Sender: TObject);
     procedure Button3Click(Sender: TObject);
@@ -182,8 +181,7 @@ begin
   Application.OnHint := DisplayHint;
 end;
 
-procedure TFEditFColumn.StringGrid1SelectCell(Sender: TObject;
-  ACol, ARow: Integer; var CanSelect: Boolean);
+procedure TFEditFColumn.StringGrid1SelectCell(Sender: TObject; ACol, ARow: Integer; var CanSelect: Boolean);
 begin
   with StringGrid1 do
   begin

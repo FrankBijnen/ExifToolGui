@@ -36,4 +36,12 @@ worth mentioning 2 things.
 
 2. Use Ctrl + Click on the map to get the coordinates. These are shown in the text box.
 
+Changed with version 6.1.0
+Windows 64 Bits support has been added. If you decide to use that version please unpack the win-x64 version of the WebView2Loader.dll.
+
+Thumbnails setting have been moved to a separate tab on the preferences form. Additional options available are:
+- Disable automatic generating of the thumbnails.
+- Manually generate the thumbnails.
+- Cleaning the thumbnail cache.
+
 Frank Bijnen

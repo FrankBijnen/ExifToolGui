@@ -56,14 +56,11 @@ procedure TFDateTimeEqual.Button2Click(Sender: TObject);
 begin
   ETcmd := '';
   if RadioButton1.Checked then
-    ETcmd := '-exif:DateTimeOriginal>exif:ModifyDate' + CRLF +
-      '-exif:DateTimeOriginal>exif:CreateDate';
+    ETcmd := '-exif:DateTimeOriginal>exif:ModifyDate' + CRLF + '-exif:DateTimeOriginal>exif:CreateDate';
   if RadioButton2.Checked then
-    ETcmd := '-exif:CreateDate>exif:ModifyDate' + CRLF +
-      '-exif:CreateDate>exif:DateTimeOriginal';
+    ETcmd := '-exif:CreateDate>exif:ModifyDate' + CRLF + '-exif:CreateDate>exif:DateTimeOriginal';
   if RadioButton3.Checked then
-    ETcmd := '-exif:ModifyDate>exif:DateTimeOriginal' + CRLF +
-      '-exif:ModifyDate>exif:CreateDate';
+    ETcmd := '-exif:ModifyDate>exif:DateTimeOriginal' + CRLF + '-exif:ModifyDate>exif:CreateDate';
 
   ET_OpenExec(ETcmd, FMain.GetSelectedFiles, ETout, ETerr);
   FMain.UpdateLogWin(ETout, ETerr);
@@ -90,8 +87,7 @@ begin
       Label1.Caption := 'Backup: ON';
     Application.OnHint := DisplayHint;
 
-    ETcmd := '-s3' + CRLF + '-f' + CRLF + CmdDateOriginal + CRLF + CmdDateCreate
-      + CRLF + CmdDateModify;
+    ETcmd := '-s3' + CRLF + '-f' + CRLF + CmdDateOriginal + CRLF + CmdDateCreate + CRLF + CmdDateModify;
     ET_OpenExec(ETcmd, FMain.GetFirstSelectedFile, ETresult);
     LabeledEdit1.Text := ETresult[0];
     LabeledEdit2.Text := ETresult[1];

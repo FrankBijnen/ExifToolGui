@@ -15,7 +15,8 @@ function ValidLatLon(const Lat, Lon: string): boolean;
 procedure ParseLatLon(const LatLon: string; var Lat, Lon: string);
 procedure AdjustLatLon(var Lat, Lon: string);
 
-const Coord_Decimals = 5;
+const
+  Coord_Decimals = 5;
 
 type
 
@@ -23,9 +24,9 @@ type
 
   private
     OsmFormatSettings: TFormatSettings;
-    Html : TStringList;
-    FPathName : string;
-    PlacesDict : TObjectDictionary<String, TStringList>;
+    Html: TStringList;
+    FPathName: string;
+    PlacesDict: TObjectDictionary<String, TStringList>;
     procedure WriteHeader;
     procedure WritePointsStart;
     procedure WritePoint(const ALat, ALon, AImg: string);
@@ -37,13 +38,13 @@ type
     destructor Destroy; override;
   end;
 
-
 implementation
 
 uses MainDef, UFrmPlaces, ExifToolsGUI_Utils, System.Variants, Winapi.Windows, ExifTool, System.JSON,
-     REST.Types, REST.Client, System.NetEncoding;
+  REST.Types, REST.Client, System.NetEncoding;
 
-var CoordFormatSettings: TFormatSettings; // for StrToFloatDef -see Initialization
+var
+  CoordFormatSettings: TFormatSettings; // for StrToFloatDef -see Initialization
 
 constructor TOSMHelper.Create(const APathName: string);
 begin
@@ -115,7 +116,7 @@ begin
   Html.Add('     CreateExtent();');
   Html.Add('     CreatePopups();');
   Html.Add('  }');
-  Html.Add('') ;
+  Html.Add('');
 
   Html.Add(' function GetLocation(){');
   Html.Add('     var bounds = map.getExtent();');
@@ -137,7 +138,7 @@ begin
   Html.Add('    map.zoomToExtent(bounds);');
   Html.Add('  }');
 
-//  OpenLayers uses LonLat, not LatLon. Confusing maybe,
+  // OpenLayers uses LonLat, not LatLon. Confusing maybe,
   Html.Add('  function AddPoint(Id, PointLat, PointLon, Href){');
   Html.Add('    var lonlat;');
   Html.Add('    lonlat = new OpenLayers.LonLat(PointLon, PointLat).transform(op, po);');
@@ -164,7 +165,8 @@ begin
 end;
 
 procedure TOSMHelper.WritePoint(const ALat, ALon, AImg: string);
-var Key: string;
+var
+  Key: string;
 begin
   Key := Format('%s,%s', [ALat, ALon]);
   if (not PlacesDict.ContainsKey(Key)) then
@@ -173,9 +175,10 @@ begin
 end;
 
 procedure TOSMHelper.WritePointsEnd;
-var Place: TPair<string, TStringList>;
-    PointCnt : integer;
-    ImgName, Href: string;
+var
+  Place: TPair<string, TStringList>;
+  PointCnt: integer;
+  ImgName, Href: string;
 begin
   PointCnt := 0;
   for Place in PlacesDict do
@@ -204,14 +207,15 @@ end;
 
 // ==============================================================================
 procedure OsmMapInit(Browser: TEdgeBrowser; const Lat, Lon, Desc: string);
-var OsmHelper: TOSMHelper;
+var
+  OsmHelper: TOSMHelper;
 begin
   OsmHelper := TOSMHelper.Create(GetHtmlTmp);
   try
     OsmHelper.WriteHeader;
-    Osmhelper.WritePointsStart;
+    OsmHelper.WritePointsStart;
     OsmHelper.WritePoint(Lat, Lon, Desc);
-    Osmhelper.WritePointsEnd;
+    OsmHelper.WritePointsEnd;
     OsmHelper.WriteFooter;
   finally
     OsmHelper.Free;
@@ -220,43 +224,44 @@ begin
 end;
 
 procedure OsmMapInit(Browser: TEdgeBrowser; const LatLon, Desc: string);
-var Lat, Lon: string;
+var
+  Lat, Lon: string;
 begin
   ParseLatLon(LatLon, Lat, Lon);
   OsmMapInit(Browser, Lat, Lon, Desc);
 end;
 // ==============================================================================
 
-procedure ShowImagesOnMap(Browser: TEdgeBrowser; APath, ETOuts: string);
-var OsmHelper: TOSMHelper;
-    ETout, Lat, LatRef, Lon, LonRef, Filename: string;
+procedure ShowImagesOnMap(Browser: TEdgeBrowser; Apath, ETOuts: string);
+var
+  OsmHelper: TOSMHelper;
+  ETout, Lat, LatRef, Lon, LonRef, Filename: string;
 begin
   OsmHelper := TOSMHelper.Create(GetHtmlTmp);
   try
     OsmHelper.WriteHeader;
-    Osmhelper.WritePointsStart;
+    OsmHelper.WritePointsStart;
     ETout := ETOuts;
 
-    while (ETOut <> '' ) do
+    while (ETout <> '') do
     begin
-      Filename := NextField(ETOut, CRLF);
+      Filename := NextField(ETout, CRLF);
 
-      Lat := NextField(ETOut, CRLF);
-      LatRef := NextField(ETOut, CRLF);
+      Lat := NextField(ETout, CRLF);
+      LatRef := NextField(ETout, CRLF);
       if (LatRef = 'S') then
         Insert('-', Lat, 1);
 
-      Lon := NextField(ETOut, CRLF);
-      LonRef := NextField(ETOut, CRLF);
+      Lon := NextField(ETout, CRLF);
+      LonRef := NextField(ETout, CRLF);
       if (LonRef = 'W') then
         Insert('-', Lon, 1);
 
-      if (Lat <> '-') and
-         (Lon <> '-') then
-        Osmhelper.WritePoint(Lat, Lon, IncludeTrailingBackslash(APath) + Filename);
+      if (Lat <> '-') and (Lon <> '-') then
+        OsmHelper.WritePoint(Lat, Lon, IncludeTrailingBackslash(Apath) + Filename);
     end;
 
-    Osmhelper.WritePointsEnd;
+    OsmHelper.WritePointsEnd;
     OsmHelper.WriteFooter;
   finally
     OsmHelper.Free;
@@ -265,13 +270,14 @@ begin
 end;
 
 procedure GetCoordsOfPLace(const Place: string; var Lat, Lon: string);
-var RESTClient: TRESTClient;
-    RESTRequest: TRESTRequest;
-    RESTResponse: TRESTResponse;
-    JValue: TJSONValue;
-    Places: TJSONArray;
-    City, Country: string;
-    UrlEncode: System.NetEncoding.TURLEncoding;
+var
+  RESTClient: TRESTClient;
+  RESTRequest: TRESTRequest;
+  RESTResponse: TRESTResponse;
+  JValue: TJSONValue;
+  Places: TJSONArray;
+  City, Country: string;
+  UrlEncode: System.NetEncoding.TURLEncoding;
 begin
   Lat := '';
   Lon := '';
@@ -296,29 +302,27 @@ begin
     RESTRequest.params.AddItem('country', Country, TRESTRequestParameterKind.pkGETorPOST);
     RESTRequest.Execute;
     Places := RESTResponse.JSONValue as TJSONArray;
-    if (places.Count = 1) then
+    if (Places.Count = 1) then
     begin
       JValue := Places[0];
       Lat := JValue.GetValue<string>('lat');
       Lon := JValue.GetValue<string>('lon');
     end
     else
-    with FrmPlaces do
-    begin
-      Listview1.Items.Clear;
-      for JValue in Places do
+      with FrmPlaces do
       begin
-        AddPlace2LV(JValue.GetValue<string>('display_name'),
-                    JValue.GetValue<string>('lat'),
-                    JValue.GetValue<string>('lon'));
+        Listview1.Items.Clear;
+        for JValue in Places do
+        begin
+          AddPlace2LV(JValue.GetValue<string>('display_name'), JValue.GetValue<string>('lat'), JValue.GetValue<string>('lon'));
+        end;
+        if (ShowModal <> IDOK) then
+          exit;
+        if (Listview1.Selected = nil) then
+          exit;
+        Lat := Listview1.Selected.Caption;
+        Lon := Listview1.Selected.Subitems[0];
       end;
-      if (ShowModal <> IDOK) then
-        exit;
-      if (Listview1.Selected = nil) then
-        exit;
-      Lat := Listview1.Selected.Caption;
-      Lon := Listview1.Selected.Subitems[0];
-    end;
   finally
     RESTResponse.Free;
     RESTRequest.Free;
@@ -333,14 +337,15 @@ begin
 end;
 
 function MapGoToPlace(Browser: TEdgeBrowser; Place, Desc: string): string;
-var Lat, Lon: string;
+var
+  Lat, Lon: string;
 begin
   result := Place;
   ParseLatLon(Place, Lat, Lon);
-  if not (ValidLatLon(Lat, Lon)) then
+  if not(ValidLatLon(Lat, Lon)) then
   begin
     GetCoordsOfPLace(Place, Lat, Lon);
-    if not (ValidLatLon(Lat, Lon)) then
+    if not(ValidLatLon(Lat, Lon)) then
       exit;
     AdjustLatLon(Lat, Lon);
     result := Lat + ', ' + Lon;
@@ -349,20 +354,22 @@ begin
 end;
 
 procedure ParseJsonMessage(const Message: string; var Msg, Parm1, Parm2: string);
-var JSonValue: TJSonValue;
+var
+  JSONValue: TJSONValue;
 begin
-   JsonValue := TJSonObject.ParseJSONValue(Message);
-   try
-     Msg := JsonValue.GetValue<string>('msg');
-     Parm1 := JsonValue.GetValue<string>('parm1');
-     Parm2 := JsonValue.GetValue<string>('parm2');
-   finally
-     JsonValue.Free;
-   end;
+  JSONValue := TJSonObject.ParseJSONValue(Message);
+  try
+    Msg := JSONValue.GetValue<string>('msg');
+    Parm1 := JSONValue.GetValue<string>('parm1');
+    Parm2 := JSONValue.GetValue<string>('parm2');
+  finally
+    JSONValue.Free;
+  end;
 end;
 
 function ValidLatLon(const Lat, Lon: string): boolean;
-var ADouble: Double;
+var
+  ADouble: Double;
 begin
   result := TryStrToFloat(Lat, ADouble, CoordFormatSettings);
   result := result and (Abs(ADouble) <= 90);
@@ -371,7 +378,8 @@ begin
 end;
 
 procedure AdjustLatLon(var Lat, Lon: string);
-var P: integer;
+var
+  P: integer;
 begin
   P := Pos('.', Lat) + Coord_Decimals;
   SetLength(Lat, P);
@@ -387,6 +395,7 @@ begin
 end;
 
 initialization
+
 begin
   CoordFormatSettings.ThousandSeparator := ',';
   CoordFormatSettings.DecimalSeparator := '.';

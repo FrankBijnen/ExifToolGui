@@ -11,3 +11,9 @@ Version:        Description             Issue
 6.0.5.0         Fix Issue #15           Still Access Violations changing directory in thumbnail mode.
                 Fix Issue #16           Change the location of the Ini file.
                 Fix Issue #17           Add the possibility to override the ExifTool.exe location in the Preference.
+6.1.0.0         Fix Issue #26           Generating Thumbnails fails in Windows 7
+                Fix Issue #31           Error in default Workspace (Subject).
+                Fix Issue #33           Prepare for 64 Bits
+                Fix Issue #36           Add platform Win64
+                Fix Issue #37           Generating Thumbnail updates
+                                        Source code formatted with Delphi Formatter

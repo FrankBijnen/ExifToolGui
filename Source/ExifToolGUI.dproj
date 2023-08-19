@@ -6,8 +6,8 @@
         <MainSource>ExifToolGUI.dpr</MainSource>
         <Base>True</Base>
         <Config Condition="'$(Config)'==''">Release</Config>
-        <Platform Condition="'$(Platform)'==''">Win32</Platform>
-        <TargetedPlatforms>1</TargetedPlatforms>
+        <Platform Condition="'$(Platform)'==''">Win64</Platform>
+        <TargetedPlatforms>3</TargetedPlatforms>
         <AppType>Application</AppType>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Config)'=='Base' or '$(Base)'!=''">
@@ -66,7 +66,7 @@
         <SanitizedProjectName>ExifToolGUI</SanitizedProjectName>
         <UWP_DelphiLogo44>$(BDS)\bin\Artwork\Windows\UWP\delphi_UwpDefault_44.png</UWP_DelphiLogo44>
         <UWP_DelphiLogo150>$(BDS)\bin\Artwork\Windows\UWP\delphi_UwpDefault_150.png</UWP_DelphiLogo150>
-        <Custom_Styles>&quot;Aqua Light Slate|VCLSTYLE|$(BDSCOMMONDIR)\Styles\AquaLightSlate.vsf&quot;;Glow|VCLSTYLE|$(BDSCOMMONDIR)\Styles\Glow.vsf;&quot;Iceberg Classico|VCLSTYLE|$(BDSCOMMONDIR)\Styles\IcebergClassico.vsf&quot;;&quot;Lavender Classico|VCLSTYLE|$(BDSCOMMONDIR)\Styles\LavenderClassico.vsf&quot;;Sky|VCLSTYLE|$(BDSCOMMONDIR)\Styles\Sky.vsf;&quot;Slate Classico|VCLSTYLE|$(BDSCOMMONDIR)\Styles\SlateClassico.vsf&quot;;&quot;Tablet Dark|VCLSTYLE|$(BDSCOMMONDIR)\Styles\TabletDark.vsf&quot;;&quot;Tablet Light|VCLSTYLE|$(BDSCOMMONDIR)\Styles\TabletLight.vsf&quot;;Windows10|VCLSTYLE|$(BDSCOMMONDIR)\Styles\Windows10.vsf;&quot;Windows10 Blue|VCLSTYLE|$(BDSCOMMONDIR)\Styles\Windows10Blue.vsf&quot;;&quot;Windows10 Dark|VCLSTYLE|$(BDSCOMMONDIR)\Styles\Windows10Dark.vsf&quot;;&quot;Windows10 Green|VCLSTYLE|$(BDSCOMMONDIR)\Styles\Windows10Green.vsf&quot;;&quot;Windows10 Purple|VCLSTYLE|$(BDSCOMMONDIR)\Styles\Windows10Purple.vsf&quot;;&quot;Windows10 SlateGray|VCLSTYLE|$(BDSCOMMONDIR)\Styles\Windows10SlateGray.vsf&quot;;Amakrits|VCLSTYLE|$(BDSCOMMONDIR)\Styles\Amakrits.vsf;&quot;Amethyst Kamri|VCLSTYLE|$(BDSCOMMONDIR)\Styles\AmethystKamri.vsf&quot;;&quot;Aqua Graphite|VCLSTYLE|$(BDSCOMMONDIR)\Styles\AquaGraphite.vsf&quot;;Auric|VCLSTYLE|$(BDSCOMMONDIR)\Styles\Auric.vsf;Carbon|VCLSTYLE|$(BDSCOMMONDIR)\Styles\Carbon.vsf;&quot;Charcoal Dark Slate|VCLSTYLE|$(BDSCOMMONDIR)\Styles\CharcoalDarkSlate.vsf&quot;;&quot;Cobalt XEMedia|VCLSTYLE|$(BDSCOMMONDIR)\Styles\CobaltXEMedia.vsf&quot;;&quot;Cyan Dusk|VCLSTYLE|$(BDSCOMMONDIR)\Styles\CyanDusk.vsf&quot;;&quot;Cyan Night|VCLSTYLE|$(BDSCOMMONDIR)\Styles\CyanNight.vsf&quot;;&quot;Emerald Light Slate|VCLSTYLE|$(BDSCOMMONDIR)\Styles\EmeraldLightSlate.vsf&quot;;&quot;Golden Graphite|VCLSTYLE|$(BDSCOMMONDIR)\Styles\GoldenGraphite.vsf&quot;;Light|VCLSTYLE|$(BDSCOMMONDIR)\Styles\Light.vsf;Luna|VCLSTYLE|$(BDSCOMMONDIR)\Styles\Luna.vsf;&quot;Metropolis UI Black|VCLSTYLE|$(BDSCOMMONDIR)\Styles\MetropolisUIBlack.vsf&quot;;&quot;Metropolis UI Blue|VCLSTYLE|$(BDSCOMMONDIR)\Styles\MetropolisUIBlue.vsf&quot;;&quot;Metropolis UI Dark|VCLSTYLE|$(BDSCOMMONDIR)\Styles\MetropolisUIDark.vsf&quot;;&quot;Metropolis UI Green|VCLSTYLE|$(BDSCOMMONDIR)\Styles\MetropolisUIGreen.vsf&quot;;Obsidian|VCLSTYLE|$(BDSCOMMONDIR)\Styles\Obsidian.vsf;&quot;Onyx Blue|VCLSTYLE|$(BDSCOMMONDIR)\Styles\OnyxBlue.vsf&quot;;&quot;Ruby Graphite|VCLSTYLE|$(BDSCOMMONDIR)\Styles\RubyGraphite.vsf&quot;;&quot;Sapphire Kamri|VCLSTYLE|$(BDSCOMMONDIR)\Styles\SapphireKamri.vsf&quot;;&quot;Smokey Quartz Kamri|VCLSTYLE|$(BDSCOMMONDIR)\Styles\SmokeyQuartzKamri.vsf&quot;;&quot;Turquoise Gray|VCLSTYLE|$(BDSCOMMONDIR)\Styles\TurquoiseGray.vsf&quot;;Blue|VCLSTYLE|$(BDSCOMMONDIR)\Styles\Blue.vsf;Green|VCLSTYLE|$(BDSCOMMONDIR)\Styles\Green.vsf;Silver|VCLSTYLE|$(BDSCOMMONDIR)\Styles\Silver.vsf;Glossy|VCLSTYLE|$(BDSCOMMONDIR)\Styles\Glossy.vsf</Custom_Styles>
+        <Custom_Styles>&quot;Aqua Light Slate|VCLSTYLE|$(BDSCOMMONDIR)\Styles\AquaLightSlate.vsf&quot;;Glow|VCLSTYLE|$(BDSCOMMONDIR)\Styles\Glow.vsf;&quot;Iceberg Classico|VCLSTYLE|$(BDSCOMMONDIR)\Styles\IcebergClassico.vsf&quot;;&quot;Lavender Classico|VCLSTYLE|$(BDSCOMMONDIR)\Styles\LavenderClassico.vsf&quot;;Sky|VCLSTYLE|$(BDSCOMMONDIR)\Styles\Sky.vsf;&quot;Slate Classico|VCLSTYLE|$(BDSCOMMONDIR)\Styles\SlateClassico.vsf&quot;;&quot;Tablet Dark|VCLSTYLE|$(BDSCOMMONDIR)\Styles\TabletDark.vsf&quot;;&quot;Tablet Light|VCLSTYLE|$(BDSCOMMONDIR)\Styles\TabletLight.vsf&quot;;Windows10|VCLSTYLE|$(BDSCOMMONDIR)\Styles\Windows10.vsf;&quot;Windows10 Blue|VCLSTYLE|$(BDSCOMMONDIR)\Styles\Windows10Blue.vsf&quot;;&quot;Windows10 Dark|VCLSTYLE|$(BDSCOMMONDIR)\Styles\Windows10Dark.vsf&quot;;&quot;Windows10 Green|VCLSTYLE|$(BDSCOMMONDIR)\Styles\Windows10Green.vsf&quot;;&quot;Windows10 Purple|VCLSTYLE|$(BDSCOMMONDIR)\Styles\Windows10Purple.vsf&quot;;&quot;Windows10 SlateGray|VCLSTYLE|$(BDSCOMMONDIR)\Styles\Windows10SlateGray.vsf&quot;;Amakrits|VCLSTYLE|$(BDSCOMMONDIR)\Styles\Amakrits.vsf;&quot;Amethyst Kamri|VCLSTYLE|$(BDSCOMMONDIR)\Styles\AmethystKamri.vsf&quot;;&quot;Aqua Graphite|VCLSTYLE|$(BDSCOMMONDIR)\Styles\AquaGraphite.vsf&quot;;Auric|VCLSTYLE|$(BDSCOMMONDIR)\Styles\Auric.vsf;Blue|VCLSTYLE|$(BDSCOMMONDIR)\Styles\Blue.vsf;Carbon|VCLSTYLE|$(BDSCOMMONDIR)\Styles\Carbon.vsf;&quot;Charcoal Dark Slate|VCLSTYLE|$(BDSCOMMONDIR)\Styles\CharcoalDarkSlate.vsf&quot;;&quot;Cobalt XEMedia|VCLSTYLE|$(BDSCOMMONDIR)\Styles\CobaltXEMedia.vsf&quot;;&quot;Cyan Dusk|VCLSTYLE|$(BDSCOMMONDIR)\Styles\CyanDusk.vsf&quot;;&quot;Cyan Night|VCLSTYLE|$(BDSCOMMONDIR)\Styles\CyanNight.vsf&quot;;&quot;Emerald Light Slate|VCLSTYLE|$(BDSCOMMONDIR)\Styles\EmeraldLightSlate.vsf&quot;;&quot;Golden Graphite|VCLSTYLE|$(BDSCOMMONDIR)\Styles\GoldenGraphite.vsf&quot;;Green|VCLSTYLE|$(BDSCOMMONDIR)\Styles\Green.vsf;Light|VCLSTYLE|$(BDSCOMMONDIR)\Styles\Light.vsf;Luna|VCLSTYLE|$(BDSCOMMONDIR)\Styles\Luna.vsf;&quot;Metropolis UI Black|VCLSTYLE|$(BDSCOMMONDIR)\Styles\MetropolisUIBlack.vsf&quot;;&quot;Metropolis UI Blue|VCLSTYLE|$(BDSCOMMONDIR)\Styles\MetropolisUIBlue.vsf&quot;;&quot;Metropolis UI Dark|VCLSTYLE|$(BDSCOMMONDIR)\Styles\MetropolisUIDark.vsf&quot;;&quot;Metropolis UI Green|VCLSTYLE|$(BDSCOMMONDIR)\Styles\MetropolisUIGreen.vsf&quot;;Obsidian|VCLSTYLE|$(BDSCOMMONDIR)\Styles\Obsidian.vsf;&quot;Onyx Blue|VCLSTYLE|$(BDSCOMMONDIR)\Styles\OnyxBlue.vsf&quot;;&quot;Ruby Graphite|VCLSTYLE|$(BDSCOMMONDIR)\Styles\RubyGraphite.vsf&quot;;&quot;Sapphire Kamri|VCLSTYLE|$(BDSCOMMONDIR)\Styles\SapphireKamri.vsf&quot;;Silver|VCLSTYLE|$(BDSCOMMONDIR)\Styles\Silver.vsf;&quot;Smokey Quartz Kamri|VCLSTYLE|$(BDSCOMMONDIR)\Styles\SmokeyQuartzKamri.vsf&quot;;&quot;Turquoise Gray|VCLSTYLE|$(BDSCOMMONDIR)\Styles\TurquoiseGray.vsf&quot;;Glossy|VCLSTYLE|$(BDSCOMMONDIR)\Styles\Glossy.vsf</Custom_Styles>
         <VerInfo_Locale>1043</VerInfo_Locale>
         <VerInfo_Keys>CompanyName=;FileDescription=GUI for ExifTool;FileVersion=5.16.0.0;InternalName=;LegalCopyright=2007-2015 Bogdan Hrastnik;LegalTrademarks=;OriginalFilename=ExifToolGUI.exe;ProductName=ExifToolGUI;ProductVersion=5.0.0.0;Comments=;ProgramID=com.embarcadero.$(MSBuildProjectName)</VerInfo_Keys>
         <DCC_UnitSearchPath>Vcl.ShellControls;$(DCC_UnitSearchPath)</DCC_UnitSearchPath>
@@ -118,11 +118,19 @@
         <BT_BuildType>Debug</BT_BuildType>
         <VerInfo_PreRelease>true</VerInfo_PreRelease>
         <VerInfo_Release>5</VerInfo_Release>
-        <DCC_DebugDCUs>true</DCC_DebugDCUs>
         <Debugger_CWD>c:\temp</Debugger_CWD>
+        <UWP_DelphiLogo44>ExifToolGUI.ico</UWP_DelphiLogo44>
+        <UWP_DelphiLogo150>ExifToolGUI.ico</UWP_DelphiLogo150>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_1_Win64)'!=''">
         <AppDPIAwarenessMode>PerMonitorV2</AppDPIAwarenessMode>
+        <DCC_DebugDCUs>true</DCC_DebugDCUs>
+        <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
+        <VerInfo_Locale>1033</VerInfo_Locale>
+        <VerInfo_Keys>CompanyName=;FileDescription=$(MSBuildProjectName);FileVersion=1.0.0.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProgramID=com.embarcadero.$(MSBuildProjectName);ProductName=$(MSBuildProjectName);ProductVersion=1.0.0.0;Comments=</VerInfo_Keys>
+        <Icon_MainIcon>ExifToolGUI.ico</Icon_MainIcon>
+        <UWP_DelphiLogo44>ExifToolGUI.ico</UWP_DelphiLogo44>
+        <UWP_DelphiLogo150>ExifToolGUI.ico</UWP_DelphiLogo150>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_2)'!=''">
         <DCC_LocalDebugSymbols>false</DCC_LocalDebugSymbols>
@@ -134,14 +142,24 @@
         <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
         <VerInfo_MajorVer>6</VerInfo_MajorVer>
         <VerInfo_Locale>1033</VerInfo_Locale>
-        <VerInfo_Keys>CompanyName=;FileVersion=6.0.5.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProductVersion=6.0.5.0;Comments=;ProgramID=com.embarcadero.$(MSBuildProjectName);FileDescription=$(MSBuildProjectName);ProductName=$(MSBuildProjectName)</VerInfo_Keys>
+        <VerInfo_Keys>CompanyName=;FileVersion=6.1.0.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProductVersion=6.1.0.0;Comments=;ProgramID=com.embarcadero.$(MSBuildProjectName);FileDescription=$(MSBuildProjectName);ProductName=$(MSBuildProjectName)</VerInfo_Keys>
         <VerInfo_PreRelease>true</VerInfo_PreRelease>
         <BT_BuildType>Debug</BT_BuildType>
         <Icon_MainIcon>ExifToolGUI.ico</Icon_MainIcon>
-        <VerInfo_Release>5</VerInfo_Release>
+        <UWP_DelphiLogo44>ExifToolGUI.ico</UWP_DelphiLogo44>
+        <UWP_DelphiLogo150>ExifToolGUI.ico</UWP_DelphiLogo150>
+        <VerInfo_MinorVer>1</VerInfo_MinorVer>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_2_Win64)'!=''">
         <AppDPIAwarenessMode>PerMonitorV2</AppDPIAwarenessMode>
+        <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
+        <VerInfo_Locale>1033</VerInfo_Locale>
+        <VerInfo_Keys>CompanyName=;FileDescription=$(MSBuildProjectName);FileVersion=6.1.0.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProgramID=com.embarcadero.$(MSBuildProjectName);ProductName=$(MSBuildProjectName);ProductVersion=6.1.0.0;Comments=</VerInfo_Keys>
+        <Icon_MainIcon>ExifToolGUI.ico</Icon_MainIcon>
+        <VerInfo_MajorVer>6</VerInfo_MajorVer>
+        <UWP_DelphiLogo44>ExifToolGUI.ico</UWP_DelphiLogo44>
+        <UWP_DelphiLogo150>ExifToolGUI.ico</UWP_DelphiLogo150>
+        <VerInfo_MinorVer>1</VerInfo_MinorVer>
     </PropertyGroup>
     <ItemGroup>
         <DelphiCompile Include="$(MainSource)">
@@ -192,6 +210,8 @@
             <Form>FrmPlaces</Form>
         </DCCReference>
         <DCCReference Include="ExifToolsGUI_Utils.pas"/>
+        <DCCReference Include="ExiftoolsGui_ShellList.pas"/>
+        <DCCReference Include="ExifToolsGUI_Thumbnails.pas"/>
         <DCCReference Include="ExifInfo.pas"/>
         <DCCReference Include="ExifTool.pas"/>
         <DCCReference Include="UFrmStyle.pas">
@@ -199,6 +219,9 @@
         </DCCReference>
         <DCCReference Include="UFrmAbout.pas">
             <Form>FrmAbout</Form>
+        </DCCReference>
+        <DCCReference Include="UFrmGenerate.pas">
+            <Form>FrmGenerate</Form>
         </DCCReference>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
@@ -253,8 +276,28 @@
                 </Source>
             </Delphi.Personality>
             <Deployment Version="4">
+                <DeployFile LocalName="ExifToolGUI.ico" Configuration="Release" Class="UWP_DelphiLogo44">
+                    <Platform Name="Win32">
+                        <RemoteDir>Assets\</RemoteDir>
+                        <RemoteName>Logo44x44.png</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="ExifToolGUI.ico" Configuration="Release" Class="UWP_DelphiLogo44">
+                    <Platform Name="Win64">
+                        <RemoteDir>Assets\</RemoteDir>
+                        <RemoteName>Logo44x44.png</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
                 <DeployFile LocalName="Win32\Debug\ExifToolGUI.exe" Configuration="Debug" Class="ProjectOutput">
                     <Platform Name="Win32">
+                        <RemoteName>ExifToolGUI.exe</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="Win64\Release\ExifToolGUI.exe" Configuration="Release" Class="ProjectOutput">
+                    <Platform Name="Win64">
                         <RemoteName>ExifToolGUI.exe</RemoteName>
                         <Overwrite>true</Overwrite>
                     </Platform>
@@ -1084,7 +1127,7 @@
             </Deployment>
             <Platforms>
                 <Platform value="Win32">True</Platform>
-                <Platform value="Win64">False</Platform>
+                <Platform value="Win64">True</Platform>
             </Platforms>
         </BorlandProject>
         <ProjectFileVersion>12</ProjectFileVersion>

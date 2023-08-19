@@ -22,8 +22,7 @@ type
     LabeledEdit3: TLabeledEdit;
     StatusBar1: TStatusBar;
     procedure FormShow(Sender: TObject);
-    procedure StringGrid1SelectCell(Sender: TObject; ACol, ARow: Integer;
-      var CanSelect: Boolean);
+    procedure StringGrid1SelectCell(Sender: TObject; ACol, ARow: Integer; var CanSelect: Boolean);
     procedure Button1Click(Sender: TObject);
     procedure Button2Click(Sender: TObject);
     procedure Button3Click(Sender: TObject);
@@ -110,8 +109,7 @@ begin
   begin
     tx := Trim(LabeledEdit2.Text);
     LabeledEdit2.Text := tx;
-    if (Length(tx) < 4) or (LeftStr(tx, 1) <> '-') or (RightStr(tx, 1) = '=')
-    then
+    if (Length(tx) < 4) or (LeftStr(tx, 1) <> '-') or (RightStr(tx, 1) = '=') then
       LabeledEdit2.SetFocus
     else
       with StringGrid1 do
@@ -205,8 +203,7 @@ begin
   Application.OnHint := DisplayHint;
 end;
 
-procedure TFQuickManager.StringGrid1SelectCell(Sender: TObject;
-  ACol, ARow: Integer; var CanSelect: Boolean);
+procedure TFQuickManager.StringGrid1SelectCell(Sender: TObject; ACol, ARow: Integer; var CanSelect: Boolean);
 begin
   with StringGrid1 do
   begin
