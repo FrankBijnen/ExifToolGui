@@ -37,8 +37,7 @@ function MessageDlgEx(const AMsg, ACaption: string; ADlgType: TMsgDlgType; AButt
 
 implementation
 
-uses Winapi.ShellAPI, Winapi.KnownFolders, System.IOUtils, System.Win.Registry, System.UITypes,
-  UFrmGenerate, MainDef;
+uses Winapi.ShellAPI, Winapi.KnownFolders, System.Win.Registry, System.UITypes, UFrmGenerate, MainDef;
 
 var
   GlobalImgFact: IWICImagingFactory;
@@ -112,7 +111,7 @@ begin
   result := '';
   if SUCCEEDED(SHGetKnownFolderPath(FOLDERID_RoamingAppData, 0, 0, NameBuffer)) then
   begin
-    result := IncludeTrailingPathDelimiter(StrPas(NameBuffer)) + IncludeTrailingPathDelimiter(TPath.GetFileNameWithoutExtension(Application.ExeName));
+    result := IncludeTrailingPathDelimiter(StrPas(NameBuffer)) + IncludeTrailingPathDelimiter(Application.Title);
     CoTaskMemFree(NameBuffer);
     if not DirectoryExists(result) then
       CreateDir(result);
