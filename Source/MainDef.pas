@@ -115,7 +115,7 @@ var
   CurVer, PrevVer, PrevPath: string;
 begin
   // Default is ExifToolGuiV6.ini in Profile %AppData%\ExifToolGui
-  CurVer := ChangeFileExt(ExtractFileName(Application.ExeName), IniVersion + '.ini');
+  CurVer := Application.Title + IniVersion + '.ini';
   result := GetINIPath + CurVer;
   if (FileExists(result)) then
     exit;
@@ -124,7 +124,7 @@ begin
   if not AllowPrevVer then
     exit;
 
-  PrevVer := ChangeFileExt(ExtractFileName(Application.ExeName), PrevIniVersion + '.ini');
+  PrevVer := Application.Title + PrevIniVersion + '.ini';
   // Maybe in AppDir V6 ?
   PrevPath := GetAppPath + CurVer;
   if (FileExists(PrevPath)) then

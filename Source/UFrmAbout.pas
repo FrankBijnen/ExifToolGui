@@ -77,7 +77,9 @@ var
   Output: string;
   I, X, Y: smallint;
 begin
-  LblVersion.Caption := 'ExifToolGUI v' + GetFileVersionNumber(Application.ExeName, false) + ' by Bogdan Hrastnik.' + #10 +
+  LblVersion.Caption := Application.Title + ' v' +
+    GetFileVersionNumber(Application.ExeName, false) +
+    ' by Bogdan Hrastnik.' + #10 +
     'Adapted for RAD11 by Frank B';
   LblSource.Caption := 'https://github.com/FrankBijnen/ExifToolGui';
   LblForum.Caption := 'https://exiftool.org/forum/index.php';
