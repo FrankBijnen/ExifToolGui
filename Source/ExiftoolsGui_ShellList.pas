@@ -59,6 +59,8 @@ type
     procedure CMThumbEnd(var Message: TMessage); message CM_ThumbEnd;
     procedure CMThumbError(var Message: TMessage); message CM_ThumbError;
     procedure CMThumbRefresh(var Message: TMessage); message CM_ThumbRefresh;
+    function CreateSelectedFileListAsString: string;
+    function CreateSelectedFileList: TStringList;
   protected
     procedure WMNotify(var Msg: TWMNotify); message WM_NOTIFY;
     procedure InitSortSpec(SortColumn: integer; SortState: THeaderSortState);
@@ -71,6 +73,7 @@ type
     procedure Add2ThumbNails(ABmp: HBITMAP; ANitemIndex: integer; NeedsGenerating: boolean);
     procedure CancelThumbTasks;
     procedure RemoveThumbTask(ItemIndex: integer);
+    procedure ShowMultiContextMenu(MousePos: TPoint);
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
@@ -78,6 +81,7 @@ type
     function FileName(ItemIndex: integer = -1): string;
     function FileExt(ItemIndex: integer = -1): string;
     procedure ColumnClick(Column: TListColumn);
+    procedure CopyFileNamesToClipboard;
 
     property OnColumnResized: TNotifyEvent read FonColumnResized write FonColumnResized;
     property ColumnSorted: boolean read FColumnSorted write SetColumnSorted;
@@ -98,7 +102,9 @@ type
 
 implementation
 
-uses Winapi.CommCtrl, Winapi.ShlObj, Vcl.Graphics, ExifToolsGUI_Utils;
+uses System.AnsiStrings, System.Win.ComObj,
+     Winapi.CommCtrl, Winapi.ShlObj, Vcl.Graphics, ExifToolsGUI_Utils,
+     Vcl.Clipbrd;
 
 // res file contains the ?
 
@@ -106,6 +112,92 @@ uses Winapi.CommCtrl, Winapi.ShlObj, Vcl.Graphics, ExifToolsGUI_Utils;
 
 const
   QUESTIONMARK = 'QUESTIONMARK';
+
+  // Contextmenu supporting multi select
+
+procedure InvokeMultiContextMenu(Owner: TWinControl; AFolder: TShellFolder; AFileList: TStrings; MousePos: TPoint);
+var
+  chEaten, dwAttributes: ULONG;
+  FilePIDL: PItemIDList;
+  CM: IContextMenu;
+  Menu: HMenu;
+  Command: LongBool;
+  ICM2: IContextMenu2;
+  ICI: TCMInvokeCommandInfo;
+  ICmd: integer;
+  ZVerb: array [0..255] of AnsiChar;
+  Verb: string;
+  Handled: boolean;
+  SCV: IShellCommandVerb;
+  HR: HResult;
+  ItemIDListArray: array of PItemIDList;
+  Index: integer;
+begin
+  if (AFileList.Count = 0) then
+    exit;
+  if (AFolder.ShellFolder = nil) then
+    exit;
+
+  // Setup ItemIDListArray.
+  SetLength(ItemIDListArray, AFileList.Count);
+  for Index := 0 to AFileList.Count - 1 do
+  begin
+    // Get the relative PItemIDList of each file in the list
+    OleCheck(AFolder.ShellFolder.ParseDisplayName(Owner.Handle, nil, PWideChar(AFileList[Index]), chEaten, FilePIDL, dwAttributes));
+    ItemIDListArray[Index] := FilePIDL;
+  end;
+
+  // get the IContextMenu Interface for the file array
+  AFolder.ShellFolder.GetUIObjectOf(Owner.Handle, AFileList.Count, ItemIDListArray[0], IID_IContextMenu, nil, CM);
+  if CM = nil then
+    exit;
+
+  Winapi.Windows.ClientToScreen(Owner.Handle, MousePos);
+  Menu := CreatePopupMenu;
+  try
+    CM.QueryContextMenu(Menu, 0, 1, $7FFF, CMF_EXPLORE or CMF_CANRENAME);
+    CM.QueryInterface(IID_IContextMenu2, ICM2); // To handle submenus.
+    try
+      Command := TrackPopupMenu(Menu,
+                                TPM_LEFTALIGN or TPM_LEFTBUTTON or TPM_RIGHTBUTTON or TPM_RETURNCMD,
+                                MousePos.X, MousePos.Y, 0, Owner.Handle, nil);
+    finally
+      ICM2 := nil;
+    end;
+
+    if Command then
+    begin
+      ICmd := LongInt(Command) - 1;
+      HR := CM.GetCommandString(ICmd, GCS_VERBA, nil, ZVerb, SizeOf(ZVerb));
+      Verb := string(System.AnsiStrings.StrPas(ZVerb));
+      Handled := False;
+      if Supports(nil, IShellCommandVerb, SCV) then
+      begin
+        HR := 0;
+        SCV.ExecuteCommand(Verb, Handled);
+      end;
+
+      if not Handled then
+      begin
+        FillChar(ICI, SizeOf(ICI), #0);
+        with ICI do
+        begin
+          cbSize := SizeOf(ICI);
+          HWND := 0;
+          lpVerb := MakeIntResourceA(ICmd);
+          nShow := SW_SHOWNORMAL;
+        end;
+        HR := CM.InvokeCommand(ICI);
+      end;
+
+      if Assigned(SCV) then
+        SCV.CommandCompleted(Verb, HR = S_OK);
+    end;
+  finally
+    DestroyMenu(Menu);
+  end;
+end;
+
   // Listview Sort
 
 function GetListHeaderSortState(HeaderLView: TCustomListView; Column: TListColumn): THeaderSortState;
@@ -138,7 +230,7 @@ begin
   case Value of
     hssAscending:
       begin
-        Column.Caption := Column.Caption + ' ' + #$25b2; // Add an arrow to the caption. Using styles dont show the arrows in the header
+        Column.Caption := Column.Caption + ' ' + #$25b2; // Add an arrow to the caption. Using styles doesn't show the arrows in the header
         Item.fmt := Item.fmt or HDF_SORTUP;
       end;
     hssDescending:
@@ -218,6 +310,60 @@ begin
         if (SortState = THeaderSortState.hssDescending) then
           Result := Result * -1;
       end);
+  end;
+end;
+
+// Copy files to clipboard
+procedure TShellListView.CopyFileNamesToClipboard;
+var
+  Size: Integer;
+  FileList: string;
+  DropFiles: PDropFiles;
+
+  procedure PutOnClipboard(ClipboardFormat: UINT; Buffer: Pointer; Count: Integer);
+  var
+    Handle: HGLOBAL;
+    Ptr: Pointer;
+  begin
+    Clipboard.Open;
+    try
+      Handle := GlobalAlloc(GMEM_MOVEABLE, Count);
+      try
+        Ptr := GlobalLock(Handle);
+        Move(Buffer^, Ptr^, Count);
+        GlobalUnlock(Handle);
+        Clipboard.SetAsHandle(ClipboardFormat, Handle);
+      except
+        GlobalFree(Handle);
+        raise;
+      end;
+    finally
+      Clipboard.Close;
+    end;
+  end;
+
+begin
+  FileList := CreateSelectedFileListAsString;
+  Size := SizeOf(TDropFiles) + ByteLength(FileList);
+  DropFiles := AllocMem(Size);
+  try
+    DropFiles.pFiles := SizeOf(TDropFiles);
+    DropFiles.fWide := True;
+    Move(Pointer(FileList)^, (PByte(DropFiles) + SizeOf(TDropFiles))^, ByteLength(FileList));
+    PutOnClipboard(CF_HDROP, DropFiles, Size);
+  finally
+    FreeMem(DropFiles);
+  end;
+end;
+
+procedure TShellListView.ShowMultiContextMenu(MousePos: TPoint);
+var FileList: TStringList;
+begin
+  FileList := CreateSelectedFileList;
+  try
+    InvokeMultiContextMenu(Self, RootFolder, FileList, MousePos);
+  finally
+    FileList.Free;
   end;
 end;
 
@@ -320,12 +466,35 @@ begin
   end;
 end;
 
+function TShellListView.CreateSelectedFileListAsString: string;
+var
+  AnItem: TListItem;
+begin
+  Result := '';
+  for AnItem in Items do
+    if (AnItem.Selected) then
+      Result := Result + Folders[AnItem.Index].PathName + #0;
+  Result := Result + #0;
+end;
+
+function TShellListView.CreateSelectedFileList: TStringList;
+var
+  AnItem: TListItem;
+begin
+  Result := TStringList.Create;
+  for AnItem in Items do
+    if (AnItem.Selected) then
+      Result.Add(Filename(AnItem.Index));
+end;
+
 procedure TShellListView.DoContextPopup(MousePos: TPoint; var Handled: boolean);
 begin
   if (ViewStyle = vsIcon) then
     FIConPopup.Popup(ClientToScreen(MousePos).X, ClientToScreen(MousePos).Y)
   else
-    inherited;
+    ShowMultiContextMenu(MousePos);
+  Handled := true;
+//  inherited;
 end;
 
 procedure TShellListView.Populate;

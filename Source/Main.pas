@@ -2439,6 +2439,8 @@ begin
     ShellListClick(Sender);
   if (Key = Ord('A')) and (ssCTRL in Shift) then // Ctrl+A
     ShellList.SelectAll;
+  if (Key = Ord('C')) and (ssCTRL in Shift) then // Ctrl+C
+    ShellList.CopyFileNamesToClipboard;
   if (Key = VK_PRIOR) or (Key = VK_NEXT) then // PageUp/Down
     ShellListClick(Sender);
 end;
