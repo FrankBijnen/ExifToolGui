@@ -29,6 +29,7 @@ uses
   FileDateTime in 'FileDateTime.pas' {FFileDateTime},
   UFrmPlaces in 'UFrmPlaces.pas' {FrmPlaces},
   ExifToolsGUI_Utils in 'ExifToolsGUI_Utils.pas',
+  UnitFilesOnClipBoard in 'UnitFilesOnClipBoard.pas',
   ExiftoolsGui_ShellList in 'ExiftoolsGui_ShellList.pas',
   ExifToolsGUI_Thumbnails in 'ExifToolsGUI_Thumbnails.pas',
   ExifInfo in 'ExifInfo.pas',

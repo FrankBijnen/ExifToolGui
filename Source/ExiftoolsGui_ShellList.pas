@@ -1,4 +1,5 @@
 unit ExiftoolsGui_ShellList;
+{$WARN SYMBOL_PLATFORM OFF}
 
 interface
 
@@ -13,7 +14,9 @@ uses
 // Thumbnails.
 // User defined columns.
 // Column sorting.
-// You need to make some modifications. See the readme in the Vcl.ShellCtrls dir.
+// Multi-select context menu
+// Copy selected files to and from Clipboard
+// You need to make some modifications to the Embarcadero source. See the readme in the Vcl.ShellCtrls dir.
 
 type
   THeaderSortState = (hssNone, hssAscending, hssDescending);
@@ -59,8 +62,7 @@ type
     procedure CMThumbEnd(var Message: TMessage); message CM_ThumbEnd;
     procedure CMThumbError(var Message: TMessage); message CM_ThumbError;
     procedure CMThumbRefresh(var Message: TMessage); message CM_ThumbRefresh;
-    function CreateSelectedFileListAsString: string;
-    function CreateSelectedFileList: TStringList;
+    function CreateSelectedFileList(FullPaths: boolean): TStringList;
   protected
     procedure WMNotify(var Msg: TWMNotify); message WM_NOTIFY;
     procedure InitSortSpec(SortColumn: integer; SortState: THeaderSortState);
@@ -81,7 +83,8 @@ type
     function FileName(ItemIndex: integer = -1): string;
     function FileExt(ItemIndex: integer = -1): string;
     procedure ColumnClick(Column: TListColumn);
-    procedure CopyFileNamesToClipboard;
+    procedure FileNamesToClipboard(Cut: boolean = false);
+    procedure PasteFilesFromClipboard;
 
     property OnColumnResized: TNotifyEvent read FonColumnResized write FonColumnResized;
     property ColumnSorted: boolean read FColumnSorted write SetColumnSorted;
@@ -104,7 +107,7 @@ implementation
 
 uses System.AnsiStrings, System.Win.ComObj,
      Winapi.CommCtrl, Winapi.ShlObj, Vcl.Graphics, ExifToolsGUI_Utils,
-     Vcl.Clipbrd;
+     UnitFilesOnClipBoard;
 
 // res file contains the ?
 
@@ -314,56 +317,67 @@ begin
 end;
 
 // Copy files to clipboard
-procedure TShellListView.CopyFileNamesToClipboard;
+procedure TShellListView.FileNamesToClipboard(Cut: boolean = false);
 var
-  Size: Integer;
-  FileList: string;
-  DropFiles: PDropFiles;
-
-  procedure PutOnClipboard(ClipboardFormat: UINT; Buffer: Pointer; Count: Integer);
-  var
-    Handle: HGLOBAL;
-    Ptr: Pointer;
-  begin
-    Clipboard.Open;
-    try
-      Handle := GlobalAlloc(GMEM_MOVEABLE, Count);
-      try
-        Ptr := GlobalLock(Handle);
-        Move(Buffer^, Ptr^, Count);
-        GlobalUnlock(Handle);
-        Clipboard.SetAsHandle(ClipboardFormat, Handle);
-      except
-        GlobalFree(Handle);
-        raise;
-      end;
-    finally
-      Clipboard.Close;
-    end;
-  end;
-
+  FileList: TStringList;
 begin
-  FileList := CreateSelectedFileListAsString;
-  Size := SizeOf(TDropFiles) + ByteLength(FileList);
-  DropFiles := AllocMem(Size);
+  FileList := CreateSelectedFileList(true);
   try
-    DropFiles.pFiles := SizeOf(TDropFiles);
-    DropFiles.fWide := True;
-    Move(Pointer(FileList)^, (PByte(DropFiles) + SizeOf(TDropFiles))^, ByteLength(FileList));
-    PutOnClipboard(CF_HDROP, DropFiles, Size);
+    SetFileNamesOnClipboard(FileList, Cut);
   finally
-    FreeMem(DropFiles);
+    FileList.Free;
+  end;
+end;
+
+procedure TShellListView.PasteFilesFromClipboard;
+var
+  FileList: TStringList;
+  AFile: string;
+  Rc: integer;
+  Fs: TSearchRec;
+  TargetDir: string;
+  TargetFile: string;
+  Cut: boolean;
+  Succes: boolean;
+begin
+  FileList := TStringList.Create;
+  try
+    if not GetFileNamesFromClipboard(FileList, Cut) then
+      exit;
+    TargetDir := RootFolder.PathName;
+    for AFile in FileList do
+    begin
+      Rc := System.SysUtils.FindFirst(AFile, faAnyFile - faDirectory, Fs);
+      System.SysUtils.FindClose(Fs);
+      if (Rc = 0) then
+      begin
+        TargetFile := IncludeTrailingBackslash(TargetDir) + Fs.Name;
+        if (CompareText(TargetFile, AFile) = 0) then
+          raise Exception.Create('Source and target should be different!');
+
+        if (Cut) then
+          Succes := MoveFile(PWideChar(AFile), PWideChar(TargetFile))
+        else
+          Succes := CopyFile(PWideChar(AFile), PWideChar(TargetFile), false);
+        if not Succes then
+          raise Exception.Create('Failed to paste:' + AFile);
+      end;
+    end;
+  finally
+    FileList.Free;
+    Refresh;
   end;
 end;
 
 procedure TShellListView.ShowMultiContextMenu(MousePos: TPoint);
 var FileList: TStringList;
 begin
-  FileList := CreateSelectedFileList;
+  FileList := CreateSelectedFileList(false);
   try
     InvokeMultiContextMenu(Self, RootFolder, FileList, MousePos);
   finally
     FileList.Free;
+    Refresh;
   end;
 end;
 
@@ -466,25 +480,19 @@ begin
   end;
 end;
 
-function TShellListView.CreateSelectedFileListAsString: string;
-var
-  AnItem: TListItem;
-begin
-  Result := '';
-  for AnItem in Items do
-    if (AnItem.Selected) then
-      Result := Result + Folders[AnItem.Index].PathName + #0;
-  Result := Result + #0;
-end;
-
-function TShellListView.CreateSelectedFileList: TStringList;
+function TShellListView.CreateSelectedFileList(FullPaths: boolean): TStringList;
 var
   AnItem: TListItem;
 begin
   Result := TStringList.Create;
   for AnItem in Items do
     if (AnItem.Selected) then
-      Result.Add(Filename(AnItem.Index));
+    begin
+      if (FullPaths) then
+        Result.Add(Folders[AnItem.Index].PathName)
+      else
+        Result.Add(FileName(AnItem.Index));
+    end;
 end;
 
 procedure TShellListView.DoContextPopup(MousePos: TPoint; var Handled: boolean);

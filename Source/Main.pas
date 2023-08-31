@@ -2158,6 +2158,8 @@ begin
           ShellTree.SetFocus;
       end;
     end;
+    if (ShellTree.Selected <> nil) then
+      ShellTree.Selected.MakeVisible;
   end
   else if (ShellList.Enabled) then
     ShellList.SetFocus;
@@ -2440,7 +2442,11 @@ begin
   if (Key = Ord('A')) and (ssCTRL in Shift) then // Ctrl+A
     ShellList.SelectAll;
   if (Key = Ord('C')) and (ssCTRL in Shift) then // Ctrl+C
-    ShellList.CopyFileNamesToClipboard;
+    ShellList.FileNamesToClipboard;
+  if (Key = Ord('X')) and (ssCTRL in Shift) then // Ctrl+X
+    ShellList.FileNamesToClipboard(True);
+  if (Key = Ord('V')) and (ssCTRL in Shift) then // Ctrl+V
+    ShellList.PasteFilesFromClipboard;
   if (Key = VK_PRIOR) or (Key = VK_NEXT) then // PageUp/Down
     ShellListClick(Sender);
 end;
