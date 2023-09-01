@@ -309,18 +309,19 @@ end;
 
 procedure DropFiles2FileList(const Values: HDROP; FileNames: TStrings);
 var Files: array of Char;
-    Size: integer;
+    PFiles: PChar absolute Files;
+    LFiles: integer;
     Index: integer;
     FilesCount: integer;
 begin
   FileNames.Clear;
-  FilesCount := DragQueryFile(Values, $ffffffff, nil, 0);       // nr. of files
+  FilesCount := DragQueryFile(Values, UINT(-1), nil, 0);       // nr. of files
   for Index := 0 to FilesCount -1 do
   begin
-    Size := DragQueryFile(Values, Index, nil, 0) +1;            // Required size +1 for #0
-    SetLength(Files, Size);                                     // Resize array
-    DragQueryFile(Values, Index, @Files[0], Size);              // Get Filename
-    FileNames.Add(PChar(Files));                                // Add to Strings
+    LFiles := DragQueryFile(Values, Index, nil, 0) +1;          // Required size +1 for #0
+    SetLength(Files, LFiles);                                   // Resize array
+    DragQueryFile(Values, Index, PFiles, LFiles);               // Get Filename
+    FileNames.Add(PFiles);                                      // Add to Strings
   end;
 end;
 
@@ -371,7 +372,6 @@ begin
     end;
   end;
 end;
-
 
 initialization
 

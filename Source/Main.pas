@@ -2050,20 +2050,23 @@ end;
 // ---------------Drag_Drop procs --------------------
 procedure TFMain.ImageDrop(var Msg: TWMDROPFILES);
 var
-  NumFiles: longint;
-  Buffer: array [0 .. MAX_PATH] of char;
+  NumFiles: integer;
+  Buffer: array of Char;
+  PBuffer: PChar absolute Buffer;
+  LBuffer: integer;
   Fname: string;
   AnItem: TListItem;
 begin
-  NumFiles := DragQueryFile(Msg.Drop, $FFFFFFFF, nil, 0);
+  NumFiles := DragQueryFile(Msg.Drop, UINT(-1), nil, 0);
   if NumFiles > 1 then
     ShowMessage('Drop only one file at a time!')
   else
   begin
-    DragQueryFile(Msg.Drop, 0, @Buffer, sizeof(Buffer));
-
-    ShellTree.Path := ExtractFileDir(Buffer);
-    Fname := ExtractFileName(Buffer);
+    LBuffer := DragQueryFile(Msg.Drop, 0, nil, 0) +1;
+    SetLength(Buffer, LBuffer);
+    DragQueryFile(Msg.Drop, 0, PBuffer, LBuffer);
+    ShellTree.Path := ExtractFileDir(PBuffer);
+    Fname := ExtractFileName(PBuffer);
     ShellList.ItemIndex := -1;
     for AnItem in ShellList.Items do
     begin
