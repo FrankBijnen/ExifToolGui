@@ -14,6 +14,7 @@ uses
   Winapi.WebView2, Winapi.ActiveX, Vcl.Edge, // Edgebrowser
   VclTee.TeeGDIPlus, VclTee.TeEngine, VclTee.TeeProcs, VclTee.Chart,
   VclTee.Series, // Chart
+  ExifToolsGUI_ShellTree, // Extension of ShellTreeView
   ExifToolsGUI_ShellList, // Extension of ShellListView
   ExifToolsGUI_Thumbnails, // Thumbnails
   ExifToolsGUI_Utils; // Various
@@ -37,7 +38,7 @@ type
     AdvPanelETdirect: TPanel;
     AdvPanelMetaTop: TPanel;
     AdvPanelMetaBottom: TPanel;
-    ShellTree: TShellTreeView;
+    ShellTree: ExifToolsGUI_ShellTree.TShellTreeView;
     // Need to create our own version!
     ShellList: ExifToolsGUI_ShellList.TShellListView;
     MetadataList: TValueListEditor;
@@ -160,9 +161,6 @@ type
     Spb_GoBack: TSpeedButton;
     Spb_Forward: TSpeedButton;
     SpeedBtn_GetLoc: TSpeedButton;
-    PopupIcon: TPopupMenu;
-    GenerateThumbnails1: TMenuItem;
-    GenerateThumbnailsIinclSubdirs1: TMenuItem;
     procedure ShellListClick(Sender: TObject);
     procedure ShellListKeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
     procedure ShellTreeChange(Sender: TObject; Node: TTreeNode);
@@ -258,8 +256,6 @@ type
     procedure EdgeBrowser1WebMessageReceived(Sender: TCustomEdgeBrowser; Args: TWebMessageReceivedEventArgs);
     procedure Spb_ForwardClick(Sender: TObject);
     procedure SpeedBtn_GetLocClick(Sender: TObject);
-    procedure GenerateThumbnails1Click(Sender: TObject);
-    procedure GenerateThumbnailsIinclSubdirs1Click(Sender: TObject);
   private
     { Private declarations }
     ETBarSeriesFocal: TBarSeries;
@@ -273,7 +269,6 @@ type
     function TranslateTagName(xMeta, xName: string): string;
 
     procedure ShellistThumbError(Sender: TObject; Item: TListItem; E: Exception);
-    procedure ShellListOnGenerateReady(Sender: TObject);
     procedure ShellistThumbGenerate(Sender: TObject; Item: TListItem; Status: TThumbGenStatus; Total, Remaining: integer);
     procedure ShellListBeforePopulate(Sender: TObject; var DoDefault: boolean);
     procedure ShellListBeforeEnumColumns(Sender: TObject);
@@ -568,16 +563,6 @@ begin
   end;
   ShowMetadata;
   ShowPreview;
-end;
-
-procedure TFMain.GenerateThumbnails1Click(Sender: TObject);
-begin
-  GenerateThumbs(ShellTree.Path, false, ShellList.ThumbNailSize, ShellListOnGenerateReady);
-end;
-
-procedure TFMain.GenerateThumbnailsIinclSubdirs1Click(Sender: TObject);
-begin
-  GenerateThumbs(ShellTree.Path, true, ShellList.ThumbNailSize, ShellListOnGenerateReady);
 end;
 
 function TFMain.GetFirstSelectedFile: string;
@@ -2042,7 +2027,6 @@ begin
   ShellList.OnThumbError := ShellistThumbError;
   // Enable Column sorting if Sorted = true. Disables Sorted.
   ShellList.ColumnSorted := ShellList.Sorted;
-  ShellList.IconPopup := PopupIcon;
 
   CBoxFileFilter.Text := SHOWALL;
 end;
@@ -2491,7 +2475,6 @@ begin
   NewPath := TShellFolder(Node.Data).PathName;
   if not ValidDir(NewPath) then
     exit;
-
   EnableMenus(ET_StayOpen(NewPath));
   ShellTreeClick(Sender);
 end;
@@ -2950,15 +2933,6 @@ begin
     StatusBar.Panels[1].Text := 'Remaining Thumbnails to generate: ' + IntToStr(Remaining)
   else
     StatusBar.Panels[1].Text := '';
-end;
-
-procedure TFMain.ShellListOnGenerateReady(Sender: TObject);
-var
-  AnItem: TListItem;
-begin
-  ShellList.Refresh;
-  for AnItem in ShellList.Items do
-    AnItem.Update;
 end;
 
 end.

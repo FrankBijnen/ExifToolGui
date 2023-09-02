@@ -6,11 +6,9 @@ program ExifToolGUI;
 {.$DEFINE STACKTRACE}
 
 uses
-
   {$IFDEF STACKTRACE}
   UnitStackTrace,
-  {$ENDIF}
-
+  {$ENDIF }
   Vcl.Forms,
   Main in 'Main.pas' {FMain},
   MainDef in 'MainDef.pas',
@@ -38,7 +36,9 @@ uses
   Vcl.Styles,
   UFrmStyle in 'UFrmStyle.pas' {FrmStyle},
   UFrmAbout in 'UFrmAbout.pas' {FrmAbout},
-  UFrmGenerate in 'UFrmGenerate.pas' {FrmGenerate};
+  UFrmGenerate in 'UFrmGenerate.pas' {FrmGenerate},
+  ExifToolsGui_ShellTree in 'ExifToolsGui_ShellTree.pas',
+  ExifToolsGUI_MultiContextMenu in 'ExifToolsGUI_MultiContextMenu.pas';
 
 {$R *.res}
 

@@ -5,6 +5,7 @@ unit UnitFilesOnClipBoard;
 // https://www.freepascal.org/~michael/articles/dragdrop2/dragdrop2.pdf
 // Many thanks!
 
+{$WARN SYMBOL_PLATFORM OFF}
 {$WRITEABLECONST ON}
 
 interface
@@ -15,11 +16,14 @@ uses
 
 procedure SetFileNamesOnClipboard(const FileNames: TStrings; Cut: boolean = false);
 function GetFileNamesFromClipboard(const FileNames: TStrings; var Cut: boolean): boolean;
+procedure PasteFilesFromClipBoard(FileList: TStrings; TargetDir: string; Cut: boolean = false);
 
 implementation
 
 uses
-  ShlObj, Winapi.UrlMon, Winapi.ShellAPI;
+  System.UITypes,
+  Winapi.ShlObj, Winapi.UrlMon, Winapi.ShellAPI,
+  ExifToolsGUI_Utils;
 
 var
   CF_PREFERREDDROPEFFECT: TClipFormat = 0;
@@ -370,6 +374,73 @@ begin
     finally
       CloseClipboard;
     end;
+  end;
+end;
+
+procedure PasteFilesFromClipBoard(FileList: TStrings; TargetDir: string; Cut: boolean = false);
+var
+  AFile: string;
+  TargetFile: string;
+  Succes: boolean;
+  WriteFile: boolean;
+  OverWriteAll: boolean;
+  Confirmation: integer;
+  CrNormal, CrWait: HCURSOR;
+begin
+  CrWait := LoadCursor(0, IDC_WAIT);
+  CrNormal := SetCursor(CrWait);
+  OverWriteAll := false;
+  try
+    for AFile in FileList do
+    begin
+      // No directories alllowed
+      if (DirectoryExists(AFile, false)) then
+        continue;
+
+      // Dont copy to same directory.
+      TargetFile := IncludeTrailingBackslash(TargetDir) + ExtractFileName(AFile);
+      if (CompareText(TargetFile, AFile) = 0) then
+        raise Exception.Create('Source and target should be different!');
+
+      // Overwrite ?
+      WriteFile := OverWriteAll;
+      if not WriteFile then
+        WriteFile := not FileExists(TargetFile);
+      if not WriteFile then
+      begin
+        Confirmation := MessageDlgEx(Format('File %s exists. Overwrite?', [TargetFile]), '',
+                                     TMsgDlgType.mtWarning,
+                                     [TMsgDlgBtn.mbYes, TMsgDlgBtn.mbNo, TMsgDlgBtn.mbCancel, TMsgDlgBtn.mbYesToAll]
+                                    );
+        case Confirmation of
+          MrYes:
+            WriteFile := true;
+          MrNo:
+            WriteFile := false;
+          MrCancel:
+            exit;
+          mrYesToAll:
+          begin
+            WriteFile := true;
+            OverWriteAll := true;
+          end;
+        end;
+      end;
+
+      // Write file?
+      if not (WriteFile) then
+        continue;
+
+      SetCursor(CrWait);  // Set cursor again. Confirmation dialog could have reset it.
+      if (Cut) then
+        Succes := MoveFile(PWideChar(AFile), PWideChar(TargetFile))
+      else
+        Succes := CopyFile(PWideChar(AFile), PWideChar(TargetFile), false);
+      if not Succes then
+        raise Exception.Create(Format('Overwrite %s failed.', [AFile]));
+    end;
+  finally
+    SetCursor(CrNormal);
   end;
 end;
 

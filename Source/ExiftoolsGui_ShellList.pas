@@ -1,20 +1,19 @@
 unit ExiftoolsGui_ShellList;
-{$WARN SYMBOL_PLATFORM OFF}
 
 interface
 
 uses
   System.Classes, System.SysUtils, System.Types, System.Threading,
   Winapi.Windows, Winapi.Messages,
-  Vcl.Shell.ShellCtrls, Vcl.ComCtrls, Vcl.Menus, Vcl.Controls,
-  ExifToolsGUI_Thumbnails;
+  Vcl.Shell.ShellCtrls, Vcl.Shell.ShellConsts, Vcl.ComCtrls, Vcl.Menus, Vcl.Controls,
+  ExifToolsGUI_Thumbnails, ExifToolsGUI_MultiContextMenu;
 
 // Extend ShellListview, keeping the same Type. So we dont have to register it in the IDE
 // Extended to support:
 // Thumbnails.
 // User defined columns.
 // Column sorting.
-// Multi-select context menu
+// Multi-select context menu, with custom menu items. (For Refresh and generate thumbs)
 // Copy selected files to and from Clipboard
 // You need to make some modifications to the Embarcadero source. See the readme in the Vcl.ShellCtrls dir.
 
@@ -27,7 +26,7 @@ type
   TPopulateBeforeEvent = procedure(Sender: TObject; var DoDefault: boolean) of object;
   TOwnerDataFetchEvent = procedure(Sender: TObject; Item: TListItem; Request: TItemRequest; Afolder: TShellFolder) of object;
 
-  TShellListView = class(Vcl.Shell.ShellCtrls.TShellListView)
+  TShellListView = class(Vcl.Shell.ShellCtrls.TShellListView, IShellCommandVerbExifTool)
   private
     FThreadPool: TThreadPool;
     FThumbTasks: Tlist;
@@ -38,7 +37,6 @@ type
     FSortColumn: integer;
     FSortState: THeaderSortState;
 
-    FIConPopup: TPopupMenu;
     FThumbNails: TImageList;
     FThumbNailSize: integer;
     FGenerating: integer;
@@ -85,6 +83,8 @@ type
     procedure ColumnClick(Column: TListColumn);
     procedure FileNamesToClipboard(Cut: boolean = false);
     procedure PasteFilesFromClipboard;
+    procedure ExecuteCommandExif(Verb: string; var Handled: boolean);
+    procedure ShellListOnGenerateReady(Sender: TObject);
 
     property OnColumnResized: TNotifyEvent read FonColumnResized write FonColumnResized;
     property ColumnSorted: boolean read FColumnSorted write SetColumnSorted;
@@ -100,7 +100,6 @@ type
     property OnEnumColumnsBeforeEvent: TNotifyEvent read FOnEnumColumnsBeforeEvent write FOnEnumColumnsBeforeEvent;
     property OnEnumColumnsAfterEvent: TNotifyEvent read FOnEnumColumnsAfterEvent write FOnEnumColumnsAfterEvent;
     property OnOwnerDataFetchEvent: TOwnerDataFetchEvent read FOnOwnerDataFetchEvent write FOnOwnerDataFetchEvent;
-    property IconPopup: TPopupMenu read FIConPopup write FIConPopup;
   end;
 
 implementation
@@ -115,91 +114,6 @@ uses System.AnsiStrings, System.Win.ComObj, System.UITypes,
 
 const
   QUESTIONMARK = 'QUESTIONMARK';
-
-  // Contextmenu supporting multi select
-
-procedure InvokeMultiContextMenu(Owner: TWinControl; AFolder: TShellFolder; AFileList: TStrings; MousePos: TPoint);
-var
-  chEaten, dwAttributes: ULONG;
-  FilePIDL: PItemIDList;
-  CM: IContextMenu;
-  Menu: HMenu;
-  Command: LongBool;
-  ICM2: IContextMenu2;
-  ICI: TCMInvokeCommandInfo;
-  ICmd: integer;
-  ZVerb: array [0..255] of AnsiChar;
-  Verb: string;
-  Handled: boolean;
-  SCV: IShellCommandVerb;
-  HR: HResult;
-  ItemIDListArray: array of PItemIDList;
-  Index: integer;
-begin
-  if (AFileList.Count = 0) then
-    exit;
-  if (AFolder.ShellFolder = nil) then
-    exit;
-
-  // Setup ItemIDListArray.
-  SetLength(ItemIDListArray, AFileList.Count);
-  for Index := 0 to AFileList.Count - 1 do
-  begin
-    // Get the relative PItemIDList of each file in the list
-    OleCheck(AFolder.ShellFolder.ParseDisplayName(Owner.Handle, nil, PWideChar(AFileList[Index]), chEaten, FilePIDL, dwAttributes));
-    ItemIDListArray[Index] := FilePIDL;
-  end;
-
-  // get the IContextMenu Interface for the file array
-  AFolder.ShellFolder.GetUIObjectOf(Owner.Handle, AFileList.Count, ItemIDListArray[0], IID_IContextMenu, nil, CM);
-  if CM = nil then
-    exit;
-
-  Winapi.Windows.ClientToScreen(Owner.Handle, MousePos);
-  Menu := CreatePopupMenu;
-  try
-    CM.QueryContextMenu(Menu, 0, 1, $7FFF, CMF_EXPLORE or CMF_CANRENAME);
-    CM.QueryInterface(IID_IContextMenu2, ICM2); // To handle submenus.
-    try
-      Command := TrackPopupMenu(Menu,
-                                TPM_LEFTALIGN or TPM_LEFTBUTTON or TPM_RIGHTBUTTON or TPM_RETURNCMD,
-                                MousePos.X, MousePos.Y, 0, Owner.Handle, nil);
-    finally
-      ICM2 := nil;
-    end;
-
-    if Command then
-    begin
-      ICmd := LongInt(Command) - 1;
-      HR := CM.GetCommandString(ICmd, GCS_VERBA, nil, ZVerb, SizeOf(ZVerb));
-      Verb := string(System.AnsiStrings.StrPas(ZVerb));
-      Handled := False;
-      if Supports(Owner , IShellCommandVerb, SCV) then
-      begin
-        HR := 0;
-        SCV.ExecuteCommand(Verb, Handled);
-      end;
-
-      if not Handled then
-      begin
-        FillChar(ICI, SizeOf(ICI), #0);
-        with ICI do
-        begin
-          cbSize := SizeOf(ICI);
-          HWND := 0;
-          lpVerb := MakeIntResourceA(ICmd);
-          nShow := SW_SHOWNORMAL;
-        end;
-        HR := CM.InvokeCommand(ICI);
-      end;
-
-      if Assigned(SCV) then
-        SCV.CommandCompleted(Verb, HR = S_OK);
-    end;
-  finally
-    DestroyMenu(Menu);
-  end;
-end;
 
   // Listview Sort
 
@@ -332,83 +246,38 @@ end;
 procedure TShellListView.PasteFilesFromClipboard;
 var
   FileList: TStringList;
-  AFile: string;
-  Rc: integer;
-  Fs: TSearchRec;
-  TargetDir: string;
-  TargetFile: string;
   Cut: boolean;
-  Succes: boolean;
-  WriteFile: boolean;
-  OverWriteAll: boolean;
-  Confirmation: integer;
-  CrNormal, CrWait: HCURSOR;
 begin
-  CrWait := LoadCursor(0, IDC_WAIT);
-  CrNormal := SetCursor(CrWait);
-
-  OverWriteAll := false;
   FileList := TStringList.Create;
   try
     if not GetFileNamesFromClipboard(FileList, Cut) then
       exit;
 
-    TargetDir := RootFolder.PathName;
-    for AFile in FileList do
-    begin
-      // No directories alllowed
-      Rc := System.SysUtils.FindFirst(AFile, faAnyFile - faDirectory, Fs);
-      System.SysUtils.FindClose(Fs);
-      if (Rc <> 0) then
-        continue;
-
-      // Dont copy to ourselves.
-      TargetFile := IncludeTrailingBackslash(TargetDir) + Fs.Name;
-      if (CompareText(TargetFile, AFile) = 0) then
-        raise Exception.Create('Source and target should be different!');
-
-      // Overwrite ?
-      WriteFile := OverWriteAll;
-      if not WriteFile then
-        WriteFile := not FileExists(TargetFile);
-      if not WriteFile then
-      begin
-        Confirmation := MessageDlgEx(Format('File %s exists. Overwrite?', [TargetFile]), '',
-                                     TMsgDlgType.mtWarning,
-                                     [TMsgDlgBtn.mbYes, TMsgDlgBtn.mbNo, TMsgDlgBtn.mbCancel, TMsgDlgBtn.mbYesToAll]
-                                    );
-        case Confirmation of
-          MrYes:
-            WriteFile := true;
-          MrNo:
-            WriteFile := false;
-          MrCancel:
-            exit;
-          mrYesToAll:
-          begin
-            WriteFile := true;
-            OverWriteAll := true;
-          end;
-        end;
-      end;
-
-      // Write file?
-      if not (WriteFile) then
-        continue;
-
-      SetCursor(CrWait);  // Set cursor again. Confirmation dialog could have reset it.
-      if (Cut) then
-        Succes := MoveFile(PWideChar(AFile), PWideChar(TargetFile))
-      else
-        Succes := CopyFile(PWideChar(AFile), PWideChar(TargetFile), false);
-      if not Succes then
-        raise Exception.Create(Format('Overwrite %s failed.', [AFile]));
-    end;
+    UnitFilesOnClipBoard.PasteFilesFromClipBoard(FileList, RootFolder.PathName, Cut);
   finally
     FileList.Free;
-    SetCursor(CrNormal);
     Refresh;
   end;
+end;
+
+procedure TShellListView.ExecuteCommandExif(Verb: string; var Handled: boolean);
+begin
+  if (Verb = SCmdVerbRefresh) then
+  begin
+    Refresh;
+    Handled := true;
+  end;
+  if (Verb = SCmdVerbGenThumbs) then
+  begin
+    GenerateThumbs(RootFolder.PathName, false, ThumbNailSize, ShellListOnGenerateReady);
+    Handled := true;
+  end;
+  if (Verb = SCmdVerbGenThumbsSub) then
+  begin
+    GenerateThumbs(RootFolder.PathName, true, ThumbNailSize, ShellListOnGenerateReady);
+    Handled := true;
+  end;
+  {}
 end;
 
 procedure TShellListView.ShowMultiContextMenu(MousePos: TPoint);
@@ -416,7 +285,7 @@ var FileList: TStringList;
 begin
   FileList := CreateSelectedFileList(false);
   try
-    InvokeMultiContextMenu(Self, RootFolder, FileList, MousePos);
+    InvokeMultiContextMenu(Self, RootFolder, MousePos, FileList);
   finally
     FileList.Free;
     Refresh;
@@ -539,11 +408,9 @@ end;
 
 procedure TShellListView.DoContextPopup(MousePos: TPoint; var Handled: boolean);
 begin
-  if (ViewStyle = vsIcon) then
-    FIConPopup.Popup(ClientToScreen(MousePos).X, ClientToScreen(MousePos).Y)
-  else
-    ShowMultiContextMenu(MousePos);
+  ShowMultiContextMenu(MousePos);
   Handled := true;
+
 //  inherited;
 end;
 
@@ -697,8 +564,17 @@ begin
       end;
     end;
   finally
-    System.TMonitor.exit(FThumbTasks);
+    System.TMonitor.Exit(FThumbTasks);
   end;
+end;
+
+procedure TShellListView.ShellListOnGenerateReady(Sender: TObject);
+var
+  AnItem: TListItem;
+begin
+  Refresh;
+  for AnItem in Items do
+    AnItem.Update;
 end;
 
 function TShellListView.FileName(ItemIndex: integer = -1): string;
