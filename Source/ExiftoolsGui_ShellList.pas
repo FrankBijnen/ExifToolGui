@@ -174,7 +174,7 @@ begin
       HR := CM.GetCommandString(ICmd, GCS_VERBA, nil, ZVerb, SizeOf(ZVerb));
       Verb := string(System.AnsiStrings.StrPas(ZVerb));
       Handled := False;
-      if Supports(nil, IShellCommandVerb, SCV) then
+      if Supports(Owner , IShellCommandVerb, SCV) then
       begin
         HR := 0;
         SCV.ExecuteCommand(Verb, Handled);
