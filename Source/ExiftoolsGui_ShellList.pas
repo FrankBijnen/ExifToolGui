@@ -5,15 +5,17 @@ interface
 uses
   System.Classes, System.SysUtils, System.Types, System.Threading,
   Winapi.Windows, Winapi.Messages,
-  Vcl.Shell.ShellCtrls, Vcl.ComCtrls, Vcl.Menus, Vcl.Controls,
-  ExifToolsGUI_Thumbnails;
+  Vcl.Shell.ShellCtrls, Vcl.Shell.ShellConsts, Vcl.ComCtrls, Vcl.Menus, Vcl.Controls,
+  ExifToolsGUI_Thumbnails, ExifToolsGUI_MultiContextMenu;
 
 // Extend ShellListview, keeping the same Type. So we dont have to register it in the IDE
 // Extended to support:
 // Thumbnails.
 // User defined columns.
 // Column sorting.
-// You need to make some modifications. See the readme in the Vcl.ShellCtrls dir.
+// Multi-select context menu, with custom menu items. (For Refresh and generate thumbs)
+// Copy selected files to and from Clipboard
+// You need to make some modifications to the Embarcadero source. See the readme in the Vcl.ShellCtrls dir.
 
 type
   THeaderSortState = (hssNone, hssAscending, hssDescending);
@@ -24,7 +26,7 @@ type
   TPopulateBeforeEvent = procedure(Sender: TObject; var DoDefault: boolean) of object;
   TOwnerDataFetchEvent = procedure(Sender: TObject; Item: TListItem; Request: TItemRequest; Afolder: TShellFolder) of object;
 
-  TShellListView = class(Vcl.Shell.ShellCtrls.TShellListView)
+  TShellListView = class(Vcl.Shell.ShellCtrls.TShellListView, IShellCommandVerbExifTool)
   private
     FThreadPool: TThreadPool;
     FThumbTasks: Tlist;
@@ -35,7 +37,6 @@ type
     FSortColumn: integer;
     FSortState: THeaderSortState;
 
-    FIConPopup: TPopupMenu;
     FThumbNails: TImageList;
     FThumbNailSize: integer;
     FGenerating: integer;
@@ -59,6 +60,7 @@ type
     procedure CMThumbEnd(var Message: TMessage); message CM_ThumbEnd;
     procedure CMThumbError(var Message: TMessage); message CM_ThumbError;
     procedure CMThumbRefresh(var Message: TMessage); message CM_ThumbRefresh;
+    function CreateSelectedFileList(FullPaths: boolean): TStringList;
   protected
     procedure WMNotify(var Msg: TWMNotify); message WM_NOTIFY;
     procedure InitSortSpec(SortColumn: integer; SortState: THeaderSortState);
@@ -71,6 +73,7 @@ type
     procedure Add2ThumbNails(ABmp: HBITMAP; ANitemIndex: integer; NeedsGenerating: boolean);
     procedure CancelThumbTasks;
     procedure RemoveThumbTask(ItemIndex: integer);
+    procedure ShowMultiContextMenu(MousePos: TPoint);
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
@@ -78,6 +81,10 @@ type
     function FileName(ItemIndex: integer = -1): string;
     function FileExt(ItemIndex: integer = -1): string;
     procedure ColumnClick(Column: TListColumn);
+    procedure FileNamesToClipboard(Cut: boolean = false);
+    procedure PasteFilesFromClipboard;
+    procedure ExecuteCommandExif(Verb: string; var Handled: boolean);
+    procedure ShellListOnGenerateReady(Sender: TObject);
 
     property OnColumnResized: TNotifyEvent read FonColumnResized write FonColumnResized;
     property ColumnSorted: boolean read FColumnSorted write SetColumnSorted;
@@ -93,12 +100,13 @@ type
     property OnEnumColumnsBeforeEvent: TNotifyEvent read FOnEnumColumnsBeforeEvent write FOnEnumColumnsBeforeEvent;
     property OnEnumColumnsAfterEvent: TNotifyEvent read FOnEnumColumnsAfterEvent write FOnEnumColumnsAfterEvent;
     property OnOwnerDataFetchEvent: TOwnerDataFetchEvent read FOnOwnerDataFetchEvent write FOnOwnerDataFetchEvent;
-    property IconPopup: TPopupMenu read FIConPopup write FIConPopup;
   end;
 
 implementation
 
-uses Winapi.CommCtrl, Winapi.ShlObj, Vcl.Graphics, ExifToolsGUI_Utils;
+uses System.AnsiStrings, System.Win.ComObj, System.UITypes,
+     Winapi.CommCtrl, Winapi.ShlObj, Vcl.Graphics, ExifToolsGUI_Utils,
+     UnitFilesOnClipBoard;
 
 // res file contains the ?
 
@@ -106,6 +114,7 @@ uses Winapi.CommCtrl, Winapi.ShlObj, Vcl.Graphics, ExifToolsGUI_Utils;
 
 const
   QUESTIONMARK = 'QUESTIONMARK';
+
   // Listview Sort
 
 function GetListHeaderSortState(HeaderLView: TCustomListView; Column: TListColumn): THeaderSortState;
@@ -138,7 +147,7 @@ begin
   case Value of
     hssAscending:
       begin
-        Column.Caption := Column.Caption + ' ' + #$25b2; // Add an arrow to the caption. Using styles dont show the arrows in the header
+        Column.Caption := Column.Caption + ' ' + #$25b2; // Add an arrow to the caption. Using styles doesn't show the arrows in the header
         Item.fmt := Item.fmt or HDF_SORTUP;
       end;
     hssDescending:
@@ -218,6 +227,68 @@ begin
         if (SortState = THeaderSortState.hssDescending) then
           Result := Result * -1;
       end);
+  end;
+end;
+
+// Copy files to clipboard
+procedure TShellListView.FileNamesToClipboard(Cut: boolean = false);
+var
+  FileList: TStringList;
+begin
+  FileList := CreateSelectedFileList(true);
+  try
+    SetFileNamesOnClipboard(FileList, Cut);
+  finally
+    FileList.Free;
+  end;
+end;
+
+procedure TShellListView.PasteFilesFromClipboard;
+var
+  FileList: TStringList;
+  Cut: boolean;
+begin
+  FileList := TStringList.Create;
+  try
+    if not GetFileNamesFromClipboard(FileList, Cut) then
+      exit;
+
+    UnitFilesOnClipBoard.PasteFilesFromClipBoard(FileList, RootFolder.PathName, Cut);
+  finally
+    FileList.Free;
+    Refresh;
+  end;
+end;
+
+procedure TShellListView.ExecuteCommandExif(Verb: string; var Handled: boolean);
+begin
+  if (Verb = SCmdVerbRefresh) then
+  begin
+    Refresh;
+    Handled := true;
+  end;
+  if (Verb = SCmdVerbGenThumbs) then
+  begin
+    GenerateThumbs(RootFolder.PathName, false, ThumbNailSize, ShellListOnGenerateReady);
+    Handled := true;
+  end;
+  if (Verb = SCmdVerbGenThumbsSub) then
+  begin
+    GenerateThumbs(RootFolder.PathName, true, ThumbNailSize, ShellListOnGenerateReady);
+    Handled := true;
+  end;
+  {}
+end;
+
+procedure TShellListView.ShowMultiContextMenu(MousePos: TPoint);
+var FileList: TStringList;
+begin
+  FileList := CreateSelectedFileList(false);
+  try
+    InvokeMultiContextMenu(Self, RootFolder, MousePos, FileList);
+  finally
+    FileList.Free;
+    Refresh;
   end;
 end;
 
@@ -320,12 +391,27 @@ begin
   end;
 end;
 
+function TShellListView.CreateSelectedFileList(FullPaths: boolean): TStringList;
+var
+  AnItem: TListItem;
+begin
+  Result := TStringList.Create;
+  for AnItem in Items do
+    if (AnItem.Selected) then
+    begin
+      if (FullPaths) then
+        Result.Add(Folders[AnItem.Index].PathName)
+      else
+        Result.Add(FileName(AnItem.Index));
+    end;
+end;
+
 procedure TShellListView.DoContextPopup(MousePos: TPoint; var Handled: boolean);
 begin
-  if (ViewStyle = vsIcon) then
-    FIConPopup.Popup(ClientToScreen(MousePos).X, ClientToScreen(MousePos).Y)
-  else
-    inherited;
+  ShowMultiContextMenu(MousePos);
+  Handled := true;
+
+//  inherited;
 end;
 
 procedure TShellListView.Populate;
@@ -478,8 +564,17 @@ begin
       end;
     end;
   finally
-    System.TMonitor.exit(FThumbTasks);
+    System.TMonitor.Exit(FThumbTasks);
   end;
+end;
+
+procedure TShellListView.ShellListOnGenerateReady(Sender: TObject);
+var
+  AnItem: TListItem;
+begin
+  Refresh;
+  for AnItem in Items do
+    AnItem.Update;
 end;
 
 function TShellListView.FileName(ItemIndex: integer = -1): string;

@@ -1424,16 +1424,4 @@ object FMain: TFMain
     Left = 184
     Top = 216
   end
-  object PopupIcon: TPopupMenu
-    Left = 181
-    Top = 289
-    object GenerateThumbnails1: TMenuItem
-      Caption = 'Generate Thumbnails'
-      OnClick = GenerateThumbnails1Click
-    end
-    object GenerateThumbnailsIinclSubdirs1: TMenuItem
-      Caption = 'Generate Thumbnails (Incl Subdirs)'
-      OnClick = GenerateThumbnailsIinclSubdirs1Click
-    end
-  end
 end

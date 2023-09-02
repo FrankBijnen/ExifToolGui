@@ -753,7 +753,7 @@ function BrowseFolderDlg(const Title: string; iFlag: integer; const StartFolder:
 var
   lpItemID: PItemIDList;
   BrowseInfo: TBrowseInfo;
-  DisplayName: array [0 .. MAX_PATH] of char;
+  DisplayName: array [0 .. MAX_PATH] of Char;
 begin
   result := '';
   FillChar(BrowseInfo, sizeof(TBrowseInfo), #0);

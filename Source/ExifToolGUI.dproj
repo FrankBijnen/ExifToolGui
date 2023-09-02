@@ -121,6 +121,7 @@
         <Debugger_CWD>c:\temp</Debugger_CWD>
         <UWP_DelphiLogo44>ExifToolGUI.ico</UWP_DelphiLogo44>
         <UWP_DelphiLogo150>ExifToolGUI.ico</UWP_DelphiLogo150>
+        <DCC_DebugDCUs>true</DCC_DebugDCUs>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_1_Win64)'!=''">
         <AppDPIAwarenessMode>PerMonitorV2</AppDPIAwarenessMode>
@@ -142,24 +143,26 @@
         <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
         <VerInfo_MajorVer>6</VerInfo_MajorVer>
         <VerInfo_Locale>1033</VerInfo_Locale>
-        <VerInfo_Keys>CompanyName=;FileVersion=6.1.0.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProductVersion=6.1.0.0;Comments=;ProgramID=com.embarcadero.$(MSBuildProjectName);FileDescription=$(MSBuildProjectName);ProductName=$(MSBuildProjectName)</VerInfo_Keys>
+        <VerInfo_Keys>CompanyName=;FileVersion=6.1.1.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProductVersion=6.1.0.0;Comments=;ProgramID=com.embarcadero.$(MSBuildProjectName);FileDescription=$(MSBuildProjectName);ProductName=$(MSBuildProjectName)</VerInfo_Keys>
         <VerInfo_PreRelease>true</VerInfo_PreRelease>
         <BT_BuildType>Debug</BT_BuildType>
         <Icon_MainIcon>ExifToolGUI.ico</Icon_MainIcon>
         <UWP_DelphiLogo44>ExifToolGUI.ico</UWP_DelphiLogo44>
         <UWP_DelphiLogo150>ExifToolGUI.ico</UWP_DelphiLogo150>
         <VerInfo_MinorVer>1</VerInfo_MinorVer>
+        <VerInfo_Release>1</VerInfo_Release>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_2_Win64)'!=''">
         <AppDPIAwarenessMode>PerMonitorV2</AppDPIAwarenessMode>
         <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
         <VerInfo_Locale>1033</VerInfo_Locale>
-        <VerInfo_Keys>CompanyName=;FileDescription=$(MSBuildProjectName);FileVersion=6.1.0.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProgramID=com.embarcadero.$(MSBuildProjectName);ProductName=$(MSBuildProjectName);ProductVersion=6.1.0.0;Comments=</VerInfo_Keys>
+        <VerInfo_Keys>CompanyName=;FileDescription=$(MSBuildProjectName);FileVersion=6.1.1.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProgramID=com.embarcadero.$(MSBuildProjectName);ProductName=$(MSBuildProjectName);ProductVersion=6.1.0.0;Comments=</VerInfo_Keys>
         <Icon_MainIcon>ExifToolGUI.ico</Icon_MainIcon>
         <VerInfo_MajorVer>6</VerInfo_MajorVer>
         <UWP_DelphiLogo44>ExifToolGUI.ico</UWP_DelphiLogo44>
         <UWP_DelphiLogo150>ExifToolGUI.ico</UWP_DelphiLogo150>
         <VerInfo_MinorVer>1</VerInfo_MinorVer>
+        <VerInfo_Release>1</VerInfo_Release>
     </PropertyGroup>
     <ItemGroup>
         <DelphiCompile Include="$(MainSource)">
@@ -210,6 +213,7 @@
             <Form>FrmPlaces</Form>
         </DCCReference>
         <DCCReference Include="ExifToolsGUI_Utils.pas"/>
+        <DCCReference Include="UnitFilesOnClipBoard.pas"/>
         <DCCReference Include="ExiftoolsGui_ShellList.pas"/>
         <DCCReference Include="ExifToolsGUI_Thumbnails.pas"/>
         <DCCReference Include="ExifInfo.pas"/>
@@ -223,6 +227,8 @@
         <DCCReference Include="UFrmGenerate.pas">
             <Form>FrmGenerate</Form>
         </DCCReference>
+        <DCCReference Include="ExifToolsGui_ShellTree.pas"/>
+        <DCCReference Include="ExifToolsGUI_MultiContextMenu.pas"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>
@@ -291,6 +297,12 @@
                     </Platform>
                 </DeployFile>
                 <DeployFile LocalName="Win32\Debug\ExifToolGUI.exe" Configuration="Debug" Class="ProjectOutput">
+                    <Platform Name="Win32">
+                        <RemoteName>ExifToolGUI.exe</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="Win32\Release\ExifToolGUI.exe" Configuration="Release" Class="ProjectOutput">
                     <Platform Name="Win32">
                         <RemoteName>ExifToolGUI.exe</RemoteName>
                         <Overwrite>true</Overwrite>

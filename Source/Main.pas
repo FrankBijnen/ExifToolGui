@@ -14,6 +14,7 @@ uses
   Winapi.WebView2, Winapi.ActiveX, Vcl.Edge, // Edgebrowser
   VclTee.TeeGDIPlus, VclTee.TeEngine, VclTee.TeeProcs, VclTee.Chart,
   VclTee.Series, // Chart
+  ExifToolsGUI_ShellTree, // Extension of ShellTreeView
   ExifToolsGUI_ShellList, // Extension of ShellListView
   ExifToolsGUI_Thumbnails, // Thumbnails
   ExifToolsGUI_Utils; // Various
@@ -37,7 +38,7 @@ type
     AdvPanelETdirect: TPanel;
     AdvPanelMetaTop: TPanel;
     AdvPanelMetaBottom: TPanel;
-    ShellTree: TShellTreeView;
+    ShellTree: ExifToolsGUI_ShellTree.TShellTreeView;
     // Need to create our own version!
     ShellList: ExifToolsGUI_ShellList.TShellListView;
     MetadataList: TValueListEditor;
@@ -160,9 +161,6 @@ type
     Spb_GoBack: TSpeedButton;
     Spb_Forward: TSpeedButton;
     SpeedBtn_GetLoc: TSpeedButton;
-    PopupIcon: TPopupMenu;
-    GenerateThumbnails1: TMenuItem;
-    GenerateThumbnailsIinclSubdirs1: TMenuItem;
     procedure ShellListClick(Sender: TObject);
     procedure ShellListKeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
     procedure ShellTreeChange(Sender: TObject; Node: TTreeNode);
@@ -258,8 +256,6 @@ type
     procedure EdgeBrowser1WebMessageReceived(Sender: TCustomEdgeBrowser; Args: TWebMessageReceivedEventArgs);
     procedure Spb_ForwardClick(Sender: TObject);
     procedure SpeedBtn_GetLocClick(Sender: TObject);
-    procedure GenerateThumbnails1Click(Sender: TObject);
-    procedure GenerateThumbnailsIinclSubdirs1Click(Sender: TObject);
   private
     { Private declarations }
     ETBarSeriesFocal: TBarSeries;
@@ -272,8 +268,10 @@ type
     procedure WMEndSession(var Msg: TWMEndSession); message WM_ENDSESSION;
     function TranslateTagName(xMeta, xName: string): string;
 
+    procedure ShellTreeBeforeContext(Sender: TObject);
+    procedure ShellTreeAfterContext(Sender: TObject);
+
     procedure ShellistThumbError(Sender: TObject; Item: TListItem; E: Exception);
-    procedure ShellListOnGenerateReady(Sender: TObject);
     procedure ShellistThumbGenerate(Sender: TObject; Item: TListItem; Status: TThumbGenStatus; Total, Remaining: integer);
     procedure ShellListBeforePopulate(Sender: TObject; var DoDefault: boolean);
     procedure ShellListBeforeEnumColumns(Sender: TObject);
@@ -568,16 +566,6 @@ begin
   end;
   ShowMetadata;
   ShowPreview;
-end;
-
-procedure TFMain.GenerateThumbnails1Click(Sender: TObject);
-begin
-  GenerateThumbs(ShellTree.Path, false, ShellList.ThumbNailSize, ShellListOnGenerateReady);
-end;
-
-procedure TFMain.GenerateThumbnailsIinclSubdirs1Click(Sender: TObject);
-begin
-  GenerateThumbs(ShellTree.Path, true, ShellList.ThumbNailSize, ShellListOnGenerateReady);
 end;
 
 function TFMain.GetFirstSelectedFile: string;
@@ -2032,6 +2020,10 @@ begin
   // EdgeBrowser
   EdgeBrowser1.UserDataFolder := GetEdgeUserData;
 
+  // Set properties of ShellTree in code.
+  ShellTree.OnBeforeContextMenu := ShellTreeBeforeContext;
+  ShellTree.OnAfterContextMenu := ShellTreeAfterContext;
+
   // Set properties of Shelllist in code.
   ShellList.OnPopulateBeforeEvent := ShellListBeforePopulate;
   ShellList.OnEnumColumnsBeforeEvent := ShellListBeforeEnumColumns;
@@ -2042,7 +2034,6 @@ begin
   ShellList.OnThumbError := ShellistThumbError;
   // Enable Column sorting if Sorted = true. Disables Sorted.
   ShellList.ColumnSorted := ShellList.Sorted;
-  ShellList.IconPopup := PopupIcon;
 
   CBoxFileFilter.Text := SHOWALL;
 end;
@@ -2050,20 +2041,23 @@ end;
 // ---------------Drag_Drop procs --------------------
 procedure TFMain.ImageDrop(var Msg: TWMDROPFILES);
 var
-  NumFiles: longint;
-  Buffer: array [0 .. MAX_PATH] of char;
+  NumFiles: integer;
+  Buffer: array of Char;
+  PBuffer: PChar absolute Buffer;
+  LBuffer: integer;
   Fname: string;
   AnItem: TListItem;
 begin
-  NumFiles := DragQueryFile(Msg.Drop, $FFFFFFFF, nil, 0);
+  NumFiles := DragQueryFile(Msg.Drop, UINT(-1), nil, 0);
   if NumFiles > 1 then
     ShowMessage('Drop only one file at a time!')
   else
   begin
-    DragQueryFile(Msg.Drop, 0, @Buffer, sizeof(Buffer));
-
-    ShellTree.Path := ExtractFileDir(Buffer);
-    Fname := ExtractFileName(Buffer);
+    LBuffer := DragQueryFile(Msg.Drop, 0, nil, 0) +1;
+    SetLength(Buffer, LBuffer);
+    DragQueryFile(Msg.Drop, 0, PBuffer, LBuffer);
+    ShellTree.Path := ExtractFileDir(PBuffer);
+    Fname := ExtractFileName(PBuffer);
     ShellList.ItemIndex := -1;
     for AnItem in ShellList.Items do
     begin
@@ -2158,6 +2152,8 @@ begin
           ShellTree.SetFocus;
       end;
     end;
+    if (ShellTree.Selected <> nil) then
+      ShellTree.Selected.MakeVisible;
   end
   else if (ShellList.Enabled) then
     ShellList.SetFocus;
@@ -2439,6 +2435,12 @@ begin
     ShellListClick(Sender);
   if (Key = Ord('A')) and (ssCTRL in Shift) then // Ctrl+A
     ShellList.SelectAll;
+  if (Key = Ord('C')) and (ssCTRL in Shift) then // Ctrl+C
+    ShellList.FileNamesToClipboard;
+  if (Key = Ord('X')) and (ssCTRL in Shift) then // Ctrl+X
+    ShellList.FileNamesToClipboard(True);
+  if (Key = Ord('V')) and (ssCTRL in Shift) then // Ctrl+V
+    ShellList.PasteFilesFromClipboard;
   if (Key = VK_PRIOR) or (Key = VK_NEXT) then // PageUp/Down
     ShellListClick(Sender);
 end;
@@ -2480,9 +2482,21 @@ begin
   NewPath := TShellFolder(Node.Data).PathName;
   if not ValidDir(NewPath) then
     exit;
-
   EnableMenus(ET_StayOpen(NewPath));
   ShellTreeClick(Sender);
+end;
+
+// Close Exiftool before context menu. Delete directory fails
+procedure TFMain.ShellTreeBeforeContext(Sender: TObject);
+begin
+  ET_OpenExit;
+end;
+
+// Restart Exiftool when context menu done.
+procedure TFMain.ShellTreeAfterContext(Sender: TObject);
+begin
+  if (ValidDir(ShellTree.Path)) then
+    ET_StayOpen(ShellTree.Path);
 end;
 
 procedure TFMain.ShellTreeClick(Sender: TObject);
@@ -2939,15 +2953,6 @@ begin
     StatusBar.Panels[1].Text := 'Remaining Thumbnails to generate: ' + IntToStr(Remaining)
   else
     StatusBar.Panels[1].Text := '';
-end;
-
-procedure TFMain.ShellListOnGenerateReady(Sender: TObject);
-var
-  AnItem: TListItem;
-begin
-  ShellList.Refresh;
-  for AnItem in ShellList.Items do
-    AnItem.Update;
 end;
 
 end.
