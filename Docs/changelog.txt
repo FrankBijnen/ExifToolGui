@@ -17,3 +17,6 @@ Version:        Description             Issue
                 Fix Issue #36           Add platform Win64
                 Fix Issue #37           Generating Thumbnail updates
                                         Source code formatted with Delphi Formatter
+6.1.1.0         Fix Issue #41           Dont use the Exename as base name for Ini file. 
+                Fix Issue #43           Copying multiple files in the Filelist tab does not work (the old version allowed this)
+                Fix Issue #45           Delete directory fails from ShellTreeView Contextmenu, because exiftool is running.

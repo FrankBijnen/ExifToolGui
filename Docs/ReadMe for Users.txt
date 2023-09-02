@@ -44,4 +44,10 @@ Thumbnails setting have been moved to a separate tab on the preferences form. Ad
 - Manually generate the thumbnails.
 - Cleaning the thumbnail cache.
 
+Changed with version 6.1.1
+The context menus for the ShelList and the ShellTree have been updated. (The menu that appears with a right click)
+- Refresh and Generate Thumbnails are merged with the standard "Explorer like context menu's"
+- The ShellList context works for multi-select.
+- Ctrl/C, Ctrl/X and Ctrl/V added for the ShellList.
+
 Frank Bijnen

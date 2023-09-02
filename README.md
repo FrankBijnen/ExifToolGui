@@ -1,7 +1,7 @@
 # ExifToolGui
 A GUI for ExifTool
 
-Current version: V6.1.0 updated August 19, 2023. See the changelog for info.<br>
+Current version: V6.1.1 updated September 3, 2023. See the changelog for info.<br>
 Important: <br>
 To help Bug hunting there are also Map files released. If you place the Map file in the same directory as the Executable
 a stacktrace can be copied to the clipboard if an Exception occurs. Please also provide the stacktrace if you report an Exception.
