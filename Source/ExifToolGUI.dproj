@@ -121,6 +121,7 @@
         <Debugger_CWD>c:\temp</Debugger_CWD>
         <UWP_DelphiLogo44>ExifToolGUI.ico</UWP_DelphiLogo44>
         <UWP_DelphiLogo150>ExifToolGUI.ico</UWP_DelphiLogo150>
+        <DCC_DebugDCUs>true</DCC_DebugDCUs>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_1_Win64)'!=''">
         <AppDPIAwarenessMode>PerMonitorV2</AppDPIAwarenessMode>

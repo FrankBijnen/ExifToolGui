@@ -268,6 +268,9 @@ type
     procedure WMEndSession(var Msg: TWMEndSession); message WM_ENDSESSION;
     function TranslateTagName(xMeta, xName: string): string;
 
+    procedure ShellTreeBeforeContext(Sender: TObject);
+    procedure ShellTreeAfterContext(Sender: TObject);
+
     procedure ShellistThumbError(Sender: TObject; Item: TListItem; E: Exception);
     procedure ShellistThumbGenerate(Sender: TObject; Item: TListItem; Status: TThumbGenStatus; Total, Remaining: integer);
     procedure ShellListBeforePopulate(Sender: TObject; var DoDefault: boolean);
@@ -2017,6 +2020,10 @@ begin
   // EdgeBrowser
   EdgeBrowser1.UserDataFolder := GetEdgeUserData;
 
+  // Set properties of ShellTree in code.
+  ShellTree.OnBeforeContextMenu := ShellTreeBeforeContext;
+  ShellTree.OnAfterContextMenu := ShellTreeAfterContext;
+
   // Set properties of Shelllist in code.
   ShellList.OnPopulateBeforeEvent := ShellListBeforePopulate;
   ShellList.OnEnumColumnsBeforeEvent := ShellListBeforeEnumColumns;
@@ -2477,6 +2484,19 @@ begin
     exit;
   EnableMenus(ET_StayOpen(NewPath));
   ShellTreeClick(Sender);
+end;
+
+// Close Exiftool before context menu. Delete directory fails
+procedure TFMain.ShellTreeBeforeContext(Sender: TObject);
+begin
+  ET_OpenExit;
+end;
+
+// Restart Exiftool when context menu done.
+procedure TFMain.ShellTreeAfterContext(Sender: TObject);
+begin
+  if (ValidDir(ShellTree.Path)) then
+    ET_StayOpen(ShellTree.Path);
 end;
 
 procedure TFMain.ShellTreeClick(Sender: TObject);
