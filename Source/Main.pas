@@ -539,7 +539,11 @@ begin
   if (ET_OpenExec(ETcmd, GetSelectedFiles, ETout, ETerr)) then
   begin
     UpdateLogWin(ETout, ETerr);
-    ShellList.Refresh;
+    if (Assigned(ShellList.Selected)) then
+    begin
+      ShellList.Folders[ShellList.Selected.Index].DetailStrings.Clear;
+      ShellList.Selected.Update;
+    end;
     ShowMetadata;
     ShowPreview;
   end;
