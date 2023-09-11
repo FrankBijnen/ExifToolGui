@@ -1410,7 +1410,7 @@ object FMain: TFMain
     end
   end
   object OpenPictureDlg: TOpenPictureDialog
-    Options = [ofHideReadOnly, ofPathMustExist, ofFileMustExist, ofEnableSizing, ofDontAddToRecent]
+    Options = [ofHideReadOnly, ofNoValidate, ofPathMustExist, ofFileMustExist, ofEnableSizing, ofDontAddToRecent]
     Left = 184
     Top = 112
   end

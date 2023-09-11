@@ -189,8 +189,8 @@ end;
 
 procedure TFPreferences.FormShow(Sender: TObject);
 var
-  i, n: smallint;
-  tx: AnsiString;
+  I, N: smallint;
+  Tx: string;
   ETResult: TStringList;
 begin
   ETResult := TStringList.Create;
@@ -202,27 +202,27 @@ begin
     begin
       Items.Clear;
       Items.Append('ExifTool standard (short)');
-      i := ETResult.Count;
-      if i > 0 then
+      I := ETResult.Count;
+      if I > 0 then
       begin
         ETResult.Delete(0);
-        dec(i);
+        dec(I);
       end;
-      if i > 0 then
-        for n := 0 to i - 1 do
-          Items.Append(TrimLeft(ETResult[n]));
-      tx := GUIsettings.Language;
-      if tx = '' then
+      if I > 0 then
+        for N := 0 to I - 1 do
+          Items.Append(TrimLeft(ETResult[N]));
+      Tx := GUIsettings.Language;
+      if Tx = '' then
         ItemIndex := 0
       else
       begin
-        i := Items.Count;
-        n := 1;
-        while n < i do
+        I := Items.Count;
+        N := 1;
+        while N < I do
         begin
-          if pos(tx, Items[n]) = 1 then
-            ItemIndex := n;
-          inc(n);
+          if pos(Tx, Items[N]) = 1 then
+            ItemIndex := N;
+          inc(N);
         end;
       end;
     end;
@@ -258,10 +258,10 @@ begin
         RadioGroupClick(RgETOverride);
       end;
     end;
-    tx := ET_Options.ETSeparator;
-    Delete(tx, 1, 6);
-    SetLength(tx, 1);
-    LabeledEdit1.Text := tx;
+    Tx := ET_Options.ETSeparator;
+    Delete(Tx, 1, 6);
+    SetLength(Tx, 1);
+    LabeledEdit1.Text := Tx;
     RadioGroup3.ItemIndex := GUIsettings.ThumbSize;
     ChkThumbAutoGenerate.Checked := GUIsettings.ThumbAutoGenerate;
     EdThumbCleanset.Text := GUIsettings.ThumbCleanSet;

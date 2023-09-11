@@ -282,7 +282,7 @@ type
   public
     { Public declarations }
     function GetFirstSelectedFile: string;
-    function GetSelectedFiles(forETopen: boolean = true): string;
+    function GetSelectedFiles(FileName: string = ''): string;
     procedure UpdateLogWin(ETouts, ETerrs: string);
     procedure UpdateStatusBar_FilesShown;
     procedure SetGuiColor;
@@ -298,7 +298,7 @@ var
 
 implementation
 
-uses System.StrUtils, System.Math, System.Masks, System.UITypes, System.AnsiStrings,
+uses System.StrUtils, System.Math, System.Masks, System.UITypes,
   Vcl.ClipBrd, Winapi.ShlObj, Winapi.ShellAPI, Vcl.Shell.ShellConsts, Vcl.Themes, Vcl.Styles,
   ExifTool, ExifInfo, MainDef, LogWin, Preferences, EditFFilter, EditFCol, UFrmStyle, UFrmAbout,
   QuickMngr, DateTimeShift, DateTimeEqual, CopyMeta, RemoveMeta, Geotag, Geomap, CopyMetaSingle, FileDateTime;
@@ -469,7 +469,7 @@ end;
 procedure TFMain.BtnQuickSaveClick(Sender: TObject);
 var
   i, j, k: smallint;
-  ETcmd, TagValue, tx: AnsiString;
+  ETcmd, TagValue, Tx: string;
   ETout, ETerr: string;
 begin
   ETcmd := '';
@@ -481,22 +481,21 @@ begin
     begin
       TagValue := MetadataList.Cells[1, i];
 
-      tx := MetadataList.Keys[i];
-      k := pos(#177, tx); // is it multi-value tag?
+      Tx := MetadataList.Keys[i];
+      k := pos(#177, Tx); // is it multi-value tag?
       if (k = 0) or (TagValue = '') then
       begin // no: standard tag
 
         k := 0;
-        if System.AnsiStrings.RightStr(tx, 1) = '#' then
+        if RightStr(Tx, 1) = '#' then
           inc(k);
-        tx := LowerCase(QuickTags[i - 1].Command);
+        Tx := LowerCase(QuickTags[i - 1].Command);
         if k > 0 then
         begin
-          if System.AnsiStrings.RightStr(tx, 1) <> '#' then
-            tx := tx + '#';
+          if RightStr(Tx, 1) <> '#' then
+            Tx := Tx + '#';
         end;
-        ETcmd := ETcmd + tx + '=' + TagValue + CRLF;
-
+        ETcmd := ETcmd + Tx + '=' + TagValue + CRLF;
       end
       else
       begin // it is multi-value tag (ie.keywords)
@@ -518,20 +517,20 @@ begin
           end;
           k := pos('+', TagValue);
           if k > 0 then
-            tx := Copy(TagValue, 1, k - 1)
+            Tx := Copy(TagValue, 1, k - 1)
           else
           begin
             k := pos('-', TagValue);
             if k > 0 then
-              tx := Copy(TagValue, 1, k - 1)
+              Tx := Copy(TagValue, 1, k - 1)
             else
-              tx := TagValue;
+              Tx := TagValue;
           end;
           if k > 0 then
             Delete(TagValue, 1, k - 1)
           else
             TagValue := '';
-          ETcmd := ETcmd + tx + CRLF;
+          ETcmd := ETcmd + Tx + CRLF;
         until length(TagValue) = 0;
       end;
     end;
@@ -540,12 +539,10 @@ begin
   if (ET_OpenExec(ETcmd, GetSelectedFiles, ETout, ETerr)) then
   begin
     UpdateLogWin(ETout, ETerr);
-    RefreshSelected;
+    RefreshSelected(Sender);
     ShowMetadata;
     ShowPreview;
   end;
-  ETcmd := '';
-  tx := '';
   MetadataList.SetFocus;
 end;
 
@@ -578,27 +575,21 @@ begin
     result := ShellList.FileName(0);
 end;
 
-function TFMain.GetSelectedFiles(forETopen: boolean = true): string;
+function TFMain.GetSelectedFiles(FileName: string = ''): string;
 var
-  F: TextFile;
-  TempFile: string;
   AnItem: TListItem;
 begin
   result := '';
-  TempFile := GetExifToolTmp;
-  AssignFile(F, TempFile);
-  Rewrite(F); // Create file (delete old if exist)
-  for AnItem in ShellList.Items do
-  begin
-    if AnItem.Selected then
-      Writeln(F, ShellList.FileName(AnItem.Index));
-    // -writes Ansi encoded lines
-  end;
-  CloseFile(F);
-  if forETopen then
-    result := '-@' + CRLF + TempFile
+  if (FileName <> '') then
+    result := FileName  + CRLF
   else
-    result := ' -@ ' + TempFile;
+  begin
+    for AnItem in ShellList.Items do
+    begin
+      if AnItem.Selected then
+        result := result + ShellList.FileName(AnItem.Index) + CRLF;
+    end;
+  end;
 end;
 
 procedure TFMain.EditMapFindChange(Sender: TObject);
@@ -844,7 +835,7 @@ begin
   if Sender = MExportMetaHTM then
     ETcmd := '-w' + CRLF + xDir + '%f.html' + CRLF + '-htmldump';
 
-  ET_OpenExec(ETcmd, GetSelectedFiles, ETout, ETerr, true);
+  ET_OpenExec(ETcmd, GetSelectedFiles, ETout, ETerr);
   UpdateLogWin(ETout, ETerr);
   if xDir = '' then
     BtnFListRefreshClick(Sender);
@@ -936,7 +927,7 @@ begin
               ETcmd := ETcmd + '--Xmp-exif' + CRLF;
           end;
           ETcmd := ETcmd + '-ext' + CRLF + DstExt;
-          if (ET_OpenExec(ETcmd, GetSelectedFiles, ETout, ETerr, true)) then
+          if (ET_OpenExec(ETcmd, GetSelectedFiles, ETout, ETerr)) then
           begin
             UpdateLogWin(ETout, ETerr);
             ShellList.Refresh;
@@ -1031,7 +1022,7 @@ begin
           end;
           ETcmd := ETcmd + '-ext' + CRLF + DstExt;
           ETCounter := GetNrOfFiles(ShellTree.Path, '*.' + DstExt, (i = mrYes));
-          if (ET_OpenExec(ETcmd, '.', ETout, ETerr, true)) then
+          if (ET_OpenExec(ETcmd, '.', ETout, ETerr)) then
           begin
             UpdateLogWin(ETout, ETerr);
             ShellList.Refresh;
@@ -1067,7 +1058,7 @@ begin
       ETcmd := ETcmd + '-GPS:GPSLatitude<Xmp-exif:GPSLatitude' + CRLF + '-GPS:GPSLongitude<Xmp-exif:GPSLongitude' + CRLF;
       ETcmd := ETcmd + '-GPS:GPSLatitudeRef<Composite:GPSLatitudeRef' + CRLF + '-GPS:GPSLongitudeRef<Composite:GPSLongitudeRef' + CRLF;
       ETcmd := ETcmd + '-GPS:GPSDateStamp<XMP-exif:GPSDateTime' + CRLF + '-GPS:GPSTimeStamp<XMP-exif:GPSDateTime';
-      if (ET_OpenExec(ETcmd, GetSelectedFiles, ETout, ETerr, true)) then
+      if (ET_OpenExec(ETcmd, GetSelectedFiles, ETout, ETerr)) then
       begin
         UpdateLogWin(ETout, ETerr);
         ShellList.Refresh;
@@ -1664,7 +1655,7 @@ begin
   i := MetadataList.Row;
   MetadataList.Keys[i] := QuickTags[i - 1].Caption;
   tx := '-s3' + CRLF + '-f' + CRLF + QuickTags[i - 1].Command;
-  ET_OpenExec(tx, ShellList.FileName, ETouts, ETerrs);
+  ET_OpenExec(tx, GetSelectedFiles(ShellList.FileName), ETouts, ETerrs);
   MetadataList.Cells[1, i] := ETouts;
   n := MetadataList.RowCount - 1;
   X := 0;
@@ -1744,20 +1735,16 @@ end;
 
 procedure TFMain.EditETdirectKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
 var
-  IsUtf8, IsRecursive: boolean;
+  IsRecursive: boolean;
   i: smallint;
   ETtx, ETout, ETerr: string;
-  ETprm: AnsiString;
+  ETprm: string;
 begin
   ETtx := EditETdirect.Text;
   if (Key = VK_Return) and (length(ETtx) > 1) then
   begin
     IsRecursive := (pos('-r ', ETtx) > 0);
-    IsUtf8 := (pos('-L ', ETtx) = 0);
-    if IsUtf8 then
-      ETprm := Utf8Encode(ETtx)
-    else
-      ETprm := ETtx;
+    ETprm := ETtx;
     if IsRecursive then
     begin // init ETcounter:
       ETprm := ETprm + ' "' + ExtractFileDir(ShellTree.Path) + '"';
@@ -1775,8 +1762,8 @@ begin
         ETtx := '*.' + ETtx;
       end;
       ETCounter := GetNrOfFiles(ShellTree.Path, ETtx, true);
-    end; // else ETprm:=ETprm+GetSelectedFiles(false);
-    if ExecET(ETprm, GetSelectedFiles(false), ShellTree.Path, ETout, ETerr, IsUtf8) then
+    end;
+    if ExecET(ETprm, GetSelectedFiles, ShellTree.Path, ETout, ETerr) then
     begin
       UpdateLogWin(ETout, ETerr);
       // do 1st: to get result (ETout/ETerr) of operation
@@ -2411,7 +2398,7 @@ begin
             ETcmd := '-s3' + CRLF + '-f';
             for Indx := 0 to High(FListColUsr) do
               ETcmd := ETcmd + CRLF + FListColUsr[Indx].Command;
-            ET_OpenExec(ETcmd, ExtractFileName(AFolder.PathName), ETouts, ETerrs);
+            ET_OpenExec(ETcmd, GetSelectedFiles(ShellList.FileName(Item.Index)), ETouts, ETerrs);
             if (ETerrs <> '') then
               Details.Text := ETerrs
             else
@@ -2487,6 +2474,19 @@ begin
   ShellTreeClick(Sender);
 end;
 
+procedure TFMain.RefreshSelected(Sender: TObject);
+var AnItem: TListItem;
+begin
+  for AnItem in ShellList.Items do
+  begin
+    if AnItem.Selected then
+    begin
+      ShellList.Folders[AnItem.Index].DetailStrings.Clear;
+      AnItem.Update;
+    end;
+  end;
+end;
+
 // Close Exiftool before context menu. Delete directory fails
 procedure TFMain.ShellTreeBeforeContext(Sender: TObject);
 begin
@@ -2514,12 +2514,11 @@ end;
 // =========================== Show Metadata ====================================
 procedure TFMain.ShowMetadata;
 var
-  E, n: integer;
-  ETcmd, Item: string;
-  tx: string;
+  E, N: integer;
+  ETcmd, Item, Tx: string;
   ETResult: TStringList;
 begin
-  Item := ShellList.FileName;
+  Item := GetSelectedFiles(ShellList.FileName);
   if (Item = '') then
   begin
     Caption := 'ExifToolGUI';
@@ -2538,45 +2537,45 @@ begin
     Caption := 'ExifToolGUI - ' + Item;
     if SpeedBtnQuick.Down then
     begin
-      n := length(QuickTags) - 1;
+      N := length(QuickTags) - 1;
       ETcmd := '-s3' + CRLF + '-f';
 
-      for E := 0 to n do
+      for E := 0 to N do
       begin
         tx := QuickTags[E].Command;
         if UpperCase(LeftStr(tx, length(GUI_SEP))) = GUI_SEP then
-          tx := GUI_SEP;
-        ETcmd := ETcmd + CRLF + tx;
+          Tx := GUI_SEP;
+        ETcmd := ETcmd + CRLF + Tx;
       end;
       ET_OpenExec(ETcmd, Item, ETResult);
-      if (ETResult.Count - 1) < n then
+      if (ETResult.Count - 1) < N then
       begin
         MessageDlgEx(Format('Only %d results returned.' + #10 + 'Your workspace has %d commands.', [ETResult.Count, n + 1]), 'Check Workspace',
           TMsgDlgType.mtWarning, [mbOk]);
-        n := Min(n, ETResult.Count - 1);
+        N := Min(n, ETResult.Count - 1);
       end;
       with MetadataList do
       begin
         Strings.Clear;
-        for E := 0 to n do
+        for E := 0 to N do
         begin
-          tx := QuickTags[E].Command;
+          Tx := QuickTags[E].Command;
           if UpperCase(LeftStr(tx, length(GUI_SEP))) = GUI_SEP then
-            tx := '=' + QuickTags[E].Caption
+            Tx := '=' + QuickTags[E].Caption
           else
           begin
-            tx := QuickTags[E].Caption;
-            if RightStr(tx, 1) = '?' then
+            Tx := QuickTags[E].Caption;
+            if RightStr(Tx, 1) = '?' then
             begin
               if ETResult[E] = '-' then
-                tx := tx + '=*NO*'
+                Tx := Tx + '=*NO*'
               else
-                tx := tx + '=*YES*';
+                Tx := Tx + '=*YES*';
             end
             else
-              tx := QuickTags[E].Caption + '=' + ETResult[E];
+              Tx := QuickTags[E].Caption + '=' + ETResult[E];
           end;
-          Strings.Append(tx);
+          Strings.Append(Tx);
         end;
       end;
     end
@@ -2618,6 +2617,7 @@ begin
       end;
 
       ET_OpenExec(ETcmd, Item, ETResult);
+
       E := 0;
       if ETResult.Count = 0 then
       begin
@@ -2893,7 +2893,7 @@ begin
     ETcmd := ETcmd + CRLF + '-Filename';
     ETcmd := ETcmd + CRLF + '-GPS:GpsLatitude' + CRLF + '-GPS:GpsLatitudeRef';
     ETcmd := ETcmd + CRLF + '-GPS:GpsLongitude' + CRLF + '-GPS:GpsLongitudeRef';
-    ET_OpenExec(ETcmd, GetSelectedFiles(), ETouts, ETerrs);
+    ET_OpenExec(ETcmd, GetSelectedFiles, ETouts, ETerrs);
     ShowImagesOnMap(EdgeBrowser1, ShellTree.Path, ETouts);
   end
   else

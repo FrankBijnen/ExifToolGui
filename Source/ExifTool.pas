@@ -15,7 +15,10 @@ type
     ETMinorError: string;
     ETGpsFormat: string;
     ETShowNumber: string;
+    ETCharset: string;
+    ETVerbose: string;
     procedure SetGpsFormat(UseDecimal: boolean);
+    function GetOptions: string;
   end;
 
 const
@@ -23,26 +26,28 @@ const
 
 var
   ETCounterLabel: TLabel = nil;
-  ETCounter: smallint = 0;
+  ETCounter: integer = 0;
   ET_Options: ET_OptionsRec = (ETLangDef: '';
     ETBackupMode: '-overwrite_original' + CRLF;   // or ='' or='overwrite_original_in_place'
     ETFileDate: '';                               // or '-P'+CRLF (preserve FileModify date)
     ETSeparator: '-sep' + CRLF + '*' + CRLF;      // or '' (for keywords etc.)
     ETMinorError: '';                             // or '-m'+CRLF
-    ETGpsFormat: '-c' + CRLF + '%d°%.4f' + CRLF;  // or '-c'+CRLF+'%.6f°'+CRLF (for decimal)
-    ETShowNumber: '');                            // or '-n'+CRLF
+    ETGpsFormat: '';                              // See SetGpsFormat
+    ETShowNumber: '';                             // or '-n'+CRLF
+    ETCharset: '-CHARSET' + CRLF + 'FILENAME=UTF8' + CRLF + '-CHARSET' + CRLF + 'UTF8'; // UTF8 it is. No choice
+    ETVerbose: '-v0' );                           // For file counter
 
 function ET_StayOpen(WorkDir: string): boolean;
-function ET_OpenExec(ETcmd: string; FNames: AnsiString; var ETouts, ETErrs: string; TagsFromFile: boolean = false): boolean; overload;
-function ET_OpenExec(ETcmd: string; FNames: AnsiString; ETout: TStringList; TagsFromFile: boolean = false): boolean; overload;
-function ET_OpenExec(ETcmd: string; FNames: AnsiString; TagsFromFile: boolean = false): boolean; overload;
+function ET_OpenExec(ETcmd: string; FNames: string; var ETouts, ETErrs: string): boolean; overload;
+function ET_OpenExec(ETcmd: string; FNames: string; ETout: TStringList): boolean; overload;
+function ET_OpenExec(ETcmd: string; FNames: string): boolean; overload;
 procedure ET_OpenExit;
 
-function ExecET(ETcmd, FNames, WorkDir: AnsiString; var ETouts, ETErrs: string; UseUtf8: boolean = true): boolean; overload;
-function ExecET(ETcmd, FNames, WorkDir: AnsiString; var ETouts: string; UseUtf8: boolean = true): boolean; overload;
+function ExecET(ETcmd, FNames, WorkDir: string; var ETouts, ETErrs: string): boolean; overload;
+function ExecET(ETcmd, FNames, WorkDir: string; var ETouts: string): boolean; overload;
 
-function ExecCMD(xCmd, WorkDir: AnsiString; var ETouts, ETErrs: string): boolean; overload;
-function ExecCMD(xCmd, WorkDir: AnsiString): boolean; overload;
+function ExecCMD(xCmd, WorkDir: string; var ETouts, ETErrs: string): boolean; overload;
+function ExecCMD(xCmd, WorkDir: string): boolean; overload;
 
 implementation
 
@@ -69,13 +74,26 @@ begin
     ETGpsFormat := '-c' + CRLF + '%d' + #$C2#$B0 + '%.4f' + CRLF;
 end;
 
+function ET_OptionsRec.GetOptions: string;
+begin
+  result := ETCharset + CRLF;
+  result := result + ETVerbose + CRLF; // -for file counter!
+  if ETLangDef <> '' then
+    result := result + '-lang' + CRLF + ETLangDef;
+  result := result + ETBackupMode;
+  result := result + ETSeparator;
+  result := result + ETMinorError + ETFileDate;
+  result := result + ETGpsFormat + ETShowNumber;
+  // +further options...
+end;
+
 // ============================== ET_Open mode ==================================
 function ET_StayOpen(WorkDir: string): boolean;
 var
   SecurityAttr: TSecurityAttributes;
   StartupInfo: TStartupInfo;
   PWorkDir: PChar;
-  ETcmd: WideString;
+  ETcmd: string;
 begin
   ETcmd := GUIsettings.ETOverrideDir + 'exiftool -stay_open True -@ -';
   if ETrunning then
@@ -102,7 +120,9 @@ begin
     PWorkDir := nil
   else
     PWorkDir := PChar(WorkDir);
-  if CreateProcess(nil, PChar(ETcmd), nil, nil, true, CREATE_DEFAULT_ERROR_MODE or CREATE_NEW_CONSOLE or NORMAL_PRIORITY_CLASS, nil, PWorkDir,
+  if CreateProcess(nil, PChar(ETcmd), nil, nil, true,
+                   CREATE_DEFAULT_ERROR_MODE or CREATE_NEW_CONSOLE or NORMAL_PRIORITY_CLASS,
+                   nil, PWorkDir,
     StartupInfo, ETprocessInfo) then
   begin
     ETrunning := true;
@@ -123,16 +143,14 @@ begin
   result := ETrunning;
 end;
 
-function ET_OpenExec(ETcmd: string; FNames: AnsiString; var ETouts, ETErrs: string; TagsFromFile: boolean = false): boolean;
-// -Fnames must be of AnsiString type here, otherwise some foreign
-// characters in filenames might no be recognized by ExifTool!
+function ET_OpenExec(ETcmd: string; FNames: string; var ETouts, ETErrs: string): boolean;
 var
   ETstream: TMemoryStream;
   PipeBuffer: array [0 .. szPipeBuffer] of byte;
-
   ETout, ETerr: TStringList;
-  ETprm: AnsiString;
-  FinalCmd: AnsiString;
+  FinalCmd: string;
+  TempFile: string;
+  Call_ET: AnsiString; // Needs to be AnsiString. Only holds the -@ <argsfilename>
   BytesCount: Dword;
   I: word;
   BuffContent: ^word;
@@ -168,45 +186,28 @@ begin
     ETerr := TStringList.Create;
     ETstream := TMemoryStream.Create;
 
+    Screen.Cursor := -11; // crHourglass
     try
+      ETShowCounter := (ETCounterLabel <> nil) and (ETCounter > 1);
+      ETCounterLabel.Visible := ETShowCounter;
+
+      // Create TempFile with commands and filenames
       if pos('||', ETcmd) > 0 then
         ETcmd := StringReplace(ETcmd, '||', CRLF, [rfReplaceAll]);
-      ETcmd := ETcmd + CRLF;
-
-      ETprm := '-v0' + CRLF; // -for file counter!
-      with ET_Options do
-      begin
-        if ETLangDef <> '' then
-          ETprm := ETprm + '-lang' + CRLF + ETLangDef;
-        ETprm := ETprm + ETBackupMode;
-        ETprm := ETprm + ETSeparator;
-        ETprm := ETprm + ETMinorError + ETFileDate;
-        ETprm := ETprm + ETGpsFormat + ETShowNumber;
-        // +further options...
-      end;
-
-      // Only Utf8encode input parameters -but not if
-      // TagsFromFile is used, because after TagsFromFile,
-      // there can be a filename parameter:
-      if TagsFromFile then
-        FinalCmd := ETprm + ETcmd
-      else
-        FinalCmd := Utf8Encode(ETprm + ETcmd);
-
-      // Add Ansi filenames:
+      FinalCmd := ET_Options.GetOptions + ETcmd + CRLF;
       if FNames <> '' then
-        FinalCmd := FinalCmd + FNames + CRLF;
+        FinalCmd := FinalCmd + FNames; // FNames should end with a CRLF. By calling GetSelectedFiles!
       FinalCmd := FinalCmd + '-execute' + Char(ThisExecNum) + CRLF;
 
-      ETShowCounter := (ETCounterLabel <> nil) and (ETCounter > 1);
-      if ETShowCounter then
-      begin
-        ETCounterLabel.Visible := true;
-      end;
-      WriteFile(PipeInWrite, FinalCmd[1], Length(FinalCmd), BytesCount, nil);
+      // Create tempfile
+      TempFile := GetExifToolTmp;
+      WriteArgsFile(FinalCmd, TempFile);
+      Call_ET := '-@' + CRLF + TempFile + CRLF;
 
-      Screen.Cursor := -11; // crHourglass
+      // Write command to Pipe. Triggers ExifTool execution
+      WriteFile(PipeInWrite, Call_ET[1], ByteLength(Call_ET), BytesCount, nil);
       FlushFileBuffers(PipeInWrite);
+
       // ========= Read StdOut =======================
       ETstream.Clear;
       BuffAddress := Addr(BuffContent);
@@ -237,6 +238,19 @@ begin
       ETstream.Position := 0;
       ETout.LoadFromStream(ETstream);
 
+      // Convert ExifTool output from UTF8 to String
+      ETout.Text := UTF8ToString(ETout.Text);
+      // ========= Cleanup ETout ======================
+      I := 0;
+      while I < ETout.Count do
+      begin
+        if pos('{r', ETout[I]) > 0 then
+          ETout.Delete(I) // delete '{ready..}' lines
+        else
+          inc(I);
+      end;
+      ETouts := ETout.Text;
+
       // ========= Read StdErr =======================
       ETstream.Clear;
       I := 0;
@@ -252,19 +266,7 @@ begin
       ETstream.Position := 0;
       ETerr.LoadFromStream(ETstream);
       ETErrs := ETerr.Text;
-      // ========= Cleanup ETout ======================
-      I := 0;
-      while I < ETout.Count do
-      begin
-        // no difference observed between UTF8ToString() and UTF8ToAnsi()
-        ETout[I] := UTF8ToAnsi(ETout[I]);
-        if pos('{r', ETout[I]) > 0 then
-          ETout.Delete(I) // delete '{ready..}' lines
-        else
-          inc(I);
-      end;
-      ETouts := ETout.Text;
-      ETErrs := ETerr.Text;
+
       // ----------------------------------------------
       if ETShowCounter then
         ETCounterLabel.Visible := false;
@@ -280,24 +282,24 @@ begin
   end;
 end;
 
-function ET_OpenExec(ETcmd: string; FNames: AnsiString; ETout: TStringList; TagsFromFile: boolean = false): boolean;
+function ET_OpenExec(ETcmd: string; FNames: string; ETout: TStringList): boolean;
 var
   ETouts, ETErrs: string;
 begin
-  result := ET_OpenExec(ETcmd, FNames, ETouts, ETErrs, TagsFromFile);
+  result := ET_OpenExec(ETcmd, FNames, ETouts, ETErrs);
   ETout.Text := ETouts;
 end;
 
-function ET_OpenExec(ETcmd: string; FNames: AnsiString; TagsFromFile: boolean = false): boolean;
+function ET_OpenExec(ETcmd: string; FNames: string): boolean;
 var
   ETouts, ETErrs: string;
 begin
-  result := ET_OpenExec(ETcmd, FNames, ETouts, ETErrs, TagsFromFile);
+  result := ET_OpenExec(ETcmd, FNames, ETouts, ETErrs);
 end;
 
 procedure ET_OpenExit;
 const
-  ExitCmd: Utf8string = '-stay_open' + CRLF + 'False' + CRLF;
+  ExitCmd: AnsiString = '-stay_open' + CRLF + 'False' + CRLF; // Needs to be AnsiString.
 var
   BytesCount: Dword;
 begin
@@ -317,21 +319,21 @@ end;
 // ^^^^^^^^^^^^^^^^^^^^^^^^^^^ End of ET_Open mode ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 //
 // =========================== ET classic mode ==================================
-function ExecET(ETcmd, FNames, WorkDir: AnsiString; var ETouts, ETErrs: string; UseUtf8: boolean = true): boolean;
+function ExecET(ETcmd, FNames, WorkDir: string; var ETouts, ETErrs: string): boolean;
 var
   ETstream: TMemoryStream;
   PipeBuffer: array [0 .. szPipeBuffer] of byte;
   ETout, ETerr: TStringList;
   ProcessInfo: TProcessInformation;
   SecurityAttr: TSecurityAttributes;
-  StartupInfo: TStartupInfoA;
+  StartupInfo: TStartupInfo;
   PipeOutRead, PipeOutWrite: THandle;
   PipeErrRead, PipeErrWrite: THandle;
-  ETprm: AnsiString;
-  PWorkDir: PAnsiChar;
+  TempFile: string;
+  Call_ET: string;
+  PWorkDir: PChar;
   BytesCount: Dword;
   BuffContent: ^word;
-  I: integer;
 begin
   Screen.Cursor := -11; // =crHourGlass
   ETout := TStringList.Create;
@@ -358,31 +360,19 @@ begin
     if WorkDir = '' then
       PWorkDir := nil
     else
-      PWorkDir := PAnsiChar(WorkDir);
+      PWorkDir := PChar(WorkDir);
 
-    ETprm := GUIsettings.ETOverrideDir + 'exiftool -v0 ';
-    with ET_Options do
-    begin
-      if ETLangDef <> '' then
-        ETprm := ETprm + '-lang' + CRLF + ETLangDef;
-      ETprm := ETprm + ETBackupMode;
-      ETprm := ETprm + ETSeparator + ETMinorError;
-      ETprm := ETprm + ETFileDate + ETGpsFormat;
-    end;
-    ETprm := StringReplace(ETprm, CRLF, ' ', [rfReplaceAll]);
-
-    if UseUtf8 then
-      ETcmd := ETprm + Utf8Encode(ETcmd) + FNames
-    else
-      ETcmd := ETprm + ETcmd + FNames;
+    ETcmd := ET_Options.GetOptions + ETcmd + CRLF + FNames;
     ETShowCounter := (ETCounterLabel <> nil) and (ETCounter > 1);
-    if ETShowCounter then
-    begin
-      ETCounterLabel.Visible := true;
-    end;
+    ETCounterLabel.Visible := ETShowCounter;
 
-    result := CreateProcessA(nil, PAnsiChar(ETcmd), nil, nil, true, CREATE_DEFAULT_ERROR_MODE or CREATE_NEW_CONSOLE or NORMAL_PRIORITY_CLASS, nil,
-      PWorkDir, StartupInfo, ProcessInfo);
+    TempFile := GetExifToolTmp;
+    WriteArgsFile(ETcmd, TempFile);
+    Call_ET := GUIsettings.ETOverrideDir + 'exiftool -@ "' + TempFile + '"';
+
+    result := CreateProcess(nil, PChar(Call_ET), nil, nil, true,
+                            CREATE_DEFAULT_ERROR_MODE or CREATE_NEW_CONSOLE or NORMAL_PRIORITY_CLASS,
+                            nil, PWorkDir, StartupInfo, ProcessInfo);
 
     CloseHandle(PipeOutWrite);
     CloseHandle(PipeErrWrite);
@@ -395,7 +385,7 @@ begin
     else
     begin
       // ========= Read StdOut =======================
-      ETstream.Clear; // BuffAddress:=Addr(BuffContent);
+      ETstream.Clear;
       repeat
         ReadFile(PipeOutRead, PipeBuffer, szPipeBuffer, BytesCount, nil);
         BuffContent := @PipeBuffer[0];
@@ -406,16 +396,16 @@ begin
             Dec(ETCounter);
             if ETShowCounter then
               ETCounterLabel.Caption := IntToStr(ETCounter);
-          end; // else ETstream.Write(PipeBuffer, BytesCount);
+          end;
           ETstream.Write(PipeBuffer, BytesCount);
         end;
-        // Application.ProcessMessages;
       until BytesCount = 0;
 
       ETstream.Position := 0;
       ETout.LoadFromStream(ETstream);
-
+      ETouts := UTF8ToString(ETout.Text);
       CloseHandle(PipeOutRead);
+
       // ========= Read StdErr =======================
       ETstream.Clear;
       repeat
@@ -424,22 +414,11 @@ begin
       until (BytesCount = 0);
       ETstream.Position := 0;
       ETerr.LoadFromStream(ETstream);
-      ETErrs := ETerr.Text;
-
+      ETErrs := UTF8ToString(ETerr.Text);
       CloseHandle(PipeErrRead);
-      // ========= Cleanup ETout ======================
-      if UseUtf8 then
-      begin
-        I := 0;
-        while I < ETout.Count do
-        begin
-          ETout[I] := UTF8ToAnsi(ETout[I]);
-          inc(I);
-        end;
-      end;
-      ETouts := ETout.Text;
+
       // ----------------------------------------------
-      WaitForSingleObject(ProcessInfo.hProcess, 5000); // msec=5sec /or INFINITE
+      WaitForSingleObject(ProcessInfo.hProcess, GUIsettings.ETTimeOut); // msec=5sec /or INFINITE
       CloseHandle(ProcessInfo.hThread);
       CloseHandle(ProcessInfo.hProcess);
       result := true;
@@ -455,27 +434,27 @@ begin
   end;
 end;
 
-function ExecET(ETcmd, FNames, WorkDir: AnsiString; var ETouts: string; UseUtf8: boolean = true): boolean;
+function ExecET(ETcmd, FNames, WorkDir: string; var ETouts: string): boolean;
 var
   ETErrs: string;
 begin
-  result := ExecET(ETcmd, FNames, WorkDir, ETouts, ETErrs, UseUtf8);
+  result := ExecET(ETcmd, FNames, WorkDir, ETouts, ETErrs);
 end;
 
 // ^^^^^^^^^^^^^^^^^^^^^^^^^^ End of ET Classic mode ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 //
 // ==============================================================================
-function ExecCMD(xCmd, WorkDir: AnsiString; var ETouts, ETErrs: string): boolean;
+function ExecCMD(xCmd, WorkDir: string; var ETouts, ETErrs: string): boolean;
 var
   ETstream: TMemoryStream;
   PipeBuffer: array [0 .. szPipeBuffer] of byte;
   ETout, ETerr: TStringList;
   ProcessInfo: TProcessInformation;
   SecurityAttr: TSecurityAttributes;
-  StartupInfo: TStartupInfoA;
+  StartupInfo: TStartupInfo;
   PipeOutRead, PipeOutWrite: THandle;
   PipeErrRead, PipeErrWrite: THandle;
-  PWorkDir: PAnsiChar;
+  PWorkDir: PChar;
   BytesCount: Dword;
 begin
   FillChar(ProcessInfo, SizeOf(TProcessInformation), #0);
@@ -498,15 +477,16 @@ begin
   if WorkDir = '' then
     PWorkDir := nil
   else
-    PWorkDir := PAnsiChar(WorkDir);
+    PWorkDir := PChar(WorkDir);
 
   ETout := TStringList.Create;
   ETerr := TStringList.Create;
   ETstream := TMemoryStream.Create;
   Screen.Cursor := -11; // =crHourGlass
   try
-    result := CreateProcessA(nil, PAnsiChar(xCmd), nil, nil, true, CREATE_DEFAULT_ERROR_MODE or CREATE_NEW_CONSOLE or NORMAL_PRIORITY_CLASS, nil,
-      PWorkDir, StartupInfo, ProcessInfo);
+    result := CreateProcess(nil, PChar(xCmd), nil, nil, true,
+                            CREATE_DEFAULT_ERROR_MODE or CREATE_NEW_CONSOLE or NORMAL_PRIORITY_CLASS,
+                            nil, PWorkDir, StartupInfo, ProcessInfo);
 
     CloseHandle(PipeOutWrite);
     CloseHandle(PipeErrWrite);
@@ -528,7 +508,7 @@ begin
       until BytesCount = 0;
       ETstream.Position := 0;
       ETout.LoadFromStream(ETstream);
-      ETouts := ETout.Text;
+      ETouts := UTF8ToString(ETout.Text);
       CloseHandle(PipeOutRead);
       // ========= Read StdErr =======================
       ETstream.Clear;
@@ -538,8 +518,7 @@ begin
       until (BytesCount = 0);
       ETstream.Position := 0;
       ETerr.LoadFromStream(ETstream);
-      ETErrs := ETerr.Text;
-
+      ETErrs := UTF8ToString(ETerr.Text);
       CloseHandle(PipeErrRead);
       // ----------------------------------------------
       WaitForSingleObject(ProcessInfo.hProcess, GUIsettings.ETTimeOut); // msec=5sec /or INFINITE
@@ -554,7 +533,7 @@ begin
   end;
 end;
 
-function ExecCMD(xCmd, WorkDir: AnsiString): boolean;
+function ExecCMD(xCmd, WorkDir: string): boolean;
 var
   ETout, ETerr: string;
 begin
@@ -565,7 +544,6 @@ end;
 initialization
 
 begin
-  // ETstream:=TMemoryStream.Create;
   ETCounterLabel := nil;
   ETEvent := TEvent.Create(nil, true, true, ExtractFileName(Paramstr(0)));
   ExecNum := $30;
@@ -575,7 +553,6 @@ finalization
 
 begin
   ET_OpenExit;
-  // ETstream.Free;
   ETEvent.Free;
 end;
 

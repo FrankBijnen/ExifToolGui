@@ -13,9 +13,9 @@ type
     Language: string[7];
     AutoRotatePreview: boolean;
     DefStartupUse: boolean;
-    DefStartupDir: AnsiString;
+    DefStartupDir: string;
     DefExportUse: boolean;
-    DefExportDir: AnsiString;
+    DefExportDir: string;
     ThumbSize: smallint;
     ThumbAutoGenerate: boolean;
     ThumbCleanSet: string[4];
@@ -25,8 +25,8 @@ type
     DefGMapHome: string[23];
     GuiStyle: string;
     ETdirDefCmd: smallint;
-    InitialDir: AnsiString;
-    ETOverrideDir: AnsiString;
+    InitialDir: string;
+    ETOverrideDir: string;
     ETTimeOut: integer;
   end;
 

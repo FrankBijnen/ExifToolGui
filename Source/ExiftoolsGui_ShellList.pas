@@ -104,7 +104,7 @@ type
 
 implementation
 
-uses System.AnsiStrings, System.Win.ComObj, System.UITypes,
+uses System.Win.ComObj, System.UITypes,
      Winapi.CommCtrl, Winapi.ShlObj, Vcl.Graphics, ExifToolsGUI_Utils,
      UnitFilesOnClipBoard;
 

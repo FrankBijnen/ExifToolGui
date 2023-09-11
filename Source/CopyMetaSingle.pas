@@ -35,7 +35,7 @@ type
     procedure CheckForImportAll;
   public
     { Public declarations }
-    SrcFile: AnsiString;
+    SrcFile: string;
   end;
 
 var
@@ -86,8 +86,7 @@ end;
 
 procedure TFCopyMetaSingle.Button2Click(Sender: TObject);
 var
-  ETcmd: AnsiString;
-  ETout, ETerr: string;
+  ETcmd, ETout, ETerr: string;
 begin
   ETcmd := '-TagsFromFile' + CRLF + SrcFile;
   if CheckBox1.Checked then
@@ -110,7 +109,7 @@ begin
       ETcmd := ETcmd + CRLF + '-ICC_Profile';
   end;
 
-  ET_OpenExec(ETcmd, FMain.GetSelectedFiles, ETout, ETerr, true);
+  ET_OpenExec(ETcmd, FMain.GetSelectedFiles, ETout, ETerr);
   FMain.UpdateLogWin(ETout, ETerr);
   ModalResult := mrOK;
 end;
