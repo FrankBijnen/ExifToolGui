@@ -268,6 +268,7 @@ type
     procedure WMEndSession(var Msg: TWMEndSession); message WM_ENDSESSION;
     function TranslateTagName(xMeta, xName: string): string;
 
+    procedure RefreshSelected(Sender: TObject);
     procedure ShellTreeBeforeContext(Sender: TObject);
     procedure ShellTreeAfterContext(Sender: TObject);
 
@@ -539,11 +540,7 @@ begin
   if (ET_OpenExec(ETcmd, GetSelectedFiles, ETout, ETerr)) then
   begin
     UpdateLogWin(ETout, ETerr);
-    if (Assigned(ShellList.Selected)) then
-    begin
-      ShellList.Folders[ShellList.Selected.Index].DetailStrings.Clear;
-      ShellList.Selected.Update;
-    end;
+    RefreshSelected;
     ShowMetadata;
     ShowPreview;
   end;
@@ -1783,7 +1780,7 @@ begin
     begin
       UpdateLogWin(ETout, ETerr);
       // do 1st: to get result (ETout/ETerr) of operation
-      ShellList.Refresh;
+      RefreshSelected(Sender);
       ShowMetadata;
     end
     else
