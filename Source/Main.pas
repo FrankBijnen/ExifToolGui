@@ -570,9 +570,9 @@ function TFMain.GetFirstSelectedFile: string;
 begin
   result := '';
   if (ShellList.Selected <> nil) then
-    result := ShellList.FileName
+    result := ShellList.FileName + CRlF
   else if (ShellList.Items.Count > 0) then
-    result := ShellList.FileName(0);
+    result := ShellList.FileName(0) + CRLF;
 end;
 
 function TFMain.GetSelectedFiles(FileName: string = ''): string;
