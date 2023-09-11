@@ -5,7 +5,7 @@ unit ExifToolsGUI_MultiContextMenu;
 // ExiftoolsGui_ShellList
 interface
 
-uses System.Classes, System.Win.Comobj, System.Sysutils, System.AnsiStrings,
+uses System.Classes, System.Win.Comobj, System.Sysutils,
      Winapi.Windows, Winapi.ShlObj, Vcl.Controls, Vcl.Shell.ShellCtrls;
 
 const SCmdVerbRefresh       = 'Refresh';
@@ -98,7 +98,7 @@ begin
         0..$7fff:           // Standard 'Explorer like'
           begin
             HR := CM.GetCommandString(ICmd, GCS_VERBA, nil, ZVerb, SizeOf(ZVerb));
-            Verb := string(System.AnsiStrings.StrPas(ZVerb));
+            Verb := string(ZVerb);
           end;
         IDVerbRefresh:      // Custom
           Verb := SCmdVerbRefresh;

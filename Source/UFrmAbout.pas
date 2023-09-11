@@ -84,7 +84,7 @@ begin
   LblSource.Caption := 'https://github.com/FrankBijnen/ExifToolGui';
   LblForum.Caption := 'https://exiftool.org/forum/index.php';
   LblExifTool.Caption := 'ExifTool by Phil Harvey ';
-  if ExecET('exiftool -ver', '', '', Output) then
+  if ExecET('-ver', '', '', Output) then
     LblExifTool.Caption := LblExifTool.Caption + Output
   else
     LblExifTool.Caption := LblExifTool.Caption + 'MISSING!';

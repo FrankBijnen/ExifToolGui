@@ -24,6 +24,7 @@ function GetNrOfFiles(StartDir, FileMask: string; subDir: boolean): integer;
 
 // String
 function NextField(var AString: string; const ADelimiter: string): string;
+procedure WriteArgsFile(const ETInp, ArgsFile: string);
 
 // Image
 function GetThumbCache(AFilePath: string; var hBmp: HBITMAP; Flags: TSIIGBF; AMaxX: longint; AMaxY: longint): HRESULT;
@@ -42,6 +43,7 @@ uses Winapi.ShellAPI, Winapi.KnownFolders, System.Win.Registry, System.UITypes, 
 var
   GlobalImgFact: IWICImagingFactory;
   TempDirectory: string;
+  UTF8Encoding: TEncoding;
 
 const
   TempPrefix = 'ExT';
@@ -238,6 +240,48 @@ begin
   begin
     result := Copy(AString, 1, Indx - 1);
     Delete(AString, 1, Indx + L - 1);
+  end;
+end;
+
+function CreateTempHandle(TempFile: string): THandle;
+begin
+  result := Winapi.Windows.CreateFile(PChar(TempFile),
+                                      GENERIC_READ or GENERIC_WRITE,
+                                      FILE_SHARE_READ or FILE_SHARE_WRITE or FILE_SHARE_DELETE,
+                                      nil,
+                                      CREATE_ALWAYS,
+                                      FILE_ATTRIBUTE_TEMPORARY,// Tells Windows flushing to disk is not needed
+                                      0);
+  if (result = INVALID_HANDLE_VALUE) then
+    raise exception.Create(Format('%s %s', [TempFile, SysErrorMessage(GetLastError)] ));
+end;
+
+procedure WriteArgsFile(const ETInp, ArgsFile: string);
+var Handle: THandle;
+    S, W: DWORD;
+    Bytes: TBytes;
+begin
+  Handle := CreateTempHandle(ArgsFile);
+  try
+    // Write BOM
+    Bytes := UTF8Encoding.GetPreamble;
+    S := Length(Bytes);
+    if (S > 0) then
+    begin
+      WriteFile(Handle, Bytes[0], S, W, nil);
+      if (W <> S) then
+        raise Exception.Create(Format('Write to %s failed', [Argsfile]));
+    end;
+
+    //Write UTF8
+    Bytes := UTF8Encoding.GetBytes(ETInp);
+    S := Length(Bytes);
+    WriteFile(Handle, Bytes[0], S, W, nil);
+    if (W <> S) then
+      raise Exception.Create(Format('Write to %s failed', [Argsfile]));
+
+  finally
+    CloseHandle(Handle);
   end;
 end;
 
@@ -466,12 +510,14 @@ initialization
 begin
   TempDirectory := IncludeTrailingBackslash(CreateTempPath(TempPrefix));
   CoCreateInstance(CLSID_WICImagingFactory, nil, CLSCTX_INPROC_SERVER or CLSCTX_LOCAL_SERVER, IUnknown, GlobalImgFact);
+  UTF8Encoding := TEncoding.GetEncoding(CP_UTF8);
 end;
 
 finalization
 
 begin
   RemovePath(TempDirectory);
+  UTF8Encoding.Free;
 end;
 
 end.

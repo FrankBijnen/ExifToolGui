@@ -10,37 +10,40 @@ type
     FieldType: word;
     TypeCount: longint;
     ValueOffs: longint;
+    procedure Clear;
   end;
 
   IPTCrec = packed record
-    ObjectName: ShortString;
-    Category: ShortString;
-    SuppCategories: ShortString;
-    Keywords: ShortString;
-    By_line, By_lineTitle: ShortString;
-    Country, Province_State, City, Sub_location: ShortString;
-    Headline: ShortString;
-    CopyrightNotice: ShortString;
-    Caption_Abstract: ShortString;
-    Writer_Editor: ShortString;
+    ObjectName: string;
+    Category: string;
+    SuppCategories: string;
+    Keywords: string;
+    By_line, By_lineTitle: string;
+    Country, Province_State, City, Sub_location: string;
+    Headline: string;
+    CopyrightNotice: string;
+    Caption_Abstract: string;
+    Writer_Editor: string;
+    procedure Clear;
   end;
 
   IFD0rec = packed record
-    Make, Model: String[64];
+    Make, Model: string;
     PreviewOffset, PreviewSize: longint;
     Orientation: word; // 1=Normal, 3=180, 6=90right, 8=90left, else=Mirror
     Xresolution, Yresolution: word;
     ResolutionUnit: string[5];
-    Software: string[64];
+    Software: string;
     DateTimeModify: string[19];
-    Artist: String[64];
-    Copyright: String[64];
+    Artist: string;
+    Copyright: string;
+    procedure Clear;
   end;
 
   ExifIFDrec = packed record
     ExposureTime: string[7];
     FNumber: string[5];
-    ExposureProgram: string[7];
+    ExposureProgram: string;
     ISO: string[5];
     DateTimeOriginal, DateTimeDigitized: string[19];
     ExposureBias: string[7];
@@ -48,13 +51,15 @@ type
     FocalLength: string[7];
     ColorSpace: string[13];
     FLin35mm: string[7];
-    LensInfo: string[23];
-    LensMake: string[23];
-    LensModel: string[47];
+    LensInfo: string;
+    LensMake: string;
+    LensModel: string;
+    procedure Clear;
   end;
 
   InteropIFDrec = packed record
     InteropIndex: string[9];
+    procedure Clear;
   end;
 
   GPSrec = packed record
@@ -65,21 +70,24 @@ type
     AltitudeRef: string[1]; // +/-
     Altitude: string[5];
     GeoLat, GeoLon: string[11]; // for OSM Map
+    procedure Clear;
   end;
 
   MakernotesRec = packed record
     LensFocalRange: string[11]; // i.e."17-55"
+    procedure Clear;
   end;
 
   XMPrec = packed record
-    Creator, Rights: AnsiString;
+    Creator, Rights: string;
     Date: string[19];
-    PhotoType: AnsiString;
-    Title, Event: AnsiString;
-    CountryShown, ProvinceShown, CityShown, LocationShown: ShortString;
-    PersonInImage: ShortString;
-    Keywords: ShortString; // =Subject
+    PhotoType: string;
+    Title, Event: string;
+    CountryShown, ProvinceShown, CityShown, LocationShown: string;
+    PersonInImage: string;
+    Keywords: string; // =Subject
     Rating: string[1];
+    procedure Clear;
   end;
 
   ICCrec = packed record
@@ -91,6 +99,7 @@ type
     DeviceManufacturer: string[4];
     ProfileCreator: string[4];
     ProfileDescription: string[31];
+    procedure Clear;
   end;
 
   FotoRec = packed record
@@ -101,6 +110,7 @@ type
     IPTC: IPTCrec;
     XMP: XMPrec;
     ICC: ICCrec;
+    procedure Clear;
   end;
 
 var
@@ -114,7 +124,7 @@ var
   ChartISO: array [5 .. 640] of word; // 50-6400 (ISO/10)
   ChartMaxFLength, ChartMaxFNumber, ChartMaxISO: word;
 
-procedure GetMetadata(fName: string; GetXMP, GetIPTC, GetGPS, GetICC: boolean);
+procedure GetMetadata(FName: string; GetXMP, GetIPTC, GetGPS, GetICC: boolean);
 function GetOrientationValue(fName: string): byte;
 procedure GetJPGsize(const sFile: string; var wWidth, wHeight: word);
 
@@ -123,6 +133,7 @@ implementation
 uses Main, SysUtils, Forms, Dialogs, Windows;
 
 var
+  Encoding: TEncoding;
   GpsFormatSettings: TFormatSettings; // for StrToFloatDef -see Initialization
   FotoF: file of byte;
   IsMM, doIPTC, doGPS, doICC: boolean;
@@ -132,6 +143,65 @@ var
   TIFFoffset, ExifIFDoffset, GPSoffset: longint; // MakernoteOffset: longint;
   ICCoffset, InteropOffset, JPGfromRAWoffset: longint;
 
+procedure XMPrec.Clear;
+begin
+  Self := Default(XMPrec);
+end;
+
+procedure MakernotesRec.Clear;
+begin
+  Self := Default(MakernotesRec);
+end;
+
+procedure GPSrec.Clear;
+begin
+  Self := Default(GPSrec);
+end;
+
+procedure InteropIFDrec.Clear;
+begin
+  Self := Default(InteropIFDrec);
+end;
+
+procedure ExifIFDrec.Clear;
+begin
+  Self := Default(ExifIFDrec);
+end;
+
+procedure IFD0rec.Clear;
+begin
+  Self := Default(IFD0rec);
+end;
+
+procedure IPTCrec.Clear;
+begin
+  Self := Default(IPTCrec);
+end;
+
+procedure IFDentryRec.Clear;
+begin
+  Self := Default(IFDentryRec);
+end;
+
+procedure ICCrec.Clear;
+begin
+  Self := Default(ICCrec);
+end;
+
+procedure FotoRec.Clear;
+begin
+  IFD0.Clear;
+  ExifIFD.Clear;
+  InteropIFD.Clear;
+  GPS.Clear;
+  IPTC.Clear;
+  XMP.Clear;
+  ICC.Clear;
+
+  Self := Default(FotoRec);
+end;
+
+
 // ****************************QUICK METADATA ACCESS*************************
 function SwapL(L: longword): longword;
 asm
@@ -139,32 +209,33 @@ asm
   bswap eax
 end;
 
-function DecodeASCII(IFDentry: IFDentryRec; MaxLen: smallint = 255): AnsiString;
+function DecodeASCII(IFDentry: IFDentryRec; MaxLen: smallint = 255): string;
 var
-  Txt: AnsiString;
+  Bytes: TBytes;
   W1: word;
   L1: longint;
 begin
   W1 := IFDentry.TypeCount - 1; // last byte is #0
-  SetLength(Txt, W1);
+  SetLength(Bytes, W1);
+  SetLength(Result, W1);
   L1 := IFDentry.ValueOffs;
   if W1 > 3 then
   begin
     Seek(FotoF, TIFFoffset + L1);
-    BlockRead(FotoF, Txt[1], W1);
-    W1 := Pos(AnsiChar(0), Txt);
+    BlockRead(FotoF, Bytes[0], W1);
+    Result := Encoding.GetString(Bytes);
+    W1 := Pos(Char(0), Result);
     if W1 > 0 then
-      SetLength(Txt, W1 - 1); // only if UserComment is ASCII!
+      SetLength(Result, W1 - 1); // only if UserComment is ASCII!
   end
   else
   begin
     if IsMM then
       L1 := SwapL(L1);
-    Move(L1, Txt[1], W1);
-    if Pos(AnsiChar(0), Txt) = 1 then
-      Txt := '-'; // in case tag is defined and empty
+    Move(L1, Result[1], W1);
+    if Pos(Char(0), Result) = 1 then
+      Result := '-'; // in case tag is defined and empty
   end;
-  Result := Utf8ToAnsi(Txt);
 end;
 
 function DecodeWord(IFDentry: IFDentryRec): word;
@@ -407,9 +478,10 @@ procedure ParseIPTC;
 var
   IPTCtagID: byte;
   IPTCtagSz: word;
-  tx: string[255];
+  tx: string;
+  Bytes: Tbytes;
 
-  function StripLen(MaxLen: smallint = 255): AnsiString;
+  function StripLen(MaxLen: smallint = 255): string;
   begin
     if length(tx) > MaxLen then
     begin
@@ -424,18 +496,9 @@ begin
   BlockRead(FotoF, IPTCtagSz, 2);
   IPTCtagSz := Swap(IPTCtagSz);
   Dec(IPTCsize, 3);
-  if IPTCtagSz < 256 then
-  begin
-    BlockRead(FotoF, tx[1], IPTCtagSz);
-    tx[0] := AnsiChar(IPTCtagSz); // Chr(Lo(IPTCtagSz));
-  end
-  else
-  begin
-    BlockRead(FotoF, tx[1], 255);
-    Seek(FotoF, FilePos(FotoF) + IPTCtagSz - 255);
-    tx[0] := #255;
-  end;
-  tx := Utf8ToAnsi(tx);
+  SetLength(Bytes, IPTCtagSz);
+  BlockRead(FotoF, Bytes[0], IPTCtagSz);
+  tx := Encoding.GetString(Bytes);
   Dec(IPTCsize, IPTCtagSz);
   with Foto.IPTC do
   begin
@@ -954,12 +1017,12 @@ end;
 // ==============================================================================
 procedure ReadXMP;
 var
-  P: AnsiChar;
   i, k, n: integer;
-  XMPdata, tmpXMP, tx: AnsiString;
-  xTx: string[255];
+  XMPdata, tmpXMP, tx: string;
+  Bytes: TBytes;
+  xTx: string;
 
-  function GetTagData(TagName: string; MaxLen: smallint = 255): AnsiString;
+  function GetTagData(TagName: string; MaxLen: smallint = 255): string;
   begin
     i := Pos(TagName, XMPdata);
     if i > 0 then
@@ -979,7 +1042,7 @@ var
       Result := '';
   end;
 
-  function GetBagData(BagName: string; MaxLen: smallint = 255): AnsiString;
+  function GetBagData(BagName: string; MaxLen: smallint = 255): string;
   begin
     i := Pos(BagName, XMPdata);
     if i > 0 then
@@ -1012,7 +1075,7 @@ var
       Result := '';
   end;
 
-  function GetAltData(AltName: string; MaxLen: smallint = 255): AnsiString;
+  function GetAltData(AltName: string; MaxLen: smallint = 255): string;
   begin
     i := Pos(AltName, XMPdata);
     Result := '';
@@ -1040,10 +1103,10 @@ var
     end;
   end;
 
-  function GetStructTag(StructName, TagName: AnsiString): AnsiString;
+  function GetStructTag(StructName, TagName: string): string;
   var
     z: smallint;
-    TagEnd: AnsiString;
+    TagEnd: string;
   begin
     i := Pos(StructName, XMPdata);
     if i > 0 then
@@ -1067,7 +1130,6 @@ var
       i := length(xTx);
       if i > 1 then
         SetLength(xTx, i - 1); // delete last separator
-      xTx[255] := '…';
       Result := xTx;
     end
     else
@@ -1077,13 +1139,9 @@ var
 begin
   XMPdata := '';
   Seek(FotoF, XMPoffset);
-  while XMPsize > 0 do
-  begin
-    BlockRead(FotoF, P, 1);
-    XMPdata := XMPdata + P;
-    Dec(XMPsize);
-  end;
-  XMPdata := Utf8ToAnsi(XMPdata);
+  Setlength(Bytes, XMPsize);
+  Blockread(FotoF, Bytes[0], XMPsize);
+  XMPdata := Encoding.GetString(Bytes);
   XMPdata := StringReplace(XMPdata, '&amp;', '&', [rfReplaceAll]);
   with Foto.XMP do
   begin
@@ -1118,12 +1176,12 @@ begin
 end;
 
 // ======================================== MAIN ==============================================
-procedure GetMetadata(fName: string; GetXMP, GetIPTC, GetGPS, GetICC: boolean);
+procedure GetMetadata(FName: string; GetXMP, GetIPTC, GetGPS, GetICC: boolean);
 begin
-  if (fName = '') then
+  if (FName = '') then
     exit;
 
-  FillChar(Foto, SizeOf(Foto), #0);
+  Foto.Clear;
   doIPTC := GetIPTC;
   doGPS := GetGPS;
   doICC := GetICC;
@@ -1131,7 +1189,7 @@ begin
   XMPsize := 0;
   JPGfromRAWoffset := 0; // for Panasonic RW2
 
-  AssignFile(FotoF, fName);
+  AssignFile(FotoF, FName);
   FileMode := 0; // read only
   Reset(FotoF); // open existing file
   try
@@ -1323,6 +1381,13 @@ begin
   // for StrToFloatDef -see function DecodeGPS
   GpsFormatSettings.ThousandSeparator := '.';
   GpsFormatSettings.DecimalSeparator := ',';
+  Encoding := TEncoding.GetEncoding(CP_UTF8)
+end;
+
+finalization
+
+begin
+  Encoding.Free;
 end;
 
 end.
