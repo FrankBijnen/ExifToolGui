@@ -223,7 +223,9 @@ begin
   begin
     Seek(FotoF, TIFFoffset + L1);
     BlockRead(FotoF, Bytes[0], W1);
-    Result := Encoding.GetString(Bytes);
+    result := '';
+    if (Encoding.GetCharCount(Bytes) > 0) then
+      Result := Encoding.GetString(Bytes);
     W1 := Pos(Char(0), Result);
     if W1 > 0 then
       SetLength(Result, W1 - 1); // only if UserComment is ASCII!
@@ -498,7 +500,9 @@ begin
   Dec(IPTCsize, 3);
   SetLength(Bytes, IPTCtagSz);
   BlockRead(FotoF, Bytes[0], IPTCtagSz);
-  tx := Encoding.GetString(Bytes);
+  tx := '';
+  if (Encoding.GetCharCount(Bytes) > 0) then
+    tx := Encoding.GetString(Bytes);
   Dec(IPTCsize, IPTCtagSz);
   with Foto.IPTC do
   begin
@@ -1141,7 +1145,9 @@ begin
   Seek(FotoF, XMPoffset);
   Setlength(Bytes, XMPsize);
   Blockread(FotoF, Bytes[0], XMPsize);
-  XMPdata := Encoding.GetString(Bytes);
+  XMPdata := '';
+  if (Encoding.GetCharCount(Bytes) > 0) then
+    XMPdata := Encoding.GetString(Bytes);
   XMPdata := StringReplace(XMPdata, '&amp;', '&', [rfReplaceAll]);
   with Foto.XMP do
   begin

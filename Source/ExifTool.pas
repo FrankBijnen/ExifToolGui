@@ -87,6 +87,13 @@ begin
   // +further options...
 end;
 
+procedure UpdateExecNum;
+begin
+  inc(ExecNum);
+  if (ExecNum > $39) then
+    ExecNum := $31;
+end;
+
 // ============================== ET_Open mode ==================================
 function ET_StayOpen(WorkDir: string): boolean;
 var
@@ -163,9 +170,7 @@ begin
   result := false;
 
   // Update Execnum
-  inc(ExecNum);
-  if (ExecNum > $39) then
-    ExecNum := $31;
+  UpdateExecNum;
   ThisExecNum := ExecNum;
   CheckNum := ($7D * 256) + ThisExecNum;
 
@@ -271,6 +276,7 @@ begin
       if ETShowCounter then
         ETCounterLabel.Visible := false;
       ETCounter := 0;
+
       result := true;
     finally
       ETout.Free;
@@ -329,6 +335,7 @@ var
   StartupInfo: TStartupInfo;
   PipeOutRead, PipeOutWrite: THandle;
   PipeErrRead, PipeErrWrite: THandle;
+  FinalCmd: string;
   TempFile: string;
   Call_ET: string;
   PWorkDir: PChar;
@@ -362,12 +369,13 @@ begin
     else
       PWorkDir := PChar(WorkDir);
 
-    ETcmd := ET_Options.GetOptions + ETcmd + CRLF + FNames;
+    UpdateExecNum;
+    FinalCmd := ET_Options.GetOptions + ETcmd + CRLF + FNames;
     ETShowCounter := (ETCounterLabel <> nil) and (ETCounter > 1);
     ETCounterLabel.Visible := ETShowCounter;
 
     TempFile := GetExifToolTmp;
-    WriteArgsFile(ETcmd, TempFile);
+    WriteArgsFile(FinalCmd, TempFile);
     Call_ET := GUIsettings.ETOverrideDir + 'exiftool -@ "' + TempFile + '"';
 
     result := CreateProcess(nil, PChar(Call_ET), nil, nil, true,
