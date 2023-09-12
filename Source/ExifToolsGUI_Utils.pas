@@ -14,7 +14,7 @@ procedure DebugMsg(const Msg: array of variant);
 // FileSystem
 function ValidDir(ADir: string): boolean;
 function ValidFile(AFolder: TShellFolder): boolean;
-function GetINIPath: string;
+function GetINIPath(AllowCreate: boolean = false): string;
 function GetAppPath: string;
 function GetTempDirectory: string;
 function GetExifToolTmp: string;
@@ -107,7 +107,7 @@ begin
   result := SFGAO_FILESYSTEM and Flags <> 0;
 end;
 
-function GetINIPath: string;
+function GetINIPath(AllowCreate: boolean = false): string;
 var
   NameBuffer: PChar;
 begin
@@ -116,7 +116,8 @@ begin
   begin
     result := IncludeTrailingPathDelimiter(StrPas(NameBuffer)) + IncludeTrailingPathDelimiter(Application.Title);
     CoTaskMemFree(NameBuffer);
-    if not DirectoryExists(result) then
+    if (AllowCreate) and
+       not DirectoryExists(result) then
       CreateDir(result);
   end;
 end;
