@@ -2097,6 +2097,7 @@ var
   AnItem: TListItem;
   Param: string;
   i: smallint;
+  PathFromParm: boolean;
 begin
   ETCounterLabel := LabelCounter;
   i := Screen.PixelsPerInch;
@@ -2133,28 +2134,26 @@ begin
   if GUIsettings.UseExitDetails then
     CBoxDetailsChange(Sender);
 
-  // The shellList is initally disabled. Now enable and refresh
-  ShellList.Enabled := true;
-  if ValidDir(GUIsettings.InitialDir) then
-    ShellTree.Path := GUIsettings.InitialDir;
-  if (ShellTree.Selected <> nil) then
-  begin
-    ShellTree.Selected.MakeVisible;
-    ShellTreeChange(ShellTree, ShellTree.Selected);
-  end;
-
   DontSaveIni := FindCmdLineSwitch('DontSaveIni');
+
+  // The shellList is initally disabled. Now enable and refresh
+  PathFromParm := false;
+  ShellList.Enabled := true;
 
   // GUI started as "Send to" or "Open with":
   if ParamCount > 0 then
   begin
     Param := ParamStr(1);
     if DirectoryExists(Param) then
-      ShellTree.Path := Param // directory only
+    begin
+      PathFromParm := true;
+      ShellTree.Path := Param; // directory only
+    end
     else
     begin
       if FileExists(Param) then
       begin // file specified
+        PathFromParm := true;
         ShellTree.Path := ExtractFileDir(Param);
         Param := ExtractFileName(Param);
         ShellList.ItemIndex := -1;
@@ -2175,11 +2174,22 @@ begin
           ShellTree.SetFocus;
       end;
     end;
-    if (ShellTree.Selected <> nil) then
-      ShellTree.Selected.MakeVisible;
-  end
-  else if (ShellList.Enabled) then
+  end;
+
+  // If Path was not set from parm, use the setting
+  if (PathFromParm = false) and
+     ValidDir(GUIsettings.InitialDir) then
+  begin
+    ShellTree.Path := GUIsettings.InitialDir;
     ShellList.SetFocus;
+  end;
+
+  // Scroll in view
+  if (ShellTree.Selected <> nil) then
+  begin
+    ShellTree.Selected.MakeVisible;
+    ShellTree.OnChange(ShellTree, ShellTree.Selected);
+  end;
   // --------------------------
   DragAcceptFiles(Self.Handle, true);
   ShowMetadata;
@@ -2506,7 +2516,10 @@ begin
   if not ValidDir(NewPath) then
     exit;
   EnableMenus(ET_StayOpen(NewPath));
+
   // Select 1st item in Shellist rightaway
+  if (NewPath <> ShellList.RootFolder.PathName) then // Startup behaviour
+    exit;
   if (ShellList.Items.Count > 0) then
     ShellList.Items[0].Selected := true;
   ShellListClick(Sender);
