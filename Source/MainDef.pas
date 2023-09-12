@@ -25,6 +25,7 @@ type
     DefGMapHome: string[23];
     GuiStyle: string;
     ETdirDefCmd: smallint;
+    ETdirMode: smallint;
     InitialDir: string;
     ETOverrideDir: string;
     ETTimeOut: integer;
@@ -285,6 +286,8 @@ begin
         end;
         AutoIncLine := ReadBool(Ini_Settings, 'AutoIncLine', True);
         ETdirDefCmd := ReadInteger(Ini_Settings, 'ETdirDefCmd', -1);
+        ETdirMode := ReadInteger(Ini_Settings, 'ETdirMode', 0);
+        CmbETDirectMode.ItemIndex := GUIsettings.ETdirMode;
       end;
 
       with ET_Options do
@@ -484,7 +487,7 @@ begin
       Top := ReadInteger(Ini_ETGUI, 'LogWinTop', 106);
       Left := ReadInteger(Ini_ETGUI, 'LogWinLeft', 108);
       Width := ReadInteger(Ini_ETGUI, 'LogWinWidth', 580);
-      Height := ReadInteger(Ini_ETGUI, 'LogWinHeight', 200);
+      Height := ReadInteger(Ini_ETGUI, 'LogWinHeight', 580);
     end;
   finally
     GUIini.Free;
@@ -593,6 +596,7 @@ begin
           WriteBool(Ini_Settings, 'DetailsDown', FMain.SpeedBtnDetails.Down);
           WriteBool(Ini_Settings, 'AutoIncLine', AutoIncLine);
           WriteInteger(Ini_Settings, 'ETdirDefCmd', ETdirDefCmd);
+          WriteInteger(Ini_Settings, 'ETdirMode', ETdirMode);
         end;
 
         EraseSection(Ini_Options);

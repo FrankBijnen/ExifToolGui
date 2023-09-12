@@ -161,6 +161,7 @@ type
     Spb_GoBack: TSpeedButton;
     Spb_Forward: TSpeedButton;
     SpeedBtn_GetLoc: TSpeedButton;
+    CmbETDirectMode: TComboBox;
     procedure ShellListClick(Sender: TObject);
     procedure ShellListKeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
     procedure ShellTreeChange(Sender: TObject; Node: TTreeNode);
@@ -255,6 +256,7 @@ type
     procedure EdgeBrowser1WebMessageReceived(Sender: TCustomEdgeBrowser; Args: TWebMessageReceivedEventArgs);
     procedure Spb_ForwardClick(Sender: TObject);
     procedure SpeedBtn_GetLocClick(Sender: TObject);
+    procedure CmbETDirectModeChange(Sender: TObject);
     procedure ShellTreeChanging(Sender: TObject; Node: TTreeNode; var AllowChange: Boolean);
   private
     { Private declarations }
