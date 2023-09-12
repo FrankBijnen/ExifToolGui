@@ -2132,7 +2132,7 @@ begin
   if GUIsettings.UseExitDetails then
     CBoxDetailsChange(Sender);
 
-  /// / The shellList is initally disabled. Now enable and refresh
+  // The shellList is initally disabled. Now enable and refresh
   ShellList.Enabled := true;
   if ValidDir(GUIsettings.InitialDir) then
     ShellTree.Path := GUIsettings.InitialDir;
@@ -2141,6 +2141,8 @@ begin
     ShellTree.Selected.MakeVisible;
     ShellTreeChange(ShellTree, ShellTree.Selected);
   end;
+
+  DontSaveIni := FindCmdLineSwitch('DontSaveIni');
 
   // GUI started as "Send to" or "Open with":
   if ParamCount > 0 then
