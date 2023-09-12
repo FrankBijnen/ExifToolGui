@@ -774,7 +774,7 @@ begin
   if FDateTimeEqual.ShowModal = mrOK then
   begin
     UpdateLogWin(FDateTimeEqual.ETout, FDateTimeEqual.ETerr);
-    ShellList.Refresh;
+    RefreshSelected(Sender);
     ShowMetadata;
   end;
 end;
@@ -784,7 +784,7 @@ begin
   if FDateTimeShift.ShowModal = mrOK then
   begin
     UpdateLogWin(FDateTimeShift.ETouts, FDateTimeShift.ETerrs);
-    ShellList.Refresh;
+    RefreshSelected(Sender);
     ShowMetadata;
   end;
 end;
@@ -799,7 +799,7 @@ begin
     ETcmd := '-Exif:LensInfo<LensID' + CRLF + '-Exif:LensModel<LensID';
     ET_OpenExec(ETcmd, GetSelectedFiles, ETout, ETerr);
     UpdateLogWin(ETout, ETerr);
-    ShellList.Refresh;
+    RefreshSelected(Sender);
     ShowMetadata;
   end;
 end;
@@ -850,7 +850,7 @@ begin
   begin
     ET_OpenExec('-FileModifyDate<Exif:DateTimeOriginal', GetSelectedFiles, ETout, ETerr);
     UpdateLogWin(ETout, ETerr);
-    ShellList.Refresh;
+    RefreshSelected(Sender);
     ShowMetadata;
     ShowPreview;
   end;
@@ -930,7 +930,7 @@ begin
           if (ET_OpenExec(ETcmd, GetSelectedFiles, ETout, ETerr)) then
           begin
             UpdateLogWin(ETout, ETerr);
-            ShellList.Refresh;
+            RefreshSelected(Sender);
             ShowMetadata;
           end;
         end;
@@ -959,7 +959,7 @@ begin
       FCopyMetaSingle.SrcFile := OpenPictureDlg.FileName;
       if FCopyMetaSingle.ShowModal = mrOK then
       begin
-        ShellList.Refresh;
+        RefreshSelected(Sender);
         ShowMetadata;
       end;
     end;
@@ -1025,7 +1025,7 @@ begin
           if (ET_OpenExec(ETcmd, '.', ETout, ETerr)) then
           begin
             UpdateLogWin(ETout, ETerr);
-            ShellList.Refresh;
+            RefreshSelected(Sender);
             ShowMetadata;
           end;
         end;
@@ -1061,7 +1061,7 @@ begin
       if (ET_OpenExec(ETcmd, GetSelectedFiles, ETout, ETerr)) then
       begin
         UpdateLogWin(ETout, ETerr);
-        ShellList.Refresh;
+        RefreshSelected(Sender);
         ShowMetadata;
       end;
     end;
@@ -1103,7 +1103,7 @@ begin
     else
       ShowMessage('Missing jhead.exe && jpegtran.exe!');
 
-    ShellList.Refresh;
+    RefreshSelected(Sender);
     ShowMetadata;
     ShowPreview;
   end;
@@ -1133,7 +1133,7 @@ begin
       ETcmd := ETcmd + '-JpgFromRaw' + CRLF + '-ext' + CRLF + 'RW2' + CRLF + '-ext' + CRLF + 'PEF';
     if (ET_OpenExec(ETcmd, GetSelectedFiles, ETout, ETerr)) then
       UpdateLogWin(ETout, ETerr);
-    ShellTree.Refresh(ShellTree.Selected);
+    RefreshSelected(Sender);
   end;
 end;
 
@@ -1227,7 +1227,7 @@ procedure TFMain.MImportGPSLogClick(Sender: TObject);
 begin
   if FGeotag.ShowModal = mrOK then
   begin
-    ShellList.Refresh;
+    RefreshSelected(Sender);
     ShowMetadata;
   end;
 end;
@@ -1237,8 +1237,8 @@ begin
   if FPreferences.ShowModal = mrOK then
   begin
     EnableMenus(ET_StayOpen(ShellTree.Path)); // Recheck Exiftool.exe.
+    RefreshSelected(Sender);
     ShowMetadata;
-    ShellList.Refresh;
   end;
 end;
 
@@ -1284,7 +1284,7 @@ begin
   if Sender = MShowGPSdecimal then
     ET_Options.SetGpsFormat(MShowGPSdecimal.Checked);
   // + used by MShowHexID, MGroup_g4, MShowComposite, MShowSorted, MNotDuplicated
-  ShellList.Refresh;
+  RefreshSelected(Sender);
   ShowMetadata;
 end;
 
@@ -1773,6 +1773,8 @@ begin
     else
       ShowMessage('ExifTool not executed!?');
     ETprm := '';
+	RefreshSelected(Sender);
+	ShowMetaData;
     ShowPreview;
   end;
 end;
@@ -2515,17 +2517,6 @@ procedure TFMain.ShellTreeAfterContext(Sender: TObject);
 begin
   if (ValidDir(ShellTree.Path)) then
     ET_StayOpen(ShellTree.Path);
-end;
-
-procedure TFMain.ShellTreeClick(Sender: TObject);
-begin
-  RotateImg.Picture.Bitmap := nil;
-  if Assigned(ETBarSeriesFocal) then
-    ETBarSeriesFocal.Clear;
-  if Assigned(ETBarSeriesFnum) then
-    ETBarSeriesFnum.Clear;
-  if Assigned(ETBarSeriesIso) then
-    ETBarSeriesIso.Clear;
 end;
 
 // =========================== Show Metadata ====================================
