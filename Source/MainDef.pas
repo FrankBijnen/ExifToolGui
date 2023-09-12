@@ -118,7 +118,7 @@ var
 begin
   // Default is ExifToolGuiV6.ini in Profile %AppData%\ExifToolGui
   CurVer := Application.Title + IniVersion + '.ini';
-  result := GetINIPath + CurVer;
+  result := GetINIPath(not AllowPrevVer) + CurVer;
   if (FileExists(result)) then
     exit;
 
@@ -481,7 +481,7 @@ end;
 
 procedure ReadGUILog;
 begin
-  GUIini := TIniFile.Create(GetIniFilePath(false));
+  GUIini := TIniFile.Create(GetIniFilePath(true));
   try
     with GUIini, FLogWin do
     begin
