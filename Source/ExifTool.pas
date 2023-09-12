@@ -517,6 +517,7 @@ begin
   ETstream := TMemoryStream.Create;
   Screen.Cursor := -11; // =crHourGlass
   try
+    UniqueString(xCmd); // Required by CreateprocessW
     result := CreateProcess(nil, PChar(xCmd), nil, nil, true,
                             CREATE_DEFAULT_ERROR_MODE or CREATE_NEW_CONSOLE or NORMAL_PRIORITY_CLASS,
                             nil, PWorkDir, StartupInfo, ProcessInfo);
