@@ -2,8 +2,8 @@ object FMain: TFMain
   Left = 0
   Top = 0
   Caption = 'FMain'
-  ClientHeight = 600
-  ClientWidth = 965
+  ClientHeight = 602
+  ClientWidth = 970
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -20,7 +20,7 @@ object FMain: TFMain
     Left = 240
     Top = 0
     Width = 5
-    Height = 581
+    Height = 583
     Color = clBtnFace
     MinSize = 160
     ParentColor = False
@@ -28,20 +28,19 @@ object FMain: TFMain
     ExplicitHeight = 587
   end
   object Splitter2: TSplitter
-    Left = 640
+    Left = 645
     Top = 0
     Width = 5
-    Height = 581
+    Height = 583
     Align = alRight
     MinSize = 284
     OnCanResize = Splitter2CanResize
-    ExplicitLeft = 645
     ExplicitHeight = 587
   end
   object StatusBar: TStatusBar
     Left = 0
-    Top = 581
-    Width = 965
+    Top = 583
+    Width = 970
     Height = 19
     Panels = <
       item
@@ -60,7 +59,7 @@ object FMain: TFMain
     Left = 0
     Top = 0
     Width = 240
-    Height = 581
+    Height = 583
     Align = alLeft
     DoubleBuffered = True
     Font.Charset = DEFAULT_CHARSET
@@ -74,7 +73,7 @@ object FMain: TFMain
     ExplicitHeight = 580
     object Splitter3: TSplitter
       Left = 1
-      Top = 355
+      Top = 357
       Width = 238
       Height = 4
       Cursor = crVSplit
@@ -87,7 +86,7 @@ object FMain: TFMain
       Left = 1
       Top = 1
       Width = 238
-      Height = 354
+      Height = 356
       ActivePage = AdvTabBrowse
       Align = alClient
       TabOrder = 0
@@ -98,7 +97,7 @@ object FMain: TFMain
           Left = 0
           Top = 0
           Width = 230
-          Height = 326
+          Height = 328
           ObjectTypes = [otFolders]
           Root = 'rfDesktop'
           ShellListView = ShellList
@@ -126,7 +125,7 @@ object FMain: TFMain
     end
     object AdvPagePreview: TPageControl
       Left = 1
-      Top = 359
+      Top = 361
       Width = 238
       Height = 221
       ActivePage = AdvTabPreview
@@ -152,10 +151,10 @@ object FMain: TFMain
     end
   end
   object AdvPageMetadata: TPageControl
-    Left = 645
+    Left = 650
     Top = 0
     Width = 320
-    Height = 581
+    Height = 583
     ActivePage = AdvTabMetadata
     Align = alRight
     DoubleBuffered = True
@@ -246,7 +245,7 @@ object FMain: TFMain
       end
       object AdvPanelMetaBottom: TPanel
         Left = 0
-        Top = 447
+        Top = 449
         Width = 312
         Height = 106
         Align = alBottom
@@ -321,7 +320,7 @@ object FMain: TFMain
         Left = 0
         Top = 57
         Width = 312
-        Height = 390
+        Height = 392
         Align = alClient
         BorderStyle = bsNone
         DefaultRowHeight = 19
@@ -342,7 +341,7 @@ object FMain: TFMain
         OnKeyDown = MetadataListKeyDown
         OnMouseDown = MetadataListMouseDown
         OnSelectCell = MetadataListSelectCell
-        ExplicitHeight = 389
+        ExplicitLeft = 150
         ColWidths = (
           150
           160)
@@ -437,7 +436,7 @@ object FMain: TFMain
       end
       object AdvPanel_MapBottom: TPanel
         Left = 0
-        Top = 521
+        Top = 523
         Width = 312
         Height = 32
         Align = alBottom
@@ -449,6 +448,7 @@ object FMain: TFMain
         Font.Style = []
         ParentFont = False
         TabOrder = 1
+        ExplicitTop = 521
         object SpeedBtn_Geotag: TSpeedButton
           Left = 2
           Top = 6
@@ -462,32 +462,32 @@ object FMain: TFMain
         Left = 0
         Top = 57
         Width = 312
-        Height = 464
+        Height = 466
         Align = alClient
         TabOrder = 2
         UserDataFolder = '%LOCALAPPDATA%\bds.exe.WebView2'
         OnWebMessageReceived = EdgeBrowser1WebMessageReceived
+        ExplicitHeight = 464
       end
     end
   end
   object AdvPageFilelist: TPageControl
     Left = 245
     Top = 0
-    Width = 395
-    Height = 581
+    Width = 400
+    Height = 583
     ActivePage = AdvTabFilelist
     Align = alClient
+    Constraints.MinWidth = 400
     DoubleBuffered = True
     ParentDoubleBuffered = False
     TabOrder = 3
-    ExplicitWidth = 391
-    ExplicitHeight = 580
     object AdvTabFilelist: TTabSheet
       Caption = 'Filelist'
       object AdvPanelFileTop: TPanel
         Left = 0
         Top = 0
-        Width = 387
+        Width = 392
         Height = 57
         Align = alTop
         BevelOuter = bvNone
@@ -567,8 +567,8 @@ object FMain: TFMain
       end
       object AdvPanelETdirect: TPanel
         Left = 0
-        Top = 369
-        Width = 387
+        Top = 371
+        Width = 392
         Height = 184
         Align = alBottom
         BevelOuter = bvNone
@@ -582,10 +582,10 @@ object FMain: TFMain
         ExplicitTop = 368
         ExplicitWidth = 383
         DesignSize = (
-          387
+          392
           184)
         object LabelCounter: TLabel
-          Left = 124
+          Left = 248
           Top = 6
           Width = 32
           Height = 18
@@ -600,7 +600,7 @@ object FMain: TFMain
           Visible = False
         end
         object SpeedBtn_ETdirect: TSpeedButton
-          Left = 2
+          Left = 1
           Top = 6
           Width = 103
           Height = 22
@@ -620,7 +620,7 @@ object FMain: TFMain
           OnClick = SpeedBtn_ETeditClick
         end
         object SpeedBtnShowLog: TSpeedButton
-          Left = 170
+          Left = 285
           Top = 6
           Width = 103
           Height = 22
@@ -670,10 +670,29 @@ object FMain: TFMain
           Caption = 'Deselect'
           OnClick = SpeedBtn_ETclearClick
         end
+        object CmbETDirectMode: TComboBox
+          Left = 111
+          Top = 6
+          Width = 130
+          Height = 21
+          Hint = 
+            'Choose how the command(s) must be executed (ArgsFile options sup' +
+            'port UTF8 best)'
+          DropDownWidth = 200
+          ParentShowHint = False
+          ShowHint = True
+          TabOrder = 3
+          Text = 'CmbETDirectMode'
+          OnChange = CmbETDirectModeChange
+          Items.Strings = (
+            'Classic+CommandLine'
+            'Classic+Argsfile'
+            'StayOpen+Argsfile')
+        end
         object EditETdirect: TLabeledEdit
-          Left = 2
+          Left = 1
           Top = 50
-          Width = 280
+          Width = 389
           Height = 23
           Anchors = [akLeft, akTop, akRight]
           AutoSelect = False
@@ -690,10 +709,9 @@ object FMain: TFMain
           Text = ''
           OnChange = EditETdirectChange
           OnKeyDown = EditETdirectKeyDown
-          ExplicitWidth = 276
         end
         object CBoxETdirect: TComboBox
-          Left = 2
+          Left = 1
           Top = 79
           Width = 271
           Height = 21
@@ -703,7 +721,7 @@ object FMain: TFMain
           OnChange = CBoxETdirectChange
         end
         object EditETcmdName: TLabeledEdit
-          Left = 2
+          Left = 1
           Top = 156
           Width = 271
           Height = 22
@@ -724,8 +742,8 @@ object FMain: TFMain
       object ShellList: TShellListView
         Left = 0
         Top = 57
-        Width = 387
-        Height = 312
+        Width = 392
+        Height = 314
         ObjectTypes = [otNonFolders]
         Root = 'rfDesktop'
         ShellTreeView = ShellTree
@@ -753,6 +771,7 @@ object FMain: TFMain
         TabOrder = 2
         ViewStyle = vsReport
         OnKeyUp = ShellListKeyUp
+        ExplicitWidth = 390
       end
     end
     object AdvTabChart: TTabSheet
@@ -760,7 +779,7 @@ object FMain: TFMain
       object AdvPanel1: TPanel
         Left = 0
         Top = 0
-        Width = 387
+        Width = 392
         Height = 137
         Align = alTop
         BevelOuter = bvNone
@@ -771,6 +790,7 @@ object FMain: TFMain
         Font.Style = []
         ParentFont = False
         TabOrder = 0
+        ExplicitWidth = 387
         object SpeedBtnChartRefresh: TSpeedButton
           Left = 214
           Top = 104
@@ -828,8 +848,8 @@ object FMain: TFMain
       object ETChart: TChart
         Left = 0
         Top = 137
-        Width = 387
-        Height = 416
+        Width = 392
+        Height = 418
         Legend.Visible = False
         Title.Font.Color = clBlack
         Title.Font.Height = -19
@@ -841,6 +861,8 @@ object FMain: TFMain
         LeftAxis.Maximum = 15.000000000000000000
         Align = alClient
         TabOrder = 1
+        ExplicitWidth = 387
+        ExplicitHeight = 416
         DefaultCanvas = 'TGDIPlusCanvas'
         PrintMargins = (
           27

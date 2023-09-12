@@ -3,8 +3,8 @@ object FLogWin: TFLogWin
   Top = 0
   BorderIcons = [biSystemMenu, biMinimize]
   Caption = 'ExifTool LOG'
-  ClientHeight = 551
-  ClientWidth = 879
+  ClientHeight = 544
+  ClientWidth = 582
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -13,85 +13,87 @@ object FLogWin: TFLogWin
   Font.Style = []
   OnCreate = FormCreate
   OnDestroy = FormDestroy
+  OnShow = FormShow
   TextHeight = 13
   object Splitter1: TSplitter
     Left = 0
-    Top = 193
-    Width = 879
-    Height = 3
+    Top = 159
+    Width = 582
+    Height = 6
     Cursor = crVSplit
     Align = alTop
-    ExplicitTop = 97
-    ExplicitWidth = 200
+    ExplicitTop = 172
+    ExplicitWidth = 568
   end
   object Splitter2: TSplitter
     Left = 0
-    Top = 412
-    Width = 879
-    Height = 3
+    Top = 402
+    Width = 582
+    Height = 6
     Cursor = crVSplit
     Align = alBottom
-    ExplicitLeft = -8
-    ExplicitTop = 283
+    ExplicitTop = 403
+    ExplicitWidth = 568
   end
   object PctExecs: TPageControl
     Left = 0
     Top = 0
-    Width = 879
-    Height = 193
+    Width = 582
+    Height = 159
     ActivePage = TabExecs
     Align = alTop
     TabOrder = 0
-    ExplicitWidth = 875
+    ExplicitWidth = 568
     object TabExecs: TTabSheet
       Caption = 'Logged ExifTool commands'
       object LBExecs: TListBox
         Left = 0
         Top = 0
-        Width = 871
-        Height = 165
+        Width = 574
+        Height = 131
         Align = alClient
         ItemHeight = 13
         TabOrder = 0
         OnClick = LBExecsClick
         ExplicitWidth = 867
+        ExplicitHeight = 165
       end
     end
   end
   object PnlMidle: TPanel
     Left = 0
-    Top = 196
-    Width = 879
-    Height = 216
+    Top = 165
+    Width = 582
+    Height = 237
     Align = alClient
     Constraints.MinWidth = 200
     TabOrder = 2
+    ExplicitTop = 196
     ExplicitWidth = 875
     ExplicitHeight = 215
     object Splitter3: TSplitter
-      Left = 386
+      Left = 288
       Top = 1
-      Height = 214
-      ExplicitLeft = 446
-      ExplicitTop = 91
-      ExplicitHeight = 100
+      Width = 6
+      Height = 235
+      ExplicitHeight = 220
     end
     object PCTCommands: TPageControl
       Left = 1
       Top = 1
-      Width = 385
-      Height = 214
+      Width = 287
+      Height = 235
       ActivePage = TabCommands
       Align = alLeft
       TabOrder = 1
-      ExplicitHeight = 213
+      ExplicitHeight = 205
       object TabCommands: TTabSheet
         Caption = 'Executed commands'
         object MemoCmds: TMemo
           Left = 0
           Top = 0
-          Width = 377
-          Height = 186
+          Width = 279
+          Height = 207
           Align = alClient
           Color = clBtnFace
           Font.Charset = DEFAULT_CHARSET
@@ -103,18 +105,21 @@ object FLogWin: TFLogWin
           ReadOnly = True
           ScrollBars = ssVertical
           TabOrder = 0
+          OnKeyDown = MemoCmdsKeyDown
+          ExplicitWidth = 377
           ExplicitHeight = 185
         end
       end
     end
     object PCTOutput: TPageControl
-      Left = 389
+      Left = 294
       Top = 1
-      Width = 489
-      Height = 214
+      Width = 287
+      Height = 235
       ActivePage = TabOutput
       Align = alClient
       TabOrder = 0
+      ExplicitLeft = 389
       ExplicitWidth = 485
       ExplicitHeight = 213
       object TabOutput: TTabSheet
@@ -122,8 +127,8 @@ object FLogWin: TFLogWin
         object MemoOuts: TMemo
           Left = 0
           Top = 0
-          Width = 481
-          Height = 186
+          Width = 279
+          Height = 207
           Align = alClient
           Color = clBtnFace
           Font.Charset = DEFAULT_CHARSET
@@ -143,8 +148,8 @@ object FLogWin: TFLogWin
   end
   object PCTErrors: TPageControl
     Left = 0
-    Top = 415
-    Width = 879
+    Top = 408
+    Width = 582
     Height = 136
     ActivePage = TabErrors
     Align = alBottom
@@ -156,7 +161,7 @@ object FLogWin: TFLogWin
       object MemoErrs: TMemo
         Left = 0
         Top = 0
-        Width = 871
+        Width = 574
         Height = 108
         Align = alClient
         Color = clBtnFace
