@@ -72,9 +72,9 @@ var
 procedure ET_OptionsRec.SetGpsFormat(UseDecimal: boolean);
 begin
   if UseDecimal then
-    ETGpsFormat := '-c' + CRLF + '%.6f' + #$C2#$B0 + CRLF
+    ETGpsFormat := '-c' + CRLF + '%.6f' + #$B0 + CRLF
   else
-    ETGpsFormat := '-c' + CRLF + '%d' + #$C2#$B0 + '%.4f' + CRLF;
+    ETGpsFormat := '-c' + CRLF + '%d' + #$B0 + '%.4f' + CRLF;
 end;
 
 function ET_OptionsRec.GetOptions(Charset: boolean = true): string;
