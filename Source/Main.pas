@@ -2807,21 +2807,21 @@ end;
 
 procedure TFMain.SpeedBtn_ETdirectClick(Sender: TObject);
 var
-  i, H: smallint;
+  I, H: smallint;
 begin
-  i := Screen.PixelsPerInch;
+  I := Screen.PixelsPerInch;
   if SpeedBtn_ETdirect.Down then
   begin
     if SpeedBtn_ETedit.Down then
       H := 184 // min 181
     else
       H := 105;
-    AdvPanelETdirect.Height := MulDiv(H, i, 96);
+    AdvPanelETdirect.Height := MulDiv(H, I, 96);
     EditETdirect.SetFocus;
   end
   else
   begin
-    AdvPanelETdirect.Height := MulDiv(32, i, 96);
+    AdvPanelETdirect.Height := MulDiv(32, I, 96);
     ShellList.SetFocus;
   end;
 end;
