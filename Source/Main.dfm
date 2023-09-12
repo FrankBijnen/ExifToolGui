@@ -341,7 +341,7 @@ object FMain: TFMain
         OnKeyDown = MetadataListKeyDown
         OnMouseDown = MetadataListMouseDown
         OnSelectCell = MetadataListSelectCell
-        ExplicitLeft = 150
+        ExplicitHeight = 391
         ColWidths = (
           150
           160)

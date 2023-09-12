@@ -29,7 +29,7 @@ type
     procedure FormDestroy(Sender: TObject);
     procedure LBExecsClick(Sender: TObject);
     procedure FormShow(Sender: TObject);
-    procedure MemoCmdsKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
+    procedure MemoKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
   protected
   private
     { Private declarations }
@@ -88,7 +88,7 @@ begin
   MemoErrs.Text:=(FEtErrs[LBExecs.ItemIndex]);
 end;
 
-procedure TFLogWin.MemoCmdsKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
+procedure TFLogWin.MemoKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
 begin
   if (Key = Ord('A')) and (ssCTRL in Shift) then // Ctrl+A
     TMemo(Sender).SelectAll;

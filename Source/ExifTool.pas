@@ -5,7 +5,7 @@ interface
 uses Classes, StdCtrls;
 
 type
-  TExecETEvent = procedure (ExecNum: integer; EtCmds, EtOuts, EtErrs: string) of object;
+  TExecETEvent = procedure (ExecNum: integer; EtCmds, EtOuts, EtErrs: string; PopupOnError: boolean) of object;
 
   ET_OptionsRec = record
     // don't define '-a' (because of Filelist custom columns)
@@ -41,9 +41,9 @@ var
     ETVerbose: '-v0' );                           // For file counter
 
 function ET_StayOpen(WorkDir: string): boolean;
-function ET_OpenExec(ETcmd: string; FNames: string; var ETouts, ETErrs: string): boolean; overload;
-function ET_OpenExec(ETcmd: string; FNames: string; ETout: TStringList): boolean; overload;
-function ET_OpenExec(ETcmd: string; FNames: string): boolean; overload;
+function ET_OpenExec(ETcmd: string; FNames: string; var ETouts, ETErrs: string; PopupOnError: boolean = true): boolean; overload;
+function ET_OpenExec(ETcmd: string; FNames: string; ETout: TStringList; PopupOnError: boolean = true): boolean; overload;
+function ET_OpenExec(ETcmd: string; FNames: string; PopupOnError: boolean = true): boolean; overload;
 procedure ET_OpenExit;
 
 function ExecET(ETcmd, FNames, WorkDir: string; var ETouts, ETErrs: string; CreateArgs: boolean): boolean; overload;
@@ -155,7 +155,7 @@ begin
   result := ETrunning;
 end;
 
-function ET_OpenExec(ETcmd: string; FNames: string; var ETouts, ETErrs: string): boolean;
+function ET_OpenExec(ETcmd: string; FNames: string; var ETouts, ETErrs: string; PopupOnError: boolean = true): boolean;
 var
   ETstream: TMemoryStream;
   PipeBuffer: array [0 .. szPipeBuffer] of byte;
@@ -276,19 +276,17 @@ begin
         inc(I);
       until (BytesCount = 0) or (I > 5); // max 2 attempts observed
       ETstream.Position := 0;
-      if (ETErrs <> '-') then
-      begin
-        ETerr.LoadFromStream(ETstream);
-        ETErrs := ETerr.Text;
-      end;
+      ETerr.LoadFromStream(ETstream);
+      ETErrs := ETerr.Text;
+
       // ----------------------------------------------
       if ETShowCounter then
         ETCounterLabel.Visible := false;
       ETCounter := 0;
 
-      // Callback for Logging;
+      // Callback for Logging
       if Assigned(ExecETEvent) then
-        ExecETEvent(ExecNum, FinalCmd, ETouts, ETErrs);
+        ExecETEvent(ExecNum, FinalCmd, ETouts, ETErrs, PopupOnError);
 
       result := true;
     finally
@@ -301,21 +299,19 @@ begin
   end;
 end;
 
-function ET_OpenExec(ETcmd: string; FNames: string; ETout: TStringList): boolean;
+function ET_OpenExec(ETcmd: string; FNames: string; ETout: TStringList; PopupOnError: boolean = true): boolean;
 var
   ETouts, ETErrs: string;
 begin
-  ETErrs := '-';
-  result := ET_OpenExec(ETcmd, FNames, ETouts, ETErrs);
+  result := ET_OpenExec(ETcmd, FNames, ETouts, ETErrs, PopupOnError);
   ETout.Text := ETouts;
 end;
 
-function ET_OpenExec(ETcmd: string; FNames: string): boolean;
+function ET_OpenExec(ETcmd: string; FNames: string; PopupOnError: boolean = true): boolean;
 var
   ETouts, ETErrs: string;
 begin
-  ETErrs := '-';
-  result := ET_OpenExec(ETcmd, FNames, ETouts, ETErrs);
+  result := ET_OpenExec(ETcmd, FNames, ETouts, ETErrs, PopupOnError);
 end;
 
 procedure ET_OpenExit;
@@ -445,11 +441,8 @@ begin
         ETstream.Write(PipeBuffer, BytesCount);
       until (BytesCount = 0);
       ETstream.Position := 0;
-      if (ETErrs <> '-') then
-      begin
-        ETerr.LoadFromStream(ETstream);
-        ETErrs := UTF8ToString(ETerr.Text);
-      end;
+      ETerr.LoadFromStream(ETstream);
+      ETErrs := UTF8ToString(ETerr.Text);
       CloseHandle(PipeErrRead);
 
       // ----------------------------------------------
@@ -457,9 +450,9 @@ begin
       CloseHandle(ProcessInfo.hThread);
       CloseHandle(ProcessInfo.hProcess);
 
-      // Callback for Logging;
+      // Callback for Logging
       if Assigned(ExecETEvent) then
-        ExecETEvent(ExecNum, FinalCmd, ETouts, ETErrs);
+        ExecETEvent(ExecNum, FinalCmd, ETouts, ETErrs, true);
 
       result := true;
     end;
@@ -478,7 +471,6 @@ function ExecET(ETcmd, FNames, WorkDir: string; var ETouts: string): boolean;
 var
   ETErrs: string;
 begin
-  ETErrs := '-';
   result := ExecET(ETcmd, FNames, WorkDir, ETouts, ETErrs, false);
 end;
 

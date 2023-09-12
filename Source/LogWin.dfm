@@ -105,7 +105,7 @@ object FLogWin: TFLogWin
           ReadOnly = True
           ScrollBars = ssVertical
           TabOrder = 0
-          OnKeyDown = MemoCmdsKeyDown
+          OnKeyDown = MemoKeyDown
           ExplicitWidth = 377
           ExplicitHeight = 185
         end
@@ -140,6 +140,7 @@ object FLogWin: TFLogWin
           ReadOnly = True
           ScrollBars = ssVertical
           TabOrder = 0
+          OnKeyDown = MemoKeyDown
           ExplicitWidth = 477
           ExplicitHeight = 185
         end
@@ -174,6 +175,7 @@ object FLogWin: TFLogWin
         ReadOnly = True
         ScrollBars = ssVertical
         TabOrder = 0
+        OnKeyDown = MemoKeyDown
         ExplicitWidth = 867
       end
     end
