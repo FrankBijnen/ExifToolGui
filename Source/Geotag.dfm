@@ -50,7 +50,7 @@ object FGeotag: TFGeotag
       Width = 423
       Height = 28
       Caption = 
-        'Note: Geotagging precission depends on camera time accuracy. If ' +
+        'Note: Geotagging precision depends on camera time accuracy. If ' +
         'neccesary,'#10'apply Exif:DateTime shift before geotagging.'
     end
     object LabeledEdit1: TLabeledEdit

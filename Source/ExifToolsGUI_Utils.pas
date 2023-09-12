@@ -24,6 +24,7 @@ function GetNrOfFiles(StartDir, FileMask: string; subDir: boolean): integer;
 
 // String
 function NextField(var AString: string; const ADelimiter: string): string;
+function ArgsFromDirectCmd(const ArgsIn: string): string;
 procedure WriteArgsFile(const ETInp, ArgsFile: string);
 
 // Image
@@ -241,6 +242,25 @@ begin
     result := Copy(AString, 1, Indx - 1);
     Delete(AString, 1, Indx + L - 1);
   end;
+end;
+
+function ArgsFromDirectCmd(const ArgsIn: string): string;
+var Indx: integer;
+    Escape: boolean;
+begin
+  Escape := false;
+  result := ArgsIn;
+  for indx := 1 to Length(result) do
+  begin
+    if (result[Indx] = '"') then
+      Escape:= not Escape;
+    if (Escape) then
+      continue;
+    if (result[Indx] = ' ') then
+      result[Indx] := #10;
+  end;
+  result := StringReplace(result, '"', '', [rfReplaceAll]);
+  result := StringReplace(result, #10, #13#10, [rfReplaceAll]);
 end;
 
 function CreateTempHandle(TempFile: string): THandle;
