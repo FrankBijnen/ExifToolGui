@@ -84,7 +84,6 @@ begin
   Y := length(ETcmd);
   SetLength(ETcmd, Y - 2); // remove last CRLF
   ET_OpenExec(ETcmd, FMain.GetSelectedFiles, ETouts, ETerrs);
-  FMain.UpdateLogWin(ETouts, ETerrs);
   if CheckBox5.Checked then
     ET_OpenExec('-FileModifyDate<Exif:DateTimeOriginal', FMain.GetSelectedFiles);
   ModalResult := mrOK;

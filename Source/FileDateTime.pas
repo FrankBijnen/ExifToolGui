@@ -89,7 +89,6 @@ begin
       ETcmd := ETcmd + '%Y' + Ds + '%m' + Ds + '%d';
   end;
   ET_OpenExec(ETcmd, FMain.GetSelectedFiles, ETout, ETerr);
-  FMain.UpdateLogWin(ETout, ETerr);
   ModalResult := mrOK;
 end;
 
@@ -99,7 +98,6 @@ var
 begin
   ETcmd := '-filename<Exif:DocumentName';
   ET_OpenExec(ETcmd, FMain.GetSelectedFiles, ETout, ETerr);
-  FMain.UpdateLogWin(ETout, ETerr);
   ModalResult := mrOK;
 end;
 

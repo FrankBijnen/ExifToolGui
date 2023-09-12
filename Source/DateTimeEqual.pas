@@ -63,7 +63,6 @@ begin
     ETcmd := '-exif:ModifyDate>exif:DateTimeOriginal' + CRLF + '-exif:ModifyDate>exif:CreateDate';
 
   ET_OpenExec(ETcmd, FMain.GetSelectedFiles, ETout, ETerr);
-  FMain.UpdateLogWin(ETout, ETerr);
   ModalResult := mrOK;
 end;
 

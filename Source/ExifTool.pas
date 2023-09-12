@@ -5,6 +5,8 @@ interface
 uses Classes, StdCtrls;
 
 type
+  TExecETEvent = procedure (ExecNum: integer; EtCmds, EtOuts, EtErrs: string) of object;
+
   ET_OptionsRec = record
     // don't define '-a' (because of Filelist custom columns)
     // don't define '-e' (because of extracting previews)
@@ -25,6 +27,7 @@ const
   CRLF = #13#10;
 
 var
+  ExecETEvent: TExecETEvent;
   ETCounterLabel: TLabel = nil;
   ETCounter: integer = 0;
   ET_Options: ET_OptionsRec = (ETLangDef: '';
@@ -273,13 +276,19 @@ begin
         inc(I);
       until (BytesCount = 0) or (I > 5); // max 2 attempts observed
       ETstream.Position := 0;
-      ETerr.LoadFromStream(ETstream);
-      ETErrs := ETerr.Text;
-
+      if (ETErrs <> '-') then
+      begin
+        ETerr.LoadFromStream(ETstream);
+        ETErrs := ETerr.Text;
+      end;
       // ----------------------------------------------
       if ETShowCounter then
         ETCounterLabel.Visible := false;
       ETCounter := 0;
+
+      // Callback for Logging;
+      if Assigned(ExecETEvent) then
+        ExecETEvent(ExecNum, FinalCmd, ETouts, ETErrs);
 
       result := true;
     finally
@@ -296,6 +305,7 @@ function ET_OpenExec(ETcmd: string; FNames: string; ETout: TStringList): boolean
 var
   ETouts, ETErrs: string;
 begin
+  ETErrs := '-';
   result := ET_OpenExec(ETcmd, FNames, ETouts, ETErrs);
   ETout.Text := ETouts;
 end;
@@ -304,6 +314,7 @@ function ET_OpenExec(ETcmd: string; FNames: string): boolean;
 var
   ETouts, ETErrs: string;
 begin
+  ETErrs := '-';
   result := ET_OpenExec(ETcmd, FNames, ETouts, ETErrs);
 end;
 
@@ -434,14 +445,22 @@ begin
         ETstream.Write(PipeBuffer, BytesCount);
       until (BytesCount = 0);
       ETstream.Position := 0;
-      ETerr.LoadFromStream(ETstream);
-      ETErrs := UTF8ToString(ETerr.Text);
+      if (ETErrs <> '-') then
+      begin
+        ETerr.LoadFromStream(ETstream);
+        ETErrs := UTF8ToString(ETerr.Text);
+      end;
       CloseHandle(PipeErrRead);
 
       // ----------------------------------------------
       WaitForSingleObject(ProcessInfo.hProcess, GUIsettings.ETTimeOut); // msec=5sec /or INFINITE
       CloseHandle(ProcessInfo.hThread);
       CloseHandle(ProcessInfo.hProcess);
+
+      // Callback for Logging;
+      if Assigned(ExecETEvent) then
+        ExecETEvent(ExecNum, FinalCmd, ETouts, ETErrs);
+
       result := true;
     end;
     if ETShowCounter then
@@ -459,6 +478,7 @@ function ExecET(ETcmd, FNames, WorkDir: string; var ETouts: string): boolean;
 var
   ETErrs: string;
 begin
+  ETErrs := '-';
   result := ExecET(ETcmd, FNames, WorkDir, ETouts, ETErrs, false);
 end;
 

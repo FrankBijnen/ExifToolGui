@@ -283,7 +283,7 @@ type
     { Public declarations }
     function GetFirstSelectedFile: string;
     function GetSelectedFiles(FileName: string = ''): string;
-    procedure UpdateLogWin(ETouts, ETerrs: string);
+    procedure ExecETEvent_Done(ExecNum: integer; EtCmds, EtOuts, EtErrs: string);
     procedure UpdateStatusBar_FilesShown;
     procedure SetGuiColor;
 
@@ -538,7 +538,6 @@ begin
 
   if (ET_OpenExec(ETcmd, GetSelectedFiles, ETout, ETerr)) then
   begin
-    UpdateLogWin(ETout, ETerr);
     RefreshSelected(Sender);
     ShowMetadata;
     ShowPreview;
@@ -773,7 +772,6 @@ procedure TFMain.MExifDateTimeEqualizeClick(Sender: TObject);
 begin
   if FDateTimeEqual.ShowModal = mrOK then
   begin
-    UpdateLogWin(FDateTimeEqual.ETout, FDateTimeEqual.ETerr);
     RefreshSelected(Sender);
     ShowMetadata;
   end;
@@ -783,7 +781,6 @@ procedure TFMain.MExifDateTimeshiftClick(Sender: TObject);
 begin
   if FDateTimeShift.ShowModal = mrOK then
   begin
-    UpdateLogWin(FDateTimeShift.ETouts, FDateTimeShift.ETerrs);
     RefreshSelected(Sender);
     ShowMetadata;
   end;
@@ -798,7 +795,6 @@ begin
   begin
     ETcmd := '-Exif:LensInfo<LensID' + CRLF + '-Exif:LensModel<LensID';
     ET_OpenExec(ETcmd, GetSelectedFiles, ETout, ETerr);
-    UpdateLogWin(ETout, ETerr);
     RefreshSelected(Sender);
     ShowMetadata;
   end;
@@ -836,7 +832,6 @@ begin
     ETcmd := '-w' + CRLF + xDir + '%f.html' + CRLF + '-htmldump';
 
   ET_OpenExec(ETcmd, GetSelectedFiles, ETout, ETerr);
-  UpdateLogWin(ETout, ETerr);
   if xDir = '' then
     BtnFListRefreshClick(Sender);
 end;
@@ -849,7 +844,6 @@ begin
     'OK to proceed?', mtInformation, [mbOk, mbCancel], 0) = mrOK then
   begin
     ET_OpenExec('-FileModifyDate<Exif:DateTimeOriginal', GetSelectedFiles, ETout, ETerr);
-    UpdateLogWin(ETout, ETerr);
     RefreshSelected(Sender);
     ShowMetadata;
     ShowPreview;
@@ -929,7 +923,6 @@ begin
           ETcmd := ETcmd + '-ext' + CRLF + DstExt;
           if (ET_OpenExec(ETcmd, GetSelectedFiles, ETout, ETerr)) then
           begin
-            UpdateLogWin(ETout, ETerr);
             RefreshSelected(Sender);
             ShowMetadata;
           end;
@@ -1024,7 +1017,6 @@ begin
           ETCounter := GetNrOfFiles(ShellTree.Path, '*.' + DstExt, (i = mrYes));
           if (ET_OpenExec(ETcmd, '.', ETout, ETerr)) then
           begin
-            UpdateLogWin(ETout, ETerr);
             RefreshSelected(Sender);
             ShowMetadata;
           end;
@@ -1060,7 +1052,6 @@ begin
       ETcmd := ETcmd + '-GPS:GPSDateStamp<XMP-exif:GPSDateTime' + CRLF + '-GPS:GPSTimeStamp<XMP-exif:GPSDateTime';
       if (ET_OpenExec(ETcmd, GetSelectedFiles, ETout, ETerr)) then
       begin
-        UpdateLogWin(ETout, ETerr);
         RefreshSelected(Sender);
         ShowMetadata;
       end;
@@ -1131,8 +1122,7 @@ begin
       ETcmd := ETcmd + '-JpgFromRaw' + CRLF + '-ext' + CRLF + 'NEF' + CRLF + '-ext' + CRLF + 'NRW';
     if Sender = MJPGfromRW2 then
       ETcmd := ETcmd + '-JpgFromRaw' + CRLF + '-ext' + CRLF + 'RW2' + CRLF + '-ext' + CRLF + 'PEF';
-    if (ET_OpenExec(ETcmd, GetSelectedFiles, ETout, ETerr)) then
-      UpdateLogWin(ETout, ETerr);
+    ET_OpenExec(ETcmd, GetSelectedFiles, ETout, ETerr);
     RefreshSelected(Sender);
   end;
 end;
@@ -1214,10 +1204,14 @@ begin
       LabelCounter.Visible := false;
       StatusBar.Panels[1].Text := IntToStr(c) + ' of ' + IntToStr(j) + ' files updated.';
       if length(errs) > 0 then
+      with FLogWin do
       begin
-        errs := errs + '<-END-';
-        FLogWin.MemoLog.Text := errs;
-        FLogWin.Show;
+        // Clear all other data
+        LBExecs.Clear;
+        MemoOuts.Clear;
+        MemoCmds.Clear;
+        MemoErrs.Text := errs;
+        Show;
       end;
     end;
   end;
@@ -1665,20 +1659,43 @@ begin
   SpeedBtnQuickSave.Enabled := (X > 0);
 end;
 
-procedure TFMain.UpdateLogWin(ETouts, ETerrs: string);
+procedure TFMain.ExecETEvent_Done(ExecNum: integer; EtCmds, EtOuts, EtErrs: string);
 var
-  i: smallint;
+  Indx: smallint;
+  ErrStatus: string;
 begin
   with FLogWin do
   begin
-    MemoLog.Lines.Text := ETouts;
-    i := MemoLog.Lines.Count;
-    if i > 0 then
-      StatusBar.Panels[1].Text := MemoLog.Lines[i - 1];
-    MemoLog.Lines.Append(ETerrs);
-    if ETerrs <> '' then
-      Show;
-    MemoLog.Lines.Append('<-END-');
+    ErrStatus := '-';
+    if (ETerrs <> ErrStatus) then
+    begin
+      if (ETerrs <> '') then
+      begin
+        ErrStatus := 'Not OK';
+        Show;
+      end
+      else
+        ErrStatus := 'OK';
+    end;
+
+    if (Showing) then
+    begin
+      Indx := ExecNum -$31;
+      FExecs[Indx] := Format('Execute: %s %s Update/ET Direct status: %s', [Char(ExecNum), TimeToStr(now), ErrStatus]);
+      FCmds[Indx] := EtCmds;
+      FEtOuts[Indx] := EtOuts;
+      FEtErrs[Indx] := EtErrs;
+
+      LBExecs.Items.Assign(Fexecs);
+      LBExecs.ItemIndex := Indx;
+      MemoCmds.Text := EtCmds;
+      MemoOuts.Text := EtOuts;
+      MemoErrs.Text := EtErrs;
+    end;
+
+    EtOutStrings.Text := EtOuts;
+    if (EtOutStrings.Count > 0) then
+      StatusBar.Panels[1].Text := EtOutStrings[EtOutStrings.Count -1];
   end;
 end;
 
@@ -1733,9 +1750,14 @@ begin
   end;
 end;
 
+procedure TFMain.CmbETDirectModeChange(Sender: TObject);
+begin
+  GUIsettings.ETdirMode := CmbETDirectMode.ItemIndex;
+end;
+
 procedure TFMain.EditETdirectKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
 var
-  IsRecursive: boolean;
+  IsRecursive, ETResult: boolean;
   i: smallint;
   ETtx, ETout, ETerr: string;
   ETprm: string;
@@ -1763,18 +1785,20 @@ begin
       end;
       ETCounter := GetNrOfFiles(ShellTree.Path, ETtx, true);
     end;
-    if ExecET(ETprm, GetSelectedFiles, ShellTree.Path, ETout, ETerr) then
-    begin
-      UpdateLogWin(ETout, ETerr);
-      // do 1st: to get result (ETout/ETerr) of operation
-      RefreshSelected(Sender);
-      ShowMetadata;
-    end
-    else
+    // Call ETDirect or ET_OpenExec depending on -L parm
+    case CmbETDirectMode.ItemIndex of
+      0: ETResult := ExecET(ETprm, GetSelectedFiles, ShellTree.Path, ETout, ETerr, false);
+      1: ETResult := ExecET(ETprm, GetSelectedFiles, ShellTree.Path, ETout, ETerr, true);
+      2: ETResult := ET_OpenExec(ArgsFromDirectCmd(ETprm), GetSelectedFiles, ETout, ETerr);
+      else
+        ETResult := false; // Make compiler happy
+    end;
+
+    if not ETResult then
       ShowMessage('ExifTool not executed!?');
-    ETprm := '';
-	RefreshSelected(Sender);
-	ShowMetaData;
+
+    RefreshSelected(Sender);
+    ShowMetadata;
     ShowPreview;
   end;
 end;
@@ -2026,6 +2050,7 @@ begin
   ShellList.ColumnSorted := ShellList.Sorted;
 
   CBoxFileFilter.Text := SHOWALL;
+  ExifTool.ExecETEvent := ExecETEvent_Done;
 end;
 
 // ---------------Drag_Drop procs --------------------
@@ -2873,10 +2898,7 @@ begin
   ETcmd := ETcmd + CRLF + '-GPS:GpsLongitude=' + Lon;
 
   if ET_OpenExec(ETcmd, GetSelectedFiles, ETouts, ETerrs) then
-  begin
-    UpdateLogWin(ETouts, ETerrs);
     ShowMetadata;
-  end;
 end;
 
 procedure TFMain.SpeedBtn_MapHomeClick(Sender: TObject);
