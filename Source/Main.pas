@@ -285,7 +285,7 @@ type
     { Public declarations }
     function GetFirstSelectedFile: string;
     function GetSelectedFiles(FileName: string = ''): string;
-    procedure ExecETEvent_Done(ExecNum: integer; EtCmds, EtOuts, EtErrs: string);
+    procedure ExecETEvent_Done(ExecNum: integer; EtCmds, EtOuts, EtErrs: string; PopupOnError: boolean);
     procedure UpdateStatusBar_FilesShown;
     procedure SetGuiColor;
 
@@ -1661,7 +1661,7 @@ begin
   SpeedBtnQuickSave.Enabled := (X > 0);
 end;
 
-procedure TFMain.ExecETEvent_Done(ExecNum: integer; EtCmds, EtOuts, EtErrs: string);
+procedure TFMain.ExecETEvent_Done(ExecNum: integer; EtCmds, EtOuts, EtErrs: string; PopupOnError: boolean);
 var
   Indx: smallint;
   ErrStatus: string;
@@ -1669,7 +1669,7 @@ begin
   with FLogWin do
   begin
     ErrStatus := '-';
-    if (ETerrs <> ErrStatus) then
+    if (PopupOnError) then
     begin
       if (ETerrs <> '') then
       begin
@@ -2430,7 +2430,7 @@ begin
             ETcmd := '-s3' + CRLF + '-f';
             for Indx := 0 to High(FListColUsr) do
               ETcmd := ETcmd + CRLF + FListColUsr[Indx].Command;
-            ET_OpenExec(ETcmd, GetSelectedFiles(ShellList.FileName(Item.Index)), ETouts, ETerrs);
+            ET_OpenExec(ETcmd, GetSelectedFiles(ShellList.FileName(Item.Index)), ETouts, ETerrs, False);
             if (ETerrs <> '') then
               Details.Text := ETerrs
             else
@@ -2582,7 +2582,7 @@ begin
           Tx := GUI_SEP;
         ETcmd := ETcmd + CRLF + Tx;
       end;
-      ET_OpenExec(ETcmd, Item, ETResult);
+      ET_OpenExec(ETcmd, Item, ETResult, false);
       if (ETResult.Count - 1) < N then
       begin
         MessageDlgEx(Format('Only %d results returned.' + #10 + 'Your workspace has %d commands.', [ETResult.Count, n + 1]), 'Check Workspace',
@@ -2651,7 +2651,7 @@ begin
         ETcmd := StringReplace(ETcmd, ' ', CRLF, [rfReplaceAll]);
       end;
 
-      ET_OpenExec(ETcmd, Item, ETResult);
+      ET_OpenExec(ETcmd, Item, ETResult, false);
 
       E := 0;
       if ETResult.Count = 0 then
