@@ -25,6 +25,7 @@ type
     PCTErrors: TPageControl;
     TabErrors: TTabSheet;
     LBExecs: TListBox;
+    ChkShowAll: TCheckBox;
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure LBExecsClick(Sender: TObject);
@@ -33,6 +34,7 @@ type
   protected
   private
     { Private declarations }
+    LogId: Integer;
   public
     { Public declarations }
     EtOutStrings: TStringList;
@@ -41,6 +43,7 @@ type
     FCmds: TStringList;
     FEtOuts: TStringList;
     FEtErrs: TStringList;
+    function NextLogId: integer;
   end;
 
 var
@@ -51,6 +54,14 @@ implementation
 uses Main, MainDef;
 
 {$R *.dfm}
+
+function TFLogWin.NextLogId: integer;
+begin
+  inc(LogId);
+  if (LogId > 9) then
+    LogId := 0;
+  result := LogId;
+end;
 
 procedure TFLogWin.FormCreate(Sender: TObject);
 begin
@@ -65,6 +76,8 @@ begin
   FEtOuts.Text:=StringOfChar(#10,10);
   FEtErrs := TStringList.Create;
   FEtErrs.Text:=StringOfChar(#10,10);
+  LogId := -1;
+  ChkShowAll.Checked := false;
 end;
 
 procedure TFLogWin.FormDestroy(Sender: TObject);
