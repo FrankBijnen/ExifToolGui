@@ -249,13 +249,13 @@ type
     procedure SpeedBtn_ETdSetDefClick(Sender: TObject);
     procedure SpeedBtn_ETclearClick(Sender: TObject);
     procedure MGUIStyleClick(Sender: TObject);
-    procedure ShellTreeClick(Sender: TObject);
     procedure ShellListColumnClick(Sender: TObject; Column: TListColumn);
     procedure AdvRadioGroup1Click(Sender: TObject);
     procedure Spb_GoBackClick(Sender: TObject);
     procedure EdgeBrowser1WebMessageReceived(Sender: TCustomEdgeBrowser; Args: TWebMessageReceivedEventArgs);
     procedure Spb_ForwardClick(Sender: TObject);
     procedure SpeedBtn_GetLocClick(Sender: TObject);
+    procedure ShellTreeChanging(Sender: TObject; Node: TTreeNode; var AllowChange: Boolean);
   private
     { Private declarations }
     ETBarSeriesFocal: TBarSeries;
@@ -2108,7 +2108,10 @@ begin
   if ValidDir(GUIsettings.InitialDir) then
     ShellTree.Path := GUIsettings.InitialDir;
   if (ShellTree.Selected <> nil) then
+  begin
     ShellTree.Selected.MakeVisible;
+    ShellTreeChange(ShellTree, ShellTree.Selected);
+  end;
 
   // GUI started as "Send to" or "Open with":
   if ParamCount > 0 then
@@ -2471,7 +2474,21 @@ begin
   if not ValidDir(NewPath) then
     exit;
   EnableMenus(ET_StayOpen(NewPath));
-  ShellTreeClick(Sender);
+  // Select 1st item in Shellist rightaway
+  if (ShellList.Items.Count > 0) then
+    ShellList.Items[0].Selected := true;
+  ShellListClick(Sender);
+end;
+
+procedure TFMain.ShellTreeChanging(Sender: TObject; Node: TTreeNode; var AllowChange: Boolean);
+begin
+  RotateImg.Picture.Bitmap := nil;
+  if Assigned(ETBarSeriesFocal) then
+    ETBarSeriesFocal.Clear;
+  if Assigned(ETBarSeriesFnum) then
+    ETBarSeriesFnum.Clear;
+  if Assigned(ETBarSeriesIso) then
+    ETBarSeriesIso.Clear;
 end;
 
 procedure TFMain.RefreshSelected(Sender: TObject);

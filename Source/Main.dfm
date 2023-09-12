@@ -118,7 +118,7 @@ object FMain: TFMain
           RightClickSelect = True
           ShowRoot = False
           TabOrder = 0
-          OnClick = ShellTreeClick
+          OnChanging = ShellTreeChanging
           OnChange = ShellTreeChange
           ExplicitHeight = 325
         end
