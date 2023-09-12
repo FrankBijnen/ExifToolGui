@@ -120,8 +120,7 @@ begin
       ETcmd := ETcmd + 'CreateDate"';
   end;
 
-  if (ET_OpenExec(ETcmd, FMain.GetSelectedFiles, ETout, ETerr)) then
-    FMain.UpdateLogWin(ETout, ETerr);
+  ET_OpenExec(ETcmd, FMain.GetSelectedFiles, ETout, ETerr);
   ModalResult := mrOK;
 end;
 

@@ -131,7 +131,6 @@ begin
   end;
 
   ET_OpenExec(ETcmd, FMain.GetSelectedFiles, ETout, ETerr);
-  FMain.UpdateLogWin(ETout, ETerr);
   ModalResult := mrOK;
 end;
 
