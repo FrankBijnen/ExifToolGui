@@ -1680,9 +1680,10 @@ begin
         ErrStatus := 'OK';
     end;
 
-    if (Showing) then
+    if (Showing) and
+       ((ChkShowAll.Checked) or (ErrStatus <> '-')) then
     begin
-      Indx := ExecNum -$31;
+      Indx := NextLogId;
       FExecs[Indx] := Format('Execute: %s %s Update/ET Direct status: %s', [Char(ExecNum), TimeToStr(now), ErrStatus]);
       FCmds[Indx] := EtCmds;
       FEtOuts[Indx] := EtOuts;
