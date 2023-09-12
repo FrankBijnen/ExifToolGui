@@ -682,6 +682,7 @@ object FMain: TFMain
           ParentShowHint = False
           ShowHint = True
           TabOrder = 3
+          TabStop = False
           Text = 'CmbETDirectMode'
           OnChange = CmbETDirectModeChange
           Items.Strings = (

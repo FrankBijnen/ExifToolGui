@@ -80,6 +80,7 @@ var
   CustomViewTags: string;
   GpsXmpDir: string = '';
   WrkIniDir: string = '';
+  DontSaveIni: boolean;
 
 function GetIniFilePath(AllowPrevVer: boolean): string;
 procedure ReadGUILog;
@@ -499,6 +500,8 @@ var
   I, N: smallint;
   Tx: string;
 begin
+  if (DontSaveIni) then
+    exit;
   // ^- EraseSection used instead
   try
     GUIini := TIniFile.Create(GetIniFilePath(false));
