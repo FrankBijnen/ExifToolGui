@@ -1678,6 +1678,10 @@ begin
       end
       else
         ErrStatus := 'OK';
+
+      EtOutStrings.Text := EtOuts;
+      if (EtOutStrings.Count > 0) then
+        StatusBar.Panels[1].Text := EtOutStrings[EtOutStrings.Count -1];
     end;
 
     if (Showing) and
@@ -1695,10 +1699,6 @@ begin
       MemoOuts.Text := EtOuts;
       MemoErrs.Text := EtErrs;
     end;
-
-    EtOutStrings.Text := EtOuts;
-    if (EtOutStrings.Count > 0) then
-      StatusBar.Panels[1].Text := EtOutStrings[EtOutStrings.Count -1];
   end;
 end;
 
@@ -2941,7 +2941,7 @@ begin
     ETcmd := ETcmd + CRLF + '-Filename';
     ETcmd := ETcmd + CRLF + '-GPS:GpsLatitude' + CRLF + '-GPS:GpsLatitudeRef';
     ETcmd := ETcmd + CRLF + '-GPS:GpsLongitude' + CRLF + '-GPS:GpsLongitudeRef';
-    ET_OpenExec(ETcmd, GetSelectedFiles, ETouts, ETerrs);
+    ET_OpenExec(ETcmd, GetSelectedFiles, ETouts, ETerrs, False);
     ShowImagesOnMap(EdgeBrowser1, ShellTree.Path, ETouts);
   end
   else

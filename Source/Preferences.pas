@@ -197,7 +197,7 @@ begin
   try
     Left := FMain.Left + 8;
     Top := FMain.Top + 56;
-    ET_OpenExec('-lang', '', ETResult);
+    ET_OpenExec('-lang', '', ETResult, false);
     with ComboBox1 do
     begin
       Items.Clear;
