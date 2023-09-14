@@ -695,6 +695,10 @@ object FMain: TFMain
           Top = 50
           Width = 389
           Height = 23
+          Hint = 
+            'Spaces in data require double quotes, double quotes in data requ' +
+            'ires prefixing it with a \. Examples -Make="abde fghi"  -Make="A' +
+            'bcde\"fghi"'
           Anchors = [akLeft, akTop, akRight]
           AutoSelect = False
           EditLabel.Width = 172
@@ -706,6 +710,8 @@ object FMain: TFMain
           Font.Name = 'Courier New'
           Font.Style = []
           ParentFont = False
+          ParentShowHint = False
+          ShowHint = True
           TabOrder = 0
           Text = ''
           OnChange = EditETdirectChange

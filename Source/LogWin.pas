@@ -26,6 +26,7 @@ type
     TabErrors: TTabSheet;
     LBExecs: TListBox;
     ChkShowAll: TCheckBox;
+    ChkCmdLineFormat: TCheckBox;
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure LBExecsClick(Sender: TObject);
@@ -51,7 +52,7 @@ var
 
 implementation
 
-uses Main, MainDef;
+uses Main, MainDef, ExifToolsGUI_Utils;
 
 {$R *.dfm}
 
@@ -68,16 +69,22 @@ begin
   ReadGUILog;
   EtOutStrings := TStringList.Create;
 
+// Note to fill the stringlists with 10 empty lines
   FExecs := TStringList.Create;
-  FExecs.Text:=StringOfChar(#10,10);
+  FExecs.Text := StringOfChar(#10,10);
+
   FCmds := TStringList.Create;
-  Fcmds.Text:=StringOfChar(#10,10);
+  Fcmds.Text := StringOfChar(#10,10);
+
   FEtOuts := TStringList.Create;
-  FEtOuts.Text:=StringOfChar(#10,10);
+  FEtOuts.Text := StringOfChar(#10,10);
+
   FEtErrs := TStringList.Create;
-  FEtErrs.Text:=StringOfChar(#10,10);
+  FEtErrs.Text := StringOfChar(#10,10);
+
   LogId := -1;
   ChkShowAll.Checked := false;
+  ChkCmdLineFormat.Checked := false;
 end;
 
 procedure TFLogWin.FormDestroy(Sender: TObject);
@@ -96,9 +103,16 @@ end;
 
 procedure TFLogWin.LBExecsClick(Sender: TObject);
 begin
-  MemoCmds.Text:=(FCmds[LBExecs.ItemIndex]);
-  MemoOuts.Text:=(FEtOuts[LBExecs.ItemIndex]);
-  MemoErrs.Text:=(FEtErrs[LBExecs.ItemIndex]);
+  if (LBExecs.ItemIndex < 0) then
+    exit;
+
+  if ChkCmdLineFormat.Checked and
+    (Pos(#10, FCmds[LBExecs.ItemIndex]) > 0) then
+    MemoCmds.Text := DirectCmdFromArgs(FCmds[LBExecs.ItemIndex])
+  else
+    MemoCmds.Text := FCmds[LBExecs.ItemIndex];
+  MemoOuts.Text := FEtOuts[LBExecs.ItemIndex];
+  MemoErrs.Text := FEtErrs[LBExecs.ItemIndex];
 end;
 
 procedure TFLogWin.MemoKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);

@@ -10,8 +10,18 @@ uses
   UnitStackTrace,
   {$ENDIF }
   Vcl.Forms,
-  Main in 'Main.pas' {FMain},
+  Vcl.Themes,
+  Vcl.Styles,
   MainDef in 'MainDef.pas',
+  ExifToolsGUI_Utils in 'ExifToolsGUI_Utils.pas',
+  UnitFilesOnClipBoard in 'UnitFilesOnClipBoard.pas',
+  ExiftoolsGui_ShellList in 'ExiftoolsGui_ShellList.pas',
+  ExifToolsGui_ShellTree in 'ExifToolsGui_ShellTree.pas',
+  ExifToolsGUI_MultiContextMenu in 'ExifToolsGUI_MultiContextMenu.pas',
+  ExifToolsGUI_Thumbnails in 'ExifToolsGUI_Thumbnails.pas',
+  ExifInfo in 'ExifInfo.pas',
+  ExifTool in 'ExifTool.pas',
+  Main in 'Main.pas' {FMain},
   LogWin in 'LogWin.pas' {FLogWin},
   Preferences in 'Preferences.pas' {FPreferences},
   EditFFilter in 'EditFFilter.pas' {FEditFFilter},
@@ -26,19 +36,9 @@ uses
   CopyMetaSingle in 'CopyMetaSingle.pas' {FCopyMetaSingle},
   FileDateTime in 'FileDateTime.pas' {FFileDateTime},
   UFrmPlaces in 'UFrmPlaces.pas' {FrmPlaces},
-  ExifToolsGUI_Utils in 'ExifToolsGUI_Utils.pas',
-  UnitFilesOnClipBoard in 'UnitFilesOnClipBoard.pas',
-  ExiftoolsGui_ShellList in 'ExiftoolsGui_ShellList.pas',
-  ExifToolsGUI_Thumbnails in 'ExifToolsGUI_Thumbnails.pas',
-  ExifInfo in 'ExifInfo.pas',
-  ExifTool in 'ExifTool.pas',
-  Vcl.Themes,
-  Vcl.Styles,
   UFrmStyle in 'UFrmStyle.pas' {FrmStyle},
   UFrmAbout in 'UFrmAbout.pas' {FrmAbout},
-  UFrmGenerate in 'UFrmGenerate.pas' {FrmGenerate},
-  ExifToolsGui_ShellTree in 'ExifToolsGui_ShellTree.pas',
-  ExifToolsGUI_MultiContextMenu in 'ExifToolsGUI_MultiContextMenu.pas';
+  UFrmGenerate in 'UFrmGenerate.pas' {FrmGenerate};
 
 {$R *.res}
 
@@ -49,6 +49,7 @@ begin
   Application.Initialize;
   Application.MainFormOnTaskbar := True;
   Application.Title := 'ExifToolGui';
+  Application.HintHidePause := 5000; // For old people like me!
   Application.CreateForm(TFMain, FMain);
   Application.CreateForm(TFLogWin, FLogWin);
   Application.CreateForm(TFPreferences, FPreferences);

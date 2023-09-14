@@ -277,7 +277,7 @@ begin
       until (BytesCount = 0) or (I > 5); // max 2 attempts observed
       ETstream.Position := 0;
       ETerr.LoadFromStream(ETstream);
-      ETErrs := ETerr.Text;
+      ETErrs := UTF8ToString(ETerr.Text);
 
       // ----------------------------------------------
       if ETShowCounter then
@@ -398,9 +398,10 @@ begin
       FinalCmd := StringReplace(FinalCmd, CRLF, ' ', [rfReplaceAll]);
       Call_ET := Guisettings.ETOverrideDir + 'exiftool ' + FinalCmd;
     end;
-    result := CreateProcessA(nil, PansiChar(Call_ET), nil, nil, true,
-                            CREATE_DEFAULT_ERROR_MODE or CREATE_NEW_CONSOLE or NORMAL_PRIORITY_CLASS,
-                            nil, PWorkDir, StartupInfo, ProcessInfo);
+    //Note: Call_ET is an UTF8string, ExifTool needs that. CreateProcessA thinks it's Ansis, but passes it as-is to ExifTool.
+    result := CreateProcessA(nil, PAnsiChar(Call_ET), nil, nil, true,
+                             CREATE_DEFAULT_ERROR_MODE or CREATE_NEW_CONSOLE or NORMAL_PRIORITY_CLASS,
+                             nil, PWorkDir, StartupInfo, ProcessInfo);
 
     CloseHandle(PipeOutWrite);
     CloseHandle(PipeErrWrite);

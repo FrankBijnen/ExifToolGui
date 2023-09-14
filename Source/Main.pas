@@ -284,7 +284,7 @@ type
   public
     { Public declarations }
     function GetFirstSelectedFile: string;
-    function GetSelectedFiles(FileName: string = ''): string;
+    function GetSelectedFiles(FileName: string = ''; QuoteSpaces: boolean = false): string;
     procedure ExecETEvent_Done(ExecNum: integer; EtCmds, EtOuts, EtErrs: string; PopupOnError: boolean);
     procedure UpdateStatusBar_FilesShown;
     procedure SetGuiColor;
@@ -576,19 +576,20 @@ begin
     result := ShellList.FileName(0) + CRLF;
 end;
 
-function TFMain.GetSelectedFiles(FileName: string = ''): string;
+// QuoteSpaces=true is only used in Commandline mode. Not in Argsfile
+function TFMain.GetSelectedFiles(FileName: string = ''; QuoteSpaces: boolean = false): string;
 var
   AnItem: TListItem;
 begin
   result := '';
   if (FileName <> '') then
-    result := FileName  + CRLF
+    result := QuotedFileName(FileName, QuoteSpaces)  + CRLF
   else
   begin
     for AnItem in ShellList.Items do
     begin
       if AnItem.Selected then
-        result := result + ShellList.FileName(AnItem.Index) + CRLF;
+        result := result + QuotedFileName(ShellList.FileName(AnItem.Index), QuoteSpaces) + CRLF;
     end;
   end;
 end;
@@ -1695,9 +1696,7 @@ begin
 
       LBExecs.Items.Assign(Fexecs);
       LBExecs.ItemIndex := Indx;
-      MemoCmds.Text := EtCmds;
-      MemoOuts.Text := EtOuts;
-      MemoErrs.Text := EtErrs;
+      LBExecsClick(LBExecs);
     end;
   end;
 end;
@@ -1788,9 +1787,9 @@ begin
       end;
       ETCounter := GetNrOfFiles(ShellTree.Path, ETtx, true);
     end;
-    // Call ETDirect or ET_OpenExec depending on -L parm
+    // Call ETDirect or ET_OpenExec
     case CmbETDirectMode.ItemIndex of
-      0: ETResult := ExecET(ETprm, GetSelectedFiles, ShellTree.Path, ETout, ETerr, false);
+      0: ETResult := ExecET(ETprm, GetSelectedFiles('', true), ShellTree.Path, ETout, ETerr, false);
       1: ETResult := ExecET(ETprm, GetSelectedFiles, ShellTree.Path, ETout, ETerr, true);
       2: ETResult := ET_OpenExec(ArgsFromDirectCmd(ETprm), GetSelectedFiles, ETout, ETerr);
       else
