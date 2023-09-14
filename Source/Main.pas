@@ -284,7 +284,7 @@ type
   public
     { Public declarations }
     function GetFirstSelectedFile: string;
-    function GetSelectedFiles(FileName: string = ''; QuoteSpaces: boolean = false): string;
+    function GetSelectedFiles(FileName: string = ''): string;
     procedure ExecETEvent_Done(ExecNum: integer; EtCmds, EtOuts, EtErrs: string; PopupOnError: boolean);
     procedure UpdateStatusBar_FilesShown;
     procedure SetGuiColor;
@@ -577,19 +577,19 @@ begin
 end;
 
 // QuoteSpaces=true is only used in Commandline mode. Not in Argsfile
-function TFMain.GetSelectedFiles(FileName: string = ''; QuoteSpaces: boolean = false): string;
+function TFMain.GetSelectedFiles(FileName: string = ''): string;
 var
   AnItem: TListItem;
 begin
   result := '';
   if (FileName <> '') then
-    result := QuotedFileName(FileName, QuoteSpaces)  + CRLF
+    result := FileName + CRLF
   else
   begin
     for AnItem in ShellList.Items do
     begin
       if AnItem.Selected then
-        result := result + QuotedFileName(ShellList.FileName(AnItem.Index), QuoteSpaces) + CRLF;
+        result := result + ShellList.FileName(AnItem.Index) + CRLF;
     end;
   end;
 end;
@@ -1791,7 +1791,7 @@ begin
     // Call ETDirect or ET_OpenExec
     case CmbETDirectMode.ItemIndex of
       0: ETResult := ET_OpenExec(ArgsFromDirectCmd(ETprm), GetSelectedFiles, ETout, ETerr);
-      1: ETResult := ExecET(ETprm, GetSelectedFiles('', true), ShellTree.Path, ETout, ETerr);
+      1: ETResult := ExecET(ETprm, GetSelectedFiles, ShellTree.Path, ETout, ETerr);
       else
         ETResult := false; // Make compiler happy
     end;
