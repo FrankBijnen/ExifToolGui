@@ -26,12 +26,19 @@ type
     TabErrors: TTabSheet;
     LBExecs: TListBox;
     ChkShowAll: TCheckBox;
-    ChkCmdLineFormat: TCheckBox;
+    PnlCommands: TPanel;
+    BtnArgs: TButton;
+    BtnCommand: TButton;
+    BtnPowerShell: TButton;
+    SaveDialogPS: TSaveDialog;
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure LBExecsClick(Sender: TObject);
     procedure FormShow(Sender: TObject);
     procedure MemoKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
+    procedure BtnArgsClick(Sender: TObject);
+    procedure BtnCommandClick(Sender: TObject);
+    procedure BtnPowerShellClick(Sender: TObject);
   protected
   private
     { Private declarations }
@@ -64,6 +71,41 @@ begin
   result := LogId;
 end;
 
+procedure TFLogWin.BtnArgsClick(Sender: TObject);
+begin
+  if (Pos(#10, FCmds[LBExecs.ItemIndex]) = 0) then
+    MemoCmds.Text := ArgsFromDirectCmd(FCmds[LBExecs.ItemIndex])
+  else
+    MemoCmds.Text := FCmds[LBExecs.ItemIndex];
+end;
+
+procedure TFLogWin.BtnCommandClick(Sender: TObject);
+begin
+  if (Pos(#10, FCmds[LBExecs.ItemIndex]) > 0) then
+    MemoCmds.Text := DirectCmdFromArgs(FCmds[LBExecs.ItemIndex])
+  else
+    MemoCmds.Text := FCmds[LBExecs.ItemIndex];;
+end;
+
+procedure TFLogWin.BtnPowerShellClick(Sender: TObject);
+var
+   PSList: TStringList;
+begin
+  SaveDialogPS.InitialDir :=FMain.ShellTree.Path;
+  if not SaveDialogPS.Execute then
+    exit;
+  PSList := TStringList.Create;
+  try
+    PSList.Add('[Console]::OutputEncoding = [System.Text.Encoding]::UTF8');
+    PSList.Add('Set-Location -Path "' + FMain.ShellTree.Path + '"');
+    PSList.Add('exiftool ' + DirectCmdFromArgs(FCmds[LBExecs.ItemIndex]));
+    PSList.Add('pause');
+    WriteArgsFile(PSList.Text, SaveDialogPS.FileName);
+  finally
+    PSList.Free;
+  end;
+end;
+
 procedure TFLogWin.FormCreate(Sender: TObject);
 begin
   ReadGUILog;
@@ -84,7 +126,6 @@ begin
 
   LogId := -1;
   ChkShowAll.Checked := false;
-  ChkCmdLineFormat.Checked := false;
 end;
 
 procedure TFLogWin.FormDestroy(Sender: TObject);
@@ -105,12 +146,7 @@ procedure TFLogWin.LBExecsClick(Sender: TObject);
 begin
   if (LBExecs.ItemIndex < 0) then
     exit;
-
-  if ChkCmdLineFormat.Checked and
-    (Pos(#10, FCmds[LBExecs.ItemIndex]) > 0) then
-    MemoCmds.Text := DirectCmdFromArgs(FCmds[LBExecs.ItemIndex])
-  else
-    MemoCmds.Text := FCmds[LBExecs.ItemIndex];
+  MemoCmds.Text := FCmds[LBExecs.ItemIndex];
   MemoOuts.Text := FEtOuts[LBExecs.ItemIndex];
   MemoErrs.Text := FEtErrs[LBExecs.ItemIndex];
 end;

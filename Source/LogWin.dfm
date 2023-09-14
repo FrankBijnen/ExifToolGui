@@ -91,9 +91,9 @@ object FLogWin: TFLogWin
         Caption = 'Executed commands'
         object MemoCmds: TMemo
           Left = 0
-          Top = 0
+          Top = 28
           Width = 279
-          Height = 182
+          Height = 154
           Align = alClient
           Color = clBtnFace
           Font.Charset = DEFAULT_CHARSET
@@ -106,7 +106,42 @@ object FLogWin: TFLogWin
           ScrollBars = ssVertical
           TabOrder = 0
           OnKeyDown = MemoKeyDown
-          ExplicitHeight = 181
+          ExplicitHeight = 153
+        end
+        object PnlCommands: TPanel
+          Left = 0
+          Top = 0
+          Width = 279
+          Height = 28
+          Align = alTop
+          TabOrder = 1
+          object BtnArgs: TButton
+            Left = -1
+            Top = 1
+            Width = 75
+            Height = 25
+            Caption = 'Args'
+            TabOrder = 0
+            OnClick = BtnArgsClick
+          end
+          object BtnCommand: TButton
+            Left = 85
+            Top = 1
+            Width = 75
+            Height = 25
+            Caption = 'Command'
+            TabOrder = 1
+            OnClick = BtnCommandClick
+          end
+          object BtnPowerShell: TButton
+            Left = 171
+            Top = 1
+            Width = 75
+            Height = 25
+            Caption = 'PowerShell'
+            TabOrder = 2
+            OnClick = BtnPowerShellClick
+          end
         end
       end
     end
@@ -144,17 +179,6 @@ object FLogWin: TFLogWin
           ExplicitHeight = 181
         end
       end
-    end
-    object ChkCmdLineFormat: TCheckBox
-      Left = 120
-      Top = 2
-      Width = 153
-      Height = 17
-      Caption = 'Convert to Commandline'
-      ParentShowHint = False
-      ShowHint = True
-      TabOrder = 2
-      OnClick = LBExecsClick
     end
   end
   object PCTErrors: TPageControl
@@ -202,5 +226,12 @@ object FLogWin: TFLogWin
     ParentShowHint = False
     ShowHint = True
     TabOrder = 3
+  end
+  object SaveDialogPS: TSaveDialog
+    DefaultExt = '*.ps1'
+    Filter = 'Powershell files|*.ps1|All|*.*'
+    Options = [ofOverwritePrompt, ofHideReadOnly, ofEnableSizing]
+    Left = 123
+    Top = 288
   end
 end
