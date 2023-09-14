@@ -27,7 +27,7 @@ function NextField(var AString: string; const ADelimiter: string): string;
 function QuotedFileName(FileName: string; QuoteSpaces: boolean = false): string;
 function ArgsFromDirectCmd(const CmdIn: string): string;
 function DirectCmdFromArgs(const ArgsIn: string): string;
-procedure WriteArgsFile(const ETInp, ArgsFile: string);
+procedure WriteArgsFile(const ETInp, ArgsFile: string; Preamble: boolean = false);
 
 // Image
 function GetThumbCache(AFilePath: string; var hBmp: HBITMAP; Flags: TSIIGBF; AMaxX: longint; AMaxY: longint): HRESULT;
@@ -316,21 +316,24 @@ begin
     raise exception.Create(Format('%s %s', [TempFile, SysErrorMessage(GetLastError)] ));
 end;
 
-procedure WriteArgsFile(const ETInp, ArgsFile: string);
+procedure WriteArgsFile(const ETInp, ArgsFile: string; Preamble: boolean = false);
 var Handle: THandle;
     S, W: DWORD;
     Bytes: TBytes;
 begin
   Handle := CreateTempHandle(ArgsFile);
   try
-    // Write BOM
-    Bytes := UTF8Encoding.GetPreamble;
-    S := Length(Bytes);
-    if (S > 0) then
+    if (Preamble) then // Turns out not needed for Exiftool, and works better for ps1
     begin
-      WriteFile(Handle, Bytes[0], S, W, nil);
-      if (W <> S) then
-        raise Exception.Create(Format('Write to %s failed', [Argsfile]));
+      // Write BOM
+      Bytes := UTF8Encoding.GetPreamble;
+      S := Length(Bytes);
+      if (S > 0) then
+      begin
+        WriteFile(Handle, Bytes[0], S, W, nil);
+        if (W <> S) then
+          raise Exception.Create(Format('Write to %s failed', [Argsfile]));
+      end;
     end;
 
     //Write UTF8

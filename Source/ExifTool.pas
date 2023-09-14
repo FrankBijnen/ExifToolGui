@@ -46,7 +46,7 @@ function ET_OpenExec(ETcmd: string; FNames: string; ETout: TStringList; PopupOnE
 function ET_OpenExec(ETcmd: string; FNames: string; PopupOnError: boolean = true): boolean; overload;
 procedure ET_OpenExit;
 
-function ExecET(ETcmd, FNames, WorkDir: string; var ETouts, ETErrs: string; CreateArgs: boolean): boolean; overload;
+function ExecET(ETcmd, FNames, WorkDir: string; var ETouts, ETErrs: string): boolean; overload;
 function ExecET(ETcmd, FNames, WorkDir: string; var ETouts: string): boolean; overload;
 
 function ExecCMD(xCmd, WorkDir: string; var ETouts, ETErrs: string): boolean; overload;
@@ -336,20 +336,20 @@ end;
 // ^^^^^^^^^^^^^^^^^^^^^^^^^^^ End of ET_Open mode ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 //
 // =========================== ET classic mode ==================================
-function ExecET(ETcmd, FNames, WorkDir: string; var ETouts, ETErrs: string; CreateArgs: boolean): boolean;
+function ExecET(ETcmd, FNames, WorkDir: string; var ETouts, ETErrs: string): boolean;
 var
   ETstream: TMemoryStream;
   PipeBuffer: array [0 .. szPipeBuffer] of byte;
   ETout, ETerr: TStringList;
   ProcessInfo: TProcessInformation;
   SecurityAttr: TSecurityAttributes;
-  StartupInfo: TStartupInfoA;
+  StartupInfo: TStartupInfo;
   PipeOutRead, PipeOutWrite: THandle;
   PipeErrRead, PipeErrWrite: THandle;
   FinalCmd: string;
   TempFile: string;
-  Call_ET: UTF8String;
-  PWorkDir: PAnsiChar;
+  Call_ET: string;
+  PWorkDir: PChar;
   BytesCount: Dword;
   BuffContent: ^word;
   CanUseUtf8: boolean;
@@ -379,29 +379,21 @@ begin
     if WorkDir = '' then
       PWorkDir := nil
     else
-      PWorkDir := PAnsiChar(AnsiString(WorkDir));
+      PWorkDir := PChar(WorkDir);
 
     UpdateExecNum;
     ETShowCounter := (ETCounterLabel <> nil) and (ETCounter > 1);
     ETCounterLabel.Visible := ETShowCounter;
     CanUseUtf8 := (pos('-L ', ETcmd) = 0);
-    if CreateArgs then
-    begin
-      FinalCmd := ET_Options.GetOptions(CanUseUtf8) + ArgsFromDirectCmd(ETcmd) + CRLF + FNames;
-      TempFile := GetExifToolTmp;
-      WriteArgsFile(FinalCmd, TempFile);
-      Call_ET := GUIsettings.ETOverrideDir + 'exiftool -@ "' + TempFile + '"';
-    end
-    else
-    begin
-      FinalCmd := ET_Options.GetOptions(CanUseUtf8) + CRLF + ETcmd + CRLF + FNames;
-      FinalCmd := StringReplace(FinalCmd, CRLF, ' ', [rfReplaceAll]);
-      Call_ET := Guisettings.ETOverrideDir + 'exiftool ' + FinalCmd;
-    end;
-    //Note: Call_ET is an UTF8string, ExifTool needs that. CreateProcessA thinks it's Ansis, but passes it as-is to ExifTool.
-    result := CreateProcessA(nil, PAnsiChar(Call_ET), nil, nil, true,
-                             CREATE_DEFAULT_ERROR_MODE or CREATE_NEW_CONSOLE or NORMAL_PRIORITY_CLASS,
-                             nil, PWorkDir, StartupInfo, ProcessInfo);
+
+    FinalCmd := ET_Options.GetOptions(CanUseUtf8) + ArgsFromDirectCmd(ETcmd) + CRLF + FNames;
+    TempFile := GetExifToolTmp;
+    WriteArgsFile(FinalCmd, TempFile);
+    Call_ET := GUIsettings.ETOverrideDir + 'exiftool -@ "' + TempFile + '"';
+
+    result := CreateProcess(nil, PChar(Call_ET), nil, nil, true,
+                            CREATE_DEFAULT_ERROR_MODE or CREATE_NEW_CONSOLE or NORMAL_PRIORITY_CLASS,
+                            nil, PWorkDir, StartupInfo, ProcessInfo);
 
     CloseHandle(PipeOutWrite);
     CloseHandle(PipeErrWrite);
@@ -472,7 +464,7 @@ function ExecET(ETcmd, FNames, WorkDir: string; var ETouts: string): boolean;
 var
   ETErrs: string;
 begin
-  result := ExecET(ETcmd, FNames, WorkDir, ETouts, ETErrs, false);
+  result := ExecET(ETcmd, FNames, WorkDir, ETouts, ETErrs);
 end;
 
 // ^^^^^^^^^^^^^^^^^^^^^^^^^^ End of ET Classic mode ^^^^^^^^^^^^^^^^^^^^^^^^^^^^

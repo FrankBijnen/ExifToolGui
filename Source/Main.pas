@@ -1787,11 +1787,11 @@ begin
       end;
       ETCounter := GetNrOfFiles(ShellTree.Path, ETtx, true);
     end;
+
     // Call ETDirect or ET_OpenExec
     case CmbETDirectMode.ItemIndex of
-      0: ETResult := ExecET(ETprm, GetSelectedFiles('', true), ShellTree.Path, ETout, ETerr, false);
-      1: ETResult := ExecET(ETprm, GetSelectedFiles, ShellTree.Path, ETout, ETerr, true);
-      2: ETResult := ET_OpenExec(ArgsFromDirectCmd(ETprm), GetSelectedFiles, ETout, ETerr);
+      0: ETResult := ET_OpenExec(ArgsFromDirectCmd(ETprm), GetSelectedFiles, ETout, ETerr);
+      1: ETResult := ExecET(ETprm, GetSelectedFiles('', true), ShellTree.Path, ETout, ETerr);
       else
         ETResult := false; // Make compiler happy
     end;
