@@ -24,7 +24,9 @@ function GetNrOfFiles(StartDir, FileMask: string; subDir: boolean): integer;
 
 // String
 function NextField(var AString: string; const ADelimiter: string): string;
-function ArgsFromDirectCmd(const ArgsIn: string): string;
+function QuotedFileName(FileName: string; QuoteSpaces: boolean = false): string;
+function ArgsFromDirectCmd(const CmdIn: string): string;
+function DirectCmdFromArgs(const ArgsIn: string): string;
 procedure WriteArgsFile(const ETInp, ArgsFile: string);
 
 // Image
@@ -245,23 +247,60 @@ begin
   end;
 end;
 
-function ArgsFromDirectCmd(const ArgsIn: string): string;
-var Indx: integer;
-    Escape: boolean;
+function QuotedFileName(FileName: string; QuoteSpaces: boolean = false): string;
 begin
-  Escape := false;
-  result := ArgsIn;
-  for indx := 1 to Length(result) do
+  Result := FileName;
+  if (QuoteSpaces) and
+     (Pos(' ', Result) > 0) then
+    Result := '"' + Result + '"';
+end;
+
+function ArgsFromDirectCmd(const CmdIn: string): string;
+var Indx: integer;
+    DQuote: boolean;
+begin
+  DQuote := false;
+  result := CmdIn;
+  result := StringReplace(result, '\"', #0, [rfReplaceAll]);    // Put a double quote in data: -make="Pentax\"Ricoh\""
+  for Indx := 1 to Length(result) do
   begin
     if (result[Indx] = '"') then
-      Escape:= not Escape;
-    if (Escape) then
+      DQuote := not DQuote;
+
+    if (DQuote) then
       continue;
+
     if (result[Indx] = ' ') then
-      result[Indx] := #10;
+      result[Indx] := #10;                                      // Change a space to a LF, If not present within " "
   end;
-  result := StringReplace(result, '"', '', [rfReplaceAll]);
-  result := StringReplace(result, #10, #13#10, [rfReplaceAll]);
+  result := StringReplace(result, '"', '', [rfReplaceAll]);     // remove Double quotes
+  result := StringReplace(result, #0, '"', [rfReplaceAll]);     // Put the DOuble quotes in, that belong to the data
+  result := StringReplace(result, #10, #13#10, [rfReplaceAll]); // LF => CRLF
+end;
+
+function DirectCmdFromArgs(const ArgsIn: string): string;
+var ArgsInList: TStringList;
+    ALine: string;
+    Sep: string;
+    Indx: integer;
+begin
+  ArgsInList := TStringList.Create;
+  ArgsInList.Text := ArgsIn;
+  try
+    Sep := '';
+    result := '';
+    for Indx := 0 to ArgsInList.Count -1 do
+    begin
+      Aline := StringReplace(ArgsInList[Indx], '"', '\"', [rfReplaceAll]);
+      if (Pos(' ', Aline) > 0) then
+        result := result + Sep + '"' + Aline + '"'
+      else
+        result := result + Sep + Aline;
+      Sep := ' ';
+    end;
+  finally
+    ArgsInList.Free;
+  end;
 end;
 
 function CreateTempHandle(TempFile: string): THandle;

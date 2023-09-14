@@ -1,7 +1,7 @@
 object FLogWin: TFLogWin
   Left = 0
   Top = 0
-  BorderIcons = [biSystemMenu, biMinimize]
+  BorderIcons = [biSystemMenu]
   Caption = 'ExifTool LOG'
   ClientHeight = 544
   ClientWidth = 582
@@ -43,6 +43,7 @@ object FLogWin: TFLogWin
     ActivePage = TabExecs
     Align = alTop
     TabOrder = 0
+    ExplicitWidth = 578
     object TabExecs: TTabSheet
       Caption = 'Logged ExifTool commands'
       object LBExecs: TListBox
@@ -54,7 +55,7 @@ object FLogWin: TFLogWin
         ItemHeight = 13
         TabOrder = 0
         OnClick = LBExecsClick
-        ExplicitHeight = 131
+        ExplicitWidth = 570
       end
     end
   end
@@ -64,11 +65,11 @@ object FLogWin: TFLogWin
     Width = 582
     Height = 212
     Align = alClient
+    Constraints.MinHeight = 200
     Constraints.MinWidth = 200
     TabOrder = 2
-    ExplicitTop = 165
     ExplicitWidth = 578
-    ExplicitHeight = 236
+    ExplicitHeight = 211
     object Splitter3: TSplitter
       Left = 288
       Top = 1
@@ -83,8 +84,9 @@ object FLogWin: TFLogWin
       Height = 210
       ActivePage = TabCommands
       Align = alLeft
+      Constraints.MinWidth = 285
       TabOrder = 1
-      ExplicitHeight = 234
+      ExplicitHeight = 209
       object TabCommands: TTabSheet
         Caption = 'Executed commands'
         object MemoCmds: TMemo
@@ -104,7 +106,7 @@ object FLogWin: TFLogWin
           ScrollBars = ssVertical
           TabOrder = 0
           OnKeyDown = MemoKeyDown
-          ExplicitHeight = 206
+          ExplicitHeight = 181
         end
       end
     end
@@ -115,9 +117,10 @@ object FLogWin: TFLogWin
       Height = 210
       ActivePage = TabOutput
       Align = alClient
+      Constraints.MinWidth = 100
       TabOrder = 0
       ExplicitWidth = 283
-      ExplicitHeight = 234
+      ExplicitHeight = 209
       object TabOutput: TTabSheet
         Caption = 'Output from commands'
         object MemoOuts: TMemo
@@ -138,9 +141,20 @@ object FLogWin: TFLogWin
           TabOrder = 0
           OnKeyDown = MemoKeyDown
           ExplicitWidth = 275
-          ExplicitHeight = 206
+          ExplicitHeight = 181
         end
       end
+    end
+    object ChkCmdLineFormat: TCheckBox
+      Left = 120
+      Top = 2
+      Width = 153
+      Height = 17
+      Caption = 'Convert to Commandline'
+      ParentShowHint = False
+      ShowHint = True
+      TabOrder = 2
+      OnClick = LBExecsClick
     end
   end
   object PCTErrors: TPageControl
@@ -177,7 +191,7 @@ object FLogWin: TFLogWin
     end
   end
   object ChkShowAll: TCheckBox
-    Left = 163
+    Left = 155
     Top = 1
     Width = 131
     Height = 17
