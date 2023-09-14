@@ -24,7 +24,7 @@ function GetNrOfFiles(StartDir, FileMask: string; subDir: boolean): integer;
 
 // String
 function NextField(var AString: string; const ADelimiter: string): string;
-function QuotedFileName(FileName: string; QuoteSpaces: boolean = false): string;
+function QuotedFileName(FileName: string): string;
 function ArgsFromDirectCmd(const CmdIn: string): string;
 function DirectCmdFromArgs(const ArgsIn: string): string;
 procedure WriteArgsFile(const ETInp, ArgsFile: string; Preamble: boolean = false);
@@ -247,11 +247,10 @@ begin
   end;
 end;
 
-function QuotedFileName(FileName: string; QuoteSpaces: boolean = false): string;
+function QuotedFileName(FileName: string): string;
 begin
   Result := FileName;
-  if (QuoteSpaces) and
-     (Pos(' ', Result) > 0) then
+  if (Pos(' ', Result) > 0) then
     Result := '"' + Result + '"';
 end;
 
@@ -292,10 +291,7 @@ begin
     for Indx := 0 to ArgsInList.Count -1 do
     begin
       Aline := StringReplace(ArgsInList[Indx], '"', '\"', [rfReplaceAll]);
-      if (Pos(' ', Aline) > 0) then
-        result := result + Sep + '"' + Aline + '"'
-      else
-        result := result + Sep + Aline;
+      result := result + Sep + QuotedFileName(Aline);
       Sep := ' ';
     end;
   finally
