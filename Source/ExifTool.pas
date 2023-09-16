@@ -158,9 +158,8 @@ end;
 
 function ET_OpenExec(ETcmd: string; FNames: string; var ETouts, ETErrs: string; PopupOnError: boolean = true): boolean;
 var
-  ETstream: TMemoryStream;
+  ETstream: TStringStream;
   PipeBuffer: array [0 .. szPipeBuffer] of byte;
-  ETout, ETerr: TStringList;
   FinalCmd: string;
   TempFile: string;
   Call_ET: AnsiString; // Needs to be AnsiString. Only holds the -@ <argsfilename>
@@ -194,10 +193,7 @@ begin
     end;
     ETEvent.ReSetEvent;
 
-    ETout := TStringList.Create;
-    ETerr := TStringList.Create;
-    ETstream := TMemoryStream.Create;
-
+    ETstream := TStringStream.Create;
     Screen.Cursor := -11; // crHourglass
     try
       ETShowCounter := (ETCounterLabel <> nil) and (ETCounter > 1);
@@ -249,20 +245,7 @@ begin
           break;
       until EndReady;
       ETstream.Position := 0;
-      ETout.LoadFromStream(ETstream);
-
-      // Convert ExifTool output from UTF8 to String
-      ETout.Text := UTF8ToString(ETout.Text);
-      // ========= Cleanup ETout ======================
-      I := 0;
-      while I < ETout.Count do
-      begin
-        if pos('{r', ETout[I]) > 0 then
-          ETout.Delete(I) // delete '{ready..}' lines
-        else
-          inc(I);
-      end;
-      ETouts := ETout.Text;
+      ETouts := UTF8ToString(ETstream.DataString);
 
       // ========= Read StdErr =======================
       ETstream.Clear;
@@ -277,8 +260,7 @@ begin
         inc(I);
       until (BytesCount = 0) or (I > 5); // max 2 attempts observed
       ETstream.Position := 0;
-      ETerr.LoadFromStream(ETstream);
-      ETErrs := UTF8ToString(ETerr.Text);
+      ETErrs := UTF8ToString(ETstream.DataString);
 
       // ----------------------------------------------
       if ETShowCounter then
@@ -291,8 +273,6 @@ begin
 
       result := true;
     finally
-      ETout.Free;
-      ETerr.Free;
       ETstream.Free;
       Screen.Cursor := 0; // crDefault
       ETEvent.SetEvent;
@@ -343,9 +323,8 @@ end;
 // =========================== ET classic mode ==================================
 function ExecET(ETcmd, FNames, WorkDir: string; var ETouts, ETErrs: string): boolean;
 var
-  ETstream: TMemoryStream;
+  ETstream: TStringStream;
   PipeBuffer: array [0 .. szPipeBuffer] of byte;
-  ETout, ETerr: TStringList;
   ProcessInfo: TProcessInformation;
   SecurityAttr: TSecurityAttributes;
   StartupInfo: TStartupInfo;
@@ -360,9 +339,7 @@ var
   CanUseUtf8: boolean;
 begin
   Screen.Cursor := -11; // =crHourGlass
-  ETout := TStringList.Create;
-  ETerr := TStringList.Create;
-  ETstream := TMemoryStream.Create;
+  ETstream := TStringStream.Create;
   try
     FillChar(ProcessInfo, SizeOf(TProcessInformation), #0);
     FillChar(SecurityAttr, SizeOf(TSecurityAttributes), #0);
@@ -428,8 +405,7 @@ begin
       until BytesCount = 0;
 
       ETstream.Position := 0;
-      ETout.LoadFromStream(ETstream);
-      ETouts := UTF8ToString(ETout.Text);
+      ETouts := UTF8ToString(ETstream.DataString);
       CloseHandle(PipeOutRead);
 
       // ========= Read StdErr =======================
@@ -439,8 +415,7 @@ begin
         ETstream.Write(PipeBuffer, BytesCount);
       until (BytesCount = 0);
       ETstream.Position := 0;
-      ETerr.LoadFromStream(ETstream);
-      ETErrs := UTF8ToString(ETerr.Text);
+      ETErrs := UTF8ToString(ETstream.DataString);
       CloseHandle(PipeErrRead);
 
       // ----------------------------------------------
@@ -459,8 +434,6 @@ begin
     ETCounter := 0;
   finally
     ETstream.Free;
-    ETout.Free;
-    ETerr.Free;
     Screen.Cursor := 0; // crDefault
   end;
 end;

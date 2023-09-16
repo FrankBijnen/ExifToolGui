@@ -2680,8 +2680,13 @@ begin
       begin
         while E < ETResult.Count do
         begin
-          ETResult[E] := StringReplace(ETResult[E], ': ', '=', []);
-          inc(E);
+          if pos('{r', ETResult[E]) > 0 then
+            ETResult.Delete(E)
+          else
+          begin
+            ETResult[E] := StringReplace(ETResult[E], ': ', '=', []);
+            inc(E);
+          end;
         end;
       end;
 
