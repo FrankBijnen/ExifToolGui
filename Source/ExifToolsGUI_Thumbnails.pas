@@ -57,8 +57,6 @@ procedure GenerateThumbs(AFilePath: string; Subdirs: boolean; AMax: longint; FOn
 
 // Functions for CleanMgr.exe
 procedure ResetPool(var AThreadPool: TThreadPool; const Threads: integer = -1);
-function GetEnvVarValue(const VarName: string): string;
-function GetComSpec: string;
 function ExistsSageSet(const StateFlagId: TStateFlagId): boolean;
 function RunAsAdmin(const Handle: HWND; const Path, Params: string; Show: integer): boolean;
 
@@ -300,28 +298,6 @@ begin
 
   AThreadPool.SetMinWorkerThreads(MinThreads);
   AThreadPool.SetMaxWorkerThreads(MaxThreads);
-end;
-
-function GetEnvVarValue(const VarName: string): string;
-var
-  BufSize: integer; // buffer size required for value
-begin
-  result := '';
-  // Get required buffer size (inc. terminal #0)
-  BufSize := GetEnvironmentVariable(PChar(VarName), nil, 0);
-  if BufSize > 0 then
-  begin
-    // Read env var value into result string
-    SetLength(result, BufSize - 1);
-    GetEnvironmentVariable(PChar(VarName), PChar(result), BufSize);
-  end;
-end;
-
-function GetComSpec: string;
-begin
-  result := GetEnvVarValue('ComSpec');
-  if (result = '') then
-    result := 'cmd.exe';
 end;
 
 function RunAsAdmin(const Handle: HWND; const Path, Params: string; Show: integer): boolean;

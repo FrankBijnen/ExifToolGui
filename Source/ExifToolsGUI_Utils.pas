@@ -21,6 +21,7 @@ function GetExifToolTmp: string;
 function GetHtmlTmp: string;
 function GetEdgeUserData: string;
 function GetNrOfFiles(StartDir, FileMask: string; subDir: boolean): integer;
+function GetComSpec: string;
 
 // String
 function NextField(var AString: string; const ADelimiter: string): string;
@@ -180,7 +181,6 @@ begin
   ShOp.pFrom := PChar(ADir + #0);
   ShOp.pTo := nil;
   ShOp.fFlags := AFlags;
-
   ShResult := SHFileOperation(ShOp);
   if (ShResult <> 0) and (ShOp.fAnyOperationsAborted = false) then
     raise Exception.Create(Format('Remove directory failed code %u', [ShResult]));
@@ -575,8 +575,8 @@ end;
 finalization
 
 begin
-  RemovePath(TempDirectory);
   UTF8Encoding.Free;
+  RemovePath(TempDirectory);
 end;
 
 end.

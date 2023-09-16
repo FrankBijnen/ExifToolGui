@@ -106,7 +106,7 @@ const
   PrevIniVersion = 'V5';
 
 var
-  GUIini: TIniFile;
+  GUIini: TMemIniFile;
   TmpItems: TStrings;
   lg_StartFolder: string;
 
@@ -176,7 +176,12 @@ var
 
 begin
   TmpItems := TStringList.Create;
-  GUIini := TIniFile.Create(GetIniFilePath(True));
+  try
+    GUIini := TMemIniFile.Create(GetIniFilePath(True), TEncoding.UTF8);
+  except
+    // Ini saved in Ansi?
+    GUIini := TMemIniFile.Create(GetIniFilePath(True));
+  end;
   try
     with GUIini, FMain do
     begin
@@ -481,7 +486,11 @@ end;
 
 procedure ReadGUILog;
 begin
-  GUIini := TIniFile.Create(GetIniFilePath(true));
+  try
+    GUIini := TMemIniFile.Create(GetIniFilePath(True), TEncoding.UTF8);
+  except
+    GUIini := TMemIniFile.Create(GetIniFilePath(True));
+  end;
   try
     with GUIini, FLogWin do
     begin
@@ -504,8 +513,11 @@ begin
     exit;
   // ^- EraseSection used instead
   try
-    GUIini := TIniFile.Create(GetIniFilePath(false));
+    // Recreate the INI file, by deleting first
+    System.SysUtils.DeleteFile(GetIniFilePath(false));
+    GUIini := TMemIniFile.Create(GetIniFilePath(false), TEncoding.UTF8);
     try
+      GUIini.AutoSave := true;
       with GUIini, FMain do
       begin
         EraseSection(Ini_ETGUI);
@@ -658,9 +670,9 @@ begin
     end;
 
   except
-    on e: Exception do
+    on E: Exception do
     begin
-      showmessage('Cannot save GUI settings.' + #10 + e.Message);
+      ShowMessage('Cannot save GUI settings.' + #10 + E.Message);
     end;
   end;
 end;
@@ -674,7 +686,7 @@ begin
   if FileExists(IniFName) then
   begin
     TmpItems := TStringList.Create;
-    GUIini := TIniFile.Create(IniFName);
+    GUIini := TMemIniFile.Create(IniFName, TEncoding.UTF8);
     with GUIini do
     begin
       ReadSectionValues('WorkspaceTags', TmpItems);
@@ -721,30 +733,25 @@ function SaveWorkspaceIni(IniFName: string): boolean;
 var
   N: smallint;
   Tx: string;
-  F: TextFile;
 begin
+  result := True;
   try
-    AssignFile(F, IniFName);
-    Rewrite(F);
-    Close(F);
-    GUIini := TIniFile.Create(IniFName);
-    with GUIini do
-    begin
+    System.SysUtils.DeleteFile(IniFName);
+    GUIini := TMemIniFile.Create(IniFName, TEncoding.UTF8);
+    try
+      GUIini.AutoSave := true;
       for N := 0 to length(QuickTags) - 1 do
-        with QuickTags[N] do
-        begin
-          Tx := Command;
-          if length(Help) > 0 then
-            Tx := Tx + '^' + Help;
-          WriteString('WorkspaceTags', Caption, Tx);
-        end;
-    end;
-    GUIini.Free;
-    result := True;
-  except
-    else
+      begin
+        Tx := QuickTags[N].Command;
+        if length(QuickTags[N].Help) > 0 then
+          Tx := Tx + '^' + QuickTags[N].Help;
+        GUIini.WriteString('WorkspaceTags', QuickTags[N].Caption, Tx);
+      end;
+    finally
       GUIini.Free;
-    result := false;
+    end;
+  except
+    result := False;
   end;
 end;
 

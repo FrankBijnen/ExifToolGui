@@ -71,29 +71,29 @@ object FLogWin: TFLogWin
     ExplicitWidth = 578
     ExplicitHeight = 211
     object Splitter3: TSplitter
-      Left = 288
+      Left = 326
       Top = 1
       Width = 6
       Height = 210
+      ExplicitLeft = 288
       ExplicitHeight = 220
     end
     object PCTCommands: TPageControl
       Left = 1
       Top = 1
-      Width = 287
+      Width = 325
       Height = 210
       ActivePage = TabCommands
       Align = alLeft
       Constraints.MinWidth = 285
       TabOrder = 1
-      ExplicitHeight = 209
       object TabCommands: TTabSheet
         Caption = 'Executed commands'
         object MemoCmds: TMemo
           Left = 0
-          Top = 28
-          Width = 279
-          Height = 154
+          Top = 40
+          Width = 317
+          Height = 142
           Align = alClient
           Color = clBtnFace
           Font.Charset = DEFAULT_CHARSET
@@ -105,55 +105,66 @@ object FLogWin: TFLogWin
           ReadOnly = True
           ScrollBars = ssVertical
           TabOrder = 0
+          WordWrap = False
           OnKeyDown = MemoKeyDown
-          ExplicitHeight = 153
+          ExplicitTop = 28
+          ExplicitWidth = 279
+          ExplicitHeight = 154
         end
         object PnlCommands: TPanel
           Left = 0
           Top = 0
-          Width = 279
-          Height = 28
+          Width = 317
+          Height = 40
           Align = alTop
           TabOrder = 1
-          object BtnArgs: TButton
-            Left = -1
-            Top = 1
-            Width = 75
-            Height = 25
-            Caption = 'Args'
-            TabOrder = 0
-            OnClick = BtnArgsClick
-          end
-          object BtnCommand: TButton
-            Left = 85
-            Top = 1
-            Width = 75
-            Height = 25
-            Caption = 'Command'
-            TabOrder = 1
-            OnClick = BtnCommandClick
-          end
           object BtnPowerShell: TButton
-            Left = 171
-            Top = 1
+            Left = 241
+            Top = 10
             Width = 75
             Height = 25
             Caption = 'PowerShell'
-            TabOrder = 2
+            TabOrder = 0
             OnClick = BtnPowerShellClick
+          end
+          object BtnCmd: TButton
+            Left = 160
+            Top = 10
+            Width = 75
+            Height = 25
+            Caption = 'Cmd prompt'
+            TabOrder = 1
+            OnClick = BtnCmdClick
+          end
+          object RadShowCmds: TRadioGroup
+            Left = 1
+            Top = 1
+            Width = 140
+            Height = 38
+            Align = alLeft
+            Caption = 'Show commands as'
+            Columns = 2
+            Items.Strings = (
+              'Args'
+              'CmdLine')
+            TabOrder = 2
+            OnClick = RadShowCmdsClick
+            ExplicitLeft = 0
+            ExplicitTop = -4
           end
         end
       end
     end
     object PCTOutput: TPageControl
-      Left = 294
+      Left = 332
       Top = 1
-      Width = 287
+      Width = 249
       Height = 210
       ActivePage = TabOutput
       Align = alClient
       Constraints.MinWidth = 100
       TabOrder = 0
+      ExplicitLeft = 294
       ExplicitWidth = 283
       ExplicitHeight = 209
       object TabOutput: TTabSheet
@@ -161,7 +172,7 @@ object FLogWin: TFLogWin
         object MemoOuts: TMemo
           Left = 0
           Top = 0
-          Width = 279
+          Width = 241
           Height = 182
           Align = alClient
           Color = clBtnFace
@@ -230,8 +241,15 @@ object FLogWin: TFLogWin
   object SaveDialogPS: TSaveDialog
     DefaultExt = '*.ps1'
     Filter = 'Powershell files|*.ps1|All|*.*'
-    Options = [ofOverwritePrompt, ofHideReadOnly, ofEnableSizing]
+    Options = [ofOverwritePrompt, ofHideReadOnly, ofNoChangeDir, ofEnableSizing]
     Left = 123
     Top = 288
+  end
+  object SaveDialogCmd: TSaveDialog
+    DefaultExt = '*.cmd'
+    Filter = 'Command Files|*.cmd|All|*.*'
+    Options = [ofOverwritePrompt, ofHideReadOnly, ofNoChangeDir, ofEnableSizing]
+    Left = 225
+    Top = 296
   end
 end

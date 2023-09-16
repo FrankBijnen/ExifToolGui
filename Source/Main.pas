@@ -583,13 +583,13 @@ var
 begin
   result := '';
   if (FileName <> '') then
-    result := FileName + CRLF
+    result := IncludeTrailingBackslash(ShellTree.Path) + FileName + CRLF
   else
   begin
     for AnItem in ShellList.Items do
     begin
       if AnItem.Selected then
-        result := result + ShellList.FileName(AnItem.Index) + CRLF;
+        result := result + ShellList.Folders[AnItem.Index].PathName + CRLF;
     end;
   end;
 end;
@@ -2006,12 +2006,12 @@ begin
         Panels[1].Width := NewWidth - n;
     end;
   end;
-
 end;
 
 procedure TFMain.FormClose(Sender: TObject; var Action: TCloseAction);
 begin
-  EdgeBrowser1.CloseWebView; // Close Edge. Else we can not remove the tempdir.
+  EdgeBrowser1.CloseBrowserProcess; // Close Edge. Else we can not remove the tempdir.
+  EdgeBrowser1.CloseWebView;
   SaveGUIini;
 end;
 
@@ -2598,10 +2598,12 @@ begin
         ETcmd := ETcmd + CRLF + Tx;
       end;
       ET_OpenExec(ETcmd, Item, ETResult, false);
-      if (ETResult.Count - 1) < N then
+      if ((ETResult.Count - 1) < N) then
       begin
-        MessageDlgEx(Format('Only %d results returned.' + #10 + 'Your workspace has %d commands.', [ETResult.Count, n + 1]), 'Check Workspace',
-          TMsgDlgType.mtWarning, [mbOk]);
+        if (ETResult.Count > 0) then
+          MessageDlgEx(Format('Only %d results returned.' + #10 + 'Your workspace has %d commands.', [ETResult.Count, n + 1]),
+                       'Check Workspace',
+                       TMsgDlgType.mtWarning, [mbOk]);
         N := Min(n, ETResult.Count - 1);
       end;
       with MetadataList do

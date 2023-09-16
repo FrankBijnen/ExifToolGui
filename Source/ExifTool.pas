@@ -44,7 +44,7 @@ function ET_StayOpen(WorkDir: string): boolean;
 function ET_OpenExec(ETcmd: string; FNames: string; var ETouts, ETErrs: string; PopupOnError: boolean = true): boolean; overload;
 function ET_OpenExec(ETcmd: string; FNames: string; ETout: TStringList; PopupOnError: boolean = true): boolean; overload;
 function ET_OpenExec(ETcmd: string; FNames: string; PopupOnError: boolean = true): boolean; overload;
-procedure ET_OpenExit;
+procedure ET_OpenExit(WaitForClose: boolean = false);
 
 function ExecET(ETcmd, FNames, WorkDir: string; var ETouts, ETErrs: string): boolean; overload;
 function ExecET(ETcmd, FNames, WorkDir: string; var ETouts: string): boolean; overload;
@@ -107,9 +107,10 @@ var
   PWorkDir: PChar;
   ETcmd: string;
 begin
-  ETcmd := GUIsettings.ETOverrideDir + 'exiftool -stay_open True -@ -';
   if ETrunning then
     ET_OpenExit; // -changing WorkDir OnTheFly requires Exit first
+
+  ETcmd := GUIsettings.ETOverrideDir + 'exiftool -stay_open True -@ -';
   FillChar(ETprocessInfo, SizeOf(TProcessInformation), #0);
   FillChar(SecurityAttr, SizeOf(TSecurityAttributes), #0);
   SecurityAttr.nLength := SizeOf(SecurityAttr);
@@ -314,7 +315,7 @@ begin
   result := ET_OpenExec(ETcmd, FNames, ETouts, ETErrs, PopupOnError);
 end;
 
-procedure ET_OpenExit;
+procedure ET_OpenExit(WaitForClose: boolean = false);
 const
   ExitCmd: AnsiString = '-stay_open' + CRLF + 'False' + CRLF; // Needs to be AnsiString.
 var
@@ -324,6 +325,10 @@ begin
   begin
     WriteFile(PipeInWrite, ExitCmd[1], Length(ExitCmd), BytesCount, nil);
     FlushFileBuffers(PipeInWrite);
+
+    if (WaitForClose) then
+      WaitForSingleObject(ETprocessInfo.hProcess, GUIsettings.ETTimeOut);
+
     CloseHandle(ETprocessInfo.hThread);
     CloseHandle(ETprocessInfo.hProcess);
     CloseHandle(PipeInWrite);
@@ -579,7 +584,7 @@ end;
 finalization
 
 begin
-  ET_OpenExit;
+  ET_OpenExit(true);
   ETEvent.Free;
 end;
 
