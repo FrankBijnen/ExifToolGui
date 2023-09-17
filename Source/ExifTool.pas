@@ -24,6 +24,7 @@ type
   end;
 
 const
+  ReadyPrompt = '{ready';
   CRLF = #13#10;
 
 var

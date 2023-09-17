@@ -1664,7 +1664,7 @@ end;
 
 procedure TFMain.ExecETEvent_Done(ExecNum: integer; EtCmds, EtOuts, EtErrs: string; PopupOnError: boolean);
 var
-  Indx: smallint;
+  Indx: Integer;
   ErrStatus: string;
 begin
   with FLogWin do
@@ -1680,9 +1680,14 @@ begin
       else
         ErrStatus := 'OK';
 
+      // Try to show 'xxx image files read'. Need to skip the {ready
+      StatusBar.Panels[1].Text := '';
       EtOutStrings.Text := EtOuts;
-      if (EtOutStrings.Count > 0) then
-        StatusBar.Panels[1].Text := EtOutStrings[EtOutStrings.Count -1];
+      Indx := EtOutStrings.Count -1;
+      if (Indx > 1) and
+         (Pos(ReadyPrompt, EtOutStrings[Indx]) > 0) then
+        Dec(Indx);
+      StatusBar.Panels[1].Text := EtOutStrings[Indx];
     end;
 
     if (Showing) and
