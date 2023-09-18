@@ -576,7 +576,6 @@ begin
     result := ShellList.FileName(0) + CRLF;
 end;
 
-// QuoteSpaces=true is only used in Commandline mode. Not in Argsfile
 function TFMain.GetSelectedFiles(FileName: string = ''): string;
 var
   AnItem: TListItem;
