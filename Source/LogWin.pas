@@ -96,6 +96,11 @@ begin
       end;
     1:
       begin
+        if not AnsiWarned then
+        begin
+          AnsiWarned := true;
+          ShowMessage('This method only works reliable for ANSI data.');
+        end;
         MemoCmds.WordWrap := true;
         BtnCmd.Enabled := true;
         if not IsArgs then
@@ -130,23 +135,17 @@ begin
       CmdList.Add('del %ARGS%');
     end
     else
-    begin
-      if not AnsiWarned then
-      begin
-        AnsiWarned := true;
-        ShowMessage('This method only works reliable for ANSI filenames');
-      end;
       CmdList.Add('exiftool ' + StringReplace(MemoCmds.Text, '%', '%%', [rfReplaceAll]));
-    end;
 
     CmdList.Add('pause');
     WriteArgsFile(CmdList.Text, SaveDialogCmd.FileName);
   finally
     CmdList.Free;
   end;
+  ACmd := ExtractFileName(SaveDialogCmd.FileName);
 
   ShellExecute(0, nil, PWideChar(GetComSpec),
-                       PWideChar(Format('/K "%s"', [SaveDialogCmd.FileName])),
+                       PWideChar(Format('/K type "%s" && dir "%s"', [ACmd, ACmd])),
                        PWideChar(Format('%s', [Fmain.ShellTree.Path])), SW_SHOWNORMAL);
 end;
 
@@ -161,6 +160,14 @@ begin
     exit;
   PSList := TStringList.Create;
   try
+    PSList.Add('# When you receive a message ".... cannot be loaded because running scripts is disabled on this system", ');
+    PSList.Add('# Copy, paste the next line in a new window:');
+    PSList.Add('# Set-ExecutionPolicy bypass -Scope Process');
+    PSList.Add('# Then uncomment and execute.');
+    PSList.Add('#');
+    PSList.Add('# To permanently disable start ISE as admin and execute:');
+    PSList.Add('# Set-ExecutionPolicy bypass -Scope LocalMachine');
+    PSList.Add('#');
     PSList.Add('try {');
     PSList.Add('  [Console]::OutputEncoding = [System.Text.Encoding]::UTF8');
     PSList.Add('}');
