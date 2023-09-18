@@ -1672,22 +1672,15 @@ begin
     ErrStatus := '-';
     if (PopupOnError) then
     begin
-      if (ETerrs <> '') then
+      if (ETerrs = '') then
+        ErrStatus := 'OK'
+      else
       begin
         ErrStatus := 'Not OK';
-        Show;
-      end
-      else
-        ErrStatus := 'OK';
-
+        Show; // Popup Log window when there's an error.
+      end;
       // Try to show 'xxx image files read'. Need to skip the {ready
-      StatusBar.Panels[1].Text := '';
-      EtOutStrings.Text := EtOuts;
-      Indx := EtOutStrings.Count -1;
-      if (Indx > 1) and
-         (Pos(ReadyPrompt, EtOutStrings[Indx]) > 0) then
-        Dec(Indx);
-      StatusBar.Panels[1].Text := EtOutStrings[Indx];
+      StatusBar.Panels[1].Text := LastLine(Etouts, ReadyPrompt);
     end;
 
     if (Showing) and
@@ -2685,7 +2678,7 @@ begin
       begin
         while E < ETResult.Count do
         begin
-          if pos('{r', ETResult[E]) > 0 then
+          if pos(ReadyPrompt, ETResult[E]) > 0 then
             ETResult.Delete(E)
           else
           begin

@@ -48,8 +48,6 @@ type
     function IsArgs: boolean;
   public
     { Public declarations }
-    EtOutStrings: TStringList;
-
     FExecs: TStringList;
     FCmds: TStringList;
     FEtOuts: TStringList;
@@ -195,7 +193,6 @@ end;
 procedure TFLogWin.FormCreate(Sender: TObject);
 begin
   ReadGUILog;
-  EtOutStrings := TStringList.Create;
 
 // Note to fill the stringlists with 10 empty lines
   FExecs := TStringList.Create;
@@ -221,7 +218,6 @@ begin
   FCmds.Free;
   FEtOuts.Free;
   FEtErrs.Free;
-  EtOutStrings.Free;
 end;
 
 procedure TFLogWin.FormShow(Sender: TObject);
