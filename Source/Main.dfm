@@ -990,6 +990,15 @@ object FMain: TFMain
         Caption = 'Group tags by instance (-g4)'
         OnClick = MShowNumbersClick
       end
+      object N4: TMenuItem
+        Caption = '-'
+      end
+      object MAPIWindowsWideFile: TMenuItem
+        AutoCheck = True
+        Caption = 'API WindowsWideFile (Requires Exiftool V12.66)'
+        Checked = True
+        OnClick = MAPIWindowsWideFileClick
+      end
     end
     object MExportImport: TMenuItem
       Caption = 'Export/Import'

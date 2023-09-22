@@ -313,6 +313,8 @@ begin
         MShowSorted.Checked := ReadBool(Ini_Options, 'ShowSorted', false);
         MShowComposite.Checked := ReadBool(Ini_Options, 'ShowComposite', false);
         MNotDuplicated.Checked := ReadBool(Ini_Options, 'NotDuplicated', false);
+        MAPIWindowsWideFile.Checked := ReadBool(Ini_Options, 'APIWindowsWideFile', true);
+        SetApiWindowsWideFile(MAPIWindowsWideFile.Checked);
       end;
 
       // Custom FList columns
@@ -626,6 +628,7 @@ begin
         WriteBool(Ini_Options, 'ShowSorted', MShowSorted.Checked);
         WriteBool(Ini_Options, 'ShowComposite', MShowComposite.Checked);
         WriteBool(Ini_Options, 'NotDuplicated', MNotDuplicated.Checked);
+        WriteBool(Ini_Options, 'APIWindowsWideFile', MAPIWindowsWideFile.Checked);
 
         EraseSection('FListUserDefColumn');
         I := length(FListColUsr) - 1;

@@ -162,6 +162,8 @@ type
     Spb_Forward: TSpeedButton;
     SpeedBtn_GetLoc: TSpeedButton;
     CmbETDirectMode: TComboBox;
+    N4: TMenuItem;
+    MAPIWindowsWideFile: TMenuItem;
     procedure ShellListClick(Sender: TObject);
     procedure ShellListKeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
     procedure ShellTreeChange(Sender: TObject; Node: TTreeNode);
@@ -258,6 +260,7 @@ type
     procedure SpeedBtn_GetLocClick(Sender: TObject);
     procedure CmbETDirectModeChange(Sender: TObject);
     procedure ShellTreeChanging(Sender: TObject; Node: TTreeNode; var AllowChange: Boolean);
+    procedure MAPIWindowsWideFileClick(Sender: TObject);
   private
     { Private declarations }
     ETBarSeriesFocal: TBarSeries;
@@ -579,16 +582,20 @@ end;
 function TFMain.GetSelectedFiles(FileName: string = ''): string;
 var
   AnItem: TListItem;
+  FullPath: string;
 begin
   result := '';
+  FullPath := '';
+  if (ET_Options.ETAPIWindowsWideFile = '') then
+    FullPath := IncludeTrailingBackslash(ShellTree.Path);
   if (FileName <> '') then
-    result := IncludeTrailingBackslash(ShellTree.Path) + FileName + CRLF
+    result := FullPath + FileName + CRLF
   else
   begin
     for AnItem in ShellList.Items do
     begin
       if AnItem.Selected then
-        result := result + ShellList.Folders[AnItem.Index].PathName + CRLF;
+        result := result + FullPath + ShellList.FileName(AnItem.Index) + CRLF;
     end;
   end;
 end;
@@ -620,6 +627,12 @@ end;
 procedure TFMain.MAboutClick(Sender: TObject);
 begin
   FrmAbout.ShowModal;
+end;
+
+procedure TFMain.MAPIWindowsWideFileClick(Sender: TObject);
+begin
+  with ET_Options do
+    SetApiWindowsWideFile(MAPIWindowsWideFile.Checked);
 end;
 
 procedure TFMain.MDontBackupClick(Sender: TObject);
