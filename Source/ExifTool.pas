@@ -19,7 +19,9 @@ type
     ETShowNumber: string;
     ETCharset: string;
     ETVerbose: string;
+    ETAPIWindowsWideFile: string;
     procedure SetGpsFormat(UseDecimal: boolean);
+    procedure SetApiWindowsWideFile(UseWide: boolean);
     function GetOptions(Charset: boolean = true): string;
   end;
 
@@ -78,6 +80,14 @@ begin
     ETGpsFormat := '-c' + CRLF + '%d' + #$B0 + '%.4f' + CRLF;
 end;
 
+procedure ET_OptionsRec.SetApiWindowsWideFile(UseWide: boolean);
+begin
+  if UseWide then
+    ETAPIWindowsWideFile := '-API' + CRLF + 'WindowsWideFile=1' + CRLF
+  else
+    ETAPIWindowsWideFile := '';
+end;
+
 function ET_OptionsRec.GetOptions(Charset: boolean = true): string;
 begin
   result := '';
@@ -90,6 +100,7 @@ begin
   result := result + ETSeparator;
   result := result + ETMinorError + ETFileDate;
   result := result + ETGpsFormat + ETShowNumber;
+  result := result + ETAPIWindowsWideFile;
   // +further options...
 end;
 
