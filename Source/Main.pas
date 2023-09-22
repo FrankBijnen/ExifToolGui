@@ -2584,28 +2584,25 @@ begin
     Caption := 'ExifToolGUI - ' + Item;
     if SpeedBtnQuick.Down then
     begin
-      N := length(QuickTags) - 1;
+      N := Length(QuickTags) - 1;
       ETcmd := '-s3' + CRLF + '-f';
 
       for E := 0 to N do
       begin
         tx := QuickTags[E].Command;
-        if UpperCase(LeftStr(tx, length(GUI_SEP))) = GUI_SEP then
+        if UpperCase(LeftStr(tx, Length(GUI_SEP))) = GUI_SEP then
           Tx := GUI_SEP;
         ETcmd := ETcmd + CRLF + Tx;
       end;
       ET_OpenExec(ETcmd, Item, ETResult, false);
-      if ((ETResult.Count - 1) < N) then
-      begin
-        if (ETResult.Count > 0) then
-          MessageDlgEx(Format('Only %d results returned.' + #10 + 'Your workspace has %d commands.', [ETResult.Count, n + 1]),
-                       'Check Workspace',
-                       TMsgDlgType.mtWarning, [mbOk]);
-        N := Min(n, ETResult.Count - 1);
-      end;
+      N := Min(N, ETResult.Count - 1);
       with MetadataList do
       begin
         Strings.Clear;
+        if ((ETResult.Count - 1) < Length(QuickTags)) and // {readyxx} doesn't count
+           (ETResult.Count > 0) then
+          Strings.Append(Format('=Warning. Only %d results returned from %d workspace commands.',
+                                [ETResult.Count -1, Length(QuickTags)]));
         for E := 0 to N do
         begin
           Tx := QuickTags[E].Command;
