@@ -1139,6 +1139,7 @@ begin
       ETcmd := ETcmd + '-JpgFromRaw' + CRLF + '-ext' + CRLF + 'RW2' + CRLF + '-ext' + CRLF + 'PEF';
     ET_OpenExec(ETcmd, GetSelectedFiles, ETout, ETerr);
     RefreshSelected(Sender);
+    ShowMetadata;
   end;
 end;
 
@@ -1364,7 +1365,7 @@ begin
   QuickPopUp_UndoEdit.Visible := (pos('*', tx) = 1);
   IsSep := (length(tx) = 0);
 
-  QuickPopUp_AddQuick.Visible := not IsSep and (SpeedBtnExif.Down or SpeedBtnXmp.Down or SpeedBtnIptc.Down);
+  QuickPopUp_AddQuick.Visible := not(SpeedBtnQuick.Down or SpeedBtnCustom.Down or IsSep);
   QuickPopUp_AddCustom.Visible := not(SpeedBtnQuick.Down or SpeedBtnCustom.Down or IsSep);
   QuickPopUp_DelCustom.Visible := SpeedBtnCustom.Down and not(IsSep);
   QuickPopUp_AddDetailsUser.Visible := not IsSep and (SpeedBtnExif.Down or SpeedBtnXmp.Down or SpeedBtnIptc.Down);
@@ -1691,8 +1692,8 @@ begin
         ErrStatus := 'Not OK';
         Show; // Popup Log window when there's an error.
       end;
-      // Try to show 'xxx image files read'. Need to skip the {ready
-      StatusBar.Panels[1].Text := LastLine(Etouts, ReadyPrompt);
+      // Try to show 'xxx image files read'.
+      StatusBar.Panels[1].Text := LastLine(EtOuts);
     end;
 
     if (Showing) and
@@ -2612,10 +2613,10 @@ begin
       with MetadataList do
       begin
         Strings.Clear;
-        if ((ETResult.Count - 1) < Length(QuickTags)) and // {readyxx} doesn't count
+        if (ETResult.Count < Length(QuickTags)) and
            (ETResult.Count > 0) then
           Strings.Append(Format('=Warning. Only %d results returned from %d workspace commands.',
-                                [ETResult.Count -1, Length(QuickTags)]));
+                                [ETResult.Count, Length(QuickTags)]));
         for E := 0 to N do
         begin
           Tx := QuickTags[E].Command;
@@ -2676,7 +2677,6 @@ begin
       end;
 
       ET_OpenExec(ETcmd, Item, ETResult, false);
-
       E := 0;
       if ETResult.Count = 0 then
       begin
@@ -2687,13 +2687,8 @@ begin
       begin
         while E < ETResult.Count do
         begin
-          if pos(ReadyPrompt, ETResult[E]) > 0 then
-            ETResult.Delete(E)
-          else
-          begin
-            ETResult[E] := StringReplace(ETResult[E], ': ', '=', []);
-            inc(E);
-          end;
+          ETResult[E] := StringReplace(ETResult[E], ': ', '=', []);
+          inc(E);
         end;
       end;
 
