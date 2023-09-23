@@ -24,7 +24,7 @@ function GetNrOfFiles(StartDir, FileMask: string; subDir: boolean): integer;
 function GetComSpec: string;
 
 // String
-function LastLine(const AString: string): string;
+function LastLine(const AString: string; LinePos: integer; var LinePosStart: integer): string;
 function NextField(var AString: string; const ADelimiter: string): string;
 function QuotedFileName(FileName: string): string;
 function ArgsFromDirectCmd(const CmdIn: string): string;
@@ -229,38 +229,38 @@ begin
 end;
 
 // String
-function SkipLineEnds(const AString: string): integer;
-begin
-  result := Length(AString);
-  if (result > 0) and
-     (AString[result] = #10) then      // Position before #13#10. If present.
-    dec(result);
-  if (result > 0) and
-     (AString[result] = #13) then
-    dec(result);
-end;
+function LastLine(const AString: string; LinePos: integer; var LinePosStart: integer): string;
+var LinePosEnd: integer;
 
-function PrevLineStart(const AString: string; FromPos: integer): integer;
-begin
-  result := FromPos;
-  while (result > 1) and               // Move backward until a NL
-        (AString[result] <> #10) do
-    dec(result);
+  function SkipLineEnds(const AString: string; FromPos: integer): integer;
+  begin
+    result := FromPos;
+    if (result > 0) and
+       (AString[result] = #10) then      // Position before CRLF. If present.
+      dec(result);
+    if (result > 0) and
+       (AString[result] = #13) then
+      dec(result);
+  end;
 
-  if (AString[result] = #10) then      // Position correctly
-    inc(result);
-end;
+  function PrevLineStart(const AString: string; FromPos: integer): integer;
+  begin
+    result := FromPos;
+    while (result > 1) and               // Move backward until a NL
+          (AString[result] <> #10) do
+      dec(result);
 
-function LastLine(const AString: string): string;
-var PrevLinePos: integer;
-    LinePos: integer;
+    if (AString[result] = #10) then      // Position after NL
+      inc(result);
+  end;
+
 begin
   result := '';
-  PrevLinePos := SkipLineEnds(AString);
-  LinePos := PrevLineStart(AString, PrevLinePos);
+  LinePosEnd := SkipLineEnds(AString, LinePos);
+  LinePosStart := PrevLineStart(AString, LinePosEnd);
 
-  if (PrevLinePos > LinePos) then
-    result := Copy(AString, LinePos, PrevLinePos +1 - LinePos);
+  if (LinePosEnd >= LinePosStart) then
+    result := Copy(AString, LinePosStart, LinePosEnd +1 - LinePosStart);
 end;
 
 function NextField(var AString: string; const ADelimiter: string): string;

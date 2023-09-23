@@ -5,7 +5,7 @@ interface
 uses Classes, StdCtrls;
 
 type
-  TExecETEvent = procedure(ExecNum: integer; EtCmds, EtOuts, EtErrs: string; PopupOnError: boolean) of object;
+  TExecETEvent = procedure(ExecNum: integer; EtCmds, EtOuts, EtErrs, StatusLine: string; PopupOnError: boolean) of object;
 
   ET_OptionsRec = record
     // don't define '-a' (because of Filelist custom columns)
@@ -72,17 +72,19 @@ var
   ETEvent: TEvent;
   ExecNum: byte;
 
-procedure RemoveReadyLine(var AString: string);
-var P1, P2: Integer;
+// Returns the output of ExifTool, but skips last {ready line, if found
+// Statusline is the line immediately preceding the last line. Contains xxxx image files read.
+function AnalyseResult(const AString: string; var StatusLine: string): string;
+var StartPrevLine: integer;
 begin
-  P1 := Pos(ReadyPrompt, Astring);
-  if (P1 = 0) then
-    exit;
-  P2 := P1 + Length(ReadyPrompt);
-  while (P2 < Length(Astring)) and
-        (AString[P2] <> #10) do
-    inc(P2);
-  Delete(Astring, P1, P2 +1 -P1);
+  result := AString;
+  StatusLine := LastLine(AString, Length(result), StartPrevLine);
+  if (StartPrevLine > 1) and
+     (Pos(ReadyPrompt, StatusLine) > 0) then
+  begin
+    SetLength(result, StartPrevLine -1);
+    StatusLine := LastLine(AString, Length(result), StartPrevLine);
+  end;
 end;
 
 procedure ET_OptionsRec.SetGpsFormat(UseDecimal: boolean);
@@ -187,6 +189,8 @@ var
   PipeBuffer: array [0 .. szPipeBuffer] of byte;
   FinalCmd: string;
   TempFile: string;
+  StatusLine: string;
+  ETlogs: string;
   Call_ET: AnsiString; // Needs to be AnsiString. Only holds the -@ <argsfilename>
   BytesCount: Dword;
   I: word;
@@ -270,7 +274,7 @@ begin
           break;
       until EndReady;
       ETstream.Position := 0;
-      ETouts := UTF8ToString(ETstream.DataString);
+      ETlogs := UTF8ToString(ETstream.DataString);
 
       // ========= Read StdErr =======================
       ETstream.Clear;
@@ -292,10 +296,11 @@ begin
         ETCounterLabel.Visible := false;
       ETCounter := 0;
 
+      ETouts := AnalyseResult(ETlogs, StatusLine); // Etouts: returned as result, ETlogs: shown in log window
+
       // Callback for Logging
-      RemoveReadyLine(ETouts);
       if Assigned(ExecETEvent) then
-        ExecETEvent(ExecNum, FinalCmd, ETouts, ETErrs, PopupOnError);
+        ExecETEvent(ExecNum, FinalCmd, ETlogs, ETErrs, StatusLine, PopupOnError);
 
       result := true;
     finally
@@ -358,6 +363,8 @@ var
   PipeErrRead, PipeErrWrite: THandle;
   FinalCmd: string;
   TempFile: string;
+  StatusLine: string;
+  ETlogs: string;
   Call_ET: string;
   PWorkDir: PChar;
   BytesCount: Dword;
@@ -431,7 +438,7 @@ begin
       until BytesCount = 0;
 
       ETstream.Position := 0;
-      ETouts := UTF8ToString(ETstream.DataString);
+      ETLogs := UTF8ToString(ETstream.DataString);
       CloseHandle(PipeOutRead);
 
       // ========= Read StdErr =======================
@@ -445,14 +452,16 @@ begin
       CloseHandle(PipeErrRead);
 
       // ----------------------------------------------
-      WaitForSingleObject(ProcessInfo.hProcess, GUIsettings.ETTimeOut); // msec=5sec /or INFINITE
+      WaitForSingleObject(ProcessInfo.hProcess, GUIsettings.ETTimeOut);
       CloseHandle(ProcessInfo.hThread);
       CloseHandle(ProcessInfo.hProcess);
 
+      ETouts := AnalyseResult(ETlogs, StatusLine); // Etouts: returned as result, ETlogs: shown in log window
+
       // Callback for Logging
       if Assigned(ExecETEvent) then
-        ExecETEvent(ExecNum, FinalCmd, ETouts, ETErrs, true);
-    
+        ExecETEvent(ExecNum, FinalCmd, ETlogs, ETErrs, StatusLine, true);
+
       result := true;
     end;
     if ETShowCounter then
