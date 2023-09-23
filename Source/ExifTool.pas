@@ -5,7 +5,7 @@ interface
 uses Classes, StdCtrls;
 
 type
-  TExecETEvent = procedure (ExecNum: integer; EtCmds, EtOuts, EtErrs: string; PopupOnError: boolean) of object;
+  TExecETEvent = procedure(ExecNum: integer; EtCmds, EtOuts, EtErrs: string; PopupOnError: boolean) of object;
 
   ET_OptionsRec = record
     // don't define '-a' (because of Filelist custom columns)
@@ -26,8 +26,8 @@ type
   end;
 
 const
-  ReadyPrompt = '{ready';
   CRLF = #13#10;
+  ReadyPrompt = '{ready';
 
 var
   ExecETEvent: TExecETEvent;
@@ -71,6 +71,19 @@ var
   ETShowCounter: boolean = false;
   ETEvent: TEvent;
   ExecNum: byte;
+
+procedure RemoveReadyLine(var AString: string);
+var P1, P2: Integer;
+begin
+  P1 := Pos(ReadyPrompt, Astring);
+  if (P1 = 0) then
+    exit;
+  P2 := P1 + Length(ReadyPrompt);
+  while (P2 < Length(Astring)) and
+        (AString[P2] <> #10) do
+    inc(P2);
+  Delete(Astring, P1, P2 +1 -P1);
+end;
 
 procedure ET_OptionsRec.SetGpsFormat(UseDecimal: boolean);
 begin
@@ -280,6 +293,7 @@ begin
       ETCounter := 0;
 
       // Callback for Logging
+      RemoveReadyLine(ETouts);
       if Assigned(ExecETEvent) then
         ExecETEvent(ExecNum, FinalCmd, ETouts, ETErrs, PopupOnError);
 
@@ -438,7 +452,7 @@ begin
       // Callback for Logging
       if Assigned(ExecETEvent) then
         ExecETEvent(ExecNum, FinalCmd, ETouts, ETErrs, true);
-
+    
       result := true;
     end;
     if ETShowCounter then

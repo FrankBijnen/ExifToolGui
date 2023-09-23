@@ -126,7 +126,6 @@ begin
 
     ETcmd := '-s3' + CRLF + '-f' + CRLF + CmdDateOriginal + CRLF + CmdDateCreate + CRLF + CmdDateModify;
     ET_OpenExec(ETcmd, FMain.GetFirstSelectedFile, ETResult);
-    // .SelectedFiles[0]);
 
     LabeledEdit1.Text := ETResult[0];
     LabeledEdit2.Text := ETResult[1];
