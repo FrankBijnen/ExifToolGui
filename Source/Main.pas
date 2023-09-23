@@ -288,7 +288,7 @@ type
     { Public declarations }
     function GetFirstSelectedFile: string;
     function GetSelectedFiles(FileName: string = ''): string;
-    procedure ExecETEvent_Done(ExecNum: integer; EtCmds, EtOuts, EtErrs: string; PopupOnError: boolean);
+    procedure ExecETEvent_Done(ExecNum: integer; EtCmds, EtOuts, EtErrs, StatusLine: string; PopupOnError: boolean);
     procedure UpdateStatusBar_FilesShown;
     procedure SetGuiColor;
 
@@ -1675,7 +1675,7 @@ begin
   SpeedBtnQuickSave.Enabled := (X > 0);
 end;
 
-procedure TFMain.ExecETEvent_Done(ExecNum: integer; EtCmds, EtOuts, EtErrs: string; PopupOnError: boolean);
+procedure TFMain.ExecETEvent_Done(ExecNum: integer; EtCmds, EtOuts, EtErrs, StatusLine: string; PopupOnError: boolean);
 var
   Indx: Integer;
   ErrStatus: string;
@@ -1693,7 +1693,7 @@ begin
         Show; // Popup Log window when there's an error.
       end;
       // Try to show 'xxx image files read'.
-      StatusBar.Panels[1].Text := LastLine(EtOuts);
+      StatusBar.Panels[1].Text := StatusLine;
     end;
 
     if (Showing) and
