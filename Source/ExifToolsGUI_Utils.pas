@@ -256,9 +256,12 @@ var LinePosEnd: integer;
 
 begin
   result := '';
+  LinePosStart := 0;
   LinePosEnd := SkipLineEnds(AString, LinePos);
-  LinePosStart := PrevLineStart(AString, LinePosEnd);
+  if (LinePosEnd < 1) then    // Empty string, only Line Ends
+    exit;
 
+  LinePosStart := PrevLineStart(AString, LinePosEnd);
   if (LinePosEnd >= LinePosStart) then
     result := Copy(AString, LinePosStart, LinePosEnd +1 - LinePosStart);
 end;

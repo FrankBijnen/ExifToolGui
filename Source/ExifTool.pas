@@ -79,8 +79,7 @@ var StartPrevLine: integer;
 begin
   result := AString;
   StatusLine := LastLine(AString, Length(result), StartPrevLine);
-  if (StartPrevLine > 1) and
-     (Pos(ReadyPrompt, StatusLine) > 0) then
+  if (Pos(ReadyPrompt, StatusLine) > 0) then
   begin
     SetLength(result, StartPrevLine -1);
     StatusLine := LastLine(AString, Length(result), StartPrevLine);
