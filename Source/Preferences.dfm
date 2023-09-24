@@ -414,7 +414,7 @@ object FPreferences: TFPreferences
         Top = 16
         Width = 337
         Height = 17
-        Caption = '-Workspace: move focus to next tag/line after value is entered'
+        Caption = '-Workspace: Move focus to next tag/line after value is entered'
         TabOrder = 0
       end
       object EdETOverride: TEdit
@@ -432,6 +432,14 @@ object FPreferences: TFPreferences
         Caption = '...'
         TabOrder = 3
         OnClick = BtnBrowseFolder
+      end
+      object CheckBox5: TCheckBox
+        Left = 16
+        Top = 39
+        Width = 337
+        Height = 17
+        Caption = '-Workspace: Double Click adds/removes tags'
+        TabOrder = 4
       end
     end
   end

@@ -336,6 +336,7 @@ object FMain: TFMain
         TitleCaptions.Strings = (
           'Tag name'
           'Value')
+        OnDblClick = MetadataListDblClick
         OnDrawCell = MetadataListDrawCell
         OnExit = MetadataListExit
         OnKeyDown = MetadataListKeyDown

@@ -261,6 +261,7 @@ type
     procedure CmbETDirectModeChange(Sender: TObject);
     procedure ShellTreeChanging(Sender: TObject; Node: TTreeNode; var AllowChange: Boolean);
     procedure MAPIWindowsWideFileClick(Sender: TObject);
+    procedure MetadataListDblClick(Sender: TObject);
   private
     { Private declarations }
     ETBarSeriesFocal: TBarSeries;
@@ -642,6 +643,25 @@ begin
       ETBackupMode := '-overwrite_original' + CRLF
     else
       ETBackupMode := '';
+end;
+
+procedure TFMain.MetadataListDblClick(Sender: TObject);
+var
+  tx: string;
+  IsSep: boolean;
+begin
+  if (GUIsettings.DblClickUpdTags = false) then
+    exit;
+
+  tx := MetadataList.Keys[MetadataList.Row];
+  IsSep := (length(tx) = 0);
+  if (IsSep) then
+    exit;
+
+  if SpeedBtnQuick.Down then
+    QuickPopUp_DelQuickClick(Sender)
+  else
+    QuickPopUp_AddQuickClick(Sender);
 end;
 
 procedure TFMain.MetadataListDrawCell(Sender: TObject; ACol, ARow: integer; Rect: TRect; State: TGridDrawState);
