@@ -41,6 +41,7 @@ type
     BtnClean: TBitBtn;
     GpxCleanThumbNails: TGroupBox;
     BtnGenThumbs: TBitBtn;
+    CheckBox5: TCheckBox;
     procedure FormShow(Sender: TObject);
     procedure BtnSaveClick(Sender: TObject);
     procedure BtnBrowseFolder(Sender: TObject);
@@ -119,6 +120,7 @@ begin
   GUIsettings.EnableGMap := CheckBox2.Checked;
   GUIsettings.UseExitDetails := CheckBox3.Checked;
   GUIsettings.AutoIncLine := CheckBox4.Checked;
+  GUIsettings.DblClickUpdTags := CheckBox5.Checked;
 end;
 
 procedure TFPreferences.BtnSetupCleanClick(Sender: TObject);
@@ -269,6 +271,7 @@ begin
     CheckBox2.Checked := GUIsettings.EnableGMap;
     CheckBox3.Checked := GUIsettings.UseExitDetails;
     CheckBox4.Checked := GUIsettings.AutoIncLine;
+    CheckBox5.Checked := GUIsettings.DblClickUpdTags;
     AdvPageControl1.ActivePage := AdvTabGeneral;
   finally
     ETResult.Free;

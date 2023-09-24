@@ -21,6 +21,7 @@ type
     ThumbCleanSet: string[4];
     UseExitDetails: boolean;
     AutoIncLine: boolean;
+    DblClickUpdTags: boolean;
     EnableGMap: boolean;
     DefGMapHome: string[23];
     GuiStyle: string;
@@ -291,6 +292,7 @@ begin
           FMain.SpeedBtnDetails.Down := ReadBool(Ini_Settings, 'DetailsDown', True);
         end;
         AutoIncLine := ReadBool(Ini_Settings, 'AutoIncLine', True);
+        DblClickUpdTags := ReadBool(Ini_Settings, 'DblClickUpdTags', False);
         ETdirDefCmd := ReadInteger(Ini_Settings, 'ETdirDefCmd', -1);
         ETdirMode := ReadInteger(Ini_Settings, 'ETdirMode', 0);
         CmbETDirectMode.ItemIndex := GUIsettings.ETdirMode;
@@ -612,6 +614,7 @@ begin
           WriteInteger(Ini_Settings, 'DetailsSel', FMain.CBoxDetails.ItemIndex);
           WriteBool(Ini_Settings, 'DetailsDown', FMain.SpeedBtnDetails.Down);
           WriteBool(Ini_Settings, 'AutoIncLine', AutoIncLine);
+          WriteBool(Ini_Settings, 'DblClickUpdTags', DblClickUpdTags);
           WriteInteger(Ini_Settings, 'ETdirDefCmd', ETdirDefCmd);
           WriteInteger(Ini_Settings, 'ETdirMode', ETdirMode);
         end;
