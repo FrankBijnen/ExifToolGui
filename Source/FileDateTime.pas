@@ -108,12 +108,12 @@ var
   ANitem: TListItem;
 begin
   renamed := 0;
-  SetCurrentDir(FMain.ShellTree.Path);
+  SetCurrentDir(FMain.ShellList.Path);
   for ANitem in FMain.ShellList.Items do
   begin
     if ANitem.Selected then
     begin
-      ETcmd := FMain.ShellList.Folders[ANitem.Index].DisplayName;
+      ETcmd := FMain.ShellList.FileName(ANitem.Index);
       k := pos(' ', ETcmd);
       if k > 0 then
       begin

@@ -78,6 +78,8 @@ type
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
     procedure Invalidate; override;
+
+    function Path: string;
     function FileName(ItemIndex: integer = -1): string;
     function FileExt(ItemIndex: integer = -1): string;
     procedure ColumnClick(Column: TListColumn);
@@ -575,6 +577,11 @@ begin
   Refresh;
   for AnItem in Items do
     AnItem.Update;
+end;
+
+function TShellListView.Path: string;
+begin
+  result := RootFolder.PathName;
 end;
 
 function TShellListView.FileName(ItemIndex: integer = -1): string;
