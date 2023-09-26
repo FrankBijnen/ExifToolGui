@@ -105,10 +105,10 @@ const
   Ini_Options = 'EToptions';
   IniVersion = 'V6';
   PrevIniVersion = 'V5';
+  WorkSpaceTags = 'WorkSpaceTags';
 
 var
   GUIini: TMemIniFile;
-  TmpItems: TStrings;
   lg_StartFolder: string;
 
   // This function returns the name of the INI file.
@@ -148,41 +148,121 @@ begin
   AlignR := AListColUsrRec.AlignR;
 end;
 
-procedure ReadGUIini;
+function SetQuickTag(const AIndex: integer; const ACaption, ACommand: string; const AHelp: string = ''): integer;
+begin
+  result := AIndex +1;
+
+  // Resize Array?
+  if (result > Length(QuickTags)) then
+    SetLength(QuickTags, result);
+
+  QuickTags[AIndex].Caption := ACaption;
+  QuickTags[AIndex].Command := ACommand;
+  QuickTags[AIndex].Help := AHelp;
+
+  // Set NoEdit
+  QuickTags[AIndex].NoEdit := (RightStr(ACaption, 1) = '?');
+  QuickTags[AIndex].NoEdit := QuickTags[result -1].NoEdit or
+                             (UpperCase(LeftStr(ACommand, 4)) = '-GUI');
+
+end;
+
+procedure ReadWorkSpaceTags(GUIini: TMemIniFile);
 var
-  I, N, X: smallint;
-  Tx, DefaultDir: string;
-
-  procedure SetQuickTag(var X: smallint; const Name: string; Cmd: string);
-  begin
-    SetLength(QuickTags, X +1);
-    with QuickTags[X] do
-    begin
-      Caption := Name;
-      N := pos('^', Cmd);
-      if N = 0 then
-      begin
-        Command := Cmd;
-        SetLength(Help, 0);
-      end
-      else
-      begin
-        Command := LeftStr(Cmd, N - 1);
-        Delete(Cmd, 1, N);
-        Help := Cmd;
-      end;
-    end;
-    inc(X);
-  end;
-
+  Indx, WSCnt: integer;
+  Name, Cmd, Help : string;
+  TmpItems: TStringList;
 begin
   TmpItems := TStringList.Create;
+  try
+    GUIini.ReadSectionValues(WorkSpaceTags, TmpItems);
+    WSCnt := TmpItems.Count;
+    SetLength(QuickTags, WSCnt);
+
+    if (WSCnt = 0) and
+       (GUIini.SectionExists(WorkSpaceTags) = false) then
+    begin
+      WSCnt :=  SetQuickTag(WSCnt, 'EXIF', '-GUI-SEP');
+      WSCnt :=  SetQuickTag(WSCnt, 'Make', '-exif:Make');
+      WSCnt :=  SetQuickTag(WSCnt, 'Model', '-exif:Model');
+      WSCnt :=  SetQuickTag(WSCnt, 'LensModel', '-exif:LensModel');
+      WSCnt :=  SetQuickTag(WSCnt, 'ExposureTime', '-exif:ExposureTime', '[1/50] or [0.02]');
+      WSCnt :=  SetQuickTag(WSCnt, 'FNumber', '-exif:FNumber');
+      WSCnt :=  SetQuickTag(WSCnt, 'ISO', '-exif:ISO');
+      WSCnt :=  SetQuickTag(WSCnt, 'FocalLength', '-exif:FocalLength', '[28] -mm not necessary');
+      WSCnt :=  SetQuickTag(WSCnt, 'Flash#', '-exif:Flash', '[ 0 ]=No flash, [ 1 ]=Flash fired');
+      WSCnt :=  SetQuickTag(WSCnt, 'Orientation#', '-exif:Orientation', '[ 1 ]=0°, [ 3 ]=180°, [ 6 ]=+90°, [ 8 ]=-90°');
+      WSCnt :=  SetQuickTag(WSCnt, 'DateTimeOriginal', '-exif:DateTimeOriginal', '[2012:01:14 20:00:00]');
+      WSCnt :=  SetQuickTag(WSCnt, 'CreateDate', '-exif:CreateDate', '[2012:01:14 20:00:00]');
+      WSCnt :=  SetQuickTag(WSCnt, 'Artist*', '-exif:Artist', 'Bogdan Hrastnik');
+      WSCnt :=  SetQuickTag(WSCnt, 'Copyright', '-exif:Copyright', 'Use Alt+0169 to get © character');
+      WSCnt :=  SetQuickTag(WSCnt, 'Software', '-exif:Software');
+      WSCnt :=  SetQuickTag(WSCnt, 'Geotagged?', '-Gps:GPSLatitude');
+
+      WSCnt :=  SetQuickTag(WSCnt, 'About photo', '-GUI-SEP');
+      WSCnt :=  SetQuickTag(WSCnt, 'Type±', '-xmp-dc:Type', '[Landscape] or [Studio+Portrait] ..');
+      WSCnt :=  SetQuickTag(WSCnt, 'Rating', '-xmp-xmp:Rating', 'Integer value [ 0 ] .. [ 5 ]');
+
+      WSCnt :=  SetQuickTag(WSCnt, 'Event', '-xmp-iptcExt:Event', '[Vacations] or [Trip] ..');
+      WSCnt :=  SetQuickTag(WSCnt, 'PersonInImage±', '-xmp:PersonInImage', '[Phil] or [Harry+Sally] or [-Peter] ..');
+      WSCnt :=  SetQuickTag(WSCnt, 'Keywords±', '-xmp-dc:Subject', '[tree] or [flower+rose] or [-fish] or [+bird-fish] ..');
+      WSCnt :=  SetQuickTag(WSCnt, 'Country', '-xmp:LocationShownCountryName');
+      WSCnt :=  SetQuickTag(WSCnt, 'Province', '-xmp:LocationShownProvinceState');
+      WSCnt :=  SetQuickTag(WSCnt, 'City', '-xmp:LocationShownCity');
+                SetQuickTag(WSCnt, 'Location', '-xmp:LocationShownSublocation');
+    end
+    else
+    begin
+      for Indx := 0 to WSCnt - 1 do
+      begin
+        Help :=  TmpItems[Indx];
+        Name := NextField(Help, '=');
+        Cmd := NextField(Help, '^');
+        SetQuickTag(Indx, Name, Cmd, Help);
+      end;
+    end;
+ finally
+    TmpItems.Free;
+  end;
+end;
+
+// Writing the workspace tags this way allows duplicate tag names.
+// Not what's intended by MS, but hey....
+procedure WriteWorkSpaceTags(GUIini: TMemIniFile);
+var
+  Indx: integer;
+  Tx: string;
+  TmpItems: TStringList;
+begin
+  TmpItems := TStringList.Create;
+  try
+    GUIini.GetStrings(TmpItems); // Get strings written so far.
+    TmpItems.Add(Format('[%s]', [WorkSpaceTags]));
+    for Indx := 0 to Length(QuickTags) - 1 do
+    begin
+      Tx := Format('%s=%s^%s', [QuickTags[Indx].Caption, QuickTags[Indx].Command, QuickTags[Indx].Help]);
+      TmpItems.Add(Tx);
+    end;
+    GUIini.SetStrings(TmpItems);
+  finally
+    TmpItems.Free;
+  end;
+end;
+
+procedure ReadGUIini;
+var
+  I, N, X: integer;
+  Tx, DefaultDir: string;
+  TmpItems: TStringList;
+begin
   try
     GUIini := TMemIniFile.Create(GetIniFilePath(True), TEncoding.UTF8);
   except
     // Ini saved in Ansi?
     GUIini := TMemIniFile.Create(GetIniFilePath(True));
   end;
+
+  TmpItems := TStringList.Create;
   try
     with GUIini, FMain do
     begin
@@ -372,6 +452,7 @@ begin
           AlignR := 0;
         end;
       end;
+
       // --- ETdirect commands---
       ETdirectCmd.Clear;
       ReadSection('ETdirectCmd', CBoxETdirect.Items);
@@ -400,80 +481,19 @@ begin
       end
       else
         GUIsettings.ETdirDefCmd := -1;
-      // ---------------------
-      ReadSectionValues('WorkspaceTags', TmpItems);
-      I := TmpItems.Count;
-      if I > 0 then
-      begin
-        SetLength(QuickTags, I);
-        for N := 0 to I - 1 do
-          with QuickTags[N] do
-          begin
-            Tx := TmpItems[N];
-            X := pos('=', Tx);
-            Caption := LeftStr(Tx, X - 1);
-            Delete(Tx, 1, X);
-            X := pos('^', Tx);
-            if X = 0 then
-            begin
-              Command := Tx;
-              SetLength(Help, 0);
-            end
-            else
-            begin
-              Command := LeftStr(Tx, X - 1);
-              Delete(Tx, 1, X);
-              Help := Tx;
-            end;
-          end;
-      end
-      else
-      begin
-        I := 0;
-        SetQuickTag(I, 'EXIF', '-GUI-SEP');
-        SetQuickTag(I, 'Make', '-exif:Make');
-        SetQuickTag(I, 'Model', '-exif:Model');
-        SetQuickTag(I, 'LensModel', '-exif:LensModel');
-        SetQuickTag(I, 'ExposureTime', '-exif:ExposureTime^[1/50] or [0.02]');
-        SetQuickTag(I, 'FNumber', '-exif:FNumber');
-        SetQuickTag(I, 'ISO', '-exif:ISO');
-        SetQuickTag(I, 'FocalLength', '-exif:FocalLength^[28] -mm not necessary');
-        SetQuickTag(I, 'Flash#', '-exif:Flash^[ 0 ]=No flash, [ 1 ]=Flash fired');
-        SetQuickTag(I, 'Orientation#', '-exif:Orientation^[ 1 ]=0°, [ 3 ]=180°, [ 6 ]=+90°, [ 8 ]=-90°');
-        SetQuickTag(I, 'DateTimeOriginal', '-exif:DateTimeOriginal^[2012:01:14 20:00:00]');
-        SetQuickTag(I, 'CreateDate', '-exif:CreateDate^[2012:01:14 20:00:00]');
-        SetQuickTag(I, 'Artist*', '-exif:Artist^Bogdan Hrastnik');
-        SetQuickTag(I, 'Copyright', '-exif:Copyright^Use Alt+0169 to get © character');
-        SetQuickTag(I, 'Software', '-exif:Software');
-        SetQuickTag(I, 'Geotagged?', '-Gps:GPSLatitude');
 
-        SetQuickTag(I, 'About photo', '-GUI-SEP');
-        SetQuickTag(I, 'Type±', '-xmp-dc:Type^[Landscape] or [Studio+Portrait] ..');
-        SetQuickTag(I, 'Rating', '-xmp-xmp:Rating^Integer value [ 0 ] .. [ 5 ]');
-        // SetQuickTag(I, 'Title','-xmp-dc:Title'); // TBD
-        SetQuickTag(I, 'Event', '-xmp-iptcExt:Event^[Vacations] or [Trip] ..');
-        SetQuickTag(I, 'PersonInImage±', '-xmp:PersonInImage^[Phil] or [Harry+Sally] or [-Peter] ..');
-        SetQuickTag(I, 'Keywords±', '-xmp-dc:Subject^[tree] or [flower+rose] or [-fish] or [+bird-fish] ..');
-        SetQuickTag(I, 'Country', '-xmp:LocationShownCountryName');
-        SetQuickTag(I, 'Province', '-xmp:LocationShownProvinceState');
-        SetQuickTag(I, 'City', '-xmp:LocationShownCity');
-        SetQuickTag(I, 'Location', '-xmp:LocationShownSublocation');
-      end;
-      for I := 0 to Length(QuickTags) - 1 do
-      begin
-        Tx := QuickTags[I].Caption;
-        QuickTags[I].NoEdit := (RightStr(Tx, 1) = '?');
-        Tx := UpperCase(LeftStr(QuickTags[I].Command, 4));
-        QuickTags[I].NoEdit := QuickTags[I].NoEdit or (Tx = '-GUI');
-      end;
-      // --------------------
+      // --- WorkSpace tags---
+      ReadWorkSpaceTags(GUIini);
+
+      // --- Marked tags---
       MarkedTags := ReadString('TagList', 'MarkedTags', 'Artist ');
       N := length(MarkedTags);
       if MarkedTags[N] = '<' then
         MarkedTags[N] := ' '
       else
         MarkedTags := 'Artist ';
-      // --------------------
+
+      // --- CustomView tags---
       CustomViewTags := ReadString('TagList', 'CustomView', '-Exif:Artist ');
       N := length(CustomViewTags);
       if CustomViewTags[N] = '<' then
@@ -510,12 +530,11 @@ end;
 
 procedure SaveGUIini;
 var
-  I, N: smallint;
+  I, N: integer;
   Tx: string;
 begin
   if (DontSaveIni) then
     exit;
-  // ^- EraseSection used instead
   try
     // Recreate the INI file, by deleting first
     System.SysUtils.DeleteFile(GetIniFilePath(false));
@@ -524,7 +543,6 @@ begin
       GUIini.AutoSave := true;
       with GUIini, FMain do
       begin
-        EraseSection(Ini_ETGUI);
         if WindowState <> wsMaximized then
         begin
           WriteBool(Ini_ETGUI, 'StartMax', false);
@@ -579,7 +597,6 @@ begin
         WriteInteger(Ini_ETGUI, 'Def3ColWidth3', FListColDef3[3].Width);
         WriteInteger(Ini_ETGUI, 'Def3ColWidth4', FListColDef3[4].Width);
 
-        EraseSection(Ini_Settings);
         with GUIsettings do
         begin
           WriteString(Ini_Settings, 'Language', Language);
@@ -619,7 +636,6 @@ begin
           WriteInteger(Ini_Settings, 'ETdirMode', ETdirMode);
         end;
 
-        EraseSection(Ini_Options);
         WriteBool(Ini_Options, 'DontBackup', MDontBackup.Checked);
         WriteBool(Ini_Options, 'PreserveDateMod', MPreserveDateMod.Checked);
         Tx := ET_Options.ETSeparator;
@@ -633,7 +649,6 @@ begin
         WriteBool(Ini_Options, 'NotDuplicated', MNotDuplicated.Checked);
         WriteBool(Ini_Options, 'APIWindowsWideFile', MAPIWindowsWideFile.Checked);
 
-        EraseSection('FListUserDefColumn');
         I := length(FListColUsr) - 1;
         for N := 0 to I do
         begin
@@ -641,21 +656,11 @@ begin
           WriteString('FListUserDefColumn', FListColUsr[N].Caption, Tx);
         end;
 
-        EraseSection('ETdirectCmd');
         for N := 0 to ETdirectCmd.Count - 1 do
           WriteString('ETdirectCmd', CBoxETdirect.Items[N], ETdirectCmd[N]);
 
-        EraseSection('WorkspaceTags');
-        for N := 0 to length(QuickTags) - 1 do
-          with QuickTags[N] do
-          begin
-            Tx := Command;
-            if length(Help) > 0 then
-              Tx := Tx + '^' + Help;
-            WriteString('WorkspaceTags', Caption, Tx);
-          end;
+        WriteWorkSpaceTags(GuiIni);
 
-        EraseSection('TagList');
         N := length(MarkedTags);
         if (N > 0) then
           MarkedTags[N] := '<'
@@ -685,79 +690,37 @@ end;
 
 function LoadWorkspaceIni(IniFName: string): boolean;
 var
-  I, N, X: smallint;
-  Tx: string;
+  TmpItems: TStringList;
 begin
   result := false;
-  if FileExists(IniFName) then
-  begin
-    TmpItems := TStringList.Create;
-    GUIini := TMemIniFile.Create(IniFName, TEncoding.UTF8);
-    with GUIini do
-    begin
-      ReadSectionValues('WorkspaceTags', TmpItems);
-      I := TmpItems.Count;
-      if I > 0 then
-      begin
-        SetLength(QuickTags, I);
-        for N := 0 to I - 1 do
-          with QuickTags[N] do
-          begin
-            Tx := TmpItems[N];
-            X := pos('=', Tx);
-            Caption := LeftStr(Tx, X - 1);
-            Delete(Tx, 1, X);
-            X := pos('^', Tx);
-            if X = 0 then
-            begin
-              Command := Tx;
-              SetLength(Help, 0);
-            end
-            else
-            begin
-              Command := LeftStr(Tx, X - 1);
-              Delete(Tx, 1, X);
-              Help := Tx;
-            end;
-          end;
-        for I := 0 to length(QuickTags) - 1 do
-        begin
-          Tx := QuickTags[I].Caption;
-          QuickTags[I].NoEdit := (RightStr(Tx, 1) = '?');
-          Tx := UpperCase(LeftStr(QuickTags[I].Command, 4));
-          QuickTags[I].NoEdit := QuickTags[I].NoEdit or (Tx = '-GUI');
-        end;
-        result := True;
-      end;
-    end;
+  if not FileExists(IniFName) then
+    exit;
+
+  TmpItems := TStringList.Create;
+  GUIini := TMemIniFile.Create(IniFName, TEncoding.UTF8);
+  try
+    ReadWorkSpaceTags(GuiIni);
+    result := true;
+  finally
     GUIini.Free;
     TmpItems.Free;
   end;
 end;
 
 function SaveWorkspaceIni(IniFName: string): boolean;
-var
-  N: smallint;
-  Tx: string;
 begin
-  result := True;
+  result := true;
   try
     System.SysUtils.DeleteFile(IniFName);
     GUIini := TMemIniFile.Create(IniFName, TEncoding.UTF8);
     try
       GUIini.AutoSave := true;
-      for N := 0 to length(QuickTags) - 1 do
-      begin
-        Tx := QuickTags[N].Command;
-        if length(QuickTags[N].Help) > 0 then
-          Tx := Tx + '^' + QuickTags[N].Help;
-        GUIini.WriteString('WorkspaceTags', QuickTags[N].Caption, Tx);
-      end;
+      WriteWorkSpaceTags(GuiIni);
     finally
       GUIini.Free;
     end;
   except
-    result := False;
+    result := false;
   end;
 end;
 
