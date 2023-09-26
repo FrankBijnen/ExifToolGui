@@ -284,7 +284,7 @@ type
     procedure ShellListBeforePopulate(Sender: TObject; var DoDefault: boolean);
     procedure ShellListBeforeEnumColumns(Sender: TObject);
     procedure ShellListAfterEnumColumns(Sender: TObject);
-    procedure ShellListAfterColumnSort(Sender: TObject);
+    procedure ShellListPathChanged(Sender: TObject);
     procedure ShellListOwnerDataFetch(Sender: TObject; Item: TListItem; Request: TItemRequest; AFolder: TShellFolder);
     procedure ShellListColumnResized(Sender: TObject);
   public
@@ -2079,7 +2079,7 @@ begin
   ShellList.OnPopulateBeforeEvent := ShellListBeforePopulate;
   ShellList.OnEnumColumnsBeforeEvent := ShellListBeforeEnumColumns;
   ShellList.OnEnumColumnsAfterEvent := ShellListAfterEnumColumns;
-  ShellList.OnColumnSortAfterEvent := ShellListAfterColumnSort;
+  ShellList.OnPathChanged := ShellListPathChanged;
   ShellList.OnOwnerDataFetchEvent := ShellListOwnerDataFetch;
   ShellList.OnColumnResized := ShellListColumnResized;
   ShellList.OnThumbGenerate := ShellistThumbGenerate;
@@ -2262,15 +2262,19 @@ end;
 
 procedure TFMain.ShellListClick(Sender: TObject);
 var
-  i: integer;
+  I: integer;
 begin
-  i := ShellList.SelCount;
-  MExportImport.Enabled := (i > 0);
-  MModify.Enabled := (i > 0);
-  MVarious.Enabled := (i > 0);
-  SpeedBtnQuickSave.Enabled := false;
-  ShowMetadata;
   ShowPreview;
+  ShowMetadata;
+
+  if (ETWorkDir = '') then
+    exit;
+
+  I := ShellList.SelCount;
+  MExportImport.Enabled := (I > 0);
+  MModify.Enabled := (I > 0);
+  MVarious.Enabled := (I > 0);
+  SpeedBtnQuickSave.Enabled := false;
 end;
 
 procedure TFMain.ShellListColumnClick(Sender: TObject; Column: TListColumn);
@@ -2384,9 +2388,10 @@ begin
   AShellList.Invalidate; // Creates new window handle!
 end;
 
-procedure TFMain.ShellListAfterColumnSort(Sender: TObject);
+procedure TFMain.ShellListPathChanged(Sender: TObject);
 var
   AShellList: TShellListView;
+  ET_Active: boolean;
 begin
   AShellList := TShellListView(Sender);
 
@@ -2395,8 +2400,11 @@ begin
   if not ValidDir(AShellList.Path) then
     exit;
 
-  // Checks for ExifTool running
-  EnableMenus(ET_StayOpen(AShellList.Path));
+  // Start ExifTool in this directory
+  ET_Active := ET_StayOpen(AShellList.Path);
+
+  // Dis/Enable menus
+  EnableMenus(ET_Active);
 
   // Select 1st Item rightaway
   if (AShellList.Items.Count > 0) then
@@ -2405,7 +2413,6 @@ begin
     if (Assigned(AShellList.OnClick)) then
       AShellList.OnClick(Sender);
   end;
-
 end;
 
 procedure TFMain.ShellListOwnerDataFetch(Sender: TObject; Item: TListItem; Request: TItemRequest; AFolder: TShellFolder);
