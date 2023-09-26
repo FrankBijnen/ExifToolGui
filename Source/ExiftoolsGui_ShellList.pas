@@ -52,7 +52,7 @@ type
     FOnPopulateBeforeEvent: TPopulateBeforeEvent;
     FOnEnumColumnsBeforeEvent: TNotifyEvent;
     FOnEnumColumnsAfterEvent: TNotifyEvent;
-    FOnColumnSortAfterEvent: TNotifyEvent;
+    FOnPathChanged: TNotifyEvent;
     FOnOwnerDataFetchEvent: TOwnerDataFetchEvent;
     procedure SetColumnSorted(AValue: boolean);
     procedure InitThumbNails;
@@ -102,7 +102,7 @@ type
     property OnPopulateBeforeEvent: TPopulateBeforeEvent read FOnPopulateBeforeEvent write FOnPopulateBeforeEvent;
     property OnEnumColumnsBeforeEvent: TNotifyEvent read FOnEnumColumnsBeforeEvent write FOnEnumColumnsBeforeEvent;
     property OnEnumColumnsAfterEvent: TNotifyEvent read FOnEnumColumnsAfterEvent write FOnEnumColumnsAfterEvent;
-    property OnColumnSortAfterEvent: TNotifyEvent read FOnColumnSortAfterEvent write FOnColumnSortAfterEvent;
+    property OnPathChanged: TNotifyEvent read FOnPathChanged write FOnPathChanged;
     property OnOwnerDataFetchEvent: TOwnerDataFetchEvent read FOnOwnerDataFetchEvent write FOnOwnerDataFetchEvent;
   end;
 
@@ -232,8 +232,6 @@ begin
           Result := Result * -1;
       end);
   end;
-  if (Assigned(FOnColumnSortAfterEvent)) then
-    FOnColumnSortAfterEvent(Self);
 end;
 
 // Copy files to clipboard
@@ -283,7 +281,6 @@ begin
     GenerateThumbs(RootFolder.PathName, true, ThumbNailSize, ShellListOnGenerateReady);
     Handled := true;
   end;
-  {}
 end;
 
 procedure TShellListView.ShowMultiContextMenu(MousePos: TPoint);
@@ -323,6 +320,10 @@ begin
     FOnEnumColumnsAfterEvent(Self);
 
   ColumnSort;
+
+  if (ViewStyle = vsReport) and // EnumColumns only called for ViewStyle=vsReport
+     (Assigned(FOnPathChanged)) then
+    FOnPathChanged(Self);
 end;
 
 procedure TShellListView.CMThumbStart(var Message: TMessage);
@@ -438,6 +439,10 @@ begin
     FOnPopulateBeforeEvent(Self, FDoDefault);
 
   inherited;
+
+  if (ViewStyle <> vsReport) and
+     (Assigned(FOnPathChanged)) then
+    FOnPathChanged(Self);
 
   // Optimize memory allocation
   AllocBy := Items.Count;
