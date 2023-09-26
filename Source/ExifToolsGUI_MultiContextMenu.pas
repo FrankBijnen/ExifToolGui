@@ -1,6 +1,6 @@
 unit ExifToolsGUI_MultiContextMenu;
 
-// Interface to allow custom coommands in contextmenu of ShellTree and ShellList
+// Interface to allow custom commands in contextmenu of ShellTree and ShellList
 // ExifToolsGui_ShellTree
 // ExiftoolsGui_ShellList
 interface
@@ -143,6 +143,5 @@ begin
     DestroyMenu(Menu);
   end;
 end;
-
 
 end.
