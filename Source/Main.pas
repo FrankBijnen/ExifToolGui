@@ -469,8 +469,6 @@ end;
 procedure TFMain.BtnFListRefreshClick(Sender: TObject);
 begin
   ShellList.Refresh; // -use this (to be sure)
-  ShowMetadata;
-  ShowPreview;
   ShellList.SetFocus;
 end;
 
@@ -1513,14 +1511,7 @@ begin
     n := Items.Count - 1;
   end;
   if i = n then
-    with ShellList do
-    begin
-      OnClick := nil;
-      Refresh;
-      // SetFocus;
-      OnClick := ShellListClick;
-      ShowMetadata;
-    end;
+    ShellList.Refresh;
 end;
 
 procedure TFMain.QuickPopUp_AddQuickClick(Sender: TObject);

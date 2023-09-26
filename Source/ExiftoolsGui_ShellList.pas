@@ -583,7 +583,7 @@ procedure TShellListView.ShellListOnGenerateReady(Sender: TObject);
 var
   AnItem: TListItem;
 begin
-  Refresh;
+  GetThumbNails;
   for AnItem in Items do
     AnItem.Update;
 end;
