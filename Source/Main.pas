@@ -284,6 +284,7 @@ type
     procedure ShellListBeforePopulate(Sender: TObject; var DoDefault: boolean);
     procedure ShellListBeforeEnumColumns(Sender: TObject);
     procedure ShellListAfterEnumColumns(Sender: TObject);
+    procedure ShellListAfterColumnSort(Sender: TObject);
     procedure ShellListOwnerDataFetch(Sender: TObject; Item: TListItem; Request: TItemRequest; AFolder: TShellFolder);
     procedure ShellListColumnResized(Sender: TObject);
   public
@@ -2078,6 +2079,7 @@ begin
   ShellList.OnPopulateBeforeEvent := ShellListBeforePopulate;
   ShellList.OnEnumColumnsBeforeEvent := ShellListBeforeEnumColumns;
   ShellList.OnEnumColumnsAfterEvent := ShellListAfterEnumColumns;
+  ShellList.OnColumnSortAfterEvent := ShellListAfterColumnSort;
   ShellList.OnOwnerDataFetchEvent := ShellListOwnerDataFetch;
   ShellList.OnColumnResized := ShellListColumnResized;
   ShellList.OnThumbGenerate := ShellistThumbGenerate;
@@ -2376,24 +2378,34 @@ begin
     4:
       AddColumns(FListColUsr);
   end;
+
+  AShellList := TShellListView(Sender);
+  SendMessage(AShellList.Handle, WM_SETREDRAW, 1, 0);
+  AShellList.Invalidate; // Creates new window handle!
+end;
+
+procedure TFMain.ShellListAfterColumnSort(Sender: TObject);
+var
+  AShellList: TShellListView;
+begin
   AShellList := TShellListView(Sender);
 
-  SendMessage(AShellList.Handle, WM_SETREDRAW, 1, 0);
   if not AShellList.Enabled then // We will get back here
     exit;
   if not ValidDir(AShellList.Path) then
     exit;
-
-  AShellList.Invalidate; // Creates new window handle!
 
   // Checks for ExifTool running
   EnableMenus(ET_StayOpen(AShellList.Path));
 
   // Select 1st Item rightaway
   if (AShellList.Items.Count > 0) then
+  begin
     AShellList.Items[0].Selected := true;
-  if (Assigned(AShellList.OnClick)) then
-    AShellList.OnClick(Sender);
+    if (Assigned(AShellList.OnClick)) then
+      AShellList.OnClick(Sender);
+  end;
+
 end;
 
 procedure TFMain.ShellListOwnerDataFetch(Sender: TObject; Item: TListItem; Request: TItemRequest; AFolder: TShellFolder);
