@@ -52,6 +52,7 @@ type
     FOnPopulateBeforeEvent: TPopulateBeforeEvent;
     FOnEnumColumnsBeforeEvent: TNotifyEvent;
     FOnEnumColumnsAfterEvent: TNotifyEvent;
+    FOnColumnSortAfterEvent: TNotifyEvent;
     FOnOwnerDataFetchEvent: TOwnerDataFetchEvent;
     procedure SetColumnSorted(AValue: boolean);
     procedure InitThumbNails;
@@ -101,6 +102,7 @@ type
     property OnPopulateBeforeEvent: TPopulateBeforeEvent read FOnPopulateBeforeEvent write FOnPopulateBeforeEvent;
     property OnEnumColumnsBeforeEvent: TNotifyEvent read FOnEnumColumnsBeforeEvent write FOnEnumColumnsBeforeEvent;
     property OnEnumColumnsAfterEvent: TNotifyEvent read FOnEnumColumnsAfterEvent write FOnEnumColumnsAfterEvent;
+    property OnColumnSortAfterEvent: TNotifyEvent read FOnColumnSortAfterEvent write FOnColumnSortAfterEvent;
     property OnOwnerDataFetchEvent: TOwnerDataFetchEvent read FOnOwnerDataFetchEvent write FOnOwnerDataFetchEvent;
   end;
 
@@ -230,6 +232,8 @@ begin
           Result := Result * -1;
       end);
   end;
+  if (Assigned(FOnColumnSortAfterEvent)) then
+    FOnColumnSortAfterEvent(Self);
 end;
 
 // Copy files to clipboard
