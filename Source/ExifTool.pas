@@ -43,9 +43,11 @@ var
     ETCharset: '-CHARSET' + CRLF + 'FILENAME=UTF8' + CRLF + '-CHARSET' + CRLF + 'UTF8'; // UTF8 it is. No choice
     ETVerbose: '-v0' );                           // For file counter
 
+function ETWorkDir: string;
+
 function ET_StayOpen(WorkDir: string): boolean;
 function ET_OpenExec(ETcmd: string; FNames: string; var ETouts, ETErrs: string; PopupOnError: boolean = true): boolean; overload;
-function ET_OpenExec(ETcmd: string; FNames: string; ETout: TStringList; PopupOnError: boolean = true): boolean; overload;
+function ET_OpenExec(ETcmd: string; FNames: string; ETout: TStrings; PopupOnError: boolean = true): boolean; overload;
 function ET_OpenExec(ETcmd: string; FNames: string; PopupOnError: boolean = true): boolean; overload;
 procedure ET_OpenExit(WaitForClose: boolean = false);
 
@@ -67,7 +69,7 @@ var
   PipeInRead, PipeInWrite: THandle;
   PipeOutRead, PipeOutWrite: THandle;
   PipeErrRead, PipeErrWrite: THandle;
-  ETrunning: string;
+  FETWorkDir: string;
   ETShowCounter: boolean = false;
   ETEvent: TEvent;
   ExecNum: byte;
@@ -125,6 +127,11 @@ begin
     ExecNum := $31;
 end;
 
+function ETWorkDir: string;
+begin
+  result := FETWorkDir;
+end;
+
 // ============================== ET_Open mode ==================================
 function ET_StayOpen(WorkDir: string): boolean;
 var
@@ -134,7 +141,7 @@ var
   ETcmd: string;
 begin
   result := true;
-  if (ETrunning = WorkDir) then
+  if (FETWorkDir = WorkDir) then
     exit;
   ET_OpenExit; // -changing WorkDir OnTheFly requires Exit first
 
@@ -169,7 +176,7 @@ begin
     CloseHandle(PipeInRead);
     CloseHandle(PipeOutWrite);
     CloseHandle(PipeErrWrite);
-    ETrunning := WorkDir;
+    FETWorkDir := WorkDir;
   end
   else
   begin
@@ -180,7 +187,7 @@ begin
     CloseHandle(PipeErrRead);
     CloseHandle(PipeErrWrite);
   end;
-  result := (ETrunning <> '');
+  result := (FETWorkDir <> '');
 end;
 
 function ET_OpenExec(ETcmd: string; FNames: string; var ETouts, ETErrs: string; PopupOnError: boolean = true): boolean;
@@ -209,7 +216,7 @@ begin
   ThisExecNum := ExecNum;
   CheckNum := ($7D * 256) + ThisExecNum;
 
-  if (ETrunning <> '') and
+  if (FETWorkDir <> '') and
      (Length(ETcmd) > 1) then
   begin
     Wr := ETEvent.WaitFor(GUIsettings.ETTimeOut);
@@ -312,7 +319,7 @@ begin
   end;
 end;
 
-function ET_OpenExec(ETcmd: string; FNames: string; ETout: TStringList; PopupOnError: boolean = true): boolean;
+function ET_OpenExec(ETcmd: string; FNames: string; ETout: TStrings; PopupOnError: boolean = true): boolean;
 var
   ETouts, ETErrs: string;
 begin
@@ -333,7 +340,7 @@ const
 var
   BytesCount: Dword;
 begin
-  if (ETrunning <> '') then
+  if (FETWorkDir <> '') then
   begin
     WriteFile(PipeInWrite, ExitCmd[1], Length(ExitCmd), BytesCount, nil);
     FlushFileBuffers(PipeInWrite);
@@ -346,7 +353,7 @@ begin
     CloseHandle(PipeInWrite);
     CloseHandle(PipeOutRead);
     CloseHandle(PipeErrRead);
-    ETrunning := '';
+    FETWorkDir := '';
   end;
 end;
 
@@ -588,7 +595,7 @@ begin
   ETCounterLabel := nil;
   ETEvent := TEvent.Create(nil, true, true, ExtractFileName(Paramstr(0)));
   ExecNum := $30;
-  ETrunning := '';
+  FETWorkDir := '';
 end;
 
 finalization

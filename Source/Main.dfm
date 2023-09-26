@@ -118,7 +118,6 @@ object FMain: TFMain
           ShowRoot = False
           TabOrder = 0
           OnChanging = ShellTreeChanging
-          OnChange = ShellTreeChange
           ExplicitHeight = 327
         end
       end

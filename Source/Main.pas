@@ -1,7 +1,9 @@
 unit Main;
 {$WARN SYMBOL_PLATFORM OFF}
 // Note all code formatted with Delphi formatter, Right margin 80->150
-
+// Note about the Path.
+// - To change: Set ShellTree.Path
+// - To read:   Get ShellList.Path
 interface
 
 uses
@@ -166,7 +168,6 @@ type
     MAPIWindowsWideFile: TMenuItem;
     procedure ShellListClick(Sender: TObject);
     procedure ShellListKeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
-    procedure ShellTreeChange(Sender: TObject; Node: TTreeNode);
     procedure SpeedBtnExifClick(Sender: TObject);
     procedure CBoxDetailsChange(Sender: TObject);
     procedure ShellListAddItem(Sender: TObject; AFolder: TShellFolder; var CanAdd: boolean);
@@ -562,13 +563,13 @@ begin
     SpeedBtnColumnEdit.Enabled := SpeedBtnDetails.Down and (ItemIndex = Items.Count - 1);
 
   with ShellList do
+  if (Enabled) then
   begin
     Refresh;
-    if (Enabled) then
-      SetFocus;
+    ShowMetadata;
+    ShowPreview;
+    SetFocus;
   end;
-  ShowMetadata;
-  ShowPreview;
 end;
 
 function TFMain.GetFirstSelectedFile: string;
@@ -588,7 +589,7 @@ begin
   result := '';
   FullPath := '';
   if (ET_Options.ETAPIWindowsWideFile = '') then
-    FullPath := IncludeTrailingBackslash(ShellTree.Path);
+    FullPath := IncludeTrailingBackslash(ShellList.Path);
   if (FileName <> '') then
     result := FullPath + FileName + CRLF
   else
@@ -619,7 +620,7 @@ procedure TFMain.MGUIStyleClick(Sender: TObject);
 begin
   with FrmStyle do
   begin
-    CurPath := ShellTree.Path;
+    CurPath := ShellList.Path;
     CurStyle := GUIsettings.GuiStyle;
     Show;
   end;
@@ -923,7 +924,7 @@ begin
     begin
       with OpenPictureDlg do
       begin
-        InitialDir := ShellTree.Path;
+        InitialDir := ShellList.Path;
         Filter := 'Image & Metadata files|*.*';
         Options := [ofFileMustExist];
         Title := 'Select any of source files';
@@ -978,7 +979,7 @@ begin
   begin
     with OpenPictureDlg do
     begin
-      InitialDir := ShellTree.Path;
+      InitialDir := ShellList.Path;
       Filter := 'Image & Metadata files|*.jpg;*.jpeg;*.cr2;*.dng;*.nef;*.tif;*.tiff;*.mie;*.xmp;*.rw2';
       Options := [ofFileMustExist];
       Title := 'Select source file';
@@ -1014,7 +1015,7 @@ begin
     begin
       with OpenPictureDlg do
       begin
-        InitialDir := ShellTree.Path;
+        InitialDir := ShellList.Path;
         Filter := 'Image & Metadata files|*.*';
         Options := [ofFileMustExist];
         Title := 'Select any of source files';
@@ -1051,7 +1052,7 @@ begin
               ETcmd := ETcmd + '--Xmp-exif' + CRLF;
           end;
           ETcmd := ETcmd + '-ext' + CRLF + DstExt;
-          ETCounter := GetNrOfFiles(ShellTree.Path, '*.' + DstExt, (i = mrYes));
+          ETCounter := GetNrOfFiles(ShellList.Path, '*.' + DstExt, (i = mrYes));
           if (ET_OpenExec(ETcmd, '.', ETout, ETerr)) then
           begin
             RefreshSelected(Sender);
@@ -1076,7 +1077,7 @@ begin
     if GpsXmpDir <> '' then
       SrcDir := GpsXmpDir
     else
-      SrcDir := ShellTree.Path;
+      SrcDir := ShellList.Path;
     SrcDir := BrowseFolderDlg('Choose folder containing XMP sidecar files', 1, SrcDir);
     if SrcDir <> '' then
     begin
@@ -1126,7 +1127,7 @@ begin
     if MPreserveDateMod.Checked then
       Img := ' -ft' + Img;
     // ^ sets win DateModified as in Exif:DateTimeOriginal>ModifyDate>CreateDate
-    if ExecCMD('jhead -autorot -q' + Img, ShellTree.Path) then
+    if ExecCMD('jhead -autorot -q' + Img, ShellList.Path) then
       ShowMessage('Autorotate finished.')
     else
       ShowMessage('Missing jhead.exe && jpegtran.exe!');
@@ -1178,7 +1179,7 @@ begin
   j := ShellList.SelCount;
   if (n = mrOK) and (j > 0) then
   begin
-    dirJPG := BrowseFolderDlg('Select folder containing JPG images', 1, ShellTree.Path);
+    dirJPG := BrowseFolderDlg('Select folder containing JPG images', 1, ShellList.Path);
     if dirJPG <> '' then
     begin
       if dirJPG[length(dirJPG)] <> '\' then
@@ -1268,7 +1269,7 @@ procedure TFMain.MPreferencesClick(Sender: TObject);
 begin
   if FPreferences.ShowModal = mrOK then
   begin
-    EnableMenus(ET_StayOpen(ShellTree.Path)); // Recheck Exiftool.exe.
+    EnableMenus(ET_StayOpen(ShellList.Path)); // Recheck Exiftool.exe.
     RefreshSelected(Sender);
     ShowMetadata;
   end;
@@ -1804,7 +1805,7 @@ begin
     ETprm := ETtx;
     if IsRecursive then
     begin // init ETcounter:
-      ETprm := ETprm + ' "' + ExtractFileDir(ShellTree.Path) + '"';
+      ETprm := ETprm + ' "' + ExtractFileDir(ShellList.Path) + '"';
       i := pos('-ext ', ETtx); // ie. '-ext jpg ...'
       if i = 0 then
         ETtx := '*.*'
@@ -1818,13 +1819,13 @@ begin
           ETtx := LeftStr(ETtx, i - 1);
         ETtx := '*.' + ETtx;
       end;
-      ETCounter := GetNrOfFiles(ShellTree.Path, ETtx, true);
+      ETCounter := GetNrOfFiles(ShellList.Path, ETtx, true);
     end;
 
     // Call ETDirect or ET_OpenExec
     case CmbETDirectMode.ItemIndex of
       0: ETResult := ET_OpenExec(ArgsFromDirectCmd(ETprm), GetSelectedFiles, ETout, ETerr);
-      1: ETResult := ExecET(ETprm, GetSelectedFiles, ShellTree.Path, ETout, ETerr);
+      1: ETResult := ExecET(ETprm, GetSelectedFiles, ShellList.Path, ETout, ETerr);
       else
         ETResult := false; // Make compiler happy
     end;
@@ -1938,7 +1939,7 @@ begin
   begin
     Screen.Cursor := crHourGlass;
     try
-      FPath := IncludeTrailingBackslash(ShellTree.Path) + ShellList.FileName;
+      FPath := IncludeTrailingBackslash(ShellList.Path) + ShellList.FileName;
       Rotate := 0;
       if GUIsettings.AutoRotatePreview then
       begin
@@ -2216,15 +2217,12 @@ begin
     ShellList.SetFocus;
   end;
 
-  // Scroll in view
+  // Scroll in view. Select initial
   if (ShellTree.Selected <> nil) then
-  begin
     ShellTree.Selected.MakeVisible;
-    ShellTree.OnChange(ShellTree, ShellTree.Selected);
-  end;
+
   // --------------------------
   DragAcceptFiles(Self.Handle, true);
-  ShowMetadata;
 end;
 
 procedure TFMain.RotateImgResize(Sender: TObject);
@@ -2262,7 +2260,7 @@ end;
 
 procedure TFMain.ShellListClick(Sender: TObject);
 var
-  i: smallint;
+  i: integer;
 begin
   i := ShellList.SelCount;
   MExportImport.Enabled := (i > 0);
@@ -2316,6 +2314,8 @@ begin
 end;
 
 procedure TFMain.ShellListAfterEnumColumns(Sender: TObject);
+var
+  AShellList: TShellListView;
 
   procedure AdjustColumns(ColumnDefs: array of smallint);
   var
@@ -2376,15 +2376,30 @@ begin
     4:
       AddColumns(FListColUsr);
   end;
+  AShellList := TShellListView(Sender);
 
-  SendMessage(TShellListView(Sender).Handle, WM_SETREDRAW, 1, 0);
-  TShellListView(Sender).Invalidate; // Creates new window handle!
+  SendMessage(AShellList.Handle, WM_SETREDRAW, 1, 0);
+  if not AShellList.Enabled then // We will get back here
+    exit;
+  if not ValidDir(AShellList.Path) then
+    exit;
+
+  AShellList.Invalidate; // Creates new window handle!
+
+  // Checks for ExifTool running
+  EnableMenus(ET_StayOpen(AShellList.Path));
+
+  // Select 1st Item rightaway
+  if (AShellList.Items.Count > 0) then
+    AShellList.Items[0].Selected := true;
+  if (Assigned(AShellList.OnClick)) then
+    AShellList.OnClick(Sender);
 end;
 
 procedure TFMain.ShellListOwnerDataFetch(Sender: TObject; Item: TListItem; Request: TItemRequest; AFolder: TShellFolder);
 var
   AShellList: TShellListView;
-  ETcmd, tx, ETouts, ETerrs, ADetail: String;
+  ETcmd, Tx, ADetail: String;
   Indx: integer;
   Details: TStrings;
 begin
@@ -2415,21 +2430,21 @@ begin
           begin
             GetMetadata(AFolder.PathName, false, false, false, false);
 
-            tx := ExifIFD.ExposureTime;
-            tx.PadLeft(7);
-            Details.Add(tx);
-            tx := ExifIFD.FNumber;
-            tx.PadLeft(4);
-            Details.Add(tx);
-            tx := ExifIFD.ISO;
-            tx.PadLeft(5);
-            Details.Add(tx);
-            tx := ExifIFD.ExposureBias;
-            tx.PadLeft(4);
-            Details.Add(tx);
-            tx := ExifIFD.FocalLength;
-            tx.PadLeft(6);
-            Details.Add(tx);
+            Tx := ExifIFD.ExposureTime;
+            Tx.PadLeft(7);
+            Details.Add(Tx);
+            Tx := ExifIFD.FNumber;
+            Tx.PadLeft(4);
+            Details.Add(Tx);
+            Tx := ExifIFD.ISO;
+            Tx.PadLeft(5);
+            Details.Add(Tx);
+            Tx := ExifIFD.ExposureBias;
+            Tx.PadLeft(4);
+            Details.Add(Tx);
+            Tx := ExifIFD.FocalLength;
+            Tx.PadLeft(6);
+            Details.Add(Tx);
             if (ExifIFD.Flash and $FF00) <> 0 then
             begin
               if (ExifIFD.Flash and 1) = 1 then
@@ -2477,11 +2492,7 @@ begin
             ETcmd := '-s3' + CRLF + '-f';
             for Indx := 0 to High(FListColUsr) do
               ETcmd := ETcmd + CRLF + FListColUsr[Indx].Command;
-            ET_OpenExec(ETcmd, GetSelectedFiles(ShellList.FileName(Item.Index)), ETouts, ETerrs, False);
-            if (ETerrs <> '') then
-              Details.Text := ETerrs
-            else
-              Details.Text := ETouts;
+            ET_OpenExec(ETcmd, GetSelectedFiles(ShellList.FileName(Item.Index)), Details, False); // Dont care about errors
           end;
       end;
     end;
@@ -2514,7 +2525,7 @@ end;
 
 procedure TFMain.EnableMenus(Enable: boolean);
 var
-  i: smallint;
+  i: integer;
 begin
   AdvPageMetadata.Enabled := Enable;
   AdvPanelETdirect.Enabled := Enable;
@@ -2540,30 +2551,8 @@ begin
       TMsgDlgType.mtError, [mbOk], Self);
 end;
 
-procedure TFMain.ShellTreeChange(Sender: TObject; Node: TTreeNode);
-begin
-  // Select 1st item in Shellist rightaway
-  if (TShellFolder(Node.Data).PathName <> ShellList.RootFolder.PathName) then // Startup behaviour
-    exit;
-  if (ShellList.Items.Count > 0) then
-    ShellList.Items[0].Selected := true;
-  ShellListClick(Sender);
-end;
-
 procedure TFMain.ShellTreeChanging(Sender: TObject; Node: TTreeNode; var AllowChange: Boolean);
-var
-  NewPath: string;
 begin
-  if (AllowChange) then
-  begin
-    if not ShellList.Enabled then // We will get back here
-      exit;
-    NewPath := TShellFolder(Node.Data).PathName;
-    if not ValidDir(NewPath) then
-      exit;
-    EnableMenus(ET_StayOpen(NewPath));
-  end;
-
   RotateImg.Picture.Bitmap := nil;
   if Assigned(ETBarSeriesFocal) then
     ETBarSeriesFocal.Clear;
@@ -2595,8 +2584,8 @@ end;
 // Restart Exiftool when context menu done.
 procedure TFMain.ShellTreeAfterContext(Sender: TObject);
 begin
-  if (ValidDir(ShellTree.Path)) then
-    ET_StayOpen(ShellTree.Path);
+  if (ValidDir(ShellList.Path)) then
+    ET_StayOpen(ShellList.Path);
 end;
 
 // =========================== Show Metadata ====================================
@@ -2772,7 +2761,7 @@ begin
 
   Screen.Cursor := -11; // =crHourGlass
   try
-    ChartFindFiles(ShellTree.Path, Ext, AdvCheckBox_Subfolders.Checked);
+    ChartFindFiles(ShellList.Path, Ext, AdvCheckBox_Subfolders.Checked);
   finally
     Screen.Cursor := 0; // crDefault;
   end;
@@ -2977,7 +2966,7 @@ begin
     ETcmd := ETcmd + CRLF + '-GPS:GpsLatitude' + CRLF + '-GPS:GpsLatitudeRef';
     ETcmd := ETcmd + CRLF + '-GPS:GpsLongitude' + CRLF + '-GPS:GpsLongitudeRef';
     ET_OpenExec(ETcmd, GetSelectedFiles, ETouts, ETerrs, False);
-    ShowImagesOnMap(EdgeBrowser1, ShellTree.Path, ETouts);
+    ShowImagesOnMap(EdgeBrowser1, ShellList.Path, ETouts);
   end
   else
     ShowMessage('No file selected.');

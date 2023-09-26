@@ -157,7 +157,7 @@ var
 begin
   xDir := BrowseFolderDlg('Folder, including subfolders, to generate thumbnails for.' + #10 +
                           'Generating will be done in the background.', 0,
-                           FMain.ShellTree.Path);
+                           FMain.ShellList.Path);
   if (xDir <> '') then
   begin
     GenerateThumbs(xDir, true, FMain.ShellList.ThumbNailSize);

@@ -117,7 +117,7 @@ var
    ACmd: string;
 begin
   SaveDialogCmd.FileName := '';
-  SaveDialogCmd.InitialDir := Fmain.ShellTree.Path;
+  SaveDialogCmd.InitialDir := Fmain.ShellList.Path;
   if not SaveDialogCmd.Execute then
     exit;
   CmdList := TStringList.Create;
@@ -151,7 +151,7 @@ begin
                                         '&& echo: ' +
                                         '&& echo type "%s" to execute the generated CMD file.' +
                                         '&& echo: && dir "%s"', [ACmd, ACmd])),
-                       PWideChar(Format('%s', [Fmain.ShellTree.Path])), SW_SHOWNORMAL);
+                       PWideChar(Format('%s', [Fmain.ShellList.Path])), SW_SHOWNORMAL);
 end;
 
 procedure TFLogWin.BtnPowerShellClick(Sender: TObject);
@@ -160,7 +160,7 @@ var
    ACmd: string;
 begin
   SaveDialogPS.FileName := '';
-  SaveDialogPS.InitialDir := Fmain.ShellTree.Path;
+  SaveDialogPS.InitialDir := Fmain.ShellList.Path;
   if not SaveDialogPS.Execute then
     exit;
   PSList := TStringList.Create;
@@ -186,7 +186,7 @@ begin
     PSList.Add('  [Console]::OutputEncoding = [System.Text.Encoding]::UTF8');
     PSList.Add('}');
     PSList.Add('# Set Working directory.');
-    PSList.Add(Format('Set-Location "%s"', [Fmain.ShellTree.Path]));
+    PSList.Add(Format('Set-Location "%s"', [Fmain.ShellList.Path]));
     PSList.Add('');
     if (RadShowCmds.ItemIndex = 0) then
     begin
@@ -212,7 +212,9 @@ begin
     PSList.Free;
   end;
 
-  ShellExecute(0, 'Edit', PWideChar(SaveDialogPS.FileName), PWideChar(Fmain.ShellTree.Path), PWideChar(Fmain.ShellTree.Path), SW_SHOWNORMAL);
+  ShellExecute(0, 'Edit', PWideChar(SaveDialogPS.FileName),
+                          PWideChar(Fmain.ShellList.Path),
+                          PWideChar(Fmain.ShellList.Path), SW_SHOWNORMAL);
 end;
 
 procedure TFLogWin.FormCreate(Sender: TObject);
