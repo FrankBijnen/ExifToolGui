@@ -2276,6 +2276,8 @@ end;
 procedure TFMain.ShellListColumnClick(Sender: TObject; Column: TListColumn);
 begin
   ShellList.ColumnClick(Column);
+  ShowMetadata;
+  ShowPreview;
 end;
 
 procedure TFMain.ShellListColumnResized(Sender: TObject);
@@ -2539,18 +2541,9 @@ begin
 end;
 
 procedure TFMain.ShellTreeChange(Sender: TObject; Node: TTreeNode);
-var
-  NewPath: string;
 begin
-  if not ShellList.Enabled then // We will get back here
-    exit;
-  NewPath := TShellFolder(Node.Data).PathName;
-  if not ValidDir(NewPath) then
-    exit;
-  EnableMenus(ET_StayOpen(NewPath));
-
   // Select 1st item in Shellist rightaway
-  if (NewPath <> ShellList.RootFolder.PathName) then // Startup behaviour
+  if (TShellFolder(Node.Data).PathName <> ShellList.RootFolder.PathName) then // Startup behaviour
     exit;
   if (ShellList.Items.Count > 0) then
     ShellList.Items[0].Selected := true;
@@ -2558,7 +2551,19 @@ begin
 end;
 
 procedure TFMain.ShellTreeChanging(Sender: TObject; Node: TTreeNode; var AllowChange: Boolean);
+var
+  NewPath: string;
 begin
+  if (AllowChange) then
+  begin
+    if not ShellList.Enabled then // We will get back here
+      exit;
+    NewPath := TShellFolder(Node.Data).PathName;
+    if not ValidDir(NewPath) then
+      exit;
+    EnableMenus(ET_StayOpen(NewPath));
+  end;
+
   RotateImg.Picture.Bitmap := nil;
   if Assigned(ETBarSeriesFocal) then
     ETBarSeriesFocal.Clear;

@@ -67,7 +67,7 @@ var
   PipeInRead, PipeInWrite: THandle;
   PipeOutRead, PipeOutWrite: THandle;
   PipeErrRead, PipeErrWrite: THandle;
-  ETrunning: boolean = false;
+  ETrunning: string;
   ETShowCounter: boolean = false;
   ETEvent: TEvent;
   ExecNum: byte;
@@ -133,8 +133,10 @@ var
   PWorkDir: PChar;
   ETcmd: string;
 begin
-  if ETrunning then
-    ET_OpenExit; // -changing WorkDir OnTheFly requires Exit first
+  result := true;
+  if (ETrunning = WorkDir) then
+    exit;
+  ET_OpenExit; // -changing WorkDir OnTheFly requires Exit first
 
   ETcmd := GUIsettings.ETOverrideDir + 'exiftool -stay_open True -@ -';
   FillChar(ETprocessInfo, SizeOf(TProcessInformation), #0);
@@ -164,14 +166,13 @@ begin
                    nil, PWorkDir,
     StartupInfo, ETprocessInfo) then
   begin
-    ETrunning := true;
     CloseHandle(PipeInRead);
     CloseHandle(PipeOutWrite);
     CloseHandle(PipeErrWrite);
+    ETrunning := WorkDir;
   end
   else
   begin
-    ETrunning := false;
     CloseHandle(PipeInRead);
     CloseHandle(PipeInWrite);
     CloseHandle(PipeOutRead);
@@ -179,7 +180,7 @@ begin
     CloseHandle(PipeErrRead);
     CloseHandle(PipeErrWrite);
   end;
-  result := ETrunning;
+  result := (ETrunning <> '');
 end;
 
 function ET_OpenExec(ETcmd: string; FNames: string; var ETouts, ETErrs: string; PopupOnError: boolean = true): boolean;
@@ -208,7 +209,8 @@ begin
   ThisExecNum := ExecNum;
   CheckNum := ($7D * 256) + ThisExecNum;
 
-  if ETrunning and (Length(ETcmd) > 1) then
+  if (ETrunning <> '') and
+     (Length(ETcmd) > 1) then
   begin
     Wr := ETEvent.WaitFor(GUIsettings.ETTimeOut);
     if (Wr <> wrSignaled) then
@@ -331,7 +333,7 @@ const
 var
   BytesCount: Dword;
 begin
-  if ETrunning then
+  if (ETrunning <> '') then
   begin
     WriteFile(PipeInWrite, ExitCmd[1], Length(ExitCmd), BytesCount, nil);
     FlushFileBuffers(PipeInWrite);
@@ -344,7 +346,7 @@ begin
     CloseHandle(PipeInWrite);
     CloseHandle(PipeOutRead);
     CloseHandle(PipeErrRead);
-    ETrunning := false;
+    ETrunning := '';
   end;
 end;
 
@@ -586,6 +588,7 @@ begin
   ETCounterLabel := nil;
   ETEvent := TEvent.Create(nil, true, true, ExtractFileName(Paramstr(0)));
   ExecNum := $30;
+  ETrunning := '';
 end;
 
 finalization
