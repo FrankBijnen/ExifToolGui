@@ -1,7 +1,10 @@
 # ExifToolGui
 A GUI for ExifTool
 
-Current version: V6.1.1 updated September 3, 2023. See the changelog for info.<br>
+Current version: V6.2.0 updated September 28, 2023. See the changelog for info.<br>
+The V6.2.0 release focuses on UTF8. All Exiftool commands can now be executed in UTF8 mode by using an Args File created with UTF8 encoding. This should solve all international character issues!
+Also the Log Window is revised. It can now show the last 10 commands, with their output and/or errors.
+
 Important: <br>
 To help Bug hunting there are also Map files released. If you place the Map file in the same directory as the Executable
 a stacktrace can be copied to the clipboard if an Exception occurs. Please also provide the stacktrace if you report an Exception.

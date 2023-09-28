@@ -50,4 +50,32 @@ The context menus for the ShelList and the ShellTree have been updated. (The men
 - The ShellList context works for multi-select.
 - Ctrl/C, Ctrl/X and Ctrl/V added for the ShellList.
 
+Changed with version 6.2.0
+- A lot of changes to support UTF8 better. It should not affect functionality, but internally ExiftoolGui uses an ArgsFile where possible. 
+  Advantages of Args files compared to passing parameters on the command line.
+  - There is no limit on the size of the parameters. Command line has a limit of 32K.
+  - All data can be passed as UTF8, thereby enabling all international characters.
+  An option has been added 'Api WindowsWideFile'. If you have directories containing international characters it is recommended to enable this option.
+  If this option is disabled, the full pathname of selected images is added to the args file.
+  For this option to take effect, ExifTool 12.66 or later is required. See also: https://exiftool.org/ExifTool.html#WindowsWideFile
+
+- The log window can now show the last 10 issued commands with there output and errors.
+  Use Ctrl/A, Ctrl/C to copy the data to the clipboard.
+  The commmands issued are initially shown as executed. Always as Args file. But via buttons they can be converted to CommmandLine format.
+  Also an option has been added to create a Cmd file, or Powershell script. To replay the commands.
+
+- The Exiftool direct now has 2 execution modes.
+  StayOpen
+    This is the default mode, it uses the exiftool.exe already active for the directory, to send an args file created from the supplied parameters to.
+
+  Classic
+    Provided for compatibility. It starts a new exiftool.exe and passing all parameters via an args file.
+
+  Notes: You can check in the log window what is actually sent.
+         The Args file always contains -charset UTF8 and -charset Filenames=UTF8, EXCEPT when you add -L as a parameter. This is added for backward compatability, although I dont see how it should work better.
+
+- Adding tags to the Workspace.
+  If you have duplicate Tag Names in your workspace, they will not be discarded anymore.
+  An option has been added to the Preferences to allow Double Click to add/remove to the workspace.
+
 Frank Bijnen
