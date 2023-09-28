@@ -3,10 +3,11 @@ unit MainDef;
 
 interface
 
-uses Classes;
+uses System.Classes, ExifTool;
 
 const
   SHOWALL = 'Show All Files';
+  EmptyCustomview = '-Echo' + CRLF + 'No custom tags defined ';
 
 type
   GUIsettingsRec = record
@@ -94,9 +95,10 @@ procedure ChartFindFiles(StartDir, FileMask: string; subDir: boolean);
 
 implementation
 
-uses Main, IniFiles, LogWin, SysUtils, Forms, StrUtils, Dialogs, ExifTool,
-  Windows, ExifInfo, ShellAPI, ShlObj,
-  Vcl.ComCtrls, ExifToolsGUI_Utils;
+uses System.SysUtils, System.StrUtils, System.IniFiles,
+  Winapi.Windows, Winapi.ShellAPI, Winapi.ShlObj,
+  Vcl.Forms, Vcl.ComCtrls, Vcl.Dialogs,
+  Main, LogWin, ExifToolsGUI_Utils, ExifInfo;
 
 const
   CRLF = #13#10;
@@ -486,20 +488,20 @@ begin
       ReadWorkSpaceTags(GUIini);
 
       // --- Marked tags---
-      MarkedTags := ReadString('TagList', 'MarkedTags', 'Artist ');
+      MarkedTags := ReadString('TagList', 'MarkedTags', '<');
       N := length(MarkedTags);
       if MarkedTags[N] = '<' then
         MarkedTags[N] := ' '
       else
-        MarkedTags := 'Artist ';
+        MarkedTags := ' ';
 
       // --- CustomView tags---
-      CustomViewTags := ReadString('TagList', 'CustomView', '-Exif:Artist ');
-      N := length(CustomViewTags);
+      CustomViewTags := ReadString('TagList', 'CustomView', '<');
+      N := Length(CustomViewTags);
       if CustomViewTags[N] = '<' then
         CustomViewTags[N] := ' '
       else
-        CustomViewTags := '-Exif:Artist ';
+        CustomViewTags := ' ';
 
     end;
   finally
@@ -667,6 +669,7 @@ begin
         else
           MarkedTags := '<';
         WriteString('TagList', 'MarkedTags', MarkedTags);
+
         N := length(CustomViewTags);
         if (N > 0) then
           CustomViewTags[N] := '<'
@@ -809,7 +812,7 @@ begin
     IsFound := FindNext(SR) = 0;
   end;
 
-  SysUtils.FindClose(SR);
+  System.SysUtils.FindClose(SR);
   // Build a list of subdirectories
   if DoSub then
   begin
@@ -821,7 +824,7 @@ begin
         DirList.Add(StartDir + SR.Name);
       IsFound := FindNext(SR) = 0;
     end;
-    SysUtils.FindClose(SR);
+    System.SysUtils.FindClose(SR);
     // Scan the list of subdirectories
     for I := 0 to DirList.Count - 1 do
       ChartFindFiles(DirList[I], FileMask, DoSub);

@@ -1468,138 +1468,135 @@ begin
     ts := '-';
   tx := ts + TranslateTagName(ts, tx);
   if pos(tx, CustomViewTags) > 0 then
-    ShowMessage('Tag allready exist in Custom view.')
+    ShowMessage('Tag already exists in Custom view.')
   else
     CustomViewTags := CustomViewTags + tx + ' ';
 end;
 
 procedure TFMain.QuickPopUp_AddDetailsUserClick(Sender: TObject);
 var
-  i, n, X: smallint;
-  tx, tk: string;
+  I, N, X: smallint;
+  Tx, Tk: string;
 begin
-  i := length(FListColUsr);
-  SetLength(FListColUsr, i + 1);
-  n := MetadataList.Row;
-  X := n;
+  I := length(FListColUsr);
+  SetLength(FListColUsr, I + 1);
+  N := MetadataList.Row;
+  X := N;
   repeat // find group
-    dec(X);
-    tx := MetadataList.Keys[X];
-  until length(tx) = 0;
-  tx := MetadataList.Cells[1, X]; // eg '---- IFD0 ----'
-  Delete(tx, 1, 5); // ='IFD0 ----'
-  X := pos(' ', tx);
-  SetLength(tx, X - 1); // ='IFD0'
-  tx := '-' + tx + ':'; // ='-IFD0:'
+    Dec(X);
+    Tx := MetadataList.Keys[X];
+  until length(Tx) = 0;
+  Tx := MetadataList.Cells[1, X];     // eg '---- IFD0 ----'
+  Delete(Tx, 1, 5);                   // ='IFD0 ----'
+  X := pos(' ', Tx);
+  SetLength(Tx, X - 1);               // ='IFD0'
+  Tx := '-' + Tx + ':';               // ='-IFD0:'
 
-  tk := MetadataList.Keys[n]; // 'Make'
-  if LeftStr(tk, 2) = '0x' then
-    Delete(tk, 1, 7)
-  else if LeftStr(tk, 2) = '- ' then
-    Delete(tk, 1, 2);
-  tk := TrimRight(tk);
+  Tk := MetadataList.Keys[N];         // 'Make'
+  if LeftStr(Tk, 2) = '0x' then
+    Delete(Tk, 1, 7)
+  else if LeftStr(Tk, 2) = '- ' then
+    Delete(Tk, 1, 2);
+  Tk := TrimRight(Tk);
 
-  FListColUsr[i].Caption := tk;
-  tk := TranslateTagName(tx, tk);
-  FListColUsr[i].Command := tx + tk; // ='-IFD0:Make'
-  FListColUsr[i].Width := 96;
-  FListColUsr[i].AlignR := 0;
+  FListColUsr[I].Caption := Tk;
+  Tk := TranslateTagName(Tx, Tk);
+  FListColUsr[I].Command := Tx + Tk;  // ='-IFD0:Make'
+  FListColUsr[I].Width := 96;
+  FListColUsr[I].AlignR := 0;
 
   with CBoxDetails do
   begin
-    i := ItemIndex;
-    n := Items.Count - 1;
+    I := ItemIndex;
+    N := Items.Count - 1;
   end;
-  if i = n then
+  if I = N then
     ShellList.Refresh;
 end;
 
 procedure TFMain.QuickPopUp_AddQuickClick(Sender: TObject);
 var
-  i, n, X: smallint;
-  tx, ty, tz, tl: string;
+  I, N, X: smallint;
+  Tx, Ty, Tz, T1: string;
 begin
-  i := length(QuickTags);
-  SetLength(QuickTags, i + 1);
-  n := MetadataList.Row;
+  I := Length(QuickTags);
+  SetLength(QuickTags, I + 1);
+  N := MetadataList.Row;
   if SpeedBtnExif.Down then
-    tz := 'Exif:'
+    Tz := 'Exif:'
   else if SpeedBtnXmp.Down then
-    tz := 'Xmp:'
+    Tz := 'Xmp:'
   else if SpeedBtnIptc.Down then
-    tz := 'Iptc:'
+    Tz := 'Iptc:'
   else
-    tz := '';
+    Tz := '';
 
   if MGroup_g4.Checked then
-    tx := tz
+    Tx := Tz
   else
   begin // find group
-    X := n;
+    X := N;
     repeat
-      dec(X);
-      tx := MetadataList.Keys[X];
-    until length(tx) = 0;
-    tx := MetadataList.Cells[1, X]; // eg '---- IFD0 ----'
-    Delete(tx, 1, 5); // -> 'IFD0 ----'
-    X := pos(' ', tx);
-    SetLength(tx, X - 1); // -> 'IFD0'
-    tx := tx + ':'; // -> 'IFD0:'
+      Dec(X);
+      Tx := MetadataList.Keys[X];
+    until length(Tx) = 0;
+    Tx := MetadataList.Cells[1, X]; // eg '---- IFD0 ----'
+    Delete(Tx, 1, 5);               // -> 'IFD0 ----'
+    X := pos(' ', Tx);
+    SetLength(Tx, X - 1);           // -> 'IFD0'
+    Tx := Tx + ':';                 // -> 'IFD0:'
   end;
 
-  ty := MetadataList.Keys[n]; // e.g. 'Make' or '0x010f Make' or '- Rating'
-  // x:=pos(' ',ty); if x>0 then Delete(ty,1,x); //get tag name only
-  if LeftStr(ty, 2) = '0x' then
-    Delete(ty, 1, 7)
-  else if LeftStr(ty, 2) = '- ' then
-    Delete(ty, 1, 2);
-  ty := TrimRight(ty);
-  tl := ty; // tl=language specific tag name
-  ty := TranslateTagName('-' + tz, ty);
-  with QuickTags[i] do
+  Ty := MetadataList.Keys[N];       // e.g. 'Make' or '0x010f Make' or '- Rating'
+  if LeftStr(Ty, 2) = '0x' then
+    Delete(Ty, 1, 7)
+  else if LeftStr(Ty, 2) = '- ' then
+    Delete(Ty, 1, 2);
+  Ty := TrimRight(Ty);
+  T1 := Ty;                         // tl=language specific tag name
+  Ty := TranslateTagName('-' + Tz, Ty);
+  with QuickTags[I] do
   begin
-    Caption := tz + tl;
-    Command := '-' + tx + ty; // ='-IFD0:Make'
+    Caption := Tz + T1;
+    Command := '-' + Tx + Ty;       // ='-IFD0:Make'
     Help := 'No Hint defined';
   end;
 end;
 
 procedure TFMain.QuickPopUp_DelCustomClick(Sender: TObject);
 var
-  i, j: smallint;
-  tx, tl: string;
+  I, J: smallint;
+  Tx, T1: string;
 begin
-  i := MetadataList.Row;
+  I := MetadataList.Row;
   if ET_Options.ETLangDef <> '' then
   begin
-    tl := ET_Options.ETLangDef;
+    T1 := ET_Options.ETLangDef;
     ET_Options.ETLangDef := '';
     ShowMetadata;
-    tx := MetadataList.Keys[i];
-    ET_Options.ETLangDef := tl;
+    Tx := MetadataList.Keys[I];
+    ET_Options.ETLangDef := T1;
   end
   else
-    tx := MetadataList.Keys[i];
+    Tx := MetadataList.Keys[I];
 
-  if LeftStr(tx, 2) = '0x' then
-    Delete(tx, 1, 7)
-  else if LeftStr(tx, 2) = '- ' then
-    Delete(tx, 1, 2);
-  tx := TrimRight(tx); // =tag name
+  if LeftStr(Tx, 2) = '0x' then
+    Delete(Tx, 1, 7)
+  else if LeftStr(Tx, 2) = '- ' then
+    Delete(Tx, 1, 2);
+  Tx := TrimRight(Tx); // =tag name
 
-  if length(tx) > 0 then
+  if Length(Tx) > 0 then
   begin // should be always true!
-    i := pos(tx, CustomViewTags);
-    j := i;
+    I := pos(Tx, CustomViewTags);
+    J := I;
     repeat
-      dec(i);
-    until CustomViewTags[i] = '-';
+      dec(I);
+    until CustomViewTags[I] = '-';
     repeat
-      inc(j);
-    until CustomViewTags[j] = ' ';
-    Delete(CustomViewTags, i, j - i + 1);
-    if length(CustomViewTags) = 0 then
-      CustomViewTags := '-Exif:Artist ';
+      inc(J);
+    until CustomViewTags[J] = ' ';
+    Delete(CustomViewTags, I, J - I + 1);
   end;
   ShowMetadata;
 end;
@@ -1646,46 +1643,44 @@ end;
 
 procedure TFMain.QuickPopUp_MarkTagClick(Sender: TObject);
 var
-  i, j: smallint;
-  tx: string;
+  I, J: smallint;
+  Tx: string;
 begin
   with MetadataList do
-    tx := Keys[Row];
-  i := pos(' ', tx);
-  if i > 0 then
-    Delete(tx, 1, i); // if Show HexID exist
-  if length(tx) > 0 then
+    Tx := Keys[Row];
+  I := pos(' ', Tx);
+  if I > 0 then
+    Delete(Tx, 1, I); // if Show HexID exist
+  if Length(Tx) > 0 then
   begin
-    i := pos(tx, MarkedTags);
-    if i > 0 then
+    I := pos(Tx, MarkedTags);
+    if I > 0 then
     begin // tag allready marked: unmark it
-      j := i;
+      J := I;
       repeat
-        inc(j);
-      until MarkedTags[j] = ' ';
-      Delete(MarkedTags, i, j - i + 1);
-      if length(MarkedTags) = 0 then
-        MarkedTags := 'Artist ';
+        inc(J);
+      until MarkedTags[J] = ' ';
+      Delete(MarkedTags, I, J - I + 1);
     end
     else
-      MarkedTags := MarkedTags + tx + ' '; // mark tag
+      MarkedTags := MarkedTags + Tx + ' '; // mark tag
   end;
 end;
 
 procedure TFMain.QuickPopUp_UndoEditClick(Sender: TObject);
 var
-  i, n, X: smallint;
-  tx, ETouts, ETerrs: string;
+  I, N, X: smallint;
+  Tx, ETouts, ETerrs: string;
 begin
-  i := MetadataList.Row;
-  MetadataList.Keys[i] := QuickTags[i - 1].Caption;
-  tx := '-s3' + CRLF + '-f' + CRLF + QuickTags[i - 1].Command;
-  ET_OpenExec(tx, GetSelectedFiles(ShellList.FileName), ETouts, ETerrs);
-  MetadataList.Cells[1, i] := ETouts;
-  n := MetadataList.RowCount - 1;
+  I := MetadataList.Row;
+  MetadataList.Keys[I] := QuickTags[I - 1].Caption;
+  Tx := '-s3' + CRLF + '-f' + CRLF + QuickTags[I - 1].Command;
+  ET_OpenExec(Tx, GetSelectedFiles(ShellList.FileName), ETouts, ETerrs);
+  MetadataList.Cells[1, I] := ETouts;
+  N := MetadataList.RowCount - 1;
   X := 0;
-  for i := 1 to n do
-    if pos('*', MetadataList.Keys[i]) = 1 then
+  for I := 1 to N do
+    if pos('*', MetadataList.Keys[I]) = 1 then
       inc(X);
   SpeedBtnQuickSave.Enabled := (X > 0);
 end;
@@ -2491,7 +2486,7 @@ begin
         3:
           begin
             GetMetadata(AFolder.PathName, true, false, false, false);
-            Details.Add(IFD0.Artist); // Xmp.Creator);
+            Details.Add(IFD0.Artist);
             Details.Add(Xmp.Rating);
             Details.Add(Xmp.PhotoType);
             Details.Add(Xmp.Event);
@@ -2696,10 +2691,19 @@ begin
 
       if SpeedBtnCustom.Down then
       begin
-        ETcmd := ETcmd + '-f' + CRLF + CustomViewTags;
-        E := length(ETcmd);
-        SetLength(ETcmd, E - 1); // remove last space char
-        ETcmd := StringReplace(ETcmd, ' ', CRLF, [rfReplaceAll]);
+        if (Trim(CustomViewTags) = '') then
+        begin
+          // Show only message, no data.
+          ETcmd := ETcmd + '-f' + CRLF + EmptyCustomview;
+          Item := '';
+        end
+        else
+        begin
+          ETcmd := ETcmd + '-f' + CRLF + CustomViewTags;
+          E := Length(ETcmd);
+          SetLength(ETcmd, E - 1); // remove last space char
+          ETcmd := StringReplace(ETcmd, ' ', CRLF, [rfReplaceAll]);
+        end;
       end;
 
       ET_OpenExec(ETcmd, Item, ETResult, false);
