@@ -20,3 +20,15 @@ Version:        Description             Issue
 6.1.1.0         Fix Issue #41           Dont use the Exename as base name for Ini file. 
                 Fix Issue #43           Copying multiple files in the Filelist tab does not work (the old version allowed this)
                 Fix Issue #45           Delete directory fails from ShellTreeView Contextmenu, because exiftool is running.
+6.2.0.0         Fix Issue #48           Better support for Unicode Filenames
+                Fix Issue #49           Add commands issued to Log Window
+                Fix Issue #50           Saving data with the workspace should retain the same file selected
+                Fix Issue #56           Select 1st item in Shelllist rightaway when Directory is changed
+                Fix Issue #61           Add option to Exiftool Direct to choose the execution mode
+                Fix Issue #65           Add command line parameter to disable saving the INI file
+                Fix Issue #73           Fixes for bugs found in Pre-rel.
+                Fix Issue #82           Option to add Tags from the All View, Use Doubleclick to add/remove.
+                Fix Issue #83           Show warning 'Warning. Only xx results returned' in Metadatalist. Not as a MessageBox
+                Fix Issue #85           Add API WindowsWideFile to options and save in INI
+                Fix Issue #91           Allow duplicate tag names in Workspace
+                Fix Issue #95           Column sorting and user defined fields. ET executed in wrong directory

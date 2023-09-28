@@ -20,4 +20,12 @@ The TShellListView extensions are moved to a separate unit. ExiftoolsGUI_ShellLi
 
 The source has been reformatted within Delphi. (Ctrl/D) The default settings are used. Except for the right margin 80->150
 
+Version 6.2.0.
+
+Basically this version is about UTF8. All occurences of 'Ansi' string/char have been revised, and where possible changed to unicode.
+Calling Exiftool was a challenge. The decision was made (by me) to use args files. These can be written with UTF8 encoding. Only the actual call to Exiftool has to be ANSI.
+But that will only contain '-@ "<tempfilename>"' and we take care that tempfilename contains only ansi chars.
+Another unit that needed revising was ExifInfo. Where possible I now use TEncoding.UTF8.Getstring to do the conversion to the 'foto' records.
+Changing the type from AnsiString or ShortString to String made it necessary to introduce Clear methods to solve Memory Leaks.
+
 Frank Bijnen
