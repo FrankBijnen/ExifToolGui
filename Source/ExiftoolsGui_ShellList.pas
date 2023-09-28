@@ -319,11 +319,11 @@ begin
   if Assigned(FOnEnumColumnsAfterEvent) then
     FOnEnumColumnsAfterEvent(Self);
 
-  ColumnSort;
-
   if (ViewStyle = vsReport) and // EnumColumns only called for ViewStyle=vsReport
      (Assigned(FOnPathChanged)) then
     FOnPathChanged(Self);
+
+  ColumnSort;
 end;
 
 procedure TShellListView.CMThumbStart(var Message: TMessage);
