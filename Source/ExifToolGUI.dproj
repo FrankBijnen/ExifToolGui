@@ -5,8 +5,8 @@
         <FrameworkType>VCL</FrameworkType>
         <MainSource>ExifToolGUI.dpr</MainSource>
         <Base>True</Base>
-        <Config Condition="'$(Config)'==''">Release</Config>
-        <Platform Condition="'$(Platform)'==''">Win64</Platform>
+        <Config Condition="'$(Config)'==''">Debug</Config>
+        <Platform Condition="'$(Platform)'==''">Win32</Platform>
         <TargetedPlatforms>3</TargetedPlatforms>
         <AppType>Application</AppType>
     </PropertyGroup>
@@ -106,7 +106,7 @@
     <PropertyGroup Condition="'$(Cfg_1_Win32)'!=''">
         <DCC_WIDECHAR_REDUCED>false</DCC_WIDECHAR_REDUCED>
         <DCC_HIDDEN_VIRTUAL>false</DCC_HIDDEN_VIRTUAL>
-        <VerInfo_Keys>CompanyName=;FileDescription=GUI for ExifTool;FileVersion=6.0.5.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=ExifToolGUI.exe;ProductName=ExifToolGUI;ProductVersion=6.0.5.0;Comments=;ProgramID=com.embarcadero.$(MSBuildProjectName)</VerInfo_Keys>
+        <VerInfo_Keys>CompanyName=;FileDescription=GUI for ExifTool;FileVersion=6.2.1.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=ExifToolGUI.exe;ProductName=ExifToolGUI;ProductVersion=6.0.5.0;Comments=;ProgramID=com.embarcadero.$(MSBuildProjectName)</VerInfo_Keys>
         <VerInfo_MajorVer>6</VerInfo_MajorVer>
         <Icon_MainIcon>ExifToolGUI.ico</Icon_MainIcon>
         <DCC_DebugInfoInExe>false</DCC_DebugInfoInExe>
@@ -117,20 +117,24 @@
         <DCC_RemoteDebug>false</DCC_RemoteDebug>
         <BT_BuildType>Debug</BT_BuildType>
         <VerInfo_PreRelease>true</VerInfo_PreRelease>
-        <VerInfo_Release>5</VerInfo_Release>
+        <VerInfo_Release>1</VerInfo_Release>
         <UWP_DelphiLogo44>ExifToolGUI.ico</UWP_DelphiLogo44>
         <UWP_DelphiLogo150>ExifToolGUI.ico</UWP_DelphiLogo150>
         <DCC_DebugDCUs>true</DCC_DebugDCUs>
+        <VerInfo_MinorVer>2</VerInfo_MinorVer>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_1_Win64)'!=''">
         <AppDPIAwarenessMode>PerMonitorV2</AppDPIAwarenessMode>
         <DCC_DebugDCUs>true</DCC_DebugDCUs>
         <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
         <VerInfo_Locale>1033</VerInfo_Locale>
-        <VerInfo_Keys>CompanyName=;FileDescription=$(MSBuildProjectName);FileVersion=1.0.0.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProgramID=com.embarcadero.$(MSBuildProjectName);ProductName=$(MSBuildProjectName);ProductVersion=1.0.0.0;Comments=</VerInfo_Keys>
+        <VerInfo_Keys>CompanyName=;FileDescription=$(MSBuildProjectName);FileVersion=6.2.1.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProgramID=com.embarcadero.$(MSBuildProjectName);ProductName=$(MSBuildProjectName);ProductVersion=1.0.0.0;Comments=</VerInfo_Keys>
         <Icon_MainIcon>ExifToolGUI.ico</Icon_MainIcon>
         <UWP_DelphiLogo44>ExifToolGUI.ico</UWP_DelphiLogo44>
         <UWP_DelphiLogo150>ExifToolGUI.ico</UWP_DelphiLogo150>
+        <VerInfo_MajorVer>6</VerInfo_MajorVer>
+        <VerInfo_MinorVer>2</VerInfo_MinorVer>
+        <VerInfo_Release>1</VerInfo_Release>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_2)'!=''">
         <DCC_LocalDebugSymbols>false</DCC_LocalDebugSymbols>
@@ -142,24 +146,26 @@
         <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
         <VerInfo_MajorVer>6</VerInfo_MajorVer>
         <VerInfo_Locale>1033</VerInfo_Locale>
-        <VerInfo_Keys>CompanyName=;FileVersion=6.2.0.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProductVersion=6.2.0.0;Comments=;ProgramID=com.embarcadero.$(MSBuildProjectName);FileDescription=$(MSBuildProjectName);ProductName=$(MSBuildProjectName)</VerInfo_Keys>
+        <VerInfo_Keys>CompanyName=;FileVersion=6.2.1.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProductVersion=6.2.1.0;Comments=;ProgramID=com.embarcadero.$(MSBuildProjectName);FileDescription=$(MSBuildProjectName);ProductName=$(MSBuildProjectName)</VerInfo_Keys>
         <VerInfo_PreRelease>true</VerInfo_PreRelease>
         <BT_BuildType>Debug</BT_BuildType>
         <Icon_MainIcon>ExifToolGUI.ico</Icon_MainIcon>
         <UWP_DelphiLogo44>ExifToolGUI.ico</UWP_DelphiLogo44>
         <UWP_DelphiLogo150>ExifToolGUI.ico</UWP_DelphiLogo150>
         <VerInfo_MinorVer>2</VerInfo_MinorVer>
+        <VerInfo_Release>1</VerInfo_Release>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_2_Win64)'!=''">
         <AppDPIAwarenessMode>PerMonitorV2</AppDPIAwarenessMode>
         <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
         <VerInfo_Locale>1033</VerInfo_Locale>
-        <VerInfo_Keys>CompanyName=;FileDescription=$(MSBuildProjectName);FileVersion=6.2.0.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProgramID=com.embarcadero.$(MSBuildProjectName);ProductName=$(MSBuildProjectName);ProductVersion=6.2.0.0;Comments=</VerInfo_Keys>
+        <VerInfo_Keys>CompanyName=;FileDescription=$(MSBuildProjectName);FileVersion=6.2.1.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProgramID=com.embarcadero.$(MSBuildProjectName);ProductName=$(MSBuildProjectName);ProductVersion=6.2.1.0;Comments=</VerInfo_Keys>
         <Icon_MainIcon>ExifToolGUI.ico</Icon_MainIcon>
         <VerInfo_MajorVer>6</VerInfo_MajorVer>
         <UWP_DelphiLogo44>ExifToolGUI.ico</UWP_DelphiLogo44>
         <UWP_DelphiLogo150>ExifToolGUI.ico</UWP_DelphiLogo150>
         <VerInfo_MinorVer>2</VerInfo_MinorVer>
+        <VerInfo_Release>1</VerInfo_Release>
     </PropertyGroup>
     <ItemGroup>
         <DelphiCompile Include="$(MainSource)">

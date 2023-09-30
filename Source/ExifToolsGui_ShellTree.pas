@@ -5,7 +5,8 @@ unit ExifToolsGui_ShellTree;
 
 interface
 
-uses System.Classes, System.SysUtils, Winapi.Windows, Vcl.Shell.ShellCtrls, ExifToolsGUI_MultiContextMenu;
+uses System.Classes, System.SysUtils, Winapi.Windows, Vcl.Shell.ShellCtrls,
+      Winapi.Messages, ExifToolsGUI_MultiContextMenu;
 
 type
 
@@ -16,7 +17,8 @@ type
   protected
     procedure DoContextPopup(MousePos: TPoint; var Handled: boolean); override;
     procedure ShowMultiContextMenu(MousePos: TPoint);
-  public
+    procedure WndProc(var Message: TMessage); override;
+ public
     procedure ExecuteCommandExif(Verb: string; var Handled: boolean);
     property OnBeforeContextMenu: TNotifyEvent read FOnBeforeContextMenu write FOnBeforeContextMenu;
     property OnAfterContextMenu: TNotifyEvent read FOnAfterContextMenu write FOnAfterContextMenu;
@@ -24,13 +26,16 @@ type
 
 implementation
 
-uses ExifToolsGUI_Thumbnails, ExiftoolsGui_ShellList, Vcl.ComCtrls, Vcl.Forms;
+uses Winapi.ShlObj, ExifToolsGUI_Thumbnails, ExiftoolsGui_ShellList, Vcl.ComCtrls, Vcl.Forms;
+
+var
+  ICM2: IContextMenu2;
 
 procedure TShellTreeView.ShowMultiContextMenu(MousePos: TPoint);
 begin
   if (SelectedFolder = nil) then
     exit;
-  InvokeMultiContextMenu(Self, SelectedFolder, MousePos);
+  InvokeMultiContextMenu(Self, SelectedFolder, MousePos, ICM2);
 end;
 
 procedure TShellTreeView.DoContextPopup(MousePos: TPoint; var Handled: boolean);
@@ -89,6 +94,23 @@ begin
       Handled := true;
     end;
   end;
+end;
+
+// to handle submenus of context menus.
+procedure TShellTreeView.WndProc(var Message: TMessage);
+begin
+  case Message.Msg of
+    WM_INITMENUPOPUP,
+    WM_DRAWITEM,
+    WM_MENUCHAR,
+    WM_MEASUREITEM:
+      if Assigned(ICM2) then
+      begin
+        ICM2.HandleMenuMsg(Message.Msg, Message.wParam, Message.lParam);
+        Message.Result := 0;
+      end;
+  end;
+  inherited;
 end;
 
 end.

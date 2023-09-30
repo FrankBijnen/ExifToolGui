@@ -75,6 +75,7 @@ type
     procedure CancelThumbTasks;
     procedure RemoveThumbTask(ItemIndex: integer);
     procedure ShowMultiContextMenu(MousePos: TPoint);
+    procedure WndProc(var Message: TMessage); override;
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
@@ -118,6 +119,9 @@ uses System.Win.ComObj, System.UITypes,
 
 const
   QUESTIONMARK = 'QUESTIONMARK';
+
+var
+  ICM2: IContextMenu2;
 
   // Listview Sort
 
@@ -288,11 +292,28 @@ var FileList: TStringList;
 begin
   FileList := CreateSelectedFileList(false);
   try
-    InvokeMultiContextMenu(Self, RootFolder, MousePos, FileList);
+    InvokeMultiContextMenu(Self, RootFolder, MousePos, ICM2, FileList);
   finally
     FileList.Free;
     Refresh;
   end;
+end;
+
+// to handle submenus of context menus.
+procedure TShellListView.WndProc(var Message: TMessage);
+begin
+  case Message.Msg of
+    WM_INITMENUPOPUP,
+    WM_DRAWITEM,
+    WM_MENUCHAR,
+    WM_MEASUREITEM:
+      if Assigned(ICM2) then
+      begin
+        ICM2.HandleMenuMsg(Message.Msg, Message.wParam, Message.lParam);
+        Message.Result := 0;
+      end;
+  end;
+  inherited;
 end;
 
 // Calling Invalidate creates a new window handle. We must store that handle in the Folders.
