@@ -21,20 +21,21 @@ type
     procedure ExecuteCommandExif(Verb: string; var Handled: boolean);
   end;
 
-procedure InvokeMultiContextMenu(Owner: TWinControl; AFolder: TShellFolder; MousePos: TPoint; AFileList: TStrings = nil);
+procedure InvokeMultiContextMenu(Owner: TWinControl; AFolder: TShellFolder; MousePos: TPoint;
+                                 var ICM2: IContextMenu2; AFileList: TStrings = nil);
 
 implementation
 
   // Contextmenu supporting multi select
 
-procedure InvokeMultiContextMenu(Owner: TWinControl; AFolder: TShellFolder; MousePos: TPoint; AFileList: TStrings = nil);
+procedure InvokeMultiContextMenu(Owner: TWinControl; AFolder: TShellFolder; MousePos: TPoint;
+                                 var ICM2: IContextMenu2; AFileList: TStrings = nil);
 var
   chEaten, dwAttributes: ULONG;
   PIDL: PItemIDList;
   CM: IContextMenu;
   Menu: HMenu;
   Command: LongBool;
-  ICM2: IContextMenu2;
   ICI: TCMInvokeCommandInfo;
   ICmd: integer;
   ZVerb: array [0..255] of AnsiChar;
@@ -73,7 +74,7 @@ begin
   Menu := CreatePopupMenu;
   try
     CM.QueryContextMenu(Menu, 0, 1, $7FFF, CMF_EXPLORE or CMF_CANRENAME);
-    CM.QueryInterface(IID_IContextMenu2, ICM2); // To handle submenus.
+    CM.QueryInterface(IID_IContextMenu2, ICM2); // To handle submenus. Note: See WndProc of ShellTree and ShellList
 
     // Add Custom items on top
     InsertMenu(Menu, 0, MF_STRING or MF_BYPOSITION, IDVerbRefresh +1, PWideChar(SCmdVerbRefresh));
