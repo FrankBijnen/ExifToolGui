@@ -51,7 +51,7 @@ The context menus for the ShelList and the ShellTree have been updated. (The men
 - Ctrl/C, Ctrl/X and Ctrl/V added for the ShellList.
 
 Changed with version 6.2.0
-- A lot of changes to support UTF8 better. It should not affect functionality, but internally ExiftoolGui uses an ArgsFile where possible. 
+- A lot of changes to support UTF8 better. It should not affect functionality, but internally ExiftoolGui uses an Args file where possible. 
   Advantages of Args files compared to passing parameters on the command line.
   - There is no limit on the size of the parameters. Command line has a limit of 32K.
   - All data can be passed as UTF8, thereby enabling all international characters.
@@ -59,7 +59,7 @@ Changed with version 6.2.0
   If this option is disabled, the full pathname of selected images is added to the args file.
   For this option to take effect, ExifTool 12.66 or later is required. See also: https://exiftool.org/ExifTool.html#WindowsWideFile
 
-- The log window can now show the last 10 issued commands with there output and errors.
+- The log window can now show the last 10 issued commands with their output and errors.
   Use Ctrl/A, Ctrl/C to copy the data to the clipboard.
   The commmands issued are initially shown as executed. Always as Args file. But via buttons they can be converted to CommmandLine format.
   Also an option has been added to create a Cmd file, or Powershell script. To replay the commands.

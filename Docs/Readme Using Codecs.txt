@@ -21,7 +21,7 @@ I also have JPG's and MP4's created by an Android Samsung phone, the standard Wi
    Install the 32/64 Bits version as required by your OS.
    In the installer dialog only keep the 'Images Codecs (Raw Support)' set the other to 'Entire feature will be unavailable'. Unless you want try them ofcourse.
 
-   All tested raw formats (Pef, Dng noticeably) work for Thumbnails an Preview.
+   All tested raw formats (Pef, Dng noticeably) work for Thumbnails and Preview.
    It is worth mentioning that the preview in the raw file is extracted. So very fast, but the camera settings are not applied.
 
 3) Adobe DNG Codec 2.0
