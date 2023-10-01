@@ -5,13 +5,16 @@ unit ExifToolsGui_ShellTree;
 
 interface
 
-uses System.Classes, System.SysUtils, Winapi.Windows, Vcl.Shell.ShellCtrls,
-      Winapi.Messages, ExifToolsGUI_MultiContextMenu;
+uses System.Classes, System.SysUtils,
+     Winapi.Windows, Winapi.ShlObj, Winapi.Messages,
+     Vcl.Shell.ShellCtrls,
+     ExifToolsGUI_MultiContextMenu;
 
 type
 
   TShellTreeView = class(Vcl.Shell.ShellCtrls.TShellTreeView, IShellCommandVerbExifTool)
   private
+    ICM2: IContextMenu2;
     FOnBeforeContextMenu: TNotifyEvent;
     FOnAfterContextMenu: TNotifyEvent;
   protected
@@ -19,6 +22,7 @@ type
     procedure ShowMultiContextMenu(MousePos: TPoint);
     procedure WndProc(var Message: TMessage); override;
  public
+    constructor Create(AOwner: TComponent); override;
     procedure ExecuteCommandExif(Verb: string; var Handled: boolean);
     property OnBeforeContextMenu: TNotifyEvent read FOnBeforeContextMenu write FOnBeforeContextMenu;
     property OnAfterContextMenu: TNotifyEvent read FOnAfterContextMenu write FOnAfterContextMenu;
@@ -26,10 +30,14 @@ type
 
 implementation
 
-uses Winapi.ShlObj, ExifToolsGUI_Thumbnails, ExiftoolsGui_ShellList, Vcl.ComCtrls, Vcl.Forms;
+uses ExifToolsGUI_Thumbnails, ExiftoolsGui_ShellList, Vcl.ComCtrls, Vcl.Forms;
 
-var
-  ICM2: IContextMenu2;
+constructor TShellTreeView.Create(AOwner: TComponent);
+begin
+  Inherited Create(AOwner);
+
+  ICM2 := nil;
+end;
 
 procedure TShellTreeView.ShowMultiContextMenu(MousePos: TPoint);
 begin
