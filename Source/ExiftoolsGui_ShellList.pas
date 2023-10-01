@@ -4,7 +4,7 @@ interface
 
 uses
   System.Classes, System.SysUtils, System.Types, System.Threading,
-  Winapi.Windows, Winapi.Messages,
+  Winapi.Windows, Winapi.Messages, Winapi.ShlObj,
   Vcl.Shell.ShellCtrls, Vcl.Shell.ShellConsts, Vcl.ComCtrls, Vcl.Menus, Vcl.Controls,
   ExifToolsGUI_Thumbnails, ExifToolsGUI_MultiContextMenu;
 
@@ -54,6 +54,7 @@ type
     FOnEnumColumnsAfterEvent: TNotifyEvent;
     FOnPathChanged: TNotifyEvent;
     FOnOwnerDataFetchEvent: TOwnerDataFetchEvent;
+    ICM2: IContextMenu2;
     procedure SetColumnSorted(AValue: boolean);
     procedure InitThumbNails;
     procedure SetThumbNailSize(AValue: integer);
@@ -110,7 +111,7 @@ type
 implementation
 
 uses System.Win.ComObj, System.UITypes,
-     Winapi.CommCtrl, Winapi.ShlObj, Vcl.Graphics, ExifToolsGUI_Utils,
+     Winapi.CommCtrl, Vcl.Graphics, ExifToolsGUI_Utils,
      UnitFilesOnClipBoard;
 
 // res file contains the ?
@@ -119,9 +120,6 @@ uses System.Win.ComObj, System.UITypes,
 
 const
   QUESTIONMARK = 'QUESTIONMARK';
-
-var
-  ICM2: IContextMenu2;
 
   // Listview Sort
 
@@ -538,6 +536,8 @@ end;
 constructor TShellListView.Create(AOwner: TComponent);
 begin
   Inherited Create(AOwner);
+
+  ICM2 := nil;
 
   FThumbNailSize := 0;
   FGenerating := 0;
