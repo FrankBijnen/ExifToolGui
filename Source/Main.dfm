@@ -241,6 +241,20 @@ object FMain: TFMain
           Caption = 'Workspace'
           OnClick = SpeedBtnExifClick
         end
+        object EditFindMeta: TLabeledEdit
+          Left = 124
+          Top = 29
+          Width = 136
+          Height = 21
+          Color = clWhite
+          EditLabel.Width = 20
+          EditLabel.Height = 21
+          EditLabel.Caption = 'Find'
+          LabelPosition = lpLeft
+          TabOrder = 0
+          Text = ''
+          OnKeyPress = EditFindMetaKeyPress
+        end
       end
       object AdvPanelMetaBottom: TPanel
         Left = 0

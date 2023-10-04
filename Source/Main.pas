@@ -166,6 +166,7 @@ type
     CmbETDirectMode: TComboBox;
     N4: TMenuItem;
     MAPIWindowsWideFile: TMenuItem;
+    EditFindMeta: TLabeledEdit;
     procedure ShellListClick(Sender: TObject);
     procedure ShellListKeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
     procedure SpeedBtnExifClick(Sender: TObject);
@@ -263,6 +264,7 @@ type
     procedure ShellTreeChanging(Sender: TObject; Node: TTreeNode; var AllowChange: Boolean);
     procedure MAPIWindowsWideFileClick(Sender: TObject);
     procedure MetadataListDblClick(Sender: TObject);
+    procedure EditFindMetaKeyPress(Sender: TObject; var Key: Char);
   private
     { Private declarations }
     ETBarSeriesFocal: TBarSeries;
@@ -1824,6 +1826,28 @@ begin
     ShowMetadata;
     ShowPreview;
   end;
+end;
+
+procedure TFMain.EditFindMetaKeyPress(Sender: TObject; var Key: Char);
+var NewRow: Integer;
+begin
+  StatusBar.Panels[1].Text := '';
+  if (Key = #13) then
+  begin
+    NewRow := MetadataList.Row;
+    while (NewRow < Metadatalist.RowCount -1) do
+    begin
+      if (MetadataList.Keys[NewRow +1] <> '') and // Dont look in group names
+         (ContainsText(MetadataList.Strings[NewRow], TLabeledEdit(Sender).Text)) then
+      begin
+        MetadataList.Row := NewRow +1;
+        Exit;
+      end;
+      Inc(NewRow);
+    end;
+    StatusBar.Panels[1].Text := 'No (more) matches found.';
+  end;
+  MetadataList.Row := 1;
 end;
 
 procedure TFMain.EditQuickEnter(Sender: TObject);
