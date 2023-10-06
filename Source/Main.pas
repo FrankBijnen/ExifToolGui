@@ -832,7 +832,7 @@ begin
   if MessageDlg('This will fill Exif:LensInfo of selected files with relevant' + #10#13 + 'values from Makernotes data (where possible).' +
     #10#13#10#13 + 'OK to proceed?', mtInformation, [mbOk, mbCancel], 0) = mrOK then
   begin
-    ETcmd := '-Exif:LensInfo<LensID' + CRLF + '-Exif:LensModel<LensID';
+    ETcmd := '-Exif:LensInfo<LensID' + CRLF + '-Exif:LensModel<LensID' + CRLF;
     ET_OpenExec(ETcmd, GetSelectedFiles, ETout, ETerr);
     RefreshSelected(Sender);
     ShowMetadata;
@@ -1054,7 +1054,7 @@ begin
           end;
           ETcmd := ETcmd + '-ext' + CRLF + DstExt;
           ETCounter := GetNrOfFiles(ShellList.Path, '*.' + DstExt, (i = mrYes));
-          if (ET_OpenExec(ETcmd, '.', ETout, ETerr)) then
+          if (ET_OpenExec(ETcmd, '.' + CRLF, ETout, ETerr)) then
           begin
             RefreshSelected(Sender);
             ShowMetadata;
@@ -1169,9 +1169,9 @@ end;
 
 procedure TFMain.MJPGtoCR2Click(Sender: TObject);
 var
-  i, j: smallint;
+  i, j: integer;
   n, W, H, c: Word;
-  dirJPG, Img, tx, outs, errs: string;
+  dirJPG, Img, tx, txH, txW, outs, errs, AllErrs: string;
 begin
   n := MessageDlg('Only those JPG images will be embedded into selected'#10#13 + 'CR2 files, where:' + #10#13 + '- CR2/JPG filenames are equal,' +
     #10#13 + '- JPG width or height is min 512pix,' + #10#13 + '- JPG width & height is multiple of 8.' + #10#13 +
@@ -1186,32 +1186,37 @@ begin
       if dirJPG[length(dirJPG)] <> '\' then
         dirJPG := dirJPG + '\';
       LabelCounter.Visible := true;
+      AllErrs := '';
       c := 0;
       for i := 0 to j - 1 do
       begin
         LabelCounter.Caption := IntToStr(j - i);
-        Img := ShellList.Folders[i].PathName;
-        tx := ExtractFileExt(Img);
+        Img := ShellList.FileName(i);
+        tx := ShellList.FileExt(i);
         if UpperCase(tx) = '.CR2' then
         begin
           n := pos(tx, Img); // get file extension position
           SetLength(Img, n); // filename ending with dot (without extension)
           if FileExists(dirJPG + Img + 'jpg') then
           begin
-            ET_OpenExec('-s3' + CRLF + '-ImageSize', dirJPG + Img + 'jpg', outs, errs);
+            ET_OpenExec('-s3' + CRLF + '-ImageSize', GetSelectedFiles(dirJPG + Img + 'jpg', false), outs, errs);
+            if (errs <> '') then
+            begin
+              AllErrs := AllErrs + Img + ' ' + errs + CRLF;
+              continue;
+            end;
+
             tx := outs;
-            n := pos('x', tx);
-            SetLength(tx, n - 1);
-            W := StrToIntDef(tx, 0);
-            tx := outs;
-            Delete(tx, 1, n);
-            H := StrToIntDef(tx, 0);
+            txH := NextField(tx, #13#10);
+            txW := Nextfield(txh, 'x');
+            W := StrToIntDef(txW, 0);
+            H := StrToIntDef(txH, 0);
             if H > W then
             begin // jpg is portrait
               n := W;
               W := H;
               H := n;
-              ET_OpenExec('-s3' + CRLF + '-exif:Orientation#', Img + 'cr2');
+              ET_OpenExec('-s3' + CRLF + '-exif:Orientation#', GetSelectedFiles(Img + 'cr2', false));
               n := StrToIntDef(outs, 1);
             end
             else
@@ -1219,7 +1224,7 @@ begin
 
             if (W >= 512) and ((W mod 8) = 0) and ((H mod 8) = 0) then
             begin
-              ET_OpenExec('-m' + CRLF + '-All=', dirJPG + Img + 'jpg');
+              ET_OpenExec('-m' + CRLF + '-All=', GetSelectedFiles(dirJPG + Img + 'jpg', false));
               case n of
                 6:
                   tx := 'jpegtran -rotate 270 ';
@@ -1231,26 +1236,26 @@ begin
               tx := '-PreviewImage<=' + dirJPG + '%f.jpg';
               tx := tx + CRLF + '-IFD0:ImageWidth=' + IntToStr(W);
               tx := tx + CRLF + '-IFD0:ImageHeight=' + IntToStr(H);
-              ET_OpenExec(tx, Img + 'cr2');
+              ET_OpenExec(tx, GetSelectedFiles(Img + 'cr2', false));
               inc(c);
             end
             else
-              errs := errs + Img + 'JPG -invalid size' + CRLF
+              AllErrs := AllErrs + Img + ' JPG -invalid size' + CRLF
           end
           else
-            errs := errs + Img + 'JPG -not found' + CRLF;
+            AllErrs := AllErrs + Img + ' JPG -not found' + CRLF;
         end;
       end;
       LabelCounter.Visible := false;
       StatusBar.Panels[1].Text := IntToStr(c) + ' of ' + IntToStr(j) + ' files updated.';
-      if length(errs) > 0 then
+      if length(AllErrs) > 0 then
       with FLogWin do
       begin
         // Clear all other data
         LBExecs.Clear;
         MemoOuts.Clear;
         MemoCmds.Clear;
-        MemoErrs.Text := errs;
+        MemoErrs.Text := AllErrs;
         Show;
       end;
     end;
@@ -1412,7 +1417,7 @@ begin
   try
     if ET_Options.ETLangDef <> '' then
     begin
-      ET_OpenExec('-X' + CRLF + '-l' + CRLF + xMeta + 'All', ShellList.FileName, ETout);
+      ET_OpenExec('-X' + CRLF + '-l' + CRLF + xMeta + 'All', GetSelectedFiles(ShellList.FileName, false), ETout);
       Indx := ETout.Count;
       while Indx > 1 do
       begin

@@ -1,4 +1,4 @@
-unit ExiftoolsGui_ShellList;
+unit ExifToolsGui_ShellList;
 
 interface
 
