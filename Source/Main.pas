@@ -1216,8 +1216,8 @@ begin
               n := W;
               W := H;
               H := n;
-              ET_OpenExec('-s3' + CRLF + '-exif:Orientation#', GetSelectedFiles(Img + 'cr2', false));
-              n := StrToIntDef(outs, 1);
+              ET_OpenExec('-s3' + CRLF + '-exif:Orientation#', GetSelectedFiles(Img + 'cr2', false), outs, errs);
+              n := StrToIntDef(LeftStr(outs, 1), 1);
             end
             else
               n := 1;

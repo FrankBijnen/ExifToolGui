@@ -45,7 +45,7 @@ var
 
 implementation
 
-uses Main, ExifTool, DateUtils;
+uses Main, ExifTool, System.DateUtils;
 {$R *.dfm}
 
 const
