@@ -5,7 +5,17 @@ interface
 
 uses Winapi.ShlObj, Winapi.ActiveX, Winapi.Wincodec, Winapi.Windows, Winapi.Messages,
   System.Classes, System.SysUtils, System.Variants, System.StrUtils, System.Math, System.Threading,
+  System.Generics.Collections,
   Vcl.Forms, Vcl.Dialogs, Vcl.Shell.ShellCtrls, Vcl.Graphics;
+
+type
+  TPreviewInfo = record
+    GroupName: string;
+    TagName: string;
+    SizeString: string;
+    SizeInt: integer;
+  end;
+  TPreviewInfoList = TList<TPreviewInfo>;
 
 // Debug
 procedure BreakPoint;
@@ -19,6 +29,7 @@ function GetAppPath: string;
 function GetTempDirectory: string;
 function GetExifToolTmp: string;
 function GetHtmlTmp: string;
+function GetPreviewTmp: string;
 function GetEdgeUserData: string;
 function GetNrOfFiles(StartDir, FileMask: string; subDir: boolean): integer;
 function GetComSpec: string;
@@ -41,6 +52,8 @@ procedure ResizeBitmapCanvas(Bitmap: TBitmap; W, H: integer; BackColor: TColor);
 // Message dialog that allows for caption and doesn't wrap lines at spaces.
 function MessageDlgEx(const AMsg, ACaption: string; ADlgType: TMsgDlgType; AButtons: TMsgDlgButtons; AParent: TForm = nil): integer;
 
+function GetPreviews(ETResult: TStringList; var Biggest: integer): TPreviewInfoList;
+
 implementation
 
 uses Winapi.ShellAPI, Winapi.KnownFolders, System.Win.Registry, System.UITypes, UFrmGenerate, MainDef;
@@ -58,6 +71,9 @@ const
 
 const
   HtmlTempFileName = 'ExifToolGUI.html';
+
+const
+  PreviewTempFileName = 'ExifToolGui_Preview.jpg';
 
 const
   EdgeUserDataDir = 'Edge';
@@ -144,6 +160,11 @@ end;
 function GetHtmlTmp: string;
 begin
   result := GetTempDirectory + HtmlTempFileName;
+end;
+
+function GetPreviewTmp: string;
+begin
+  result := GetTempDirectory + PreviewTempFileName;
 end;
 
 function GetEdgeUserData: string;
@@ -600,6 +621,39 @@ begin
   result := GetEnvVarValue('ComSpec');
   if (result = '') then
     result := 'cmd.exe';
+end;
+
+function GetPreviews(ETResult: TStringList; var Biggest: integer): TPreviewInfoList;
+var
+  Aline: string;
+  AResult: string;
+  ASizeInt: string;
+  BiggestSize: integer;
+  APreviewInfo: TPreviewInfo;
+begin
+  result := TPreviewInfoList.Create;
+  BiggestSize := 0;
+  Biggest := -1;
+  for Aline in ETResult do
+  begin
+    AResult := ALine;
+    with APreviewInfo do
+    begin
+      GroupName   := NextField(AResult, '[');             // Strip Leading [
+      GroupName   := NextField(AResult, ']');             // Group name
+      TagName     := Trim(NextField(AResult, ':'));       // Tag Name
+      SizeString  := Nextfield(AResult, '(Binary data');  // Strip
+      SizeString  := Nextfield(AResult, ', use -b');      // Size, including ' bytes'
+      ASizeInt    := SizeString;
+      TryStrToInt(NextField(ASizeInt, ' bytes'), SizeInt);
+      if (SizeInt > BiggestSize) then
+      begin
+        Biggest := result.Count;
+        BiggestSize := SizeInt;
+      end;
+    end;
+    result.Add(APreviewInfo);
+  end;
 end;
 
 initialization

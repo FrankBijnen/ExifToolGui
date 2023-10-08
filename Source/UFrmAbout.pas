@@ -32,7 +32,7 @@ var
 
 implementation
 
-uses ExifTool, ShellAPI;
+uses ExifTool, ExifToolsGui_LossLess, ShellAPI;
 
 {$R *.dfm}
 
@@ -90,13 +90,13 @@ begin
     LblExifTool.Caption := LblExifTool.Caption + 'MISSING!';
 
   LblJpegTools.Caption := 'jhead.exe=';
-  if ExecCMD('jhead', '') then
+  if HasJHead then
     LblJpegTools.Caption := LblJpegTools.Caption + 'ready'
   else
     LblJpegTools.Caption := LblJpegTools.Caption + 'missing';
 
   LblJpegTools.Caption := LblJpegTools.Caption + ',  jpegtran.exe=';
-  if ExecCMD('jpegtran', '') then
+  if HasJpegTran then
     LblJpegTools.Caption := LblJpegTools.Caption + 'ready'
   else
     LblJpegTools.Caption := LblJpegTools.Caption + 'missing';
