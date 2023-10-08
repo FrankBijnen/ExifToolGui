@@ -167,6 +167,9 @@ type
     N4: TMenuItem;
     MAPIWindowsWideFile: TMenuItem;
     EditFindMeta: TLabeledEdit;
+    N9: TMenuItem;
+    GenericExtractPreviews: TMenuItem;
+    GenericImportPreview: TMenuItem;
     procedure ShellListClick(Sender: TObject);
     procedure ShellListKeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
     procedure SpeedBtnExifClick(Sender: TObject);
@@ -265,6 +268,8 @@ type
     procedure MAPIWindowsWideFileClick(Sender: TObject);
     procedure MetadataListDblClick(Sender: TObject);
     procedure EditFindMetaKeyPress(Sender: TObject; var Key: Char);
+    procedure GenericExtractPreviewsClick(Sender: TObject);
+    procedure GenericImportPreviewClick(Sender: TObject);
   private
     { Private declarations }
     ETBarSeriesFocal: TBarSeries;
@@ -292,15 +297,13 @@ type
   public
     { Public declarations }
     function GetFirstSelectedFile: string;
-    function GetSelectedFiles(FileName: string = ''): string;
+    function GetSelectedFiles(FileName: string; MustExpandPath: boolean): string; overload;
+    function GetSelectedFiles(FileName: string = ''): string; overload;
     procedure ExecETEvent_Done(ExecNum: integer; EtCmds, EtOuts, EtErrs, StatusLine: string; PopupOnError: boolean);
     procedure UpdateStatusBar_FilesShown;
     procedure SetGuiColor;
-
-  var
-    GUIBorderWidth, GUIBorderHeight: integer; // Initialized in OnShow
-    GUIcolor: TColor;
-
+    var GUIBorderWidth, GUIBorderHeight: integer; // Initialized in OnShow
+    var GUIcolor: TColor;
   end;
 
 var
@@ -310,8 +313,9 @@ implementation
 
 uses System.StrUtils, System.Math, System.Masks, System.UITypes,
   Vcl.ClipBrd, Winapi.ShlObj, Winapi.ShellAPI, Vcl.Shell.ShellConsts, Vcl.Themes, Vcl.Styles,
-  ExifTool, ExifInfo, MainDef, LogWin, Preferences, EditFFilter, EditFCol, UFrmStyle, UFrmAbout,
-  QuickMngr, DateTimeShift, DateTimeEqual, CopyMeta, RemoveMeta, Geotag, Geomap, CopyMetaSingle, FileDateTime;
+  ExifTool, ExifInfo, ExifToolsGui_LossLess, MainDef, LogWin, Preferences, EditFFilter, EditFCol, UFrmStyle, UFrmAbout,
+  QuickMngr, DateTimeShift, DateTimeEqual, CopyMeta, RemoveMeta, Geotag, Geomap, CopyMetaSingle, FileDateTime,
+  UFrmGenericExtract, UFrmGenericImport;
 
 {$R *.dfm}
 
@@ -573,6 +577,24 @@ begin
   end;
 end;
 
+procedure TFMain.GenericExtractPreviewsClick(Sender: TObject);
+begin
+  if FGenericExtract.ShowModal = mrOK then
+  begin
+    RefreshSelected(Sender);
+    ShowMetadata;
+  end;
+end;
+
+procedure TFMain.GenericImportPreviewClick(Sender: TObject);
+begin
+  if FGenericImport.ShowModal = mrOK then
+  begin
+    RefreshSelected(Sender);
+    ShowMetadata;
+  end;
+end;
+
 function TFMain.GetFirstSelectedFile: string;
 begin
   result := '';
@@ -582,14 +604,14 @@ begin
     result := ShellList.FileName(0) + CRLF;
 end;
 
-function TFMain.GetSelectedFiles(FileName: string = ''): string;
+function TFMain.GetSelectedFiles(FileName: string; MustExpandPath: boolean): string;
 var
   AnItem: TListItem;
   FullPath: string;
 begin
   result := '';
   FullPath := '';
-  if (ET_Options.ETAPIWindowsWideFile = '') then
+  if (MustExpandPath) then
     FullPath := IncludeTrailingBackslash(ShellList.Path);
   if (FileName <> '') then
     result := FullPath + FileName + CRLF
@@ -601,6 +623,11 @@ begin
         result := result + FullPath + ShellList.FileName(AnItem.Index) + CRLF;
     end;
   end;
+end;
+
+function TFMain.GetSelectedFiles(FileName: string = ''): string;
+begin
+  result := GetSelectedFiles(FileName, (ET_Options.ETAPIWindowsWideFile = ''));
 end;
 
 procedure TFMain.EditMapFindChange(Sender: TObject);
@@ -1100,38 +1127,101 @@ end;
 
 procedure TFMain.MJPGAutorotateClick(Sender: TObject);
 var
-  Img, FileName: string;
+  Img: string;
+  FileName: string;
+  FullPathName: string;
+  ETcmd: string;
+  outs, errs: string;
+  ETResult: TStringList;
+  APreviewList: TPreviewInfoList;
+  AMaxPos: integer;
   AnItem: TListItem;
+  N: Integer;
+  Angle: integer;
 begin
   if MessageDlg('This will rotate selected JPG files according to' + #10#13 + 'existing Exif:Orientation value.' + #10#13 +
     'In case menu Preserve Date modified is checked,' + #10#13 + 'Exif DateTime values (on ALL selected files) will' + #10#13 +
     'be used for this purpose.' + #10#13#10#13 + 'OK to proceed?', mtInformation, [mbOk, mbCancel], 0) = mrOK then
   begin
-
-    Img := '';
-    for AnItem in ShellList.Items do
-    begin
-      if (ShellList.SelCount = 0) or (AnItem.Selected) then
-      begin
-        FileName := ShellList.FileName(AnItem.Index);
-        if IsJpeg(FileName) then
-          Img := Img + ' "' + FileName + '"';
-      end;
-    end;
-
-    if (Img = '') then
+    if (ShellList.SelCount < 1) then
     begin
       ShowMessage('No files selected.');
       exit;
     end;
 
-    if MPreserveDateMod.Checked then
-      Img := ' -ft' + Img;
-    // ^ sets win DateModified as in Exif:DateTimeOriginal>ModifyDate>CreateDate
-    if ExecCMD('jhead -autorot -q' + Img, ShellList.Path) then
-      ShowMessage('Autorotate finished.')
-    else
-      ShowMessage('Missing jhead.exe && jpegtran.exe!');
+    img := '';
+    for AnItem in ShellList.Items do
+    begin
+      if (AnItem.Selected = false) then
+        continue;
+      if (IsJpeg(ShellList.FileName(AnItem.Index)) = false) then
+        continue;
+      FileName := ShellList.FileName(AnItem.Index);
+      // For JHead only build a list of filenames.
+      if (GetLossLessMethod = TLossLessMethod.JheadJpegTran) then
+        Img := Img + ' "' + FileName + '"'
+      else
+      begin
+        FullPathName := IncludeTrailingBackslash(ShellList.Path) + FileName;
+
+        // Read current Orientation
+        ET_OpenExec('-s3' + CRLF + '-exif:Orientation#', FileName + CRLF, outs, errs);
+        N := StrToIntDef(LeftStr(outs, 1), 1);
+        case N of
+          3: Angle := 180;
+          6: Angle := 90;
+          8: Angle := 270;
+          else
+            continue;  // No need to modifyu
+        end;
+
+        // Rotate, to match orientation
+        PerformLossLess(FullPathName, Angle, 0);
+
+        // reset orientation and modified date
+        ETcmd := '-s3' + CRLF + '-exif:Orientation#=1';
+        if MPreserveDateMod.Checked then
+          ETcmd := ETcmd + CRLF + '-FileModifyDate<Exif:DateTimeOriginal' + CRLF;
+
+        // Do the preview image
+        ET_OpenExec(ETcmd, FileName + CRLF, outs, errs);
+        ETResult := TStringList.Create;
+        try
+          ETcmd := '-s1' + CRLF + '-a' + CRLF + '-G' + CRLF + '-Preview:All';
+          ET_OpenExec(ETcmd, FileName + CRLF, ETResult);
+          APreviewList := GetPreviews(ETResult, AMaxPos);
+          try
+            if (AMaxPos > -1) then
+            begin
+
+              ETcmd := '-b' + CRLF + '-W!' + CRLF + GetPreviewTmp + CRLF;
+              ETcmd := ETcmd + '-' + APreviewList[AMaxPos].GroupName + ':' + APreviewList[AMaxPos].TagName + CRLF;
+              ET_OpenExec(ETcmd, FileName + CRLF);
+
+              PerformLossLess(GetPreviewTmp, Angle, 0);
+
+              ETcmd := '-' + APreviewList[AMaxPos].GroupName + ':' + APreviewList[AMaxPos].TagName + '<=' + GetPreviewTmp + CRLF;
+              ET_OpenExec(ETcmd, FileName + CRLF);
+            end;
+          finally
+            APreviewList.Free;
+          end;
+        finally
+          ETResult.Free;
+        end;
+      end;
+    end;
+
+    if (GetLossLessMethod = TLossLessMethod.JheadJpegTran) then
+    begin
+      // Execute at once.
+      if MPreserveDateMod.Checked then
+        Img := ' -ft' + Img;
+      // ^ sets win DateModified as in Exif:DateTimeOriginal>ModifyDate>CreateDate
+      if ExecCMD('jhead -autorot -q' + Img, ShellList.Path) and
+         ExecCMD('jhead -norot -q' + Img, ShellList.Path) then
+        ShowMessage('Autorotate finished.');
+    end;
 
     RefreshSelected(Sender);
     ShowMetadata;
@@ -1222,8 +1312,19 @@ begin
             else
               n := 1;
 
-            if (W >= 512) and ((W mod 8) = 0) and ((H mod 8) = 0) then
+            if (W >= 512) then
             begin
+              // Crop to modulo 8
+              if ((W mod 8) <> 0) or
+                 ((H mod 8) <> 0) then
+              begin
+                if not PerformLossLess(dirJPG + Img + 'jpg', 0, 8) then
+                begin
+                  AllErrs := AllErrs + Img + ' JPG -size not multiple of 8, not possible with jpegtran' + CRLF;
+                  continue;
+                end;
+              end;
+              // remove all Exif data
               ET_OpenExec('-m' + CRLF + '-All=', GetSelectedFiles(dirJPG + Img + 'jpg', false));
               case n of
                 6:
@@ -1949,11 +2050,13 @@ var
   FPath: string;
   ABitMap: TBitmap;
   HBmp: HBITMAP;
+  CrWait, CrNormal: HCURSOR;
 begin
   RotateImg.Picture.Bitmap := nil;
   if ShellList.SelCount > 0 then
   begin
-    Screen.Cursor := crHourGlass;
+    CrWait := LoadCursor(0, IDC_WAIT);
+    CrNormal := SetCursor(CrWait);
     try
       FPath := IncludeTrailingBackslash(ShellList.Path) + ShellList.FileName;
       Rotate := 0;
@@ -1987,7 +2090,7 @@ begin
         ABitMap.Free;
       end;
     finally
-      Screen.Cursor := crDefault;
+      SetCursor(CrNormal);
     end;
   end;
 end;
@@ -2787,14 +2890,15 @@ end;
 procedure TFMain.SpeedBtnChartRefreshClick(Sender: TObject);
 var
   Ext: string;
-  i: integer;
+  I: integer;
+  CrWait, CrNormal: HCURSOR;
 begin
-  for i := Low(ChartFLength) to High(ChartFLength) do
-    ChartFLength[i] := 0;
-  for i := Low(ChartFNumber) to High(ChartFNumber) do
-    ChartFNumber[i] := 0;
-  for i := Low(ChartISO) to High(ChartISO) do
-    ChartISO[i] := 0;
+  for I := Low(ChartFLength) to High(ChartFLength) do
+    ChartFLength[I] := 0;
+  for I := Low(ChartFNumber) to High(ChartFNumber) do
+    ChartFNumber[I] := 0;
+  for I := Low(ChartISO) to High(ChartISO) do
+    ChartISO[I] := 0;
   Ext := '*.*';
   if AdvRadioGroup1.ItemIndex > 0 then
     Ext := '*.' + AdvRadioGroup1.Items[AdvRadioGroup1.ItemIndex];
@@ -2802,53 +2906,54 @@ begin
   ETBarSeriesFnum.Clear;
   ETBarSeriesIso.Clear;
 
-  Screen.Cursor := -11; // =crHourGlass
+  CrWait := LoadCursor(0, IDC_WAIT);
+  CrNormal := SetCursor(CrWait);
   try
     ChartFindFiles(ShellList.Path, Ext, AdvCheckBox_Subfolders.Checked);
   finally
-    Screen.Cursor := 0; // crDefault;
+    SetCursor(CrNormal);
   end;
 
   ChartMaxFLength := 0;
-  for i := Low(ChartFLength) to High(ChartFLength) do
+  for I := Low(ChartFLength) to High(ChartFLength) do
   begin
-    if ChartFLength[i] > 0 then
+    if ChartFLength[I] > 0 then
     begin
-      if ChartFLength[i] > ChartMaxFLength then
-        ChartMaxFLength := ChartFLength[i];
-      Ext := IntToStr(i);
-      if i < 100 then
+      if ChartFLength[I] > ChartMaxFLength then
+        ChartMaxFLength := ChartFLength[I];
+      Ext := IntToStr(I);
+      if I < 100 then
         Insert('.', Ext, length(Ext)) // 58->5.8
       else
         SetLength(Ext, length(Ext) - 1);
-      ETBarSeriesFocal.AddBar(ChartFLength[i], Ext, CLFocal);
+      ETBarSeriesFocal.AddBar(ChartFLength[I], Ext, CLFocal);
     end;
   end;
   ChartMaxFLength := Round(ChartMaxFLength * 1.1);
 
   ChartMaxFNumber := 0;
-  for i := Low(ChartFNumber) to High(ChartFNumber) do
+  for I := Low(ChartFNumber) to High(ChartFNumber) do
   begin
-    if ChartFNumber[i] > 0 then
+    if ChartFNumber[I] > 0 then
     begin
-      if ChartFNumber[i] > ChartMaxFNumber then
-        ChartMaxFNumber := ChartFNumber[i];
-      Ext := IntToStr(i);
+      if ChartFNumber[I] > ChartMaxFNumber then
+        ChartMaxFNumber := ChartFNumber[I];
+      Ext := IntToStr(I);
       Insert('.', Ext, length(Ext)); // 40->4.0
-      ETBarSeriesFnum.AddBar(ChartFNumber[i], Ext, CLFNumber);
+      ETBarSeriesFnum.AddBar(ChartFNumber[I], Ext, CLFNumber);
     end;
   end;
   ChartMaxFNumber := Round(ChartMaxFNumber * 1.1);
 
   ChartMaxISO := 0;
-  for i := Low(ChartISO) to High(ChartISO) do
+  for I := Low(ChartISO) to High(ChartISO) do
   begin
-    if ChartISO[i] > 0 then
+    if ChartISO[I] > 0 then
     begin
-      if ChartISO[i] > ChartMaxISO then
-        ChartMaxISO := ChartISO[i];
-      Ext := IntToStr(i) + '0'; // 80->800
-      ETBarSeriesIso.AddBar(ChartISO[i], Ext, CLISO);
+      if ChartISO[I] > ChartMaxISO then
+        ChartMaxISO := ChartISO[I];
+      Ext := IntToStr(I) + '0'; // 80->800
+      ETBarSeriesIso.AddBar(ChartISO[I], Ext, CLISO);
     end;
   end;
   ChartMaxISO := Round(ChartMaxISO * 1.1);

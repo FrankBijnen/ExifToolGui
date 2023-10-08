@@ -19,6 +19,7 @@ uses
   ExifToolsGui_ShellTree in 'ExifToolsGui_ShellTree.pas',
   ExifToolsGUI_MultiContextMenu in 'ExifToolsGUI_MultiContextMenu.pas',
   ExifToolsGUI_Thumbnails in 'ExifToolsGUI_Thumbnails.pas',
+  ExifToolsGui_LossLess in 'ExifToolsGui_LossLess.pas',
   ExifInfo in 'ExifInfo.pas',
   ExifTool in 'ExifTool.pas',
   Main in 'Main.pas' {FMain},
@@ -27,7 +28,8 @@ uses
   EditFFilter in 'EditFFilter.pas' {FEditFFilter},
   EditFCol in 'EditFCol.pas' {FEditFColumn},
   QuickMngr in 'QuickMngr.pas' {FQuickManager},
-  DateTimeShift in 'DateTimeShift.pas' {FDateTimeShift},
+  UFrmGenericImport in 'UFrmGenericImport.pas' {FGenericImport},
+  UFrmGenericExtract in 'UFrmGenericExtract.pas' {FGenericExtract},
   CopyMeta in 'CopyMeta.pas' {FCopyMetadata},
   Geotag in 'Geotag.pas' {FGeotag},
   DateTimeEqual in 'DateTimeEqual.pas' {FDateTimeEqual},
@@ -38,7 +40,8 @@ uses
   UFrmPlaces in 'UFrmPlaces.pas' {FrmPlaces},
   UFrmStyle in 'UFrmStyle.pas' {FrmStyle},
   UFrmAbout in 'UFrmAbout.pas' {FrmAbout},
-  UFrmGenerate in 'UFrmGenerate.pas' {FrmGenerate};
+  UFrmGenerate in 'UFrmGenerate.pas' {FrmGenerate},
+  DateTimeShift in 'DateTimeShift.pas' {FDateTimeShift};
 
 {$R *.res}
 
@@ -56,7 +59,7 @@ begin
   Application.CreateForm(TFEditFFilter, FEditFFilter);
   Application.CreateForm(TFEditFColumn, FEditFColumn);
   Application.CreateForm(TFQuickManager, FQuickManager);
-  Application.CreateForm(TFDateTimeShift, FDateTimeShift);
+  Application.CreateForm(TFGenericImport, FGenericImport);
   Application.CreateForm(TFCopyMetadata, FCopyMetadata);
   Application.CreateForm(TFGeotag, FGeotag);
   Application.CreateForm(TFDateTimeEqual, FDateTimeEqual);
@@ -67,5 +70,7 @@ begin
   Application.CreateForm(TFrmStyle, FrmStyle);
   Application.CreateForm(TFrmAbout, FrmAbout);
   Application.CreateForm(TFrmGenerate, FrmGenerate);
+  Application.CreateForm(TFDateTimeShift, FDateTimeShift);
+  Application.CreateForm(TFGenericExtract, FGenericExtract);
   Application.Run;
 end.

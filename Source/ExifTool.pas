@@ -208,6 +208,7 @@ var
   ThisExecNum: byte;
   CheckNum: word;
   Wr: TWaitResult;
+  CrWait, CrNormal: HCURSOR;
 begin
   result := false;
 
@@ -231,7 +232,8 @@ begin
     ETEvent.ReSetEvent;
 
     ETstream := TStringStream.Create;
-    Screen.Cursor := -11; // crHourglass
+    CrWait := LoadCursor(0, IDC_WAIT);
+    CrNormal := SetCursor(CrWait);
     try
       ETShowCounter := (ETCounterLabel <> nil) and (ETCounter > 1);
       ETCounterLabel.Visible := ETShowCounter;
@@ -313,7 +315,7 @@ begin
       result := true;
     finally
       ETstream.Free;
-      Screen.Cursor := 0; // crDefault
+      SetCursor(CrNormal);
       ETEvent.SetEvent;
     end;
   end;
@@ -378,8 +380,10 @@ var
   BytesCount: Dword;
   BuffContent: ^word;
   CanUseUtf8: boolean;
+  CrWait, CrNormal: HCURSOR;
 begin
-  Screen.Cursor := -11; // =crHourGlass
+  CrWait := LoadCursor(0, IDC_WAIT);
+  CrNormal := SetCursor(CrWait);
   ETstream := TStringStream.Create;
   try
     FillChar(ProcessInfo, SizeOf(TProcessInformation), #0);
@@ -477,7 +481,7 @@ begin
     ETCounter := 0;
   finally
     ETstream.Free;
-    Screen.Cursor := 0; // crDefault
+    SetCursor(CrNormal);
   end;
 end;
 
@@ -503,6 +507,7 @@ var
   PipeErrRead, PipeErrWrite: THandle;
   PWorkDir: PChar;
   BytesCount: Dword;
+  CrWait, CrNormal: HCURSOR;
 begin
   FillChar(ProcessInfo, SizeOf(TProcessInformation), #0);
   FillChar(SecurityAttr, SizeOf(TSecurityAttributes), #0);
@@ -529,7 +534,8 @@ begin
   ETout := TStringList.Create;
   ETerr := TStringList.Create;
   ETstream := TMemoryStream.Create;
-  Screen.Cursor := -11; // =crHourGlass
+  CrWait := LoadCursor(0, IDC_WAIT);
+  CrNormal := SetCursor(CrWait);
   try
     UniqueString(xCmd); // Required by CreateprocessW
     result := CreateProcess(nil, PChar(xCmd), nil, nil, true,
@@ -577,7 +583,7 @@ begin
     ETout.Free;
     ETerr.Free;
     ETstream.Free;
-    Screen.Cursor := 0; // crDefault
+    SetCursor(CrNormal);
   end;
 end;
 

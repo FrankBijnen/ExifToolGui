@@ -1087,6 +1087,17 @@ object FMain: TFMain
           OnClick = MJPGtoCR2Click
         end
       end
+      object N9: TMenuItem
+        Caption = '-'
+      end
+      object GenericExtractPreviews: TMenuItem
+        Caption = 'Generic extract previews'
+        OnClick = GenericExtractPreviewsClick
+      end
+      object GenericImportPreview: TMenuItem
+        Caption = 'Generic import preview'
+        OnClick = GenericImportPreviewClick
+      end
     end
     object MModify: TMenuItem
       Caption = 'Modify'
