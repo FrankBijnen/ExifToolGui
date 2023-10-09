@@ -8,7 +8,7 @@ type TLossLessMethod = (NotTested, JheadJpegTran, Internal);
 function GetLossLessMethod: TLossLessMethod;
 function HasJHead: boolean;
 function HasJpegTran: boolean;
-function PerformLossLess(AJpeg: string; Angle, Modulo: integer): boolean;
+function PerformLossLess(AJpeg: string; Angle, Modulo: integer; OJpeg: string = ''): boolean;
 
 implementation
 
@@ -39,7 +39,7 @@ begin
   result := LossLessMethod;
 end;
 
-function PerformLossLess(AJpeg: string; Angle, Modulo: integer): boolean;
+function PerformLossLess(AJpeg: string; Angle, Modulo: integer; OJpeg: string = ''): boolean;
 var LossLess: TsdLosslessOperation;
     JpegImage: TsdJpegImage;
     L, T, R, B:integer;
@@ -73,8 +73,10 @@ begin
          (B <> JpegImage.Height) then
         LossLess.Crop(L, T, R, B);
     end;
-
-    JpegImage.SaveToFile(AJpeg);
+    if (OJpeg <> '') then
+      JpegImage.SaveToFile(OJpeg)
+    else
+      JpegImage.SaveToFile(AJpeg);
   finally
     JpegImage.Free;
   end;

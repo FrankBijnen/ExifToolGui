@@ -153,43 +153,13 @@ begin
 end;
 
 procedure TFGenericExtract.FormShow(Sender: TObject);
-var
-  ETResult: TStringList;
-  AMaxPos: integer;
-  AListItem: TListItem;
-  APreviewList: TPreviewInfoList;
-  APreviewInfo: TPreviewInfo;
 begin
   Left := FMain.Left + FMain.GUIBorderWidth + FMain.AdvPageFilelist.Left;
   Top := FMain.Top + FMain.GUIBorderHeight;
   Application.OnHint := DisplayHint;
 
-  ETResult := TStringList.Create;
-  try
-    LvPreviews.Items.Clear;
-    ETcmd := '-s1' + CRLF + '-a' + CRLF + '-G' + CRLF + '-Preview:All';
-    ET_OpenExec(ETcmd, FMain.GetFirstSelectedFile, ETResult);
-    APreviewList := GetPreviews(ETResult, AMaxPos);
-    try
-      for APreviewInfo in APreviewList do
-      begin
-        AListItem := LvPreviews.Items.Add;
-        AListItem.Caption := APreviewInfo.GroupName;
-        AListItem.SubItems.Add(APreviewInfo.TagName);
-        AListItem.SubItems.Add(APreviewInfo.SizeString);
-      end;
-    finally
-      APreviewList.Free;
-    end;
-
-    // Check the greatest
-    if (AMaxPos >= 0) then
-      LvPreviews.Items[AMaxPos].Checked := true;
-
-  finally
-    Button2.Enabled := LvPreviews.Items.Count > 0;
-    ETResult.Free;
-  end;
+  FillPreviewInListView(FMain.GetFirstSelectedFile, LvPreviews);
+  Button2.Enabled := LvPreviews.Items.Count > 0;
 end;
 
 end.
