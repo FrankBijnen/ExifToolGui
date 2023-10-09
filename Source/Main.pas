@@ -1081,7 +1081,7 @@ begin
           end;
           ETcmd := ETcmd + '-ext' + CRLF + DstExt;
           ETCounter := GetNrOfFiles(ShellList.Path, '*.' + DstExt, (i = mrYes));
-          if (ET_OpenExec(ETcmd, '.' + CRLF, ETout, ETerr)) then
+          if (ET_OpenExec(ETcmd, '.', ETout, ETerr)) then
           begin
             RefreshSelected(Sender);
             ShowMetadata;
@@ -1312,18 +1312,8 @@ begin
             else
               n := 1;
 
-            if (W >= 512) then
+            if (W >= 512) and ((W mod 8) = 0) and ((H mod 8) = 0) then
             begin
-              // Crop to modulo 8
-              if ((W mod 8) <> 0) or
-                 ((H mod 8) <> 0) then
-              begin
-                if not PerformLossLess(dirJPG + Img + 'jpg', 0, 8) then
-                begin
-                  AllErrs := AllErrs + Img + ' JPG -size not multiple of 8, not possible with jpegtran' + CRLF;
-                  continue;
-                end;
-              end;
               // remove all Exif data
               ET_OpenExec('-m' + CRLF + '-All=', GetSelectedFiles(dirJPG + Img + 'jpg', false));
               case n of
@@ -2243,6 +2233,7 @@ begin
     Application.BringToFront;
   end;
 end;
+
 // ------------- ^ Enf of Drag_Drop procs ^-------------------------------
 
 procedure TFMain.FormShow(Sender: TObject);

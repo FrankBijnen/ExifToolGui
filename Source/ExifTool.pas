@@ -242,15 +242,15 @@ begin
       if pos('||', ETcmd) > 0 then
         ETcmd := StringReplace(ETcmd, '||', CRLF, [rfReplaceAll]);
       CanUseUtf8 := (pos('-L' + CRLF, ETcmd) = 0);
-      FinalCmd := ET_Options.GetOptions(CanUseUtf8) + ETcmd + CRLF;
+      FinalCmd := EndsWithCRLF(ET_Options.GetOptions(CanUseUtf8) + ETcmd);
       if FNames <> '' then
-        FinalCmd := FinalCmd + FNames; // FNames should end with a CRLF. By calling GetSelectedFiles!
-      FinalCmd := FinalCmd + '-execute' + Char(ThisExecNum) + CRLF;
+        FinalCmd := EndsWithCRLF(FinalCmd + FNames);
+      FinalCmd := EndsWithCRLF(FinalCmd + '-execute' + Char(ThisExecNum));
 
       // Create tempfile
       TempFile := GetExifToolTmp;
       WriteArgsFile(FinalCmd, TempFile);
-      Call_ET := '-@' + CRLF + TempFile + CRLF;
+      Call_ET := EndsWithCRLF('-@' + CRLF + TempFile);
 
       // Write command to Pipe. Triggers ExifTool execution
       WriteFile(PipeInWrite, Call_ET[1], ByteLength(Call_ET), BytesCount, nil);
@@ -413,7 +413,8 @@ begin
     ETCounterLabel.Visible := ETShowCounter;
     CanUseUtf8 := (pos('-L ', ETcmd) = 0);
 
-    FinalCmd := ET_Options.GetOptions(CanUseUtf8) + ArgsFromDirectCmd(ETcmd) + CRLF + FNames;
+    FinalCmd := EndsWithCRLF(ET_Options.GetOptions(CanUseUtf8) + ArgsFromDirectCmd(ETcmd));
+    FinalCmd := EndsWithCRLF(FinalCmd + FNames);
     TempFile := GetExifToolTmp;
     WriteArgsFile(FinalCmd, TempFile);
     Call_ET := GUIsettings.ETOverrideDir + 'exiftool -@ "' + TempFile + '"';
