@@ -170,6 +170,7 @@ type
     N9: TMenuItem;
     GenericExtractPreviews: TMenuItem;
     GenericImportPreview: TMenuItem;
+    JPGGenericlosslessautorotate1: TMenuItem;
     procedure ShellListClick(Sender: TObject);
     procedure ShellListKeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
     procedure SpeedBtnExifClick(Sender: TObject);
@@ -270,6 +271,7 @@ type
     procedure EditFindMetaKeyPress(Sender: TObject; var Key: Char);
     procedure GenericExtractPreviewsClick(Sender: TObject);
     procedure GenericImportPreviewClick(Sender: TObject);
+    procedure JPGGenericlosslessautorotate1Click(Sender: TObject);
   private
     { Private declarations }
     ETBarSeriesFocal: TBarSeries;
@@ -315,7 +317,7 @@ uses System.StrUtils, System.Math, System.Masks, System.UITypes,
   Vcl.ClipBrd, Winapi.ShlObj, Winapi.ShellAPI, Vcl.Shell.ShellConsts, Vcl.Themes, Vcl.Styles,
   ExifTool, ExifInfo, ExifToolsGui_LossLess, MainDef, LogWin, Preferences, EditFFilter, EditFCol, UFrmStyle, UFrmAbout,
   QuickMngr, DateTimeShift, DateTimeEqual, CopyMeta, RemoveMeta, Geotag, Geomap, CopyMetaSingle, FileDateTime,
-  UFrmGenericExtract, UFrmGenericImport;
+  UFrmGenericExtract, UFrmGenericImport, UFrmLossLessRotate;
 
 {$R *.dfm}
 
@@ -583,6 +585,7 @@ begin
   begin
     RefreshSelected(Sender);
     ShowMetadata;
+    ShowPreview;
   end;
 end;
 
@@ -592,6 +595,7 @@ begin
   begin
     RefreshSelected(Sender);
     ShowMetadata;
+    ShowPreview;
   end;
 end;
 
@@ -1125,30 +1129,29 @@ begin
   end;
 end;
 
+// TODO: deprecated
 procedure TFMain.MJPGAutorotateClick(Sender: TObject);
 var
   Img: string;
   FileName: string;
-  FullPathName: string;
-  ETcmd: string;
-  outs, errs: string;
-  ETResult: TStringList;
-  APreviewList: TPreviewInfoList;
-  AMaxPos: integer;
   AnItem: TListItem;
-  N: Integer;
-  Angle: integer;
 begin
+  if (GetLossLessMethod = TLossLessMethod.Internal) then
+  begin
+    ShowMessage('Missing jhead.exe && jpegtran.exe!');
+    exit;
+  end;
+
+  if (ShellList.SelCount < 1) then
+  begin
+    ShowMessage('No files selected.');
+    exit;
+  end;
+
   if MessageDlg('This will rotate selected JPG files according to' + #10#13 + 'existing Exif:Orientation value.' + #10#13 +
     'In case menu Preserve Date modified is checked,' + #10#13 + 'Exif DateTime values (on ALL selected files) will' + #10#13 +
     'be used for this purpose.' + #10#13#10#13 + 'OK to proceed?', mtInformation, [mbOk, mbCancel], 0) = mrOK then
   begin
-    if (ShellList.SelCount < 1) then
-    begin
-      ShowMessage('No files selected.');
-      exit;
-    end;
-
     img := '';
     for AnItem in ShellList.Items do
     begin
@@ -1157,71 +1160,16 @@ begin
       if (IsJpeg(ShellList.FileName(AnItem.Index)) = false) then
         continue;
       FileName := ShellList.FileName(AnItem.Index);
-      // For JHead only build a list of filenames.
-      if (GetLossLessMethod = TLossLessMethod.JheadJpegTran) then
-        Img := Img + ' "' + FileName + '"'
-      else
-      begin
-        FullPathName := IncludeTrailingBackslash(ShellList.Path) + FileName;
-
-        // Read current Orientation
-        ET_OpenExec('-s3' + CRLF + '-exif:Orientation#', FileName + CRLF, outs, errs);
-        N := StrToIntDef(LeftStr(outs, 1), 1);
-        case N of
-          3: Angle := 180;
-          6: Angle := 90;
-          8: Angle := 270;
-          else
-            continue;  // No need to modifyu
-        end;
-
-        // Rotate, to match orientation
-        PerformLossLess(FullPathName, Angle, 0);
-
-        // reset orientation and modified date
-        ETcmd := '-s3' + CRLF + '-exif:Orientation#=1';
-        if MPreserveDateMod.Checked then
-          ETcmd := ETcmd + CRLF + '-FileModifyDate<Exif:DateTimeOriginal' + CRLF;
-
-        // Do the preview image
-        ET_OpenExec(ETcmd, FileName + CRLF, outs, errs);
-        ETResult := TStringList.Create;
-        try
-          ETcmd := '-s1' + CRLF + '-a' + CRLF + '-G' + CRLF + '-Preview:All';
-          ET_OpenExec(ETcmd, FileName + CRLF, ETResult);
-          APreviewList := GetPreviews(ETResult, AMaxPos);
-          try
-            if (AMaxPos > -1) then
-            begin
-
-              ETcmd := '-b' + CRLF + '-W!' + CRLF + GetPreviewTmp + CRLF;
-              ETcmd := ETcmd + '-' + APreviewList[AMaxPos].GroupName + ':' + APreviewList[AMaxPos].TagName + CRLF;
-              ET_OpenExec(ETcmd, FileName + CRLF);
-
-              PerformLossLess(GetPreviewTmp, Angle, 0);
-
-              ETcmd := '-' + APreviewList[AMaxPos].GroupName + ':' + APreviewList[AMaxPos].TagName + '<=' + GetPreviewTmp + CRLF;
-              ET_OpenExec(ETcmd, FileName + CRLF);
-            end;
-          finally
-            APreviewList.Free;
-          end;
-        finally
-          ETResult.Free;
-        end;
-      end;
+      Img := Img + ' "' + FileName + '"';
     end;
 
-    if (GetLossLessMethod = TLossLessMethod.JheadJpegTran) then
-    begin
-      // Execute at once.
-      if MPreserveDateMod.Checked then
-        Img := ' -ft' + Img;
-      // ^ sets win DateModified as in Exif:DateTimeOriginal>ModifyDate>CreateDate
-      if ExecCMD('jhead -autorot -q' + Img, ShellList.Path) and
-         ExecCMD('jhead -norot -q' + Img, ShellList.Path) then
-        ShowMessage('Autorotate finished.');
-    end;
+    // Execute at once.
+    if MPreserveDateMod.Checked then
+      Img := ' -ft' + Img;
+    // ^ sets win DateModified as in Exif:DateTimeOriginal>ModifyDate>CreateDate
+    if ExecCMD('jhead -autorot -q' + Img, ShellList.Path) and
+       ExecCMD('jhead -norot -q' + Img, ShellList.Path) then
+      ShowMessage('Autorotate finished.');
 
     RefreshSelected(Sender);
     ShowMetadata;
@@ -1229,6 +1177,17 @@ begin
   end;
 end;
 
+procedure TFMain.JPGGenericlosslessautorotate1Click(Sender: TObject);
+begin
+  if FLossLessRotate.ShowModal = mrOK then
+  begin
+    RefreshSelected(Sender);
+    ShowMetadata;
+    ShowPreview;
+  end;
+end;
+
+//TODO: Deprecated
 procedure TFMain.MJPGfromCR2Click(Sender: TObject);
 var
   b: Word;
@@ -1257,12 +1216,20 @@ begin
   end;
 end;
 
+//TODO: Deprecated
 procedure TFMain.MJPGtoCR2Click(Sender: TObject);
 var
   i, j: integer;
   n, W, H, c: Word;
   dirJPG, Img, tx, txH, txW, outs, errs, AllErrs: string;
 begin
+
+  if (GetLossLessMethod = TLossLessMethod.Internal) then
+  begin
+    ShowMessage('Missing jhead.exe && jpegtran.exe!');
+    exit;
+  end;
+
   n := MessageDlg('Only those JPG images will be embedded into selected'#10#13 + 'CR2 files, where:' + #10#13 + '- CR2/JPG filenames are equal,' +
     #10#13 + '- JPG width or height is min 512pix,' + #10#13 + '- JPG width & height is multiple of 8.' + #10#13 +
     'Metadata of imported JPG files will be deleted.' + #10#13#10#13 + 'Next: Select folder containing JPG files. OK to proceed?', mtInformation,
@@ -2197,6 +2164,8 @@ begin
 
   CBoxFileFilter.Text := SHOWALL;
   ExifTool.ExecETEvent := ExecETEvent_Done;
+  MEmbedPreview.Enabled := (GetLossLessMethod = TLossLessMethod.JheadJpegTran);
+  MJPGAutorotate.Enabled := (GetLossLessMethod = TLossLessMethod.JheadJpegTran);
 end;
 
 // ---------------Drag_Drop procs --------------------

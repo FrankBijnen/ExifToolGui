@@ -1066,7 +1066,7 @@ object FMain: TFMain
         Caption = '-'
       end
       object MExtractPreview: TMenuItem
-        Caption = 'Extract preview image from selected'
+        Caption = 'Extract preview image from selected (Deprecated)'
         object MJPGfromCR2: TMenuItem
           Caption = 'CR2/DNG files'
           OnClick = MJPGfromCR2Click
@@ -1081,7 +1081,7 @@ object FMain: TFMain
         end
       end
       object MEmbedPreview: TMenuItem
-        Caption = 'Embed preview image into selected'
+        Caption = 'Embed preview image into selected (Deprecated)'
         object MJPGtoCR2: TMenuItem
           Caption = 'CR2 files...'
           OnClick = MJPGtoCR2Click
@@ -1132,8 +1132,12 @@ object FMain: TFMain
         OnClick = MFileNameDateTimeClick
       end
       object MJPGAutorotate: TMenuItem
-        Caption = 'JPG: Lossless autorotate...'
+        Caption = 'JPG: Lossless autorotate... (Deprecated)'
         OnClick = MJPGAutorotateClick
+      end
+      object JPGGenericlosslessautorotate1: TMenuItem
+        Caption = 'JPG:  Lossless autorotate'
+        OnClick = JPGGenericlosslessautorotate1Click
       end
     end
   end

@@ -28,8 +28,9 @@ uses
   EditFFilter in 'EditFFilter.pas' {FEditFFilter},
   EditFCol in 'EditFCol.pas' {FEditFColumn},
   QuickMngr in 'QuickMngr.pas' {FQuickManager},
-  UFrmGenericImport in 'UFrmGenericImport.pas' {FGenericImport},
+  UFrmLossLessRotate in 'UFrmLossLessRotate.pas' {FLossLessRotate},
   UFrmGenericExtract in 'UFrmGenericExtract.pas' {FGenericExtract},
+  UFrmGenericImport in 'UFrmGenericImport.pas' {FGenericImport},
   CopyMeta in 'CopyMeta.pas' {FCopyMetadata},
   Geotag in 'Geotag.pas' {FGeotag},
   DateTimeEqual in 'DateTimeEqual.pas' {FDateTimeEqual},
@@ -59,6 +60,8 @@ begin
   Application.CreateForm(TFEditFFilter, FEditFFilter);
   Application.CreateForm(TFEditFColumn, FEditFColumn);
   Application.CreateForm(TFQuickManager, FQuickManager);
+  Application.CreateForm(TFLossLessRotate, FLossLessRotate);
+  Application.CreateForm(TFGenericExtract, FGenericExtract);
   Application.CreateForm(TFGenericImport, FGenericImport);
   Application.CreateForm(TFCopyMetadata, FCopyMetadata);
   Application.CreateForm(TFGeotag, FGeotag);
@@ -71,6 +74,5 @@ begin
   Application.CreateForm(TFrmAbout, FrmAbout);
   Application.CreateForm(TFrmGenerate, FrmGenerate);
   Application.CreateForm(TFDateTimeShift, FDateTimeShift);
-  Application.CreateForm(TFGenericExtract, FGenericExtract);
   Application.Run;
 end.
