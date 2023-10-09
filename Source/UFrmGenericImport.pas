@@ -26,7 +26,7 @@ type
     var
       Preview: string;
     procedure DisplayHint(Sender: TObject);
-    procedure BeforeImport(Sender: TObject; ADirJpg: string);
+    function DoImportPreview(Sender: TObject; ADirJpg: string): boolean;
   public
     { Public declarations }
     var
@@ -42,7 +42,7 @@ uses System.StrUtils, Main, ExifTool, ExifToolsGUI_Utils, ExifToolsGui_LossLess,
 
 {$R *.dfm}
 
-procedure TFGenericImport.BeforeImport(Sender: TObject; ADirJpg: string);
+function TFGenericImport.DoImportPreview(Sender: TObject; ADirJpg: string): boolean;
 var SelFiles: TstringList;
     AFile: string;
     AnImport: string;
@@ -51,9 +51,9 @@ var SelFiles: TstringList;
     Angle: integer;
     ANitem: TListItem;
 begin
+  result := true;
   SelFiles := TStringList.Create;
   SelFiles.Text := Fmain.GetSelectedFiles('', false);
-  ETcmd := '';
   try
     for ANitem in LvPreviews.Items do
     begin
@@ -85,9 +85,11 @@ begin
             8: Angle := 90;
           end;
         end;
-        PerformLossLess(AnImport, Angle, Modulo);
+        PerformLossLess(AnImport, Angle, Modulo, GetPreviewTmp);
 
-        ETcmd := ETcmd + Preview + AnImport + CRLF + FMain.GetSelectedFiles(Afile, true) + CRLF + '-execute' + CRLF;
+        ETcmd := Preview + GetPreviewTmp;
+        ET_OpenExec(ETcmd, FMain.GetSelectedFiles(Afile, true), ETouts, ETerrs);
+        result := result and (ETerrs = '');
       end;
     end;
   finally
@@ -97,6 +99,7 @@ end;
 
 procedure TFGenericImport.Button2Click(Sender: TObject);
 var
+  ImportStatus: boolean;
   ANitem: TListItem;
   DirJpg: string;
   CrWait, CrNormal: HCURSOR;
@@ -122,14 +125,12 @@ begin
   CrWait := LoadCursor(0, IDC_WAIT);
   CrNormal := SetCursor(CrWait);
   try
-    BeforeImport(Sender, DirJpg);
-
-    ET_OpenExec(ETcmd, FMain.GetSelectedFiles, ETouts, ETerrs);
+    ImportStatus := DoImportPreview(Sender, DirJpg);
   finally
     SetCursor(CrNormal);
   end;
 
-  if (ETerrs = '') then
+  if (ImportStatus) then
     ModalResult := mrOK;
 end;
 
@@ -145,43 +146,13 @@ begin
 end;
 
 procedure TFGenericImport.FormShow(Sender: TObject);
-var
-  ETResult: TStringList;
-  AMaxPos: integer;
-  AListItem: TListItem;
-  APreviewList: TPreviewInfoList;
-  APreviewInfo: TPreviewInfo;
 begin
   Left := FMain.Left + FMain.GUIBorderWidth + FMain.AdvPageFilelist.Left;
   Top := FMain.Top + FMain.GUIBorderHeight;
   Application.OnHint := DisplayHint;
 
-  ETResult := TStringList.Create;
-  try
-    LvPreviews.Items.Clear;
-    ETcmd := '-s1' + CRLF + '-a' + CRLF + '-G' + CRLF + '-Preview:All';
-    ET_OpenExec(ETcmd, FMain.GetFirstSelectedFile, ETResult);
-    APreviewList := GetPreviews(ETResult, AMaxPos);
-    try
-      for APreviewInfo in APreviewList do
-      begin
-        AListItem := LvPreviews.Items.Add;
-        AListItem.Caption := APreviewInfo.GroupName;
-        AListItem.SubItems.Add(APreviewInfo.TagName);
-        AListItem.SubItems.Add(APreviewInfo.SizeString);
-      end;
-    finally
-      APreviewList.Free;
-    end;
-
-    // Check the greatest
-    if (AMaxPos >= 0) then
-      LvPreviews.Items[AMaxPos].Checked := true;
-
-  finally
-    Button2.Enabled := LvPreviews.Items.Count > 0;
-    ETResult.Free;
-  end;
+  FillPreviewInListView(FMain.GetFirstSelectedFile, LvPreviews);
+  Button2.Enabled := LvPreviews.Items.Count > 0;
 end;
 
 end.

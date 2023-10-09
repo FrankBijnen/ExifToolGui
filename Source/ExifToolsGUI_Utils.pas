@@ -6,7 +6,7 @@ interface
 uses Winapi.ShlObj, Winapi.ActiveX, Winapi.Wincodec, Winapi.Windows, Winapi.Messages,
   System.Classes, System.SysUtils, System.Variants, System.StrUtils, System.Math, System.Threading,
   System.Generics.Collections,
-  Vcl.Forms, Vcl.Dialogs, Vcl.Shell.ShellCtrls, Vcl.Graphics;
+  Vcl.Forms, Vcl.Dialogs, Vcl.ComCtrls, Vcl.Shell.ShellCtrls, Vcl.Graphics;
 
 type
   TPreviewInfo = record
@@ -16,9 +16,6 @@ type
     SizeInt: integer;
   end;
   TPreviewInfoList = TList<TPreviewInfo>;
-
-const
-  CRLF = #13#10;
 
 // Debug
 procedure BreakPoint;
@@ -56,11 +53,13 @@ procedure ResizeBitmapCanvas(Bitmap: TBitmap; W, H: integer; BackColor: TColor);
 // Message dialog that allows for caption and doesn't wrap lines at spaces.
 function MessageDlgEx(const AMsg, ACaption: string; ADlgType: TMsgDlgType; AButtons: TMsgDlgButtons; AParent: TForm = nil): integer;
 
+// Previews in Raw/Jpeg files
 function GetPreviews(ETResult: TStringList; var Biggest: integer): TPreviewInfoList;
+procedure FillPreviewInListView(SelectedFile: string; LvPreviews: TListView);
 
 implementation
 
-uses Winapi.ShellAPI, Winapi.KnownFolders, System.Win.Registry, System.UITypes, UFrmGenerate, MainDef;
+uses Winapi.ShellAPI, Winapi.KnownFolders, System.Win.Registry, System.UITypes, UFrmGenerate, MainDef, ExifTool;
 
 var
   GlobalImgFact: IWICImagingFactory;
@@ -664,6 +663,40 @@ begin
       end;
     end;
     result.Add(APreviewInfo);
+  end;
+end;
+
+procedure FillPreviewInListView(SelectedFile: string; LvPreviews: TListView);
+var
+  ETCmd: string;
+  ETResult: TStringList;
+  AMaxPos: integer;
+  AListItem: TListItem;
+  APreviewList: TPreviewInfoList;
+  APreviewInfo: TPreviewInfo;
+begin
+  ETResult := TStringList.Create;
+  try
+    ETcmd := '-s1' + CRLF + '-a' + CRLF + '-G' + CRLF + '-Preview:All';
+    ET_OpenExec(ETcmd, SelectedFile, ETResult);
+    LvPreviews.Items.Clear;
+    APreviewList := GetPreviews(ETResult, AMaxPos);
+    try
+      for APreviewInfo in APreviewList do
+      begin
+        AListItem := LvPreviews.Items.Add;
+        AListItem.Caption := APreviewInfo.GroupName;
+        AListItem.SubItems.Add(APreviewInfo.TagName);
+        AListItem.SubItems.Add(APreviewInfo.SizeString);
+      end;
+    finally
+      APreviewList.Free;
+    end;
+    // Check the greatest
+    if (AMaxPos >= 0) then
+      LvPreviews.Items[AMaxPos].Checked := true;
+  finally
+    ETResult.Free;
   end;
 end;
 
