@@ -17,6 +17,9 @@ type
   end;
   TPreviewInfoList = TList<TPreviewInfo>;
 
+const
+  CRLF = #13#10;
+
 // Debug
 procedure BreakPoint;
 procedure DebugMsg(const Msg: array of variant);
@@ -38,6 +41,7 @@ function GetComSpec: string;
 function LastLine(const AString: string; LinePos: integer; var LinePosStart: integer): string;
 function NextField(var AString: string; const ADelimiter: string): string;
 function QuotedFileName(FileName: string): string;
+function EndsWithCRLF(const AString: string): string;
 function ArgsFromDirectCmd(const CmdIn: string): string;
 function DirectCmdFromArgs(const ArgsIn: string): string;
 procedure WriteArgsFile(const ETInp, ArgsFile: string; Preamble: boolean = false);
@@ -311,6 +315,13 @@ begin
   Result := FileName;
   if (Pos(' ', Result) > 0) then
     Result := '"' + Result + '"';
+end;
+
+function EndsWithCRLF(const AString: string): string;
+begin
+  result := AString;
+  if (RightStr(result, Length(CRLF)) <> CRLF) then
+    result := result + CRLF;
 end;
 
 function ArgsFromDirectCmd(const CmdIn: string): string;
