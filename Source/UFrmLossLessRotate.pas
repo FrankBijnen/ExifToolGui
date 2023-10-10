@@ -9,18 +9,18 @@ type
   TFLossLessRotate = class(TForm)
     StatusBar1: TStatusBar;
     AdvPanel1: TPanel;
-    Button1: TButton;
-    Button2: TButton;
+    BtnCancel: TButton;
+    BtnExecute: TButton;
     LvPreviews: TListView;
-    Label1: TLabel;
+    LblPreview: TLabel;
     ChkResetOrientation: TCheckBox;
     CmbCrop: TComboBox;
+    LblSample: TLabel;
     procedure FormShow(Sender: TObject);
-    procedure Button2Click(Sender: TObject);
+    procedure BtnExecuteClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
   private
     { Private declarations }
-    procedure DisplayHint(Sender: TObject);
     function DoRotate(Sender: TObject): boolean;
   public
     { Public declarations }
@@ -73,6 +73,7 @@ begin
       1: Modulo := 8;
       2: Modulo := 16;
     end;
+
     // Read current Orientation
     ET_OpenExec('-s3' + CRLF + '-exif:Orientation#', FileName, ETouts, ETerrs);
     result := result and (ETerrs = '');
@@ -85,7 +86,9 @@ begin
         continue;  // No need to modify
     end;
     // Rotate, to match orientation
+    StatusBar1.SimpleText := Format('Rotating %s Angle: %d Modulo: %d', [FullPathName, Angle, Modulo]);
     PerformLossLess(FullPathName, Angle, Modulo);
+
     // reset orientation and modified date
     ETcmd := '';
     if (ChkResetOrientation.Checked) then
@@ -93,24 +96,32 @@ begin
     if Fmain.MPreserveDateMod.Checked then
       ETcmd := ETcmd + CRLF + '-FileModifyDate<Exif:DateTimeOriginal' + CRLF;
     if (Etcmd <> '') then
+    begin
+      StatusBar1.SimpleText := Format('Resetting Orientation to Normal: %s', [FileName]);
       ET_OpenExec(ETcmd, FileName, ETouts, ETerrs);
-    result := result and (ETerrs = '');
+      result := result and (ETerrs = '');
+    end;
 
     if (APreviewItem <> nil) then
     begin
       ETcmd := '-b' + CRLF + '-W!' + CRLF + GetPreviewTmp + CRLF;
       ETcmd := ETcmd + '-' + APreviewItem.Caption + ':' + APreviewItem.SubItems[0];
+      StatusBar1.SimpleText := Format('Extracting preview from: %s', [FileName]);
       ET_OpenExec(ETcmd, FileName, ETouts, ETerrs);
       result := result and (ETerrs = '');
+
+      StatusBar1.SimpleText := Format('Rotating preview %s Angle: %d Modulo: %d', [GetPreviewTmp, Angle, Modulo]);
       PerformLossLess(GetPreviewTmp, Angle, 0);
+
       ETcmd := '-' + APreviewItem.Caption + ':' + APreviewItem.SubItems[0] + '<=' + GetPreviewTmp + CRLF;
+      StatusBar1.SimpleText := Format('Importing preview into: %s', [FileName]);
       ET_OpenExec(ETcmd, FileName, ETouts, ETerrs);
       result := result and (ETerrs = '');
     end;
   end;
 end;
 
-procedure TFLossLessRotate.Button2Click(Sender: TObject);
+procedure TFLossLessRotate.BtnExecuteClick(Sender: TObject);
 var
   RotateStatus: boolean;
   CrWait, CrNormal: HCURSOR;
@@ -119,6 +130,7 @@ begin
   CrNormal := SetCursor(CrWait);
   try
     RotateStatus := DoRotate(Sender);
+    StatusBar1.SimpleText := 'All Done';
   finally
     SetCursor(CrNormal);
   end;
@@ -126,24 +138,20 @@ begin
     ModalResult := mrOK;
 end;
 
-procedure TFLossLessRotate.DisplayHint(Sender: TObject);
-begin
-  StatusBar1.SimpleText := GetShortHint(Application.Hint);
-end;
-
 procedure TFLossLessRotate.FormCreate(Sender: TObject);
 begin
   ChkResetOrientation.Checked := true;
-  CmbCrop.ItemIndex := 1;
+  CmbCrop.ItemIndex := 0;
 end;
 
 procedure TFLossLessRotate.FormShow(Sender: TObject);
 begin
   Left := FMain.Left + FMain.GUIBorderWidth + FMain.AdvPageFilelist.Left;
   Top := FMain.Top + FMain.GUIBorderHeight;
-  Application.OnHint := DisplayHint;
+  StatusBar1.SimpleText := '';
+  LblSample.Caption := Format('Sample: %s', [ExtractFileName(Fmain.GetFirstSelectedFile)]);
   FillPreviewInListView(FMain.GetFirstSelectedFile, LvPreviews);
-  Button2.Enabled := LvPreviews.Items.Count > 0;
+  BtnExecute.Enabled := LvPreviews.Items.Count > 0;
 end;
 
 end.

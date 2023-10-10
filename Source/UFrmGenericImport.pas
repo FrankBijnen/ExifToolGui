@@ -12,20 +12,20 @@ type
   TFGenericImport = class(TForm)
     StatusBar1: TStatusBar;
     AdvPanel1: TPanel;
-    Button1: TButton;
-    Button2: TButton;
+    BtnCancel: TButton;
+    BtnExecute: TButton;
     LvPreviews: TListView;
     Label1: TLabel;
     ChkAutoRotate: TCheckBox;
     CmbCrop: TComboBox;
+    LblSample: TLabel;
     procedure FormShow(Sender: TObject);
-    procedure Button2Click(Sender: TObject);
+    procedure BtnExecuteClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
   private
     { Private declarations }
     var
       Preview: string;
-    procedure DisplayHint(Sender: TObject);
     function DoImportPreview(Sender: TObject; ADirJpg: string): boolean;
   public
     { Public declarations }
@@ -60,11 +60,11 @@ begin
       if (ANitem.Checked = false) then
         continue;
 
-      for Afile in SelFiles do
+      for AFile in SelFiles do
       begin
 
         // Only care about JPG
-        AnImport := IncludeTrailingPathDelimiter(ADirJpg) + ChangeFileExt(Afile, '.jpg');
+        AnImport := IncludeTrailingPathDelimiter(ADirJpg) + ChangeFileExt(AFile, '.jpg');
         if not FileExists(AnImport) then
           continue;
 
@@ -77,7 +77,7 @@ begin
         Angle := 0;
         if (ChkAutoRotate.Checked) then
         begin
-          ET_OpenExec('-s3' + CRLF + '-exif:Orientation#', FMain.GetSelectedFiles(Afile, true), ETouts, ETerrs);
+          ET_OpenExec('-s3' + CRLF + '-exif:Orientation#', FMain.GetSelectedFiles(AFile, true), ETouts, ETerrs);
           N := StrToIntDef(LeftStr(ETouts, 1), 1);
           case N of
             3: Angle := 180;
@@ -85,10 +85,19 @@ begin
             8: Angle := 90;
           end;
         end;
-        PerformLossLess(AnImport, Angle, Modulo, GetPreviewTmp);
 
-        ETcmd := Preview + GetPreviewTmp;
-        ET_OpenExec(ETcmd, FMain.GetSelectedFiles(Afile, true), ETouts, ETerrs);
+        if (Modulo = 0) and
+           (Angle = 0) then
+          ETcmd := Preview + AnImport // Jpeg does not need to be cropped or rotated
+        else
+        begin
+          StatusBar1.SimpleText := Format('Rotating %s Angle: %d Modulo: %d', [GetPreviewTmp, Angle, Modulo]);
+          PerformLossLess(AnImport, Angle, Modulo, GetPreviewTmp);
+          ETcmd := Preview + GetPreviewTmp;
+        end;
+
+        StatusBar1.SimpleText := Format('Updating preview in: %s', [AFile]);
+        ET_OpenExec(ETcmd, FMain.GetSelectedFiles(AFile, true), ETouts, ETerrs);
         result := result and (ETerrs = '');
       end;
     end;
@@ -97,7 +106,7 @@ begin
   end;
 end;
 
-procedure TFGenericImport.Button2Click(Sender: TObject);
+procedure TFGenericImport.BtnExecuteClick(Sender: TObject);
 var
   ImportStatus: boolean;
   ANitem: TListItem;
@@ -126,17 +135,13 @@ begin
   CrNormal := SetCursor(CrWait);
   try
     ImportStatus := DoImportPreview(Sender, DirJpg);
+    StatusBar1.SimpleText := 'All Done';
   finally
     SetCursor(CrNormal);
   end;
 
   if (ImportStatus) then
     ModalResult := mrOK;
-end;
-
-procedure TFGenericImport.DisplayHint(Sender: TObject);
-begin
-  StatusBar1.SimpleText := GetShortHint(Application.Hint);
 end;
 
 procedure TFGenericImport.FormCreate(Sender: TObject);
@@ -149,10 +154,10 @@ procedure TFGenericImport.FormShow(Sender: TObject);
 begin
   Left := FMain.Left + FMain.GUIBorderWidth + FMain.AdvPageFilelist.Left;
   Top := FMain.Top + FMain.GUIBorderHeight;
-  Application.OnHint := DisplayHint;
-
+  StatusBar1.SimpleText := '';
+  LblSample.Caption := Format('Sample: %s', [ExtractFileName(Fmain.GetFirstSelectedFile)]);
   FillPreviewInListView(FMain.GetFirstSelectedFile, LvPreviews);
-  Button2.Enabled := LvPreviews.Items.Count > 0;
+  BtnExecute.Enabled := LvPreviews.Items.Count > 0;
 end;
 
 end.

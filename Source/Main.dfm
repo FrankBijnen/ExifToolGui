@@ -902,7 +902,8 @@ object FMain: TFMain
     end
   end
   object MainMenu: TMainMenu
-    Left = 120
+    Left = 184
+    Top = 47
     object MProgram: TMenuItem
       Caption = 'Program'
       object MAbout: TMenuItem

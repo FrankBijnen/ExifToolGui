@@ -40,12 +40,24 @@ object FLossLessRotate: TFLossLessRotate
     ParentFont = False
     TabOrder = 1
     ExplicitHeight = 299
-    object Label1: TLabel
+    object LblPreview: TLabel
       Left = 10
       Top = 20
-      Width = 260
+      Width = 139
       Height = 14
-      Caption = 'Select preview to rotate (Only 1, not required)'
+      Hint = 'Only the first selected will be used. Not required.'
+      Caption = 'Select preview to rotate.'
+      ParentShowHint = False
+      ShowHint = True
+    end
+    object LblSample: TLabel
+      Left = 213
+      Top = 19
+      Width = 269
+      Height = 14
+      Alignment = taRightJustify
+      AutoSize = False
+      Caption = 'LblSample'
     end
     object LvPreviews: TListView
       Left = 10
@@ -73,7 +85,7 @@ object FLossLessRotate: TFLossLessRotate
     object ChkResetOrientation: TCheckBox
       Left = 10
       Top = 229
-      Width = 204
+      Width = 475
       Height = 17
       Caption = 'Reset Orientation to Horizontal'
       TabOrder = 1
@@ -92,7 +104,7 @@ object FLossLessRotate: TFLossLessRotate
         'Crop to multiple of 16')
     end
   end
-  object Button1: TButton
+  object BtnCancel: TButton
     Left = 528
     Top = 17
     Width = 69
@@ -101,13 +113,13 @@ object FLossLessRotate: TFLossLessRotate
     ModalResult = 2
     TabOrder = 2
   end
-  object Button2: TButton
-    Left = 528
-    Top = 250
+  object BtnExecute: TButton
+    Left = 530
+    Top = 252
     Width = 69
     Height = 25
     Caption = 'Execute'
     TabOrder = 3
-    OnClick = Button2Click
+    OnClick = BtnExecuteClick
   end
 end
