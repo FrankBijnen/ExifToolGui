@@ -21,10 +21,11 @@ Changes to the original library:
 
 Changes to ExifToolGui.
 
-- If jhead and jpegtran are found they will still be used. For compatibility reasons.
-- If not found this library will be used, to do the actual translation. 
-- The jhead program can even rotate the preview image contained in the Jpg. If jhead is not found the extracting and injecting of the thumbnail will be
-  done with ExifTool and the rotating by this library.
+- If jhead and jpegtran are found they will still be used. For compatibility reasons. But the Menu items are marked 'Deprecated'.
+- New menu items are created that use this library, and cover the functionality of the deprecated menu items.
+  - Generic extract previews. 	Crop and rotate can be selected for the exported JPEG's.
+  - Generic import preview.	Optionally crop and rotate JPEG's before import
+  - JPG: Lossless autorate.	Replace functionality of Jhead autorot. Using ExifTool and this library. 
 
 Reasons to prefer this libray.
 

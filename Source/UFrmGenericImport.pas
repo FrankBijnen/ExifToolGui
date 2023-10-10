@@ -117,7 +117,7 @@ begin
   begin
     if ANitem.Checked then
     begin
-      Preview := ET_Options.GetOptions(true) + '-' + ANitem.Caption + ':' + ANitem.SubItems[0] + '<=';
+      Preview := '-' + ANitem.Caption + ':' + ANitem.SubItems[0] + '<=';
       break;
     end;
   end;
