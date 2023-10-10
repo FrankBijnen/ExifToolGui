@@ -12,20 +12,20 @@ type
   TFGenericExtract = class(TForm)
     StatusBar1: TStatusBar;
     AdvPanel1: TPanel;
-    Button1: TButton;
-    Button2: TButton;
+    BtnCancel: TButton;
+    BtnExecute: TButton;
     LvPreviews: TListView;
     Label1: TLabel;
     ChkSubdirs: TCheckBox;
     ChkAutoRotate: TCheckBox;
     CmbCrop: TComboBox;
     ChkOverWrite: TCheckBox;
+    LblSample: TLabel;
     procedure FormShow(Sender: TObject);
-    procedure Button2Click(Sender: TObject);
+    procedure BtnExecuteClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
   private
     { Private declarations }
-    procedure DisplayHint(Sender: TObject);
     procedure AfterExtract(Sender: TObject);
   public
     { Public declarations }
@@ -89,6 +89,7 @@ begin
             8: Angle := 270;
           end;
         end;
+        StatusBar1.SimpleText := Format('Rotating %s Angle: %d Modulo: %d', [AnExtract, Angle, Modulo]);
         PerformLossLess(AnExtract, Angle, Modulo);
       end;
     end;
@@ -97,7 +98,7 @@ begin
   end;
 end;
 
-procedure TFGenericExtract.Button2Click(Sender: TObject);
+procedure TFGenericExtract.BtnExecuteClick(Sender: TObject);
 var 
   ANitem: TListItem;
   Previews: string;
@@ -126,22 +127,19 @@ begin
       ShowMessage('Check at least 1 preview to extract');
       exit;
     end;
+    StatusBar1.SimpleText := 'Extracting previews';
     ETcmd := ETcmd + Previews;
     ET_OpenExec(ETcmd, FMain.GetSelectedFiles, ETouts, ETerrs);
 
     AfterExtract(Sender);
-    
+
+    StatusBar1.SimpleText := 'All Done';
   finally
     SetCursor(CrNormal);
   end;
-  
+
   if (ETerrs = '') then
     ModalResult := mrOK;
-end;
-
-procedure TFGenericExtract.DisplayHint(Sender: TObject);
-begin
-  StatusBar1.SimpleText := GetShortHint(Application.Hint);
 end;
 
 procedure TFGenericExtract.FormCreate(Sender: TObject);
@@ -156,10 +154,10 @@ procedure TFGenericExtract.FormShow(Sender: TObject);
 begin
   Left := FMain.Left + FMain.GUIBorderWidth + FMain.AdvPageFilelist.Left;
   Top := FMain.Top + FMain.GUIBorderHeight;
-  Application.OnHint := DisplayHint;
-
+  StatusBar1.SimpleText := '';
+  LblSample.Caption := Format('Sample: %s', [ExtractFileName(Fmain.GetFirstSelectedFile)]);
   FillPreviewInListView(FMain.GetFirstSelectedFile, LvPreviews);
-  Button2.Enabled := LvPreviews.Items.Count > 0;
+  BtnExecute.Enabled := LvPreviews.Items.Count > 0;
 end;
 
 end.

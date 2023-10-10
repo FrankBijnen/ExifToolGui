@@ -18,7 +18,7 @@ object FPreferences: TFPreferences
     Top = 0
     Width = 521
     Height = 391
-    ActivePage = AdvTabSheetThumbs
+    ActivePage = AdvTabGeneral
     Align = alLeft
     DoubleBuffered = True
     ParentDoubleBuffered = False

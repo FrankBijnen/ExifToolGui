@@ -45,7 +45,19 @@ object FGenericExtract: TFGenericExtract
       Top = 20
       Width = 149
       Height = 14
+      Hint = 'Select at least 1 preview to extract. Multi-select enabled.'
       Caption = 'Select previews to extract:'
+      ParentShowHint = False
+      ShowHint = True
+    end
+    object LblSample: TLabel
+      Left = 213
+      Top = 19
+      Width = 269
+      Height = 14
+      Alignment = taRightJustify
+      AutoSize = False
+      Caption = 'LblSample'
     end
     object LvPreviews: TListView
       Left = 10
@@ -73,17 +85,19 @@ object FGenericExtract: TFGenericExtract
     object ChkSubdirs: TCheckBox
       Left = 10
       Top = 226
-      Width = 166
+      Width = 475
       Height = 17
-      Caption = 'Create subdirectories'
+      Caption = 
+        'Create subdirectories for selected Previews (Example: ..\Exif\Jp' +
+        'gFromRaw)'
       TabOrder = 1
     end
     object ChkAutoRotate: TCheckBox
       Left = 10
       Top = 274
-      Width = 204
+      Width = 475
       Height = 17
-      Caption = 'Auto rotate extracted JPEG'#39's'
+      Caption = 'Auto rotate extracted JPEG'#39's (From Exif:Orientation)'
       TabOrder = 2
     end
     object CmbCrop: TComboBox
@@ -102,13 +116,13 @@ object FGenericExtract: TFGenericExtract
     object ChkOverWrite: TCheckBox
       Left = 10
       Top = 250
-      Width = 204
+      Width = 475
       Height = 17
-      Caption = 'Overwrite existing '
+      Caption = 'Overwrite existing JPEG'#39's'
       TabOrder = 4
     end
   end
-  object Button1: TButton
+  object BtnCancel: TButton
     Left = 528
     Top = 17
     Width = 69
@@ -117,13 +131,13 @@ object FGenericExtract: TFGenericExtract
     ModalResult = 2
     TabOrder = 2
   end
-  object Button2: TButton
+  object BtnExecute: TButton
     Left = 528
     Top = 342
     Width = 69
     Height = 25
     Caption = 'Execute'
     TabOrder = 3
-    OnClick = Button2Click
+    OnClick = BtnExecuteClick
   end
 end
