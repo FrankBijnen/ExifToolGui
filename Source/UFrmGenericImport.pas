@@ -24,9 +24,7 @@ type
     procedure FormCreate(Sender: TObject);
   private
     { Private declarations }
-    var
-      Preview: string;
-    function DoImportPreview(Sender: TObject; ADirJpg: string): boolean;
+    function DoImportPreview(Sender: TObject): boolean;
   public
     { Public declarations }
     var
@@ -42,19 +40,51 @@ uses System.StrUtils, Main, ExifTool, ExifToolsGUI_Utils, ExifToolsGui_LossLess,
 
 {$R *.dfm}
 
-function TFGenericImport.DoImportPreview(Sender: TObject; ADirJpg: string): boolean;
+function TFGenericImport.DoImportPreview(Sender: TObject): boolean;
 var SelFiles: TstringList;
+    DirJpg: string;
     AFile: string;
     AnImport: string;
     N: integer;
     Modulo: integer;
     Angle: integer;
     ANitem: TListItem;
+    Preview: string;
 begin
+  result := false;
+
+  Preview := '';
+  for ANitem in LvPreviews.Items do
+  begin
+    if ANitem.Checked then
+    begin
+      Preview := '-' + ANitem.Caption + ':' + ANitem.SubItems[0];
+      break;
+    end;
+  end;
+
+  if (Preview = '') then
+  begin
+    ShowMessage('Check 1 preview to import');
+    exit;
+  end;
+
+  DirJPG := BrowseFolderDlg('Select folder containing JPG images', 1, Fmain.ShellList.Path);
+  if (DirJpg = '') then
+    exit;
+
   result := true;
   SelFiles := TStringList.Create;
-  SelFiles.Text := Fmain.GetSelectedFiles('', false);
   try
+    SelFiles.Text := Fmain.GetSelectedFiles('', false);
+
+    // Crop?
+    Modulo := 0;
+    case CmbCrop.ItemIndex of
+      1: Modulo := 8;
+      2: Modulo := 16;
+    end;
+
     for ANitem in LvPreviews.Items do
     begin
       if (ANitem.Checked = false) then
@@ -64,15 +94,9 @@ begin
       begin
 
         // Only care about JPG
-        AnImport := IncludeTrailingPathDelimiter(ADirJpg) + ChangeFileExt(AFile, '.jpg');
+        AnImport := IncludeTrailingPathDelimiter(DirJPG) + ChangeFileExt(AFile, '.jpg');
         if not FileExists(AnImport) then
           continue;
-
-        Modulo := 0;
-        case CmbCrop.ItemIndex of
-          1: Modulo := 8;
-          2: Modulo := 16;
-        end;
 
         Angle := 0;
         if (ChkAutoRotate.Checked) then
@@ -88,12 +112,12 @@ begin
 
         if (Modulo = 0) and
            (Angle = 0) then
-          ETcmd := Preview + AnImport // Jpeg does not need to be cropped or rotated
+          ETcmd := Preview + '<=' + AnImport // Jpeg does not need to be cropped or rotated
         else
         begin
           StatusBar1.SimpleText := Format('Rotating %s Angle: %d Modulo: %d', [GetPreviewTmp, Angle, Modulo]);
           PerformLossLess(AnImport, Angle, Modulo, GetPreviewTmp);
-          ETcmd := Preview + GetPreviewTmp;
+          ETcmd := Preview + '<=' + GetPreviewTmp;
         end;
 
         StatusBar1.SimpleText := Format('Updating preview in: %s', [AFile]);
@@ -109,32 +133,13 @@ end;
 procedure TFGenericImport.BtnExecuteClick(Sender: TObject);
 var
   ImportStatus: boolean;
-  ANitem: TListItem;
-  DirJpg: string;
   CrWait, CrNormal: HCURSOR;
 begin
-  for ANitem in LvPreviews.Items do
-  begin
-    if ANitem.Checked then
-    begin
-      Preview := '-' + ANitem.Caption + ':' + ANitem.SubItems[0] + '<=';
-      break;
-    end;
-  end;
-  if (Preview = '') then
-  begin
-    ShowMessage('Check 1 preview to import');
-    exit;
-  end;
-
-  DirJPG := BrowseFolderDlg('Select folder containing JPG images', 1, Fmain.ShellList.Path);
-  if (DirJpg = '') then
-    exit;
 
   CrWait := LoadCursor(0, IDC_WAIT);
   CrNormal := SetCursor(CrWait);
   try
-    ImportStatus := DoImportPreview(Sender, DirJpg);
+    ImportStatus := DoImportPreview(Sender);
     StatusBar1.SimpleText := 'All Done';
   finally
     SetCursor(CrNormal);
@@ -147,7 +152,7 @@ end;
 procedure TFGenericImport.FormCreate(Sender: TObject);
 begin
   ChkAutoRotate.Checked := true;
-  CmbCrop.ItemIndex := 1;
+  CmbCrop.ItemIndex := 0;
 end;
 
 procedure TFGenericImport.FormShow(Sender: TObject);
