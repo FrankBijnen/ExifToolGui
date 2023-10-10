@@ -39,8 +39,8 @@ uses System.StrUtils, Main, ExifTool, ExifToolsGUI_Utils, ExifToolsGui_LossLess,
 
 function TFLossLessRotate.DoRotate(Sender: TObject): boolean;
 var
-  APreviewItem: TListItem;
   ANitem: TListItem;
+  Preview: string;
   FullPathName: string;
   FileName: string;
   Modulo: integer;
@@ -50,14 +50,21 @@ begin
   result := true;
 
   // Get selected Preview
-  APreviewItem := nil;
+  Preview := '';
   for ANitem in LvPreviews.Items do
   begin
     if (ANitem.Checked) then
     begin
-      APreviewItem := ANitem;
+      Preview := '-' + ANitem.Caption + ':' + ANitem.SubItems[0];
       break;
     end;
+  end;
+
+  // Crop?
+  Modulo := 0;
+  case CmbCrop.ItemIndex of
+    1: Modulo := 8;
+    2: Modulo := 16;
   end;
 
   for AnItem in Fmain.ShellList.Items do
@@ -68,11 +75,6 @@ begin
     FullPathName := Fmain.ShellList.Folders[AnItem.Index].PathName;
     if (IsJpeg(FullPathName) = false) then
       continue;
-    Modulo := 0;
-    case CmbCrop.ItemIndex of
-      1: Modulo := 8;
-      2: Modulo := 16;
-    end;
 
     // Read current Orientation
     ET_OpenExec('-s3' + CRLF + '-exif:Orientation#', FileName, ETouts, ETerrs);
@@ -85,6 +87,7 @@ begin
       else
         continue;  // No need to modify
     end;
+
     // Rotate, to match orientation
     StatusBar1.SimpleText := Format('Rotating %s Angle: %d Modulo: %d', [FullPathName, Angle, Modulo]);
     PerformLossLess(FullPathName, Angle, Modulo);
@@ -102,10 +105,11 @@ begin
       result := result and (ETerrs = '');
     end;
 
-    if (APreviewItem <> nil) then
+    // Rotate preview?
+    if (Preview <> '') then
     begin
       ETcmd := '-b' + CRLF + '-W!' + CRLF + GetPreviewTmp + CRLF;
-      ETcmd := ETcmd + '-' + APreviewItem.Caption + ':' + APreviewItem.SubItems[0];
+      ETcmd := ETcmd + Preview;
       StatusBar1.SimpleText := Format('Extracting preview from: %s', [FileName]);
       ET_OpenExec(ETcmd, FileName, ETouts, ETerrs);
       result := result and (ETerrs = '');
@@ -113,7 +117,7 @@ begin
       StatusBar1.SimpleText := Format('Rotating preview %s Angle: %d Modulo: %d', [GetPreviewTmp, Angle, Modulo]);
       PerformLossLess(GetPreviewTmp, Angle, 0);
 
-      ETcmd := '-' + APreviewItem.Caption + ':' + APreviewItem.SubItems[0] + '<=' + GetPreviewTmp + CRLF;
+      ETcmd := Preview + '<=' + GetPreviewTmp + CRLF;
       StatusBar1.SimpleText := Format('Importing preview into: %s', [FileName]);
       ET_OpenExec(ETcmd, FileName, ETouts, ETerrs);
       result := result and (ETerrs = '');

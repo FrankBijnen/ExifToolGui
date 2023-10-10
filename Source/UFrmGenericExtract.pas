@@ -45,6 +45,7 @@ uses System.StrUtils, Main, ExifTool, ExifToolsGUI_Utils, ExifToolsGui_LossLess;
 procedure TFGenericExtract.AfterExtract(Sender: TObject);
 var SelFiles: TstringList;
     AFile: string;
+    ExtractDir: string;
     AnExtract: string;
     N: integer;
     Angle: integer;
@@ -55,33 +56,36 @@ begin
   SelFiles := TStringList.Create;
   SelFiles.Text := Fmain.GetSelectedFiles('', false);
   try
+    // Crop?
+    Modulo := 0;
+    case CmbCrop.ItemIndex of
+      1: Modulo := 8;
+      2: Modulo := 16;
+    end;
+
     for ANitem in LvPreviews.Items do
     begin
       if (ANitem.Checked = false) then
         continue;
 
-      for Afile in SelFiles do
+      if (ChkSubdirs.Checked) then
+        Sep := PathDelim
+      else
+        Sep := '#';
+      ExtractDir := IncludeTrailingPathDelimiter(Fmain.ShellList.Path) + ANitem.Caption + Sep + Anitem.SubItems[0] + Sep;
+
+      for AFile in SelFiles do
       begin
-        if (ChkSubdirs.Checked) then
-          Sep := PathDelim
-        else
-          Sep := '#';
 
         // Only care about JPG
-        AnExtract := IncludeTrailingPathDelimiter(Fmain.ShellList.Path) + ANitem.Caption + Sep + Anitem.SubItems[0] + Sep + ChangeFileExt(Afile, '.jpg');
+        AnExtract := ExtractDir + ChangeFileExt(AFile, '.jpg');
         if not FileExists(AnExtract) then
           continue;
-
-        Modulo := 0;
-        case CmbCrop.ItemIndex of
-          1: Modulo := 8;
-          2: Modulo := 16;
-        end;
 
         Angle := 0;
         if (ChkAutoRotate.Checked) then
         begin
-          ET_OpenExec('-s3' + CRLF + '-exif:Orientation#', FMain.GetSelectedFiles(Afile, true), ETouts, ETerrs);
+          ET_OpenExec('-s3' + CRLF + '-exif:Orientation#', FMain.GetSelectedFiles(AFile, true), ETouts, ETerrs);
           N := StrToIntDef(LeftStr(ETouts, 1), 1);
           case N of
             3: Angle := 180;
@@ -99,10 +103,10 @@ begin
 end;
 
 procedure TFGenericExtract.BtnExecuteClick(Sender: TObject);
-var 
+var
   ANitem: TListItem;
-  Previews: string;
-  CrWait, CrNormal: HCURSOR;  
+  HasChecks: boolean;
+  CrWait, CrNormal: HCURSOR;
 begin
   CrWait := LoadCursor(0, IDC_WAIT);
   CrNormal := SetCursor(CrWait);
@@ -112,25 +116,31 @@ begin
       ETcmd := ETcmd  + '-W!' + CRLF
     else
       ETcmd := ETcmd  + '-W' + CRLF;
+
     if ChkSubdirs.Checked then
       ETcmd := ETcmd + '%g\%t\%f.%s' + CRLF
     else
       ETcmd := ETcmd + '%g#%t#%f.%s' + CRLF;
-    Previews := '';
+
+    HasChecks := false;
     for ANitem in LvPreviews.Items do
     begin
       if ANitem.Checked then
-        Previews := Previews + '-' + ANitem.Caption + ':' + ANitem.SubItems[0] + CRLF;
+      begin
+        ETcmd := ETcmd + '-' + ANitem.Caption + ':' + ANitem.SubItems[0] + CRLF;
+        HasChecks := true;
+      end;
     end;
-    if (Previews = '') then
+    if (HasChecks = false) then
     begin
       ShowMessage('Check at least 1 preview to extract');
       exit;
     end;
+
     StatusBar1.SimpleText := 'Extracting previews';
-    ETcmd := ETcmd + Previews;
     ET_OpenExec(ETcmd, FMain.GetSelectedFiles, ETouts, ETerrs);
 
+    // Do AfterExtract always, even if errors occurred.
     AfterExtract(Sender);
 
     StatusBar1.SimpleText := 'All Done';
