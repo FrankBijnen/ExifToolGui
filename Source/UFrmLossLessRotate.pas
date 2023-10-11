@@ -13,9 +13,13 @@ type
     BtnExecute: TButton;
     LvPreviews: TListView;
     LblPreview: TLabel;
-    ChkResetOrientation: TCheckBox;
     CmbCrop: TComboBox;
     LblSample: TLabel;
+    CmbRotate: TComboBox;
+    CmbResetOrientation: TComboBox;
+    Label1: TLabel;
+    Label2: TLabel;
+    Label3: TLabel;
     procedure FormShow(Sender: TObject);
     procedure BtnExecuteClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
@@ -76,31 +80,51 @@ begin
     if (IsJpeg(FullPathName) = false) then
       continue;
 
-    // Read current Orientation
-    ET_OpenExec('-s3' + CRLF + '-exif:Orientation#', FileName, ETouts, ETerrs);
-    result := result and (ETerrs = '');
-    N := StrToIntDef(LeftStr(ETouts, 1), 1);
-    case N of
-      3: Angle := 180;
-      6: Angle := 90;
-      8: Angle := 270;
-      else
-        continue;  // No need to modify
+    // Angle to rotate
+    Angle := 0;
+    case CmbRotate.ItemIndex of
+      1:  begin
+          // Read current Orientation
+            ET_OpenExec('-s3' + CRLF + '-exif:Orientation#', FileName, ETouts, ETerrs);
+            result := result and (ETerrs = '');
+            N := StrToIntDef(LeftStr(ETouts, 1), 1);
+            case N of
+              3: Angle := 180;
+              6: Angle := 90;
+              8: Angle := 270;
+            end;
+          end;
+       2: Angle := 90;
+       3: Angle := 180;
+       4: Angle := 270;
     end;
 
-    // Rotate, to match orientation
-    StatusBar1.SimpleText := Format('Rotating %s Angle: %d Modulo: %d', [FullPathName, Angle, Modulo]);
-    PerformLossLess(FullPathName, Angle, Modulo);
+    // Rotate and or Crop as requested.
+    if (Angle <> 0) or
+       (Modulo <> 0) then
+    begin
+      StatusBar1.SimpleText := Format('Rotating %s Angle: %d Modulo: %d', [FullPathName, Angle, Modulo]);
+      PerformLossLess(FullPathName, Angle, Modulo);
+    end;
 
     // reset orientation and modified date
     ETcmd := '';
-    if (ChkResetOrientation.Checked) then
-      ETcmd := '-s3' + CRLF + '-exif:Orientation#=1';
+    case CmbResetOrientation.ItemIndex of
+      1: ETcmd := '1';
+      2: ETcmd := '3';
+      3: ETcmd := '6';
+      4: ETcmd := '8';
+    end;
+    if (ETcmd <> '') then
+      ETcmd := '-exif:Orientation#=' + ETcmd;
+
+    // Modified date
     if Fmain.MPreserveDateMod.Checked then
       ETcmd := ETcmd + CRLF + '-FileModifyDate<Exif:DateTimeOriginal' + CRLF;
+
     if (Etcmd <> '') then
     begin
-      StatusBar1.SimpleText := Format('Resetting Orientation to Normal: %s', [FileName]);
+      StatusBar1.SimpleText := Format('Resetting Orientation, ModifyDate: %s', [FileName]);
       ET_OpenExec(ETcmd, FileName, ETouts, ETerrs);
       result := result and (ETerrs = '');
     end;
@@ -144,7 +168,8 @@ end;
 
 procedure TFLossLessRotate.FormCreate(Sender: TObject);
 begin
-  ChkResetOrientation.Checked := true;
+  CmbResetOrientation.ItemIndex := 1;
+  CmbRotate.ItemIndex := 1;
   CmbCrop.ItemIndex := 0;
 end;
 

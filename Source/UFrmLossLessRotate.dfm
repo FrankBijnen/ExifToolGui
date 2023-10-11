@@ -3,7 +3,7 @@ object FLossLessRotate: TFLossLessRotate
   Top = 0
   BorderStyle = bsDialog
   Caption = 'JPG: Lossless autorotate'
-  ClientHeight = 319
+  ClientHeight = 401
   ClientWidth = 607
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
@@ -16,7 +16,7 @@ object FLossLessRotate: TFLossLessRotate
   TextHeight = 13
   object StatusBar1: TStatusBar
     Left = 0
-    Top = 300
+    Top = 382
     Width = 607
     Height = 19
     Panels = <>
@@ -28,7 +28,7 @@ object FLossLessRotate: TFLossLessRotate
     Left = 0
     Top = 0
     Width = 495
-    Height = 300
+    Height = 382
     Align = alLeft
     DoubleBuffered = True
     Font.Charset = DEFAULT_CHARSET
@@ -38,8 +38,9 @@ object FLossLessRotate: TFLossLessRotate
     Font.Style = []
     ParentDoubleBuffered = False
     ParentFont = False
-    TabOrder = 1
-    ExplicitHeight = 299
+    TabOrder = 0
+    ExplicitTop = -6
+    ExplicitHeight = 390
     object LblPreview: TLabel
       Left = 10
       Top = 20
@@ -58,6 +59,27 @@ object FLossLessRotate: TFLossLessRotate
       Alignment = taRightJustify
       AutoSize = False
       Caption = 'LblSample'
+    end
+    object Label1: TLabel
+      Left = 10
+      Top = 226
+      Width = 84
+      Height = 14
+      Caption = 'Rotate method'
+    end
+    object Label2: TLabel
+      Left = 10
+      Top = 323
+      Width = 82
+      Height = 14
+      Caption = 'Set orientation'
+    end
+    object Label3: TLabel
+      Left = 10
+      Top = 274
+      Width = 163
+      Height = 14
+      Caption = 'Crop image size to multilple of'
     end
     object LvPreviews: TListView
       Left = 10
@@ -82,17 +104,9 @@ object FLossLessRotate: TFLossLessRotate
       TabOrder = 0
       ViewStyle = vsReport
     end
-    object ChkResetOrientation: TCheckBox
-      Left = 10
-      Top = 229
-      Width = 475
-      Height = 17
-      Caption = 'Reset Orientation to Horizontal'
-      TabOrder = 1
-    end
     object CmbCrop: TComboBox
       Left = 10
-      Top = 253
+      Top = 291
       Width = 204
       Height = 22
       ItemIndex = 0
@@ -103,23 +117,51 @@ object FLossLessRotate: TFLossLessRotate
         'Crop to multiple of 8'
         'Crop to multiple of 16')
     end
+    object CmbRotate: TComboBox
+      Left = 10
+      Top = 242
+      Width = 472
+      Height = 22
+      TabOrder = 1
+      Text = 'Rotate'
+      Items.Strings = (
+        'No rotate'
+        'Auto rotate'
+        '90 degrees'
+        '180 degrees'
+        '270 degrees')
+    end
+    object CmbResetOrientation: TComboBox
+      Left = 10
+      Top = 339
+      Width = 472
+      Height = 22
+      TabOrder = 3
+      Text = 'Reset Orientation'
+      Items.Strings = (
+        'No change'
+        '[ 1 ]=0'#176
+        '[ 3 ]=180'#176
+        '[ 6 ]=+90'#176
+        '[ 8 ]=-90'#176)
+    end
   end
   object BtnCancel: TButton
-    Left = 528
-    Top = 17
+    Left = 518
+    Top = 14
     Width = 69
     Height = 25
     Caption = 'Cancel'
     ModalResult = 2
-    TabOrder = 2
+    TabOrder = 1
   end
   object BtnExecute: TButton
-    Left = 530
-    Top = 252
+    Left = 518
+    Top = 346
     Width = 69
     Height = 25
     Caption = 'Execute'
-    TabOrder = 3
+    TabOrder = 2
     OnClick = BtnExecuteClick
   end
 end
