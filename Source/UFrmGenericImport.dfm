@@ -38,7 +38,7 @@ object FGenericImport: TFGenericImport
     Font.Style = []
     ParentDoubleBuffered = False
     ParentFont = False
-    TabOrder = 1
+    TabOrder = 0
     ExplicitHeight = 299
     object Label1: TLabel
       Left = 10
@@ -105,21 +105,21 @@ object FGenericImport: TFGenericImport
     end
   end
   object BtnCancel: TButton
-    Left = 528
-    Top = 17
+    Left = 518
+    Top = 14
     Width = 69
     Height = 25
     Caption = 'Cancel'
     ModalResult = 2
-    TabOrder = 2
+    TabOrder = 1
   end
   object BtnExecute: TButton
-    Left = 528
-    Top = 250
+    Left = 518
+    Top = 264
     Width = 69
     Height = 25
     Caption = 'Execute'
-    TabOrder = 3
+    TabOrder = 2
     OnClick = BtnExecuteClick
   end
 end

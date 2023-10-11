@@ -3,8 +3,8 @@ object FGenericExtract: TFGenericExtract
   Top = 0
   BorderStyle = bsDialog
   Caption = 'Generic extract previews'
-  ClientHeight = 399
-  ClientWidth = 601
+  ClientHeight = 356
+  ClientWidth = 598
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -16,8 +16,8 @@ object FGenericExtract: TFGenericExtract
   TextHeight = 13
   object StatusBar1: TStatusBar
     Left = 0
-    Top = 380
-    Width = 601
+    Top = 337
+    Width = 598
     Height = 19
     Panels = <>
     SimplePanel = True
@@ -28,7 +28,7 @@ object FGenericExtract: TFGenericExtract
     Left = 0
     Top = 0
     Width = 495
-    Height = 380
+    Height = 337
     Align = alLeft
     DoubleBuffered = True
     Font.Charset = DEFAULT_CHARSET
@@ -38,7 +38,7 @@ object FGenericExtract: TFGenericExtract
     Font.Style = []
     ParentDoubleBuffered = False
     ParentFont = False
-    TabOrder = 1
+    TabOrder = 0
     ExplicitHeight = 379
     object Label1: TLabel
       Left = 10
@@ -98,7 +98,7 @@ object FGenericExtract: TFGenericExtract
       Width = 475
       Height = 17
       Caption = 'Auto rotate extracted JPEG'#39's (From Exif:Orientation)'
-      TabOrder = 2
+      TabOrder = 3
     end
     object CmbCrop: TComboBox
       Left = 10
@@ -106,7 +106,7 @@ object FGenericExtract: TFGenericExtract
       Width = 204
       Height = 22
       ItemIndex = 0
-      TabOrder = 3
+      TabOrder = 4
       Text = 'Do not crop'
       Items.Strings = (
         'Do not crop'
@@ -119,25 +119,25 @@ object FGenericExtract: TFGenericExtract
       Width = 475
       Height = 17
       Caption = 'Overwrite existing JPEG'#39's'
-      TabOrder = 4
+      TabOrder = 2
     end
   end
   object BtnCancel: TButton
-    Left = 528
-    Top = 17
+    Left = 514
+    Top = 16
     Width = 69
     Height = 25
     Caption = 'Cancel'
     ModalResult = 2
-    TabOrder = 2
+    TabOrder = 1
   end
   object BtnExecute: TButton
-    Left = 528
-    Top = 342
+    Left = 514
+    Top = 302
     Width = 69
     Height = 25
     Caption = 'Execute'
-    TabOrder = 3
+    TabOrder = 2
     OnClick = BtnExecuteClick
   end
 end

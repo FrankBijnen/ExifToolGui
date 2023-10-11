@@ -1137,7 +1137,7 @@ object FMain: TFMain
         OnClick = MJPGAutorotateClick
       end
       object JPGGenericlosslessautorotate1: TMenuItem
-        Caption = 'JPG:  Lossless autorotate'
+        Caption = 'JPG:  Lossless rotate + crop'
         OnClick = JPGGenericlosslessautorotate1Click
       end
     end
