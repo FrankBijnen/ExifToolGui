@@ -180,7 +180,6 @@ begin
   StatusBar1.SimpleText := '';
   LblSample.Caption := Format('Sample: %s', [ExtractFileName(Fmain.GetFirstSelectedFile)]);
   FillPreviewInListView(FMain.GetFirstSelectedFile, LvPreviews);
-  BtnExecute.Enabled := LvPreviews.Items.Count > 0;
 end;
 
 end.
