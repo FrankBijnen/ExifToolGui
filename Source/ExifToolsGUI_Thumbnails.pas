@@ -302,17 +302,17 @@ end;
 
 function RunAsAdmin(const Handle: HWND; const Path, Params: string; Show: integer): boolean;
 var
-  Sei: TShellExecuteInfo;
+  sei: TShellExecuteInfo;
 begin
-  FillChar(Sei, SizeOf(Sei), 0);
-  Sei.cbSize := SizeOf(Sei);
-  Sei.Wnd := Handle;
-  Sei.fMask := SEE_MASK_FLAG_DDEWAIT or SEE_MASK_FLAG_NO_UI;
-  Sei.lpVerb := 'runas';
-  Sei.lpFile := PChar(Path);
-  Sei.lpParameters := PChar(Params);
-  Sei.nShow := Show;
-  result := ShellExecuteEx(@Sei);
+  FillChar(sei, SizeOf(sei), 0);
+  sei.cbSize := SizeOf(sei);
+  sei.Wnd := Handle;
+  sei.fMask := SEE_MASK_FLAG_DDEWAIT or SEE_MASK_FLAG_NO_UI;
+  sei.lpVerb := 'runas';
+  sei.lpFile := PChar(Path);
+  sei.lpParameters := PChar(Params);
+  sei.nShow := Show;
+  result := ShellExecuteEx(@sei);
 end;
 
 function ExistsSageSet(const StateFlagId: TStateFlagId): boolean;
