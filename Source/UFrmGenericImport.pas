@@ -111,13 +111,15 @@ begin
         end;
 
         if (Modulo = 0) and
-           (Angle = 0) then
-          ETcmd := Preview + '<=' + AnImport // Jpeg does not need to be cropped or rotated
+           (Angle = 0) then                  // Jpeg does not need to be cropped or rotated
+          ETcmd := Preview + '=' + CRLF +    // Removing preview first works more reliable when sizes are different. E.G.: Jpeg is cropped
+                   Preview + '<=' + AnImport
         else
         begin
           StatusBar1.SimpleText := Format('Rotating %s Angle: %d Modulo: %d', [GetPreviewTmp, Angle, Modulo]);
           PerformLossLess(AnImport, Angle, Modulo, GetPreviewTmp);
-          ETcmd := Preview + '<=' + GetPreviewTmp;
+          ETcmd := Preview + '=' + CRLF +    // Removing preview first works more reliable when sizes are different. E.G.: Jpeg is cropped
+                   Preview + '<=' + GetPreviewTmp;
         end;
 
         StatusBar1.SimpleText := Format('Updating preview in: %s', [AFile]);
