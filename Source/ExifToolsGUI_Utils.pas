@@ -508,7 +508,7 @@ var
   W, H, NewW, NewH: cardinal;
 begin
   result := nil;
-  GlobalImgFact.CreateDecoderFromFilename(PWideChar(AImg), GUID_VendorMicrosoftBuiltIn, // Use only buitln codecs. No additional installs needed.
+  GlobalImgFact.CreateDecoderFromFilename(PWideChar(AImg), GUID_VendorMicrosoftBuiltIn, // Use only builtin codecs. No additional installs needed.
     GENERIC_READ, WICDecodeMetadataCacheOnDemand, IwD);
   if IwD = nil then
     exit;
