@@ -19,6 +19,7 @@ type
     ChkAutoRotate: TCheckBox;
     CmbCrop: TComboBox;
     LblSample: TLabel;
+    ChkRemoveOthers: TCheckBox;
     procedure FormShow(Sender: TObject);
     procedure BtnExecuteClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
@@ -50,17 +51,22 @@ var SelFiles: TstringList;
     Angle: integer;
     ANitem: TListItem;
     Preview: string;
+    IFD: string;
+    ASize: TSize;
 begin
   result := false;
 
   Preview := '';
+  IFD := '';
   for ANitem in LvPreviews.Items do
   begin
-    if ANitem.Checked then
+    if (ANitem.Checked) and
+       (Preview = '') then
     begin
-      Preview := '-' + ANitem.Caption + ':' + ANitem.SubItems[0];
+      IFD := ANitem.Caption;
+      Preview := '-' + IFD + ':' + ANitem.SubItems[0]; // Suppress ifd0 bytestripcount
       break;
-    end;
+    end
   end;
 
   if (Preview = '') then
@@ -110,18 +116,20 @@ begin
           end;
         end;
 
-        if (Modulo = 0) and
-           (Angle = 0) then                  // Jpeg does not need to be cropped or rotated
-          ETcmd := Preview + '=' + CRLF +    // Removing preview first works more reliable when sizes are different. E.G.: Jpeg is cropped
-                   Preview + '<=' + AnImport
-        else
+        StatusBar1.SimpleText := Format('Rotating %s Angle: %d Modulo: %d', [GetPreviewTmp, Angle, Modulo]);
+        ASize := PerformLossLess(AnImport, Angle, Modulo, GetPreviewTmp);
+        ETcmd := '';
+        if (ChkRemoveOthers.Checked) then // Remove others?
         begin
-          StatusBar1.SimpleText := Format('Rotating %s Angle: %d Modulo: %d', [GetPreviewTmp, Angle, Modulo]);
-          PerformLossLess(AnImport, Angle, Modulo, GetPreviewTmp);
-          ETcmd := Preview + '=' + CRLF +    // Removing preview first works more reliable when sizes are different. E.G.: Jpeg is cropped
-                   Preview + '<=' + GetPreviewTmp;
+          EtCmd := '-a' + CRLF + '-Preview:All=' + CRLF;
+          StatusBar1.SimpleText := Format('Updating preview in: %s', [AFile]);
+          ET_OpenExec(ETcmd, FMain.GetSelectedFiles(AFile, true), ETouts, ETerrs);
+          result := result and (ETerrs = '');
         end;
 
+        ETcmd := Preview + '<=' + GetPreviewTmp + CRLF +
+                 '-' + IFD + ':ImageWidth=' + IntToStr(ASize.cx) + CRLF +
+                 '-' + IFD + ':ImageHeight=' + IntToStr(ASize.cy);
         StatusBar1.SimpleText := Format('Updating preview in: %s', [AFile]);
         ET_OpenExec(ETcmd, FMain.GetSelectedFiles(AFile, true), ETouts, ETerrs);
         result := result and (ETerrs = '');
@@ -154,6 +162,7 @@ end;
 procedure TFGenericImport.FormCreate(Sender: TObject);
 begin
   ChkAutoRotate.Checked := true;
+  ChkRemoveOthers.Checked := false;
   CmbCrop.ItemIndex := 0;
 end;
 

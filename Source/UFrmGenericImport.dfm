@@ -3,8 +3,8 @@ object FGenericImport: TFGenericImport
   Top = 0
   BorderStyle = bsDialog
   Caption = 'Generic import previews'
-  ClientHeight = 319
-  ClientWidth = 607
+  ClientHeight = 346
+  ClientWidth = 594
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -16,19 +16,19 @@ object FGenericImport: TFGenericImport
   TextHeight = 13
   object StatusBar1: TStatusBar
     Left = 0
-    Top = 300
-    Width = 607
+    Top = 327
+    Width = 594
     Height = 19
     Panels = <>
     SimplePanel = True
-    ExplicitTop = 299
-    ExplicitWidth = 603
+    ExplicitTop = 326
+    ExplicitWidth = 590
   end
   object AdvPanel1: TPanel
     Left = 0
     Top = 0
     Width = 495
-    Height = 300
+    Height = 327
     Align = alLeft
     DoubleBuffered = True
     Font.Charset = DEFAULT_CHARSET
@@ -39,7 +39,7 @@ object FGenericImport: TFGenericImport
     ParentDoubleBuffered = False
     ParentFont = False
     TabOrder = 0
-    ExplicitHeight = 299
+    ExplicitHeight = 326
     object Label1: TLabel
       Left = 10
       Top = 20
@@ -85,14 +85,14 @@ object FGenericImport: TFGenericImport
     object ChkAutoRotate: TCheckBox
       Left = 10
       Top = 229
-      Width = 204
+      Width = 470
       Height = 17
       Caption = 'Auto rotate imported JPEG'#39's'
       TabOrder = 1
     end
     object CmbCrop: TComboBox
       Left = 10
-      Top = 253
+      Top = 260
       Width = 204
       Height = 22
       ItemIndex = 0
@@ -102,6 +102,14 @@ object FGenericImport: TFGenericImport
         'Do not crop'
         'Crop to multiple of 8'
         'Crop to multiple of 16')
+    end
+    object ChkRemoveOthers: TCheckBox
+      Left = 10
+      Top = 291
+      Width = 470
+      Height = 17
+      Caption = 'Remove unchecked previews'
+      TabOrder = 3
     end
   end
   object BtnCancel: TButton

@@ -87,9 +87,7 @@ object FGenericExtract: TFGenericExtract
       Top = 226
       Width = 475
       Height = 17
-      Caption = 
-        'Create subdirectories for selected Previews (Example: .\Exif\Jpg' +
-        'FromRaw)'
+      Caption = 'Create subdirectories for selected Previews'
       TabOrder = 1
     end
     object ChkAutoRotate: TCheckBox

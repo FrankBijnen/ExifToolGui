@@ -1,20 +1,18 @@
 unit ExifToolsGui_LossLess;
 
 interface
-uses ExifTool;
+
+uses ExifTool, System.Types;
 
 type TLossLessMethod = (NotTested, JheadJpegTran, Internal);
 
-function GetLossLessMethod: TLossLessMethod;
 function HasJHead: boolean;
 function HasJpegTran: boolean;
-function PerformLossLess(AJpeg: string; Angle, Modulo: integer; OJpeg: string = ''): boolean;
+function PerformLossLess(AJpeg: string; Angle, Modulo: integer; OJpeg: string = ''): TSize;
 
 implementation
 
 uses sdJpegLossless, sdJpegImage, sdJpegTypes, sdJpegMarkers;
-
-var LossLessMethod: TLossLessMethod;
 
 function HasJHead: boolean;
 begin
@@ -26,32 +24,14 @@ begin
   result := ExecCMD('jpegtran', '');
 end;
 
-function GetLossLessMethod: TLossLessMethod;
-begin
-  if (LossLessMethod = TLossLessMethod.NotTested) then
-  begin
-    if HasJHead and
-       HasJpegTran then
-      LossLessMethod := TLossLessMethod.JheadJpegTran
-    else
-      LossLessMethod := TLossLessMethod.Internal;
-  end;
-  result := LossLessMethod;
-end;
-
-function PerformLossLess(AJpeg: string; Angle, Modulo: integer; OJpeg: string = ''): boolean;
+function PerformLossLess(AJpeg: string; Angle, Modulo: integer; OJpeg: string = ''): TSize;
 var LossLess: TsdLosslessOperation;
     JpegImage: TsdJpegImage;
     L, T, R, B:integer;
 begin
-  if (GetLossLessMethod <> TLossLessMethod.Internal) then
-    exit(false);
+  result.cx := 0;
+  result.cy := 0;
 
-  if (Angle = 0) and
-     (Modulo = 0) then
-    exit(false);
-
-  result := true;
   JpegImage := TsdJpegImage.Create(nil);
   try
     JpegImage.LoadFromFile(AJpeg);
@@ -73,6 +53,10 @@ begin
          (B <> JpegImage.Height) then
         LossLess.Crop(L, T, R, B);
     end;
+
+    result.cx := JpegImage.Width;
+    result.cy := JpegImage.Height;
+
     if (OJpeg <> '') then
       JpegImage.SaveToFile(OJpeg)
     else
@@ -80,11 +64,6 @@ begin
   finally
     JpegImage.Free;
   end;
-end;
-
-initialization
-begin
-  LossLessMethod := TLossLessMethod.NotTested;
 end;
 
 end.

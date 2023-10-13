@@ -50,6 +50,7 @@ var
   Modulo: integer;
   N: integer;
   Angle: integer;
+  ASize: TSize;
 begin
   result := true;
 
@@ -104,7 +105,7 @@ begin
        (Modulo <> 0) then
     begin
       StatusBar1.SimpleText := Format('Rotating %s Angle: %d Modulo: %d', [FullPathName, Angle, Modulo]);
-      PerformLossLess(FullPathName, Angle, Modulo);
+      ASize := PerformLossLess(FullPathName, Angle, Modulo);
     end;
 
     // reset orientation and modified date
@@ -139,7 +140,7 @@ begin
       result := result and (ETerrs = '');
 
       StatusBar1.SimpleText := Format('Rotating preview %s Angle: %d Modulo: %d', [GetPreviewTmp, Angle, Modulo]);
-      PerformLossLess(GetPreviewTmp, Angle, 0);
+      ASize := PerformLossLess(GetPreviewTmp, Angle, 0);
 
       ETcmd := Preview + '<=' + GetPreviewTmp + CRLF;
       StatusBar1.SimpleText := Format('Importing preview into: %s', [FileName]);

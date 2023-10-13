@@ -1136,7 +1136,8 @@ var
   FileName: string;
   AnItem: TListItem;
 begin
-  if (GetLossLessMethod = TLossLessMethod.Internal) then
+  if not HasJpegTran or
+     not HasJHead then
   begin
     ShowMessage('Missing jhead.exe && jpegtran.exe!');
     exit;
@@ -1224,9 +1225,9 @@ var
   dirJPG, Img, tx, txH, txW, outs, errs, AllErrs: string;
 begin
 
-  if (GetLossLessMethod = TLossLessMethod.Internal) then
+  if (not HasJpegTran) then
   begin
-    ShowMessage('Missing jhead.exe && jpegtran.exe!');
+    ShowMessage('Missing jpegtran.exe!');
     exit;
   end;
 
@@ -2164,8 +2165,8 @@ begin
 
   CBoxFileFilter.Text := SHOWALL;
   ExifTool.ExecETEvent := ExecETEvent_Done;
-  MEmbedPreview.Enabled := (GetLossLessMethod = TLossLessMethod.JheadJpegTran);
-  MJPGAutorotate.Enabled := (GetLossLessMethod = TLossLessMethod.JheadJpegTran);
+  MEmbedPreview.Enabled := HasJpegTran;
+  MJPGAutorotate.Enabled := HasJHead and HasJpegTran;
 end;
 
 // ---------------Drag_Drop procs --------------------

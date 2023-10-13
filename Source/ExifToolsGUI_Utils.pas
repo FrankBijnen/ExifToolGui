@@ -677,7 +677,7 @@ var
 begin
   ETResult := TStringList.Create;
   try
-    ETcmd := '-s1' + CRLF + '-a' + CRLF + '-G' + CRLF + '-Preview:All';
+    ETcmd := '-s1' + CRLF + '-a' + CRLF + '-G1' + CRLF + '-Preview:All';
     ET_OpenExec(ETcmd, SelectedFile, ETResult);
     LvPreviews.Items.Clear;
     APreviewList := GetPreviews(ETResult, AMaxPos);
