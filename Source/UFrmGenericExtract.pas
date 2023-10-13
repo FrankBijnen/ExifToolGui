@@ -118,9 +118,9 @@ begin
       ETcmd := ETcmd  + '-W' + CRLF;
 
     if ChkSubdirs.Checked then
-      ETcmd := ETcmd + '%g\%t\%f.%s' + CRLF
+      ETcmd := ETcmd + '%g1\%t\%f.%s' + CRLF
     else
-      ETcmd := ETcmd + '%g#%t#%f.%s' + CRLF;
+      ETcmd := ETcmd + '%g1#%t#%f.%s' + CRLF;
 
     HasChecks := false;
     for ANitem in LvPreviews.Items do

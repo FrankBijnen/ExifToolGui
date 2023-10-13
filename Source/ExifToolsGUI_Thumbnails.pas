@@ -362,7 +362,7 @@ end;
 initialization
 
 begin
-  ResetPool(FThreadPool, 4);
+  ResetPool(FThreadPool);
 end;
 
 finalization
