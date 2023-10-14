@@ -1847,9 +1847,10 @@ end;
 procedure TFMain.EditETdirectKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
 var
   IsRecursive, ETResult: boolean;
-  i: smallint;
+  I: smallint;
   ETtx, ETout, ETerr: string;
   ETprm: string;
+  SelectedFiles: string;
 begin
   ETtx := EditETdirect.Text;
   if (Key = VK_Return) and (length(ETtx) > 1) then
@@ -1858,27 +1859,30 @@ begin
     ETprm := ETtx;
     if IsRecursive then
     begin // init ETcounter:
-      ETprm := ETprm + ' "' + ExtractFileDir(ShellList.Path) + '"';
-      i := pos('-ext ', ETtx); // ie. '-ext jpg ...'
-      if i = 0 then
+      ETprm := ETprm + ' "' + ExcludeTrailingPathDelimiter(ShellList.Path) + '"'; // If pathname ends with \, it would be escaping a "
+      I := pos('-ext ', ETtx); // ie. '-ext jpg ...'
+      if I = 0 then
         ETtx := '*.*'
       else
       begin
-        inc(i, 4);
-        Delete(ETtx, 1, i);
+        inc(I, 4);
+        Delete(ETtx, 1, I);
         ETtx := TrimLeft(ETtx); // ='jpg ...'
-        i := pos(' ', ETtx);
-        if i > 0 then
-          ETtx := LeftStr(ETtx, i - 1);
+        I := pos(' ', ETtx);
+        if I > 0 then
+          ETtx := LeftStr(ETtx, I - 1);
         ETtx := '*.' + ETtx;
       end;
       ETCounter := GetNrOfFiles(ShellList.Path, ETtx, true);
-    end;
+      SelectedFiles := '';
+    end
+    else
+      SelectedFiles := GetSelectedFiles;
 
     // Call ETDirect or ET_OpenExec
     case CmbETDirectMode.ItemIndex of
-      0: ETResult := ET_OpenExec(ArgsFromDirectCmd(ETprm), GetSelectedFiles, ETout, ETerr);
-      1: ETResult := ExecET(ETprm, GetSelectedFiles, ShellList.Path, ETout, ETerr);
+      0: ETResult := ET_OpenExec(ArgsFromDirectCmd(ETprm), SelectedFiles, ETout, ETerr);
+      1: ETResult := ExecET(ETprm, SelectedFiles, ShellList.Path, ETout, ETerr);
       else
         ETResult := false; // Make compiler happy
     end;
