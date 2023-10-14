@@ -598,21 +598,6 @@ object FMain: TFMain
         DesignSize = (
           392
           184)
-        object LabelCounter: TLabel
-          Left = 248
-          Top = 6
-          Width = 32
-          Height = 18
-          Alignment = taRightJustify
-          Caption = '0000'
-          Font.Charset = DEFAULT_CHARSET
-          Font.Color = clBlue
-          Font.Height = -15
-          Font.Name = 'Tahoma'
-          Font.Style = []
-          ParentFont = False
-          Visible = False
-        end
         object SpeedBtn_ETdirect: TSpeedButton
           Left = 1
           Top = 6

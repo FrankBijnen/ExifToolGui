@@ -216,40 +216,47 @@ function GetNrOfFiles(StartDir, FileMask: string; subDir: boolean): integer;
 var
   SR: TSearchRec;
   DirList: TStringList;
-  IsFound, doSub: boolean;
-  I, x: integer;
+  IsFound, DoSub: boolean;
+  I, X: integer;
+  CrNormal, CrWait: HCURSOR;
 begin
-  if StartDir[Length(StartDir)] <> '\' then
-    StartDir := StartDir + '\';
-  doSub := subDir;
-  x := 0;
-  // Count files in directory
-  IsFound := FindFirst(StartDir + FileMask, faAnyFile - faDirectory, SR) = 0;
-  while IsFound do
-  begin
-    inc(x);
-    IsFound := FindNext(SR) = 0;
-  end;
-  FindClose(SR);
-
-  // Build a list of subdirectories
-  if doSub then
-  begin
-    DirList := TStringList.Create;
-    IsFound := FindFirst(StartDir + '*.*', faAnyFile, SR) = 0;
+  CrWait := LoadCursor(0, IDC_WAIT);
+  CrNormal := SetCursor(CrWait);
+  try
+    if StartDir[Length(StartDir)] <> '\' then
+      StartDir := StartDir + '\';
+    DoSub := subDir;
+    X := 0;
+    // Count files in directory
+    IsFound := FindFirst(StartDir + FileMask, faAnyFile - faDirectory, SR) = 0;
     while IsFound do
     begin
-      if ((SR.Attr and faDirectory) <> 0) and (SR.Name[1] <> '.') then
-        DirList.Add(StartDir + SR.Name);
+      inc(X);
       IsFound := FindNext(SR) = 0;
     end;
     FindClose(SR);
-    // Scan the list of subdirectories
-    for I := 0 to DirList.Count - 1 do
-      x := x + GetNrOfFiles(DirList[I], FileMask, doSub);
-    DirList.Free;
+
+    // Build a list of subdirectories
+    if DoSub then
+    begin
+      DirList := TStringList.Create;
+      IsFound := FindFirst(StartDir + '*.*', faAnyFile, SR) = 0;
+      while IsFound do
+      begin
+        if ((SR.Attr and faDirectory) <> 0) and (SR.Name[1] <> '.') then
+          DirList.Add(StartDir + SR.Name);
+        IsFound := FindNext(SR) = 0;
+      end;
+      FindClose(SR);
+      // Scan the list of subdirectories
+      for I := 0 to DirList.Count - 1 do
+        X := X + GetNrOfFiles(DirList[I], FileMask, DoSub);
+      DirList.Free;
+    end;
+    result := X;
+  finally
+    SetCursor(CrNormal);
   end;
-  result := x;
 end;
 
 // String
