@@ -269,7 +269,10 @@ begin
           begin
             Dec(ETCounter);
             if ETShowCounter then
+            begin
               ETCounterLabel.Caption := IntToStr(ETCounter);
+              ETCounterLabel.Update;
+            end;
           end
           else
             ETstream.Write(PipeBuffer, BytesCount);
@@ -444,7 +447,10 @@ begin
           begin // line starts with '=='
             Dec(ETCounter);
             if ETShowCounter then
+            begin
               ETCounterLabel.Caption := IntToStr(ETCounter);
+              ETCounterLabel.Update;
+            end;
           end;
           ETstream.Write(PipeBuffer, BytesCount);
         end;
