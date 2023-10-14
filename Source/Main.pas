@@ -56,7 +56,6 @@ type
     SpeedBtnDetails: TSpeedButton;
     CBoxDetails: TComboBox;
     EditETdirect: TLabeledEdit;
-    LabelCounter: TLabel;
     SpeedBtn_ETdirect: TSpeedButton;
     CBoxETdirect: TComboBox;
     SpeedBtn_ETedit: TSpeedButton;
@@ -301,7 +300,7 @@ type
     function GetFirstSelectedFile: string;
     function GetSelectedFiles(FileName: string; MustExpandPath: boolean): string; overload;
     function GetSelectedFiles(FileName: string = ''): string; overload;
-    procedure ExecETEvent_Done(ExecNum: integer; EtCmds, EtOuts, EtErrs, StatusLine: string; PopupOnError: boolean);
+    procedure ExecETEvent_Done(ExecNum: word; EtCmds, EtOuts, EtErrs, StatusLine: string; PopupOnError: boolean);
     procedure UpdateStatusBar_FilesShown;
     procedure SetGuiColor;
     var GUIBorderWidth, GUIBorderHeight: integer; // Initialized in OnShow
@@ -1084,7 +1083,7 @@ begin
               ETcmd := ETcmd + '--Xmp-exif' + CRLF;
           end;
           ETcmd := ETcmd + '-ext' + CRLF + DstExt;
-          ETCounter := GetNrOfFiles(ShellList.Path, '*.' + DstExt, (i = mrYes));
+          SetCounter(StatusBar, 1, GetNrOfFiles(ShellList.Path, '*.' + DstExt, (i = mrYes)));
           if (ET_OpenExec(ETcmd, '.', ETout, ETerr)) then
           begin
             RefreshSelected(Sender);
@@ -1243,12 +1242,11 @@ begin
     begin
       if dirJPG[length(dirJPG)] <> '\' then
         dirJPG := dirJPG + '\';
-      LabelCounter.Visible := true;
       AllErrs := '';
       c := 0;
       for i := 0 to j - 1 do
       begin
-        LabelCounter.Caption := IntToStr(j - i);
+        StatusBar.Panels[1].Text := IntToStr(j - i);
         Img := ShellList.FileName(i);
         tx := ShellList.FileExt(i);
         if UpperCase(tx) = '.CR2' then
@@ -1305,7 +1303,6 @@ begin
             AllErrs := AllErrs + Img + ' JPG -not found' + CRLF;
         end;
       end;
-      LabelCounter.Visible := false;
       StatusBar.Panels[1].Text := IntToStr(c) + ' of ' + IntToStr(j) + ' files updated.';
       if length(AllErrs) > 0 then
       with FLogWin do
@@ -1751,7 +1748,7 @@ begin
   SpeedBtnQuickSave.Enabled := (X > 0);
 end;
 
-procedure TFMain.ExecETEvent_Done(ExecNum: integer; EtCmds, EtOuts, EtErrs, StatusLine: string; PopupOnError: boolean);
+procedure TFMain.ExecETEvent_Done(ExecNum: word; EtCmds, EtOuts, EtErrs, StatusLine: string; PopupOnError: boolean);
 var
   Indx: Integer;
   ErrStatus: string;
@@ -1776,7 +1773,7 @@ begin
        ((ChkShowAll.Checked) or (ErrStatus <> '-')) then
     begin
       Indx := NextLogId;
-      FExecs[Indx] := Format('Execute: %s %s Update/ET Direct status: %s', [Char(ExecNum), TimeToStr(now), ErrStatus]);
+      FExecs[Indx] := Format('Execute: %d %s Update/ET Direct status: %s', [ExecNum, TimeToStr(now), ErrStatus]);
       FCmds[Indx] := EtCmds;
       FEtOuts[Indx] := EtOuts;
       FEtErrs[Indx] := EtErrs;
@@ -1873,7 +1870,7 @@ begin
           ETtx := LeftStr(ETtx, I - 1);
         ETtx := '*.' + ETtx;
       end;
-      ETCounter := GetNrOfFiles(ShellList.Path, ETtx, true);
+      SetCounter(StatusBar, 1, GetNrOfFiles(ShellList.Path, ETtx, true));
       SelectedFiles := '';
     end
     else
@@ -2217,7 +2214,6 @@ var
   i: smallint;
   PathFromParm: boolean;
 begin
-  ETCounterLabel := LabelCounter;
   i := Screen.PixelsPerInch;
   AdvPanelETdirect.Height := MulDiv(32, i, 96);
   AdvPanelMetaBottom.Height := MulDiv(32, i, 96);

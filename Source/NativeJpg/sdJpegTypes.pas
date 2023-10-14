@@ -1060,13 +1060,15 @@ begin
   FStream := TMemoryStream.Create;
 end;
 
-//TODO: Needed?
 procedure TsdJpegMarker.DebugSample(S: TStream; Size: integer);
+{$IFDEF DEBUG}
 var
   i: integer;
   B: byte;
   Msg: string;
+{$ENDIF}
 begin
+{$IFDEF DEBUG}
   Msg := '';
   S.Position := 0;
   for i := 0 to IntMin(Size, 32) - 1 do
@@ -1077,6 +1079,7 @@ begin
       Msg := Msg + '-';
   end;
   S.Position := 0;
+{$ENDIF}
 end;
 
 destructor TsdJpegMarker.Destroy;

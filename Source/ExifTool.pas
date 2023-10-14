@@ -2,10 +2,10 @@ unit ExifTool;
 
 interface
 
-uses Classes, StdCtrls;
+uses System.Classes, Vcl.StdCtrls, Vcl.ComCtrls;
 
 type
-  TExecETEvent = procedure(ExecNum: integer; EtCmds, EtOuts, EtErrs, StatusLine: string; PopupOnError: boolean) of object;
+  TExecETEvent = procedure(ExecNum: word; EtCmds, EtOuts, EtErrs, StatusLine: string; PopupOnError: boolean) of object;
 
   ET_OptionsRec = record
     // don't define '-a' (because of Filelist custom columns)
@@ -28,11 +28,10 @@ type
 const
   CRLF = #13#10;
   ReadyPrompt = '{ready';
+  FilePrompt  = '========';
 
 var
   ExecETEvent: TExecETEvent;
-  ETCounterLabel: TLabel = nil;
-  ETCounter: integer = 0;
   ET_Options: ET_OptionsRec = (ETLangDef: '';
     ETBackupMode: '-overwrite_original' + CRLF;   // or ='' or='overwrite_original_in_place'
     ETFileDate: '';                               // or '-P'+CRLF (preserve FileModify date)
@@ -57,22 +56,27 @@ function ExecET(ETcmd, FNames, WorkDir: string; var ETouts: string): boolean; ov
 function ExecCMD(xCmd, WorkDir: string; var ETouts, ETErrs: string): boolean; overload;
 function ExecCMD(xCmd, WorkDir: string): boolean; overload;
 
+procedure SetCounter(AStatusBar: TStatusBar; APanel, ACounter: integer);
+
 implementation
 
-uses Main, MainDef, Windows, Forms, SysUtils, ExifToolsGUI_Utils, System.SyncObjs;
+uses System.SysUtils, System.SyncObjs, Winapi.Windows, Vcl.Forms, Main, MainDef, ExifToolsGUI_Utils;
 
 const
   szPipeBuffer = 65535;
 
 var
+  ETCounterBar: TStatusBar = nil;
+  ETCounterPanel: integer = 0;
+  ETCounter: integer = 0;
+
   ETprocessInfo: TProcessInformation;
   PipeInRead, PipeInWrite: THandle;
   PipeOutRead, PipeOutWrite: THandle;
   PipeErrRead, PipeErrWrite: THandle;
   FETWorkDir: string;
-  ETShowCounter: boolean = false;
   ETEvent: TEvent;
-  ExecNum: byte;
+  ExecNum: word;
 
 // Returns the output of ExifTool, but skips last {ready line, if found
 // Statusline is the line immediately preceding the last line. Contains xxxx image files read.
@@ -123,8 +127,50 @@ end;
 procedure UpdateExecNum;
 begin
   inc(ExecNum);
-  if (ExecNum > $39) then
-    ExecNum := $31;
+  if (ExecNum > 99) then
+    ExecNum := 10;
+end;
+
+// Scan for Ready prompt and optionally for ===== (New file processed by ExifTool)
+function CheckBuffer(PipeBuffer: array of byte; BuffLen: Dword): boolean;
+var Buffer: AnsiString;
+    LastBufferLine: string;
+    CheckNum: string;
+    FilePos, PrevPos: integer;
+begin
+  if (BuffLen = 0) then
+    exit(true);
+
+  // Get Buffer as an AnsiString
+  SetLength(Buffer, BuffLen);
+  Move(PipeBuffer[0], Buffer[1], BuffLen);
+
+  // Last Line is our ready prompt?
+  CheckNum := ReadyPrompt + IntToStr(ExecNum) + '}';
+  LastBufferLine := LastLine(Buffer, Length(Buffer), FilePos);
+  result := (LastBufferLine = CheckNum);
+
+  // Count the nr of Files processed.
+  FilePos := BuffLen;
+  PrevPos := 1;
+  while (ETCounter > 0) and
+        (FilePos > 0) do
+  begin
+    FilePos := Pos(FilePrompt, Buffer, PrevPos);
+
+    if (FilePos > 0) then
+    begin
+      Dec(ETCounter);
+      if (Assigned(ETCounterBar)) then
+      begin
+        ETCounterBar.Panels[ETCounterPanel].Text := IntToStr(ETCounter) + ' Files remaining';
+        ETCounterBar.Update;
+      end;
+      if ((ETCounter mod 10) = 0) then
+        Application.ProcessMessages;
+    end;
+    PrevPos := FilePos + Length(FilePrompt) + 1;
+  end;
 end;
 
 function ETWorkDir: string;
@@ -201,12 +247,8 @@ var
   Call_ET: AnsiString; // Needs to be AnsiString. Only holds the -@ <argsfilename>
   BytesCount: Dword;
   I: word;
-  BuffContent: ^word;
-  BuffAddress: ^Dword;
   CanUseUtf8: boolean;
   EndReady: boolean;
-  ThisExecNum: byte;
-  CheckNum: word;
   Wr: TWaitResult;
   CrWait, CrNormal: HCURSOR;
 begin
@@ -214,8 +256,6 @@ begin
 
   // Update Execnum
   UpdateExecNum;
-  ThisExecNum := ExecNum;
-  CheckNum := ($7D * 256) + ThisExecNum;
 
   if (FETWorkDir <> '') and
      (Length(ETcmd) > 1) then
@@ -235,9 +275,6 @@ begin
     CrWait := LoadCursor(0, IDC_WAIT);
     CrNormal := SetCursor(CrWait);
     try
-      ETShowCounter := (ETCounterLabel <> nil) and (ETCounter > 1);
-      ETCounterLabel.Visible := ETShowCounter;
-
       // Create TempFile with commands and filenames
       if pos('||', ETcmd) > 0 then
         ETcmd := StringReplace(ETcmd, '||', CRLF, [rfReplaceAll]);
@@ -245,7 +282,7 @@ begin
       FinalCmd := EndsWithCRLF(ET_Options.GetOptions(CanUseUtf8) + ETcmd);
       if FNames <> '' then
         FinalCmd := EndsWithCRLF(FinalCmd + FNames);
-      FinalCmd := EndsWithCRLF(FinalCmd + '-execute' + Char(ThisExecNum));
+      FinalCmd := EndsWithCRLF(FinalCmd + '-execute' + IntToStr(ExecNum));
 
       // Create tempfile
       TempFile := GetExifToolTmp;
@@ -258,36 +295,14 @@ begin
 
       // ========= Read StdOut =======================
       ETstream.Clear;
-      BuffAddress := Addr(BuffContent);
-      EndReady := false;
       repeat
         ReadFile(PipeOutRead, PipeBuffer, szPipeBuffer, BytesCount, nil);
-        BuffContent := @PipeBuffer[0];
-        if BytesCount > 1 then
-        begin
-          if BuffContent^ = $3D3D then
-          begin
-            Dec(ETCounter);
-            if ETShowCounter then
-            begin
-              ETCounterLabel.Caption := IntToStr(ETCounter);
-              ETCounterLabel.Update;
-            end;
-          end
-          else
-            ETstream.Write(PipeBuffer, BytesCount);
-          for I := 0 to BytesCount - 1 do
-          begin
-            if BuffContent^ = CheckNum then
-              EndReady := true; // line contains 'n}'
-            inc(BuffAddress^, 1);
-          end;
-        end
-        else
-          break;
+        ETstream.Write(PipeBuffer, BytesCount);
+        EndReady := CheckBuffer(PipeBuffer, BytesCount);
       until EndReady;
       ETstream.Position := 0;
       ETlogs := UTF8ToString(ETstream.DataString);
+      SetCounter(nil, 0 ,0);
 
       // ========= Read StdErr =======================
       ETstream.Clear;
@@ -304,11 +319,7 @@ begin
       ETstream.Position := 0;
       ETErrs := UTF8ToString(ETstream.DataString);
 
-      // ----------------------------------------------
-      if ETShowCounter then
-        ETCounterLabel.Visible := false;
-      ETCounter := 0;
-
+      // Analyse
       ETouts := AnalyseResult(ETlogs, StatusLine); // Etouts: returned as result, ETlogs: shown in log window
 
       // Callback for Logging
@@ -381,7 +392,6 @@ var
   Call_ET: string;
   PWorkDir: PChar;
   BytesCount: Dword;
-  BuffContent: ^word;
   CanUseUtf8: boolean;
   CrWait, CrNormal: HCURSOR;
 begin
@@ -412,8 +422,6 @@ begin
       PWorkDir := PChar(WorkDir);
 
     UpdateExecNum;
-    ETShowCounter := (ETCounterLabel <> nil) and (ETCounter > 1);
-    ETCounterLabel.Visible := ETShowCounter;
     CanUseUtf8 := (pos('-L ', ETcmd) = 0);
 
     FinalCmd := EndsWithCRLF(ET_Options.GetOptions(CanUseUtf8) + ArgsFromDirectCmd(ETcmd));
@@ -440,25 +448,14 @@ begin
       ETstream.Clear;
       repeat
         ReadFile(PipeOutRead, PipeBuffer, szPipeBuffer, BytesCount, nil);
-        BuffContent := @PipeBuffer[0];
-        if BytesCount > 1 then
-        begin
-          if BuffContent^ = $3D3D then
-          begin // line starts with '=='
-            Dec(ETCounter);
-            if ETShowCounter then
-            begin
-              ETCounterLabel.Caption := IntToStr(ETCounter);
-              ETCounterLabel.Update;
-            end;
-          end;
-          ETstream.Write(PipeBuffer, BytesCount);
-        end;
+        ETstream.Write(PipeBuffer, BytesCount);
+        CheckBuffer(PipeBuffer, BytesCount);
       until BytesCount = 0;
 
       ETstream.Position := 0;
       ETLogs := UTF8ToString(ETstream.DataString);
       CloseHandle(PipeOutRead);
+      SetCounter(nil, 0, 0);
 
       // ========= Read StdErr =======================
       ETstream.Clear;
@@ -475,6 +472,7 @@ begin
       CloseHandle(ProcessInfo.hThread);
       CloseHandle(ProcessInfo.hProcess);
 
+      // Analyse
       ETouts := AnalyseResult(ETlogs, StatusLine); // Etouts: returned as result, ETlogs: shown in log window
 
       // Callback for Logging
@@ -483,9 +481,6 @@ begin
 
       result := true;
     end;
-    if ETShowCounter then
-      ETCounterLabel.Visible := false;
-    ETCounter := 0;
   finally
     ETstream.Free;
     SetCursor(CrNormal);
@@ -602,12 +597,18 @@ begin
 end;
 // ==============================================================================
 
+procedure SetCounter(AStatusBar: TStatusBar; APanel, ACounter: integer);
+begin
+  ETCounterBar := AStatusBar;
+  ETCounterPanel := APanel;
+  ETCounter := ACounter;
+end;
+
 initialization
 
 begin
-  ETCounterLabel := nil;
   ETEvent := TEvent.Create(nil, true, true, ExtractFileName(Paramstr(0)));
-  ExecNum := $30;
+  ExecNum := 10; // From 10 to 99
   FETWorkDir := '';
 end;
 
