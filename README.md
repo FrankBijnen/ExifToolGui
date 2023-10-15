@@ -33,10 +33,20 @@ Obtaining Exiftool.
 
 2) An installer provided by Oliver Betz. https://oliverbetz.de/pages/Artikel/ExifTool-for-Windows
 
+Obtaining WebWiew2Loader.dll.
+
+https://www.nuget.org/packages/Microsoft.Web.WebView2
+See Docs/ReadMe for Users.txt for more info.
+
+Obtaining jhead.exe and jpegtran.exe.
+
+https://exiftool.org/gui/exiftoolgui516.zip
+Just take these executables from that version. You can find them in the zip in folder jhead_jpegtran.
+
 Documentation.
 
  Online documentation is available at https://exiftool.org/gui/
  It is written with V5 in mind, but most of it still applies. 
 
 
- Frank Bijnen
+Frank Bijnen
