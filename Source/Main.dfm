@@ -11,6 +11,7 @@ object FMain: TFMain
   Font.Name = 'Tahoma'
   Font.Style = []
   Menu = MainMenu
+  Position = poDesigned
   OnCanResize = FormCanResize
   OnClose = FormClose
   OnCreate = FormCreate
