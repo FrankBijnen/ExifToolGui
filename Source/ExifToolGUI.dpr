@@ -22,6 +22,7 @@ uses
   ExifToolsGui_LossLess in 'ExifToolsGui_LossLess.pas',
   ExifInfo in 'ExifInfo.pas',
   ExifTool in 'ExifTool.pas',
+  ExifTool_PipeStream in 'ExifTool_PipeStream.pas',
   Main in 'Main.pas' {FMain},
   LogWin in 'LogWin.pas' {FLogWin},
   Preferences in 'Preferences.pas' {FPreferences},
@@ -43,7 +44,7 @@ uses
   UFrmAbout in 'UFrmAbout.pas' {FrmAbout},
   UFrmGenerate in 'UFrmGenerate.pas' {FrmGenerate},
   DateTimeShift in 'DateTimeShift.pas' {FDateTimeShift};
-
+  
 {$R *.res}
 
 begin

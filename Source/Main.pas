@@ -295,6 +295,7 @@ type
     procedure ShellListPathChanged(Sender: TObject);
     procedure ShellListOwnerDataFetch(Sender: TObject; Item: TListItem; Request: TItemRequest; AFolder: TShellFolder);
     procedure ShellListColumnResized(Sender: TObject);
+    procedure CounterETEvent(Counter: integer);
   public
     { Public declarations }
     function GetFirstSelectedFile: string;
@@ -314,7 +315,8 @@ implementation
 
 uses System.StrUtils, System.Math, System.Masks, System.UITypes,
   Vcl.ClipBrd, Winapi.ShlObj, Winapi.ShellAPI, Vcl.Shell.ShellConsts, Vcl.Themes, Vcl.Styles,
-  ExifTool, ExifInfo, ExifToolsGui_LossLess, MainDef, LogWin, Preferences, EditFFilter, EditFCol, UFrmStyle, UFrmAbout,
+  ExifTool, ExifInfo, ExifToolsGui_LossLess, ExifTool_PipeStream,
+  MainDef, LogWin, Preferences, EditFFilter, EditFCol, UFrmStyle, UFrmAbout,
   QuickMngr, DateTimeShift, DateTimeEqual, CopyMeta, RemoveMeta, Geotag, Geomap, CopyMetaSingle, FileDateTime,
   UFrmGenericExtract, UFrmGenericImport, UFrmLossLessRotate;
 
@@ -1083,7 +1085,7 @@ begin
               ETcmd := ETcmd + '--Xmp-exif' + CRLF;
           end;
           ETcmd := ETcmd + '-ext' + CRLF + DstExt;
-          SetCounter(StatusBar, 1, GetNrOfFiles(ShellList.Path, '*.' + DstExt, (i = mrYes)));
+          SetCounter(CounterETEvent, GetNrOfFiles(ShellList.Path, '*.' + DstExt, (i = mrYes)));
           if (ET_OpenExec(ETcmd, '.', ETout, ETerr)) then
           begin
             RefreshSelected(Sender);
@@ -1870,7 +1872,7 @@ begin
           ETtx := LeftStr(ETtx, I - 1);
         ETtx := '*.' + ETtx;
       end;
-      SetCounter(StatusBar, 1, GetNrOfFiles(ShellList.Path, ETtx, true));
+      SetCounter(CounterETEvent, GetNrOfFiles(ShellList.Path, ETtx, true));
       SelectedFiles := '';
     end
     else
@@ -3135,6 +3137,12 @@ begin
     StatusBar.Panels[1].Text := 'Remaining Thumbnails to generate: ' + IntToStr(Remaining)
   else
     StatusBar.Panels[1].Text := '';
+end;
+
+procedure TFMain.CounterETEvent(Counter: integer);
+begin
+  StatusBar.Panels[1].Text := Format('%d Files remaining', [Counter]);
+  StatusBar.Update;
 end;
 
 end.

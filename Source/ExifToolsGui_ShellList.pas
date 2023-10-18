@@ -510,7 +510,7 @@ function TShellListView.OwnerDataFetch(Item: TListItem; Request: TItemRequest): 
       TaskId := FThumbTasks.Add(nil);
       FThumbTasks[TaskId] := TThumbTask.Create(ItemIndx, Self, Self.RootFolder.AbsoluteID, FThreadPool, FThumbNailSize);
     finally
-      System.TMonitor.exit(FThumbTasks);
+      System.TMonitor.Exit(FThumbTasks);
     end;
 
     // Actually start the task. It will create a HBITMAP, and send a message to the ShellListView window.
