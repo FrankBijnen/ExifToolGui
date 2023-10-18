@@ -2,14 +2,14 @@ unit ExifTool;
 
 interface
 
-uses System.Classes, Vcl.StdCtrls, Vcl.ComCtrls;
+uses System.Classes, System.Types;
 
 type
   TExecETEvent = procedure(ExecNum: word; EtCmds, EtOuts, EtErrs, StatusLine: string; PopupOnError: boolean) of object;
 
+  // don't define '-a' (because of Filelist custom columns)
+  // don't define '-e' (because of extracting previews)
   ET_OptionsRec = record
-    // don't define '-a' (because of Filelist custom columns)
-    // don't define '-e' (because of extracting previews)
     ETLangDef: string;
     ETBackupMode: string;
     ETFileDate: string;
@@ -27,11 +27,10 @@ type
 
 const
   CRLF = #13#10;
-  ReadyPrompt = '{ready';
-  FilePrompt  = '========';
 
 var
   ExecETEvent: TExecETEvent;
+
   ET_Options: ET_OptionsRec = (ETLangDef: '';
     ETBackupMode: '-overwrite_original' + CRLF;   // or ='' or='overwrite_original_in_place'
     ETFileDate: '';                               // or '-P'+CRLF (preserve FileModify date)
@@ -45,52 +44,37 @@ var
 function ETWorkDir: string;
 
 function ET_StayOpen(WorkDir: string): boolean;
+
 function ET_OpenExec(ETcmd: string; FNames: string; var ETouts, ETErrs: string; PopupOnError: boolean = true): boolean; overload;
 function ET_OpenExec(ETcmd: string; FNames: string; ETout: TStrings; PopupOnError: boolean = true): boolean; overload;
 function ET_OpenExec(ETcmd: string; FNames: string; PopupOnError: boolean = true): boolean; overload;
+
 procedure ET_OpenExit(WaitForClose: boolean = false);
 
 function ExecET(ETcmd, FNames, WorkDir: string; var ETouts, ETErrs: string): boolean; overload;
 function ExecET(ETcmd, FNames, WorkDir: string; var ETouts: string): boolean; overload;
 
+//TODO: Deprecated with JHead and JpegTran
 function ExecCMD(xCmd, WorkDir: string; var ETouts, ETErrs: string): boolean; overload;
 function ExecCMD(xCmd, WorkDir: string): boolean; overload;
 
-procedure SetCounter(AStatusBar: TStatusBar; APanel, ACounter: integer);
-
 implementation
 
-uses System.SysUtils, System.SyncObjs, Winapi.Windows, Vcl.Forms, Main, MainDef, ExifToolsGUI_Utils;
+uses System.SysUtils, System.SyncObjs, Winapi.Windows, Main, MainDef, ExifToolsGUI_Utils, ExifTool_PipeStream;
 
 const
-  szPipeBuffer = 65535;
+  SizePipeBuffer = 65535;
 
 var
-  ETCounterBar: TStatusBar = nil;
-  ETCounterPanel: integer = 0;
-  ETCounter: integer = 0;
-
   ETprocessInfo: TProcessInformation;
+  EtOutPipe: TPipeStream;
+  EtErrPipe: TPipeStream;
   PipeInRead, PipeInWrite: THandle;
   PipeOutRead, PipeOutWrite: THandle;
   PipeErrRead, PipeErrWrite: THandle;
   FETWorkDir: string;
   ETEvent: TEvent;
   ExecNum: word;
-
-// Returns the output of ExifTool, but skips last {ready line, if found
-// Statusline is the line immediately preceding the last line. Contains xxxx image files read.
-function AnalyseResult(const AString: string; var StatusLine: string): string;
-var StartPrevLine: integer;
-begin
-  result := AString;
-  StatusLine := LastLine(AString, Length(result), StartPrevLine);
-  if (Pos(ReadyPrompt, StatusLine) > 0) then
-  begin
-    SetLength(result, StartPrevLine -1);
-    StatusLine := LastLine(AString, Length(result), StartPrevLine);
-  end;
-end;
 
 procedure ET_OptionsRec.SetGpsFormat(UseDecimal: boolean);
 begin
@@ -131,48 +115,6 @@ begin
     ExecNum := 10;
 end;
 
-// Scan for Ready prompt and optionally for ===== (New file processed by ExifTool)
-function CheckBuffer(PipeBuffer: array of byte; BuffLen: Dword): boolean;
-var Buffer: AnsiString;
-    LastBufferLine: string;
-    CheckNum: string;
-    FilePos, PrevPos: integer;
-begin
-  if (BuffLen = 0) then
-    exit(true);
-
-  // Get Buffer as an AnsiString
-  SetLength(Buffer, BuffLen);
-  Move(PipeBuffer[0], Buffer[1], BuffLen);
-
-  // Last Line is our ready prompt?
-  CheckNum := ReadyPrompt + IntToStr(ExecNum) + '}';
-  LastBufferLine := LastLine(Buffer, Length(Buffer), FilePos);
-  result := (LastBufferLine = CheckNum);
-
-  // Count the nr of Files processed.
-  FilePos := BuffLen;
-  PrevPos := 1;
-  while (ETCounter > 0) and
-        (FilePos > 0) do
-  begin
-    FilePos := Pos(FilePrompt, Buffer, PrevPos);
-
-    if (FilePos > 0) then
-    begin
-      Dec(ETCounter);
-      if (Assigned(ETCounterBar)) then
-      begin
-        ETCounterBar.Panels[ETCounterPanel].Text := IntToStr(ETCounter) + ' Files remaining';
-        ETCounterBar.Update;
-      end;
-      if ((ETCounter mod 10) = 0) then
-        Application.ProcessMessages;
-    end;
-    PrevPos := FilePos + Length(FilePrompt) + 1;
-  end;
-end;
-
 function ETWorkDir: string;
 begin
   result := FETWorkDir;
@@ -198,8 +140,8 @@ begin
   SecurityAttr.bInheritHandle := true;
   SecurityAttr.lpSecurityDescriptor := nil;
   CreatePipe(PipeInRead, PipeInWrite, @SecurityAttr, 0);
-  CreatePipe(PipeOutRead, PipeOutWrite, @SecurityAttr, 65535);
-  CreatePipe(PipeErrRead, PipeErrWrite, @SecurityAttr, 32767);
+  CreatePipe(PipeOutRead, PipeOutWrite, @SecurityAttr, 0);
+  CreatePipe(PipeErrRead, PipeErrWrite, @SecurityAttr, 0);
   FillChar(StartupInfo, SizeOf(TStartupInfo), #0);
   StartupInfo.cb := SizeOf(StartupInfo);
   with StartupInfo do
@@ -222,6 +164,15 @@ begin
     CloseHandle(PipeInRead);
     CloseHandle(PipeOutWrite);
     CloseHandle(PipeErrWrite);
+
+    if Assigned(EtOutPipe) then
+      FreeAndNil(EtOutPipe);
+    ETOutPipe := TPipeStream.Create(PipeOutRead, SizePipeBuffer);
+
+    if Assigned(EtErrPipe) then
+      FreeAndNil(EtErrPipe);
+    ETErrPipe := TPipeStream.Create(PipeErrRead, SizePipeBuffer);
+
     FETWorkDir := WorkDir;
   end
   else
@@ -238,17 +189,13 @@ end;
 
 function ET_OpenExec(ETcmd: string; FNames: string; var ETouts, ETErrs: string; PopupOnError: boolean = true): boolean;
 var
-  ETstream: TStringStream;
-  PipeBuffer: array [0 .. szPipeBuffer] of byte;
   FinalCmd: string;
   TempFile: string;
   StatusLine: string;
-  ETlogs: string;
+  LengthReady: integer;
   Call_ET: AnsiString; // Needs to be AnsiString. Only holds the -@ <argsfilename>
   BytesCount: Dword;
-  I: word;
   CanUseUtf8: boolean;
-  EndReady: boolean;
   Wr: TWaitResult;
   CrWait, CrNormal: HCURSOR;
 begin
@@ -271,7 +218,6 @@ begin
     end;
     ETEvent.ReSetEvent;
 
-    ETstream := TStringStream.Create;
     CrWait := LoadCursor(0, IDC_WAIT);
     CrNormal := SetCursor(CrWait);
     try
@@ -294,41 +240,27 @@ begin
       FlushFileBuffers(PipeInWrite);
 
       // ========= Read StdOut =======================
-      ETstream.Clear;
-      repeat
-        ReadFile(PipeOutRead, PipeBuffer, szPipeBuffer, BytesCount, nil);
-        ETstream.Write(PipeBuffer, BytesCount);
-        EndReady := CheckBuffer(PipeBuffer, BytesCount);
-      until EndReady;
-      ETstream.Position := 0;
-      ETlogs := UTF8ToString(ETstream.DataString);
-      SetCounter(nil, 0 ,0);
+      EtOutPipe.SetCounter(GetCounter);
+      while (not EtOutPipe.PipeHasReady(ExecNum)) do // Keep reading till we see our execnum
+        ETOutPipe.ReadPipe;
+      SetCounter(nil, 0);
+      ETouts := ETOutPipe.AnalyseResult(StatusLine, LengthReady);
+      ETOutPipe.Clear;
 
       // ========= Read StdErr =======================
-      ETstream.Clear;
-      I := 0;
-      repeat
-        PeekNamedPipe(PipeErrRead, nil, 0, nil, @BytesCount, nil);
-        if BytesCount > 0 then
-        begin
-          ReadFile(PipeErrRead, PipeBuffer, szPipeBuffer, BytesCount, nil);
-          ETstream.Write(PipeBuffer, BytesCount);
-        end;
-        inc(I);
-      until (BytesCount = 0) or (I > 5); // max 2 attempts observed
-      ETstream.Position := 0;
-      ETErrs := UTF8ToString(ETstream.DataString);
-
-      // Analyse
-      ETouts := AnalyseResult(ETlogs, StatusLine); // Etouts: returned as result, ETlogs: shown in log window
+      while (ETErrPipe.PipeHasData) and
+            (ETErrPipe.ReadPipe > 0) do;
+      ETErrs := ETErrPipe.AsString;
+      ETErrPipe.Clear;
 
       // Callback for Logging
       if Assigned(ExecETEvent) then
-        ExecETEvent(ExecNum, FinalCmd, ETlogs, ETErrs, StatusLine, PopupOnError);
+        ExecETEvent(ExecNum, FinalCmd, ETouts, ETErrs, StatusLine, PopupOnError);
 
+      // Return result without {readyxx}#13#10
+      SetLength(ETouts, Length(ETouts) - LengthReady);
       result := true;
     finally
-      ETstream.Free;
       SetCursor(CrNormal);
       ETEvent.SetEvent;
     end;
@@ -378,8 +310,7 @@ end;
 // =========================== ET classic mode ==================================
 function ExecET(ETcmd, FNames, WorkDir: string; var ETouts, ETErrs: string): boolean;
 var
-  ETstream: TStringStream;
-  PipeBuffer: array [0 .. szPipeBuffer] of byte;
+  ETstream: TPipeStream;
   ProcessInfo: TProcessInformation;
   SecurityAttr: TSecurityAttributes;
   StartupInfo: TStartupInfo;
@@ -388,24 +319,22 @@ var
   FinalCmd: string;
   TempFile: string;
   StatusLine: string;
-  ETlogs: string;
+  LengthReady: integer;
   Call_ET: string;
   PWorkDir: PChar;
-  BytesCount: Dword;
   CanUseUtf8: boolean;
   CrWait, CrNormal: HCURSOR;
 begin
   CrWait := LoadCursor(0, IDC_WAIT);
   CrNormal := SetCursor(CrWait);
-  ETstream := TStringStream.Create;
   try
     FillChar(ProcessInfo, SizeOf(TProcessInformation), #0);
     FillChar(SecurityAttr, SizeOf(TSecurityAttributes), #0);
     SecurityAttr.nLength := SizeOf(SecurityAttr);
     SecurityAttr.bInheritHandle := true;
     SecurityAttr.lpSecurityDescriptor := nil;
-    CreatePipe(PipeOutRead, PipeOutWrite, @SecurityAttr, 65535);
-    CreatePipe(PipeErrRead, PipeErrWrite, @SecurityAttr, 32767);
+    CreatePipe(PipeOutRead, PipeOutWrite, @SecurityAttr, 0);
+    CreatePipe(PipeErrRead, PipeErrWrite, @SecurityAttr, 0);
     FillChar(StartupInfo, SizeOf(TStartupInfo), #0);
     StartupInfo.cb := SizeOf(StartupInfo);
     with StartupInfo do
@@ -421,7 +350,6 @@ begin
     else
       PWorkDir := PChar(WorkDir);
 
-    UpdateExecNum;
     CanUseUtf8 := (pos('-L ', ETcmd) = 0);
 
     FinalCmd := EndsWithCRLF(ET_Options.GetOptions(CanUseUtf8) + ArgsFromDirectCmd(ETcmd));
@@ -433,56 +361,47 @@ begin
     result := CreateProcess(nil, PChar(Call_ET), nil, nil, true,
                             CREATE_DEFAULT_ERROR_MODE or CREATE_NEW_CONSOLE or NORMAL_PRIORITY_CLASS,
                             nil, PWorkDir, StartupInfo, ProcessInfo);
-
     CloseHandle(PipeOutWrite);
     CloseHandle(PipeErrWrite);
-
-    if not result then
+    if result then
     begin
-      CloseHandle(PipeOutRead);
-      CloseHandle(PipeErrRead);
-    end
-    else
-    begin
-      // ========= Read StdOut =======================
-      ETstream.Clear;
-      repeat
-        ReadFile(PipeOutRead, PipeBuffer, szPipeBuffer, BytesCount, nil);
-        ETstream.Write(PipeBuffer, BytesCount);
-        CheckBuffer(PipeBuffer, BytesCount);
-      until BytesCount = 0;
+      // Read StdOut
+      ETstream := TPipeStream.Create(PipeOutRead, SizePipeBuffer);
+      try
+        ETstream.SetCounter(GetCounter);
+        while (ETstream.ReadPipe > 0) do;
+        SetCounter(nil, 0);
+        ETouts := ETstream.AnalyseResult(StatusLine, LengthReady);
+      finally
+        ETstream.Free;
+      end;
 
-      ETstream.Position := 0;
-      ETLogs := UTF8ToString(ETstream.DataString);
-      CloseHandle(PipeOutRead);
-      SetCounter(nil, 0, 0);
-
-      // ========= Read StdErr =======================
-      ETstream.Clear;
-      repeat
-        ReadFile(PipeErrRead, PipeBuffer, szPipeBuffer, BytesCount, nil);
-        ETstream.Write(PipeBuffer, BytesCount);
-      until (BytesCount = 0);
-      ETstream.Position := 0;
-      ETErrs := UTF8ToString(ETstream.DataString);
-      CloseHandle(PipeErrRead);
+      // Read StdErr
+      ETstream := TPipeStream.Create(PipeErrRead, SizePipeBuffer);
+      try
+        while (ETstream.ReadPipe > 0) do;
+        ETErrs := ETstream.AsString;
+      finally
+        ETstream.Free;
+      end;
 
       // ----------------------------------------------
       WaitForSingleObject(ProcessInfo.hProcess, GUIsettings.ETTimeOut);
       CloseHandle(ProcessInfo.hThread);
       CloseHandle(ProcessInfo.hProcess);
 
-      // Analyse
-      ETouts := AnalyseResult(ETlogs, StatusLine); // Etouts: returned as result, ETlogs: shown in log window
-
       // Callback for Logging
       if Assigned(ExecETEvent) then
-        ExecETEvent(ExecNum, FinalCmd, ETlogs, ETErrs, StatusLine, true);
+        ExecETEvent(ExecNum, FinalCmd, ETouts, ETErrs, StatusLine, true);
 
+      // Return result without {readyxx}#13#10
+      // Although this call will never have it.
+      SetLength(ETouts, Length(ETouts) - LengthReady);
       result := true;
     end;
   finally
-    ETstream.Free;
+    CloseHandle(PipeOutRead);
+    CloseHandle(PipeErrRead);
     SetCursor(CrNormal);
   end;
 end;
@@ -497,18 +416,16 @@ end;
 // ^^^^^^^^^^^^^^^^^^^^^^^^^^ End of ET Classic mode ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 //
 // ==============================================================================
+//TODO: Deprecated with JHead and JpegTran
 function ExecCMD(xCmd, WorkDir: string; var ETouts, ETErrs: string): boolean;
 var
-  ETstream: TMemoryStream;
-  PipeBuffer: array [0 .. szPipeBuffer] of byte;
-  ETout, ETerr: TStringList;
+  ETstream: TPipeStream;
   ProcessInfo: TProcessInformation;
   SecurityAttr: TSecurityAttributes;
   StartupInfo: TStartupInfo;
   PipeOutRead, PipeOutWrite: THandle;
   PipeErrRead, PipeErrWrite: THandle;
   PWorkDir: PChar;
-  BytesCount: Dword;
   CrWait, CrNormal: HCURSOR;
 begin
   FillChar(ProcessInfo, SizeOf(TProcessInformation), #0);
@@ -516,8 +433,8 @@ begin
   SecurityAttr.nLength := SizeOf(SecurityAttr);
   SecurityAttr.bInheritHandle := true;
   SecurityAttr.lpSecurityDescriptor := nil;
-  CreatePipe(PipeOutRead, PipeOutWrite, @SecurityAttr, 8192);
-  CreatePipe(PipeErrRead, PipeErrWrite, @SecurityAttr, 8192);
+  CreatePipe(PipeOutRead, PipeOutWrite, @SecurityAttr, 0);
+  CreatePipe(PipeErrRead, PipeErrWrite, @SecurityAttr, 0);
   FillChar(StartupInfo, SizeOf(TStartupInfo), #0);
   StartupInfo.cb := SizeOf(StartupInfo);
   with StartupInfo do
@@ -533,9 +450,6 @@ begin
   else
     PWorkDir := PChar(WorkDir);
 
-  ETout := TStringList.Create;
-  ETerr := TStringList.Create;
-  ETstream := TMemoryStream.Create;
   CrWait := LoadCursor(0, IDC_WAIT);
   CrNormal := SetCursor(CrWait);
   try
@@ -547,48 +461,39 @@ begin
     CloseHandle(PipeOutWrite);
     CloseHandle(PipeErrWrite);
 
-    if not result then
+    if result then
     begin
-      CloseHandle(PipeOutRead);
-      CloseHandle(PipeErrRead);
-    end
-    else
-    begin
-      // ========= Read StdOut =======================
-      ETstream.Clear; // BuffAddress:=Addr(BuffContent);
-      repeat
-        ReadFile(PipeOutRead, PipeBuffer, szPipeBuffer, BytesCount, nil);
-        if BytesCount > 1 then
-          ETstream.Write(PipeBuffer, BytesCount);
-        // Application.ProcessMessages;
-      until BytesCount = 0;
-      ETstream.Position := 0;
-      ETout.LoadFromStream(ETstream);
-      ETouts := UTF8ToString(ETout.Text);
-      CloseHandle(PipeOutRead);
+      // Read StdOut
+      ETstream := TPipeStream.Create(PipeOutRead, SizePipeBuffer);
+      try
+        while (ETstream.ReadPipe > 0) do;
+        ETouts := ETstream.AsString;
+      finally
+        ETstream.Free;
+      end;
+
       // ========= Read StdErr =======================
-      ETstream.Clear;
-      repeat
-        ReadFile(PipeErrRead, PipeBuffer, szPipeBuffer, BytesCount, nil);
-        ETstream.Write(PipeBuffer, BytesCount);
-      until (BytesCount = 0);
-      ETstream.Position := 0;
-      ETerr.LoadFromStream(ETstream);
-      ETErrs := UTF8ToString(ETerr.Text);
-      CloseHandle(PipeErrRead);
+      ETstream := TPipeStream.Create(PipeErrRead, SizePipeBuffer);
+      try
+        while (ETstream.ReadPipe > 0) do;
+        ETerrs := ETstream.AsString;
+      finally
+        ETstream.Free;
+      end;
+
       // ----------------------------------------------
       WaitForSingleObject(ProcessInfo.hProcess, GUIsettings.ETTimeOut); // msec=5sec /or INFINITE
       CloseHandle(ProcessInfo.hThread);
       CloseHandle(ProcessInfo.hProcess);
     end;
   finally
-    ETout.Free;
-    ETerr.Free;
-    ETstream.Free;
+    CloseHandle(PipeOutRead);
+    CloseHandle(PipeErrRead);
     SetCursor(CrNormal);
   end;
 end;
 
+//TODO: Deprecated with JHead and JpegTran
 function ExecCMD(xCmd, WorkDir: string): boolean;
 var
   ETout, ETerr: string;
@@ -597,19 +502,14 @@ begin
 end;
 // ==============================================================================
 
-procedure SetCounter(AStatusBar: TStatusBar; APanel, ACounter: integer);
-begin
-  ETCounterBar := AStatusBar;
-  ETCounterPanel := APanel;
-  ETCounter := ACounter;
-end;
-
 initialization
 
 begin
   ETEvent := TEvent.Create(nil, true, true, ExtractFileName(Paramstr(0)));
   ExecNum := 10; // From 10 to 99
   FETWorkDir := '';
+  EtOutPipe := nil;
+  EtErrPipe := nil;
 end;
 
 finalization
@@ -617,6 +517,10 @@ finalization
 begin
   ET_OpenExit(true);
   ETEvent.Free;
+  if Assigned(EtOutPipe) then
+    EtOutPipe.Free;
+  if Assigned(EtErrPipe) then
+    EtErrPipe.Free;
 end;
 
 end.

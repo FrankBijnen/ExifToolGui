@@ -198,11 +198,14 @@
         <DCCReference Include="QuickMngr.pas">
             <Form>FQuickManager</Form>
         </DCCReference>
-        <DCCReference Include="UFrmGenericImport.pas">
-            <Form>FGenericImport</Form>
+        <DCCReference Include="UFrmLossLessRotate.pas">
+            <Form>FLossLessRotate</Form>
         </DCCReference>
         <DCCReference Include="UFrmGenericExtract.pas">
             <Form>FGenericExtract</Form>
+        </DCCReference>
+        <DCCReference Include="UFrmGenericImport.pas">
+            <Form>FGenericImport</Form>
         </DCCReference>
         <DCCReference Include="CopyMeta.pas">
             <Form>FCopyMetadata</Form>
@@ -238,6 +241,7 @@
         <DCCReference Include="DateTimeShift.pas">
             <Form>FDateTimeShift</Form>
         </DCCReference>
+        <DCCReference Include="ExifTool_PipeStream.pas"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>

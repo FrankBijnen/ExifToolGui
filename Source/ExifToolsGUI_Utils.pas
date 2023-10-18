@@ -35,7 +35,6 @@ function GetNrOfFiles(StartDir, FileMask: string; subDir: boolean): integer;
 function GetComSpec: string;
 
 // String
-function LastLine(const AString: string; LinePos: integer; var LinePosStart: integer): string;
 function NextField(var AString: string; const ADelimiter: string): string;
 function QuotedFileName(FileName: string): string;
 function EndsWithCRLF(const AString: string): string;
@@ -260,42 +259,6 @@ begin
 end;
 
 // String
-function LastLine(const AString: string; LinePos: integer; var LinePosStart: integer): string;
-var LinePosEnd: integer;
-
-  function SkipLineEnds(const AString: string; FromPos: integer): integer;
-  begin
-    result := FromPos;
-    if (result > 0) and
-       (AString[result] = #10) then      // Position before CRLF. If present.
-      dec(result);
-    if (result > 0) and
-       (AString[result] = #13) then
-      dec(result);
-  end;
-
-  function PrevLineStart(const AString: string; FromPos: integer): integer;
-  begin
-    result := FromPos;
-    while (result > 1) and               // Move backward until a NL
-          (AString[result] <> #10) do
-      dec(result);
-
-    if (AString[result] = #10) then      // Position after NL
-      inc(result);
-  end;
-
-begin
-  result := '';
-  LinePosStart := 0;
-  LinePosEnd := SkipLineEnds(AString, LinePos);
-  if (LinePosEnd < 1) then    // Empty string, only Line Ends
-    exit;
-
-  LinePosStart := PrevLineStart(AString, LinePosEnd);
-  if (LinePosEnd >= LinePosStart) then
-    result := Copy(AString, LinePosStart, LinePosEnd +1 - LinePosStart);
-end;
 
 function NextField(var AString: string; const ADelimiter: string): string;
 var
