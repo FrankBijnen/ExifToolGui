@@ -56,11 +56,11 @@ type
     class function UnEscape(Value: string): string;
   end;
 
-procedure OsmMapInit(Browser: TEdgeBrowser; const Lat, Lon, Desc: string); overload;
-procedure OsmMapInit(Browser: TEdgeBrowser; const LatLon, Desc: string); overload;
+procedure OsmMapInit(Browser: TEdgeBrowser;
+                     const Lat, Lon, Desc, InitialZoom: string);
 procedure ShowImagesOnMap(Browser: TEdgeBrowser; Apath, ETOuts: string);
 procedure MapGetLocation(Browser: TEdgeBrowser);
-function MapGoToPlace(Browser: TEdgeBrowser; Place, Bounds, Desc: string): string;
+function MapGoToPlace(Browser: TEdgeBrowser; Place, Bounds, Desc, InitialZoom: string): string;
 procedure ParseJsonMessage(const Message: string; var Msg, Parm1, Parm2: string);
 function ValidLatLon(const Lat, Lon: string): boolean;
 procedure ParseLatLon(const LatLon: string; var Lat, Lon: string);
@@ -74,12 +74,14 @@ procedure WriteGeoCodeSettings(GUIini: TMemIniFile);
 const
   Coord_Decimals = 6;
   CRLF = #13#10;
+  OSMCtrlClick = 'Ctrl Click';
   OSMGetLocation = 'Get Location';
   OSMGetBounds = 'Get Bounds';
-  InitialZoom = '15';
   Geo_Settings = 'GeoSettings';
   Geo_City = 'GeoCity';
   Geo_Province = 'GeoProvince';
+  InitialZoom_Out = '16';
+  InitialZoom_In = '20';
 
 type
 
@@ -87,6 +89,7 @@ type
   private
     OsmFormatSettings: TFormatSettings;
     Html: TStringList;
+    FInitialZoom: string;
     FPathName: string;
     PlacesDict: TObjectDictionary<String, TStringList>;
     procedure WriteHeader;
@@ -95,7 +98,7 @@ type
     procedure WritePointsEnd;
     procedure WriteFooter;
   public
-    constructor Create(const APathName: string);
+    constructor Create(const APathName, AInitialZoom: string);
     destructor Destroy; override;
   end;
 
@@ -276,13 +279,14 @@ begin
     FCityList.AddPair(IntToStr(Key), Value);
 end;
 
-constructor TOSMHelper.Create(const APathName: string);
+constructor TOSMHelper.Create(const APathName, AInitialZoom: string);
 begin
   inherited Create;
   OsmFormatSettings := TFormatSettings.Create(GetThreadLocale);
   OsmFormatSettings.DecimalSeparator := '.'; // The decimal separator is a . PERIOD!
   OsmFormatSettings.NegCurrFormat := 11;
   FPathName := APathName;
+  FInitialZoom := AInitialZoom;
   Html := TStringList.Create;
   PlacesDict := TObjectDictionary<String, TStringList>.Create([doOwnsValues]);
 end;
@@ -337,20 +341,22 @@ begin
   Html.Add('        func: function(e){');
   Html.Add('           if (e.ctrlKey) {');
   Html.Add('              var lonlat = map.getLonLatFromViewPortPx(e.xy).transform(po, op);');
-  Html.Add('              SendMessage("' + OSMGetLocation + '", lonlat.lat, lonlat.lon);');
+  Html.Add('              SendMessage("' + OSMCtrlClick + '", lonlat.lat, lonlat.lon);');
   Html.Add('            }');
   Html.Add('        }');
   Html.Add('     });');
 
-  Html.Add('     map.events.register(''zoomend'', map, function(evt) {');
-  Html.Add('       GetBounds("' + OSMGetBounds + '");');
-  Html.Add('     })');
+//TODO: Not needed?
+//  Html.Add('     map.events.register(''zoomend'', map, function(evt) {');
+//  Html.Add('       GetBounds("' + OSMGetBounds + '");');
+//  Html.Add('     })');
+
   Html.Add('     map.events.register(''moveend'', map, function(evt) {');
   Html.Add('       GetBounds("' + OSMGetBounds + '");');
   Html.Add('     })');
 
   Html.Add('');
-  Html.Add('     CreateExtent(' + InitialZoom + ');');
+  Html.Add('     CreateExtent(' + FInitialZoom + ');');
   Html.Add('     CreatePopups();');
   Html.Add('  }');
   Html.Add('');
@@ -452,11 +458,12 @@ begin
 end;
 
 // ==============================================================================
-procedure OsmMapInit(Browser: TEdgeBrowser; const Lat, Lon, Desc: string);
+procedure OsmMapInit(Browser: TEdgeBrowser;
+                     const Lat, Lon, Desc, InitialZoom: string);
 var
   OsmHelper: TOSMHelper;
 begin
-  OsmHelper := TOSMHelper.Create(GetHtmlTmp);
+  OsmHelper := TOSMHelper.Create(GetHtmlTmp, InitialZoom);
   try
     OsmHelper.WriteHeader;
     OsmHelper.WritePointsStart;
@@ -478,21 +485,13 @@ begin
   LastQuery := Now;
 end;
 
-procedure OsmMapInit(Browser: TEdgeBrowser; const LatLon, Desc: string);
-var
-  Lat, Lon: string;
-begin
-  ParseLatLon(LatLon, Lat, Lon);
-  OsmMapInit(Browser, Lat, Lon, Desc);
-end;
-
 // ==============================================================================
 procedure ShowImagesOnMap(Browser: TEdgeBrowser; Apath, ETOuts: string);
 var
   OsmHelper: TOSMHelper;
   ETout, Lat, LatRef, Lon, LonRef, Filename: string;
 begin
-  OsmHelper := TOSMHelper.Create(GetHtmlTmp);
+  OsmHelper := TOSMHelper.Create(GetHtmlTmp, InitialZoom_Out);
   try
     OsmHelper.WriteHeader;
     OsmHelper.WritePointsStart;
@@ -964,7 +963,7 @@ begin
   Browser.ExecuteScript('GetLocation("' + OSMGetLocation + '");');
 end;
 
-function MapGoToPlace(Browser: TEdgeBrowser; Place, Bounds, Desc: string): string;
+function MapGoToPlace(Browser: TEdgeBrowser; Place, Bounds, Desc, InitialZoom: string): string;
 var
   Lat, Lon: string;
 begin
@@ -978,7 +977,7 @@ begin
     AdjustLatLon(Lat, Lon, Coord_Decimals);
     result := Lat + ', ' + Lon;
   end;
-  OsmMapInit(Browser, Lat, Lon, Desc);
+  OsmMapInit(Browser, Lat, Lon, Desc, InitialZoom);
 end;
 
 procedure ParseJsonMessage(const Message: string; var Msg, Parm1, Parm2: string);
