@@ -3,7 +3,7 @@ unit MainDef;
 
 interface
 
-uses System.Classes, ExifTool;
+uses System.Classes, ExifTool, GEOMap;
 
 const
   SHOWALL = 'Show All Files';
@@ -503,6 +503,7 @@ begin
       else
         CustomViewTags := ' ';
 
+      ReadGeoCodeSettings(GUIini);
     end;
   finally
     GUIini.Free;
@@ -678,7 +679,7 @@ begin
         WriteString('TagList', 'CustomView', CustomViewTags);
 
       end;
-
+      WriteGeoCodeSettings(GUIini);
     finally
       GUIini.Free;
     end;

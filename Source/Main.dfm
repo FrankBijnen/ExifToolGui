@@ -463,13 +463,44 @@ object FMain: TFMain
         Font.Style = []
         ParentFont = False
         TabOrder = 1
+        ExplicitTop = 522
         object SpeedBtn_Geotag: TSpeedButton
-          Left = 2
-          Top = 6
-          Width = 79
-          Height = 21
+          AlignWithMargins = True
+          Left = 3
+          Top = 5
+          Width = 70
+          Height = 22
+          Margins.Top = 5
+          Margins.Bottom = 5
+          Align = alLeft
           Caption = 'Geotag files'
           OnClick = SpeedBtn_GeotagClick
+        end
+        object EditMapBounds: TLabeledEdit
+          AlignWithMargins = True
+          Left = 121
+          Top = 6
+          Width = 188
+          Height = 23
+          Hint = 'Coordinates of the visible area (South,West,North,East)'
+          Margins.Left = 45
+          Margins.Top = 6
+          TabStop = False
+          Align = alClient
+          EditLabel.Width = 39
+          EditLabel.Height = 23
+          EditLabel.Caption = 'Bounds:'
+          LabelPosition = lpLeft
+          MaxLength = 200
+          ParentShowHint = False
+          ReadOnly = True
+          ShowHint = True
+          TabOrder = 0
+          Text = ''
+          OnChange = EditMapFindChange
+          OnKeyDown = EditMapFindKeyDown
+          ExplicitLeft = 150
+          ExplicitWidth = 159
         end
       end
       object EdgeBrowser1: TEdgeBrowser
@@ -481,6 +512,7 @@ object FMain: TFMain
         TabOrder = 2
         UserDataFolder = '%LOCALAPPDATA%\bds.exe.WebView2'
         OnWebMessageReceived = EdgeBrowser1WebMessageReceived
+        ExplicitHeight = 465
       end
     end
   end

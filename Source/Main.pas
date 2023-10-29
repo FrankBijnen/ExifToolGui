@@ -170,6 +170,7 @@ type
     GenericExtractPreviews: TMenuItem;
     GenericImportPreview: TMenuItem;
     JPGGenericlosslessautorotate1: TMenuItem;
+    EditMapBounds: TLabeledEdit;
     procedure ShellListClick(Sender: TObject);
     procedure ShellListKeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
     procedure SpeedBtnExifClick(Sender: TObject);
@@ -644,7 +645,7 @@ procedure TFMain.EditMapFindKeyDown(Sender: TObject; var Key: Word; Shift: TShif
 begin
   if (Key = VK_Return) and (EditMapFind.Text <> '') then
   begin
-    EditMapFind.Text := MapGotoPlace(EdgeBrowser1, EditMapFind.Text, 'Find');
+    EditMapFind.Text := MapGotoPlace(EdgeBrowser1, EditMapFind.Text, EditMapBounds.Text, 'Find');
     EditMapFind.Font.Color := clBlue;
   end;
 end;
@@ -1802,12 +1803,20 @@ var
 begin
   Args.ArgsInterface.Get_webMessageAsJson(Message);
   ParseJsonMessage(Message, Msg, Parm1, Parm2);
-  if (Msg = 'Location') then
+  if (Msg = OSMGetLocation) then
   begin
-    AdjustLatLon(Parm1, Parm2);
+    AdjustLatLon(Parm1, Parm2, Coord_Decimals);
     EditMapFind.Text := Parm1 + ', ' + Parm2;
-    MapGotoPlace(EdgeBrowser1, EditMapFind.Text, 'Get Location');
+    MapGotoPlace(EdgeBrowser1, EditMapFind.Text, '', Msg);
+    exit;
   end;
+
+  if (Msg = OSMGetBounds) then
+  begin
+    EditMapBounds.Text := Parm1;
+    exit;
+  end;
+
 end;
 
 procedure TFMain.EditETcmdNameChange(Sender: TObject);
@@ -2227,13 +2236,17 @@ begin
   AdvPageMetadata.ActivePage := AdvTabMetadata;
   AdvPageFilelist.ActivePage := AdvTabFilelist;
 
+  AdvTabOSMMap.Enabled := false;
   if GUIsettings.EnableGMap then
   begin
-    OSMMapInit(EdgeBrowser1, GUIsettings.DefGMapHome, 'Home');
-    AdvTabOSMMap.Enabled := true;
-  end
-  else
-    AdvTabOSMMap.Enabled := false;
+    try
+      OSMMapInit(EdgeBrowser1, GUIsettings.DefGMapHome, 'Home');
+      AdvTabOSMMap.Enabled := true;
+    except
+      on E:Exception do
+        MessageDlgEx(E.Message, 'Error positioning Home', TMsgDlgType.mtWarning, [TMsgDlgBtn.mbOK]);
+    end;
+  end;
 
   // Init Chart
   AdvRadioGroup2Click(Sender);
@@ -3056,7 +3069,7 @@ end;
 
 procedure TFMain.SpeedBtn_MapHomeClick(Sender: TObject);
 begin
-  MapGotoPlace(EdgeBrowser1, GUIsettings.DefGMapHome, 'Home');
+  MapGotoPlace(EdgeBrowser1, GUIsettings.DefGMapHome, '', 'Home');
   EditMapFind.Font.Color := clGray;
 end;
 
