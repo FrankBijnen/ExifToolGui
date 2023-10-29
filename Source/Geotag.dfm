@@ -3,7 +3,7 @@ object FGeotag: TFGeotag
   Top = 0
   BorderStyle = bsDialog
   Caption = 'Import GPS data'
-  ClientHeight = 256
+  ClientHeight = 262
   ClientWidth = 556
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
@@ -22,18 +22,19 @@ object FGeotag: TFGeotag
   end
   object StatusBar1: TStatusBar
     Left = 0
-    Top = 237
+    Top = 243
     Width = 556
     Height = 19
     Panels = <>
     SimplePanel = True
-    ExplicitWidth = 550
+    ExplicitTop = 236
+    ExplicitWidth = 552
   end
   object AdvPanel1: TPanel
     Left = 0
     Top = 0
     Width = 473
-    Height = 237
+    Height = 243
     Align = alLeft
     DoubleBuffered = True
     Font.Charset = DEFAULT_CHARSET
@@ -44,14 +45,15 @@ object FGeotag: TFGeotag
     ParentDoubleBuffered = False
     ParentFont = False
     TabOrder = 1
+    ExplicitHeight = 236
     object Label2: TLabel
       Left = 16
       Top = 208
-      Width = 423
+      Width = 418
       Height = 28
       Caption = 
-        'Note: Geotagging precision depends on camera time accuracy. If ' +
-        'neccesary,'#10'apply Exif:DateTime shift before geotagging.'
+        'Note: Geotagging precision depends on camera time accuracy. If n' +
+        'eccesary,'#10'apply Exif:DateTime shift before geotagging.'
     end
     object LabeledEdit1: TLabeledEdit
       Left = 64

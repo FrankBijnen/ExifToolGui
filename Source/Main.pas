@@ -291,7 +291,6 @@ type
     procedure ShellistThumbError(Sender: TObject; Item: TListItem; E: Exception);
     procedure ShellistThumbGenerate(Sender: TObject; Item: TListItem; Status: TThumbGenStatus; Total, Remaining: integer);
     procedure ShellListBeforePopulate(Sender: TObject; var DoDefault: boolean);
-    procedure ShellListBeforeEnumColumns(Sender: TObject);
     procedure ShellListAfterEnumColumns(Sender: TObject);
     procedure ShellListPathChanged(Sender: TObject);
     procedure ShellListOwnerDataFetch(Sender: TObject; Item: TListItem; Request: TItemRequest; AFolder: TShellFolder);
@@ -319,7 +318,7 @@ uses System.StrUtils, System.Math, System.Masks, System.UITypes,
   ExifTool, ExifInfo, ExifToolsGui_LossLess, ExifTool_PipeStream,
   MainDef, LogWin, Preferences, EditFFilter, EditFCol, UFrmStyle, UFrmAbout,
   QuickMngr, DateTimeShift, DateTimeEqual, CopyMeta, RemoveMeta, Geotag, Geomap, CopyMetaSingle, FileDateTime,
-  UFrmGenericExtract, UFrmGenericImport, UFrmLossLessRotate;
+  UFrmGenericExtract, UFrmGenericImport, UFrmLossLessRotate, UFrmGeoTagFiles;
 
 {$R *.dfm}
 
@@ -1799,10 +1798,11 @@ end;
 procedure TFMain.EdgeBrowser1WebMessageReceived(Sender: TCustomEdgeBrowser; Args: TWebMessageReceivedEventArgs);
 var
   Message: PChar;
-  Msg, Parm1, Parm2: string;
+  Msg, Parm1, Parm2, Lat, Lon: string;
 begin
   Args.ArgsInterface.Get_webMessageAsJson(Message);
   ParseJsonMessage(Message, Msg, Parm1, Parm2);
+
   if (Msg = OSMGetLocation) then
   begin
     AdjustLatLon(Parm1, Parm2, Coord_Decimals);
@@ -1814,6 +1814,11 @@ begin
   if (Msg = OSMGetBounds) then
   begin
     EditMapBounds.Text := Parm1;
+
+    ParseLatLon(Parm2, Lat, Lon);
+    AdjustLatLon(Lat, Lon, Coord_Decimals);
+    EditMapFind.Text := Lat + ', ' + Lon;
+
     exit;
   end;
 
@@ -2165,13 +2170,13 @@ begin
 
   // Set properties of Shelllist in code.
   ShellList.OnPopulateBeforeEvent := ShellListBeforePopulate;
-  ShellList.OnEnumColumnsBeforeEvent := ShellListBeforeEnumColumns;
   ShellList.OnEnumColumnsAfterEvent := ShellListAfterEnumColumns;
   ShellList.OnPathChanged := ShellListPathChanged;
   ShellList.OnOwnerDataFetchEvent := ShellListOwnerDataFetch;
   ShellList.OnColumnResized := ShellListColumnResized;
   ShellList.OnThumbGenerate := ShellistThumbGenerate;
   ShellList.OnThumbError := ShellistThumbError;
+
   // Enable Column sorting if Sorted = true. Disables Sorted.
   ShellList.ColumnSorted := ShellList.Sorted;
 
@@ -2407,15 +2412,7 @@ begin
   DoDefault := (ShellList.ViewStyle <> vsReport) or (CBoxDetails.ItemIndex = 0);
 end;
 
-procedure TFMain.ShellListBeforeEnumColumns(Sender: TObject);
-begin
-  // Prevent flickering when updating columns
-  SendMessage(TShellListView(Sender).Handle, WM_SETREDRAW, 0, 0);
-end;
-
 procedure TFMain.ShellListAfterEnumColumns(Sender: TObject);
-var
-  AShellList: TShellListView;
 
   procedure AdjustColumns(ColumnDefs: array of smallint);
   var
@@ -2477,9 +2474,6 @@ begin
       AddColumns(FListColUsr);
   end;
 
-  AShellList := TShellListView(Sender);
-  SendMessage(AShellList.Handle, WM_SETREDRAW, 1, 0);
-  AShellList.Invalidate; // Creates new window handle!
 end;
 
 procedure TFMain.ShellListPathChanged(Sender: TObject);
@@ -3034,37 +3028,26 @@ begin
 end;
 
 procedure TFMain.SpeedBtn_GeotagClick(Sender: TObject);
-var
-  ETcmd, ETouts, ETerrs, Lat, Lon: string;
 begin
-  ParseLatLon(EditMapFind.Text, Lat, Lon);
-  if (Lat = '') or (Lon = '') then
-    raise Exception.Create('No Lat Lon coordinates selected.');
+  ParseLatLon(EditMapFind.Text, FGeotagFiles.Lat, FGeotagFiles.Lon);
+  if (FGeotagFiles.Lat = '') or (FGeotagFiles.Lon = '') then
+  begin
+    MessageDlgEx('No Lat Lon coordinates selected.', '', TMsgDlgType.mtError, [TMsgDlgBtn.mbOK]);
+    exit;
+  end;
 
   if ShellList.SelectedFolder = nil then
-    raise Exception.Create('No files selected.');
-
-  ETcmd := '-GPS:All=' + CRLF + '-GPS:GpsLatitudeRef=';
-  if Lat[1] = '-' then
   begin
-    ETcmd := ETcmd + 'S';
-    Delete(Lat, 1, 1);
-  end
-  else
-    ETcmd := ETcmd + 'N';
-  ETcmd := ETcmd + CRLF + '-GPS:GpsLatitude=' + Lat;
-  ETcmd := ETcmd + CRLF + '-GPS:GpsLongitudeRef=';
-  if Lon[1] = '-' then
-  begin
-    ETcmd := ETcmd + 'W';
-    Delete(Lon, 1, 1);
-  end
-  else
-    ETcmd := ETcmd + 'E';
-  ETcmd := ETcmd + CRLF + '-GPS:GpsLongitude=' + Lon;
+    MessageDlgEx('No files selected.', '', TMsgDlgType.mtError, [TMsgDlgBtn.mbOK]);
+    exit;
+  end;
 
-  if ET_OpenExec(ETcmd, GetSelectedFiles, ETouts, ETerrs) then
+  if FGeotagFiles.ShowModal = mrOK then
+  begin
+    RefreshSelected(Sender);
     ShowMetadata;
+    ShowPreview;
+  end;
 end;
 
 procedure TFMain.SpeedBtn_MapHomeClick(Sender: TObject);

@@ -19,6 +19,7 @@ type
     OverPassCaseSensitive: boolean;
     OverPassCompleteWord: boolean;
     ThrottleOverPass: integer;
+    CountryCodeLocation: boolean;
   end;
 
   TPlace = class
@@ -30,7 +31,10 @@ type
     FName: string;
     FNodeId: string;
     FPostCode: string;
+    function GetCountryLocation: string;
+    function GetPrioProvince: string;
     function GetProvince: string;
+    function GetPrioCity: string;
     function GetCity: string;
     function GetSearchResult: string;
   public
@@ -40,10 +44,13 @@ type
     procedure AssignFromGeocode(Key, Value: string);
     procedure AssignFromOverPass(Key: integer; Value: string);
     property CountryCode: string read FCountryCode write FCountryCode;
+    property CountryLocation: string read GetCountryLocation;
     property DefLang: string read FDefLang write FDefLang;
     property PostCode: string read FPostCode write FPostCode;
     property Name: string read FName write FName;
+    property PrioProvince: string read GetPrioProvince;
     property Province: string read GetProvince;
+    property PrioCity: string read GetPrioCity;
     property City: string read GetCity;
     property SearchReault: string read GetSearchResult;
     class function UnEscape(Value: string): string;
@@ -59,12 +66,13 @@ function ValidLatLon(const Lat, Lon: string): boolean;
 procedure ParseLatLon(const LatLon: string; var Lat, Lon: string);
 procedure AdjustLatLon(var Lat, Lon: string; No_Decimals: integer);
 function GetPlaceOfCoords(const Lat, Lon: string; const Provider: TGeoCodeProvider): TPlace;
+procedure ClearCoordCache;
 procedure GetCoordsOfPlace(const Place, Bounds: string; var Lat, Lon: string; const Provider: TGeoCodeProvider);
 procedure ReadGeoCodeSettings(GUIini: TMemIniFile);
 procedure WriteGeoCodeSettings(GUIini: TMemIniFile);
 
 const
-  Coord_Decimals = 5;
+  Coord_Decimals = 6;
   CRLF = #13#10;
   OSMGetLocation = 'Get Location';
   OSMGetBounds = 'Get Bounds';
@@ -86,11 +94,15 @@ type
     procedure WritePoint(const ALat, ALon, AImg: string);
     procedure WritePointsEnd;
     procedure WriteFooter;
-
   public
     constructor Create(const APathName: string);
     destructor Destroy; override;
   end;
+
+var
+  GeoSettings: GEOsettingsRec;
+  GeoProvinceList: TStringList;
+  GeoCityList: TStringList;
 
 implementation
 
@@ -104,9 +116,6 @@ var
   CoordFormatSettings: TFormatSettings; // for StrToFloatDef -see Initialization
   LastQuery: TDateTime;
   CoordCache: TObjectDictionary<string, TPlace>;
-  GeoProvinceList: TStringList;
-  GeoCityList: TStringList;
-  GeoSettings: GEOsettingsRec;
 
 constructor TPlace.Create;
 begin
@@ -146,22 +155,34 @@ begin
   result := StringReplace(result, '\/', '/', [rfReplaceAll]); // Belgium
 end;
 
-function TPlace.GetProvince: string;
+function TPlace.GetCountryLocation: string;
+begin
+  if (GeoSettings.CountryCodeLocation) then
+    result := FCountryCode
+  else
+    result := FCountry;
+end;
+
+function TPlace.GetPrioProvince: string;
 var GeoPrio: string;
 begin
   result := '';
+  GeoPrio := GeoProvinceList.Values[FCountryCode];
+  if (FProvinceList.Values[GeoPrio] <> '') then
+    result := FProvinceList.Values[GeoPrio];
+end;
+
+function TPlace.GetProvince: string;
+begin
+  result := GetPrioProvince;
 
   // Geocode
-  if (result = '') and (FProvinceList.Values['state'] <> '') then
-    result := FProvinceList.Values['state'];
   if (result = '') and (FProvinceList.Values['county'] <> '') then
     result := FProvinceList.Values['county'];
+  if (result = '') and (FProvinceList.Values['state'] <> '') then
+    result := FProvinceList.Values['state'];
 
   // Overpass
-  GeoPrio := GeoProvinceList.Values[FCountryCode];
-  if (result = '') and (FProvinceList.Values[GeoPrio] <> '') then
-    result := FProvinceList.Values[GeoPrio];
-
   if (result = '') and (FProvinceList.Values['6'] <> '') then
     result := FProvinceList.Values['6'];
   if (result = '') and (FProvinceList.Values['5'] <> '') then
@@ -172,24 +193,30 @@ begin
     result := FProvinceList.Values['3'];
 end;
 
-function TPlace.GetCity: string;
+function TPlace.GetPrioCity: string;
 var GeoPrio: string;
 begin
   result := '';
+  GeoPrio := GeoCityList.Values[FCountryCode];
+  if (FCityList.Values[GeoPrio] <> '') then
+    result := FCityList.Values[GeoPrio];
+end;
+
+function TPlace.GetCity: string;
+begin
+  result := GetPrioCity;
 
   // Geocode
   if (result = '') and (FCityList.Values['village'] <> '') then
     result := FCityList.Values['village'];
   if (result = '') and (FCityList.Values['municipality'] <> '') then
     result := FCityList.Values['municipality'];
+  if (result = '') and (FCityList.Values['town'] <> '') then
+    result := FCityList.Values['town'];
   if (result = '') and (FCityList.Values['city'] <> '') then
     result := FCityList.Values['city'];
 
   // Overpass
-  GeoPrio := GeoCityList.Values[FCountryCode];
-  if (result = '') and (FCityList.Values[GeoPrio] <> '') then
-    result := FCityList.Values[GeoPrio];
-
   if (result = '') and (FCityList.Values['8'] <> '') then
     result := FCityList.Values['8'];
   if (result = '') and (FCityList.Values['7'] <> '') then
@@ -225,6 +252,8 @@ begin
   if (Key = 'postcode') then
     FPostCode := Value;
 
+  if (Key = 'town') then
+    FCityList.AddPair(Key, Value);
   if (Key = 'village') then
     FCityList.AddPair(Key, Value);
   if (Key = 'municipality') then
@@ -332,10 +361,11 @@ begin
   Html.Add('     SendMessage(Func, lonlat.lat, lonlat.lon);');
   Html.Add('  }');
 
-  Html.Add(' function GetBounds(Func){');
+  Html.Add('  function GetBounds(Func){');
   Html.Add('     var bounds = map.getExtent();');
   Html.Add('     bounds.transform(po, op);');
-  Html.Add('     SendMessage(Func, bounds.toBBOX(4, true), "");');
+  Html.Add('     var lonlat = bounds.getCenterLonLat();');
+  Html.Add('     SendMessage(Func, bounds.toBBOX(4, true), lonlat.lat + ", " + lonlat.lon);');
   Html.Add('  }');
   Html.Add('  function CreateExtent(ZoomLevel){');
   Html.Add('');
@@ -444,7 +474,7 @@ var Diff: Int64;
 begin
   Diff := Delay - MilliSecondsBetween(Now, LastQuery);
   if (Diff > 0) then
-    sleep(Diff);
+    Sleep(Diff);
   LastQuery := Now;
 end;
 
@@ -666,6 +696,11 @@ begin
   finally
     SetCursor(CrNormal);
   end;
+end;
+
+procedure ClearCoordCache;
+begin
+  CoordCache.Clear;
 end;
 
 procedure ChooseLocation(var Lat, Lon: string);
@@ -1009,6 +1044,7 @@ begin
 
   GeoSettings.OverPassCaseSensitive := GUIini.ReadBool(Geo_Settings, 'OverPassCaseSensitive', True);
   GeoSettings.OverPassCompleteWord := GUIini.ReadBool(Geo_Settings, 'OverPassCompleteWord', True);
+  GeoSettings.CountryCodeLocation := GUIini.ReadBool(Geo_Settings, 'CountryCodeLocation', True);
 
   GUIini.ReadSectionValues(Geo_Province, GeoProvinceList);
 //Default = 6,5,4,3
@@ -1061,6 +1097,7 @@ begin
   GUIini.WriteInteger(Geo_Settings, 'ThrottleOverPass', GeoSettings.ThrottleOverPass);
   GUIini.WriteBool(Geo_Settings, 'OverPassCaseSensitive', GeoSettings.OverPassCaseSensitive);
   GUIini.WriteBool(Geo_Settings, 'OverPassCompleteWord', GeoSettings.OverPassCompleteWord);
+  GUIini.WriteBool(Geo_Settings, 'CountryCodeLocation', GeoSettings.CountryCodeLocation);
 
   TmpItems := TStringList.Create;
   try

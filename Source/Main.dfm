@@ -155,7 +155,7 @@ object FMain: TFMain
     Top = 0
     Width = 320
     Height = 583
-    ActivePage = AdvTabMetadata
+    ActivePage = AdvTabOSMMap
     Align = alRight
     DoubleBuffered = True
     ParentDoubleBuffered = False
@@ -271,7 +271,6 @@ object FMain: TFMain
         Font.Style = []
         ParentFont = False
         TabOrder = 1
-        ExplicitTop = 448
         DesignSize = (
           312
           106)
@@ -356,7 +355,6 @@ object FMain: TFMain
         OnKeyDown = MetadataListKeyDown
         OnMouseDown = MetadataListMouseDown
         OnSelectCell = MetadataListSelectCell
-        ExplicitHeight = 391
         ColWidths = (
           150
           160)
@@ -499,8 +497,7 @@ object FMain: TFMain
           Text = ''
           OnChange = EditMapFindChange
           OnKeyDown = EditMapFindKeyDown
-          ExplicitLeft = 150
-          ExplicitWidth = 159
+          ExplicitHeight = 21
         end
       end
       object EdgeBrowser1: TEdgeBrowser
@@ -722,7 +719,7 @@ object FMain: TFMain
         object EditETdirect: TLabeledEdit
           Left = 1
           Top = 50
-          Width = 389
+          Width = 385
           Height = 23
           Hint = 
             'Spaces in data require double quotes, double quotes in data requ' +
@@ -745,7 +742,7 @@ object FMain: TFMain
           Text = ''
           OnChange = EditETdirectChange
           OnKeyDown = EditETdirectKeyDown
-          ExplicitWidth = 385
+          ExplicitWidth = 381
         end
         object CBoxETdirect: TComboBox
           Left = 1
