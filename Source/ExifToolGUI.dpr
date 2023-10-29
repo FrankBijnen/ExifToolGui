@@ -40,11 +40,12 @@ uses
   CopyMetaSingle in 'CopyMetaSingle.pas' {FCopyMetaSingle},
   FileDateTime in 'FileDateTime.pas' {FFileDateTime},
   UFrmPlaces in 'UFrmPlaces.pas' {FrmPlaces},
+  UFrmGeoTagFiles in 'UFrmGeoTagFiles.pas' {FGeotagFiles},
   UFrmStyle in 'UFrmStyle.pas' {FrmStyle},
   UFrmAbout in 'UFrmAbout.pas' {FrmAbout},
   UFrmGenerate in 'UFrmGenerate.pas' {FrmGenerate},
   DateTimeShift in 'DateTimeShift.pas' {FDateTimeShift};
-  
+
 {$R *.res}
 
 begin
@@ -75,5 +76,6 @@ begin
   Application.CreateForm(TFrmAbout, FrmAbout);
   Application.CreateForm(TFrmGenerate, FrmGenerate);
   Application.CreateForm(TFDateTimeShift, FDateTimeShift);
+  Application.CreateForm(TFGeotagFiles, FGeotagFiles);
   Application.Run;
 end.

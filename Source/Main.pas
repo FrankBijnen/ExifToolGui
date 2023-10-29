@@ -170,6 +170,7 @@ type
     GenericExtractPreviews: TMenuItem;
     GenericImportPreview: TMenuItem;
     JPGGenericlosslessautorotate1: TMenuItem;
+    EditMapBounds: TLabeledEdit;
     procedure ShellListClick(Sender: TObject);
     procedure ShellListKeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
     procedure SpeedBtnExifClick(Sender: TObject);
@@ -317,7 +318,7 @@ uses System.StrUtils, System.Math, System.Masks, System.UITypes,
   ExifTool, ExifInfo, ExifToolsGui_LossLess, ExifTool_PipeStream,
   MainDef, LogWin, Preferences, EditFFilter, EditFCol, UFrmStyle, UFrmAbout,
   QuickMngr, DateTimeShift, DateTimeEqual, CopyMeta, RemoveMeta, Geotag, Geomap, CopyMetaSingle, FileDateTime,
-  UFrmGenericExtract, UFrmGenericImport, UFrmLossLessRotate;
+  UFrmGenericExtract, UFrmGenericImport, UFrmLossLessRotate, UFrmGeoTagFiles;
 
 {$R *.dfm}
 
@@ -643,7 +644,7 @@ procedure TFMain.EditMapFindKeyDown(Sender: TObject; var Key: Word; Shift: TShif
 begin
   if (Key = VK_Return) and (EditMapFind.Text <> '') then
   begin
-    EditMapFind.Text := MapGotoPlace(EdgeBrowser1, EditMapFind.Text, 'Find');
+    EditMapFind.Text := MapGotoPlace(EdgeBrowser1, EditMapFind.Text, EditMapBounds.Text, 'Find');
     EditMapFind.Font.Color := clBlue;
   end;
 end;
@@ -1797,16 +1798,30 @@ end;
 procedure TFMain.EdgeBrowser1WebMessageReceived(Sender: TCustomEdgeBrowser; Args: TWebMessageReceivedEventArgs);
 var
   Message: PChar;
-  Msg, Parm1, Parm2: string;
+  Msg, Parm1, Parm2, Lat, Lon: string;
 begin
   Args.ArgsInterface.Get_webMessageAsJson(Message);
   ParseJsonMessage(Message, Msg, Parm1, Parm2);
-  if (Msg = 'Location') then
+
+  if (Msg = OSMGetLocation) then
   begin
-    AdjustLatLon(Parm1, Parm2);
+    AdjustLatLon(Parm1, Parm2, Coord_Decimals);
     EditMapFind.Text := Parm1 + ', ' + Parm2;
-    MapGotoPlace(EdgeBrowser1, EditMapFind.Text, 'Get Location');
+    MapGotoPlace(EdgeBrowser1, EditMapFind.Text, '', Msg);
+    exit;
   end;
+
+  if (Msg = OSMGetBounds) then
+  begin
+    EditMapBounds.Text := Parm1;
+
+    ParseLatLon(Parm2, Lat, Lon);
+    AdjustLatLon(Lat, Lon, Coord_Decimals);
+    EditMapFind.Text := Lat + ', ' + Lon;
+
+    exit;
+  end;
+
 end;
 
 procedure TFMain.EditETcmdNameChange(Sender: TObject);
@@ -2226,13 +2241,17 @@ begin
   AdvPageMetadata.ActivePage := AdvTabMetadata;
   AdvPageFilelist.ActivePage := AdvTabFilelist;
 
+  AdvTabOSMMap.Enabled := false;
   if GUIsettings.EnableGMap then
   begin
-    OSMMapInit(EdgeBrowser1, GUIsettings.DefGMapHome, 'Home');
-    AdvTabOSMMap.Enabled := true;
-  end
-  else
-    AdvTabOSMMap.Enabled := false;
+    try
+      OSMMapInit(EdgeBrowser1, GUIsettings.DefGMapHome, 'Home');
+      AdvTabOSMMap.Enabled := true;
+    except
+      on E:Exception do
+        MessageDlgEx(E.Message, 'Error positioning Home', TMsgDlgType.mtWarning, [TMsgDlgBtn.mbOK]);
+    end;
+  end;
 
   // Init Chart
   AdvRadioGroup2Click(Sender);
@@ -3009,42 +3028,31 @@ begin
 end;
 
 procedure TFMain.SpeedBtn_GeotagClick(Sender: TObject);
-var
-  ETcmd, ETouts, ETerrs, Lat, Lon: string;
 begin
-  ParseLatLon(EditMapFind.Text, Lat, Lon);
-  if (Lat = '') or (Lon = '') then
-    raise Exception.Create('No Lat Lon coordinates selected.');
+  ParseLatLon(EditMapFind.Text, FGeotagFiles.Lat, FGeotagFiles.Lon);
+  if (FGeotagFiles.Lat = '') or (FGeotagFiles.Lon = '') then
+  begin
+    MessageDlgEx('No Lat Lon coordinates selected.', '', TMsgDlgType.mtError, [TMsgDlgBtn.mbOK]);
+    exit;
+  end;
 
   if ShellList.SelectedFolder = nil then
-    raise Exception.Create('No files selected.');
-
-  ETcmd := '-GPS:All=' + CRLF + '-GPS:GpsLatitudeRef=';
-  if Lat[1] = '-' then
   begin
-    ETcmd := ETcmd + 'S';
-    Delete(Lat, 1, 1);
-  end
-  else
-    ETcmd := ETcmd + 'N';
-  ETcmd := ETcmd + CRLF + '-GPS:GpsLatitude=' + Lat;
-  ETcmd := ETcmd + CRLF + '-GPS:GpsLongitudeRef=';
-  if Lon[1] = '-' then
-  begin
-    ETcmd := ETcmd + 'W';
-    Delete(Lon, 1, 1);
-  end
-  else
-    ETcmd := ETcmd + 'E';
-  ETcmd := ETcmd + CRLF + '-GPS:GpsLongitude=' + Lon;
+    MessageDlgEx('No files selected.', '', TMsgDlgType.mtError, [TMsgDlgBtn.mbOK]);
+    exit;
+  end;
 
-  if ET_OpenExec(ETcmd, GetSelectedFiles, ETouts, ETerrs) then
+  if FGeotagFiles.ShowModal = mrOK then
+  begin
+    RefreshSelected(Sender);
     ShowMetadata;
+    ShowPreview;
+  end;
 end;
 
 procedure TFMain.SpeedBtn_MapHomeClick(Sender: TObject);
 begin
-  MapGotoPlace(EdgeBrowser1, GUIsettings.DefGMapHome, 'Home');
+  MapGotoPlace(EdgeBrowser1, GUIsettings.DefGMapHome, '', 'Home');
   EditMapFind.Font.Color := clGray;
 end;
 
