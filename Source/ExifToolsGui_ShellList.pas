@@ -50,7 +50,6 @@ type
     FOnNotifyErrorEvent: TThumbErrorEvent;
     FOnNotifyGenerateEvent: TThumbGenerateEvent;
     FOnPopulateBeforeEvent: TPopulateBeforeEvent;
-    FOnEnumColumnsBeforeEvent: TNotifyEvent;
     FOnEnumColumnsAfterEvent: TNotifyEvent;
     FOnPathChanged: TNotifyEvent;
     FOnOwnerDataFetchEvent: TOwnerDataFetchEvent;
@@ -102,7 +101,6 @@ type
     property OnThumbGenerate: TThumbGenerateEvent read FOnNotifyGenerateEvent write FOnNotifyGenerateEvent;
     property Generating: integer read FGenerating;
     property OnPopulateBeforeEvent: TPopulateBeforeEvent read FOnPopulateBeforeEvent write FOnPopulateBeforeEvent;
-    property OnEnumColumnsBeforeEvent: TNotifyEvent read FOnEnumColumnsBeforeEvent write FOnEnumColumnsBeforeEvent;
     property OnEnumColumnsAfterEvent: TNotifyEvent read FOnEnumColumnsAfterEvent write FOnEnumColumnsAfterEvent;
     property OnPathChanged: TNotifyEvent read FOnPathChanged write FOnPathChanged;
     property OnOwnerDataFetchEvent: TOwnerDataFetchEvent read FOnOwnerDataFetchEvent write FOnOwnerDataFetchEvent;
@@ -198,35 +196,39 @@ end;
 procedure TShellListView.ColumnSort;
 var
   ANitem: TListItem;
+  SortOnDetails: boolean;
 begin
-  if (ViewStyle = vsReport) and FColumnSorted then
+  if (ViewStyle = vsReport) and
+      FColumnSorted then
   begin
     if (FSortColumn < Columns.Count) then
       SetListHeaderSortState(Self, Columns[FSortColumn], FSortState);
 
-    if (SortColumn <> 0) then
+    SortOnDetails := (FSortColumn <> 0) and
+                     (FDoDefault = false);
+    if (SortOnDetails) then
       for ANitem in Items do; // Need to get all the details of the items
+
     // Use an anonymous method. So we can test for FDoDefault, SortColumn and SortState
     // See also method ListSortFunc in Vcl.Shell.ShellCtrls.pas
     FoldersList.SortList(
       function(Item1, Item2: Pointer): integer
-
       const
         R: array [boolean] of Byte = (0, 1);
       begin
         Result := R[TShellFolder(Item2).IsFolder] - R[TShellFolder(Item1).IsFolder];
         if (Result = 0) then
         begin
-          if (FDoDefault) or (SortColumn = 0) then // Use the standard compare
-          begin
-            if (TShellFolder(Item1).ParentShellFolder <> nil) then
-              Result := Smallint(TShellFolder(Item1).ParentShellFolder.CompareIDs(SortColumn, TShellFolder(Item1).RelativeID,
-                TShellFolder(Item2).RelativeID));
-          end
-          else
+          if (SortOnDetails) then
           begin // Compare the values from DetailStrings. Always text.
             if (SortColumn <= TShellFolder(Item1).DetailStrings.Count) and (SortColumn <= TShellFolder(Item2).DetailStrings.Count) then
               Result := CompareText(TShellFolder(Item1).Details[SortColumn], TShellFolder(Item2).Details[SortColumn]);
+          end
+          else
+          begin // Use the standard compare
+            if (TShellFolder(Item1).ParentShellFolder <> nil) then
+              Result := Smallint(TShellFolder(Item1).ParentShellFolder.CompareIDs(SortColumn, TShellFolder(Item1).RelativeID,
+                TShellFolder(Item2).RelativeID));
           end;
         end;
 
@@ -328,21 +330,33 @@ begin
 end;
 
 procedure TShellListView.EnumColumns;
+var
+  MustLockWindow: boolean;
 begin
-  if Assigned(FOnEnumColumnsBeforeEvent) then
-    FOnEnumColumnsBeforeEvent(Self);
+  MustLockWindow := (not FDoDefault) or
+                    (FColumnSorted);
+  if (MustLockWindow) then
+    SendMessage(Handle, WM_SETREDRAW, 0, 0);
+  try
+    if (FDoDefault) then
+      inherited;
 
-  if (FDoDefault) then
-    inherited;
+    if Assigned(FOnEnumColumnsAfterEvent) then
+      FOnEnumColumnsAfterEvent(Self);
 
-  if Assigned(FOnEnumColumnsAfterEvent) then
-    FOnEnumColumnsAfterEvent(Self);
+    if (ViewStyle = vsReport) and // EnumColumns only called for ViewStyle=vsReport
+       (Assigned(FOnPathChanged)) then
+      FOnPathChanged(Self);
 
-  if (ViewStyle = vsReport) and // EnumColumns only called for ViewStyle=vsReport
-     (Assigned(FOnPathChanged)) then
-    FOnPathChanged(Self);
+    ColumnSort;
 
-  ColumnSort;
+  finally
+    if (MustLockWindow) then
+    begin
+      SendMessage(Handle, WM_SETREDRAW, 1, 0);
+      Invalidate; // Creates new window handle!
+    end;
+  end;
 end;
 
 procedure TShellListView.CMThumbStart(var Message: TMessage);
@@ -442,6 +456,14 @@ end;
 
 procedure TShellListView.Populate;
 begin
+  // Disable inherited sort
+  if (FColumnSorted) and
+     (Sorted) then
+  begin
+    Sorted := False;  // We get called again, but next time we fall thru
+    exit;
+  end;
+
   // Prevent flicker by skipping populate when not yet needed.
   if (csLoading in ComponentState) then
     exit;
@@ -451,11 +473,11 @@ begin
     exit;
   // until here
 
-  // Force initialization of array with zeroes
-  SetLength(FThumbNailCache, 0);
-
   if Assigned(FOnPopulateBeforeEvent) then
     FOnPopulateBeforeEvent(Self, FDoDefault);
+
+  // Force initialization of array with zeroes
+  SetLength(FThumbNailCache, 0);
 
   inherited;
 
@@ -638,6 +660,9 @@ var
   Ascending: boolean;
   State: THeaderSortState;
 begin
+  if (FColumnSorted = false) then
+    exit;
+
   Ascending := GetListHeaderSortState(Self, Column) <> hssAscending;
   for I := 0 to Columns.Count - 1 do
   begin
@@ -659,11 +684,7 @@ end;
 procedure TShellListView.SetColumnSorted(AValue: boolean);
 begin
   if (FColumnSorted <> AValue) then
-  begin
     FColumnSorted := AValue;
-  end;
-  if FColumnSorted then
-    Sorted := false;
 end;
 
 procedure TShellListView.InitThumbNails;

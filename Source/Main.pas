@@ -290,7 +290,6 @@ type
     procedure ShellistThumbError(Sender: TObject; Item: TListItem; E: Exception);
     procedure ShellistThumbGenerate(Sender: TObject; Item: TListItem; Status: TThumbGenStatus; Total, Remaining: integer);
     procedure ShellListBeforePopulate(Sender: TObject; var DoDefault: boolean);
-    procedure ShellListBeforeEnumColumns(Sender: TObject);
     procedure ShellListAfterEnumColumns(Sender: TObject);
     procedure ShellListPathChanged(Sender: TObject);
     procedure ShellListOwnerDataFetch(Sender: TObject; Item: TListItem; Request: TItemRequest; AFolder: TShellFolder);
@@ -2156,13 +2155,13 @@ begin
 
   // Set properties of Shelllist in code.
   ShellList.OnPopulateBeforeEvent := ShellListBeforePopulate;
-  ShellList.OnEnumColumnsBeforeEvent := ShellListBeforeEnumColumns;
   ShellList.OnEnumColumnsAfterEvent := ShellListAfterEnumColumns;
   ShellList.OnPathChanged := ShellListPathChanged;
   ShellList.OnOwnerDataFetchEvent := ShellListOwnerDataFetch;
   ShellList.OnColumnResized := ShellListColumnResized;
   ShellList.OnThumbGenerate := ShellistThumbGenerate;
   ShellList.OnThumbError := ShellistThumbError;
+
   // Enable Column sorting if Sorted = true. Disables Sorted.
   ShellList.ColumnSorted := ShellList.Sorted;
 
@@ -2394,15 +2393,7 @@ begin
   DoDefault := (ShellList.ViewStyle <> vsReport) or (CBoxDetails.ItemIndex = 0);
 end;
 
-procedure TFMain.ShellListBeforeEnumColumns(Sender: TObject);
-begin
-  // Prevent flickering when updating columns
-  SendMessage(TShellListView(Sender).Handle, WM_SETREDRAW, 0, 0);
-end;
-
 procedure TFMain.ShellListAfterEnumColumns(Sender: TObject);
-var
-  AShellList: TShellListView;
 
   procedure AdjustColumns(ColumnDefs: array of smallint);
   var
@@ -2464,9 +2455,6 @@ begin
       AddColumns(FListColUsr);
   end;
 
-  AShellList := TShellListView(Sender);
-  SendMessage(AShellList.Handle, WM_SETREDRAW, 1, 0);
-  AShellList.Invalidate; // Creates new window handle!
 end;
 
 procedure TFMain.ShellListPathChanged(Sender: TObject);
