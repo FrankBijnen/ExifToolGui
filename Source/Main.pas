@@ -644,7 +644,7 @@ procedure TFMain.EditMapFindKeyDown(Sender: TObject; var Key: Word; Shift: TShif
 begin
   if (Key = VK_Return) and (EditMapFind.Text <> '') then
   begin
-    EditMapFind.Text := MapGotoPlace(EdgeBrowser1, EditMapFind.Text, EditMapBounds.Text, 'Find');
+    EditMapFind.Text := MapGotoPlace(EdgeBrowser1, EditMapFind.Text, EditMapBounds.Text, 'Find', InitialZoom_Out);
     EditMapFind.Font.Color := clBlue;
   end;
 end;
@@ -1789,10 +1789,10 @@ end;
 
 procedure TFMain.UpdateStatusBar_FilesShown;
 var
-  i: smallint;
+  I: smallint;
 begin
-  i := ShellList.Items.Count;
-  StatusBar.Panels[0].Text := 'Files: ' + IntToStr(i);
+  I := ShellList.Items.Count;
+  StatusBar.Panels[0].Text := 'Files: ' + IntToStr(I);
 end;
 
 procedure TFMain.EdgeBrowser1WebMessageReceived(Sender: TCustomEdgeBrowser; Args: TWebMessageReceivedEventArgs);
@@ -1803,14 +1803,6 @@ begin
   Args.ArgsInterface.Get_webMessageAsJson(Message);
   ParseJsonMessage(Message, Msg, Parm1, Parm2);
 
-  if (Msg = OSMGetLocation) then
-  begin
-    AdjustLatLon(Parm1, Parm2, Coord_Decimals);
-    EditMapFind.Text := Parm1 + ', ' + Parm2;
-    MapGotoPlace(EdgeBrowser1, EditMapFind.Text, '', Msg);
-    exit;
-  end;
-
   if (Msg = OSMGetBounds) then
   begin
     EditMapBounds.Text := Parm1;
@@ -1818,6 +1810,22 @@ begin
     ParseLatLon(Parm2, Lat, Lon);
     AdjustLatLon(Lat, Lon, Coord_Decimals);
     EditMapFind.Text := Lat + ', ' + Lon;
+
+    exit;
+  end;
+
+  AdjustLatLon(Parm1, Parm2, Coord_Decimals);
+  EditMapFind.Text := Parm1 + ', ' + Parm2;
+  if (Msg = OSMCtrlClick) then
+  begin
+    MapGotoPlace(EdgeBrowser1, EditMapFind.Text, '', Msg, InitialZoom_In);
+
+    exit;
+  end;
+
+  if (Msg = OSMGetLocation) then
+  begin
+    MapGotoPlace(EdgeBrowser1, EditMapFind.Text, '', Msg, InitialZoom_Out);
 
     exit;
   end;
@@ -2227,13 +2235,14 @@ procedure TFMain.FormShow(Sender: TObject);
 var
   AnItem: TListItem;
   Param: string;
-  i: smallint;
+  Lat, Lon: string;
+  I: smallint;
   PathFromParm: boolean;
 begin
-  i := Screen.PixelsPerInch;
-  AdvPanelETdirect.Height := MulDiv(32, i, 96);
-  AdvPanelMetaBottom.Height := MulDiv(32, i, 96);
-  MetadataList.DefaultRowHeight := MulDiv(19, i, 96);
+  I := Screen.PixelsPerInch;
+  AdvPanelETdirect.Height := MulDiv(32, I, 96);
+  AdvPanelMetaBottom.Height := MulDiv(32, I, 96);
+  MetadataList.DefaultRowHeight := MulDiv(19, I, 96);
   // This must be in OnShow event -for OnCanResize event (probably bug in XE2):
   GUIBorderWidth := Width - ClientWidth;
   GUIBorderHeight := Height - ClientHeight;
@@ -2245,7 +2254,8 @@ begin
   if GUIsettings.EnableGMap then
   begin
     try
-      OSMMapInit(EdgeBrowser1, GUIsettings.DefGMapHome, 'Home');
+      ParseLatLon(GUIsettings.DefGMapHome, Lat, Lon);
+      OSMMapInit(EdgeBrowser1, Lat, Lon, 'Home', InitialZoom_Out);
       AdvTabOSMMap.Enabled := true;
     except
       on E:Exception do
@@ -2262,8 +2272,8 @@ begin
     CBoxDetails.Enabled := false;
   end;
 
-  i := CBoxDetails.Items.Count - 1;
-  SpeedBtnColumnEdit.Enabled := (CBoxDetails.ItemIndex = i);
+  I := CBoxDetails.Items.Count - 1;
+  SpeedBtnColumnEdit.Enabled := (CBoxDetails.ItemIndex = I);
   WrkIniDir := GetAppPath;
   if GUIsettings.UseExitDetails then
     CBoxDetailsChange(Sender);
@@ -3052,7 +3062,7 @@ end;
 
 procedure TFMain.SpeedBtn_MapHomeClick(Sender: TObject);
 begin
-  MapGotoPlace(EdgeBrowser1, GUIsettings.DefGMapHome, '', 'Home');
+  MapGotoPlace(EdgeBrowser1, GUIsettings.DefGMapHome, '', 'Home', InitialZoom_Out);
   EditMapFind.Font.Color := clGray;
 end;
 
