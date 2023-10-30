@@ -73,6 +73,7 @@ procedure WriteGeoCodeSettings(GUIini: TMemIniFile);
 
 const
   Coord_Decimals = 6;
+  Place_Decimals = 4;
   CRLF = #13#10;
   OSMCtrlClick = 'Ctrl Click';
   OSMGetLocation = 'Get Location';
@@ -371,7 +372,7 @@ begin
   Html.Add('     var bounds = map.getExtent();');
   Html.Add('     bounds.transform(po, op);');
   Html.Add('     var lonlat = bounds.getCenterLonLat();');
-  Html.Add('     SendMessage(Func, bounds.toBBOX(4, true), lonlat.lat + ", " + lonlat.lon);');
+  Html.Add('     SendMessage(Func, bounds.toBBOX(' + IntToStr(Place_Decimals) + ', true), lonlat.lat + ", " + lonlat.lon);');
   Html.Add('  }');
   Html.Add('  function CreateExtent(ZoomLevel){');
   Html.Add('');
@@ -675,7 +676,7 @@ begin
   try
     LatP := Lat;
     LonP := Lon;
-    AdjustLatLon(LatP, LonP, 4);
+    AdjustLatLon(LatP, LonP, Place_Decimals);
     CoordsKey := LatP + ',' + LonP;
     if (CoordCache.ContainsKey(CoordsKey)) then
     begin
@@ -708,7 +709,7 @@ begin
   Lon := '';
   with FrmPlaces do
   begin
-//TODO PARm
+//TODO PARM
 //    if (Listview1.Items.Count = 1) then
 //    begin
 //      Lat := Listview1.Items[0].Caption;

@@ -23,11 +23,14 @@ type
     Button2: TButton;
     Label1: TLabel;
     Label2: TLabel;
+    ChkUpdateLocation: TCheckBox;
+    BtnSetupGeoCode: TButton;
     procedure FormShow(Sender: TObject);
     procedure Button3Click(Sender: TObject);
     procedure TrackBar1Change(Sender: TObject);
     procedure CheckBox2Click(Sender: TObject);
     procedure Button2Click(Sender: TObject);
+    procedure BtnSetupGeoCodeClick(Sender: TObject);
   private
     { Private declarations }
     procedure DisplayHint(Sender: TObject);
@@ -40,7 +43,7 @@ var
 
 implementation
 
-uses Main, MainDef, ExifTool;
+uses Main, MainDef, ExifTool, ExifToolsGUI_Utils, UFrmGeoTagFiles, Geomap;
 
 {$R *.dfm}
 
@@ -63,7 +66,7 @@ begin
     if GpsXmpDir <> '' then
       InitialDir := GpsXmpDir
     else
-      InitialDir := FMain.ShellList.GetNamePath; // .Path;
+      InitialDir := FMain.ShellList.Path;
     Filter := 'Any GPS log file|*.*';
     Options := [ofFileMustExist];
     Title := 'Select GPS log file';
@@ -94,9 +97,26 @@ begin
   Edit1.Text := tx;
 end;
 
+procedure TFGeotag.BtnSetupGeoCodeClick(Sender: TObject);
+begin
+  ParseLatLon(Fmain.EditMapFind.Text, FGeotagFiles.Lat, FGeotagFiles.Lon);
+  if not (ValidLatLon(FGeotagFiles.Lat, FGeotagFiles.Lon)) then
+  begin
+    MessageDlgEx('No valid Lat Lon coordinates selected.' + #10 +
+                 'Use the OSM Map to select', '', TMsgDlgType.mtError, [TMsgDlgBtn.mbOK]);
+    exit;
+  end;
+
+  FGeotagFiles.SetupMode := true;
+  FGeotagFiles.ShowModal;
+end;
+
 procedure TFGeotag.Button2Click(Sender: TObject);
 var
   ETcmd, ETout, ETerr: string;
+  AFile: string;
+  SelectedFiles: TStringList;
+
 begin
   if CheckBox1.Checked then
     ETcmd := ExtractFilePath(LabeledEdit1.Text) + '*' + ExtractFileExt(LabeledEdit1.Text)
@@ -121,6 +141,15 @@ begin
   end;
 
   ET_OpenExec(ETcmd, FMain.GetSelectedFiles, ETout, ETerr);
+  SelectedFiles := TStringList.Create;
+  try
+    SelectedFiles.Text := FMain.GetSelectedFiles('', true); // Need complete path
+    for AFile in SelectedFiles do
+      FillLocationInImage(AFile);
+  finally
+    SelectedFiles.Free;
+  end;
+
   ModalResult := mrOK;
 end;
 

@@ -6,7 +6,8 @@ interface
 uses Winapi.ShlObj, Winapi.ActiveX, Winapi.Wincodec, Winapi.Windows, Winapi.Messages,
   System.Classes, System.SysUtils, System.Variants, System.StrUtils, System.Math, System.Threading,
   System.Generics.Collections,
-  Vcl.Forms, Vcl.Dialogs, Vcl.ComCtrls, Vcl.Shell.ShellCtrls, Vcl.Graphics;
+  Vcl.Forms, Vcl.Dialogs, Vcl.ComCtrls, Vcl.Shell.ShellCtrls, Vcl.Graphics,
+  Geomap;
 
 type
   TPreviewInfo = record
@@ -56,9 +57,12 @@ function MessageDlgEx(const AMsg, ACaption: string; ADlgType: TMsgDlgType; AButt
 function GetPreviews(ETResult: TStringList; var Biggest: integer): TPreviewInfoList;
 procedure FillPreviewInListView(SelectedFile: string; LvPreviews: TListView);
 
+// GeoCoding
+procedure FillLocationInImage(const ANImage: string);
+
 implementation
 
-uses Winapi.ShellAPI, Winapi.KnownFolders, System.Win.Registry, System.UITypes, UFrmGenerate, MainDef, ExifTool;
+uses Winapi.ShellAPI, Winapi.KnownFolders, System.Win.Registry, System.UITypes, UFrmGenerate, MainDef, ExifTool, ExifInfo;
 
 var
   GlobalImgFact: IWICImagingFactory;
@@ -667,6 +671,28 @@ begin
       LvPreviews.Items[AMaxPos].Checked := true;
   finally
     ETResult.Free;
+  end;
+end;
+
+procedure FillLocationInImage(const ANImage: string);
+var
+  ETCmd: string;
+  APlace: TPlace;
+  Lat, Lon: string;
+begin
+  GetMetadata(ANImage, false, false, true, false);
+  Lat := Foto.GPS.GeoLat;
+  Lon := Foto.GPS.GeoLon;
+  if (ValidLatLon(Lat, Lon)) then
+  begin
+    AdjustLatLon(Lat, Lon, Place_Decimals);
+    APlace := GetPlaceOfCoords(Lat, Lon, GeoSettings.GetPlaceProvider);
+
+    ETCmd := ETCmd + CRLF + '-xmp:LocationShownCountryName=' + APlace.CountryLocation;
+    ETCmd := ETCmd + CRLF + '-xmp:LocationShownProvinceState=' + APlace.Province;
+    ETCmd := ETCmd + CRLF + '-xmp:LocationShownCity=' + APlace.City;
+
+    ET_OpenExec(ETcmd, ANImage);
   end;
 end;
 
