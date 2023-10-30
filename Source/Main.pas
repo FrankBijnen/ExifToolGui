@@ -240,7 +240,6 @@ type
     procedure SpeedBtn_GeotagClick(Sender: TObject);
     procedure SpeedBtn_ShowOnMapClick(Sender: TObject);
     procedure SpeedBtn_MapHomeClick(Sender: TObject);
-    procedure EditMapFindChange(Sender: TObject);
     procedure EditMapFindKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
     procedure SpeedBtn_MapSetHomeClick(Sender: TObject);
     procedure QuickPopUp_AddDetailsUserClick(Sender: TObject);
@@ -292,7 +291,8 @@ type
     procedure ShellistThumbGenerate(Sender: TObject; Item: TListItem; Status: TThumbGenStatus; Total, Remaining: integer);
     procedure ShellListBeforePopulate(Sender: TObject; var DoDefault: boolean);
     procedure ShellListAfterEnumColumns(Sender: TObject);
-    procedure ShellListPathChanged(Sender: TObject);
+    procedure ShellListPathChange(Sender: TObject);
+    procedure ShellListItemsLoaded(Sender: TObject);
     procedure ShellListOwnerDataFetch(Sender: TObject; Item: TListItem; Request: TItemRequest; AFolder: TShellFolder);
     procedure ShellListColumnResized(Sender: TObject);
     procedure CounterETEvent(Counter: integer);
@@ -635,18 +635,11 @@ begin
   result := GetSelectedFiles(FileName, (ET_Options.ETAPIWindowsWideFile = ''));
 end;
 
-procedure TFMain.EditMapFindChange(Sender: TObject);
-begin
-  EditMapFind.Font.Color := clBlue;
-end;
-
 procedure TFMain.EditMapFindKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
 begin
-  if (Key = VK_Return) and (EditMapFind.Text <> '') then
-  begin
+  if (Key = VK_Return) and
+     (EditMapFind.Text <> '') then
     EditMapFind.Text := MapGotoPlace(EdgeBrowser1, EditMapFind.Text, EditMapBounds.Text, 'Find', InitialZoom_Out);
-    EditMapFind.Font.Color := clBlue;
-  end;
 end;
 
 procedure TFMain.MGUIStyleClick(Sender: TObject);
@@ -2179,7 +2172,8 @@ begin
   // Set properties of Shelllist in code.
   ShellList.OnPopulateBeforeEvent := ShellListBeforePopulate;
   ShellList.OnEnumColumnsAfterEvent := ShellListAfterEnumColumns;
-  ShellList.OnPathChanged := ShellListPathChanged;
+  ShellList.OnPathChange := ShellListPathChange;
+  ShellList.OnItemsLoaded := ShellListItemsLoaded;
   ShellList.OnOwnerDataFetchEvent := ShellListOwnerDataFetch;
   ShellList.OnColumnResized := ShellListColumnResized;
   ShellList.OnThumbGenerate := ShellistThumbGenerate;
@@ -2486,23 +2480,24 @@ begin
 
 end;
 
-procedure TFMain.ShellListPathChanged(Sender: TObject);
+// Path is about to change. Need to restart ExiftTool and setup the menu's
+procedure TFMain.ShellListPathChange(Sender: TObject);
 var
-  AShellList: TShellListView;
   ET_Active: boolean;
 begin
-  AShellList := TShellListView(Sender);
-
-  if not AShellList.Enabled then // We will get back here
-    exit;
-  if not ValidDir(AShellList.Path) then
-    exit;
-
   // Start ExifTool in this directory
-  ET_Active := ET_StayOpen(AShellList.Path);
+  ET_Active := ET_StayOpen(TShellListView(Sender).Path);
 
   // Dis/Enable menus
   EnableMenus(ET_Active);
+end;
+
+// Items are loaded and possibly sorted. Select the first
+procedure TFMain.ShellListItemsLoaded(Sender: TObject);
+var
+  AShellList: TShellListView;
+begin
+  AShellList := TShellListView(Sender);
 
   // Select 1st Item rightaway
   if (AShellList.Items.Count > 0) then
@@ -3063,7 +3058,6 @@ end;
 procedure TFMain.SpeedBtn_MapHomeClick(Sender: TObject);
 begin
   MapGotoPlace(EdgeBrowser1, GUIsettings.DefGMapHome, '', 'Home', InitialZoom_Out);
-  EditMapFind.Font.Color := clGray;
 end;
 
 procedure TFMain.SpeedBtn_MapSetHomeClick(Sender: TObject);

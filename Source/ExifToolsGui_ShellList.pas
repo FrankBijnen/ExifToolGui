@@ -51,7 +51,8 @@ type
     FOnNotifyGenerateEvent: TThumbGenerateEvent;
     FOnPopulateBeforeEvent: TPopulateBeforeEvent;
     FOnEnumColumnsAfterEvent: TNotifyEvent;
-    FOnPathChanged: TNotifyEvent;
+    FOnPathChange: TNotifyEvent;
+    FOnItemsLoaded: TNotifyEvent;
     FOnOwnerDataFetchEvent: TOwnerDataFetchEvent;
     ICM2: IContextMenu2;
     procedure SetColumnSorted(AValue: boolean);
@@ -66,6 +67,7 @@ type
     procedure WMNotify(var Msg: TWMNotify); message WM_NOTIFY;
     procedure InitSortSpec(SortColumn: integer; SortState: THeaderSortState);
     procedure ColumnSort; virtual;
+    procedure CreateWnd; override;
     procedure EnumColumns; override;
     procedure GetThumbNails; virtual;
     procedure DoContextPopup(MousePos: TPoint; var Handled: boolean); override;
@@ -102,7 +104,8 @@ type
     property Generating: integer read FGenerating;
     property OnPopulateBeforeEvent: TPopulateBeforeEvent read FOnPopulateBeforeEvent write FOnPopulateBeforeEvent;
     property OnEnumColumnsAfterEvent: TNotifyEvent read FOnEnumColumnsAfterEvent write FOnEnumColumnsAfterEvent;
-    property OnPathChanged: TNotifyEvent read FOnPathChanged write FOnPathChanged;
+    property OnPathChange: TNotifyEvent read FOnPathChange write FOnPathChange;
+    property OnItemsLoaded: TNotifyEvent read FOnItemsLoaded write FOnItemsLoaded;
     property OnOwnerDataFetchEvent: TOwnerDataFetchEvent read FOnOwnerDataFetchEvent write FOnOwnerDataFetchEvent;
   end;
 
@@ -344,12 +347,22 @@ begin
     if Assigned(FOnEnumColumnsAfterEvent) then
       FOnEnumColumnsAfterEvent(Self);
 
-    if (ViewStyle = vsReport) and // EnumColumns only called for ViewStyle=vsReport
-       (Assigned(FOnPathChanged)) then
-      FOnPathChanged(Self);
+    if Enabled and
+       ValidDir(Path) and
+       (ViewStyle = vsReport) then // EnumColumns only called for ViewStyle=vsReport
+    begin
 
-    ColumnSort;
+      // Allow starting exiftool
+      if (Assigned(FOnPathChange)) then
+        FOnPathChange(Self);
 
+      ColumnSort;
+
+      // All data loaded
+      if (Assigned(FOnItemsLoaded)) then
+        FOnItemsLoaded(Self);
+
+    end;
   finally
     if (MustLockWindow) then
     begin
@@ -456,14 +469,6 @@ end;
 
 procedure TShellListView.Populate;
 begin
-  // Disable inherited sort
-  if (FColumnSorted) and
-     (Sorted) then
-  begin
-    Sorted := False;  // We get called again, but next time we fall thru
-    exit;
-  end;
-
   // Prevent flicker by skipping populate when not yet needed.
   if (csLoading in ComponentState) then
     exit;
@@ -481,20 +486,28 @@ begin
 
   inherited;
 
-  if (ViewStyle <> vsReport) and
-     (Assigned(FOnPathChanged)) then
-    FOnPathChanged(Self);
-
   // Optimize memory allocation
   AllocBy := Items.Count;
 
+  if (ViewStyle = vsReport) then
+    exit;
+
+  // Allow starting exiftool
+  if (Assigned(FOnPathChange)) then
+    FOnPathChange(Self);
+
   // Get Thumbnails and load in imagelist.
   GetThumbNails;
+
+  // All data loaded
+  if (Assigned(FOnItemsLoaded)) then
+    FOnItemsLoaded(Self);
+
 end;
 
 // When in vsReport mode, calls the OwnerDataFetch event to get the item.caption and subitems.
 //
-// Sets the Item.ImageIndex when the listview is in vsIcon mode. When not avail (<0) it start the generating.
+// Sets the Item.ImageIndex when the listview is in vsIcon mode. When not avail (<0) it starts generating.
 function TShellListView.OwnerDataFetch(Item: TListItem; Request: TItemRequest): boolean;
 
   procedure DoIcon;
@@ -511,8 +524,7 @@ function TShellListView.OwnerDataFetch(Item: TListItem; Request: TItemRequest): 
 
     // Update the item with the imageindex of our cached thumbnail (-1 here)
     if (FThumbNailCache[ItemIndx] > 0) then
-    // The bitmap in the cache is a thumbnail
-    begin
+    begin // The bitmap in the cache is a thumbnail
       Item.ImageIndex := FThumbNailCache[ItemIndx];
       exit;
     end;
@@ -569,6 +581,13 @@ begin
   FThumbNails := TImageList.Create(Self);
   SetLength(FThumbNailCache, 0);
   ResetPool(FThreadPool);
+end;
+
+procedure TShellListView.CreateWnd;
+begin
+  inherited;
+
+  SetColumnSorted(FColumnSorted); // Disable inherited Sorted?  Note: Populate will not be called when Enabled = false
 end;
 
 destructor TShellListView.Destroy;
@@ -685,6 +704,9 @@ procedure TShellListView.SetColumnSorted(AValue: boolean);
 begin
   if (FColumnSorted <> AValue) then
     FColumnSorted := AValue;
+  if (FColumnSorted) and
+     (Sorted) then
+    Sorted := false;
 end;
 
 procedure TShellListView.InitThumbNails;
