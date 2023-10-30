@@ -443,7 +443,6 @@ object FMain: TFMain
           TabOrder = 0
           Text = ''
           TextHint = '0.1234, 0.1234'
-          OnChange = EditMapFindChange
           OnKeyDown = EditMapFindKeyDown
         end
       end
@@ -484,7 +483,7 @@ object FMain: TFMain
           Margins.Left = 45
           Margins.Top = 6
           TabStop = False
-          Align = alClient
+          Align = alLeft
           EditLabel.Width = 39
           EditLabel.Height = 23
           EditLabel.Caption = 'Bounds:'
@@ -495,8 +494,6 @@ object FMain: TFMain
           ShowHint = True
           TabOrder = 0
           Text = ''
-          OnChange = EditMapFindChange
-          OnKeyDown = EditMapFindKeyDown
           ExplicitHeight = 21
         end
       end
@@ -719,7 +716,7 @@ object FMain: TFMain
         object EditETdirect: TLabeledEdit
           Left = 1
           Top = 50
-          Width = 385
+          Width = 377
           Height = 23
           Hint = 
             'Spaces in data require double quotes, double quotes in data requ' +
@@ -742,7 +739,7 @@ object FMain: TFMain
           Text = ''
           OnChange = EditETdirectChange
           OnKeyDown = EditETdirectKeyDown
-          ExplicitWidth = 381
+          ExplicitWidth = 373
         end
         object CBoxETdirect: TComboBox
           Left = 1
@@ -804,6 +801,7 @@ object FMain: TFMain
         ParentFont = False
         TabOrder = 2
         ViewStyle = vsReport
+        OnKeyPress = EditFindMetaKeyPress
         OnKeyUp = ShellListKeyUp
       end
     end

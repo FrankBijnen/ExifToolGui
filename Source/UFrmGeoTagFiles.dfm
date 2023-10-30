@@ -21,8 +21,8 @@ object FGeotagFiles: TFGeotagFiles
     Height = 19
     Panels = <>
     SimplePanel = True
-    ExplicitTop = 336
-    ExplicitWidth = 594
+    ExplicitTop = 361
+    ExplicitWidth = 595
   end
   object BtnCancel: TButton
     Left = 518
@@ -47,7 +47,7 @@ object FGeotagFiles: TFGeotagFiles
     Top = 8
     Width = 500
     Height = 348
-    ActivePage = TabExecute
+    ActivePage = TabSetup
     TabOrder = 3
     object TabExecute: TTabSheet
       Caption = 'Execute'
@@ -66,7 +66,6 @@ object FGeotagFiles: TFGeotagFiles
         ParentDoubleBuffered = False
         ParentFont = False
         TabOrder = 0
-        ExplicitHeight = 295
         object Label1: TLabel
           Left = 10
           Top = 5
@@ -127,8 +126,8 @@ object FGeotagFiles: TFGeotagFiles
         Caption = 'GeoCode provider:'
       end
       object LblProvince: TLabel
-        Left = 166
-        Top = 113
+        Left = 169
+        Top = 127
         Width = 320
         Height = 80
         AutoSize = False
@@ -137,21 +136,21 @@ object FGeotagFiles: TFGeotagFiles
       end
       object Label3: TLabel
         Left = 8
-        Top = 92
+        Top = 106
         Width = 100
         Height = 13
         Caption = 'Map field to Province'
       end
       object Label4: TLabel
         Left = 8
-        Top = 185
+        Top = 199
         Width = 80
         Height = 13
         Caption = 'Map Field to City'
       end
       object LblCity: TLabel
-        Left = 166
-        Top = 206
+        Left = 169
+        Top = 220
         Width = 320
         Height = 80
         AutoSize = False
@@ -160,7 +159,7 @@ object FGeotagFiles: TFGeotagFiles
       end
       object LblCountrySettings: TLabel
         Left = 8
-        Top = 55
+        Top = 81
         Width = 92
         Height = 19
         Caption = 'Settings for: '
@@ -191,7 +190,7 @@ object FGeotagFiles: TFGeotagFiles
       end
       object CmbProvince: TComboBox
         Left = 8
-        Top = 111
+        Top = 125
         Width = 145
         Height = 21
         TabOrder = 1
@@ -200,12 +199,21 @@ object FGeotagFiles: TFGeotagFiles
       end
       object CmbCity: TComboBox
         Left = 8
-        Top = 204
+        Top = 218
         Width = 145
         Height = 21
         TabOrder = 2
         Text = 'CmbProvince'
         OnChange = CmbCityChange
+      end
+      object ChkCountryLocation: TCheckBox
+        Left = 8
+        Top = 55
+        Width = 470
+        Height = 17
+        Caption = 'Map CountryCode'
+        TabOrder = 3
+        OnClick = ChkCountryLocationClick
       end
     end
   end

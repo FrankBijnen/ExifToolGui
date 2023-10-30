@@ -32,12 +32,14 @@ type
     LblCity: TLabel;
     LblCountrySettings: TLabel;
     ChkUpdateLatLon: TCheckBox;
+    ChkCountryLocation: TCheckBox;
     procedure FormShow(Sender: TObject);
     procedure BtnExecuteClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure CmbProvinceChange(Sender: TObject);
     procedure CmbGeoProviderClick(Sender: TObject);
     procedure CmbCityChange(Sender: TObject);
+    procedure ChkCountryLocationClick(Sender: TObject);
   private
     { Private declarations }
     var
@@ -49,6 +51,7 @@ type
     { Public declarations }
     var
       Lat, Lon: string;
+      SetupMode: boolean;
   end;
 
 var
@@ -127,6 +130,12 @@ begin
   end;
 end;
 
+procedure TFGeotagFiles.ChkCountryLocationClick(Sender: TObject);
+begin
+  GeoSettings.CountryCodeLocation := ChkCountryLocation.Checked;
+  FillPreview;
+end;
+
 procedure TFGeotagFiles.CmbCityChange(Sender: TObject);
 begin
   GeoCityList.Values[APlace.CountryCode] := CmbCity.Text;
@@ -150,6 +159,8 @@ end;
 
 procedure TFGeotagFiles.FillPreview;
 begin
+  if (not Showing) then
+    exit;
   GeoSettings.GetPlaceProvider := TGeoCodeProvider(CmbGeoProvider.ItemIndex);
 
   ValLocation.Strings.BeginUpdate;
@@ -194,6 +205,11 @@ procedure TFGeotagFiles.BtnExecuteClick(Sender: TObject);
 var
   CrWait, CrNormal: HCURSOR;
 begin
+  if (SetupMode) then
+  begin
+    ModalResult := MROK;
+    exit;
+  end;
   CrWait := LoadCursor(0, IDC_WAIT);
   CrNormal := SetCursor(CrWait);
   try
@@ -204,24 +220,31 @@ begin
     ETcmd := '';
     if (ChkUpdateLatLon.Checked) then
     begin
-      ETcmd := '-GPS:All=' + CRLF + '-GPS:GpsLatitudeRef=';
-      if Lat[1] = '-' then
+      ETcmd := '-GPS:All=';
+      if (Lat <> '') then
       begin
-        ETcmd := ETcmd + 'S';
-        Delete(Lat, 1, 1);
-      end
-      else
-        ETcmd := ETcmd + 'N';
-      ETcmd := ETcmd + CRLF + '-GPS:GpsLatitude=' + Lat;
-      ETcmd := ETcmd + CRLF + '-GPS:GpsLongitudeRef=';
-      if Lon[1] = '-' then
+        ETcmd := ETcmd + CRLF + '-GPS:GpsLatitudeRef=';
+        if Lat[1] = '-' then
+        begin
+          ETcmd := ETcmd + 'S';
+          Delete(Lat, 1, 1);
+        end
+        else
+          ETcmd := ETcmd + 'N';
+        ETcmd := ETcmd + CRLF + '-GPS:GpsLatitude=' + Lat;
+      end;
+      if (Lon <> '') then
       begin
-        ETcmd := ETcmd + 'W';
-        Delete(Lon, 1, 1);
-      end
-      else
-        ETcmd := ETcmd + 'E';
-      ETcmd := ETcmd + CRLF + '-GPS:GpsLongitude=' + Lon;
+        ETcmd := ETcmd + CRLF + '-GPS:GpsLongitudeRef=';
+        if Lon[1] = '-' then
+        begin
+          ETcmd := ETcmd + 'W';
+          Delete(Lon, 1, 1);
+        end
+        else
+          ETcmd := ETcmd + 'E';
+        ETcmd := ETcmd + CRLF + '-GPS:GpsLongitude=' + Lon;
+      end;
     end;
 
     if (ChkUpdateLocationInfo.Checked) then
@@ -247,6 +270,7 @@ begin
   ChkUpdateLatLon.Checked := true;
   ChkUpdateLocationInfo.Checked := true;
   CmbGeoProvider.ItemIndex := Ord(GeoSettings.GetPlaceProvider);
+  ChkCountryLocation.Checked := GeoSettings.CountryCodeLocation;
 end;
 
 procedure TFGeotagFiles.FormShow(Sender: TObject);
@@ -256,6 +280,13 @@ begin
   StatusBar1.SimpleText := '';
   LblSample.Caption := Format('Sample: %s', [ExtractFileName(Fmain.GetFirstSelectedFile)]);
   PctMain.ActivePage := TabExecute;
+
+  if (SetupMode) then
+    BtnExecute.Caption := 'Ok'
+  else
+    BtnExecute.Caption := 'Execute';
+  ChkUpdateLatLon.Visible := not SetupMode;
+  ChkUpdateLocationInfo.Visible := not SetupMode;
 
   FillPreview;
   FillSetup; // Need CountryCode for setup

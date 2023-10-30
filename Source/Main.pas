@@ -3035,9 +3035,9 @@ end;
 procedure TFMain.SpeedBtn_GeotagClick(Sender: TObject);
 begin
   ParseLatLon(EditMapFind.Text, FGeotagFiles.Lat, FGeotagFiles.Lon);
-  if (FGeotagFiles.Lat = '') or (FGeotagFiles.Lon = '') then
+  if not (ValidLatLon(FGeotagFiles.Lat, FGeotagFiles.Lon)) then
   begin
-    MessageDlgEx('No Lat Lon coordinates selected.', '', TMsgDlgType.mtError, [TMsgDlgBtn.mbOK]);
+    MessageDlgEx('No valid Lat Lon coordinates selected.', '', TMsgDlgType.mtError, [TMsgDlgBtn.mbOK]);
     exit;
   end;
 
@@ -3047,6 +3047,7 @@ begin
     exit;
   end;
 
+  FGeotagFiles.SetupMode := false;
   if FGeotagFiles.ShowModal = mrOK then
   begin
     RefreshSelected(Sender);

@@ -3,8 +3,8 @@ object FGeotag: TFGeotag
   Top = 0
   BorderStyle = bsDialog
   Caption = 'Import GPS data'
-  ClientHeight = 262
-  ClientWidth = 556
+  ClientHeight = 301
+  ClientWidth = 570
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -15,26 +15,26 @@ object FGeotag: TFGeotag
   TextHeight = 13
   object Label1: TLabel
     Left = 488
-    Top = 195
-    Width = 31
+    Top = 232
+    Width = 80
     Height = 13
     Caption = 'Label1'
   end
   object StatusBar1: TStatusBar
     Left = 0
-    Top = 243
-    Width = 556
+    Top = 282
+    Width = 570
     Height = 19
     Panels = <>
     SimplePanel = True
-    ExplicitTop = 236
+    ExplicitTop = 242
     ExplicitWidth = 552
   end
   object AdvPanel1: TPanel
     Left = 0
     Top = 0
     Width = 473
-    Height = 243
+    Height = 282
     Align = alLeft
     DoubleBuffered = True
     Font.Charset = DEFAULT_CHARSET
@@ -45,11 +45,11 @@ object FGeotag: TFGeotag
     ParentDoubleBuffered = False
     ParentFont = False
     TabOrder = 1
-    ExplicitHeight = 236
+    ExplicitHeight = 242
     object Label2: TLabel
-      Left = 16
-      Top = 208
-      Width = 418
+      Left = 18
+      Top = 204
+      Width = 435
       Height = 28
       Caption = 
         'Note: Geotagging precision depends on camera time accuracy. If n' +
@@ -144,11 +144,19 @@ object FGeotag: TFGeotag
       TickMarks = tmTopLeft
       OnChange = TrackBar1Change
     end
+    object ChkUpdateLocation: TCheckBox
+      Left = 18
+      Top = 244
+      Width = 435
+      Height = 17
+      Caption = 'Update Geo Location (Country, Province, City)'
+      TabOrder = 7
+    end
   end
   object Button1: TButton
     Left = 488
     Top = 23
-    Width = 65
+    Width = 80
     Height = 25
     Caption = 'Cancel'
     ModalResult = 2
@@ -156,11 +164,20 @@ object FGeotag: TFGeotag
   end
   object Button2: TButton
     Left = 488
-    Top = 214
-    Width = 65
+    Top = 251
+    Width = 80
     Height = 25
     Caption = 'Execute'
     TabOrder = 3
     OnClick = Button2Click
+  end
+  object BtnSetupGeoCode: TButton
+    Left = 488
+    Top = 201
+    Width = 80
+    Height = 25
+    Caption = 'Setup Geo'
+    TabOrder = 4
+    OnClick = BtnSetupGeoCodeClick
   end
 end
