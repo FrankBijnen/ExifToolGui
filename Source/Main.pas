@@ -3047,7 +3047,6 @@ begin
     exit;
   end;
 
-  FGeotagFiles.SetupMode := false;
   if FGeotagFiles.ShowModal = mrOK then
   begin
     RefreshSelected(Sender);

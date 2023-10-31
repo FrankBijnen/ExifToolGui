@@ -16,7 +16,7 @@ object FGeotag: TFGeotag
   object Label1: TLabel
     Left = 488
     Top = 232
-    Width = 80
+    Width = 31
     Height = 13
     Caption = 'Label1'
   end
@@ -27,8 +27,8 @@ object FGeotag: TFGeotag
     Height = 19
     Panels = <>
     SimplePanel = True
-    ExplicitTop = 242
-    ExplicitWidth = 552
+    ExplicitTop = 281
+    ExplicitWidth = 566
   end
   object AdvPanel1: TPanel
     Left = 0
@@ -45,11 +45,11 @@ object FGeotag: TFGeotag
     ParentDoubleBuffered = False
     ParentFont = False
     TabOrder = 1
-    ExplicitHeight = 242
+    ExplicitHeight = 281
     object Label2: TLabel
       Left = 18
       Top = 204
-      Width = 435
+      Width = 418
       Height = 28
       Caption = 
         'Note: Geotagging precision depends on camera time accuracy. If n' +
