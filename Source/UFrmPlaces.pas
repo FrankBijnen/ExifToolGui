@@ -13,6 +13,7 @@ type
     BtnCancel: TBitBtn;
     ListView1: TListView;
     procedure FormShow(Sender: TObject);
+    procedure ListView1DblClick(Sender: TObject);
   private
     { Private declarations }
   public
@@ -40,6 +41,11 @@ end;
 procedure TFrmPlaces.FormShow(Sender: TObject);
 begin
   ListView1.Selected := ListView1.Items[0];
+end;
+
+procedure TFrmPlaces.ListView1DblClick(Sender: TObject);
+begin
+  ModalResult := MROK;
 end;
 
 end.

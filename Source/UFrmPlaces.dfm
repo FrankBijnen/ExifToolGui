@@ -29,7 +29,7 @@ object FrmPlaces: TFrmPlaces
       636
       29)
     object BtnOk: TBitBtn
-      Left = 454
+      Left = 450
       Top = 2
       Width = 75
       Height = 25
@@ -55,10 +55,10 @@ object FrmPlaces: TFrmPlaces
       ModalResult = 1
       NumGlyphs = 2
       TabOrder = 0
-      ExplicitLeft = 450
+      ExplicitLeft = 446
     end
     object BtnCancel: TBitBtn
-      Left = 535
+      Left = 531
       Top = 2
       Width = 75
       Height = 25
@@ -86,7 +86,7 @@ object FrmPlaces: TFrmPlaces
       ModalResult = 2
       NumGlyphs = 2
       TabOrder = 1
-      ExplicitLeft = 531
+      ExplicitLeft = 527
     end
   end
   object ListView1: TListView
@@ -112,6 +112,7 @@ object FrmPlaces: TFrmPlaces
     RowSelect = True
     TabOrder = 1
     ViewStyle = vsReport
+    OnDblClick = ListView1DblClick
     ExplicitWidth = 632
     ExplicitHeight = 403
   end

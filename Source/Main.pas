@@ -639,7 +639,7 @@ procedure TFMain.EditMapFindKeyDown(Sender: TObject; var Key: Word; Shift: TShif
 begin
   if (Key = VK_Return) and
      (EditMapFind.Text <> '') then
-    EditMapFind.Text := MapGotoPlace(EdgeBrowser1, EditMapFind.Text, EditMapBounds.Text, 'Find', InitialZoom_Out);
+    EditMapFind.Text := MapGotoPlace(EdgeBrowser1, EditMapFind.Text, EditMapBounds.Text, '', InitialZoom_Out);
 end;
 
 procedure TFMain.MGUIStyleClick(Sender: TObject);
@@ -1811,14 +1811,14 @@ begin
   EditMapFind.Text := Parm1 + ', ' + Parm2;
   if (Msg = OSMCtrlClick) then
   begin
-    MapGotoPlace(EdgeBrowser1, EditMapFind.Text, '', Msg, InitialZoom_In);
+    MapGotoPlace(EdgeBrowser1, EditMapFind.Text, '', '', InitialZoom_In);
 
     exit;
   end;
 
   if (Msg = OSMGetLocation) then
   begin
-    MapGotoPlace(EdgeBrowser1, EditMapFind.Text, '', Msg, InitialZoom_Out);
+    MapGotoPlace(EdgeBrowser1, EditMapFind.Text, '', '', InitialZoom_Out);
 
     exit;
   end;
