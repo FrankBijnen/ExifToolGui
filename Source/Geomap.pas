@@ -37,6 +37,7 @@ type
     function GetPrioCity: string;
     function GetCity: string;
     function GetSearchResult: string;
+    function GetHtmlSearchResult: string;
   public
     constructor Create;
     destructor Destroy; override;
@@ -53,6 +54,7 @@ type
     property PrioCity: string read GetPrioCity;
     property City: string read GetCity;
     property SearchReault: string read GetSearchResult;
+    property HtmlSearchReault: string read GetHtmlSearchResult;
     class function UnEscape(Value: string): string;
   end;
 
@@ -95,7 +97,7 @@ type
     PlacesDict: TObjectDictionary<String, TStringList>;
     procedure WriteHeader;
     procedure WritePointsStart;
-    procedure WritePoint(const ALat, ALon, AImg: string);
+    procedure WritePoint(const ALat, ALon, AImg: string; Link: boolean);
     procedure WritePointsEnd;
     procedure WriteFooter;
   public
@@ -239,6 +241,13 @@ begin
   if (FPostCode <> '') then
     result := result + Format('%s, ', [FPostCode]);
   result := result + Format('Name: %s, City: %s, Province: %s, Country: %s, %s', [Name, City, Province, FCountryCode, FCountry]);
+end;
+
+function Tplace.GetHtmlSearchResult: string;
+begin
+  result := Format('<a>%s<br>%s %s</a>', [City, Province, FCountryCode]);
+  result := StringReplace(result, ' ', '&nbsp', [rfReplaceAll]);
+  result := StringReplace(result, '-', '&#8209;', [rfReplaceAll]);
 end;
 
 procedure TPlace.AssignFromGeocode(Key, Value: string);
@@ -417,28 +426,42 @@ begin
   Html.Add('  function AddPoints(){');
 end;
 
-procedure TOSMHelper.WritePoint(const ALat, ALon, AImg: string);
+procedure TOSMHelper.WritePoint(const ALat, ALon, AImg: string; Link: boolean);
 var
   Key: string;
 begin
   Key := Format('%s,%s', [ALat, ALon]);
   if (not PlacesDict.ContainsKey(Key)) then
     PlacesDict.Add(Key, TStringList.Create);
-  PlacesDict.Items[Key].Add(AImg);
+  PlacesDict.Items[Key].AddObject(AImg, Pointer(Link));
 end;
 
 procedure TOSMHelper.WritePointsEnd;
 var
   Place: TPair<string, TStringList>;
+  PlaceLoc: TPlace;
   PointCnt: integer;
-  ImgName, Href: string;
+  PlaceCnt: integer;
+  ImgName, Href, Lat, Lon: string;
 begin
   PointCnt := 0;
   for Place in PlacesDict do
   begin
     Href := '';
-    for ImgName in Place.Value do
-      Href := Href + '<a href="file://' + StringReplace(ImgName, '\', '/', [rfReplaceAll]) + '">' + ExtractFileName(ImgName) + '</a><br>';
+    for PlaceCnt := 0 to PLace.Value.Count -1 do
+    begin
+      ImgName := Place.Value[PlaceCnt];
+      if (ImgName = '') then
+        continue;
+      if (boolean(Place.Value.Objects[PlaceCnt]) = true) then
+        Href := Href + '<a href="file://' + StringReplace(ImgName, '\', '/', [rfReplaceAll]) + '">' +
+                        ExtractFileName(ImgName) + '</a><br>'
+      else
+        Href := Href + '<a>' + ImgName + '</a><br>';
+    end;
+    ParseLatLon(Place.Key, Lat, Lon);
+    PlaceLoc := GetPlaceOfCoords(Lat, Lon, GeoSettings.GetPlaceProvider);
+    Href := Href + PlaceLoc.HtmlSearchReault;
     Html.Add(Format('     AddPoint(%d, %s, ''%s'');', [PointCnt, Place.Key, Href]));
     inc(PointCnt);
   end;
@@ -468,7 +491,7 @@ begin
   try
     OsmHelper.WriteHeader;
     OsmHelper.WritePointsStart;
-    OsmHelper.WritePoint(Lat, Lon, Desc);
+    OsmHelper.WritePoint(Lat, Lon, Desc, false);
     OsmHelper.WritePointsEnd;
     OsmHelper.WriteFooter;
   finally
@@ -513,7 +536,7 @@ begin
         Insert('-', Lon, 1);
 
       if (Lat <> '-') and (Lon <> '-') then
-        OsmHelper.WritePoint(Lat, Lon, IncludeTrailingBackslash(Apath) + Filename);
+        OsmHelper.WritePoint(Lat, Lon, IncludeTrailingBackslash(Apath) + Filename, true);
     end;
 
     OsmHelper.WritePointsEnd;
