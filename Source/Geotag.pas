@@ -43,7 +43,7 @@ var
 
 implementation
 
-uses Main, MainDef, ExifTool, ExifToolsGUI_Utils, UFrmGeoTagFiles, Geomap;
+uses Main, MainDef, ExifTool, ExifToolsGUI_Utils, UFrmGeoSetup, Geomap;
 
 {$R *.dfm}
 
@@ -99,16 +99,14 @@ end;
 
 procedure TFGeotag.BtnSetupGeoCodeClick(Sender: TObject);
 begin
-  ParseLatLon(Fmain.EditMapFind.Text, FGeotagFiles.Lat, FGeotagFiles.Lon);
-  if not (ValidLatLon(FGeotagFiles.Lat, FGeotagFiles.Lon)) then
+  ParseLatLon(Fmain.EditMapFind.Text, FGeoSetup.Lat, FGeoSetup.Lon);
+  if not (ValidLatLon(FGeoSetup.Lat, FGeoSetup.Lon)) then
   begin
     MessageDlgEx('No valid Lat Lon coordinates selected.' + #10 +
                  'Use the OSM Map to select', '', TMsgDlgType.mtError, [TMsgDlgBtn.mbOK]);
     exit;
   end;
-
-  FGeotagFiles.SetupMode := true;
-  FGeotagFiles.ShowModal;
+  FGeoSetup.ShowModal;
 end;
 
 procedure TFGeotag.Button2Click(Sender: TObject);
