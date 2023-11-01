@@ -604,7 +604,7 @@ function TFMain.GetFirstSelectedFile: string;
 begin
   result := '';
   if (ShellList.Selected <> nil) then
-    result := ShellList.FileName + CRlF
+    result := ShellList.FileName + CRLF
   else if (ShellList.Items.Count > 0) then
     result := ShellList.FileName(0) + CRLF;
 end;
@@ -2034,7 +2034,7 @@ begin
     CrWait := LoadCursor(0, IDC_WAIT);
     CrNormal := SetCursor(CrWait);
     try
-      FPath := IncludeTrailingBackslash(ShellList.Path) + ShellList.FileName;
+      FPath := ShellList.FilePath;
       Rotate := 0;
       if GUIsettings.AutoRotatePreview then
       begin

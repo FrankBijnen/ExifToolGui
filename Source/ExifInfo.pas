@@ -125,7 +125,7 @@ var
   ChartMaxFLength, ChartMaxFNumber, ChartMaxISO: word;
 
 procedure GetMetadata(FName: string; GetXMP, GetIPTC, GetGPS, GetICC: boolean);
-function GetOrientationValue(fName: string): byte;
+function GetOrientationValue(FName: string): byte;
 procedure GetJPGsize(const sFile: string; var wWidth, wHeight: word);
 
 implementation
@@ -135,13 +135,13 @@ uses Main, SysUtils, Forms, Dialogs, Windows;
 var
   Encoding: TEncoding;
   GpsFormatSettings: TFormatSettings; // for StrToFloatDef -see Initialization
-  FotoF: file of byte;
+  FotoF: TFileStream;
   IsMM, doIPTC, doGPS, doICC: boolean;
   Wdata: word;
   Ldata: longint;
-  XMPoffset, XMPsize, IPTCsize, IPTCoffset: longint;
-  TIFFoffset, ExifIFDoffset, GPSoffset: longint; // MakernoteOffset: longint;
-  ICCoffset, InteropOffset, JPGfromRAWoffset: longint;
+  XMPoffset, XMPsize, IPTCsize, IPTCoffset: int64;
+  TIFFoffset, ExifIFDoffset, GPSoffset: int64; // MakernoteOffset: longint;
+  ICCoffset, InteropOffset, JPGfromRAWoffset: int64;
 
 procedure XMPrec.Clear;
 begin
@@ -221,8 +221,8 @@ begin
   L1 := IFDentry.ValueOffs;
   if W1 > 3 then
   begin
-    Seek(FotoF, TIFFoffset + L1);
-    BlockRead(FotoF, Bytes[0], W1);
+    FotoF.Seek(TIFFoffset + L1, TSeekOrigin.soBeginning);
+    FotoF.Read(Bytes[0], W1);
     result := '';
     if (Encoding.GetCharCount(Bytes) > 0) then
       Result := Encoding.GetString(Bytes);
@@ -256,9 +256,9 @@ function DecodeRational(IFDentry: IFDentryRec): word;
 var
   L1, L2: longint;
 begin
-  Seek(FotoF, TIFFoffset + IFDentry.ValueOffs);
-  BlockRead(FotoF, L1, 4);
-  BlockRead(FotoF, L2, 4);
+  FotoF.Seek(TIFFoffset + IFDentry.ValueOffs, TSeekOrigin.soBeginning);
+  FotoF.Read(L1, 4);
+  FotoF.Read(L2, 4);
   if IsMM then
   begin
     L1 := SwapL(L1);
@@ -276,12 +276,12 @@ var
   i: smallint;
   tx: string[23];
 begin
-  Seek(FotoF, TIFFoffset + IFDentry.ValueOffs);
+  FotoF.Seek(TIFFoffset + IFDentry.ValueOffs, TSeekOrigin.soBeginning);
   // Min-Max focal length
-  BlockRead(FotoF, L1, 4);
-  BlockRead(FotoF, L2, 4);
-  BlockRead(FotoF, L3, 4);
-  BlockRead(FotoF, L4, 4);
+  FotoF.Read(L1, 4);
+  FotoF.Read(L2, 4);
+  FotoF.Read(L3, 4);
+  FotoF.Read(L4, 4);
   if IsMM then
   begin
     L1 := SwapL(L1);
@@ -303,10 +303,10 @@ begin
     tx := 'err!';
   tx := tx + 'mm f/';
   // Min-Max aperture
-  BlockRead(FotoF, L1, 4);
-  BlockRead(FotoF, L2, 4);
-  BlockRead(FotoF, L3, 4);
-  BlockRead(FotoF, L4, 4);
+  FotoF.Read(L1, 4);
+  FotoF.Read(L2, 4);
+  FotoF.Read(L3, 4);
+  FotoF.Read(L4, 4);
   if IsMM then
   begin
     L1 := SwapL(L1);
@@ -336,9 +336,9 @@ var
   L1, L2: longint;
   tx: string[15];
 begin
-  Seek(FotoF, TIFFoffset + IFDentry.ValueOffs);
-  BlockRead(FotoF, L1, 4);
-  BlockRead(FotoF, L2, 4);
+  FotoF.Seek(TIFFoffset + IFDentry.ValueOffs, TSeekOrigin.soBeginning);
+  FotoF.Read(L1, 4);
+  FotoF.Read(L2, 4);
   if IsMM then
   begin
     L1 := SwapL(L1);
@@ -388,9 +388,9 @@ function GetRational(IFDentry: IFDentryRec): single;
 var
   L1, L2: longint;
 begin
-  Seek(FotoF, TIFFoffset + IFDentry.ValueOffs);
-  BlockRead(FotoF, L1, 4);
-  BlockRead(FotoF, L2, 4);
+  FotoF.Seek(TIFFoffset + IFDentry.ValueOffs, TSeekOrigin.soBeginning);
+  FotoF.Read(L1, 4);
+  FotoF.Read(L2, 4);
   if IsMM then
   begin
     L1 := SwapL(L1);
@@ -409,9 +409,9 @@ var
   tx, Ty: string[11];
   Sec: string[7]; // Tx=Deg°Min.Sec, Ty=Deg.min°
 begin
-  Seek(FotoF, TIFFoffset + IFDentry.ValueOffs);
-  BlockRead(FotoF, L1, 4);
-  BlockRead(FotoF, L2, 4); // =Deg
+  FotoF.Seek(TIFFoffset + IFDentry.ValueOffs, TSeekOrigin.soBeginning);
+  FotoF.Read(L1, 4);
+  FotoF.Read(L2, 4); // =Deg
   if IsMM then
   begin
     L1 := SwapL(L1);
@@ -426,8 +426,8 @@ begin
   else
     Rd := 0; // <-DecDeg
 
-  BlockRead(FotoF, L1, 4);
-  BlockRead(FotoF, L2, 4); // =Min
+  FotoF.Read(L1, 4);
+  FotoF.Read(L2, 4); // =Min
   if IsMM then
   begin
     L1 := SwapL(L1);
@@ -442,8 +442,8 @@ begin
   else
     Ty := '0'; // <-DecMin
 
-  BlockRead(FotoF, L1, 4);
-  BlockRead(FotoF, L2, 4); // =Sec
+  FotoF.Read(L1, 4);
+  FotoF.Read(L2, 4); // =Sec
   if IsMM then
   begin
     L1 := SwapL(L1);
@@ -494,12 +494,12 @@ var
   end;
 
 begin
-  BlockRead(FotoF, IPTCtagID, 1);
-  BlockRead(FotoF, IPTCtagSz, 2);
+  FotoF.Read(IPTCtagID, 1);
+  FotoF.Read(IPTCtagSz, 2);
   IPTCtagSz := Swap(IPTCtagSz);
   Dec(IPTCsize, 3);
   SetLength(Bytes, IPTCtagSz);
-  BlockRead(FotoF, Bytes[0], IPTCtagSz);
+  FotoF.Read(Bytes[0], IPTCtagSz);
   tx := '';
   if (Encoding.GetCharCount(Bytes) > 0) then
     tx := Encoding.GetString(Bytes);
@@ -542,9 +542,9 @@ end;
 // ------------------------------------------------------------------------------
 procedure ParseIFD0(IFDentry: IFDentryRec);
 var
-  FposBak: longword;
+  FposBak: int64;
 begin
-  FposBak := FilePos(FotoF);
+  FposBak := FotoF.Position;
   with Foto.IFD0 do
   begin
     case IFDentry.Tag of
@@ -607,16 +607,16 @@ begin
         GPSoffset := IFDentry.ValueOffs;
     end;
   end;
-  Seek(FotoF, FposBak);
+  FotoF.Seek(FposBak, TSeekOrigin.soBeginning);
 end;
 
 // ------------------------------------------------------------------------------
 procedure ParseExifIFD(IFDentry: IFDentryRec);
 var
   tx: string[13];
-  FposBak: longword;
+  FposBak: int64;
 begin
-  FposBak := FilePos(FotoF);
+  FposBak := FotoF.Position;
   with Foto.ExifIFD do
   begin
     case IFDentry.Tag of
@@ -706,15 +706,15 @@ begin
         LensModel := DecodeASCII(IFDentry, 47);
     end;
   end;
-  Seek(FotoF, FposBak);
+  FotoF.Seek(FposBak, TSeekOrigin.soBeginning);
 end;
 
 // ------------------------------------------------------------------------------
 procedure ParseGPS(IFDentry: IFDentryRec);
 var
-  FposBak: longword;
+  FposBak: int64;
 begin
-  FposBak := FilePos(FotoF);
+  FposBak := FotoF.Position;
   with Foto.GPS do
   begin
     case IFDentry.Tag of
@@ -735,55 +735,55 @@ begin
         Altitude := IntToStr(DecodeRational(IFDentry)) + 'm';
     end;
   end;
-  Seek(FotoF, FposBak);
+  FotoF.Seek(FposBak, TSeekOrigin.soBeginning);
 end;
 
 // ==============================================================================
 procedure ParseICCprofile;
 var
-  StartOfICC, xLong: longword;
+  StartOfICC, xLong: int64;
   xWord: word;
   tx: string[31];
 begin
-  StartOfICC := FilePos(FotoF);
-  BlockRead(FotoF, tx[1], 4); // skip ICC size
+  StartOfICC := FotoF.Position;
+  FotoF.Read(tx[1], 4); // skip ICC size
   with Foto do
   begin
-    BlockRead(FotoF, ICC.ProfileCMMType[1], 4);
+    FotoF.Read(ICC.ProfileCMMType[1], 4);
     ICC.ProfileCMMType[0] := #4;
-    BlockRead(FotoF, tx[1], 4); // skip ProfileVersion
-    BlockRead(FotoF, ICC.ProfileClass[1], 4);
+    FotoF.Read(tx[1], 4); // skip ProfileVersion
+    FotoF.Read(ICC.ProfileClass[1], 4);
     ICC.ProfileClass[0] := #4;
-    BlockRead(FotoF, ICC.ColorSpaceData[1], 4);
+    FotoF.Read(ICC.ColorSpaceData[1], 4);
     ICC.ColorSpaceData[0] := #4;
-    BlockRead(FotoF, ICC.ProfileConnectionSpace[1], 4);
+    FotoF.Read(ICC.ProfileConnectionSpace[1], 4);
     ICC.ProfileConnectionSpace[0] := #4;
-    BlockRead(FotoF, tx[1], 16); // skip ProfileDateTime & ProfileFileSignature
-    BlockRead(FotoF, ICC.PrimaryPlatform[1], 4);
+    FotoF.Read(tx[1], 16); // skip ProfileDateTime & ProfileFileSignature
+    FotoF.Read(ICC.PrimaryPlatform[1], 4);
     ICC.PrimaryPlatform[0] := #4;
-    BlockRead(FotoF, tx[1], 4); // skip CMMFlags
-    BlockRead(FotoF, ICC.DeviceManufacturer[1], 4);
+    FotoF.Read(tx[1], 4); // skip CMMFlags
+    FotoF.Read(ICC.DeviceManufacturer[1], 4);
     ICC.DeviceManufacturer[0] := #4;
-    BlockRead(FotoF, tx[1], 28); // skip DeviceModel... goto ProfileCreator
-    BlockRead(FotoF, ICC.ProfileCreator[1], 4);
+    FotoF.Read(tx[1], 28); // skip DeviceModel... goto ProfileCreator
+    FotoF.Read(ICC.ProfileCreator[1], 4);
     ICC.ProfileCreator[0] := #4;
     tx := '????';
     while tx <> 'desc' do
-      BlockRead(FotoF, tx[1], 4); // <---What if desc doesn't exist??!!
-    BlockRead(FotoF, xLong, 4);
+      FotoF.Read(tx[1], 4); // <---What if desc doesn't exist??!!
+    FotoF.Read(xLong, 4);
     xLong := SwapL(xLong);
-    Seek(FotoF, StartOfICC + xLong);
-    BlockRead(FotoF, tx[1], 4);
+    FotoF.Seek(StartOfICC + xLong, TSeekOrigin.soBeginning);
+    FotoF.Read(tx[1], 4);
     if tx = 'desc' then
     begin
-      BlockRead(FotoF, tx[1], 6); // skip zeroes
-      BlockRead(FotoF, xWord, 2);
+      FotoF.Read(tx[1], 6); // skip zeroes
+      FotoF.Read(xWord, 2);
       xWord := Swap(xWord);
       xWord := xWord and $FF;
       Dec(xWord);
       if xWord > 31 then
         xWord := 31;
-      BlockRead(FotoF, ICC.ProfileDescription[1], xWord);
+      FotoF.Read(ICC.ProfileDescription[1], xWord);
       ICC.ProfileDescription[0] := AnsiChar(xWord);
     end;
   end;
@@ -798,7 +798,7 @@ var
 
   procedure GetIFDentry;
   begin
-    BlockRead(FotoF, IFDentry, 12);
+    FotoF.Read(IFDentry, 12);
     if IsMM then
       with IFDentry do
       begin
@@ -810,26 +810,26 @@ var
   end;
 
 begin
-  TIFFoffset := FilePos(FotoF) - 2;
+  TIFFoffset := FotoF.Position - 2;
   ExifIFDoffset := 0;
   GPSoffset := 0;
   IPTCoffset := 0;
   ICCoffset := 0;
   InteropOffset := 0; // MakernoteOffset:=0;
   IsMM := (Wdata = $4D4D);
-  BlockRead(FotoF, Wdata, 2);
+  FotoF.Read(Wdata, 2);
   if IsMM then
     Wdata := Swap(Wdata);
   if (Wdata = $002A) or (Wdata = $0055) or (Wdata = $4F52) then
   begin // $002A=TIFF, $0055=PanasonicRW2, $4F52=OlympusORF
     IFDcount := 0;
-    BlockRead(FotoF, Ldata, 4);
+    FotoF.Read(Ldata, 4);
     if IsMM then
       Ldata := SwapL(Ldata); // Read IFD0offset
     if Ldata > 0 then
     begin
-      Seek(FotoF, TIFFoffset + Ldata);
-      BlockRead(FotoF, IFDcount, 2);
+      FotoF.Seek(TIFFoffset + Ldata, TSeekOrigin.soBeginning);
+      FotoF.Read(IFDcount, 2);
       if IsMM then
         IFDcount := Swap(IFDcount);
       while IFDcount > 0 do
@@ -842,8 +842,8 @@ begin
 
     if ExifIFDoffset > 0 then
     begin
-      Seek(FotoF, TIFFoffset + ExifIFDoffset);
-      BlockRead(FotoF, IFDcount, 2);
+      FotoF.Seek(TIFFoffset + ExifIFDoffset, TSeekOrigin.soBeginning);
+      FotoF.Read(IFDcount, 2);
       if IsMM then
         IFDcount := Swap(IFDcount);
       while IFDcount > 0 do
@@ -856,8 +856,8 @@ begin
 
     if InteropOffset > 0 then
     begin
-      Seek(FotoF, TIFFoffset + InteropOffset);
-      BlockRead(FotoF, IFDcount, 2);
+      FotoF.Seek(TIFFoffset + InteropOffset, TSeekOrigin.soBeginning);
+      FotoF.Read(IFDcount, 2);
       if IsMM then
         IFDcount := Swap(IFDcount);
       GetIFDentry;
@@ -874,8 +874,8 @@ begin
 
     if doGPS and (GPSoffset > 0) then
     begin
-      Seek(FotoF, TIFFoffset + GPSoffset);
-      BlockRead(FotoF, IFDcount, 2);
+      FotoF.Seek(TIFFoffset + GPSoffset, TSeekOrigin.soBeginning);
+      FotoF.Read(IFDcount, 2);
       if IsMM then
         IFDcount := Swap(IFDcount);
       while IFDcount > 0 do
@@ -897,10 +897,10 @@ begin
 
     if doIPTC and (IPTCoffset > 0) then
     begin
-      Seek(FotoF, TIFFoffset + IPTCoffset);
+      FotoF.Seek(TIFFoffset + IPTCoffset, TSeekOrigin.soBeginning);
       while IPTCsize > 1 do
       begin // one padded byte possible!
-        BlockRead(FotoF, Wdata, 2);
+        FotoF.Read(Wdata, 2);
         Dec(IPTCsize, 2); // Skip $1C02
         if Wdata <> $021C then
           break;
@@ -923,7 +923,7 @@ begin
 
     if doICC and (ICCoffset > 0) then
     begin
-      Seek(FotoF, TIFFoffset + ICCoffset);
+      FotoF.Seek(TIFFoffset + ICCoffset, TSeekOrigin.soBeginning);
       ParseICCprofile;
     end;
 
@@ -934,42 +934,42 @@ end;
 procedure ReadJPEG;
 var
   APPmark, APPsize: word;
-  APPmarkNext: longint;
+  APPmarkNext: int64;
   tx: string[15];
   i: smallint;
 begin
   repeat
-    BlockRead(FotoF, APPmark, 2);
+    FotoF.Read(APPmark, 2);
     APPmark := Swap(APPmark);
     if (APPmark = $FFE0) or (APPmark = $FFE1) or (APPmark = $FFE2) or (APPmark = $FFED) then
     begin
-      BlockRead(FotoF, APPsize, 2);
+      FotoF.Read(APPsize, 2);
       APPsize := Swap(APPsize);
-      APPmarkNext := FilePos(FotoF) + APPsize - 2;
+      APPmarkNext := FotoF.Position + APPsize - 2;
       // ------------------$FFE0=APP0:JFIF-----------------------
       // -don't parse
       // ------------------$FFE1=APP1:EXIF or XMP----------------
       if APPmark = $FFE1 then
       begin
-        BlockRead(FotoF, tx[1], 6);
+        FotoF.Read(tx[1], 6);
         tx[0] := #4;
         if tx = 'Exif' then
         begin
-          BlockRead(FotoF, Wdata, 2);
+          FotoF.Read(Wdata, 2);
           if (Wdata = $4949) or (Wdata = $4D4D) then
             ReadTIFF; // 'MM' or 'II'
         end
         else if tx = 'http' then
         begin
-          Seek(FotoF, FilePos(FotoF) + 23); // skip '://ns.adobe.com/xap/...'
-          XMPoffset := FilePos(FotoF); // point to '<?xpacket...'
+          FotoF.Seek(23, TSeekOrigin.soCurrent); // skip '://ns.adobe.com/xap/...'
+          XMPoffset := FotoF.Position; // point to '<?xpacket...'
           XMPsize := APPsize - 31;
         end;
       end;
       // -----------------$FFE2=APP2:ICC_Profile-----------------
       if doICC and (APPmark = $FFE2) then
       begin
-        BlockRead(FotoF, tx[1], 14);
+        FotoF.Read(tx[1], 14);
         tx[0] := #11;
         if tx = 'ICC_PROFILE' then
           ParseICCprofile;
@@ -977,22 +977,22 @@ begin
       // -----------------$FFED=APP13:IPTC-----------------------
       if doIPTC and (APPmark = $FFED) then
       begin
-        BlockRead(FotoF, tx[1], 14);
+        FotoF.Read(tx[1], 14);
         tx[0] := #13;
         if tx = 'Photoshop 3.0' then
         begin
-          BlockRead(FotoF, tx[1], 4);
+          FotoF.Read(tx[1], 4);
           tx[0] := #4; // Tx='8BIM'
-          BlockRead(FotoF, Wdata, 2);
+          FotoF.Read(Wdata, 2);
           if Wdata = $0404 then
           begin // $0404=IPTCData Photoshop tag
-            BlockRead(FotoF, Ldata, 4); // Ldata=0=dummy
-            BlockRead(FotoF, Wdata, 2);
+            FotoF.Read(Ldata, 4); // Ldata=0=dummy
+            FotoF.Read(Wdata, 2);
             Wdata := Swap(Wdata);
             IPTCsize := Wdata;
             while IPTCsize > 1 do
             begin // one padded byte possible!
-              BlockRead(FotoF, Wdata, 2);
+              FotoF.Read(Wdata, 2);
               Dec(IPTCsize, 2); // Skip $1C02
               ParseIPTC;
             end;
@@ -1013,7 +1013,7 @@ begin
         end;
       end;
       // ---------------------------------------------------
-      Seek(FotoF, APPmarkNext);
+      FotoF.Seek(APPmarkNext, TSeekOrigin.soBeginning);
     end;
   until (APPmark <> $FFE0) and (APPmark <> $FFE1) and (APPmark <> $FFE2) and (APPmark <> $FFED);
 end;
@@ -1142,9 +1142,9 @@ var
 
 begin
   XMPdata := '';
-  Seek(FotoF, XMPoffset);
+  FotoF.Seek(XMPoffset, TSeekOrigin.soBeginning);
   Setlength(Bytes, XMPsize);
-  Blockread(FotoF, Bytes[0], XMPsize);
+  FotoF.Read(Bytes[0], XMPsize);
   XMPdata := '';
   if (Encoding.GetCharCount(Bytes) > 0) then
     XMPdata := Encoding.GetString(Bytes);
@@ -1195,13 +1195,11 @@ begin
   XMPsize := 0;
   JPGfromRAWoffset := 0; // for Panasonic RW2
 
-  AssignFile(FotoF, FName);
-  FileMode := 0; // read only
-  Reset(FotoF); // open existing file
+  FotoF := TFileStream.Create(FName, fmOpenRead);
   try
-    if FileSize(FotoF) > 31 then
+    if (FotoF.Size > 31) then
     begin // size must be at least 32 bytes
-      BlockRead(FotoF, Wdata, 2);
+      FotoF.Read(Wdata, 2);
       Wdata := Swap(Wdata);
       case Wdata of
         $FFD8:
@@ -1213,8 +1211,8 @@ begin
       end;
       if JPGfromRAWoffset > 0 then
       begin // in case of RW2
-        Seek(FotoF, JPGfromRAWoffset);
-        BlockRead(FotoF, Wdata, 2);
+        FotoF.Seek(JPGfromRAWoffset, TSeekOrigin.soBeginning);
+        FotoF.Read(Wdata, 2);
         Wdata := Swap(Wdata);
         if Wdata = $FFD8 then
           ReadJPEG;
@@ -1223,41 +1221,42 @@ begin
         ReadXMP;
     end;
   finally
-    CloseFile(FotoF);
+    FotoF.Free;
   end;
 end;
 
 // ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 // ============================================================================================
-function GetOrientationValue(fName: string): byte;
+function GetOrientationValue(FName: string): byte;
 var
   IFDentry: IFDentryRec;
   Wdata, AppMarker, APPsize, IFDcount, Rotate: word;
-  Ldata, TIFFoffset, NextAPPmarker: longword;
+  Ldata: longword;
+  TIFFoffset, NextAPPmarker: int64;
   IsMM: boolean;
   TmpTxt: string[7];
 
   procedure ReadTIFF;
   begin
     IsMM := (Wdata = $4D4D);
-    TIFFoffset := FilePos(FotoF) - 2;
-    BlockRead(FotoF, Wdata, 2);
+    TIFFoffset := FotoF.Position - 2;
+    FotoF.Read(Wdata, 2);
     if IsMM then
       Wdata := Swap(Wdata);
     if Wdata = $002A then
     begin
-      BlockRead(FotoF, Ldata, 4);
+      FotoF.Read(Ldata, 4);
       if IsMM then
         Ldata := SwapL(Ldata); // Read IFD0offset
       if Ldata > 0 then
       begin
-        Seek(FotoF, TIFFoffset + Ldata);
-        BlockRead(FotoF, IFDcount, 2);
+        FotoF.Seek(TIFFoffset + Ldata, TSeekOrigin.soBeginning);
+        FotoF.Read(IFDcount, 2);
         if IsMM then
           IFDcount := Swap(IFDcount);
         while IFDcount > 0 do
         begin
-          BlockRead(FotoF, IFDentry, 12);
+          FotoF.Read(IFDentry, 12);
           if IsMM then
             with IFDentry do
             begin
@@ -1283,45 +1282,46 @@ var
 // --------------------------------------------------------------
 begin
   Rotate := 0;
-  AssignFile(FotoF, fName);
-  FileMode := 0;
-  Reset(FotoF);
-  if FileSize(FotoF) > 31 then
-  begin // size must be at least 32 bytes
-    BlockRead(FotoF, Wdata, 2);
-    Wdata := Swap(Wdata);
-    if (Wdata = $4949) or (Wdata = $4D4D) then
-      ReadTIFF
-    else
-    begin
-      if Wdata = $FFD8 then
+  FotoF := TFileStream.Create(FName, fmOpenRead);
+  try
+    if (FotoF.Size > 31) then
+    begin // size must be at least 32 bytes
+      FotoF.Read(Wdata, 2);
+      Wdata := Swap(Wdata);
+      if (Wdata = $4949) or (Wdata = $4D4D) then
+        ReadTIFF
+      else
       begin
-        repeat
-          BlockRead(FotoF, AppMarker, 2);
-          AppMarker := Swap(AppMarker);
-          if (AppMarker = $FFE0) or (AppMarker = $FFE1) or (AppMarker = $FFED) then
-          begin
-            BlockRead(FotoF, APPsize, 2);
-            APPsize := Swap(APPsize);
-            NextAPPmarker := FilePos(FotoF) + APPsize - 2;
-            if AppMarker = $FFE1 then
+        if Wdata = $FFD8 then
+        begin
+          repeat
+            FotoF.Read(AppMarker, 2);
+            AppMarker := Swap(AppMarker);
+            if (AppMarker = $FFE0) or (AppMarker = $FFE1) or (AppMarker = $FFED) then
             begin
-              BlockRead(FotoF, TmpTxt[1], 6);
-              TmpTxt[0] := #4;
-              BlockRead(FotoF, Wdata, 2);
-              if (TmpTxt = 'Exif') and ((Wdata = $4949) or (Wdata = $4D4D)) then
-                ReadTIFF;
+              FotoF.Read(APPsize, 2);
+              APPsize := Swap(APPsize);
+              NextAPPmarker := FotoF.Position + APPsize - 2;
+              if AppMarker = $FFE1 then
+              begin
+                FotoF.Read(TmpTxt[1], 6);
+                TmpTxt[0] := #4;
+                FotoF.Read(Wdata, 2);
+                if (TmpTxt = 'Exif') and ((Wdata = $4949) or (Wdata = $4D4D)) then
+                  ReadTIFF;
+              end;
+              if Rotate <> 0 then
+                break;
+              FotoF.Seek(NextAPPmarker, TSeekOrigin.soBeginning);
             end;
-            if Rotate <> 0 then
-              break;
-            Seek(FotoF, NextAPPmarker);
-          end;
-        until (AppMarker <> $FFE0) and (AppMarker <> $FFE1) and (AppMarker <> $FFED);
+          until (AppMarker <> $FFE0) and (AppMarker <> $FFE1) and (AppMarker <> $FFED);
+        end;
       end;
     end;
+    Result := Rotate;
+  finally
+    FotoF.Free;
   end;
-  CloseFile(FotoF);
-  Result := Rotate;
 end;
 
 // =============================== GetJPGsize =================================================
@@ -1329,7 +1329,6 @@ procedure GetJPGsize(const sFile: string; var wWidth, wHeight: word);
 const
   Parameterless = [$01, $D0, $D1, $D2, $D3, $D4, $D5, $D6, $D7];
 var
-  f: TFileStream;
   Seg: byte;
   Len, w: word;
   ReadLen, dummy: longint;
@@ -1338,35 +1337,35 @@ begin
   wHeight := 0;
   if FileExists(sFile) then
   begin
-    f := TFileStream.Create(sFile, fmOpenRead);
+    FotoF := TFileStream.Create(sFile, fmOpenRead);
     try
       w := 0;
-      f.Read(w, 2);
+      FotoF.Read(w, 2);
       w := Swap(w);
       if w = $FFD8 then
       begin
-        ReadLen := f.Read(Seg, 1);
+        ReadLen := FotoF.Read(Seg, 1);
         while (Seg = $FF) and (ReadLen > 0) do
         begin
-          ReadLen := f.Read(Seg, 1);
+          ReadLen := FotoF.Read(Seg, 1);
           if Seg <> $FF then
           begin
             if (Seg = $C0) or (Seg = $C1) then
             begin
-              ReadLen := f.Read(dummy, 3); { don't need these bytes }
-              f.Read(wHeight, 2);
+              ReadLen := FotoF.Read(dummy, 3); { don't need these bytes }
+              FotoF.Read(wHeight, 2);
               wHeight := Swap(wHeight);
-              f.Read(wWidth, 2);
+              FotoF.Read(wWidth, 2);
               wWidth := Swap(wWidth);
             end
             else
             begin
               if not(Seg in Parameterless) then
               begin
-                f.Read(Len, 2);
+                FotoF.Read(Len, 2);
                 Len := Swap(Len);
-                f.Seek(Len - 2, 1);
-                f.Read(Seg, 1);
+                FotoF.Seek(Len - 2, 1);
+                FotoF.Read(Seg, 1);
               end
               else
                 Seg := $FF; { Fake it to keep looping. }
@@ -1375,7 +1374,7 @@ begin
         end;
       end;
     finally
-      f.Free;
+      FotoF.Free;
     end;
   end;
 end;
