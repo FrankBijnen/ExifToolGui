@@ -84,6 +84,7 @@ type
     procedure Invalidate; override;
 
     function Path: string;
+    function FilePath(ItemIndex: integer = -1): string;
     function FileName(ItemIndex: integer = -1): string;
     function FileExt(ItemIndex: integer = -1): string;
     procedure ColumnClick(Column: TListColumn);
@@ -655,13 +656,18 @@ begin
   result := RootFolder.PathName;
 end;
 
-function TShellListView.FileName(ItemIndex: integer = -1): string;
+function TShellListView.FilePath(ItemIndex: integer = -1): string;
 begin
   Result := '';
   if (ItemIndex = -1) and (Selected <> nil) then
-    Result := ExtractFileName(Folders[Selected.Index].PathName)
+    Result := Folders[Selected.Index].PathName
   else if (ItemIndex > -1) and (ItemIndex < Items.Count) then
-    Result := ExtractFileName(Folders[ItemIndex].PathName);
+    Result := Folders[ItemIndex].PathName;
+end;
+
+function TShellListView.FileName(ItemIndex: integer = -1): string;
+begin
+  Result := ExtractFileName(FilePath(ItemIndex));
 end;
 
 function TShellListView.FileExt(ItemIndex: integer = -1): string;
