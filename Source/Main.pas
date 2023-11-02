@@ -823,7 +823,7 @@ procedure TFMain.MetadataListSelectCell(Sender: TObject; ACol, ARow: integer; va
 begin
   EditQuick.Text := '';
   MemoQuick.Text := '';
-  if (ARow > High(QuickTags)) then
+  if (ARow - 1 > High(QuickTags)) then
     exit;
   if SpeedBtnQuick.Down and not(QuickTags[ARow - 1].NoEdit) then
     with MetadataList do
