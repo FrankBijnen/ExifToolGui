@@ -1149,6 +1149,11 @@ begin
   if (Encoding.GetCharCount(Bytes) > 0) then
     XMPdata := Encoding.GetString(Bytes);
   XMPdata := StringReplace(XMPdata, '&amp;', '&', [rfReplaceAll]);
+  XMPdata := StringReplace(XMPdata, '&quot;', '"', [rfReplaceAll]);
+  XMPdata := StringReplace(XMPdata, '&#39;', '''', [rfReplaceAll]);
+  XMPdata := StringReplace(XMPdata, '&lt;', '<', [rfReplaceAll]);
+  XMPdata := StringReplace(XMPdata, '&gt;', '>', [rfReplaceAll]);
+
   with Foto.XMP do
   begin
     Creator := GetAltData('<dc:creator>');
