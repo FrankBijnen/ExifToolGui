@@ -42,6 +42,19 @@ type
     GpxCleanThumbNails: TGroupBox;
     BtnGenThumbs: TBitBtn;
     CheckBox5: TCheckBox;
+    GrpGeoCode: TGroupBox;
+    EdGeoCodeUrl: TLabeledEdit;
+    UpdThrottleGeoCode: TUpDown;
+    EdThrottleGeoCode: TLabeledEdit;
+    GrpOverPass: TGroupBox;
+    EdOverPassUrl: TLabeledEdit;
+    UpdThrottleOverpass: TUpDown;
+    EdThrottleOverPass: TLabeledEdit;
+    GrpGeoCodeGeneral: TGroupBox;
+    ChkGeoCodeDialog: TCheckBox;
+    ChkReverseGeoCodeDialog: TCheckBox;
+    Label3: TLabel;
+    Label4: TLabel;
     procedure FormShow(Sender: TObject);
     procedure BtnSaveClick(Sender: TObject);
     procedure BtnBrowseFolder(Sender: TObject);
@@ -60,7 +73,7 @@ var
 
 implementation
 
-uses Main, ExifTool, MainDef,
+uses Main, ExifTool, MainDef, GeoMap,
   ExifToolsGUI_Utils, ExifToolsGUI_Thumbnails;
 
 {$R *.dfm}
@@ -121,6 +134,15 @@ begin
   GUIsettings.UseExitDetails := CheckBox3.Checked;
   GUIsettings.AutoIncLine := CheckBox4.Checked;
   GUIsettings.DblClickUpdTags := CheckBox5.Checked;
+
+  //GeoCode
+  GeoSettings.GeoCodeUrl := EdGeoCodeUrl.Text;
+  GeoSettings.ThrottleGeoCode := UpdThrottleGeoCode.Position;
+  GeoSettings.OverPassUrl := EdOverPassUrl.Text;
+  GeoSettings.ThrottleOverPass := UpdThrottleOverpass.Position;
+  GUIsettings.GeoCodeDialog := ChkGeoCodeDialog.Checked;
+  GUIsettings.ReverseGeoCodeDialog := ChkReverseGeoCodeDialog.Checked;
+  GeoMap.BlockRestRequests := false;
 end;
 
 procedure TFPreferences.BtnSetupCleanClick(Sender: TObject);
@@ -272,6 +294,15 @@ begin
     CheckBox3.Checked := GUIsettings.UseExitDetails;
     CheckBox4.Checked := GUIsettings.AutoIncLine;
     CheckBox5.Checked := GUIsettings.DblClickUpdTags;
+
+    // GeoCode
+    EdGeoCodeUrl.Text := GeoSettings.GeoCodeUrl;
+    UpdThrottleGeoCode.Position := GeoSettings.ThrottleGeoCode;
+    EdOverPassUrl.Text := GeoSettings.OverPassUrl;
+    UpdThrottleOverpass.Position := GeoSettings.ThrottleOverPass;
+    ChkGeoCodeDialog.Checked := GUIsettings.GeoCodeDialog;
+    ChkReverseGeoCodeDialog.Checked := GUIsettings.ReverseGeoCodeDialog;
+
     AdvPageControl1.ActivePage := AdvTabGeneral;
   finally
     ETResult.Free;

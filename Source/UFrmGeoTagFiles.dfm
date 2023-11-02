@@ -21,7 +21,8 @@ object FGeotagFiles: TFGeotagFiles
     Height = 19
     Panels = <>
     SimplePanel = True
-    ExplicitWidth = 595
+    ExplicitTop = 360
+    ExplicitWidth = 603
   end
   object BtnCancel: TButton
     Left = 514
@@ -74,33 +75,35 @@ object FGeotagFiles: TFGeotagFiles
           AutoSize = False
           Caption = 'LblSample'
         end
+        object Label1: TLabel
+          Left = 10
+          Top = 270
+          Width = 131
+          Height = 14
+          Caption = 'Update in selected files:'
+        end
         object ValLocation: TValueListEditor
           Left = 10
           Top = 25
           Width = 470
           Height = 226
-          TabOrder = 1
+          TabOrder = 0
           ColWidths = (
             150
             314)
         end
-        object ChkUpdateLocationInfo: TCheckBox
+        object CmbGeoTagMode: TComboBox
           Left = 10
-          Top = 288
+          Top = 290
           Width = 470
-          Height = 17
-          Caption = 
-            'Update location info (Country, Province, City and Location) in s' +
-            'elected files'
-          TabOrder = 0
-        end
-        object ChkUpdateLatLon: TCheckBox
-          Left = 10
-          Top = 260
-          Width = 470
-          Height = 17
-          Caption = 'Update Lat/Lon values in selected files'
-          TabOrder = 2
+          Height = 22
+          TabOrder = 1
+          Text = 'CmbGeoTagMode'
+          OnClick = CmbGeoTagModeClick
+          Items.Strings = (
+            'Coordinates (Lat, Lon) '
+            'Location (Country, Province, City)'
+            'Coordinates and Location')
         end
       end
     end

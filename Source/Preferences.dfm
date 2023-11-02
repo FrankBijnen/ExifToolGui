@@ -18,7 +18,7 @@ object FPreferences: TFPreferences
     Top = 0
     Width = 521
     Height = 391
-    ActivePage = AdvTabGeneral
+    ActivePage = AdvTabOther
     Align = alLeft
     DoubleBuffered = True
     ParentDoubleBuffered = False
@@ -36,7 +36,7 @@ object FPreferences: TFPreferences
       object ComboBox1: TComboBox
         Left = 119
         Top = 13
-        Width = 232
+        Width = 282
         Height = 21
         Style = csDropDownList
         TabOrder = 0
@@ -127,7 +127,7 @@ object FPreferences: TFPreferences
         Top = 71
         Width = 297
         Height = 17
-        Caption = '-enable internet access for Google map (requires restart)'
+        Caption = '-enable internet access for OSM Map (requires restart)'
         TabOrder = 9
       end
       object CheckBox3: TCheckBox
@@ -396,10 +396,34 @@ object FPreferences: TFPreferences
     end
     object AdvTabOther: TTabSheet
       Caption = 'Other'
+      object GrpGeoCodeGeneral: TGroupBox
+        Left = 16
+        Top = 141
+        Width = 480
+        Height = 220
+        Caption = 'GeoCoding'
+        TabOrder = 7
+        object ChkGeoCodeDialog: TCheckBox
+          Left = 66
+          Top = 15
+          Width = 365
+          Height = 17
+          Caption = 'Enable Geocode dialog'
+          TabOrder = 0
+        end
+        object ChkReverseGeoCodeDialog: TCheckBox
+          Left = 66
+          Top = 36
+          Width = 365
+          Height = 17
+          Caption = 'Enable reverse Geocode dialog'
+          TabOrder = 1
+        end
+      end
       object RgETOverride: TRadioGroup
         Left = 16
         Top = 62
-        Width = 385
+        Width = 480
         Height = 73
         Caption = 'ExifTool.exe location'
         ItemIndex = 0
@@ -420,12 +444,12 @@ object FPreferences: TFPreferences
       object EdETOverride: TEdit
         Left = 87
         Top = 105
-        Width = 264
+        Width = 365
         Height = 21
         TabOrder = 2
       end
       object BtnETOverride: TButton
-        Left = 357
+        Left = 460
         Top = 105
         Width = 28
         Height = 22
@@ -440,6 +464,106 @@ object FPreferences: TFPreferences
         Height = 17
         Caption = '-Workspace: Double Click adds/removes tags'
         TabOrder = 4
+      end
+      object GrpGeoCode: TGroupBox
+        Left = 24
+        Top = 204
+        Width = 464
+        Height = 72
+        Caption = 'GeoCode Maps:'
+        TabOrder = 5
+        object Label3: TLabel
+          Left = 140
+          Top = 50
+          Width = 146
+          Height = 13
+          Caption = '(Min. time between calls in Ms)'
+        end
+        object EdGeoCodeUrl: TLabeledEdit
+          Left = 60
+          Top = 19
+          Width = 365
+          Height = 21
+          EditLabel.Width = 19
+          EditLabel.Height = 21
+          EditLabel.Caption = 'URL'
+          LabelPosition = lpLeft
+          TabOrder = 0
+          Text = ''
+        end
+        object UpdThrottleGeoCode: TUpDown
+          Left = 109
+          Top = 46
+          Width = 16
+          Height = 21
+          Associate = EdThrottleGeoCode
+          Min = 500
+          Max = 10000
+          Position = 500
+          TabOrder = 1
+        end
+        object EdThrottleGeoCode: TLabeledEdit
+          Left = 60
+          Top = 46
+          Width = 49
+          Height = 21
+          EditLabel.Width = 38
+          EditLabel.Height = 21
+          EditLabel.Caption = 'Throttle'
+          LabelPosition = lpLeft
+          TabOrder = 2
+          Text = '500'
+        end
+      end
+      object GrpOverPass: TGroupBox
+        Left = 24
+        Top = 280
+        Width = 464
+        Height = 72
+        Caption = 'OverPass Api'
+        TabOrder = 6
+        object Label4: TLabel
+          Left = 140
+          Top = 54
+          Width = 146
+          Height = 13
+          Caption = '(Min. time between calls in Ms)'
+        end
+        object EdOverPassUrl: TLabeledEdit
+          Left = 60
+          Top = 23
+          Width = 365
+          Height = 21
+          EditLabel.Width = 19
+          EditLabel.Height = 21
+          EditLabel.Caption = 'URL'
+          LabelPosition = lpLeft
+          TabOrder = 0
+          Text = ''
+        end
+        object UpdThrottleOverpass: TUpDown
+          Left = 109
+          Top = 50
+          Width = 16
+          Height = 21
+          Associate = EdThrottleOverPass
+          Min = 10
+          Max = 10000
+          Position = 10
+          TabOrder = 1
+        end
+        object EdThrottleOverPass: TLabeledEdit
+          Left = 60
+          Top = 50
+          Width = 49
+          Height = 21
+          EditLabel.Width = 38
+          EditLabel.Height = 21
+          EditLabel.Caption = 'Throttle'
+          LabelPosition = lpLeft
+          TabOrder = 2
+          Text = '10'
+        end
       end
     end
   end

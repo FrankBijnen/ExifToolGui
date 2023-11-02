@@ -9,6 +9,7 @@ uses
 
 type
   TGeoCodeProvider = (gpGeoName, gpOverPass);
+  TGeoTagMode = (gtmCoordinates, gtmLocation, gtmCoordinatesLocation);
 
   GEOsettingsRec = record
     GetCoordProvider: TGeoCodeProvider;
@@ -20,6 +21,7 @@ type
     OverPassCompleteWord: boolean;
     ThrottleOverPass: integer;
     CountryCodeLocation: boolean;
+    GeoTagMode: TGeoTagMode;
   end;
 
   TPlace = class
@@ -77,6 +79,7 @@ const
   Coord_Decimals = 6;
   Place_Decimals = 4;
   CRLF = #13#10;
+  OSMHome = 'Home';
   OSMCtrlClick = 'Ctrl Click';
   OSMGetLocation = 'Get Location';
   OSMGetBounds = 'Get Bounds';
@@ -98,7 +101,7 @@ type
     procedure WriteHeader;
     procedure WritePointsStart;
     procedure WritePoint(const ALat, ALon, AImg: string; Link: boolean);
-    procedure WritePointsEnd;
+    procedure WritePointsEnd(const GetPlace: boolean);
     procedure WriteFooter;
   public
     constructor Create(const APathName, AInitialZoom: string);
@@ -109,12 +112,13 @@ var
   GeoSettings: GEOsettingsRec;
   GeoProvinceList: TStringList;
   GeoCityList: TStringList;
+  BlockRestRequests: boolean;
 
 implementation
 
 uses
   System.Variants, System.JSON,  System.NetEncoding, System.Math, System.StrUtils, System.DateUtils,
-  Winapi.Windows,
+  Winapi.Windows, Vcl.Dialogs,
   REST.Types, REST.Client, REST.Utils,
   UFrmPlaces, ExifToolsGUI_Utils;
 
@@ -356,11 +360,6 @@ begin
   Html.Add('        }');
   Html.Add('     });');
 
-//TODO: Not needed?
-//  Html.Add('     map.events.register(''zoomend'', map, function(evt) {');
-//  Html.Add('       GetBounds("' + OSMGetBounds + '");');
-//  Html.Add('     })');
-
   Html.Add('     map.events.register(''moveend'', map, function(evt) {');
   Html.Add('       GetBounds("' + OSMGetBounds + '");');
   Html.Add('     })');
@@ -436,7 +435,7 @@ begin
   PlacesDict.Items[Key].AddObject(AImg, Pointer(Link));
 end;
 
-procedure TOSMHelper.WritePointsEnd;
+procedure TOSMHelper.WritePointsEnd(const GetPlace: boolean);
 var
   Place: TPair<string, TStringList>;
   PlaceLoc: TPlace;
@@ -459,9 +458,15 @@ begin
       else
         Href := Href + '<a>' + ImgName + '</a><br>';
     end;
-    ParseLatLon(Place.Key, Lat, Lon);
-    PlaceLoc := GetPlaceOfCoords(Lat, Lon, GeoSettings.GetPlaceProvider);
-    Href := Href + PlaceLoc.HtmlSearchReault;
+
+    if (GetPlace) then
+    begin
+      ParseLatLon(Place.Key, Lat, Lon);
+      PlaceLoc := GetPlaceOfCoords(Lat, Lon, GeoSettings.GetPlaceProvider);
+      if (Assigned(PlaceLoc)) then
+        Href := Href + PlaceLoc.HtmlSearchReault;
+    end;
+
     Html.Add(Format('     AddPoint(%d, %s, ''%s'');', [PointCnt, Place.Key, Href]));
     inc(PointCnt);
   end;
@@ -492,12 +497,30 @@ begin
     OsmHelper.WriteHeader;
     OsmHelper.WritePointsStart;
     OsmHelper.WritePoint(Lat, Lon, Desc, false);
-    OsmHelper.WritePointsEnd;
+    OsmHelper.WritePointsEnd(Desc <> OSMHome);
     OsmHelper.WriteFooter;
   finally
     OsmHelper.Free;
   end;
   Browser.Navigate(GetHtmlTmp);
+end;
+
+function ExecuteRest(const RESTRequest: TRESTRequest): boolean;
+begin
+  result := true;
+  try
+    RESTRequest.Execute;
+  except
+    on E:Exception do
+    begin
+      result := false;
+      if (MessageDlgEx('Request failed with' + E.Message + #10 + 'Continue ?', '',
+                       TMsgDlgType.mtInformation,
+                       [TMsgDlgBtn.mbYes, TMsgDlgBtn.mbNo]) = IDNO) then
+        BlockRestRequests := true;
+      exit;
+    end;
+  end;
 end;
 
 procedure Throttle(const Delay: Int64);
@@ -539,7 +562,7 @@ begin
         OsmHelper.WritePoint(Lat, Lon, IncludeTrailingBackslash(Apath) + Filename, true);
     end;
 
-    OsmHelper.WritePointsEnd;
+    OsmHelper.WritePointsEnd(true);
     OsmHelper.WriteFooter;
   finally
     OsmHelper.Free;
@@ -594,9 +617,8 @@ var
   JSOnAdmin      : integer;
   Data           : string;
 begin
-  Throttle(GeoSettings.ThrottleOverPass);
-
   result := TPlace.Create;
+  Throttle(GeoSettings.ThrottleOverPass);
 
   // Overpass query
   Data := format('[out:json];is_in(%s, %s);area._[admin_level][name][boundary=administrative];out qt;', [Trim(Lat), Trim(Lon)]);
@@ -610,7 +632,8 @@ begin
   try
     RESTRequest.params.Clear;
     RESTRequest.params.AddItem('data', Data, TRESTRequestParameterKind.pkGETorPOST);
-    RESTRequest.Execute;
+    if not ExecuteRest(RESTRequest) then
+      exit;
 
     JSONObject := RESTResponse.JSONValue as TJSONObject;
     JSONElements := JSONObject.GetValue<TJSONArray>('elements');
@@ -667,7 +690,8 @@ begin
     RESTRequest.params.Clear;
     RESTRequest.params.AddItem('lat', LatE, TRESTRequestParameterKind.pkGETorPOST);
     RESTRequest.params.AddItem('lon', LonE, TRESTRequestParameterKind.pkGETorPOST);
-    RESTRequest.Execute;
+    if not ExecuteRest(RESTRequest) then
+      exit;
 
     JSONObject := TJSonObject.ParseJSONValue(RESTResponse.Content) as TJSONObject;
     try
@@ -708,6 +732,8 @@ begin
     end;
 
     result := nil;
+    if (BlockRestRequests) then
+      exit;
     case Provider of
       TGeoCodeProvider.gpGeoName:
         result := GetPlaceOfCoords_GeoCode(Lat, Lon);
@@ -854,7 +880,9 @@ begin
   try
     RESTRequest.params.Clear;
     RESTRequest.params.AddItem('data', Data, TRESTRequestParameterKind.pkGETorPOST);
-    RESTRequest.Execute;
+    if not ExecuteRest(RESTRequest) then
+      exit;
+
     FrmPlaces.Listview1.Items.Clear;
 
     JSONObject := RESTResponse.JSONValue as TJSONObject;
@@ -950,7 +978,9 @@ begin
     else
       RESTRequest.params.AddItem('q', City, TRESTRequestParameterKind.pkGETorPOST);
 
-    RESTRequest.Execute;
+    if not ExecuteRest(RESTRequest) then
+      exit;
+
     FrmPlaces.Listview1.Items.Clear;
 
     Places := RESTResponse.JSONValue as TJSONArray;
@@ -968,6 +998,8 @@ procedure GetCoordsOfPlace(const Place, Bounds: string; var Lat, Lon: string; co
 var
   CrWait, CrNormal: HCURSOR;
 begin
+  if (BlockRestRequests) then
+    exit;
   CrWait := LoadCursor(0, IDC_WAIT);
   CrNormal := SetCursor(CrWait);
   try
@@ -1068,6 +1100,7 @@ begin
   GeoSettings.OverPassCaseSensitive := GUIini.ReadBool(Geo_Settings, 'OverPassCaseSensitive', True);
   GeoSettings.OverPassCompleteWord := GUIini.ReadBool(Geo_Settings, 'OverPassCompleteWord', True);
   GeoSettings.CountryCodeLocation := GUIini.ReadBool(Geo_Settings, 'CountryCodeLocation', True);
+  GeoSettings.GeoTagMode := TGeoTagMode(GUIini.ReadInteger(Geo_Settings, 'GeoTagMode', 1));
 
   GUIini.ReadSectionValues(Geo_Province, GeoProvinceList);
 //Default = 6,5,4,3
@@ -1121,6 +1154,7 @@ begin
   GUIini.WriteBool(Geo_Settings, 'OverPassCaseSensitive', GeoSettings.OverPassCaseSensitive);
   GUIini.WriteBool(Geo_Settings, 'OverPassCompleteWord', GeoSettings.OverPassCompleteWord);
   GUIini.WriteBool(Geo_Settings, 'CountryCodeLocation', GeoSettings.CountryCodeLocation);
+  GUIini.WriteInteger(Geo_Settings, 'GeotagMode', Ord(GeoSettings.GeoTagMode));
 
   TmpItems := TStringList.Create;
   try
@@ -1145,6 +1179,7 @@ begin
   GeoProvinceList := TStringList.Create;
   CoordCache := TObjectDictionary<string, TPlace>.Create([doOwnsValues]);
   LastQuery := 0;
+  BlockRestRequests := false;
 end;
 
 finalization

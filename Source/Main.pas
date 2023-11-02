@@ -171,6 +171,8 @@ type
     GenericImportPreview: TMenuItem;
     JPGGenericlosslessautorotate1: TMenuItem;
     EditMapBounds: TLabeledEdit;
+    N10: TMenuItem;
+    UpdateLocationfromGPScoordinates1: TMenuItem;
     procedure ShellListClick(Sender: TObject);
     procedure ShellListKeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
     procedure SpeedBtnExifClick(Sender: TObject);
@@ -271,6 +273,7 @@ type
     procedure GenericExtractPreviewsClick(Sender: TObject);
     procedure GenericImportPreviewClick(Sender: TObject);
     procedure JPGGenericlosslessautorotate1Click(Sender: TObject);
+    procedure UpdateLocationfromGPScoordinates1Click(Sender: TObject);
   private
     { Private declarations }
     ETBarSeriesFocal: TBarSeries;
@@ -299,6 +302,7 @@ type
   public
     { Public declarations }
     function GetFirstSelectedFile: string;
+    function GetFirstSelectedFilePath: string;
     function GetSelectedFiles(FileName: string; MustExpandPath: boolean): string; overload;
     function GetSelectedFiles(FileName: string = ''): string; overload;
     procedure ExecETEvent_Done(ExecNum: word; EtCmds, EtOuts, EtErrs, StatusLine: string; PopupOnError: boolean);
@@ -318,7 +322,7 @@ uses System.StrUtils, System.Math, System.Masks, System.UITypes,
   ExifTool, ExifInfo, ExifToolsGui_LossLess, ExifTool_PipeStream,
   MainDef, LogWin, Preferences, EditFFilter, EditFCol, UFrmStyle, UFrmAbout,
   QuickMngr, DateTimeShift, DateTimeEqual, CopyMeta, RemoveMeta, Geotag, Geomap, CopyMetaSingle, FileDateTime,
-  UFrmGenericExtract, UFrmGenericImport, UFrmLossLessRotate, UFrmGeoTagFiles;
+  UFrmGenericExtract, UFrmGenericImport, UFrmLossLessRotate, UFrmGeoTagFiles, UFrmGeoSetup;
 
 {$R *.dfm}
 
@@ -607,6 +611,15 @@ begin
     result := ShellList.FileName + CRLF
   else if (ShellList.Items.Count > 0) then
     result := ShellList.FileName(0) + CRLF;
+end;
+
+function TFMain.GetFirstSelectedFilePath: string;
+begin
+  result := '';
+  if (ShellList.Selected <> nil) then
+    result := ShellList.FilePath
+  else if (ShellList.Items.Count > 0) then
+    result := ShellList.FilePath(0);
 end;
 
 function TFMain.GetSelectedFiles(FileName: string; MustExpandPath: boolean): string;
@@ -1780,6 +1793,44 @@ begin
   end;
 end;
 
+procedure TFMain.UpdateLocationfromGPScoordinates1Click(Sender: TObject);
+var
+  CrWait, CrNormal: HCURSOR;
+  SelectedFiles: TStringList;
+  AFile: string;
+begin
+  GetMetadata(GetFirstSelectedFilePath, false, false, true, false);
+  FGeoSetup.Lat := Foto.GPS.GeoLat;
+  FGeoSetup.Lon := Foto.GPS.GeoLon;
+
+  if not (ValidLatLon(FGeoSetup.Lat, FGeoSetup.Lon)) then
+  begin
+    MessageDlgEx('Selected file has no valid Lat Lon coordinates.', '', TMsgDlgType.mtError, [TMsgDlgBtn.mbOK]);
+    exit;
+  end;
+
+  if (FGeoSetup.ShowModal = MROK) then
+  begin
+    CrWait := LoadCursor(0, IDC_WAIT);
+    CrNormal := SetCursor(CrWait);
+    SelectedFiles := TStringList.Create;
+    try
+      SelectedFiles.Text := GetSelectedFiles('', true);
+      for AFile in SelectedFiles do
+      begin
+        StatusBar.Panels[1].Text := AFile;
+        StatusBar.Update;
+        FillLocationInImage(AFile);
+      end;
+    finally
+      SelectedFiles.Free;
+      RefreshSelected(Sender);
+      SetCursor(CrNormal);
+    end;
+  end;
+  StatusBar.Panels[1].Text := '';
+end;
+
 procedure TFMain.UpdateStatusBar_FilesShown;
 var
   I: smallint;
@@ -2249,7 +2300,7 @@ begin
   begin
     try
       ParseLatLon(GUIsettings.DefGMapHome, Lat, Lon);
-      OSMMapInit(EdgeBrowser1, Lat, Lon, 'Home', InitialZoom_Out);
+      OSMMapInit(EdgeBrowser1, Lat, Lon, OSMHome, InitialZoom_Out);
       AdvTabOSMMap.Enabled := true;
     except
       on E:Exception do
@@ -3047,17 +3098,21 @@ begin
     exit;
   end;
 
-  if FGeotagFiles.ShowModal = mrOK then
+  if (GUIsettings.ReverseGeoCodeDialog = false) then
   begin
-    RefreshSelected(Sender);
-    ShowMetadata;
-    ShowPreview;
-  end;
+    FGeotagFiles.FillPreview;
+    FGeotagFiles.Execute;
+  end
+  else
+    FGeotagFiles.ShowModal;
+  RefreshSelected(Sender);
+  ShowMetadata;
+  ShowPreview;
 end;
 
 procedure TFMain.SpeedBtn_MapHomeClick(Sender: TObject);
 begin
-  MapGotoPlace(EdgeBrowser1, GUIsettings.DefGMapHome, '', 'Home', InitialZoom_Out);
+  MapGotoPlace(EdgeBrowser1, GUIsettings.DefGMapHome, '', OSMHome, InitialZoom_Out);
 end;
 
 procedure TFMain.SpeedBtn_MapSetHomeClick(Sender: TObject);

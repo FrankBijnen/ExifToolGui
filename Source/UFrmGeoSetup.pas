@@ -68,7 +68,8 @@ begin
   // Get Place of selected coordinates
   ClearCoordCache; // Make sure we dont get cached data.
   APlace := GetPlaceOfCoords(Lat, Lon, GeoSettings.GetPlaceProvider);
-
+  if (APlace = nil) then
+    exit;
   LblCountrySettings.Caption := 'Settings for: ' + APlace.CountryLocation;
 
   if (APlace.PrioProvince <> '') then
