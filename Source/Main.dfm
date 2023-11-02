@@ -155,7 +155,7 @@ object FMain: TFMain
     Top = 0
     Width = 320
     Height = 583
-    ActivePage = AdvTabOSMMap
+    ActivePage = AdvTabMetadata
     Align = alRight
     DoubleBuffered = True
     ParentDoubleBuffered = False
@@ -716,7 +716,7 @@ object FMain: TFMain
         object EditETdirect: TLabeledEdit
           Left = 1
           Top = 50
-          Width = 377
+          Width = 373
           Height = 23
           Hint = 
             'Spaces in data require double quotes, double quotes in data requ' +
@@ -739,7 +739,7 @@ object FMain: TFMain
           Text = ''
           OnChange = EditETdirectChange
           OnKeyDown = EditETdirectKeyDown
-          ExplicitWidth = 373
+          ExplicitWidth = 369
         end
         object CBoxETdirect: TComboBox
           Left = 1
@@ -1133,6 +1133,13 @@ object FMain: TFMain
       object MRemoveMeta: TMenuItem
         Caption = 'Remove metadata...'
         OnClick = MRemoveMetaClick
+      end
+      object N10: TMenuItem
+        Caption = '-'
+      end
+      object UpdateLocationfromGPScoordinates1: TMenuItem
+        Caption = 'Update City, Province, Country from GPS coordinates'
+        OnClick = UpdateLocationfromGPScoordinates1Click
       end
     end
     object MVarious: TMenuItem

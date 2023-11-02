@@ -19,23 +19,25 @@ type
     AdvPanel1: TPanel;
     LblSample: TLabel;
     ValLocation: TValueListEditor;
-    ChkUpdateLocationInfo: TCheckBox;
-    ChkUpdateLatLon: TCheckBox;
     BtnSetupGeoCode: TButton;
+    CmbGeoTagMode: TComboBox;
+    Label1: TLabel;
     procedure FormShow(Sender: TObject);
     procedure BtnExecuteClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure BtnSetupGeoCodeClick(Sender: TObject);
+    procedure CmbGeoTagModeClick(Sender: TObject);
   private
     { Private declarations }
     var
       APlace: TPlace; // No need to free, handled in CoordCache.
       ETcmd, ETouts, ETerrs: string;
-    procedure FillPreview;
   public
     { Public declarations }
     var
       Lat, Lon: string;
+    procedure FillPreview;
+    procedure Execute;
   end;
 
 var
@@ -55,11 +57,13 @@ begin
   FillPreview;
 end;
 
+procedure TFGeotagFiles.CmbGeoTagModeClick(Sender: TObject);
+begin
+  GeoSettings.GeoTagMode := TGeoTagMode(CmbGeoTagMode.ItemIndex);
+end;
+
 procedure TFGeotagFiles.FillPreview;
 begin
-  if (not Showing) then
-    exit;
-
   ValLocation.Strings.BeginUpdate;
   try
     ValLocation.Strings.Clear;
@@ -79,7 +83,7 @@ begin
   end;
 end;
 
-procedure TFGeotagFiles.BtnExecuteClick(Sender: TObject);
+procedure TFGeotagFiles.Execute;
 var
   CrWait, CrNormal: HCURSOR;
 begin
@@ -91,41 +95,47 @@ begin
     Lon := ValLocation.Values['Lon'];
 
     ETcmd := '';
-    if (ChkUpdateLatLon.Checked) then
-    begin
-      ETcmd := '-GPS:All=';
-      if (Lat <> '') then
+    case (TGeoTagMode(CmbGeoTagMode.ItemIndex)) of
+      TGeoTagMode.gtmCoordinates,
+      TGeoTagMode.gtmCoordinatesLocation:
       begin
-        ETcmd := ETcmd + CRLF + '-GPS:GpsLatitudeRef=';
-        if Lat[1] = '-' then
+        ETcmd := '-GPS:All=';
+        if (Lat <> '') then
         begin
-          ETcmd := ETcmd + 'S';
-          Delete(Lat, 1, 1);
-        end
-        else
-          ETcmd := ETcmd + 'N';
-        ETcmd := ETcmd + CRLF + '-GPS:GpsLatitude=' + Lat;
-      end;
-      if (Lon <> '') then
-      begin
-        ETcmd := ETcmd + CRLF + '-GPS:GpsLongitudeRef=';
-        if Lon[1] = '-' then
+          ETcmd := ETcmd + CRLF + '-GPS:GpsLatitudeRef=';
+          if Lat[1] = '-' then
+          begin
+            ETcmd := ETcmd + 'S';
+            Delete(Lat, 1, 1);
+          end
+          else
+            ETcmd := ETcmd + 'N';
+          ETcmd := ETcmd + CRLF + '-GPS:GpsLatitude=' + Lat;
+        end;
+        if (Lon <> '') then
         begin
-          ETcmd := ETcmd + 'W';
-          Delete(Lon, 1, 1);
-        end
-        else
-          ETcmd := ETcmd + 'E';
-        ETcmd := ETcmd + CRLF + '-GPS:GpsLongitude=' + Lon;
+          ETcmd := ETcmd + CRLF + '-GPS:GpsLongitudeRef=';
+          if Lon[1] = '-' then
+          begin
+            ETcmd := ETcmd + 'W';
+            Delete(Lon, 1, 1);
+          end
+          else
+            ETcmd := ETcmd + 'E';
+          ETcmd := ETcmd + CRLF + '-GPS:GpsLongitude=' + Lon;
+        end;
       end;
     end;
 
-    if (ChkUpdateLocationInfo.Checked) then
-    begin
-      Etcmd := Etcmd + CRLF + '-xmp:LocationShownCountryName=' + ValLocation.Values['Country'];
-      Etcmd := Etcmd + CRLF + '-xmp:LocationShownProvinceState=' + ValLocation.Values['Province'];
-      Etcmd := Etcmd + CRLF + '-xmp:LocationShownCity=' + ValLocation.Values['City'];
-      Etcmd := Etcmd + CRLF + '-xmp:LocationShownSublocation=' + ValLocation.Values['Location'];
+    case (TGeoTagMode(CmbGeoTagMode.ItemIndex)) of
+      TGeoTagMode.gtmLocation,
+      TGeoTagMode.gtmCoordinatesLocation:
+      begin
+        Etcmd := Etcmd + CRLF + '-xmp:LocationShownCountryName=' + ValLocation.Values['Country'];
+        Etcmd := Etcmd + CRLF + '-xmp:LocationShownProvinceState=' + ValLocation.Values['Province'];
+        Etcmd := Etcmd + CRLF + '-xmp:LocationShownCity=' + ValLocation.Values['City'];
+        Etcmd := Etcmd + CRLF + '-xmp:LocationShownSublocation=' + ValLocation.Values['Location'];
+      end;
     end;
     ET_OpenExec(ETcmd, Fmain.GetSelectedFiles, ETouts, ETerrs);
 
@@ -133,6 +143,11 @@ begin
   finally
     SetCursor(CrNormal);
   end;
+end;
+
+procedure TFGeotagFiles.BtnExecuteClick(Sender: TObject);
+begin
+  Execute;
 
   if (ETerrs = '') then
     ModalResult := mrOK;
@@ -140,8 +155,7 @@ end;
 
 procedure TFGeotagFiles.FormCreate(Sender: TObject);
 begin
-  ChkUpdateLatLon.Checked := true;
-  ChkUpdateLocationInfo.Checked := true;
+  CmbGeoTagMode.ItemIndex := Ord(GeoSettings.GeoTagMode);
 end;
 
 procedure TFGeotagFiles.FormShow(Sender: TObject);

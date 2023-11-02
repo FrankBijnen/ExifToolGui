@@ -31,6 +31,8 @@ type
     InitialDir: string;
     ETOverrideDir: string;
     ETTimeOut: integer;
+    GeoCodeDialog: boolean;
+    ReverseGeoCodeDialog: boolean;
   end;
 
   FListColUsrRec = record
@@ -378,6 +380,8 @@ begin
         ETdirDefCmd := ReadInteger(Ini_Settings, 'ETdirDefCmd', -1);
         ETdirMode := ReadInteger(Ini_Settings, 'ETdirMode', 0);
         CmbETDirectMode.ItemIndex := GUIsettings.ETdirMode;
+        GeoCodeDialog := ReadBool(Ini_Settings, 'GeoCodeDialog', true);
+        ReverseGeoCodeDialog := ReadBool(Ini_Settings, 'ReverseGeoCodeDialog', true);
       end;
 
       with ET_Options do
@@ -637,6 +641,8 @@ begin
           WriteBool(Ini_Settings, 'DblClickUpdTags', DblClickUpdTags);
           WriteInteger(Ini_Settings, 'ETdirDefCmd', ETdirDefCmd);
           WriteInteger(Ini_Settings, 'ETdirMode', ETdirMode);
+          WriteBool(Ini_Settings, 'GeoCodeDialog', GeoCodeDialog);
+          WriteBool(Ini_Settings, 'ReverseGeoCodeDialog', ReverseGeoCodeDialog);
         end;
 
         WriteBool(Ini_Options, 'DontBackup', MDontBackup.Checked);
