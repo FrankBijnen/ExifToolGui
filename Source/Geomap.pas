@@ -664,6 +664,8 @@ begin
         JSONTagVal := JSONTags.FindValue('name:' + result.FDefLang);
       if (JSONTagVal = nil) then
         JSONTagVal := JSONTags.FindValue('name');
+      if (JSONTagVal = nil) then // Must have a name
+        continue;
 
       result.AssignFromOverPass(JSOnAdmin, JSONTagVal.Value);
     end;
@@ -798,10 +800,10 @@ var
   SearchEnd      : string;
   SearchCase     : string;
   FormatNL       : string;
-  JSOnName       : string;
   Data           : string;
   ElementType    : string;
   JSONNodeVal    : TJSONObject;
+  JSONTagVal     : TJSONValue;
   PlaceResult    : TPlace;
 begin
   if (Length(Trim(City)) < 5) and
@@ -888,7 +890,6 @@ begin
       exit;
 
     FrmPlaces.Listview1.Items.Clear;
-
     JSONObject := RESTResponse.JSONValue as TJSONObject;
     JSONElements := JSONObject.GetValue<TJSONArray>('elements');
     for ElementIndx := 0 to JSONElements.Count -1 do
@@ -925,10 +926,17 @@ begin
           FillCountry_OverPass(JSONElements, ElementIndx, PlaceResult);
 
         JSONNodeVal := JSONElement.GetValue<TJSONObject>('tags') as TJSONObject;
-        JSonName := JSONNodeVal.GetValue<string>('name');
-        JSOnAdmin := JSONNodeVal.GetValue<integer>('admin_level');
+      // Get name(local) name if avail
+        JSONTagVal := nil;
+        if (PlaceResult.FDefLang <> '') then
+          JSONTagVal := JSONNodeVal.FindValue('name:' + PlaceResult.FDefLang);
+        if (JSONTagVal = nil) then
+          JSONTagVal := JSONNodeVal.FindValue('name');
+        if (JSONTagVal = nil) then // Must have a name
+          continue;
 
-        PlaceResult.AssignFromOverPass(JSOnAdmin, JSOnName);
+        JSOnAdmin := JSONNodeVal.GetValue<integer>('admin_level');
+        PlaceResult.AssignFromOverPass(JSOnAdmin, JSONTagVal.Value);
 
         continue;
       end;
