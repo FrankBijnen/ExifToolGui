@@ -3,8 +3,8 @@ object FPreferences: TFPreferences
   Top = 0
   BorderStyle = bsDialog
   Caption = 'Preferences'
-  ClientHeight = 391
-  ClientWidth = 602
+  ClientHeight = 395
+  ClientWidth = 600
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -17,7 +17,7 @@ object FPreferences: TFPreferences
     Left = 0
     Top = 0
     Width = 521
-    Height = 391
+    Height = 395
     ActivePage = AdvTabGeneral
     Align = alLeft
     DoubleBuffered = True
@@ -405,25 +405,33 @@ object FPreferences: TFPreferences
         Caption = 'GeoCoding'
         TabOrder = 0
         object ChkGeoCodeDialog: TCheckBox
-          Left = 66
-          Top = 15
+          Left = 67
+          Top = 49
           Width = 365
           Height = 17
           Caption = 'Enable Geocode dialog (Get coordinates of location)'
           TabOrder = 0
         end
         object ChkReverseGeoCodeDialog: TCheckBox
-          Left = 66
-          Top = 36
+          Left = 67
+          Top = 74
           Width = 365
           Height = 17
           Caption = 'Enable reverse Geocode dialog (Get location of coordinates)'
           TabOrder = 1
         end
+        object ChkGeoCodingEnable: TCheckBox
+          Left = 67
+          Top = 25
+          Width = 365
+          Height = 17
+          Caption = 'Enable GeoCoding'
+          TabOrder = 2
+        end
       end
       object GrpGeoCode: TGroupBox
         Left = 24
-        Top = 89
+        Top = 117
         Width = 464
         Height = 80
         Caption = 'GeoCode Maps:'
@@ -473,7 +481,7 @@ object FPreferences: TFPreferences
       end
       object GrpOverPass: TGroupBox
         Left = 24
-        Top = 176
+        Top = 203
         Width = 464
         Height = 80
         Caption = 'OverPass Api'

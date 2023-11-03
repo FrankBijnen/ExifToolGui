@@ -56,6 +56,7 @@ type
     Label4: TLabel;
     UpdThrottleOverpass: TUpDown;
     EdOverPassUrl: TLabeledEdit;
+    ChkGeoCodingEnable: TCheckBox;
     procedure FormShow(Sender: TObject);
     procedure BtnSaveClick(Sender: TObject);
     procedure BtnBrowseFolder(Sender: TObject);
@@ -142,8 +143,8 @@ begin
   GeoSettings.OverPassUrl := EdOverPassUrl.Text;
   GeoSettings.ThrottleOverPass := UpdThrottleOverpass.Position;
   GeoSettings.GeoCodeDialog := ChkGeoCodeDialog.Checked;
+  GeoSettings.GeoCodingEnable := ChkGeoCodingEnable.Checked;
   GUIsettings.ReverseGeoCodeDialog := ChkReverseGeoCodeDialog.Checked;
-  GeoMap.BlockRestRequests := false;
 end;
 
 procedure TFPreferences.BtnSetupCleanClick(Sender: TObject);
@@ -301,6 +302,7 @@ begin
     UpdThrottleGeoCode.Position := GeoSettings.ThrottleGeoCode;
     EdOverPassUrl.Text := GeoSettings.OverPassUrl;
     UpdThrottleOverpass.Position := GeoSettings.ThrottleOverPass;
+    ChkGeoCodingEnable.Checked := GeoSettings.GeoCodingEnable;
     ChkGeoCodeDialog.Checked := GeoSettings.GeoCodeDialog;
     ChkReverseGeoCodeDialog.Checked := GUIsettings.ReverseGeoCodeDialog;
 

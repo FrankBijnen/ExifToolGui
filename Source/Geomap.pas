@@ -12,6 +12,7 @@ type
   TGeoTagMode = (gtmCoordinates, gtmLocation, gtmCoordinatesLocation);
 
   GEOsettingsRec = record
+    GeoCodingEnable: boolean;
     GetCoordProvider: TGeoCodeProvider;
     GetPlaceProvider: TGeoCodeProvider;
     GeoCodeUrl: string;
@@ -114,7 +115,6 @@ var
   GeoSettings: GEOsettingsRec;
   GeoProvinceList: TStringList;
   GeoCityList: TStringList;
-  BlockRestRequests: boolean;
 
 implementation
 
@@ -522,10 +522,10 @@ begin
     on E:Exception do
     begin
       result := false;
-      if (MessageDlgEx('Request failed with' + E.Message + #10 + 'Continue ?', '',
+      if (MessageDlgEx('Request failed with' + E.Message + #10 + 'Continue ? (Re-enable in Preferences)', '',
                        TMsgDlgType.mtInformation,
                        [TMsgDlgBtn.mbYes, TMsgDlgBtn.mbNo]) = IDNO) then
-        BlockRestRequests := true;
+        GeoSettings.GeoCodingEnable := false;
       exit;
     end;
   end;
@@ -744,8 +744,9 @@ begin
     end;
 
     result := nil;
-    if (BlockRestRequests) then
+    if (GeoSettings.GeoCodingEnable = false) then
       exit;
+
     case Provider of
       TGeoCodeProvider.gpGeoName:
         result := GetPlaceOfCoords_GeoCode(Lat, Lon);
@@ -997,7 +998,7 @@ var
   CrWait, CrNormal: HCURSOR;
   Region: string;
 begin
-  if (BlockRestRequests) then
+  if (GeoSettings.GeoCodingEnable = false) then
     exit;
 
   Region := Place;
@@ -1117,6 +1118,7 @@ begin
   GeoSettings.CountryCodeLocation := GUIini.ReadBool(Geo_Settings, 'CountryCodeLocation', True);
   GeoSettings.GeoTagMode := TGeoTagMode(GUIini.ReadInteger(Geo_Settings, 'GeoTagMode', 1));
   GeoSettings.GeoCodeDialog := GUIini.ReadBool(Geo_Settings, 'GeoCodeDialog', true);
+  GeoSettings.GeoCodingEnable := GUIini.ReadBool(Geo_Settings, 'GeoCodingEnable', false);
 
   GUIini.ReadSectionValues(Geo_Province, GeoProvinceList);
 //Default = 6,5,4,3
@@ -1173,6 +1175,7 @@ begin
   GUIini.WriteBool(Geo_Settings, 'CountryCodeLocation', GeoSettings.CountryCodeLocation);
   GUIini.WriteInteger(Geo_Settings, 'GeotagMode', Ord(GeoSettings.GeoTagMode));
   GUIini.WriteBool(Geo_Settings, 'GeoCodeDialog', GeoSettings.GeoCodeDialog);
+  GUIini.WriteBool(Geo_Settings, 'GeoCodingEnable', GeoSettings.GeoCodingEnable);
 
   TmpItems := TStringList.Create;
   try
@@ -1197,7 +1200,6 @@ begin
   GeoProvinceList := TStringList.Create;
   CoordCache := TObjectDictionary<string, TPlace>.Create([doOwnsValues]);
   LastQuery := 0;
-  BlockRestRequests := false;
 end;
 
 finalization
