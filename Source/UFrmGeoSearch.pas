@@ -21,15 +21,18 @@ type
     EdSearchCity: TLabeledEdit;
     EdRegion: TLabeledEdit;
     EdBounds: TLabeledEdit;
-    ChkCaseSensitve: TCheckBox;
     GrpCitySearch: TGroupBox;
     ChkComplete: TCheckBox;
+    CmbOverPasslang: TComboBox;
+    Label1: TLabel;
+    ChkCaseSensitve: TCheckBox;
     procedure FormShow(Sender: TObject);
     procedure BtnOKClick(Sender: TObject);
     procedure CmbGeoProviderChange(Sender: TObject);
     procedure EdRegionChange(Sender: TObject);
     procedure ChkCaseSensitveClick(Sender: TObject);
     procedure ChkCompleteClick(Sender: TObject);
+    procedure CmbOverPasslangChange(Sender: TObject);
   private
     { Private declarations }
     procedure UpdateDesign;
@@ -61,6 +64,7 @@ begin
   ChkComplete.Enabled := GeoSettings.GetCoordProvider = TGeoCodeProvider.gpOverPass;
   ChkComplete.Checked := ChkComplete.Enabled and
                          GeoSettings.OverPassCompleteWord;
+  CmbOverPasslang.Enabled := ChkComplete.Enabled;
 end;
 
 procedure TFGeoSearch.BtnOKClick(Sender: TObject);
@@ -84,6 +88,11 @@ begin
   UpdateDesign;
 end;
 
+procedure TFGeoSearch.CmbOverPasslangChange(Sender: TObject);
+begin
+  GeoSettings.OverPassLang := CmbOverPasslang.Text;
+end;
+
 procedure TFGeoSearch.EdRegionChange(Sender: TObject);
 begin
   UpdateDesign;
@@ -96,7 +105,9 @@ begin
   StatusBar1.SimpleText := '';
 
   CmbGeoProvider.ItemIndex := Ord(GeoSettings.GetCoordProvider);
+  CmbOverPasslang.Text := GeoSettings.OverPassLang;
   SelectedBounds := EdBounds.Text;
+
   UpdateDesign;
 end;
 

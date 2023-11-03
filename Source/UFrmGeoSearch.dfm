@@ -59,13 +59,20 @@ object FGeoSearch: TFGeoSearch
         AutoSize = False
         Caption = 'GeoCode provider:'
       end
+      object Label1: TLabel
+        Left = 8
+        Top = 52
+        Width = 97
+        Height = 13
+        Caption = 'Preferred language:'
+      end
       object GrpCitySearch: TGroupBox
-        Left = 3
-        Top = 187
+        Left = 8
+        Top = 238
         Width = 467
         Height = 104
         Caption = 'City search'
-        TabOrder = 5
+        TabOrder = 4
         object ChkComplete: TCheckBox
           Left = 16
           Top = 62
@@ -74,6 +81,15 @@ object FGeoSearch: TFGeoSearch
           Caption = 'Complete word (faster)'
           TabOrder = 0
           OnClick = ChkCompleteClick
+        end
+        object ChkCaseSensitve: TCheckBox
+          Left = 16
+          Top = 25
+          Width = 399
+          Height = 17
+          Caption = 'Case sensitive (faster)'
+          TabOrder = 1
+          OnClick = ChkCaseSensitveClick
         end
       end
       object CmbGeoProvider: TComboBox
@@ -99,18 +115,18 @@ object FGeoSearch: TFGeoSearch
       end
       object EdSearchCity: TLabeledEdit
         Left = 8
-        Top = 81
+        Top = 111
         Width = 470
         Height = 21
         EditLabel.Width = 72
         EditLabel.Height = 13
-        EditLabel.Caption = 'Seacrh for City'
+        EditLabel.Caption = 'Search for City'
         TabOrder = 1
         Text = ''
       end
       object EdRegion: TLabeledEdit
         Left = 8
-        Top = 121
+        Top = 155
         Width = 470
         Height = 21
         EditLabel.Width = 109
@@ -122,7 +138,7 @@ object FGeoSearch: TFGeoSearch
       end
       object EdBounds: TLabeledEdit
         Left = 8
-        Top = 160
+        Top = 200
         Width = 470
         Height = 21
         EditLabel.Width = 68
@@ -131,14 +147,18 @@ object FGeoSearch: TFGeoSearch
         TabOrder = 3
         Text = ''
       end
-      object ChkCaseSensitve: TCheckBox
-        Left = 19
-        Top = 215
-        Width = 399
-        Height = 17
-        Caption = 'Case sensitive (faster)'
-        TabOrder = 4
-        OnClick = ChkCaseSensitveClick
+      object CmbOverPasslang: TComboBox
+        Left = 8
+        Top = 70
+        Width = 470
+        Height = 21
+        TabOrder = 5
+        Text = 'CmbOverPasslang'
+        OnChange = CmbOverPasslangChange
+        OnClick = CmbOverPasslangChange
+        Items.Strings = (
+          'local'
+          'default')
       end
     end
   end

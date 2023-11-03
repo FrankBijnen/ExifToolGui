@@ -22,8 +22,8 @@ object FGeoSetup: TFGeoSetup
     Height = 19
     Panels = <>
     SimplePanel = True
-    ExplicitTop = 361
-    ExplicitWidth = 595
+    ExplicitTop = 401
+    ExplicitWidth = 589
   end
   object BtnCancel: TButton
     Left = 518
@@ -108,7 +108,7 @@ object FGeoSetup: TFGeoSetup
         ParentFont = False
       end
       object Label1: TLabel
-        Left = 11
+        Left = 8
         Top = 52
         Width = 97
         Height = 13
@@ -153,8 +153,8 @@ object FGeoSetup: TFGeoSetup
         OnChange = CmbCityChange
       end
       object ChkCountryLocation: TCheckBox
-        Left = 8
-        Top = 98
+        Left = 3
+        Top = 95
         Width = 470
         Height = 17
         Caption = 'Map CountryCode'

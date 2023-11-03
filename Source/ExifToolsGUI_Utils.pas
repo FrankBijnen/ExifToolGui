@@ -687,7 +687,8 @@ begin
   begin
     AdjustLatLon(Lat, Lon, Place_Decimals);
     APlace := GetPlaceOfCoords(Lat, Lon, GeoSettings.GetPlaceProvider);
-
+    if not Assigned(APlace) then
+      exit;
     ETCmd := ETCmd + CRLF + '-xmp:LocationShownCountryName=' + APlace.CountryLocation;
     ETCmd := ETCmd + CRLF + '-xmp:LocationShownProvinceState=' + APlace.Province;
     ETCmd := ETCmd + CRLF + '-xmp:LocationShownCity=' + APlace.City;
