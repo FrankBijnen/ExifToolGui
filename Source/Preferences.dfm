@@ -18,7 +18,7 @@ object FPreferences: TFPreferences
     Top = 0
     Width = 521
     Height = 391
-    ActivePage = AdvTabOther
+    ActivePage = AdvTabGeneral
     Align = alLeft
     DoubleBuffered = True
     ParentDoubleBuffered = False
@@ -394,21 +394,22 @@ object FPreferences: TFPreferences
         OnClick = BtnGenThumbsClick
       end
     end
-    object AdvTabOther: TTabSheet
-      Caption = 'Other'
+    object TabGeoCoding: TTabSheet
+      Caption = 'GeoCoding'
+      ImageIndex = 3
       object GrpGeoCodeGeneral: TGroupBox
-        Left = 16
-        Top = 141
-        Width = 480
-        Height = 220
+        Left = 17
+        Top = 13
+        Width = 493
+        Height = 347
         Caption = 'GeoCoding'
-        TabOrder = 7
+        TabOrder = 0
         object ChkGeoCodeDialog: TCheckBox
           Left = 66
           Top = 15
           Width = 365
           Height = 17
-          Caption = 'Enable Geocode dialog'
+          Caption = 'Enable Geocode dialog (Get coordinates of location)'
           TabOrder = 0
         end
         object ChkReverseGeoCodeDialog: TCheckBox
@@ -416,62 +417,17 @@ object FPreferences: TFPreferences
           Top = 36
           Width = 365
           Height = 17
-          Caption = 'Enable reverse Geocode dialog'
+          Caption = 'Enable reverse Geocode dialog (Get location of coordinates)'
           TabOrder = 1
         end
       end
-      object RgETOverride: TRadioGroup
-        Left = 16
-        Top = 62
-        Width = 480
-        Height = 73
-        Caption = 'ExifTool.exe location'
-        ItemIndex = 0
-        Items.Strings = (
-          '-Default search (See Windows documentation on CreateProcess)'
-          '-Specify')
-        TabOrder = 1
-        OnClick = RadioGroupClick
-      end
-      object CheckBox4: TCheckBox
-        Left = 16
-        Top = 16
-        Width = 337
-        Height = 17
-        Caption = '-Workspace: Move focus to next tag/line after value is entered'
-        TabOrder = 0
-      end
-      object EdETOverride: TEdit
-        Left = 87
-        Top = 105
-        Width = 365
-        Height = 21
-        TabOrder = 2
-      end
-      object BtnETOverride: TButton
-        Left = 460
-        Top = 105
-        Width = 28
-        Height = 22
-        Caption = '...'
-        TabOrder = 3
-        OnClick = BtnBrowseFolder
-      end
-      object CheckBox5: TCheckBox
-        Left = 16
-        Top = 39
-        Width = 337
-        Height = 17
-        Caption = '-Workspace: Double Click adds/removes tags'
-        TabOrder = 4
-      end
       object GrpGeoCode: TGroupBox
         Left = 24
-        Top = 204
+        Top = 89
         Width = 464
-        Height = 72
+        Height = 80
         Caption = 'GeoCode Maps:'
-        TabOrder = 5
+        TabOrder = 1
         object Label3: TLabel
           Left = 140
           Top = 50
@@ -517,11 +473,11 @@ object FPreferences: TFPreferences
       end
       object GrpOverPass: TGroupBox
         Left = 24
-        Top = 280
+        Top = 176
         Width = 464
-        Height = 72
+        Height = 80
         Caption = 'OverPass Api'
-        TabOrder = 6
+        TabOrder = 2
         object Label4: TLabel
           Left = 140
           Top = 54
@@ -529,17 +485,17 @@ object FPreferences: TFPreferences
           Height = 13
           Caption = '(Min. time between calls in Ms)'
         end
-        object EdOverPassUrl: TLabeledEdit
+        object EdThrottleOverPass: TLabeledEdit
           Left = 60
-          Top = 23
-          Width = 365
+          Top = 50
+          Width = 49
           Height = 21
-          EditLabel.Width = 19
+          EditLabel.Width = 38
           EditLabel.Height = 21
-          EditLabel.Caption = 'URL'
+          EditLabel.Caption = 'Throttle'
           LabelPosition = lpLeft
           TabOrder = 0
-          Text = ''
+          Text = '10'
         end
         object UpdThrottleOverpass: TUpDown
           Left = 109
@@ -552,18 +508,66 @@ object FPreferences: TFPreferences
           Position = 10
           TabOrder = 1
         end
-        object EdThrottleOverPass: TLabeledEdit
+        object EdOverPassUrl: TLabeledEdit
           Left = 60
-          Top = 50
-          Width = 49
+          Top = 23
+          Width = 365
           Height = 21
-          EditLabel.Width = 38
+          EditLabel.Width = 19
           EditLabel.Height = 21
-          EditLabel.Caption = 'Throttle'
+          EditLabel.Caption = 'URL'
           LabelPosition = lpLeft
           TabOrder = 2
-          Text = '10'
+          Text = ''
         end
+      end
+    end
+    object AdvTabOther: TTabSheet
+      Caption = 'Other'
+      object RgETOverride: TRadioGroup
+        Left = 16
+        Top = 62
+        Width = 480
+        Height = 73
+        Caption = 'ExifTool.exe location'
+        ItemIndex = 0
+        Items.Strings = (
+          '-Default search (See Windows documentation on CreateProcess)'
+          '-Specify')
+        TabOrder = 1
+        OnClick = RadioGroupClick
+      end
+      object CheckBox4: TCheckBox
+        Left = 16
+        Top = 16
+        Width = 337
+        Height = 17
+        Caption = '-Workspace: Move focus to next tag/line after value is entered'
+        TabOrder = 0
+      end
+      object EdETOverride: TEdit
+        Left = 87
+        Top = 105
+        Width = 365
+        Height = 21
+        TabOrder = 2
+      end
+      object BtnETOverride: TButton
+        Left = 460
+        Top = 105
+        Width = 28
+        Height = 22
+        Caption = '...'
+        TabOrder = 3
+        OnClick = BtnBrowseFolder
+      end
+      object CheckBox5: TCheckBox
+        Left = 16
+        Top = 39
+        Width = 337
+        Height = 17
+        Caption = '-Workspace: Double Click adds/removes tags'
+        TabOrder = 4
       end
     end
   end

@@ -26,6 +26,8 @@ type
     LblCity: TLabel;
     LblCountrySettings: TLabel;
     ChkCountryLocation: TCheckBox;
+    Label1: TLabel;
+    CmbOverPasslang: TComboBox;
     procedure FormShow(Sender: TObject);
     procedure BtnOKClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
@@ -35,6 +37,9 @@ type
     procedure ChkCountryLocationClick(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure BtnCancelClick(Sender: TObject);
+    procedure CmbOverPasslangClick(Sender: TObject);
+    procedure CmbOverPasslangChange(Sender: TObject);
+    procedure CmbOverPasslangKeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
   private
     { Private declarations }
     var
@@ -106,6 +111,9 @@ begin
           CmbProvince.Items.Add('Default');
           CmbProvince.Items.Add('county');
           CmbProvince.Items.Add('state');
+          CmbProvince.Items.Add('None');
+
+          CmbOverPasslang.Enabled := false;
         end;
     TGeoCodeProvider.gpOverPass:
       begin
@@ -115,6 +123,9 @@ begin
           CmbProvince.Items.Add('5');
           CmbProvince.Items.Add('4');
           CmbProvince.Items.Add('3');
+          CmbProvince.Items.Add('None');
+
+          CmbOverPasslang.Enabled := true;
         end;
       end;
     end;
@@ -137,6 +148,7 @@ begin
           CmbCity.Items.Add('municipality');
           CmbCity.Items.Add('town');
           CmbCity.Items.Add('city');
+          CmbCity.Items.Add('None');
         end;
     TGeoCodeProvider.gpOverPass:
       begin
@@ -146,6 +158,7 @@ begin
           CmbCity.Items.Add('7');
           CmbCity.Items.Add('9');
           CmbCity.Items.Add('10');
+          CmbCity.Items.Add('None');
         end;
       end;
     end;
@@ -176,6 +189,23 @@ begin
   GeoCityList.Values[APlace.CountryCode] := CmbCity.Text;
   GeoProvinceList.Values[APlace.CountryCode] := CmbProvince.Text;
   FillPreview;
+end;
+
+procedure TFGeoSetup.CmbOverPasslangChange(Sender: TObject);
+begin
+  GeoSettings.OverPassLang := CmbOverPasslang.Text;
+end;
+
+procedure TFGeoSetup.CmbOverPasslangClick(Sender: TObject);
+begin
+  GeoSettings.OverPassLang := CmbOverPasslang.Text;
+  FillPreview;
+end;
+
+procedure TFGeoSetup.CmbOverPasslangKeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
+begin
+  if Key = 13 then
+    FillPreview;
 end;
 
 procedure TFGeoSetup.CmbProvinceChange(Sender: TObject);
@@ -219,6 +249,7 @@ begin
   SavedCityList.Assign(GeoCityList);
   CmbGeoProvider.ItemIndex := Ord(GeoSettings.GetPlaceProvider);
   ChkCountryLocation.Checked := GeoSettings.CountryCodeLocation;
+  CmbOverPasslang.Text := GeoSettings.OverPassLang;
 
   FillPreview; // Need CountryCode for setup, so do the Preview first
   FillSetup;

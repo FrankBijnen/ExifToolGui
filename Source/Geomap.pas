@@ -19,9 +19,11 @@ type
     OverPassUrl: string;
     OverPassCaseSensitive: boolean;
     OverPassCompleteWord: boolean;
+    OverPassLang: string;
     ThrottleOverPass: integer;
     CountryCodeLocation: boolean;
     GeoTagMode: TGeoTagMode;
+    GeoCodeDialog: boolean;
   end;
 
   TPlace = class
@@ -71,7 +73,7 @@ procedure ParseLatLon(const LatLon: string; var Lat, Lon: string);
 procedure AdjustLatLon(var Lat, Lon: string; No_Decimals: integer);
 function GetPlaceOfCoords(const Lat, Lon: string; const Provider: TGeoCodeProvider): TPlace;
 procedure ClearCoordCache;
-procedure GetCoordsOfPlace(const Place, Bounds: string; var Lat, Lon: string; const Provider: TGeoCodeProvider);
+procedure GetCoordsOfPlace(const Place, Bounds: string; var Lat, Lon: string);
 procedure ReadGeoCodeSettings(GUIini: TMemIniFile);
 procedure WriteGeoCodeSettings(GUIini: TMemIniFile);
 
@@ -120,7 +122,7 @@ uses
   System.Variants, System.JSON,  System.NetEncoding, System.Math, System.StrUtils, System.DateUtils,
   Winapi.Windows, Vcl.Dialogs,
   REST.Types, REST.Client, REST.Utils,
-  UFrmPlaces, ExifToolsGUI_Utils;
+  UFrmPlaces, UFrmGeoSearch, ExifToolsGUI_Utils;
 
 var
   CoordFormatSettings: TFormatSettings; // for StrToFloatDef -see Initialization
@@ -184,6 +186,9 @@ end;
 
 function TPlace.GetProvince: string;
 begin
+  if (GeoProvinceList.Values[FCountryCode] = 'None') then
+    exit('');
+
   result := GetPrioProvince;
 
   // Geocode
@@ -214,6 +219,9 @@ end;
 
 function TPlace.GetCity: string;
 begin
+  if (GeoCityList.Values[FCountryCode] = 'None') then
+    exit('');
+
   result := GetPrioCity;
 
   // Geocode
@@ -582,6 +590,9 @@ var
   ElementIndx:  integer;
   ElementType:  string;
 begin
+  if (GeoSettings.OverPassLang <> 'default') and
+     (GeoSettings.OverPassLang <> 'local') then
+    APlace.DefLang := GeoSettings.OverPassLang;
   for ElementIndx := FromElement to AJSONElements.Count -1 do
   begin
     JSONElement := AJSONElements.Items[ElementIndx];
@@ -595,7 +606,8 @@ begin
     if (JSONTags.GetValue<string>('admin_level') <> '2') then
       continue;
 
-    if (JSONTags.FindValue('default_language') <> nil) then
+    if (GeoSettings.OverPassLang = 'local') and
+       (JSONTags.FindValue('default_language') <> nil) then
       APlace.DefLang := JSONTags.GetValue<string>('default_language');
     if (JSONTags.FindValue('ISO3166-1:alpha2') <> nil) then
       APlace.CountryCode := JSONTags.GetValue<string>('ISO3166-1:alpha2');
@@ -758,14 +770,6 @@ begin
   Lon := '';
   with FrmPlaces do
   begin
-//TODO PARM
-//    if (Listview1.Items.Count = 1) then
-//    begin
-//      Lat := Listview1.Items[0].Caption;
-//      Lon := Listview1.Items[0].Subitems[0];
-//      exit;
-//    end;
-
     if (ShowModal <> IDOK) then
       exit;
     if (Listview1.Selected = nil) then
@@ -775,18 +779,18 @@ begin
   end;
 end;
 
-procedure GetCoordsOfPlace_OverPass(const Place, Bounds: string; var Lat, Lon: string);
+procedure GetCoordsOfPlace_OverPass(const City, Country, Bounds: string; var Lat, Lon: string);
 var
   RESTClient: TRESTClient;
   RESTRequest: TRESTRequest;
   RESTResponse: TRESTResponse;
-  City, Country: string;
 
   JSONObject     : TJSONObject;
   JSONElements   : TJSONArray;
   JSONElement    : TJSONValue;
   JSOnAdmin      : integer;
   ElementIndx    : integer;
+  SearchBounds   : string;
   SearchName     : string;
   SearchOp       : string;
   SearchStart    : string;
@@ -799,23 +803,17 @@ var
   JSONNodeVal    : TJSONObject;
   PlaceResult    : TPlace;
 begin
-  if (Length(Trim(Place)) < 5) and
+  if (Length(Trim(City)) < 5) and
+     (Country = '') and
      (Bounds = '') then
     exit;
 
   Throttle(GeoSettings.ThrottleOverPass);
-  Lat := '';
-  Lon := '';
 
-  Country := Place;
-  City := Trim(NextField(Country, ','));
-  if (City = '') then
-    exit;
-
-  City := StringReplace(Trim(City), '&', '', [rfReplaceAll]);
-  Country := StringReplace(Trim(Country), '&', '', [rfReplaceAll]);
-
+  Lat         := '';
+  Lon         := '';
   FormatNL    := '';
+  SearchBounds:= '';
   SearchOp    := '=';
   SearchStart := '';
   SearchEnd   := '';
@@ -835,39 +833,44 @@ begin
     SearchStart := '^';
     SearchEnd   := '$';
   end;
-  SearchName := Format('name%s"%s%s%s"%s', [SearchOp, SearchStart, City, SearchEnd, SearchCase]);
+  SearchName := Format('name%s"%s%s%s"%s',
+                  [SearchOp, SearchStart,
+                   StringReplace(Trim(City), '&', '', [rfReplaceAll]),
+                   SearchEnd, SearchCase]);
 
   Data := Format('[out:json][timeout:25];%s',
                   [FormatNL]);
+
   if (Country = '') then
-    // Query within bounds
-    Data := Data +
-            Format('node[%s][place~"^(village|city|town)$"](%s);%s',
-                   [SearchName, Bounds, FormatNL])
-  else
-  begin
-// Does NOT work
-//    Data := Data +
-//            Format('{{geocodeArea:"%s"}}->.searchArea;%',
-//            [Country, FormatNL]);
+  begin   // Query within selected bounds
+    if (Bounds <> '') then
+      SearchBounds := Format('(%s);', [Bounds]);
 
     Data := Data +
-    // Query for country case and language insensitive
+            Format('node[%s][place~"^(village|city|town)$"]%s%s',
+                     [SearchName, SearchBounds, FormatNL]);
+
+  end
+  else
+  begin   // Query within country/region case and language insensitive
+    Data := Data +
             	Format('rel[~"^name"~"^%s", i][boundary=administrative][admin_level~"2|4"];map_to_area->.searchArea;%s',
-                     [Country, FormatNL]);
+                       [StringReplace(Trim(Country), '&', '', [rfReplaceAll]),
+                        FormatNL]);
     Data := Data +
             Format('(%s' +
                    'node[%s][place~"city|town|village|hamlet"](area.searchArea);%s' +
                    ');%s',
-                   [FormatNL, SearchName, FormatNL, FormatNL]);
+                     [FormatNL, SearchName, FormatNL, FormatNL]);
   end;
   Data := Data +
-    Format('foreach%s{%s out qt;%s' +
-           'is_in; area._[name][boundary=administrative][admin_level];%s' +
+    Format('foreach%s{%s'+
+           '  out qt;%s' +
+           '  is_in; area._[name][boundary=administrative][admin_level];%s' +
            '  out qt;%s' +
            '  out count;%s' +
            '}%s',
-           [FormatNL, FormatNL, FormatNL, FormatNL, FormatNL, FormatNL, FormatNL, FormatNL]);
+             [FormatNL, FormatNL, FormatNL, FormatNL, FormatNL, FormatNL, FormatNL, FormatNL]);
 
   RESTClient := TRESTClient.Create(GeoSettings.OverPassUrl);
   RESTResponse := TRESTResponse.Create(nil);
@@ -940,27 +943,22 @@ begin
   end;
 end;
 
-procedure GetCoordsOfPlace_GeoCode(const Place: string; var Lat, Lon: string);
+procedure GetCoordsOfPlace_GeoCode(const City, Country: string; var Lat, Lon: string);
 var
   RESTClient: TRESTClient;
   RESTRequest: TRESTRequest;
   RESTResponse: TRESTResponse;
   JValue: TJSONValue;
   Places: TJSONArray;
-  City, Country: string;
 begin
-  if (Length(Trim(Place)) < 5) then
+  if (Length(Trim(City)) < 5) and
+     (Country = '') then
     exit;
 
   Throttle(GeoSettings.ThrottleGeoCode);
 
   Lat := '';
   Lon := '';
-
-  Country := Place;
-  City := Trim(NextField(Country, ','));
-  if (City = '') then
-    exit;
 
   RESTClient := TRESTClient.Create(GeoSettings.GeoCodeUrl);
   RESTResponse := TRESTResponse.Create(nil);
@@ -994,20 +992,35 @@ begin
   end;
 end;
 
-procedure GetCoordsOfPlace(const Place, Bounds: string; var Lat, Lon: string; const Provider: TGeoCodeProvider);
+procedure GetCoordsOfPlace(const Place, Bounds: string; var Lat, Lon: string);
 var
   CrWait, CrNormal: HCURSOR;
+  Region: string;
 begin
   if (BlockRestRequests) then
     exit;
+
+  Region := Place;
+  FGeoSearch.EdSearchCity.Text := Trim(NextField(Region, ','));
+  if (FGeoSearch.EdSearchCity.Text = '') then
+    exit;
+  FGeoSearch.EdRegion.Text := Trim(Region);
+  FGeoSearch.EdBounds.Text := Bounds;
+
+  if (GeoSettings.GeoCodeDialog) then
+  begin
+    if (FGeoSearch.ShowModal <> IDOK) then
+      exit;
+  end;
+
   CrWait := LoadCursor(0, IDC_WAIT);
   CrNormal := SetCursor(CrWait);
   try
-    case Provider of
+    case GeoSettings.GetCoordProvider  of
       TGeoCodeProvider.gpGeoName:
-        GetCoordsOfPlace_GeoCode(Place, Lat, Lon);
+        GetCoordsOfPlace_GeoCode(FGeoSearch.EdSearchCity.Text, FGeoSearch.EdRegion.Text, Lat, Lon);
       TGeoCodeProvider.gpOverPass:
-        GetCoordsOfPlace_OverPass(Place, Bounds, Lat, Lon);
+        GetCoordsOfPlace_OverPass(FGeoSearch.EdSearchCity.Text, FGeoSearch.EdRegion.Text, FGeoSearch.EdBounds.Text, Lat, Lon);
     end;
   finally
     SetCursor(CrNormal);
@@ -1027,7 +1040,7 @@ begin
   ParseLatLon(Place, Lat, Lon);
   if not(ValidLatLon(Lat, Lon)) then
   begin
-    GetCoordsOfPLace(Place, Bounds, Lat, Lon, GeoSettings.GetCoordProvider);
+    GetCoordsOfPLace(Place, Bounds, Lat, Lon);
     if not(ValidLatLon(Lat, Lon)) then
       exit;
     AdjustLatLon(Lat, Lon, Coord_Decimals);
@@ -1088,19 +1101,22 @@ end;
 procedure ReadGeoCodeSettings(GUIini: TMemIniFile);
 begin
 
-  GeoSettings.GetCoordProvider := TGeoCodeProvider(GUIini.ReadInteger(Geo_Settings, 'GetCoordProvider', 0));
+  GeoSettings.GetCoordProvider := TGeoCodeProvider(GUIini.ReadInteger(Geo_Settings, 'GetCoordProvider', 1));
   GeoSettings.GetPlaceProvider := TGeoCodeProvider(GUIini.ReadInteger(Geo_Settings, 'GetPlaceProvider', 1));
 
   GeoSettings.GeoCodeUrl := GUIini.ReadString(Geo_Settings, 'GeoCodeUrl', 'https://geocode.maps.co');
   GeoSettings.ThrottleGeoCode := GUIini.ReadInteger(Geo_Settings, 'ThrottleGeoCode', 500);
 
-  GeoSettings.OverPassUrl := GUIini.ReadString(Geo_Settings, 'OverPassUrl', 'https://www.overpass-api.de/api');
+  GeoSettings.OverPassUrl := GUIini.ReadString(Geo_Settings, 'OverPassUrl', 'https://overpass-api.de/api');
   GeoSettings.ThrottleOverPass := GUIini.ReadInteger(Geo_Settings, 'ThrottleOverPass', 10);
 
   GeoSettings.OverPassCaseSensitive := GUIini.ReadBool(Geo_Settings, 'OverPassCaseSensitive', True);
   GeoSettings.OverPassCompleteWord := GUIini.ReadBool(Geo_Settings, 'OverPassCompleteWord', True);
+  GeoSettings.OverPassCompleteWord := GUIini.ReadBool(Geo_Settings, 'OverPassCompleteWord', True);
+  GeoSettings.OverPassLang := GUIini.ReadString(Geo_Settings, 'OverPassLang', 'default');
   GeoSettings.CountryCodeLocation := GUIini.ReadBool(Geo_Settings, 'CountryCodeLocation', True);
   GeoSettings.GeoTagMode := TGeoTagMode(GUIini.ReadInteger(Geo_Settings, 'GeoTagMode', 1));
+  GeoSettings.GeoCodeDialog := GUIini.ReadBool(Geo_Settings, 'GeoCodeDialog', true);
 
   GUIini.ReadSectionValues(Geo_Province, GeoProvinceList);
 //Default = 6,5,4,3
@@ -1153,8 +1169,10 @@ begin
   GUIini.WriteInteger(Geo_Settings, 'ThrottleOverPass', GeoSettings.ThrottleOverPass);
   GUIini.WriteBool(Geo_Settings, 'OverPassCaseSensitive', GeoSettings.OverPassCaseSensitive);
   GUIini.WriteBool(Geo_Settings, 'OverPassCompleteWord', GeoSettings.OverPassCompleteWord);
+  GUIini.WriteString(Geo_Settings, 'OverPassLang', GeoSettings.OverPassLang);
   GUIini.WriteBool(Geo_Settings, 'CountryCodeLocation', GeoSettings.CountryCodeLocation);
   GUIini.WriteInteger(Geo_Settings, 'GeotagMode', Ord(GeoSettings.GeoTagMode));
+  GUIini.WriteBool(Geo_Settings, 'GeoCodeDialog', GeoSettings.GeoCodeDialog);
 
   TmpItems := TStringList.Create;
   try
