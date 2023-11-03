@@ -73,7 +73,8 @@ begin
     // Get Place of selected coordinates
     ClearCoordCache; // Make sure we dont get cached data.
     APlace := GetPlaceOfCoords(Lat, Lon, GeoSettings.GetPlaceProvider);
-
+    if not Assigned(APlace) then
+      exit;
     ValLocation.Strings.AddPair('Country', APlace.CountryLocation);
     ValLocation.Strings.AddPair('Province', APlace.Province);
     ValLocation.Strings.AddPair('City', APlace.City);
