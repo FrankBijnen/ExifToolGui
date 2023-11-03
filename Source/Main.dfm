@@ -271,6 +271,7 @@ object FMain: TFMain
         Font.Style = []
         ParentFont = False
         TabOrder = 1
+        ExplicitTop = 448
         DesignSize = (
           312
           106)
@@ -355,6 +356,7 @@ object FMain: TFMain
         OnKeyDown = MetadataListKeyDown
         OnMouseDown = MetadataListMouseDown
         OnSelectCell = MetadataListSelectCell
+        ExplicitHeight = 391
         ColWidths = (
           150
           160)
@@ -460,7 +462,6 @@ object FMain: TFMain
         Font.Style = []
         ParentFont = False
         TabOrder = 1
-        ExplicitTop = 522
         object SpeedBtn_Geotag: TSpeedButton
           AlignWithMargins = True
           Left = 3
@@ -506,7 +507,6 @@ object FMain: TFMain
         TabOrder = 2
         UserDataFolder = '%LOCALAPPDATA%\bds.exe.WebView2'
         OnWebMessageReceived = EdgeBrowser1WebMessageReceived
-        ExplicitHeight = 465
       end
     end
   end

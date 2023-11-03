@@ -97,8 +97,10 @@ object FGeotagFiles: TFGeotagFiles
           Top = 290
           Width = 470
           Height = 22
+          Style = csDropDownList
+          ItemIndex = 1
           TabOrder = 1
-          Text = 'CmbGeoTagMode'
+          Text = 'Location (Country, Province, City)'
           OnClick = CmbGeoTagModeClick
           Items.Strings = (
             'Coordinates (Lat, Lon) '

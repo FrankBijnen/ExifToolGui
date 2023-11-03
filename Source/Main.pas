@@ -329,17 +329,6 @@ uses System.StrUtils, System.Math, System.Masks, System.UITypes,
 const
   GUI_SEP = '-GUI-SEP';
 
-  // TODO Add to ini file
-  // Colors of the Bar charts.
-const
-  CLFNumber = $C0DCC0;
-
-const
-  CLFocal = $FFDAB6;
-
-const
-  CLISO = $D0D0D0;
-
   // Start Main
 
 procedure TFMain.WMEndSession(var Msg: TWMEndSession);
@@ -2952,7 +2941,7 @@ begin
         Insert('.', Ext, length(Ext)) // 58->5.8
       else
         SetLength(Ext, length(Ext) - 1);
-      ETBarSeriesFocal.AddBar(ChartFLength[I], Ext, CLFocal);
+      ETBarSeriesFocal.AddBar(ChartFLength[I], Ext, GUIsettings.CLFocal);
     end;
   end;
   ChartMaxFLength := Round(ChartMaxFLength * 1.1);
@@ -2966,7 +2955,7 @@ begin
         ChartMaxFNumber := ChartFNumber[I];
       Ext := IntToStr(I);
       Insert('.', Ext, length(Ext)); // 40->4.0
-      ETBarSeriesFnum.AddBar(ChartFNumber[I], Ext, CLFNumber);
+      ETBarSeriesFnum.AddBar(ChartFNumber[I], Ext, GUIsettings.CLFNumber);
     end;
   end;
   ChartMaxFNumber := Round(ChartMaxFNumber * 1.1);
@@ -2979,7 +2968,7 @@ begin
       if ChartISO[I] > ChartMaxISO then
         ChartMaxISO := ChartISO[I];
       Ext := IntToStr(I) + '0'; // 80->800
-      ETBarSeriesIso.AddBar(ChartISO[I], Ext, CLISO);
+      ETBarSeriesIso.AddBar(ChartISO[I], Ext, GUIsettings.CLISO);
     end;
   end;
   ChartMaxISO := Round(ChartMaxISO * 1.1);
