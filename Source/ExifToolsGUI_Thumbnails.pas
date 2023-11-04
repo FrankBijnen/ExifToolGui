@@ -141,7 +141,7 @@ begin
 
       // Sendmessage that task has finished.
       // We must wait for this message, to be sure that the Task object does not get freed to soon.
-      SendMessage(FHandle, CM_ThumbEnd, 0, 0);
+      SendMessage(FHandle, CM_ThumbEnd, FItemIndex, 0);
 
     except
       on E: Exception do
