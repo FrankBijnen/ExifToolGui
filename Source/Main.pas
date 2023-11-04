@@ -306,6 +306,7 @@ type
     function GetSelectedFiles(FileName: string; MustExpandPath: boolean): string; overload;
     function GetSelectedFiles(FileName: string = ''): string; overload;
     procedure ExecETEvent_Done(ExecNum: word; EtCmds, EtOuts, EtErrs, StatusLine: string; PopupOnError: boolean);
+    procedure ExecRestEvent_Done(Url, Response: string; Succes: boolean);
     procedure UpdateStatusBar_FilesShown;
     procedure SetGuiColor;
     var GUIBorderWidth, GUIBorderHeight: integer; // Initialized in OnShow
@@ -1782,6 +1783,31 @@ begin
   end;
 end;
 
+procedure TFmain.ExecRestEvent_Done(Url, Response: string; Succes: boolean);
+var
+  Indx: integer;
+  ErrStatus: string;
+begin
+  with FLogWin do
+  begin
+    if (Showing) then
+    begin
+      Indx := NextLogId;
+      if (Succes) then
+        ErrStatus := 'Ok'
+      else
+        ErrStatus := 'NOT Ok';
+      FExecs[Indx] := Format('Rest request: %s Update/ET Direct status: %s', [TimeToStr(now), ErrStatus]);
+      FCmds[Indx] := Url;
+      FEtOuts[Indx] := Response;
+
+      LBExecs.Items.Assign(Fexecs);
+      LBExecs.ItemIndex := Indx;
+      LBExecsClick(LBExecs);
+    end;
+  end;
+end;
+
 procedure TFMain.UpdateLocationfromGPScoordinates1Click(Sender: TObject);
 var
   CrWait, CrNormal: HCURSOR;
@@ -1851,14 +1877,14 @@ begin
   EditMapFind.Text := Parm1 + ', ' + Parm2;
   if (Msg = OSMCtrlClick) then
   begin
-    MapGotoPlace(EdgeBrowser1, EditMapFind.Text, '', '', InitialZoom_In);
+    MapGotoPlace(EdgeBrowser1, EditMapFind.Text, '', OSMCtrlClick, InitialZoom_In);
 
     exit;
   end;
 
   if (Msg = OSMGetLocation) then
   begin
-    MapGotoPlace(EdgeBrowser1, EditMapFind.Text, '', '', InitialZoom_Out);
+    MapGotoPlace(EdgeBrowser1, EditMapFind.Text, '', OSMGetLocation, InitialZoom_Out);
 
     exit;
   end;
@@ -2224,6 +2250,7 @@ begin
 
   CBoxFileFilter.Text := SHOWALL;
   ExifTool.ExecETEvent := ExecETEvent_Done;
+  Geomap.ExecRestEvent := ExecRestEvent_Done;
   MEmbedPreview.Enabled := HasJpegTran;
   MJPGAutorotate.Enabled := HasJHead and HasJpegTran;
 end;
