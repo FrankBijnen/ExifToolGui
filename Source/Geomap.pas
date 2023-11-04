@@ -8,6 +8,7 @@ uses
   Vcl.Edge;
 
 type
+  TExecRestEvent = procedure(Url, Response: string; Succes: boolean) of object;
   TGeoCodeProvider = (gpGeoName, gpOverPass);
   TGeoTagMode = (gtmCoordinates, gtmLocation, gtmCoordinatesLocation);
 
@@ -115,6 +116,7 @@ var
   GeoSettings: GEOsettingsRec;
   GeoProvinceList: TStringList;
   GeoCityList: TStringList;
+  ExecRestEvent: TExecRestEvent;
 
 implementation
 
@@ -463,7 +465,7 @@ begin
       if (boolean(Place.Value.Objects[PlaceCnt]) = true) then
         Href := Href + '<a href="file://' + StringReplace(ImgName, '\', '/', [rfReplaceAll]) + '">' +
                         ExtractFileName(ImgName) + '</a><br>'
-      else
+      else if (GetPlace = false) then
         Href := Href + '<a>' + ImgName + '</a><br>';
     end;
 
@@ -505,7 +507,7 @@ begin
     OsmHelper.WriteHeader;
     OsmHelper.WritePointsStart;
     OsmHelper.WritePoint(Lat, Lon, Desc, false);
-    OsmHelper.WritePointsEnd(Desc <> OSMHome);
+    OsmHelper.WritePointsEnd((GeoSettings.GeoCodingEnable) and (Desc <> OSMHome));
     OsmHelper.WriteFooter;
   finally
     OsmHelper.Free;
@@ -517,17 +519,21 @@ function ExecuteRest(const RESTRequest: TRESTRequest): boolean;
 begin
   result := true;
   try
-    RESTRequest.Execute;
-  except
-    on E:Exception do
-    begin
-      result := false;
-      if (MessageDlgEx('Request failed with' + E.Message + #10 + 'Continue ? (Re-enable in Preferences)', '',
-                       TMsgDlgType.mtInformation,
-                       [TMsgDlgBtn.mbYes, TMsgDlgBtn.mbNo]) = IDNO) then
-        GeoSettings.GeoCodingEnable := false;
-      exit;
+    try
+      RESTRequest.Execute;
+    except
+      on E:Exception do
+      begin
+        result := false;
+        if (MessageDlgEx('Request failed with' + E.Message + #10 + 'Continue ? (Re-enable in Preferences)', '',
+                         TMsgDlgType.mtInformation,
+                         [TMsgDlgBtn.mbYes, TMsgDlgBtn.mbNo]) = IDNO) then
+          GeoSettings.GeoCodingEnable := false;
+      end;
     end;
+  finally
+    if Assigned(ExecRestEvent) then
+      ExecRestEvent(RESTRequest.GetFullRequestURL(true) + #10, RESTRequest.Response.Content, result);
   end;
 end;
 
@@ -755,8 +761,8 @@ begin
       TGeoCodeProvider.gpOverPass:
         result := GetPlaceOfCoords_OverPass(Lat, Lon);
     end;
-    if (Assigned(result)) then
-      CoordCache.Add(CoordsKey, result);
+    // Also cache if not found
+    CoordCache.Add(CoordsKey, result);
   finally
     SetCursor(CrNormal);
   end;
