@@ -615,7 +615,7 @@ begin
   finally
     FThumbTasks.Clear;
     FGenerating := 0;
-    System.TMonitor.exit(FThumbTasks);
+    System.TMonitor.Exit(FThumbTasks);
   end;
 end;
 
