@@ -1200,7 +1200,7 @@ begin
   XMPsize := 0;
   JPGfromRAWoffset := 0; // for Panasonic RW2
 
-  FotoF := TFileStream.Create(FName, fmOpenRead);
+  FotoF := TFileStream.Create(FName, fmOpenRead or fmShareDenyNone);
   try
     if (FotoF.Size > 31) then
     begin // size must be at least 32 bytes
@@ -1287,7 +1287,7 @@ var
 // --------------------------------------------------------------
 begin
   Rotate := 0;
-  FotoF := TFileStream.Create(FName, fmOpenRead);
+  FotoF := TFileStream.Create(FName, fmOpenRead or fmShareDenyNone);
   try
     if (FotoF.Size > 31) then
     begin // size must be at least 32 bytes
@@ -1342,7 +1342,7 @@ begin
   wHeight := 0;
   if FileExists(sFile) then
   begin
-    FotoF := TFileStream.Create(sFile, fmOpenRead);
+    FotoF := TFileStream.Create(sFile, fmOpenRead or fmShareDenyNone);
     try
       w := 0;
       FotoF.Read(w, 2);
