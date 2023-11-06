@@ -10,7 +10,6 @@ uses Winapi.ShlObj, Winapi.ActiveX, Winapi.Windows, Winapi.Messages,
 const
   VolumeCachesKey = 'SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\VolumeCaches';
   StateFlag = 'StateFlags';
-  ThumbnailCache = 'Thumbnail Cache';
 
 type
   TStateFlagId = string[4];
@@ -34,14 +33,15 @@ type
     FItemIndex: integer;
     FMax: integer;
     FListView: TShellListView;
-    FPitemIDList: pointer;
+    FPitemIDListItem: pointer;
+    FPitemIDListRoot: pointer;
     FThreadPool: TThreadPool;
     FPathName: string;
     procedure DoExecuteListView;
     procedure DoExecuteBackground;
   public
-    constructor Create(const AItemIndex: integer; const AListView: TShellListView; const APitemIDList: pointer; const AThreadPool: TThreadPool;
-      const AMax: integer); overload;
+    constructor Create(const AItemIndex: integer; const AListView: TShellListView;
+                       const AThreadPool: TThreadPool; const AMax: integer); overload;
     constructor Create(const AItemIndex: integer; const AHandle: HWND; const APathName: string; const AMax: integer); overload;
     destructor Destroy; override;
     function Start: ITask;
@@ -52,7 +52,8 @@ type
   end;
 
   // Image thumbnails
-function GetThumbCache(AFilePath: string; var hBmp: HBITMAP; Flags: TSIIGBF; AMaxX: longint; AMaxY: longint): HRESULT;
+function GetThumbCache(APIdl: PItemIDList; var hBmp: HBITMAP; Flags: TSIIGBF; AMaxX: longint; AMaxY: longint): HRESULT; overload;
+function GetThumbCache(APath: string; var hBmp: HBITMAP; Flags: TSIIGBF; AMaxX: longint; AMaxY: longint): HRESULT; overload;
 procedure GenerateThumbs(AFilePath: string; Subdirs: boolean; AMax: longint; FOnReady: TNotifyEvent = nil);
 
 // Functions for CleanMgr.exe
@@ -62,22 +63,30 @@ function RunAsAdmin(const Handle: HWND; const Path, Params: string; Show: intege
 
 implementation
 
-uses Winapi.ShellAPI, System.Win.Registry, System.UITypes,
+uses Winapi.ShellAPI, System.Win.Registry, System.UITypes, System.Win.ComObj,
   ExifToolsGUI_Utils, UFrmGenerate;
 
 var
   FThreadPool: TThreadPool;
 
+function GetPidlFromName(const Name: string): PItemIDList;
+begin
+  Result := ILCreateFromPath(PChar(Name));
+  if not Assigned(Result) then
+    RaiseLastOSError;
+end;
+
   // TThumbTask. Generates Thumbnail in a separate thread.
 
   // Constructor for use in Listview
-constructor TThumbTask.Create(const AItemIndex: integer; const AListView: TShellListView; const APitemIDList: pointer; const AThreadPool: TThreadPool;
-  const AMax: integer);
+constructor TThumbTask.Create(const AItemIndex: integer; const AListView: TShellListView;
+                              const AThreadPool: TThreadPool; const AMax: integer);
 begin
   FItemIndex := AItemIndex;
   FListView := AListView;
   FHandle := FListView.Handle;
-  FPitemIDList := APitemIDList;
+  FPitemIDListRoot := AListView.RootFolder.AbsoluteID;
+  FPitemIDListItem := AListView.Folders[FItemIndex].AbsoluteID;
   FThreadPool := AThreadPool;
   FMax := AMax;
   FPathName := AListView.Folders[FItemIndex].PathName;
@@ -119,7 +128,7 @@ begin
       while (Tries > 0) and (Hr <> S_OK) and (GetStatus <> TTaskStatus.Canceled) do
       begin
         dec(Tries);
-        Hr := GetThumbCache(FPathName, hBmp, Flags, FMax, FMax);
+        Hr := GetThumbCache(FPitemIDListItem, hBmp, Flags, FMax, FMax);
         if (Hr <> S_OK) then
         begin
           DeleteObject(hBmp); // Not sure if this is needed
@@ -129,7 +138,7 @@ begin
 
       // The task is canceled, or the current path has changed.
       // Dont send any messages, but delete bitmap. If the handle is invalid, doesn't matter
-      if (GetStatus = TTaskStatus.Canceled) or (FPitemIDList <> FListView.RootFolder.AbsoluteID) then
+      if (GetStatus = TTaskStatus.Canceled) or (FPitemIDListRoot <> FListView.RootFolder.AbsoluteID) then
       begin
         DeleteObject(hBmp);
         exit;
@@ -168,7 +177,6 @@ begin
 
     Flags := SIIGBF_THUMBNAILONLY;
     Hr := GetThumbCache(FPathName, hBmp, Flags, FMax, FMax);
-
     // We must update the form in the main thread, send a message
     if (Hr = S_OK) then
       SendMessage(FHandle, CM_ThumbGenProgress, FItemIndex, LPARAM(ExtractFileName(FPathName)));
@@ -189,18 +197,29 @@ begin
   inherited;
 end;
 
-function GetThumbCache(AFilePath: string; var hBmp: HBITMAP; Flags: TSIIGBF; AMaxX: longint; AMaxY: longint): HRESULT;
+function GetThumbCache(APIdl: PItemIDList; var hBmp: HBITMAP; Flags: TSIIGBF; AMaxX: longint; AMaxY: longint): HRESULT;
 var
   FileShellItemImage: IShellItemImageFactory;
   S: TSize;
 begin
-  result := SHCreateItemFromParsingName(PChar(AFilePath), nil, IShellItemImageFactory, FileShellItemImage);
+  result := SHCreateItemFromIDList(APIdl, IShellItemImageFactory, FileShellItemImage);
 
   if Succeeded(result) then
   begin
     S.cx := AMaxX;
     S.cy := AMaxY;
     result := FileShellItemImage.GetImage(S, Flags, hBmp);
+  end;
+end;
+
+function GetThumbCache(APath: string; var hBmp: HBITMAP; Flags: TSIIGBF; AMaxX: longint; AMaxY: longint): HRESULT;
+var APidl: PItemIDList;
+begin
+  APidl := GetPidlFromName(APath);
+  try
+    result := GetThumbCache(APidl, hBmp, Flags, AMaxX, AMaxY);
+  finally
+    CoTaskMemFree(APidl);
   end;
 end;
 

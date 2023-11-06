@@ -430,14 +430,14 @@ begin
     begin
       ItemIndx := ANitem.Index;
 
-      Hr := GetThumbCache(Folders[ItemIndx].PathName, HBmp, SIIGBF_THUMBNAILONLY or SIIGBF_INCACHEONLY, FThumbNails.Width, FThumbNails.Height);
+      Hr := GetThumbCache(Folders[ItemIndx].AbsoluteID, HBmp, SIIGBF_THUMBNAILONLY or SIIGBF_INCACHEONLY, FThumbNails.Width, FThumbNails.Height);
       if (Hr = S_OK) then
         Add2ThumbNails(HBmp, ItemIndx, false)
       else
       begin
         // No thumbnail in cache.
         // Show the Icon. That is reasonably fast.
-        Hr := GetThumbCache(Folders[ItemIndx].PathName, HBmp, SIIGBF_ICONONLY, FThumbNails.Width, FThumbNails.Height);
+        Hr := GetThumbCache(Folders[ItemIndx].AbsoluteID, HBmp, SIIGBF_ICONONLY, FThumbNails.Width, FThumbNails.Height);
         if (Hr = S_OK) then
           Add2ThumbNails(HBmp, ItemIndx, true);
       end;
@@ -543,7 +543,7 @@ function TShellListView.OwnerDataFetch(Item: TListItem; Request: TItemRequest): 
       inc(FGenerating);
       // Add to list of thumbnails to generate
       TaskId := FThumbTasks.Add(nil);
-      FThumbTasks[TaskId] := TThumbTask.Create(ItemIndx, Self, Self.RootFolder.AbsoluteID, FThreadPool, FThumbNailSize);
+      FThumbTasks[TaskId] := TThumbTask.Create(ItemIndx, Self, FThreadPool, FThumbNailSize);
     finally
       System.TMonitor.Exit(FThumbTasks);
     end;

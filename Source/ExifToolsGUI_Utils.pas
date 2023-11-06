@@ -44,7 +44,6 @@ function DirectCmdFromArgs(const ArgsIn: string): string;
 procedure WriteArgsFile(const ETInp, ArgsFile: string; Preamble: boolean = false);
 
 // Image
-function GetThumbCache(AFilePath: string; var hBmp: HBITMAP; Flags: TSIIGBF; AMaxX: longint; AMaxY: longint): HRESULT;
 function IsJpeg(Filename: string): boolean;
 function GetBitmapFromWic(const FWicBitmapSource: IWICBitmapSource): TBitmap;
 function WicPreview(AImg: string; Rotate, MaxW, MaxH: cardinal): IWICBitmapSource;
@@ -394,21 +393,6 @@ var
 begin
   Ext := ';' + ExtractFileExt(Filename) + ';';
   result := (ContainsText(';.jpg;.jpeg;', Ext));
-end;
-
-function GetThumbCache(AFilePath: string; var hBmp: HBITMAP; Flags: TSIIGBF; AMaxX: longint; AMaxY: longint): HRESULT;
-var
-  FileShellItemImage: IShellItemImageFactory;
-  S: TSize;
-begin
-  result := SHCreateItemFromParsingName(PChar(AFilePath), nil, IShellItemImageFactory, FileShellItemImage);
-
-  if SUCCEEDED(result) then
-  begin
-    S.cx := AMaxX;
-    S.cy := AMaxY;
-    result := FileShellItemImage.GetImage(S, Flags, hBmp);
-  end;
 end;
 
 // Get a bitmap from WIC
