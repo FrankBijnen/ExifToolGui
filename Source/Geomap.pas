@@ -623,17 +623,16 @@ end;
 
 function GetPlaceOfCoords_OverPass(const Lat, Lon: string): TPlace;
 var
-  RESTClient: TRESTClient;
-  RESTRequest: TRESTRequest;
-  RESTResponse: TRESTResponse;
-
-  JSONObject     : TJSONObject;
-  JSONElements   : TJSONArray;
-  JSONElement    : TJSONValue;
-  JSONTags       : TJSONObject;
-  JSONTagVal     : TJSONValue;
-  JSOnAdmin      : integer;
-  Data           : string;
+  RESTClient      : TRESTClient;
+  RESTRequest     : TRESTRequest;
+  RESTResponse    : TRESTResponse;
+  JSONObject      : TJSONObject;
+  JSONElements    : TJSONArray;
+  JSONElement     : TJSONValue;
+  JSONTags        : TJSONObject;
+  JSONTagVal      : TJSONValue;
+  JSOnAdmin       : integer;
+  Data            : string;
 begin
   result := TPlace.Create;
   Throttle(GeoSettings.ThrottleOverPass);
@@ -790,27 +789,26 @@ end;
 
 procedure GetCoordsOfPlace_OverPass(const City, Country, Bounds: string; var Lat, Lon: string);
 var
-  RESTClient: TRESTClient;
-  RESTRequest: TRESTRequest;
-  RESTResponse: TRESTResponse;
-
-  JSONObject     : TJSONObject;
-  JSONElements   : TJSONArray;
-  JSONElement    : TJSONValue;
-  JSOnAdmin      : integer;
-  ElementIndx    : integer;
-  SearchBounds   : string;
-  SearchName     : string;
-  SearchOp       : string;
-  SearchStart    : string;
-  SearchEnd      : string;
-  SearchCase     : string;
-  FormatNL       : string;
-  Data           : string;
-  ElementType    : string;
-  JSONNodeVal    : TJSONObject;
-  JSONTagVal     : TJSONValue;
-  PlaceResult    : TPlace;
+  RESTClient      : TRESTClient;
+  RESTRequest     : TRESTRequest;
+  RESTResponse    : TRESTResponse;
+  JSONObject      : TJSONObject;
+  JSONElements    : TJSONArray;
+  JSONElement     : TJSONValue;
+  JSOnAdmin       : integer;
+  ElementIndx     : integer;
+  SearchBounds    : string;
+  SearchName      : string;
+  SearchOp        : string;
+  SearchStart     : string;
+  SearchEnd       : string;
+  SearchCase      : string;
+  FormatNL        : string;
+  Data            : string;
+  ElementType     : string;
+  JSONNodeVal     : TJSONObject;
+  JSONTagVal      : TJSONValue;
+  PlaceResult     : TPlace;
 begin
   if (Length(Trim(City)) < 5) and
      (Country = '') and
