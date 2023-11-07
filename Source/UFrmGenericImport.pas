@@ -1,4 +1,6 @@
 unit UFrmGenericImport;
+//TODO Decide if we want to enable. For now to dangerous.
+{.$DEFINE ENABLEREMOVEOTHERS}
 
 interface
 
@@ -162,7 +164,11 @@ end;
 procedure TFGenericImport.FormCreate(Sender: TObject);
 begin
   ChkAutoRotate.Checked := true;
+  ChkRemoveOthers.Visible := false;
   ChkRemoveOthers.Checked := false;
+{$IFDEF ENABLEREMOVEOTHERS}
+  ChkRemoveOthers.Visible := true;
+{$ENDIF}
   CmbCrop.ItemIndex := 0;
 end;
 
