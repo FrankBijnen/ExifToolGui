@@ -172,7 +172,7 @@ type
     JPGGenericlosslessautorotate1: TMenuItem;
     EditMapBounds: TLabeledEdit;
     N10: TMenuItem;
-    UpdateLocationfromGPScoordinates1: TMenuItem;
+    UpdateLocationfromGPScoordinates: TMenuItem;
     procedure ShellListClick(Sender: TObject);
     procedure ShellListKeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
     procedure SpeedBtnExifClick(Sender: TObject);
@@ -273,7 +273,7 @@ type
     procedure GenericExtractPreviewsClick(Sender: TObject);
     procedure GenericImportPreviewClick(Sender: TObject);
     procedure JPGGenericlosslessautorotate1Click(Sender: TObject);
-    procedure UpdateLocationfromGPScoordinates1Click(Sender: TObject);
+    procedure UpdateLocationfromGPScoordinatesClick(Sender: TObject);
   private
     { Private declarations }
     ETBarSeriesFocal: TBarSeries;
@@ -1808,7 +1808,7 @@ begin
   end;
 end;
 
-procedure TFMain.UpdateLocationfromGPScoordinates1Click(Sender: TObject);
+procedure TFMain.UpdateLocationfromGPScoordinatesClick(Sender: TObject);
 var
   CrWait, CrNormal: HCURSOR;
   SelectedFiles: TStringList;
@@ -2311,10 +2311,12 @@ begin
   AdvPageMetadata.ActivePage := AdvTabMetadata;
   AdvPageFilelist.ActivePage := AdvTabFilelist;
 
+  UpdateLocationfromGPScoordinates.Enabled := false;
   AdvTabOSMMap.Enabled := false;
   if GUIsettings.EnableGMap then
   begin
     try
+      UpdateLocationfromGPScoordinates.Enabled := true;
       ParseLatLon(GUIsettings.DefGMapHome, Lat, Lon);
       OSMMapInit(EdgeBrowser1, Lat, Lon, OSMHome, InitialZoom_Out);
       AdvTabOSMMap.Enabled := true;

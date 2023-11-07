@@ -1137,9 +1137,9 @@ object FMain: TFMain
       object N10: TMenuItem
         Caption = '-'
       end
-      object UpdateLocationfromGPScoordinates1: TMenuItem
+      object UpdateLocationfromGPScoordinates: TMenuItem
         Caption = 'Update City, Province, Country from GPS coordinates'
-        OnClick = UpdateLocationfromGPScoordinates1Click
+        OnClick = UpdateLocationfromGPScoordinatesClick
       end
     end
     object MVarious: TMenuItem
