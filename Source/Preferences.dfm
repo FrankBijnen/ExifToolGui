@@ -3,8 +3,8 @@ object FPreferences: TFPreferences
   Top = 0
   BorderStyle = bsDialog
   Caption = 'Preferences'
-  ClientHeight = 395
-  ClientWidth = 600
+  ClientHeight = 394
+  ClientWidth = 596
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -17,7 +17,7 @@ object FPreferences: TFPreferences
     Left = 0
     Top = 0
     Width = 521
-    Height = 395
+    Height = 394
     ActivePage = AdvTabGeneral
     Align = alLeft
     DoubleBuffered = True

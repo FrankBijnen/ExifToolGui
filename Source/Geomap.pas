@@ -26,6 +26,7 @@ type
     CountryCodeLocation: boolean;
     GeoTagMode: TGeoTagMode;
     GeoCodeDialog: boolean;
+    ReverseGeoCodeDialog: boolean;
   end;
 
   TPlace = class
@@ -237,14 +238,14 @@ begin
     result := FCityList.Values['city'];
 
   // Overpass
+  if (result = '') and (FCityList.Values['10'] <> '') then
+    result := FCityList.Values['10'];
+  if (result = '') and (FCityList.Values['9'] <> '') then
+    result := FCityList.Values['9'];
   if (result = '') and (FCityList.Values['8'] <> '') then
     result := FCityList.Values['8'];
   if (result = '') and (FCityList.Values['7'] <> '') then
     result := FCityList.Values['7'];
-  if (result = '') and (FCityList.Values['9'] <> '') then
-    result := FCityList.Values['9'];
-  if (result = '') and (FCityList.Values['10'] <> '') then
-    result := FCityList.Values['10'];
 end;
 
 function Tplace.GetSearchResult: string;
@@ -1113,16 +1114,12 @@ end;
 
 procedure ReadGeoCodeSettings(GUIini: TMemIniFile);
 begin
-
-  GeoSettings.GetCoordProvider := TGeoCodeProvider(GUIini.ReadInteger(Geo_Settings, 'GetCoordProvider', 1));
+  GeoSettings.GetCoordProvider := TGeoCodeProvider(GUIini.ReadInteger(Geo_Settings, 'GetCoordProvider', 0));
   GeoSettings.GetPlaceProvider := TGeoCodeProvider(GUIini.ReadInteger(Geo_Settings, 'GetPlaceProvider', 1));
-
   GeoSettings.GeoCodeUrl := GUIini.ReadString(Geo_Settings, 'GeoCodeUrl', 'https://geocode.maps.co');
   GeoSettings.ThrottleGeoCode := GUIini.ReadInteger(Geo_Settings, 'ThrottleGeoCode', 500);
-
   GeoSettings.OverPassUrl := GUIini.ReadString(Geo_Settings, 'OverPassUrl', 'https://overpass-api.de/api');
   GeoSettings.ThrottleOverPass := GUIini.ReadInteger(Geo_Settings, 'ThrottleOverPass', 10);
-
   GeoSettings.OverPassCaseSensitive := GUIini.ReadBool(Geo_Settings, 'OverPassCaseSensitive', True);
   GeoSettings.OverPassCompleteWord := GUIini.ReadBool(Geo_Settings, 'OverPassCompleteWord', True);
   GeoSettings.OverPassCompleteWord := GUIini.ReadBool(Geo_Settings, 'OverPassCompleteWord', True);
@@ -1130,44 +1127,12 @@ begin
   GeoSettings.CountryCodeLocation := GUIini.ReadBool(Geo_Settings, 'CountryCodeLocation', True);
   GeoSettings.GeoTagMode := TGeoTagMode(GUIini.ReadInteger(Geo_Settings, 'GeoTagMode', 1));
   GeoSettings.GeoCodeDialog := GUIini.ReadBool(Geo_Settings, 'GeoCodeDialog', true);
+  GeoSettings.ReverseGeoCodeDialog := GUIini.ReadBool(Geo_Settings, 'ReverseGeoCodeDialog', true);
   GeoSettings.GeoCodingEnable := GUIini.ReadBool(Geo_Settings, 'GeoCodingEnable', false);
 
   GUIini.ReadSectionValues(Geo_Province, GeoProvinceList);
-//Default = 6,5,4,3
-  if (GeoProvinceList.Count = 0) then
-  begin
-    GeoProvinceList.AddPair('NL','4');
-    GeoProvinceList.AddPair('DE','4');
-    GeoProvinceList.AddPair('PL','4');
-    GeoProvinceList.AddPair('CA','4');
-    GeoProvinceList.AddPair('US','4');
-    GeoProvinceList.AddPair('EC','4');
-    GeoProvinceList.AddPair('ZA','4');
-  end;
 
   GUIini.ReadSectionValues(Geo_City, GeoCityList);
-//default = 8,7,9,10
-  if (GeoCityList.Count = 0) then
-  begin
-    GeoCityList.AddPair('NL','10');
-//    GeoCityList.AddPair('DE','8,7,6,9,10');
-    GeoCityList.AddPair('AU','10');
-    GeoCityList.AddPair('BE','9');
-    GeoCityList.AddPair('FI','9');
-    GeoCityList.AddPair('NO','9');
-    GeoCityList.AddPair('PT','9');
-    GeoCityList.AddPair('SI','9');
-//    GeoCityList.AddPair('SE','9,7');
-    GeoCityList.AddPair('SE','9');
-//    GeoCityList.AddPair('EC','6,7,8');
-    GeoCityList.AddPair('EC','6');
-//    GeoCityList.AddPair('ZA','6,7,8');
-    GeoCityList.AddPair('ZA','6');
-//    GeoCityList.AddPair('SK','6,7,8');
-    GeoCityList.AddPair('SK','6');
-    GeoCityList.AddPair('GR','7');
-    GeoCityList.AddPair('GB','10');
-  end;
 end;
 
 procedure WriteGeoCodeSettings(GUIini: TMemIniFile);
@@ -1176,7 +1141,6 @@ var
 begin
   GUIini.WriteString(Geo_Settings, 'GeoCodeUrl', GeoSettings.GeoCodeUrl);
   GUIini.WriteString(Geo_Settings, 'OverPassUrl', GeoSettings.OverPassUrl);
-
   GUIini.WriteInteger(Geo_Settings, 'GetCoordProvider', Ord(GeoSettings.GetCoordProvider));
   GUIini.WriteInteger(Geo_Settings, 'ThrottleGeoCode', GeoSettings.ThrottleGeoCode);
   GUIini.WriteInteger(Geo_Settings, 'GetPlaceProvider', Ord(GeoSettings.GetPlaceProvider));
@@ -1187,6 +1151,7 @@ begin
   GUIini.WriteBool(Geo_Settings, 'CountryCodeLocation', GeoSettings.CountryCodeLocation);
   GUIini.WriteInteger(Geo_Settings, 'GeotagMode', Ord(GeoSettings.GeoTagMode));
   GUIini.WriteBool(Geo_Settings, 'GeoCodeDialog', GeoSettings.GeoCodeDialog);
+  GUIini.WriteBool(Geo_Settings, 'ReverseGeoCodeDialog', GeoSettings.ReverseGeoCodeDialog);
   GUIini.WriteBool(Geo_Settings, 'GeoCodingEnable', GeoSettings.GeoCodingEnable);
 
   TmpItems := TStringList.Create;
@@ -1202,9 +1167,7 @@ begin
   end;
 end;
 
-
 initialization
-
 begin
   CoordFormatSettings.ThousandSeparator := ',';
   CoordFormatSettings.DecimalSeparator := '.';

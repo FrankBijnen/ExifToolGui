@@ -3116,7 +3116,7 @@ begin
     exit;
   end;
 
-  if (GUIsettings.ReverseGeoCodeDialog = false) then
+  if (Geosettings.ReverseGeoCodeDialog = false) then
   begin
     FGeotagFiles.FillPreview;
     FGeotagFiles.Execute;

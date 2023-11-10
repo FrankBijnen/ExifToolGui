@@ -10,7 +10,7 @@ Changes to the original library:
 	- wsWarn -> DebugMsg
 	- wsFail -> Exception
 
-- A few changes were made to enable compiling for WIN64. (Pointers cast to integer replaced by NativeInt for eaxmple)
+- A few changes were made to enable compiling for WIN64. (Pointers cast to integer replaced by NativeInt for example)
 
 - UTF8String -> string. To get rid of the compiler warnings.
   Note: AnsiStrings are unchanged. Especially those strings used in JPEG files.
