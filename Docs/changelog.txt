@@ -32,3 +32,9 @@ Version:        Description             Issue
                 Fix Issue #85           Add API WindowsWideFile to options and save in INI
                 Fix Issue #91           Allow duplicate tag names in Workspace
                 Fix Issue #95           Column sorting and user defined fields. ET executed in wrong directory
+6.2.5.0         Fix Issue #51           Investigate the possibility to code the jhead & jpegtran in Delphi
+                Fix Issue #106          MenuMsg not handled forShellList and ShellTree submenus
+                Fix Issue #109          Add Find function to Metadata
+                Fix Issue #111          Executing some commands make ExifToolGui hang. (Forgot CRLF)
+                Fix Issue #126          Reverse Geocoding (feature request) 
+                Fix Issue #140          Support long filenames (Path > MAX_PATH)

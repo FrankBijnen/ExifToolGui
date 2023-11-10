@@ -48,8 +48,6 @@ My personal view:
 - The temp-files should be deleted upon closing the application. But in case of abnormal termination it's only logical that they are not deleted.
 - 'Leaving no traces' should not be the goal of the design. Besides the fact that it's nearly impossible, why would you want it? To me it has a nasty smell, what do you want to hide?
 
-Post your feedback on GIT Hub (https://github.com/FrankBijnen/ExifToolGui/), or the ExifTool forum (https://exiftool.org/forum/index.php?topic=15053.0) .
-
 Frank
 
 

@@ -78,4 +78,17 @@ Changed with version 6.2.0
   If you have duplicate Tag Names in your workspace, they will not be discarded anymore.
   An option has been added to the Preferences to allow Double Click to add/remove to the workspace.
 
-Frank Bijnen
+Changed with version 6.2.5
+- Lossless rotate and crop is now coded in Delphi. You dont need external programs Jhead and JpegTran anymore. The affected menu-items are marked 'Deprecated', they will continue to work, but removed in a next release.
+  The deprecated menu-items are replaced by new ones that use the Delphi code. They will show a dialog giving you more control. 
+  See also: 'Readme Lossless rotate_Import_Export previews.txt'
+
+- GeoCoding has been enhanced. You can now select a provider, and reverse GeoCoding has been implemented. Find the location (Country, Province, City) from GPS coordinates and store it in metadata.
+  See also: 'Readme GeoCoding.txt'
+
+- A 'find' edit box has been added to the metadata, allowing you to search for tag names and values.
+
+- Various small fixes, for bugs encountered when testing. 
+  If you find a bug, or think you found one, dont hesitate to report. You can create an issue on Github (https://github.com/FrankBijnen/ExifToolGui/issues) or post on the ExifTool forum (https://exiftool.org/forum/index.php?board=7.0). 
+
+Frank

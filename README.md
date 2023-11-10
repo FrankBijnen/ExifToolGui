@@ -46,7 +46,7 @@ Just take these executables from that version. You can find them in the zip in f
 Documentation.
 
  Online documentation is available at https://exiftool.org/gui/
- It is written with V5 in mind, but most of it still applies. 
+ It is written with V5 in mind, but most of it still applies.
 
 
 Frank Bijnen

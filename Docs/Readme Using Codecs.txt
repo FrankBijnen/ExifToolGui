@@ -31,6 +31,4 @@ I also have JPG's and MP4's created by an Android Samsung phone, the standard Wi
    Contrary to the FastPicture viewer is can apply the camera settings, which makes it considerable slower.
    If you install FastPicture viewer and Abobe DNG Codec both, the latter is preferred by Windows.
 
-If you have more information post it on GIT Hub (https://github.com/FrankBijnen/ExifToolGui/), or the ExifTool forum (https://exiftool.org/forum/index.php?topic=15053.0) .
-
 Frank
