@@ -144,7 +144,7 @@ begin
   GeoSettings.ThrottleOverPass := UpdThrottleOverpass.Position;
   GeoSettings.GeoCodeDialog := ChkGeoCodeDialog.Checked;
   GeoSettings.GeoCodingEnable := ChkGeoCodingEnable.Checked;
-  GUIsettings.ReverseGeoCodeDialog := ChkReverseGeoCodeDialog.Checked;
+  GeoSettings.ReverseGeoCodeDialog := ChkReverseGeoCodeDialog.Checked;
 end;
 
 procedure TFPreferences.BtnSetupCleanClick(Sender: TObject);
@@ -304,7 +304,7 @@ begin
     UpdThrottleOverpass.Position := GeoSettings.ThrottleOverPass;
     ChkGeoCodingEnable.Checked := GeoSettings.GeoCodingEnable;
     ChkGeoCodeDialog.Checked := GeoSettings.GeoCodeDialog;
-    ChkReverseGeoCodeDialog.Checked := GUIsettings.ReverseGeoCodeDialog;
+    ChkReverseGeoCodeDialog.Checked := GeoSettings.ReverseGeoCodeDialog;
 
     AdvPageControl1.ActivePage := AdvTabGeneral;
   finally

@@ -154,10 +154,10 @@ begin
       begin
         begin
           CmbCity.Items.Add('Default');
+          CmbCity.Items.Add('10');
+          CmbCity.Items.Add('9');
           CmbCity.Items.Add('8');
           CmbCity.Items.Add('7');
-          CmbCity.Items.Add('9');
-          CmbCity.Items.Add('10');
           CmbCity.Items.Add('None');
         end;
       end;
