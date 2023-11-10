@@ -6,6 +6,4 @@ I made a few changes as described in https://github.com/FrankBijnen/ExifToolGui/
 These changes fixed the Shelllist (the list of files you see), the preview, thumbnail generating and getting Metadata info for the filelist.
 I did NOT test other functions, maybe I will reopen the issue if I happen to spot an error. I dont consider this to have a high prio.
 
-Post your feedback on GIT Hub (https://github.com/FrankBijnen/ExifToolGui/), or the ExifTool forum (https://exiftool.org/forum/index.php?topic=15053.0) .
-
 Frank

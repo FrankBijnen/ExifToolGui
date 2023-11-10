@@ -61,6 +61,4 @@ My personal motives for updating these functions:
 - I use DNG files, created by Adobe DNG Converter. Adobe Dng Converter saves a preview in JpegFromRaw, not in PreviewImage.
 - I was unable to update the preview in my DNG files, only CR2 was allowed.
 
-Post your feedback on GIT Hub (https://github.com/FrankBijnen/ExifToolGui/), or the ExifTool forum (https://exiftool.org/forum/index.php?topic=15053.0) .
-
 Frank

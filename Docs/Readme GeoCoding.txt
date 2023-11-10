@@ -103,7 +103,4 @@ Search for the location of coordinates. Reverse geocoding.
 
    All Rest requests (calls to the GeoCode provider) are logged and visible in the log window. You can copy the executed Command and paste it in a browser to replay.
 
-
-Post your feedback on GIT Hub (https://github.com/FrankBijnen/ExifToolGui/), or the ExifTool forum (https://exiftool.org/forum/index.php?topic=15053.0) .
-
 Frank

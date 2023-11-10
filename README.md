@@ -1,9 +1,12 @@
 # ExifToolGui
 A GUI for ExifTool
 
-Current version: V6.2.0 updated September 28, 2023. See the changelog for info.<br>
-The V6.2.0 release focuses on UTF8. All Exiftool commands can now be executed in UTF8 mode by using an Args File created with UTF8 encoding. This should solve all international character issues!
-Also the Log Window is revised. It can now show the last 10 commands, with their output and/or errors.
+Current version: V6.2.5 updated November 12, 2023.
+The V6.2.5 release features 2 major changes.<br>
+1) [GeoCoding](/Docs/Readme%20GeoCoding.txt) You can now choose from 2 GeoCoding providers, and use Reverse GeoCoding to lookup Country, Province and City from GPS coordinates.<br>
+2) [Lossless rotate and crop, import and export previews](/Docs/Readme%20Lossless%20rotate_Import_Export%20previews.txt) The external programs Jhead and JpegTrans are replaced by native Delphi code, using a modified library NativeJpg by SimDesign B.V. Exporting and Importing previews has been revised.<br>
+
+Besides these 2 updates, some smaller updates/bugfixes were applied. See the [ChangeLog](Docs/changelog.txt) for more info.
 
 Important: <br>
 To help Bug hunting there are also Map files released. If you place the Map file in the same directory as the Executable
@@ -49,4 +52,4 @@ Documentation.
  It is written with V5 in mind, but most of it still applies. 
 
 
-Frank Bijnen
+Frank
