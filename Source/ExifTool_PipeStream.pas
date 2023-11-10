@@ -40,6 +40,28 @@ type
     function AnalyseResult(var StatusLine: string; var LengthReady: integer): string;
   end;
 
+// Reads the PipeStream in a separate thread
+  TReadPipeThread = class(TThread)
+  protected
+    FPipeStream: TPipeStream;
+    procedure Execute; override;
+  public
+    constructor Create(AFile: THandle; ABufSize: integer);
+    destructor Destroy; override;
+    property PipeStream: TPipeStream read FPipeStream;
+  end;
+
+// Reads the PipeStream in a separate thread, for Stay Open
+  TSOReadPipeThread = class(TThread)
+  protected
+    FExecNum: word;
+    FOutPipeStream: TPipeStream;
+    FErrPipeStream: TPipeStream;
+    procedure Execute; override;
+  public
+    constructor Create(AOutPipeStream, AErrPipeStream: TPipeStream; AExecNum: word);
+  end;
+
   procedure SetCounter(ACounterEvent: TCounterETEvent; ACounter: integer);
   function GetCounter: TET_Counter;
 
@@ -103,6 +125,8 @@ end;
 // Scan backward in Memory, from Startpos, to find the previous LF.
 function TPipeStream.GetLastLinePosition(var StartPos, EndPos: PByte): boolean;
 begin
+  if not Assigned(Memory) then
+    exit(false);
   if Assigned(StartPos) then
     EndPos := StartPos
   else
@@ -219,6 +243,48 @@ begin
     Dec(StartPos);
     if GetLastLinePosition(StartPos, EndPos) then
       StatusLine := UTF8ToString(GetPipe(StartPos, EndPos));
+  end;
+end;
+
+{ TReadPipeThread }
+// Read Pipe in separate thread
+
+constructor TReadPipeThread.Create(AFile: THandle; ABufSize: integer);
+begin
+  FPipeStream := TPipeStream.Create(AFile, ABufSize);
+  inherited Create(false); // start running
+end;
+
+destructor TReadPipeThread.Destroy;
+begin
+  FPipeStream.Free;
+  inherited Destroy;
+end;
+
+procedure TReadPipeThread.Execute;
+begin
+  while FPipeStream.ReadPipe > 0 do;
+end;
+
+{ TSOReadPipeThread }
+// Read Pipe in separate thread for Stay Open
+
+constructor TSOReadPipeThread.Create(AOutPipeStream, AErrPipeStream: TPipeStream; AExecNum: word);
+begin
+  FOutPipeStream := AOutPipeStream;
+  FErrPipeStream := AErrPipeStream;
+  FExecNum := AExecNum;
+  inherited Create(False); // start running;
+end;
+
+procedure TSOReadPipeThread.Execute;
+begin
+  while (not FOutPipeStream.PipeHasReady(FExecNum)) do // Continue until we see our execnum
+  begin
+    if (FErrPipeStream.PipeHasData) then // First read errors
+      FErrPipeStream.ReadPipe;
+    if (FOutPipeStream.PipeHasData) then
+      FOutPipeStream.ReadPipe;
   end;
 end;
 

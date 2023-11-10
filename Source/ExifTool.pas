@@ -198,6 +198,7 @@ var
   CanUseUtf8: boolean;
   Wr: TWaitResult;
   CrWait, CrNormal: HCURSOR;
+  SOReadPipeThread: TSOReadPipeThread;
 begin
   result := false;
 
@@ -239,17 +240,18 @@ begin
       WriteFile(PipeInWrite, Call_ET[1], ByteLength(Call_ET), BytesCount, nil);
       FlushFileBuffers(PipeInWrite);
 
-      // ========= Read StdOut =======================
+      // ========= Read StdOut and stdErr =======================
       EtOutPipe.SetCounter(GetCounter);
-      while (not EtOutPipe.PipeHasReady(ExecNum)) do // Keep reading till we see our execnum
-        ETOutPipe.ReadPipe;
-      SetCounter(nil, 0);
+      SOReadPipeThread := TSOReadPipeThread.Create(EtOutPipe, EtErrPipe, ExecNum);
+      try
+        SOReadPipeThread.WaitFor;
+      finally
+        SetCounter(nil, 0);
+        SOReadPipeThread.Free;
+      end;
       ETouts := ETOutPipe.AnalyseResult(StatusLine, LengthReady);
       ETOutPipe.Clear;
 
-      // ========= Read StdErr =======================
-      while (ETErrPipe.PipeHasData) and
-            (ETErrPipe.ReadPipe > 0) do;
       ETErrs := ETErrPipe.AsString;
       ETErrPipe.Clear;
 
@@ -310,7 +312,8 @@ end;
 // =========================== ET classic mode ==================================
 function ExecET(ETcmd, FNames, WorkDir: string; var ETouts, ETErrs: string): boolean;
 var
-  ETstream: TPipeStream;
+  ReadOut: TReadPipeThread;
+  ReadErr: TReadPipeThread;
   ProcessInfo: TProcessInformation;
   SecurityAttr: TSecurityAttributes;
   StartupInfo: TStartupInfo;
@@ -325,8 +328,12 @@ var
   CanUseUtf8: boolean;
   CrWait, CrNormal: HCURSOR;
 begin
+
   CrWait := LoadCursor(0, IDC_WAIT);
   CrNormal := SetCursor(CrWait);
+
+  UpdateExecNum;
+
   try
     FillChar(ProcessInfo, SizeOf(TProcessInformation), #0);
     FillChar(SecurityAttr, SizeOf(TSecurityAttributes), #0);
@@ -365,24 +372,20 @@ begin
     CloseHandle(PipeErrWrite);
     if result then
     begin
-      // Read StdOut
-      ETstream := TPipeStream.Create(PipeOutRead, SizePipeBuffer);
+      // ========= Read StdOut and stdErr =======================
+      ReadOut := TReadPipeThread.Create(PipeOutRead, SizePipeBuffer);
+      ReadOut.PipeStream.SetCounter(GetCounter);
+      ReadErr := TReadPipeThread.Create(PipeErrRead, SizePipeBuffer);
       try
-        ETstream.SetCounter(GetCounter);
-        while (ETstream.ReadPipe > 0) do;
-        SetCounter(nil, 0);
-        ETouts := ETstream.AnalyseResult(StatusLine, LengthReady);
-      finally
-        ETstream.Free;
-      end;
+        ReadOut.WaitFor;
+        ETouts := ReadOut.PipeStream.AnalyseResult(StatusLine, LengthReady);
 
-      // Read StdErr
-      ETstream := TPipeStream.Create(PipeErrRead, SizePipeBuffer);
-      try
-        while (ETstream.ReadPipe > 0) do;
-        ETErrs := ETstream.AsString;
+        ReadErr.WaitFor;
+        ETErrs := ReadErr.PipeStream.AsString;
       finally
-        ETstream.Free;
+        ReadOut.Free;
+        ReadErr.Free;
+        SetCounter(nil, 0);
       end;
 
       // ----------------------------------------------
@@ -419,7 +422,8 @@ end;
 //TODO: Deprecated with JHead and JpegTran
 function ExecCMD(xCmd, WorkDir: string; var ETouts, ETErrs: string): boolean;
 var
-  ETstream: TPipeStream;
+  ReadOut: TReadPipeThread;
+  ReadErr: TReadPipeThread;
   ProcessInfo: TProcessInformation;
   SecurityAttr: TSecurityAttributes;
   StartupInfo: TStartupInfo;
@@ -463,22 +467,19 @@ begin
 
     if result then
     begin
-      // Read StdOut
-      ETstream := TPipeStream.Create(PipeOutRead, SizePipeBuffer);
+      // ========= Read StdOut and stdErr =======================
+      ReadOut := TReadPipeThread.Create(PipeOutRead, SizePipeBuffer);
+      SetCounter(nil, 0);
+      ReadErr := TReadPipeThread.Create(PipeErrRead, SizePipeBuffer);
       try
-        while (ETstream.ReadPipe > 0) do;
-        ETouts := ETstream.AsString;
-      finally
-        ETstream.Free;
-      end;
+        ReadOut.WaitFor;
+        ETouts := ReadOut.PipeStream.AsString;
 
-      // ========= Read StdErr =======================
-      ETstream := TPipeStream.Create(PipeErrRead, SizePipeBuffer);
-      try
-        while (ETstream.ReadPipe > 0) do;
-        ETerrs := ETstream.AsString;
+        ReadErr.WaitFor;
+        ETErrs := ReadErr.PipeStream.AsString;
       finally
-        ETstream.Free;
+        ReadOut.Free;
+        ReadErr.Free;
       end;
 
       // ----------------------------------------------
