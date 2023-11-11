@@ -281,10 +281,9 @@ procedure TSOReadPipeThread.Execute;
 begin
   while (not FOutPipeStream.PipeHasReady(FExecNum)) do // Continue until we see our execnum
   begin
-    if (FErrPipeStream.PipeHasData) then // First read errors
+    FOutPipeStream.ReadPipe;
+    while (FErrPipeStream.PipeHasData) do
       FErrPipeStream.ReadPipe;
-    if (FOutPipeStream.PipeHasData) then
-      FOutPipeStream.ReadPipe;
   end;
 end;
 
