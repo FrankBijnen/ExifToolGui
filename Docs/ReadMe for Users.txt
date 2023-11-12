@@ -84,6 +84,7 @@ Changed with version 6.2.5
   See also: 'Readme Lossless rotate_Import_Export previews.txt'
 
 - GeoCoding has been enhanced. You can now select a provider, and reverse GeoCoding has been implemented. Find the location (Country, Province, City) from GPS coordinates and store it in metadata.
+  By default GeoCoding is NOT enabled. Even the 'The Find for places' introduced in version 6.0.3 is disabled by default! To enable go to Preferences/GeoCoding and check 'Enable GeoCoding'.
   See also: 'Readme GeoCoding.txt'
 
 - A 'find' edit box has been added to the metadata, allowing you to search for tag names and values.

@@ -44,7 +44,7 @@ Note that in stead of a CRLF, a bare LF will also work, but I decided to leave t
 When looking at the original code to format the output of ExifTool I figured it needed an overhaul. So I created TPipeStream in Exiftool_PipeStream.pas. 
 TPipeStream handles: Conversion to UTF8, Scanning for {Ready..., Scanning for ======= (it indicates a new file) and uses an event to communicate.
 Previous versions would first read it into a Buffer (array of byte), then write it to a stream, load it in a Stringlist, then the stringlist would be checked line by line, and converted to UTF8.  
-TPipeStream is more efficient, because it scans the memory directly backward, and does not use TStringList. 
+TPipeStream is more efficient, because it scans the memory directly backward, and does not use TStringList. The reads are performed in a separate thread.
 You will notice the difference when ExifTool outputs > 100.000 lines.
 
 example of an inefficiency: (It scans forward for {ready, where scanning backward would be a lot faster)

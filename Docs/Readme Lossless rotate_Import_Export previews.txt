@@ -15,11 +15,11 @@ In V6.2.5 you will see 2 menu-items for Jpg Lossless rotate:
   - Specify how you want the orientation to be set after rotating.
   - Select an embedded preview to rotate.
 
-  Note: If you don't change the settings it should work the same as the jhead.exe program.
+  Note: If you don't change the default settings it should work the same as the jhead.exe program.
 
 In V6.2.5 you will see 4 menu-items for Importing (Embedding) and Extracting previews.
 
-Menu-items replaced. They will continue to function, but will be deleted in a next release.
+Menu-items deprecated. They will continue to function, but will be deleted in a next release.
 - Export/Import/Extract preview from selected (Deprecated)
 - Export/Import/Embed preview from selected (Deprecated) (Note: It will be greyed out if jpegtran.exe is not available)
 

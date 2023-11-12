@@ -78,7 +78,8 @@ Search for the location of coordinates. Reverse geocoding.
    Setting up Geo.
 
    - Choose the provider.
-   - If Overpass selected you can choose your preferred language.
+     If Overpass selected you can choose your preferred language.
+
    - Map the fields Country, City and Province. Location can not be mapped, but you can update it manually. 
 
      - Country. Select only the Code, or the Name. Example: NL or Netherlands. DE or Germany.
