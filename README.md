@@ -8,6 +8,8 @@ The V6.2.5 release features 2 major changes.<br>
 
 Besides these 2 updates, some smaller updates/bugfixes were applied. See the [ChangeLog](Docs/changelog.txt) for more info.
 
+I have noticed that recently ExifToolGui is downloaded from sites that propagate portable use. Please read [Portable use](/Docs/Readme%20Portable.txt) for more info.
+
 Important: <br>
 To help Bug hunting there are also Map files released. If you place the Map file in the same directory as the Executable
 a stacktrace can be copied to the clipboard if an Exception occurs. Please also provide the stacktrace if you report an Exception.

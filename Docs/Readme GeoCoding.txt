@@ -57,7 +57,7 @@ Search for the coordinates of a location.
    's-Hertogenbosch, Nederland
    's-Hertogenbosch, Ned
    
-   The default provider for searching cities is 'https://geocode.maps.co/'. Searching is faster and yields better results. The disadvantage of only 2 requests per second is no issue in my opionion.
+   The default provider for searching cities is 'https://geocode.maps.co/'. Searching is faster and yields better results. The disadvantage of only 2 requests per second is no issue in my opinion.
 
 Search for the location of coordinates. Reverse geocoding.
    Reverse geocoding is performed in these 3 functions.
