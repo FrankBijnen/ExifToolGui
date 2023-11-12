@@ -37,9 +37,10 @@ If you burn this to a CD, or copy it to a USB stick that you write-protect after
 
 But If you use this parameter and think you will leave no traces on the computer, you may be disappointed.
 
-- ExifTool itself will write to the TEMP directory. To overcome this you could propably install Perl, or install the 'Oliver Betz' version. But to install you need to be admin, and it will leave traces.
+- ExifTool itself will write to the TEMP directory. To overcome this you could propably install Perl, or install the 'Oliver Betz' version. But depending on the options chosen  you need to be admin to install, and it will leave traces.
 - The integrated WebBrowser based on EDGE will write temp-files.
 - To control ExifTool and the Edge browser temp-files are created.
+- Windows may keep MRU (Most Recently Used) entries in the registry.
 
 My personal view:
 
