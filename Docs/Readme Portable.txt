@@ -47,7 +47,7 @@ My personal view:
 - You should be able to start ExifToolGui without admin privileges from a 'readonly' location.
 - It should save it's settings to a location that's writable, (%AppData%\ExiftoolGui ....) or optionally not save any settings at all.
 - The temp-files should be deleted upon closing the application. But in case of abnormal termination it's only logical that they are not deleted.
-- 'Leaving no traces' should not be the goal of the design. Besides the fact that it's nearly impossible, why would you want it? To me it has a nasty smell, what do you want to hide?
+- 'Leaving no traces' should not be the goal of the design. Besides the fact that it's nearly impossible, why would you want it? 
 
 Frank
 
