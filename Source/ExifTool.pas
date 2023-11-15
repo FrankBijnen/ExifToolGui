@@ -108,11 +108,17 @@ begin
   // +further options...
 end;
 
-procedure UpdateExecNum;
+// Add ExecNum to FinalCmd
+// '-echo4 CRLF {readyxx} CRLF'    Ensures that something is written to StdErr. TSOPipeStream relies on it.
+// '-executexx CRLF'               The same for STDout.
+procedure AddExecNum(var FinalCmd: string);
 begin
-  inc(ExecNum);
+  // Update Execnum. From 10 to 99.
+  Inc(ExecNum);
   if (ExecNum > 99) then
     ExecNum := 10;
+
+  FinalCmd := FinalCmd + Format('-echo4%s{ready%u}%s-execute%u%s', [CRLF, ExecNum, CRLF, ExecNum, CRLF]);
 end;
 
 function ETWorkDir: string;
@@ -189,6 +195,8 @@ end;
 
 function ET_OpenExec(ETcmd: string; FNames: string; var ETouts, ETErrs: string; PopupOnError: boolean = true): boolean;
 var
+  ReadOut: TSOReadPipeThread;
+  ReadErr: TSOReadPipeThread;
   FinalCmd: string;
   TempFile: string;
   StatusLine: string;
@@ -198,12 +206,8 @@ var
   CanUseUtf8: boolean;
   Wr: TWaitResult;
   CrWait, CrNormal: HCURSOR;
-  SOReadPipeThread: TSOReadPipeThread;
 begin
   result := false;
-
-  // Update Execnum
-  UpdateExecNum;
 
   if (FETWorkDir <> '') and
      (Length(ETcmd) > 1) then
@@ -229,7 +233,8 @@ begin
       FinalCmd := EndsWithCRLF(ET_Options.GetOptions(CanUseUtf8) + ETcmd);
       if FNames <> '' then
         FinalCmd := EndsWithCRLF(FinalCmd + FNames);
-      FinalCmd := EndsWithCRLF(FinalCmd + '-execute' + IntToStr(ExecNum));
+
+      AddExecNum(FinalCmd);
 
       // Create tempfile
       TempFile := GetExifToolTmp;
@@ -242,17 +247,20 @@ begin
 
       // ========= Read StdOut and stdErr =======================
       EtOutPipe.SetCounter(GetCounter);
-      SOReadPipeThread := TSOReadPipeThread.Create(EtOutPipe, EtErrPipe, ExecNum);
+      ReadOut := TSOReadPipeThread.Create(EtOutPipe, ExecNum);
+      ReadErr := TSOReadPipeThread.Create(EtErrPipe, ExecNum);
       try
-        SOReadPipeThread.WaitFor;
+        ReadOut.WaitFor;
+        ReadErr.WaitFor;
       finally
         SetCounter(nil, 0);
-        SOReadPipeThread.Free;
+        ReadOut.Free;
+        ReadErr.Free;
       end;
       ETouts := ETOutPipe.AnalyseResult(StatusLine, LengthReady);
       ETOutPipe.Clear;
 
-      ETErrs := ETErrPipe.AsString;
+      ETErrs := ETErrPipe.AnalyseError;
       ETErrPipe.Clear;
 
       // Callback for Logging
@@ -332,8 +340,6 @@ begin
   CrWait := LoadCursor(0, IDC_WAIT);
   CrNormal := SetCursor(CrWait);
 
-  UpdateExecNum;
-
   try
     FillChar(ProcessInfo, SizeOf(TProcessInformation), #0);
     FillChar(SecurityAttr, SizeOf(TSecurityAttributes), #0);
@@ -361,6 +367,9 @@ begin
 
     FinalCmd := EndsWithCRLF(ET_Options.GetOptions(CanUseUtf8) + ArgsFromDirectCmd(ETcmd));
     FinalCmd := EndsWithCRLF(FinalCmd + FNames);
+
+    AddExecNum(FinalCmd);
+
     TempFile := GetExifToolTmp;
     WriteArgsFile(FinalCmd, TempFile);
     Call_ET := GUIsettings.ETOverrideDir + 'exiftool -@ "' + TempFile + '"';
@@ -381,7 +390,7 @@ begin
         ETouts := ReadOut.PipeStream.AnalyseResult(StatusLine, LengthReady);
 
         ReadErr.WaitFor;
-        ETErrs := ReadErr.PipeStream.AsString;
+        ETErrs := ReadErr.PipeStream.AnalyseError;
       finally
         ReadOut.Free;
         ReadErr.Free;
