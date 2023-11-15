@@ -38,6 +38,7 @@ type
     function ReadPipe: DWORD;
     function AsString: string;
     function AnalyseResult(var StatusLine: string; var LengthReady: integer): string;
+    function AnalyseError: string;
   end;
 
 // Reads the PipeStream in a separate thread
@@ -55,11 +56,10 @@ type
   TSOReadPipeThread = class(TThread)
   protected
     FExecNum: word;
-    FOutPipeStream: TPipeStream;
-    FErrPipeStream: TPipeStream;
+    FPipeStream: TPipeStream;
     procedure Execute; override;
   public
-    constructor Create(AOutPipeStream, AErrPipeStream: TPipeStream; AExecNum: word);
+    constructor Create(APipeStream: TPipeStream; AExecNum: word);
   end;
 
   procedure SetCounter(ACounterEvent: TCounterETEvent; ACounter: integer);
@@ -246,6 +246,15 @@ begin
   end;
 end;
 
+// Dont need the statusline, just the data.
+function TPipeStream.AnalyseError: string;
+var StatusLine: string;
+    LengthReady: integer;
+begin
+  result := AnalyseResult(StatusLine, LengthReady);
+  SetLength(result, Length(result) - LengthReady);
+end;
+
 { TReadPipeThread }
 // Read Pipe in separate thread
 
@@ -268,23 +277,19 @@ end;
 
 { TSOReadPipeThread }
 // Read Pipe in separate thread for Stay Open
-
-constructor TSOReadPipeThread.Create(AOutPipeStream, AErrPipeStream: TPipeStream; AExecNum: word);
+constructor TSOReadPipeThread.Create(APipeStream: TPipeStream; AExecNum: word);
 begin
-  FOutPipeStream := AOutPipeStream;
-  FErrPipeStream := AErrPipeStream;
+  FPipeStream := APipeStream;
   FExecNum := AExecNum;
   inherited Create(False); // start running;
 end;
 
 procedure TSOReadPipeThread.Execute;
 begin
-  while (not FOutPipeStream.PipeHasReady(FExecNum)) do // Continue until we see our execnum
-  begin
-    FOutPipeStream.ReadPipe;
-    while (FErrPipeStream.PipeHasData) do
-      FErrPipeStream.ReadPipe;
-  end;
+  // Continue until we see our execnum
+  // -executexx and -echo4 CRLF xx need to be set for this to work
+  while (not FPipeStream.PipeHasReady(FExecNum)) do
+    FPipeStream.ReadPipe;
 end;
 
 initialization
