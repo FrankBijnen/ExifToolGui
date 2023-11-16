@@ -109,8 +109,6 @@ begin
 end;
 
 // Add ExecNum to FinalCmd
-// '-echo4 CRLF {readyxx} CRLF'    Ensures that something is written to StdErr. TSOPipeStream relies on it.
-// '-executexx CRLF'               The same for STDout.
 procedure AddExecNum(var FinalCmd: string);
 begin
   // Update Execnum. From 10 to 99.
@@ -118,7 +116,11 @@ begin
   if (ExecNum > 99) then
     ExecNum := 10;
 
-  FinalCmd := FinalCmd + Format('-echo4%s{ready%u}%s-execute%u%s', [CRLF, ExecNum, CRLF, ExecNum, CRLF]);
+              // '-echo4 CRLF {readyxx} CRLF'    Ensures that something is written to StdErr. TSOPipeStream relies on it.
+  FinalCmd := Format('-echo4%s{ready%u}%s', [CRLF, ExecNum, CRLF]) +
+              FinalCmd +
+              // '-executexx CRLF'               The same for STDout.
+              Format('-execute%u%s', [ExecNum, CRLF]);
 end;
 
 function ETWorkDir: string;
