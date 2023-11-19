@@ -946,7 +946,7 @@ object FMain: TFMain
       end
       object MGUIStyle: TMenuItem
         AutoHotkeys = maManual
-        Caption = 'Style'
+        Caption = 'Style...'
         OnClick = MGUIStyleClick
       end
       object N5: TMenuItem
@@ -1105,11 +1105,11 @@ object FMain: TFMain
         Caption = '-'
       end
       object GenericExtractPreviews: TMenuItem
-        Caption = 'Generic extract previews'
+        Caption = 'Generic extract previews...'
         OnClick = GenericExtractPreviewsClick
       end
       object GenericImportPreview: TMenuItem
-        Caption = 'Generic import preview'
+        Caption = 'Generic import preview...'
         OnClick = GenericImportPreviewClick
       end
     end
@@ -1138,7 +1138,7 @@ object FMain: TFMain
         Caption = '-'
       end
       object UpdateLocationfromGPScoordinates: TMenuItem
-        Caption = 'Update City, Province, Country from GPS coordinates'
+        Caption = 'Update City, Province, Country from GPS coordinates...'
         OnClick = UpdateLocationfromGPScoordinatesClick
       end
     end
@@ -1157,7 +1157,7 @@ object FMain: TFMain
         OnClick = MJPGAutorotateClick
       end
       object JPGGenericlosslessautorotate1: TMenuItem
-        Caption = 'JPG:  Lossless rotate + crop'
+        Caption = 'JPG:  Lossless rotate + crop...'
         OnClick = JPGGenericlosslessautorotate1Click
       end
     end

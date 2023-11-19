@@ -28,7 +28,7 @@ I also have JPG's and MP4's created by an Android Samsung phone, the standard Wi
    Adobe does not provide this Codec anymore, but if you search the net you will find the links.
 
    Works for Thumbnails and Preview, obviously only for DNG files.
-   Contrary to the FastPicture viewer is can apply the camera settings, which makes it considerable slower.
+   Contrary to the FastPicture viewer it can apply the camera settings, which makes it considerable slower.
    If you install FastPicture viewer and Abobe DNG Codec both, the latter is preferred by Windows.
 
 Frank

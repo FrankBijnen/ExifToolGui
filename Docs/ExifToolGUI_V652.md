@@ -11,8 +11,8 @@
 <tbody><tr><td class="A4">
 <h1>ExifToolGUI for Windows v6.xx</h1><hr>
 <h2>Introduction</h2>
-In the summer of 2023 I decided to revive the ExifToolGui project initally created by <b>Bogdan Hrastnik</b>. Read his complete documentation here <a href="https://exiftool.org/gui"><b>here</b></a><br><br>
-This was his intro, I will quote it now, because it still holds for me:<br>
+In the summer of 2023 I decided to revive the ExifToolGui project initally created by <b>Bogdan Hrastnik</b>. Read his complete documentation <a href="https://exiftool.org/gui"><b>here</b></a><br><br>
+This was his intro, I will quote it now, because it still holds for me:<br><br>
 <em>
 There are many tools for viewing/editing metadata inside image files. In my opinion, <b>ExifTool</b> by <b>Phil Harvey</b>, is the best I've found so far. Here's why:<br>
 <li>-it shows more metadata tags than any other tool,</li>
@@ -39,6 +39,7 @@ Basic idea behind GUI is, to keep it <u>simple!</u> Thus, only those options are
 </em>
 <br>
 <font class="red"><b>Important changes in ExifToolGUI v6.xx</b></font><br>
+<ul>
 <li>The source code now compiles with Delphi Community Edition. Version used, as of writing, Rad 11.3.</li>
 <li class="tab">No (closed source) 3rd party libraries needed.</li>
 <li class="tab">All source code provided on GitHub.</li>
@@ -46,28 +47,30 @@ Basic idea behind GUI is, to keep it <u>simple!</u> Thus, only those options are
 <li>Image preview is handled by WIC (Windows Imaging Component).</li>
 <li>Google Maps is replaced by Open Street Map.</li>
 <li>64 Bits executable available.</li>
-<li>Optionally copy the stack trace to the clipboard in case of an exception. Available in the released executables, to compile Project-JEDI/JCL is required.</li>
+<li>Optionally copy the stack trace to the clipboard in case of an exception. Available in the released executables, If you compile from source code the Project-JEDI/JCL is required.</li>
 <li>Better support for international characters. All internal code now uses Unicode (UTF16), to interface with Exiftool UTF8.</li>
 <li>Enhanced Log Window. The last 10 commands are shown, with their respective output and error. Option to replay the command in PowerShell/Cmd prompt.</li>
 <li>The external programs Jhead.exe and Jpegtran.exe are no longer needed. Rotation, and cropping, are handled in Delphi native code. With a modified library called NativeJpg by SimDesign B.V. (I tried contacting SimDesign to verify the Licence requirements, but was unable to.)</li>
 <li>Exporting and Importing previews has been revised, and offer greater flexability.</li>
 <li>GeoCoding has been enhanced. You can now choose from 2 providers (https://overpass-api.de and https://geocode.maps.co) and lookup City, Province and Country from GPS coordinates AKA reverse GeoCoding.</li>
-<br>
+</ul>
+<a href="changelog.txt"><b>See changelog.txt for a complete list of issues.</b></a>
+
 <h2>Requirements and preparations</h2>
 ExiftoolGUI should run on Windows 7, 8 32-64bit. However, it is highly recommended to use Windows 10 or 11 when you plan to use the OSM map, or GEOcoding.<br>
 It will not run on Windows XP or earlier!<br>
-<br>
 
 <h3>1. ExifTool</h3>
 You only need to download "Windows Executable" zip file from <a href="https://exiftool.org/"><b>here</b></a>.
 After unzipping, depending on your Windows Explorer settings, you will see:<font color="CC0000">exiftool(-k)</font> or <font color="CC0000">exiftool(-k).exe</font>
 Rename it to either <font color="CC0000">exiftool</font> or <font color="CC0000">exiftool.exe</font> and put it in the same folder as ExifToolGui.<br><br>
 <u>Notes:</u>
+<ul>
 <li>Bogdan Hrastnik recommended to copy exiftool into the Windows directory, but I strongly advise not to. Microsoft makes it harder with every Windows version to modify System directories.</li>
 <li>If you prefer an installer, I recommend the installer provided by <a href="https://oliverbetz.de/pages/Artikel/ExifTool-for-Windows"><b>Oliver Betz</b></a></li>
 <li>You can overrule the location of exiftool in Preferences/other.</li>
 <li>In case you've done something wrong in this regard, you'll see an error message when GUI starts.</li>
-<br>
+</ul>
 
 <h3>2. ExifToolGUI</h3>
 You can download GUI from <a href="https://github.com/FrankBijnen/ExifToolGui/releases"><b>here</b></a>.
@@ -93,25 +96,21 @@ The menu-items that use these programs are marked <u>deprecated</u> and will be 
 <h3>5. Wish to see thumbnails of raw image files?</h3>
 Of course you do. What you need is a "raw codec", usually available for 
 free from camera manufacturer. The best I've found so far is 
-"FastPictureViewer codec" (from <a href="http://www.fastpictureviewer.com/codecs/">here</a>). It is very fast, covers many raw formats and has small package -but not free ($15 as I'm writing this).<br>
+"FastPictureViewer codec" (from <a href="http://www.fastpictureviewer.com/codecs/">here</a>). It is very fast, covers many raw formats and is free for personal use.<br>
+<a href="Readme Using Codecs.txt"><b>Readme Using Codecs.txt</b></a>
 <br>
+<br>
+
 That's all you need. And when new ExifTool or GUI version is available, you only need to repeat process as described above.<br>
-More info can be found here:<br>
-<li><a href="changelog.txt">changelog.txt</a></li>
-<li><a href="ReadMe for Developers.txt">ReadMe for Developers.txt</a></li>
-<li><a href="ReadMe for Users.txt">ReadMe for Users.txt</a></li>
-<li><a href="Readme GeoCoding.txt">Readme GeoCoding.txt</a></li>
-<li><a href="Readme Long filenames.txt">Readme Long filenames.txt</a></li>
-<li><a href="Readme Lossless rotate_Import_Export previews.txt">Readme Lossless rotate_Import_Export previews.txt</a></li>
-<li><a href="Readme Portable.txt">Readme Portable.txt</a></li>
-<li><a href="Readme Using Codecs.txt">Readme Using Codecs.txt</a></li>
 <br>
-<a name="gui_screen"><img src="ExifToolGUI_V652_files/gui01.png"></a><br>
+
+<a name="gui_screen"><img src="ExifToolGUI_V652_files/gui_screen.jpg"></a><br>
 <br>
 <h3>Content</h3>
 <b>Menu:</b><br>
 <li><a href="#m_program">Program</a> menu</li>
 <ul><li><a href="#m_workspace">Workspace manager</a> menu</li></ul>
+<ul><li><a href="#m_style">Style</a> menu</li></ul>
 <li><a href="#m_options">Options</a> menu</li>
 <li><a href="#m_exp_imp">Export/Import</a> menu</li>
 <li><a href="#m_modify">Modify</a> menu</li>
@@ -126,10 +125,10 @@ More info can be found here:<br>
 <br><br>
 <h2><a name="m_program">Program menu</a></h2>
 <h3>About</h3>
--displays ExifTool and GUI versions.<br>
+-Displays ExifTool and GUI versions and links.<br>
 <br>
 <h3>Preferences</h3>
-<img src="ExifToolGUI_V652_files/gui02.png"><br>
+<img src="ExifToolGUI_V652_files/preferences_general.jpg"><br>
 <br><br>
 <b><u>General</u></b> settings tab<br>
 <br>
@@ -140,19 +139,16 @@ Here you can choose the language for displaying metadata tag names and values in
 In most cases, you will need to check this option, because Windows 
 doesn't automatically rotate JPG images according to Exif:Orientation 
 tag value. Anyway, if this option is checked, then GUI won't 
-change/rotate your JPG files phisically: rotation (if needed) is applied
+change/rotate your JPG files physically: rotation (if needed) is applied
  in GUI's memory after the image has been loaded for displaying. If 
 checked, GUI will only rotate image in <font class="blue">Preview</font> panel -thumbnails aren't rotated.<br>
-If you're using some recent version of "FastPictureViewer" codec, then 
-you should not check this option (because that codec is capable to 
-deliver properly rotated JPG images).<br>
 <br>
 <b>Enabling internet access</b><br>
 By default, this option is unchecked and if you are a bit paranoid, then
  keep it that way. In this case however, you won't be able to use GUI's <font class="blue">GoogleMap</font>
  feature for geotagging your images manually. After changing this 
 option, you'll need to close and reopen GUI, to make this feature 
-available.<br>
+available. You have to enable this option also if you want to use GeoCoding.<br>
 <br>
 <b>Default Startup &amp; Export folder</b><br>
 I think, these two options don't need some special explanation.<br>
@@ -167,19 +163,41 @@ multi-value tags on <u>your</u> PC.<br>
 <b>Save Filelist Details state on exit</b><br>
 If checked, then <font class="blue">Details:</font> button state and selected Filelist view (Standard filelist, Camera settings,..etc.) are saved when closing GUI. Selected <b>Thumbnails size</b> is always saved.<br>
 <br><br>
-<b><u>Other</u></b> settings tab (not shown in above screenshot)<br>
+
+<img src="ExifToolGUI_V652_files/preferences_thumbnails.jpg"><br>
+<br><br>
+<b><u>Thumbnail</u></b> settings tab<br>
 <br>
-<b>Workspace: Move focus to next tag/line after value is entered</b><br>
-By default, when you hit Enter button to confirm changing tag value in 
-Workspace, focus of selected tag/line automatically moves to next 
-tag/line. If you prefer focus would remain on currently edited tag/line,
- then uncheck this option.
+<b>Thumbnail size: 96, 128 or 160 pix</b><br><br>
+<b>Generate thumbnails as needed</b><br>
+Depending on the type of files, the codecs installed, and of course the system, generating thumbnails can be a time-consuming process.
+You can disable automatic generating here.<br><br>
+<b>Generate thumbnails now</b><br>
+if you dont have 'Generate thumbnails as needed' checked, this option allows you to manually generate them. You can also generate them manually from the context-menus on the folder and filelist.<br><br>
+<b>Cleanup Thumbnails</b><br>
+The thumbnails that GUI generates are the same as Windows explorer uses. They share the same folder on your hard-drive.
+Sometimes the cache gets corrupt, or you just want to cleanup. It can be done with the standard Windows program 'CleanMgr'.
+For your convenience you can start that program here.<br>
+<ul>
+<li>First click on Setup Disk cleanup for thumbnails. If you dont know what 'Clean set' is used for, stay with the value '0000'. <br>
+In the next dialog keep only 'Thumbnail' checked, and click on OK.</li>
+<li>Cleanup thumbnails will start the actual cleaning.</li>
+</ul>
+<br><br>
+
+<img src="ExifToolGUI_V652_files/preferences_geocoding.jpg"><br>
+<br><br>
+<b><u>GeoCoding</u></b> settings tab<br>
+<br>
+Here you can setup the GeoCoding parameters. Typically you only have to check <b>Enable GeoCoding</b><br>
+For an in-depth explanation see <a href="Readme GeoCoding.txt"><b>Readme GeoCoding.txt</b></a>
 <br><br>
 <br>
+
 <h3><a name="m_workspace">Workspace manager</a></h3>
 Here you define what will be shown in <font class="blue">Metadata</font> panel when <font class="blue">Workspace</font> is selected. Besides <font class="blue">ExifTool direct</font> option, this is the most powerfull GUI feature.<br>
 <br>
-<img src="ExifToolGUI_V652_files/gui03.png"><br>
+<img src="ExifToolGUI_V652_files/workspace.jpg"><br>
 <br>
 <br>
 <b>Tag name column</b><br>
@@ -244,9 +262,13 @@ However, when saving, name of Workspace definition file can not be
 ExifToolGUIv5.ini -you should use any names that reminds you on content,
  for example: MyWorkspace_XMP.ini.<br>
 <br>
-<h3>GUI color</h3>
-My humble attempt to keep GUI up to date... to some degree :)<br>
+
+<h3><a name="m_style">Style</a></h3>
+Shows a list of available style/skins. To change the appearance of GUI.<br>
+<img src="ExifToolGUI_V652_files/style.jpg"><br>
+The Styles Silver, Green and Blue try to mimic the colors available in V516
 <br>
+
 <h2><a name="m_options">Options menu</a></h2>
 <h3>Don't make backup files</h3>
 -if checked (default), then ExifTool won't make "filename.ext_original" 
@@ -721,6 +743,16 @@ Modified on May, 2012<br>
 And if interested: first ExifToolGUI v1.00 was "published" on May 27th, 2007.<br>
 <br>
 
+<u>Additional info can be found in the ReadMe files</u>
+<ul>
+<li><a href="ReadMe for Developers.txt">ReadMe for Developers.txt</a></li>
+<li><a href="ReadMe for Users.txt">ReadMe for Users.txt</a></li>
+<li><a href="Readme GeoCoding.txt">Readme GeoCoding.txt</a></li>
+<li><a href="Readme Long filenames.txt">Readme Long filenames.txt</a></li>
+<li><a href="Readme Lossless rotate_Import_Export previews.txt">Readme Lossless rotate_Import_Export previews.txt</a></li>
+<li><a href="Readme Portable.txt">Readme Portable.txt</a></li>
+<li><a href="Readme Using Codecs.txt">Readme Using Codecs.txt</a></li>
+</ul>
 </td></tr>
 </tbody></table>
 
