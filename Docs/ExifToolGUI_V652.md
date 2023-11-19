@@ -15,9 +15,11 @@ In the summer of 2023 I decided to revive the ExifToolGui project initally creat
 This was his intro, I will quote it now, because it still holds for me:<br><br>
 <em>
 There are many tools for viewing/editing metadata inside image files. In my opinion, <b>ExifTool</b> by <b>Phil Harvey</b>, is the best I've found so far. Here's why:<br>
+<ul>
 <li>-it shows more metadata tags than any other tool,</li>
 <li>-it allows to edit almost any metadata tag,</li>
 <li>-it is very secure to use, is regulary updated and has the best possible support.</li>
+</ul>
 <br>
 The only downside for many potential users is the fact, that ExifTool is
  a "command-line" utility. That means, there's no Graphic User Interface
@@ -31,9 +33,11 @@ So, I've decided to make some simple ExifTool GUI for my private use.
 There are already some GUI's that make use of ExifTool, but some of them
  are not flexible enough (for my needs) and/or have somehow limited use.
  When making ExifToolGUI, the main goal was:<br>
+<ul>
 <li>-view all metadata that ExifTool recognizes,</li>
 <li>-ability to edit most frequently used metadata tags,</li>
 <li>-batch capability (where appropriate), means: you can select multiple files and modify them at once.</li>
+</ul>
 <br>
 Basic idea behind GUI is, to keep it <u>simple!</u> Thus, only those options are implemented, which I believe, are essential for majority of users.<br>
 </em>
@@ -145,7 +149,7 @@ checked, GUI will only rotate image in <font class="blue">Preview</font> panel -
 <br>
 <b>Enabling internet access</b><br>
 By default, this option is unchecked and if you are a bit paranoid, then
- keep it that way. In this case however, you won't be able to use GUI's <font class="blue">GoogleMap</font>
+ keep it that way. In this case however, you won't be able to use GUI's <font class="blue">OSM Map</font>
  feature for geotagging your images manually. After changing this 
 option, you'll need to close and reopen GUI, to make this feature 
 available. You have to enable this option also if you want to use GeoCoding.<br>
