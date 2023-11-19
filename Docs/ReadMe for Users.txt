@@ -9,10 +9,10 @@ I have tested this version with Windows 10, but it still works with Windows 8.1 
   the progam will still work, but the OSM map will not be available.
     
   How to get the WebView2Loader.dll?
-  Browse to https://www.nuget.org/packages/Microsoft.Web.WebView2, select the version (Eg. 1.0.1988-prerelease) and click on Download package. (on the Right) 
-  This will get you a file named like 'microsoft.web.webview2.1.0.1988-prerelease.nupkg'. 
+  Browse to https://www.nuget.org/packages/Microsoft.Web.WebView2, select the version (Eg. 1.0.2194-prerelease) and click on Download package. (on the Right) 
+  This will get you a file named like 'microsoft.web.webview2.1.0.2194-prerelease.nupkg'. 
   Open this file with an archiver. (Winrar https://www.win-rar.com/ and 7-Zip https://www.7-zip.org/ are known to work)
-  From this nupkg file extract the file 'runtimes\win-x86\native\WebView2Loader.dll' to the directory where you save the ExifToolGui.exe.       
+  From this nupkg file extract the file 'runtimes\win-x86\native\WebView2Loader.dll' or 'runtimes\win-x64\native\WebView2Loader.dll' to the directory where you saved ExifToolGui(_X64).exe.       
         
   More info: https://docwiki.embarcadero.com/RADStudio/Sydney/en/Using_TEdgeBrowser_Component_and_Changes_to_the_TWebBrowser_Component
 

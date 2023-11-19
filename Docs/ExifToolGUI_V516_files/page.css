@@ -1,0 +1,55 @@
+<html>
+<head>
+<style type="text/css">
+body {}
+body {margin-left:0; margin-top:0}
+body {font-family:arial; font-size:10pt; color:#000000; background-color:#DDDDDD}
+
+a:link {color: #880088}
+a:visited {color: #888800}
+a:hover {color: #008800}
+a:active {color: #EE4444}
+
+h1 {color: #004488; font-size:16pt; font-weight: bold; margin-top:8px; margin-bottom:0px}
+h2 {color: #0000BB; font-size:14pt; font-weight: bold; margin-top:16px; margin-bottom:4px}
+h3 {color: #0044AA; font-size:12pt; font-weight: bold; margin-top:8px; margin-bottom:0px}
+
+ul {margin-left:16px; margin-top:0px; margin-bottom:0px}
+
+table.A4
+{table-layout:auto;
+ width:800px;
+ border:0px #AA0000 solid;
+ margin-top:0px;
+ margin-left:0px;
+ border-spacing:4px;
+ border-collapse: collapse;
+ background-color:#F4F8FF;
+ font-family:arial;
+ font-size:11pt;
+ color:#000000
+}
+td.A4
+{width:100%;
+ vertical-align:top;
+ padding-left:4px}
+
+font.blue
+{color:#0000FF;
+}
+font.red
+{color:#FF0000;
+}
+font.brown
+{color:#AA3300;
+}
+font.sz10pt
+{font-size:10pt;
+}
+pre
+{color:#AA3300;
+}
+</style>
+<body>
+</body>
+</html>
