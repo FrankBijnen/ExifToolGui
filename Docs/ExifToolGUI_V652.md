@@ -84,7 +84,7 @@ GUI doesn't need to be "installed". Just download the executable for your platfo
 GUI doesn't write anything into the registry file. It does however create temporary files in the %TEMP% directory. <br>
 It will save its settings in %APPDATA%\ExifToolGUI\ExifToolV6.ini, unless you use the commandline parameter <u>/DontSaveIni</u>.<br>  
 It was decided not to save the INI file in the same directory as the executable, because that location may not be writable.<br>
-<br>
+<a href="Readme Portable.txt"><b>See Readme Portable.txt for more info on portable use.</b></a><br><br>
 
 <h3>3. WebView2Loader.dll</h3>
 This dll is only needed when you want to use the OSM map. You can download it <a href="https://www.nuget.org/packages/Microsoft.Web.WebView2">from nuget</a>
@@ -240,7 +240,7 @@ To separate group of tags in <font class="blue">Workspace</font> view, special "
 <br>
 <b>Hint text column</b><br>
 Text entered here is your <u>short</u> "private" help, which will be displayed in GUI's status bar when you start modifying tag value:<br>
-<img src="ExifToolGUI_V652_files/gui03a.png"><br>
+<img src="ExifToolGUI_V652_files/hint.jpg"><br>
 <br>
 I hope you can recognize the power of <font class="blue">Workspace manager</font>:
  YOU define any metadata tag you wish to change regulary. Btw. you can 
@@ -259,11 +259,11 @@ however, you can choose any other directory.<br>
 When you choose <font class="blue">Load</font>, again, default starting 
 directory will be the one, where ExifToolGUI.exe is. And if you've 
 messed with your Workspace inbetween, you can choose to load Workspace 
-from ExifToolGUIv5.ini file -which simply reloads Workspace from last 
+from ExifToolGUIv6.ini file -which simply reloads Workspace from last 
 GUI session.<br>
 <br>
 However, when saving, name of Workspace definition file can not be 
-ExifToolGUIv5.ini -you should use any names that reminds you on content,
+ExifToolGUIv6.ini -you should use any names that reminds you on content,
  for example: MyWorkspace_XMP.ini.<br>
 <br>
 
@@ -314,9 +314,10 @@ next GUI start. Remaining options settings however, are only temporary
 (as long GUI is running) and are not checked by default:<br>
 <br>
 <font class="blue">
-Show tag values as numbers<br>
-Prefix tag names with ID number<br>
-Group tag names by instance (-g4)</font> -this can help you to identify duplicated tags when viewing in <font class="blue">Metadata</font> panel.<br>
+<h3>Show tag values as numbers</h3><br>
+<h3>Prefix tag names with ID number</h3><br>
+<h3>Group tag names by instance (-g4)</h3></font> -This can help you to identify duplicated tags when viewing in <font class="blue">Metadata</font> panel.<br>
+<h3>API WindowsWideFile (requires Exiftool v12.66)</h3></font> -Force the use of wide-character Windows I/O functions when the CharsetFileName option is used.<br>
 <br>
 <br>
 <h2><a name="m_exp_imp">Export/Import menu</a></h2>
