@@ -3,7 +3,6 @@
 <meta http-equiv="Description" content="ExifToolGUI">
 <meta http-equiv="Content-Language" content="en-us">
 <meta http-equiv="Content-Type" content="text/html; charset=windows-1250">
-<title>ExifToolGUI</title>
 <link rel="stylesheet" type="text/css" href="ExifToolGUI_V652_files/page.css">
 </head>
 
