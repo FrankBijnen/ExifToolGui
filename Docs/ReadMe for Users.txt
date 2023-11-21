@@ -8,15 +8,17 @@ I have tested this version with Windows 10, but it still works with Windows 8.1 
 - The internal browser used for OSM map relies on Edge. To use this the 'WebView2Loader.dll' should be placed alongside the executable. If you dont install this dll, 
   the progam will still work, but the OSM map will not be available.
     
-  How to get the WebView2Loader.dll?
+  The WebView2Loader.dll.
+    This dll is not standard available and can be downloaded from NuGet. I recommend to save it in the same directory as ExifToolGui.exe, but any    directory that Windows searches will do.	
 
-  1) Browse to https://www.nuget.org/packages/Microsoft.Web.WebView2, select the version (Eg. 1.0.2194-prerelease) and click on Download package. (on the Right) 
-     This will get you a file named like 'microsoft.web.webview2.1.0.2194-prerelease.nupkg'. 
-     Open this file with an archiver (Winrar https://www.win-rar.com/ and 7-Zip https://www.7-zip.org/ are known to work), or rename the file from .nupkg to .zip to open it in Windows Explorer.
-     From this nupkg file extract the file 'runtimes\win-x86\native\WebView2Loader.dll' or 'runtimes\win-x64\native\WebView2Loader.dll' to the directory where you saved ExifToolGui(_X64).exe.       
-  2) Browse to https://nuget.info/packages/Microsoft.Web.WebView2. This will open the WebView2 in NuGet Package Explorer with the current version.
+  1) Download only the DLL. Browse to https://nuget.info/packages/Microsoft.Web.WebView2. This will open the WebView2 in NuGet Package Explorer with the current version.
      In the 'Contents' pane expand the node 'runtimes\win-x86\native', or 'runtimes\win-x64\native' depending on your platform.
-     Double-Click 'WebView2Loader.dll'. The download will start. Save the dll in the same folder as ExifToolGui.exe, or a folder in your PATH.  	
+     Double-Click 'WebView2Loader.dll' to start the download.
+  2) Download the complete package. Browse to https://www.nuget.org/packages/Microsoft.Web.WebView2, select the version (Eg. 1.0.2194-prerelease) and click on Download package. (on the Right) 
+     This will get you a file named like 'microsoft.web.webview2.1.0.2194-prerelease.nupkg'. 
+     Rename the .nupkg file to .zip to open it Windows Explorer, or open with an archiver.
+     (Winrar https://www.win-rar.com/ and 7-Zip https://www.7-zip.org/ are known to work)
+     Extract the file 'runtimes\win-x86\native\WebView2Loader.dll' or 'runtimes\win-x64\native\WebView2Loader.dll'.
         
   More info: https://docwiki.embarcadero.com/RADStudio/Sydney/en/Using_TEdgeBrowser_Component_and_Changes_to_the_TWebBrowser_Component
 
