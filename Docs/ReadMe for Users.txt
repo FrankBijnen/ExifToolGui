@@ -1,14 +1,15 @@
 This version has basically the same prereqs as the existing version.
 I have tested this version with Windows 10, but it still works with Windows 8.1 and even Windows 7. 
 
-- Place the exiftool.exe in a folder that is in your PATH. e.g.: C:\windows, or in the program location.
+- Place the exiftool.exe in a folder that is in your PATH, or in the same location as ExifToolGui.exe.
+  Alternatively you can use an installer provided by Olliver Betz. https://oliverbetz.de/pages/Artikel/ExifTool-for-Windows.
 - The Jhead.exe en Jpegtran.exe programs are no longer needed. This functionality is now handled by Delphi native code. The affected menus are marked 'deprecated' and will be removed in a next version.
 - The previews rely on WIC. (Windows Imaging Component) All file types that have a good codec installed should work. 
   The standard Microsoft Codecs installed with Windows 10 should work. Please check. I use DNG and JPG myself, so these are tested.
-- The internal browser used for OSM map relies on Edge and requires then WebView2Loader dll. If you dont install this dll, the progam will still work, but the OSM map will not be available.
+- The internal browser used for OSM map relies on Edge and requires the WebView2Loader dll. If you dont install this dll, the progam will still work, but the OSM map will not be available.
     
   Downloading the WebView2Loader.dll.
-     This dll can be downloaded from NuGet. I recommend to save it in the same directory as ExifToolGui.exe, but any directory that Windows searches will do.	
+     This dll can be downloaded from NuGet. I recommend to save it in the same directory as ExifToolGui.exe, but any directory that Windows searches will do.   
 
   1) Download only the DLL. Browse to https://nuget.info/packages/Microsoft.Web.WebView2. This will open the WebView2 in NuGet Package Explorer with the current version.
      In the 'Contents' pane expand the node 'runtimes\win-x86\native', or 'runtimes\win-x64\native' depending on your platform.
