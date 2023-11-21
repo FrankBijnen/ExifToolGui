@@ -1877,13 +1877,13 @@ begin
       if (MessageDlgEx('The WebView2Loader.dll could not be loaded.' + #10 +
                        'Show Online help?',
                        '', TMsgDlgType.mtError, [TMsgDlgBtn.mbYes, TMsgDlgBtn.mbNo]) = ID_YES) then
-        Url := 'm_edge_dll';
+        Url := '/#m_edge_dll';
     end
     else
       if (MessageDlgEx('Unable to start Edge browser.' +#10 +
                        'Show Online help?',
                        '', TMsgDlgType.mtError, [TMsgDlgBtn.mbYes, TMsgDlgBtn.mbNo]) = ID_YES) then
-        Url := 'm_edge_runtime';
+        Url := '/#m_edge_runtime';
     if (Url <> '') then
       ShellExecute(0, 'Open', PWideChar(ONLINE_DOC_URL + Url), '', '', SW_SHOWNORMAL);
   end;
