@@ -95,7 +95,9 @@ On modern Windows versions the runtime will be available standard. If it is miss
 <a href="https://www.microsoft.com/edge/download/insider?form=MA13FJ">use this link and install one of Edge Canary, Dev or Beta.</a><br>
 
 <h4><a name="m_edge_dll">WebView2Loader.dll</a></h4>
-This dll is not standard available and can be downloaded from NuGet. I recommend to save it in the same directory as ExifToolGui.exe, but any directory that Windows searches will do.<br><br>
+This dll is not standard available and can be downloaded from NuGet. I recommend to save it in the same directory as ExifToolGui.exe, but any directory that Windows searches will do.
+If the dll can not be loaded you will get this dialog.<br><br>
+<img src="ExifToolGUI_V652_files/WebView2Loader_dll.jpg"><br><br><br>
 <ul>
 <li>
 Download only the DLL from <a href="https://nuget.info/packages/Microsoft.Web.WebView2/"><b>Package explorer</b></a>.<br>

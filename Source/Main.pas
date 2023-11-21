@@ -1880,10 +1880,12 @@ begin
         Url := '/#m_edge_dll';
     end
     else
+    begin
       if (MessageDlgEx('Unable to start Edge browser.' +#10 +
                        'Show Online help?',
                        '', TMsgDlgType.mtError, [TMsgDlgBtn.mbYes, TMsgDlgBtn.mbNo]) = ID_YES) then
         Url := '/#m_edge_runtime';
+    end;
     if (Url <> '') then
       ShellExecute(0, 'Open', PWideChar(ONLINE_DOC_URL + Url), '', '', SW_SHOWNORMAL);
   end;
