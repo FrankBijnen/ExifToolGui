@@ -271,7 +271,6 @@ object FMain: TFMain
         Font.Style = []
         ParentFont = False
         TabOrder = 1
-        ExplicitTop = 448
         DesignSize = (
           312
           106)
@@ -356,7 +355,6 @@ object FMain: TFMain
         OnKeyDown = MetadataListKeyDown
         OnMouseDown = MetadataListMouseDown
         OnSelectCell = MetadataListSelectCell
-        ExplicitHeight = 391
         ColWidths = (
           150
           160)
@@ -462,6 +460,7 @@ object FMain: TFMain
         Font.Style = []
         ParentFont = False
         TabOrder = 1
+        ExplicitTop = 522
         object SpeedBtn_Geotag: TSpeedButton
           AlignWithMargins = True
           Left = 3
@@ -506,7 +505,9 @@ object FMain: TFMain
         Align = alClient
         TabOrder = 2
         UserDataFolder = '%LOCALAPPDATA%\bds.exe.WebView2'
+        OnCreateWebViewCompleted = EdgeBrowser1CreateWebViewCompleted
         OnWebMessageReceived = EdgeBrowser1WebMessageReceived
+        ExplicitHeight = 465
       end
     end
   end
@@ -1159,6 +1160,13 @@ object FMain: TFMain
       object JPGGenericlosslessautorotate1: TMenuItem
         Caption = 'JPG:  Lossless rotate + crop...'
         OnClick = JPGGenericlosslessautorotate1Click
+      end
+    end
+    object Help1: TMenuItem
+      Caption = 'Help'
+      object OnlineDocumentation1: TMenuItem
+        Caption = 'Online Documentation'
+        OnClick = OnlineDocumentation1Click
       end
     end
   end

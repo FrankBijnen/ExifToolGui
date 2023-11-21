@@ -5,7 +5,7 @@ object FrmAbout: TFrmAbout
   BorderStyle = bsToolWindow
   Caption = 'About'
   ClientHeight = 264
-  ClientWidth = 376
+  ClientWidth = 414
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -49,8 +49,8 @@ object FrmAbout: TFrmAbout
   object LblVersion: TLabel
     Left = 56
     Top = 8
-    Width = 300
-    Height = 50
+    Width = 340
+    Height = 65
     AutoSize = False
     Caption = 'LblVersion'
     Font.Charset = DEFAULT_CHARSET
@@ -63,8 +63,8 @@ object FrmAbout: TFrmAbout
   end
   object LblSource: TLabel
     Left = 56
-    Top = 79
-    Width = 300
+    Top = 95
+    Width = 340
     Height = 15
     AutoSize = False
     Caption = 'LblSource'
@@ -81,8 +81,8 @@ object FrmAbout: TFrmAbout
   end
   object LblForum: TLabel
     Left = 56
-    Top = 100
-    Width = 300
+    Top = 116
+    Width = 340
     Height = 15
     AutoSize = False
     Caption = 'LblForum'
@@ -99,16 +99,16 @@ object FrmAbout: TFrmAbout
   end
   object LblExifTool: TLabel
     Left = 56
-    Top = 117
-    Width = 300
+    Top = 133
+    Width = 340
     Height = 15
     AutoSize = False
     Caption = 'LblExifTool'
   end
   object LblJpegTools: TLabel
     Left = 56
-    Top = 165
-    Width = 300
+    Top = 181
+    Width = 340
     Height = 15
     AutoSize = False
     Caption = 'LblJpegTools'
@@ -116,7 +116,7 @@ object FrmAbout: TFrmAbout
   object LblScreen: TLabel
     Left = 56
     Top = 208
-    Width = 300
+    Width = 340
     Height = 15
     AutoSize = False
     Caption = 'LblScreen'
@@ -124,17 +124,17 @@ object FrmAbout: TFrmAbout
   object Panel1: TPanel
     Left = 0
     Top = 235
-    Width = 376
+    Width = 414
     Height = 29
     Align = alBottom
     TabOrder = 0
     ExplicitTop = 223
     ExplicitWidth = 368
     DesignSize = (
-      376
+      414
       29)
     object BtnOk: TBitBtn
-      Left = 270
+      Left = 300
       Top = 2
       Width = 75
       Height = 25
@@ -160,7 +160,7 @@ object FrmAbout: TFrmAbout
       ModalResult = 1
       NumGlyphs = 2
       TabOrder = 0
-      ExplicitLeft = 262
+      ExplicitLeft = 254
     end
   end
 end

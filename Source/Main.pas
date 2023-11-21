@@ -13,7 +13,7 @@ uses
   Vcl.ValEdit, Vcl.ImgList,
   Vcl.ComCtrls, Vcl.ExtCtrls, Vcl.Menus, Vcl.Buttons, Vcl.StdCtrls, Vcl.ExtDlgs,
   Vcl.Shell.ShellCtrls, // Embarcadero ShellTreeView and ShellListView
-  Winapi.WebView2, Winapi.ActiveX, Vcl.Edge, // Edgebrowser
+  Winapi.WebView2, Winapi.ActiveX, Winapi.EdgeUtils, Vcl.Edge, // Edgebrowser
   VclTee.TeeGDIPlus, VclTee.TeEngine, VclTee.TeeProcs, VclTee.Chart,
   VclTee.Series, // Chart
   ExifToolsGUI_ShellTree, // Extension of ShellTreeView
@@ -173,6 +173,8 @@ type
     EditMapBounds: TLabeledEdit;
     N10: TMenuItem;
     UpdateLocationfromGPScoordinates: TMenuItem;
+    Help1: TMenuItem;
+    OnlineDocumentation1: TMenuItem;
     procedure ShellListClick(Sender: TObject);
     procedure ShellListKeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
     procedure SpeedBtnExifClick(Sender: TObject);
@@ -274,6 +276,8 @@ type
     procedure GenericImportPreviewClick(Sender: TObject);
     procedure JPGGenericlosslessautorotate1Click(Sender: TObject);
     procedure UpdateLocationfromGPScoordinatesClick(Sender: TObject);
+    procedure EdgeBrowser1CreateWebViewCompleted(Sender: TCustomEdgeBrowser; AResult: HRESULT);
+    procedure OnlineDocumentation1Click(Sender: TObject);
   private
     { Private declarations }
     ETBarSeriesFocal: TBarSeries;
@@ -329,8 +333,11 @@ uses System.StrUtils, System.Math, System.Masks, System.UITypes,
 
 const
   GUI_SEP = '-GUI-SEP';
-
-  // Start Main
+{$IFDEF DEBUG}
+  ONLINE_DOC_URL = 'https://github.com/FrankBijnen/ExifToolGui/blob/Development/Docs/ExifToolGUI_V652.md';
+{$ELSE}
+  ONLINE_DOC_URL = 'https://github.com/FrankBijnen/ExifToolGui/blob/main/Docs/ExifToolGUI_V652.md';
+{$ENDIF}
 
 procedure TFMain.WMEndSession(var Msg: TWMEndSession);
 begin // for Windows Shutdown/Log-off while GUI is open
@@ -1437,6 +1444,11 @@ begin
   end;
 end;
 
+procedure TFMain.OnlineDocumentation1Click(Sender: TObject);
+begin
+  ShellExecute(0, 'Open', PWideChar(ONLINE_DOC_URL), '', '', SW_SHOWNORMAL);
+end;
+
 procedure TFMain.QuickPopUpMenuPopup(Sender: TObject);
 var
   i: smallint;
@@ -1852,6 +1864,30 @@ var
 begin
   I := ShellList.Items.Count;
   StatusBar.Panels[0].Text := 'Files: ' + IntToStr(I);
+end;
+
+procedure TFMain.EdgeBrowser1CreateWebViewCompleted(Sender: TCustomEdgeBrowser; AResult: HRESULT);
+var Url: string;
+begin
+  if (AResult <> S_OK) then
+  begin
+    Url := '';
+    if not CheckWebView2Loaded then
+    begin
+      if (MessageDlgEx('The WebView2Loader.dll could not be loaded.' + #10 +
+                       'Show Online help?',
+                       '', TMsgDlgType.mtError, [TMsgDlgBtn.mbYes, TMsgDlgBtn.mbNo]) = ID_YES) then
+        Url := 'm_edge_dll';
+    end
+    else
+      if (MessageDlgEx('Unable to start Edge browser.' +#10 +
+                       'Show Online help?',
+                       '', TMsgDlgType.mtError, [TMsgDlgBtn.mbYes, TMsgDlgBtn.mbNo]) = ID_YES) then
+        Url := 'm_edge_runtime';
+    if (Url <> '') then
+      ShellExecute(0, 'Open', PWideChar(ONLINE_DOC_URL + Url), '', '', SW_SHOWNORMAL);
+  end;
+
 end;
 
 procedure TFMain.EdgeBrowser1WebMessageReceived(Sender: TCustomEdgeBrowser; Args: TWebMessageReceivedEventArgs);

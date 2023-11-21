@@ -86,12 +86,34 @@ It will save its settings in %APPDATA%\ExifToolGUI\ExifToolV6.ini, unless you us
 It was decided not to save the INI file in the same directory as the executable, because that location may not be writable.<br>
 <a href="Readme Portable.txt"><b>See Readme Portable.txt for more info on portable use.</b></a><br><br>
 
-<h3>3. WebView2Loader.dll</h3>
-This dll is only needed when you want to use the OSM map. You can download it <a href="https://www.nuget.org/packages/Microsoft.Web.WebView2">from nuget</a>
-Select the version (Eg. 1.0.2194-prerelease) and click on Download package. (on the Right)<br>
+<h3><a name="m_edge">3. Edge browser needed for OSM map<a></h3>
+If you don't need the OSM map functionality, you can skip this step.<br>
+The OSM map is hosted by an internal web browser based on Edge. There are 2 requirements. The <b>Runtime</b> and the <b>WebView2Loader.dll</b>. 
+
+<h4><a name="m_edge_runtime">Edge Runtime<a></h4>
+On modern Windows versions the runtime will be available standard. If it is missing on your system, or you want to install the latest version
+<a href="https://www.microsoft.com/edge/download/insider?form=MA13FJ">use this link and install one of Edge Canary, Dev or Beta.</a><br>
+
+<h4><a name="m_edge_dll">WebView2Loader.dll</a></h4>
+This dll is not standard available and can be downloaded from NuGet. I recommend to save it in the same directory as ExifToolGui.exe, but any directory that Windows searches will do.<br><br>
+<ul>
+<li>
+Download only the DLL from <a href="https://nuget.info/packages/Microsoft.Web.WebView2/"><b>Package explorer</b></a>.<br>
+Navigate in the <b>Contents</b> pane to runtimes\<b>win-x86</b>\native or runtimes\<b>win-x64</b>\native, depending on your platform.<br>
+Double-click on WebView2Loader.dll to start the download.<br><br>
+<img src="ExifToolGUI_V652_files/package explorer.jpg"><br><br>
+</li>
+<li>
+Download the complete package from <a href="https://www.nuget.org/packages/Microsoft.Web.WebView2"><b>NuGet</b></a> manually.<br>
+Select the version (Eg. 1.0.2194-prerelease) and click on <b>Download package</b>. (on the Right)<br>
 This will get you a file named like 'microsoft.web.webview2.1.0.2194-prerelease.nupkg'.<br>
-Open this file with an archiver. (Winrar https://www.win-rar.com/ and 7-Zip https://www.7-zip.org/ are known to work)<br>
-From this nupkg file extract the file 'runtimes\win-x86\native\WebView2Loader.dll' or 'runtimes\win-x64\native\WebView2Loader.dll' to the directory where you saved ExifToolGui(_X64).exe.<br>
+Rename the .nupkg file to .zip to open it Windows Explorer, or open with an archiver. <br>(Winrar https://www.win-rar.com/ and 7-Zip https://www.7-zip.org/ are known to work)<br>
+Extract the file 'runtimes\win-x86\native\WebView2Loader.dll' or 'runtimes\win-x64\native\WebView2Loader.dll'.</li>
+</ul>
+<br>
+<a href="https://docwiki.embarcadero.com/RADStudio/Sydney/en/Using_TEdgeBrowser_Component_and_Changes_to_the_TWebBrowser_Component">More info for developers from Embarcadero</a>
+<br>
+<br>
 
 <h3>4. jhead.exe &amp; jpegtran.exe</h3>
 These files are no longer needed, but can still be used if available.<br>
