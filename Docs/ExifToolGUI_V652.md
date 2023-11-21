@@ -523,8 +523,10 @@ You can check which preview(s) to extract and optionally perform autorate, and o
 <br><br>
 
 <h3>Generic import preview</h3>
-This does the opposite as the previous option does. It should be possible to import the previews
-created with the previous option.<br>
+Use this option to update a preview. Before you choose this option select in the filelist which files to update.<br>
+In this dialog select which preview to update. Optionally rotate and or crop.<br>
+When you click on <b>Execute</b> browse to the folder containing the previews. The previews should have<br>
+the same base name as the raw files. Typically they are created by the previous option.<br>
 <img src="ExifToolGUI_V652_files/genericimportpreview.jpg">
 <br>
 <br>
@@ -552,17 +554,49 @@ possible/safe to remove the metadata you've selected to remove. In such
 cases, ExifTool will simply refuse to remove such metadata (also see <font class="blue">Ignore minor errors in metadata</font> menu above).<br>
 <br>
 
+<h3>Update City, Province, Country from GPS coordinates</h3>
+This option can update the location info (Country, Province and City) for the selected files.<br>
+The selected files should already be geotagged, that is contain lat and lon values.<br>
+For every selected file a lookup is done using the selected provider. To reduce the nbr of calls a cache is used.<br>
+In the dialog you can customize how the fields are filled.<br><br>
+<img src="ExifToolGUI_V652_files/updatelocationfromgps.jpg"><br><br>
+Notes:<br>
+- Due to the nature of this function, it uses an external webservice, there are some 'point of failures'.<br>
+<ul>
+<li>You need a reliable internet connection.</li>
+<li>The external webservice could be (temporarily) out of service for various reasons.</li>
+<li>The external webservice might change it's API.</li>
+<li>etc...</li>
+</ul>
+- If you open the log window you can see the rest requests and their responses.<br><br>
+<a href="Readme GeoCoding.txt">See also Readme GeoCoding.txt</a><br>
+
 <h2><a name="m_various">Various menu</a></h2>
+
 <h3>File: Date modified as in Exif</h3>
 -use it, if you feel the need.<br>
+This is a remark originally made by Bogdan. I would like to add my comment why it's not a good idea.<br>
+If you have a backup tool that relies on the Date Modified, it will not notice that a file is modified. Example: Robocopy<br>
+
 <br>
 <h3>File: Name=DateTime+Name</h3>
-<img src="ExifToolGUI_V652_files/gui08a.png"><br>
+<img src="ExifToolGUI_V652_files/renamefiles.jpg"><br>
 <br>
-<h3>JPG: Lossless autorotate</h3>
--this will physically rotate selected JPG images according to Exif:Orientation value inside files.<br>
+
+<h3>JPG: Lossless autorotate (Deprecated)</h3>
+This menu still uses external program jhead.exe. (if available) But will be removed in a next release. Use the next menu-item.<br>
 <br>
 <br>
+
+<h3>JPG: Lossless autorotate + crop</h3>
+This will physically rotate selected JPG images according to Exif:Orientation value inside files.<br>
+It uses a library NativeJpg by SimDesign B.V. to do the actual rotating. No external program is needed.<br>
+In addition you have more control over how the function is performed.<br><br>
+<img src="ExifToolGUI_V652_files/jpeglosslessrotate.jpg"><br><br>
+<a href="Readme Lossless rotate_Import_Export previews.txt">See also Readme Lossless rotate_Import_Export previews.txt</a>
+<br>
+<br>
+
 <h2><a name="p_filelist">Filelist panel</a></h2>
 <img src="ExifToolGUI_V652_files/gui09.png"><br>
 <br>

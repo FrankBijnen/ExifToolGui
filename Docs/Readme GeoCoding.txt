@@ -91,7 +91,7 @@ Search for the location of coordinates. Reverse geocoding.
      The available fields from Geocode.maps.co are the OSM fields for address. https://wiki.openstreetmap.org/wiki/Key:addr:*
      More info on admin levels: https://wiki.openstreetmap.org/wiki/Key:admin_level
 
-   The default provider for reverse geocoding 'Overpass'. It allows more than 2 requests/second. You can change the language.
+   The default provider for reverse geocoding is 'Overpass'. It allows more than 2 requests/second. You can change the language.
 
    Caching.
 
