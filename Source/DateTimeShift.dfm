@@ -27,6 +27,8 @@ object FDateTimeShift: TFDateTimeShift
     Height = 19
     Panels = <>
     SimplePanel = True
+    ExplicitTop = 200
+    ExplicitWidth = 459
   end
   object AdvPanel1: TPanel
     Left = 0
@@ -43,13 +45,14 @@ object FDateTimeShift: TFDateTimeShift
     ParentDoubleBuffered = False
     ParentFont = False
     TabOrder = 1
+    ExplicitHeight = 200
     object Label2: TLabel
-      Left = 48
+      Left = 43
       Top = 125
-      Width = 70
+      Width = 75
       Height = 14
       Alignment = taRightJustify
-      Caption = 'Shif amount:'
+      Caption = 'Shift amount:'
     end
     object LabeledEdit1: TLabeledEdit
       Left = 120
