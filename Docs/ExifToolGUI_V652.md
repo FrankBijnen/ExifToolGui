@@ -298,14 +298,17 @@ The Styles Silver, Green and Blue try to mimic the colors available in V516
 <br>
 
 <h2><a name="m_options">Options menu</a></h2>
+
 <h3>Don't make backup files</h3>
 -if checked (default), then ExifTool won't make "filename.ext_original" 
 backup files. However, if you're not sure what you're doing, then you 
 better uncheck this option.<br>
 <br>
+
 <h3>Preserve Date modified of files</h3>
 -no matter what I think about this, some prefer having this option checked.<br>
 <br>
+
 <h3>Ignore minor errors in metadata</h3>
 -by default, this option is unchecked. This results, in case metadata is
  not "as it should be", ExifTool will output warnings/errors messages 
@@ -315,9 +318,11 @@ there's a danger that you might lose some metadata by modifying it.<br>
 If this option is checked and metadata only contain "minor" errors (or 
 only "minor" damage can occur), then ExifTool will do his job anyway.<br>
 <br>
+
 <h3>Show Exif:GPS in decimal notation</h3>
--checked by default (because i.e. GoogleMap uses this notation as well).<br>
+-checked by default (because i.e. OSM Map uses this notation as well).<br>
 <br>
+
 <h3>Show sorted tags (not in Workspace)</h3>
 -if this option is unchecked (default), then metadata tags are shown 
 sorted as defined internally in metadata. Many times however, it's quite
@@ -325,9 +330,11 @@ sorted as defined internally in metadata. Many times however, it's quite
 option will be checked most of the time.<br>
 Obviously, this setting has no influence on <font class="blue">Workspace</font> view output (see <font class="blue">Workspace manager</font> above).<br>
 <br>
+
 <h3>Show Composite tags in view ALL</h3>
 Composite tags aren't "real" tags (their values are calculated from various existing tags), so they are shown optionally.<br>
 <br>
+
 <h3>Don't show duplicated tags</h3>
 It can happen that the same tag is defined more than once inside image 
 file and by default, GUI will show all of them. If you don't like this 
@@ -338,9 +345,13 @@ next GUI start. Remaining options settings however, are only temporary
 (as long GUI is running) and are not checked by default:<br>
 <br>
 <font class="blue">
+
 <h3>Show tag values as numbers</h3><br>
+
 <h3>Prefix tag names with ID number</h3><br>
+
 <h3>Group tag names by instance (-g4)</h3></font> -This can help you to identify duplicated tags when viewing in <font class="blue">Metadata</font> panel.<br>
+
 <h3>API WindowsWideFile (requires Exiftool v12.66)</h3></font> -Force the use of wide-character Windows I/O functions when the CharsetFileName option is used.<br>
 <br>
 <br>
@@ -351,13 +362,15 @@ backup of complete metadata inside image file, HTML is ment for
 "studying" metadata structure, etc. So, try and see what suits your 
 needs.<br>
 <br>
+
 <h3>Copy metadata from single file</h3>
 This will copy metadata from single source file (can be MIE file too) 
 into currently selected files. That is, all selected files will be 
 populated with the same metadata. After you choose the source file, 
 you'll have a chance to reduce the amount of metadata to be copied:<br>
-<img src="ExifToolGUI_V652_files/gui03b.png"><br>
+<img src="ExifToolGUI_V652_files/copymetadatasingle.jpg"><br>
 <br>
+
 <h3>Copy metadata into JPG or TIF files</h3>
 If single (JPG or TIFF) file is selected (=destination), then metadata 
 can be copied from any other file containing metadata (incl. MIE file).<br>
@@ -390,7 +403,7 @@ JPG/TIFF and you know, that your raw converter doesn't copy all metadata
 modified inbetween (resized, etc.), not all metadata is desired to be 
 copied. Because of this, you'll be asked, if you also wish to copy 
 following tags:<br>
-<img src="ExifToolGUI_V652_files/gui04.png"><br>
+<img src="ExifToolGUI_V652_files/copymetadataoptions.jpg"><br>
 -in 99% cases, there will be no reason to check any of above option.<br>
 <br>
 <h3>Copy metadata into all JPG or TIF files</h3>
@@ -400,7 +413,7 @@ least one for menu to be enabled), metadata will always be copied into <b>all</b
 <li>After you choose this menu option, you'll be first asked "<font class="blue">should files in subfolders also be processed?</font>". If we choose <font class="blue">No</font>, then again, this option behaves the same way as if all files are selected in <b>Scenario 2</b> above. However, if we coose <font class="blue">Yes</font>, then metadata will be copied into images in all subfolders as well (only where folder/file names are equal, of course).</li>
 <br>
 Let's see an example, where we wish to update <font class="brown">jpg</font> files with metadata from <font class="brown">raw</font> files:<br>
-<img src="ExifToolGUI_V652_files/gui04a.png"><br>
+<img src="ExifToolGUI_V652_files/copymetadatamulti.jpg"><br>
 <br>
 1. Select any destination file inside <font class="brown">MyJpg\Dir1</font>
  folder. If you select any JPG file, then only JPG files will be 
@@ -410,20 +423,20 @@ processed.<br>
 3. Click on <font class="blue">Yes</font> button when asked<br>
 4. File browser will appear, where you select any (source) file inside <font class="brown">MyRaw\Dir1</font> folder. <u>Note:</u> You only need to select one file (to specify file extension).<br>
 5. A panel will appear, where you confirm/check which of "not desired" metadata you <u>wish</u> to be copied:<br>
-<img src="ExifToolGUI_V652_files/gui04.png"><br>
+<img src="ExifToolGUI_V652_files/copymetadataoptions.jpg"><br>
 <u>Note:</u> Even if none of above is checked, the rest of metadata in source files (Exif, Xmp, etc.) will be copied into destination files.<br>
 <br>
 That's it: after click on <font class="blue">Execute</font>, metadata will be copied into all files inside <font class="brown">MyJpg\Dir1</font> folder (incl. <font class="brown">Dir2</font> folder) from files inside <font class="brown">MyRaw\Dir1</font> folder (incl. <font class="brown">Dir2</font> folder).<br>
 If we would choose <font class="blue">No</font> in step 3 above, then only files inside <font class="brown">MyJpg\Dir1</font> would be processed.<br>
 <br>
-<br>
-<h3>Import GPS data from : Log files</h3>
+
+<h3>Import GPS data from: Log files</h3>
 This option allows geotagging your files in batch by using log file of your GPS device (see here for <a href="https://exiftool.org/geotag.html">supported GPS files</a>).<br> 
-<img src="ExifToolGUI_V652_files/gui05.png"><br>
+<img src="ExifToolGUI_V652_files/importgpsdata.jpg"><br>
 <br>
 <u>Step 1:</u> <b>Select log file</b> of your GPS device.<br>
-As usually in GUI, you must select files you wish to geotag, first. In 
-most cases, folder content will contain series of "session" photos, so 
+As usual in GUI, you first must select files you wish to geotag. In 
+most cases, folder contents will contain series of "session" photos, so 
 you will select all of them.<br>
 <br>
 <u>Step 2:</u> Check <b>use all log files in directory</b> if more than one log file for set of files exist.<br>
@@ -437,7 +450,7 @@ choose -important is, all log files must have the same extension.<br>
 Here you define which photo DateTime values to compare with those in log file.<br>
 <br>
 <u>Step 4:</u> Choose if <b>TimeZone offset</b> is needed to be taken into account.<br>
-This is funny one... The thing is, log files contain UTC time, while 
+This is a funny one... The thing is, log files contain UTC time, while 
 camera is usually set to local time (of where photo is taken). In most 
 cases, we are dealing with two scenarios:<br>
 <ul>
@@ -454,9 +467,13 @@ offset to +01 (depending on winter/summer time?)</li>
 In both cases above it's assumed, that camera is set to local time of 
 where photos are taken. It's also assumed, that when geotagging, your 
 PC/laptop is set to your local (home) TimeZone.<br>
-For further reading/questions see <a href="https://exiftool.org/forum/index.php/topic,3333.0.html">here</a>.<br> 
+For further reading/questions see <a href="https://exiftool.org/forum/index.php/topic,3333.0.html">here</a>.<br><br>
+<u>Step 5:</u> Check Update Geo Location, if you wish to update Country, Province and City.<br>
+Click on <a href="#m_geotag_setup"><b>Setup Geo</b></a> to control how these fields are filled.<br>
+Note: These fields are also shown in the filelist if it's set to 'Location info'.<br>
 <br>
-<h3>Import GPS data from : Xmp files</h3>
+
+<h3>Import GPS data from: Xmp files</h3>
 By using this menu, you can copy GPS data from xmp sidecar files into Exif GPS section of selected image files.<br>
 <u>Note:</u> It is expected that image and sidecar files only differ in 
 extension -name part however, must be equal. Example of valid 
@@ -483,34 +500,58 @@ be prompted to select folder containing (xmp) sidecar files -in most
 cases, that will be the same folder where image files reside.</li>
 ...and that's it.<br>
 <br>
-<h3>Extract preview image from selected: raw files</h3>
-As known, every raw image file also contains JPG image, which serves for
- previewing raw image file content. In most cases, this JPG image is "as
- if photo would be taken in JPG mode" -while this is true for exposure 
+
+<h3>Extract preview image from selected: raw files (Deprecated)</h3>
+This function has been replaced by <b>Generic extract previews</b> and will be
+removed in a next release.
+<br>
+
+<h3>Embed preview image into selected: raw files (Deprecated)</h3>
+This function has been replaced by <b>Generic import preview</b> and will be
+removed in a next release.
+<br>
+
+<h3>Generic extract previews</h3>
+As you may know raw image files can also contain a JPG image, which serves for
+previewing raw image file content. In most cases, this JPG image is "as
+if photo would be taken in JPG mode" -while this is true for exposure 
 and colors, resolution (pixel size) may differ (depends on camera).<br>
+Because there are many flavours possible I created a generic function.
+It shows, for the selected file, what previews are available, and their sizes.<br>
+You can check which preview(s) to extract and optionally perform autorate, and or crop.<br>
+<img src="ExifToolGUI_V652_files/genericextractpreviews.jpg">
+<br><br>
+
+<h3>Generic import preview</h3>
+This does the opposite as the previous option does. It should be possible to import the previews
+created with the previous option.<br>
+<img src="ExifToolGUI_V652_files/genericimportpreview.jpg">
 <br>
-<h3>Embed preview image into selected: raw files</h3>
-This does the opposite as previous option does. Because I didn't noticed
- much interest from users, JPG images can be embedded (back) into CR2 
-raw files only. That is, I made this for my needs in first place.<br>
 <br>
+See also the readme.<a href="Readme Lossless rotate_Import_Export previews.txt">Readme Lossless rotate_Import_Export previews.txt</a><br>
+
 <h2><a name="m_modify">Modify menu</a></h2>
+
 <h3>Exif: DateTime shift</h3>
-<img src="ExifToolGUI_V652_files/gui06.png"><br>
-<br>
+<img src="ExifToolGUI_V652_files/exifdatetimeshift.jpg"><br>
+<br><br>
+
 <h3>Exif: DateTime equalize</h3>
-<img src="ExifToolGUI_V652_files/gui07.png"><br>
+<img src="ExifToolGUI_V652_files/exifdatetimeequalize.jpg"><br>
 <br>
+
 <h3>Exif: LensInfo from Makernotes</h3>
 This will fill <font class="brown">Exif:LensInfo</font> of selected file(s) with relevant values from <font class="brown">Makernotes</font> data (where possible).<br>
 <br>
+
 <h3>Remove metadata</h3>
-<img src="ExifToolGUI_V652_files/gui08.png"><br>
+<img src="ExifToolGUI_V652_files/removemetadata.jpg"><br>
 <br>
-Note, that in some cases (depends on image file format), it's not 
-possible/safe to remove metadata you've choosed for removing. In such 
+Note, that in some cases (depending on the image file format), it's not 
+possible/safe to remove the metadata you've selected to remove. In such 
 cases, ExifTool will simply refuse to remove such metadata (also see <font class="blue">Ignore minor errors in metadata</font> menu above).<br>
 <br>
+
 <h2><a name="m_various">Various menu</a></h2>
 <h3>File: Date modified as in Exif</h3>
 -use it, if you feel the need.<br>
@@ -519,7 +560,7 @@ cases, ExifTool will simply refuse to remove such metadata (also see <font class
 <img src="ExifToolGUI_V652_files/gui08a.png"><br>
 <br>
 <h3>JPG: Lossless autorotate</h3>
--this will phisically rotate selected JPG images according to Exif:Orientation value inside files.<br>
+-this will physically rotate selected JPG images according to Exif:Orientation value inside files.<br>
 <br>
 <br>
 <h2><a name="p_filelist">Filelist panel</a></h2>
@@ -757,6 +798,10 @@ Current map cursor position becomes <font class="blue">Home</font> position.<br>
 <br>
 <b>Geotag files</b> button<br>
 By clicking on this button, all selected files will be geotagged with current map cursor position.<br>
+<b>Geotag files</b> button<br><br>
+<img src="ExifToolGUI_V652_files/geotagfiles.jpg"><br>
+<a name="m_geotag_setup">Setting up Geo tagging<a><br>
+<img src="ExifToolGUI_V652_files/setupgeotag.jpg">
 <br>
 <br>
 <br>
