@@ -639,7 +639,7 @@ But to give you at least something, the last entry in this drop-down box is <fon
 this view on relative small amount of files in folder. In short: tryout.<br>
 <br>
 
-Developer note: Bogdan used JAM Shellbrowser for the filelist, and folderlist. I wanted to have sourcecode that did not rely on 3rd party libraries. The additional functionality needed for
+Developer note: Bogdan Hrastnik used JAM Shellbrowser for the filelist, and folderlist. I wanted to have sourcecode that did not rely on 3rd party libraries. The additional functionality needed for
 ExifToolGui required extending the standard Embarcadero TShellTreeView and TShellListView. It proved to be more difficult than I anticipated. By now it works satisfactory.<br>
 A few small modifications to the Embarcadero source are needed. You can find the ReadMe and source code in GitHub. 
 <a href="..\Source\Vcl.ShellControls\ReadMe.txt">ReadMe ShellControls.txt</a>
@@ -649,15 +649,16 @@ A few small modifications to the Embarcadero source are needed. You can find the
 By clicking on <font class="blue">ExifTool direct</font> button, you get an input field where ExifTool commands can be entered and executed:<br>
 <img src="ExifToolGUI_V652_files/exiftooldirect.jpg"><br>
 <br>
-<b>StayOpen/Classic</b> Sarting with version 6.2.0 you can choose how the commands are executed.<br>
-<li>StayOpen. Send the commands to the ExifTool program using stay open mode. This is the default, and doesn't start a new instance of ExifTool.exe.</li>
-<li>Classic. Starts a new instance of ExifTool.exe, sends the commands, and wait for ExifTool to complete. This was the default in previous version. Retained for compatibility reasons.</li>
-
+<b>StayOpen/Classic</b> Starting with version 6.2.0 you can choose how the commands are executed.<br>
+<li>StayOpen. Send the commands to the ExifTool.exe program using stay open mode. This is the default, and doesn't start a new instance of ExifTool.exe.</li>
+<li>Classic. Starts a new instance of ExifTool.exe, sends the commands, and waits for ExifTool.exe to complete. This was the default in previous versions. Retained for compatibility reasons.</li>
+<br>
 <u><b>Note:</b></u> Don't need to type "exiftool" here -GUI will take care of calling ExifTool for executing commands you have entered.<br>
 <u><b>Note:</b></u> Even you're in "direct mode", <font class="blue">Options menu</font> settings for:<br>
 <li>Don't backup files when modifying</li>
 <li>Preserve Date modified of files</li>
 <li>Ignore existing minor errors</li>
+<li>Api WindowsWideFile</li>
 are automatically applied by GUI -meaning: these settings are still valid.<br>
 <br>
 
@@ -683,6 +684,7 @@ so selecting it in filelist isn't what you want. If you select it
 anyway, then (in this case) xmp file will be created first (as 
 expected), and after that, xmp file content will be added back to 
 selected file -that's what you don't want.<br>
+<b>Tip</b> Use the file filter to make sure no files are selected.<br>
 <br>
 
 If you wish to modify all files inside currently selected folder, <u>including files in subfolders</u>, then you should use <font class="brown">-r</font> option. Some examples:<br>
@@ -702,14 +704,15 @@ If you wish to modify all files inside currently selected folder, <u>including f
 There's one predefined ExifTool command in GUI, so you can see what's 
 all about. To access it, you click on combo-box (blank on above image) 
 and choose it:<br>
-<img src="ExifToolGUI_V652_files/gui13.png"><br>
+<img src="ExifToolGUI_V652_files/exiftooldirect.jpg"><br>
 Once command is chosen, you can execute it by pressing Enter key (while 
 you're in edit field). If needed, you can modify displayed command and 
 execute it, without actually changing predefined command.<br>
 <br>
+
 <h3>Modifying predefined commands</h3>
 By clicking on <font class="blue">Edit predefined</font> button, panel increases with additional options:<br>
-<img src="ExifToolGUI_V652_files/gui14.png"><br>
+<img src="ExifToolGUI_V652_files/exiftooldirectpredefined.jpg"><br>
 <br>
 <font class="blue">^Delete</font> -deletes currently selected predefined command permanently.<br>
 <font class="blue">^Replace</font> -replaces currently selected predefined command (i.e. after changes have been made).<br>
@@ -733,6 +736,7 @@ To execute above commands in GUI (after desired image files are selected), we ne
 </pre>
 -and press Enter key.<br>
 <br>
+
 ExifTool full source version (can be downloaded on top of ExifTool main 
 page) contains several predefined args files, which are ment for 
 transferring "similar" metadata between sections. One of them is (for 
@@ -740,15 +744,25 @@ example) "xmp2iptc.args" file, which copies all "compatible" metadata
 from Xmp to Iptc section. And as said, there are more of them.<br>
 <br>
 <h3>Show Log Window button</h3>
-When using <font class="blue">ExifTool direct</font> mode, any results are automatically written into <font class="blue">Log window</font>. Keep in mind, that content reflects only last executed command.<br>
+When using <font class="blue">ExifTool direct</font> mode, any results are written into the <font class="blue">Log window</font> when it is opened.<br>
 If, for example, we select two files and execute following <font class="blue">ExifTool direct</font> command:<br>
 <pre>-e -gps:all
 </pre>
 -we will get something like this:<br>
-<img src="ExifToolGUI_V652_files/gui14a.png"><br>
+<img src="ExifToolGUI_V652_files/logwindow.jpg"><br>
 <br>
 <u>Note:</u> In case of errors, <font class="blue">Log window</font> with relevant messages automatically appears after ExifTool ends processing files.<br>
+Starting with version 6.2.0 the Log window will show the last 10 commands. In the top panel you can select the command issued, <br>
+on the left you will see what was sent to ExifTool, on the right you see the output it generated and in the bottom panel the errors, if applicable.<br>
+To help identifying the commands an execnum is send to ExifTool, you can see this in the command window 'execute14 and -echo4 {ready14}', <br>
+Exiftool will return this in the Output and Error. <br>
+GUI uses execnums from 10-99, and when 100 is reached it is reset to 10.<br>
+In the top you will see a checkbox 'Show all commands'. By default only the commands issued from Direct mode, or that return an error, are displayed. <br>
+If you check this also the commands that GUI uses are displayed.<br>
+With the buttons <b>Cmd prompt</b> and <b>PowerShell </b> you can generate a .cmd or .ps1 script to replay the commmands.<br>
 <br>
+<img src="ExifToolGUI_V652_files/powershell.jpg"><br>
+
 <h2><a name="p_metadata">Metadata panel</a></h2>
 <img src="ExifToolGUI_V652_files/gui15.png"><br>
 <br>

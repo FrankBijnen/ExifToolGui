@@ -34,5 +34,5 @@ Due to the Copyright statement I can't distribute that source, but the Community
 Notes:
 
 - If you already have these controls installed, make the modifications described above to your version.
-- The subdirectoy 'Vcl.ShellControls' is in the Search path of ExifToolGUI. 
+- The subdirectory 'Vcl.ShellControls' is in the Search path of ExifToolGUI. 
 

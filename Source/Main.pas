@@ -1970,6 +1970,14 @@ var
   ETprm: string;
   SelectedFiles: string;
 begin
+  if (Key = VK_ESCAPE) and
+     (SpeedBtn_ETdirect.Down) then
+  begin
+    SpeedBtn_ETdirect.Down := not SpeedBtn_ETdirect.Down;
+    SpeedBtn_ETdirectClick(Sender);
+    exit;
+  end;
+
   ETtx := EditETdirect.Text;
   if (Key = VK_Return) and (length(ETtx) > 1) then
   begin
