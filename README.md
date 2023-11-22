@@ -53,7 +53,7 @@ Documentation.
  Online documentation is available at https://exiftool.org/gui/
  It is written with V5 in mind, but most of it still applies. 
 
- [V516 Documentation](/Docs/ExifToolGUI_V516.md)<br>
+ [V516 Documentation](/Docs/Original notes/ExifToolGUI_V516.md)<br>
  [V625 Documentation](/Docs/ExifToolGUI_V652.md)<br>
 
 Frank

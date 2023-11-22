@@ -598,8 +598,9 @@ In addition you have more control over how the function is performed.<br><br>
 <br>
 
 <h2><a name="p_filelist">Filelist panel</a></h2>
-<img src="ExifToolGUI_V652_files/gui09.png"><br>
+<img src="ExifToolGUI_V652_files/filelistpanel.jpg"><br>
 <br>
+
 <b>Refresh</b> button<br>
 -will update folder (directory) content in filelist panel. This might be
  usefull in cases you're interested on file characteristics changes 
@@ -610,6 +611,7 @@ In addition you have more control over how the function is performed.<br><br>
 GUI startup and this behaviour can't be changed. This drop-down box 
 allready contain few predefined file filters and by clicking on <font class="blue">Edit</font> button, you can add additional filters which you need most often.<br>
 <br>
+
 <b>Details:</b> button<br>
 -is "pressed" by default, which means, files are listed with detals 
 about files. If this button is "de-pressed" then thumbnails are shown 
@@ -618,32 +620,47 @@ instead of file details.<br>
 as images. Meaning, for raw image files, you'll need to install 
 appropriate raw "codec", to be able to see thumbnails and previews.<br>
 <br>
+
 <b>Details</b> drop-down box<br>
 -is set to <font class="blue">Standard filelist</font> by default. This drop-down box also contain few predefined details views: <font class="blue">Camera settings, Location info</font> and <font class="blue">About photo</font> -where each of these views shows few metadata values inside files; i.e.:<br> 
-<img src="ExifToolGUI_V652_files/gui10.png"><br>
+<img src="ExifToolGUI_V652_files/filelistcamerasettings.jpg"><br>
 <br>
+
 No matter how disappointed you might be, you can't define/change tags 
 shown in these predefined views. The main and only reason why's that is:
- that's the only way I could get reasonable speed to show this data.<br>
+that's the only way I could get reasonable speed to show this data.<br>
 <br>
+
 But to give you at least something, the last entry in this drop-down box is <font class="blue">User defined</font>. If you select that, then <font class="blue">Edit</font> button on the right side becomes enabled, and by clicking on it, you'll get:<br>
-<img src="ExifToolGUI_V652_files/gui11.png"><br>
+<img src="ExifToolGUI_V652_files/filelistuserdefined.jpg"><br>
 -here you can define your own columns and metadata values to be shown.<br>
 <font class="red">Note:</font> Displaying <font class="blue">User defined</font>
  details view is noticeable slower than fixed predefined views. So, use 
 this view on relative small amount of files in folder. In short: tryout.<br>
 <br>
+
+Developer note: Bogdan used JAM Shellbrowser for the filelist, and folderlist. I wanted to have sourcecode that did not rely on 3rd party libraries. The additional functionality needed for
+ExifToolGui required extending the standard Embarcadero TShellTreeView and TShellListView. It proved to be more difficult than I anticipated. By now it works satisfactory.<br>
+A few small modifications to the Embarcadero source are needed. You can find the ReadMe and source code in GitHub. 
+<a href="..\Source\Vcl.ShellControls\ReadMe.txt">ReadMe ShellControls.txt</a>
+<br>
+
 <h2><a name="p_etdirect">ExifTool direct panel</a></h2>
 By clicking on <font class="blue">ExifTool direct</font> button, you get an input field where ExifTool commands can be entered and executed:<br>
-<img src="ExifToolGUI_V652_files/gui12.png"><br>
+<img src="ExifToolGUI_V652_files/exiftooldirect.jpg"><br>
 <br>
-<u><b>Note:</b></u> Don't need to write "exiftool" here -GUI will take care of calling ExifTool for executing commands you have entered.<br>
+<b>StayOpen/Classic</b> Sarting with version 6.2.0 you can choose how the commands are executed.<br>
+<li>StayOpen. Send the commands to the ExifTool program using stay open mode. This is the default, and doesn't start a new instance of ExifTool.exe.</li>
+<li>Classic. Starts a new instance of ExifTool.exe, sends the commands, and wait for ExifTool to complete. This was the default in previous version. Retained for compatibility reasons.</li>
+
+<u><b>Note:</b></u> Don't need to type "exiftool" here -GUI will take care of calling ExifTool for executing commands you have entered.<br>
 <u><b>Note:</b></u> Even you're in "direct mode", <font class="blue">Options menu</font> settings for:<br>
 <li>Don't backup files when modifying</li>
 <li>Preserve Date modified of files</li>
 <li>Ignore existing minor errors</li>
 are automatically applied by GUI -meaning: these settings are still valid.<br>
 <br>
+
 If you're a bit familiar with ExifTool usage, then here, you can execute commands not covered by GUI. Usage is very simple:<br>
 <li>select one or more files</li>
 <li>enter desired command and press Enter key</li>
@@ -656,6 +673,7 @@ Btw. you can close ExifTool direct mode by clicking on <font class="blue">ExifTo
 <code><font class="brown">-Exif:Artist="My Name"</font></code> -it's obvious, isn't it?<br>
 etc... You can find more info <a href="https://exiftool.org/exiftool_pod.html">here</a>, on homepage of ExifTool.<br>
 <br>
+
 As mentioned, selected files are automatically added to the end of 
 command, so you don't need to type them. However, there are cases, when 
 you should <u>not</u> select source file, i.e.:<br>
@@ -666,17 +684,20 @@ anyway, then (in this case) xmp file will be created first (as
 expected), and after that, xmp file content will be added back to 
 selected file -that's what you don't want.<br>
 <br>
+
 If you wish to modify all files inside currently selected folder, <u>including files in subfolders</u>, then you should use <font class="brown">-r</font> option. Some examples:<br>
 <code><font class="brown">-r -Xmp:all=</font></code><br>
 -deletes all Xmp metadata from all files inside currently selected folder and subfolders.<br>
 <code><font class="brown">-r -Exif:Artist="My Name" -ext jpg</font></code><br>
 -set Exif:Artist tag value to My Name for all jpg files inside currently selected folder and subfolders.<br>
 <code><font class="brown">-r -Xmp:City=Paris -ext jpg -ext tif</font></code><br>
--set Xmp:City tag value to Paris for all all jpg and tif files inside selected folder and subfolders.<br>
+-set Xmp:City tag value to Paris for all jpg and tif files inside selected folder and subfolders.<br>
 <u>Note:</u> If more than one extension is specified, then (processed) <font class="blue">files counter</font> only counts number of files defined by first file extension. Meaning: if more than one extension is specified, <font class="blue">files counter</font> might not reflect actual number of files.<br>
 <br>
+
 <u><b>Note:</b></u> You can't "redirect" output in <font class="blue">ExifTool direct</font>. If you need to do that (i.e. extract thumbnail image), then you should use ExifTool directly (that is, outside GUI).<br>
 <br>
+
 <h3>Using predefined ExifTool commands</h3>
 There's one predefined ExifTool command in GUI, so you can see what's 
 all about. To access it, you click on combo-box (blank on above image) 
@@ -854,6 +875,7 @@ And if interested: first ExifToolGUI v1.00 was "published" on May 27th, 2007.<br
 <u>Additional info can be found in the ReadMe files</u>
 <ul>
 <li><a href="ReadMe for Developers.txt">ReadMe for Developers.txt</a></li>
+<li><a href="..\Source\Vcl.ShellControls\ReadMe.txt">ReadMe ShellControls.txt</a></li>
 <li><a href="ReadMe for Users.txt">ReadMe for Users.txt</a></li>
 <li><a href="Readme GeoCoding.txt">Readme GeoCoding.txt</a></li>
 <li><a href="Readme Long filenames.txt">Readme Long filenames.txt</a></li>
