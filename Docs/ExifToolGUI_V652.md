@@ -65,12 +65,15 @@ ExiftoolGUI should run on Windows 7, 8 32-64bit. However, it is highly recommend
 It will not run on Windows XP or earlier!<br>
 
 <h3>1. ExifTool</h3>
-You only need to download "Windows Executable" zip file from <a href="https://exiftool.org/"><b>here</b></a>.
+You only need to download the "Windows Executable" zip file from <a href="https://exiftool.org/"><b>here</b></a>.
 After unzipping, depending on your Windows Explorer settings, you will see:<font color="CC0000">exiftool(-k)</font> or <font color="CC0000">exiftool(-k).exe</font>
 Rename it to either <font color="CC0000">exiftool</font> or <font color="CC0000">exiftool.exe</font> and put it in the same folder as ExifToolGui.<br><br>
 <u>Notes:</u>
 <ul>
-<li>Bogdan Hrastnik recommended to copy exiftool into the Windows directory, but I strongly advise not to. Microsoft makes it harder with every Windows version to modify System directories.</li>
+<li>Bogdan Hrastnik recommended to copy exiftool into the Windows directory, but I strongly advise not to.
+Microsoft makes it harder with every Windows version to modify System directories.<br>
+If you want Windows to be able to always find ExifTool, then add the directory where it is saved in your PATH.<br>
+</li>
 <li>If you prefer an installer, I recommend the installer provided by <a href="https://oliverbetz.de/pages/Artikel/ExifTool-for-Windows"><b>Oliver Betz</b></a></li>
 <li>You can overrule the location of exiftool in Preferences/other.</li>
 <li>In case you've done something wrong in this regard, you'll see an error message when GUI starts.</li>
@@ -84,11 +87,11 @@ GUI doesn't need to be "installed". Just download the executable for your platfo
 GUI doesn't write anything into the registry file. It does however create temporary files in the %TEMP% directory. <br>
 It will save its settings in %APPDATA%\ExifToolGUI\ExifToolV6.ini, unless you use the commandline parameter <u>/DontSaveIni</u>.<br>  
 It was decided not to save the INI file in the same directory as the executable, because that location may not be writable.<br>
-<a href="Readme Portable.txt"><b>See Readme Portable.txt for more info on portable use.</b></a><br><br>
+<a href="Readme Portable.txt"><b>See Readme Portable.txt for more info on portable use.</b></a><br>
 
 <h3><a name="m_edge">3. Edge browser needed for OSM map<a></h3>
 If you don't need the OSM map functionality, you can skip this step.<br>
-The OSM map is hosted by an internal web browser based on Edge. There are 2 requirements. The <b>Runtime</b> and the <b>WebView2Loader.dll</b>. 
+The OSM map is hosted by an internal web browser based on Edge. There are 2 requirements. The <b>Edge Runtime</b> and the <b>WebView2Loader.dll</b>.
 
 <h4><a name="m_edge_runtime">Edge Runtime<a></h4>
 On modern Windows versions the runtime will be available standard. If it is missing on your system, or you want to install the latest version
@@ -122,14 +125,14 @@ These files are no longer needed, but can still be used if available.<br>
 The menu-items that use these programs are marked <u>deprecated</u> and will be removed in a next release.</br>
 
 <h3>5. Wish to see thumbnails of raw image files?</h3>
-Of course you do. What you need is a "raw codec", usually available for 
-free from camera manufacturer. The best I've found so far is 
-"FastPictureViewer codec" (from <a href="http://www.fastpictureviewer.com/codecs/">here</a>). It is very fast, covers many raw formats and is free for personal use.<br>
+Of course you do. What you need is a "raw codec", usually available for free from the camera manufacturer.
+The best I've found so far is "FastPictureViewer codec" (from <a href="http://www.fastpictureviewer.com/codecs/">here</a>).
+It is very fast, covers many raw formats and is free for personal use.<br>
 <a href="Readme Using Codecs.txt"><b>Readme Using Codecs.txt</b></a>
 <br>
 <br>
 
-That's all you need. And when new ExifTool or GUI version is available, you only need to repeat process as described above.<br>
+That's all you need. And when a new ExifTool or GUI version is available, you only need to repeat process as described above.<br>
 <br>
 
 <a name="gui_screen"><img src="ExifToolGUI_V652_files/gui_screen.jpg"></a><br>
@@ -161,7 +164,9 @@ That's all you need. And when new ExifTool or GUI version is available, you only
 <b><u>General</u></b> settings tab<br>
 <br>
 <b>Metadata language</b><br>
-Here you can choose the language for displaying metadata tag names and values in <font class="blue">Metadata</font> panel. Selected language is also used when working in <font class="blue">ExifTool direct</font> mode (output to <font class="blue">Log window</font>), or when exporting metadata to external TXT files.<br>
+Here you can choose the language for displaying metadata tag names and values in <font class="blue">Metadata</font> panel.
+Selected language is also used when working in <font class="blue">ExifTool direct</font> mode (output to <font class="blue">Log window</font>),
+or when exporting metadata to external TXT files.<br>
 <br>
 <b>Let GUI rotate JPG preview image</b><br>
 In most cases, you will need to check this option, because Windows 
@@ -173,8 +178,8 @@ checked, GUI will only rotate image in <font class="blue">Preview</font> panel -
 <br>
 <b>Enabling internet access</b><br>
 By default, this option is unchecked and if you are a bit paranoid, then
- keep it that way. In this case however, you won't be able to use GUI's <font class="blue">OSM Map</font>
- feature for geotagging your images manually. After changing this 
+keep it that way. In that case however, you won't be able to use GUI's <font class="blue">OSM Map</font>
+feature for geotagging your images manually. After changing this
 option, you'll need to close and reopen GUI, to make this feature 
 available. You have to enable this option also if you want to use GeoCoding.<br>
 <br>
@@ -220,7 +225,6 @@ In the next dialog keep only 'Thumbnail' checked, and click on OK.</li>
 Here you can setup the GeoCoding parameters. Typically you only have to check <b>Enable GeoCoding</b><br>
 For an in-depth explanation see <a href="Readme GeoCoding.txt"><b>Readme GeoCoding.txt</b></a>
 <br><br>
-<br>
 
 <h3><a name="m_workspace">Workspace manager</a></h3>
 Here you define what will be shown in <font class="blue">Metadata</font> panel when <font class="blue">Workspace</font> is selected. Besides <font class="blue">ExifTool direct</font> option, this is the most powerfull GUI feature.<br>
@@ -237,31 +241,39 @@ Tag names written here, can have different "behaviour" in case special
 character is used for their ending. For now, GUI uses following ending 
 characters:<br>
 <br>
+
 <font class="red">#</font> -if tag name ends with this character (see 
 Flash# and Orientation# above), then content of this tag will be 
 displayed as usual. However, when modifying this tag, you need to enter 
-numerical value.<br>
-<font class="red">*</font> -if tag name ends with this character (see Artist* above), then that means, that value defined in <font class="blue">Hint text</font> will be used as default value for this tag. In this case, if you right-click on <font class="blue">Metadata</font> panel (when in <font class="blue">Workspace</font> view mode), pop-up menu appears and there's option <font class="blue">Fill in default values</font> -you get the idea, I hope.<br>
-<font class="red">?</font> -if tag name ends with this character (see 
-Geotagged? above), then that means, that you're not interested on tag 
-value itself -what you wish to see is, if particular tag is defined or 
-not. <u>Note:</u> You won't be able to edit such tag in <font class="blue">Workspace</font> view.<br>
-<font class="red">±</font> -if tag name ends with this character (see 
-Type± in main screenshot above), then you'll be allowed to enter 
-multiple values for single tag at once (i.e. keywords and similar). Of 
+numerical value.<br><br>
+<font class="red">*</font> -if tag name ends with this character (see Artist* above), then that means,
+that value defined in <font class="blue">Hint text</font> will be used as default value for this tag.
+In this case, if you right-click on <font class="blue">Metadata</font> panel (when in <font class="blue">Workspace</font> view mode),
+pop-up menu appears and there's option <font class="blue">Fill in default values</font> -you get the idea, I hope.<br><br>
+<font class="red">?</font> -if tag name ends with this character (see
+Geotagged? above), then that means, that you're not interested on tag
+value itself -what you wish to see is, if particular tag is defined or
+not. <u>Note:</u> You won't be able to edit such tag in <font class="blue">Workspace</font> view.<br><br>
+<font class="red">±</font> -if tag name ends with this character (see
+Type± in main screenshot above), then you'll be allowed to enter
+multiple values for single tag at once (i.e. keywords and similar). Of
 course, you can't use this feature for any tag, so read (Iptc &amp; Xmp)
- metadata documentation to findout what tags support multi-values. Btw. 
-you can get ± character with Alt+0177 (typing 0177 on numerical 
+metadata documentation to findout what tags support multi-values. Btw.
+you can get ± character with Alt+0177 (typing 0177 on numerical
 keyboard, while pressing Alt key).<br>
 <br>
 <u>Note:</u> I might use further special ending characters in future, so try to avoid their usage at the end (or start) of tag names.<br>
 <br>
+
 <b>Tag definition column</b><br>
-Here you define tags as recognized by ExifTool. And if needed, you can 
-also add # character at the end of tag name -this will force displaying 
-numerical tag value (try with <font class="brown">-exif:Orientation#</font> to see the difference). Of course, only single tag can be defined per line.<br>
-To separate group of tags in <font class="blue">Workspace</font> view, special "fake" tag is used: <font class="brown">-GUI-SEP</font> (see "About photo" on above screenshot).<br>
+Here you define tags as recognized by ExifTool. And if needed, you can
+also add # character at the end of tag name -this will force displaying
+numerical tag value (try with <font class="brown">-exif:Orientation#</font> to see the difference).
+Of course, only one single tag can be defined per line.<br>
+To separate group of tags in <font class="blue">Workspace</font> view, special "fake" tag is used: <font class="brown">-GUI-SEP</font>
+(see "About photo" on above screenshot).<br>
 <br>
+
 <b>Hint text column</b><br>
 Text entered here is your <u>short</u> "private" help, which will be displayed in GUI's status bar when you start modifying tag value:<br>
 <img src="ExifToolGUI_V652_files/hint.jpg"><br>
@@ -272,21 +284,22 @@ move defined tags up/down by clicking &amp; moving tag name in first
 (Tag name) column.<br>
 <br>
 <h3>Workspace definition file: Load/Save</h3>
-All tags defined for <font class="blue">Workspace</font> are automatically saved into <b>ExifToolGUIv5.ini</b> file. So, when you start GUI, <font class="blue">Workspace</font> content is the same as it was when you used GUI the last time. For whatever reason, you might wish to save your <u>current</u> <font class="blue">Workspace</font>
- content -to create a backup of your Workspace, so to speak. And when 
-needed, you just load previously saved Workspace definition file again.<br>
+All tags defined for <font class="blue">Workspace</font> are automatically saved into <b>ExifToolGUIv6.ini</b> file.
+So, when you start GUI, <font class="blue">Workspace</font> content is the same as it was when you used GUI the last time.
+If for whatever reason, you might wish to save your <u>current</u> <font class="blue">Workspace</font>
+content -to create a backup of your Workspace, so to speak. And when needed, you just load previously saved Workspace definition file again.<br>
 <br>
 When you choose <font class="blue">Save</font>, you'll be asked where to
- save the file and you'll need to set the filename. By default, save 
-directory will allways be the directory where ExifToolGUI.exe is saved; 
+save the file and you'll need to set the filename. By default, save
+directory will allways be the directory where ExifToolGUI.exe is saved;
 however, you can choose any other directory.<br>
-When you choose <font class="blue">Load</font>, again, default starting 
-directory will be the one, where ExifToolGUI.exe is. And if you've 
-messed with your Workspace inbetween, you can choose to load Workspace 
-from ExifToolGUIv6.ini file -which simply reloads Workspace from last 
+When you choose <font class="blue">Load</font>, again, default starting
+directory will be the one, where ExifToolGUI.exe is. And if you've
+messed with your Workspace inbetween, you can choose to load Workspace
+from ExifToolGUIV6.ini file -which simply reloads Workspace from last
 GUI session.<br>
 <br>
-However, when saving, name of Workspace definition file can not be 
+However, when saving, name of Workspace definition file can not be
 ExifToolGUIv6.ini -you should use any names that reminds you on content,
  for example: MyWorkspace_XMP.ini.<br>
 <br>
@@ -300,8 +313,8 @@ The Styles Silver, Green and Blue try to mimic the colors available in V516
 <h2><a name="m_options">Options menu</a></h2>
 
 <h3>Don't make backup files</h3>
--if checked (default), then ExifTool won't make "filename.ext_original" 
-backup files. However, if you're not sure what you're doing, then you 
+-if checked (default), then ExifTool won't make "filename.ext_original"
+backup files. However, if you're not sure what you're doing, then you
 better uncheck this option.<br>
 <br>
 
@@ -525,7 +538,7 @@ You can check which preview(s) to extract and optionally perform autorate, and o
 <h3>Generic import preview</h3>
 Use this option to update a preview. Before you choose this option select in the filelist which files to update.<br>
 In this dialog select which preview to update. Optionally rotate and or crop.<br>
-When you click on <b>Execute</b> browse to the folder containing the previews. The previews should have<br>
+When you click on <b>Execute</b> browse to the folder containing the previews. The previews should have
 the same base name as the raw files. Typically they are created by the previous option.<br>
 <img src="ExifToolGUI_V652_files/genericimportpreview.jpg">
 <br>
