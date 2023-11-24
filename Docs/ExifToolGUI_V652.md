@@ -799,10 +799,10 @@ With the buttons <b>Cmd prompt</b> and <b>PowerShell </b> you can generate a .cm
 By clicking on any button on top row, relevant metadata will be shown -that is, top row is for displaying metadata only.<br>
 <br>
 In second row, there's only one button: <font class="blue">Workspace</font>. This button is "pressed" by default on every GUI startup and this can't be changed by user. And where are "good old" <font class="blue"><b>[ ^ ]</b></font> edit buttons, known from previous GUI versions? They're gone.. they aren't needed anymore.<br>
-As explained above (see <font class="blue">Workspace manager</font> menu), <font class="blue">Workspace</font> is fully customizable: user can define which tags he wish to be listed here. And value of any tag listed in <font class="blue">Workspace</font> can be edited at will.<br><br>
+As explained above (see <font class="blue">Workspace manager</font> menu), <font class="blue">Workspace</font> is fully customizable: user can define which tags he wishes to be listed here. And value of any tag listed in <font class="blue">Workspace</font> can be edited at will.<br><br>
 
 <img src="ExifToolGUI_V652_files/metadataworkspacefind.jpg"><br><br>
-In the <b>Find</b> edit box you can enter a text, press Enter and the first line containing that text in Key or Value is highlighted.<br>
+In the <b>Find</b> edit box you can enter a text, press Enter and the first line containing that text in 'Tag name' or 'Value' is highlighted.<br>
 Pressing Enter again searches for the next occurence.<br>
 <br>
 
@@ -812,8 +812,8 @@ Here's how to edit metadata in <font class="blue">Workspace</font>:
 <li>Click on tag line you wish to modify</li>
 <li>Press Enter key or click into Value edit field (which becomes yellow)</li>
 <li>Write tag value and press Enter key when you're done (or press <b>Esc</b> key to cancel editing)</li>
-<li>Tag name you've previously selected becomes yellow and contain value you've just written</li>
-<li>If needed, pick another tag and repeat process</li>
+<li>Tag name you've previously selected becomes yellow and contains the value you've just entered.</li>
+<li>If needed, pick another tag and repeat the process.</li>
 <u>Note:</u> Data isn't saved yet!<br>
 
 <br>
@@ -832,14 +832,14 @@ Some tag values may require a bit longer text to be entered (just <u>a bit</u> l
 This sign means tag can have multiple values defined (where keywords are
  most known). Posibilities for entering values for such tags:<br>
 <font class="brown">bird</font> -all existing keywords will be deleted and keyword "bird" will be saved.<br>
-<font class="brown">+flight</font> -keyword "fligt" will be added to existing list of keywords.<br>
+<font class="brown">+flight</font> -keyword "flight" will be added to existing list of keywords.<br>
 <font class="brown">-bird</font> -keyword "bird" will be deleted from existing list of keywords (if it exist).<br>
 <br>
 You can also add multiple keywords at once, for example by entering: <font class="brown">+nature+daylight+sky</font><br>
 or you can delete multiple keywords at once, for example: <font class="brown">-water-tree</font><br>
 <br>
 <u>Note:</u> As you know by now, you can't enter keywords which contain + or - sign (which is a bad keywording habbit anyway).<br>
-<u>Advice:</u> Don't write stories into keywords -by it's definition, keyword is ment to be a (single) word.<br>
+<u>Advice:</u> Don't write stories into keywords -by it's definition, a keyword is meant to be a (single) word.<br>
 <br>
 
 <h3><a name="m_popup_meta">Pop-up menu in Metadata panel</a></h3>
