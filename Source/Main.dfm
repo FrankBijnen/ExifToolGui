@@ -309,6 +309,7 @@ object FMain: TFMain
           ParentFont = False
           TabOrder = 0
           WantReturns = False
+          StyleElements = [seFont, seBorder]
           OnEnter = EditQuickEnter
           OnExit = EditQuickExit
           OnKeyDown = EditQuickKeyDown
@@ -326,6 +327,7 @@ object FMain: TFMain
           Font.Style = []
           ParentFont = False
           TabOrder = 1
+          StyleElements = [seFont, seBorder]
           OnEnter = EditQuickEnter
           OnExit = EditQuickExit
           OnKeyDown = EditQuickKeyDown

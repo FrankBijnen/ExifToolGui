@@ -226,6 +226,23 @@ Here you can setup the GeoCoding parameters. Typically you only have to check <b
 For an in-depth explanation see <a href="Readme GeoCoding.txt"><b>Readme GeoCoding.txt</b></a>
 <br><br>
 
+<img src="ExifToolGUI_V652_files/preferences_other.jpg"><br>
+<br><br>
+<b><u>Other</u></b> settings tab<br>
+<br>
+<b>Workspace: Move focus to next tag/line after value is entered</b><br>
+By default, when you hit Enter button to confirm changing tag value in
+Workspace, focus of selected tag/line automatically moves to next
+tag/line. If you prefer focus would remain on currently edited tag/line, then uncheck this option.
+<br><br>
+<b>Workspace: Double Click adds/removes tags</b><br>
+If you check this, double-clicking in the Workspace will remove a tag,
+double-clicking on one of the tabs Exif, Xmp, Iptc, Maker, All will add that tag to the Workspace.
+<br><br>
+<b>Exiftool.exe location</b><br>
+If you need to override the location of exiftool.exe you can do that here.
+<br><br>
+
 <h3><a name="m_workspace">Workspace manager</a></h3>
 Here you define what will be shown in <font class="blue">Metadata</font> panel when <font class="blue">Workspace</font> is selected. Besides <font class="blue">ExifTool direct</font> option, this is the most powerfull GUI feature.<br>
 <br>
@@ -777,15 +794,20 @@ With the buttons <b>Cmd prompt</b> and <b>PowerShell </b> you can generate a .cm
 <img src="ExifToolGUI_V652_files/powershell.jpg"><br>
 
 <h2><a name="p_metadata">Metadata panel</a></h2>
-<img src="ExifToolGUI_V652_files/gui15.png"><br>
+<img src="ExifToolGUI_V652_files/metadataworkspace.jpg"><br>
 <br>
 By clicking on any button on top row, relevant metadata will be shown -that is, top row is for displaying metadata only.<br>
 <br>
 In second row, there's only one button: <font class="blue">Workspace</font>. This button is "pressed" by default on every GUI startup and this can't be changed by user. And where are "good old" <font class="blue"><b>[ ^ ]</b></font> edit buttons, known from previous GUI versions? They're gone.. they aren't needed anymore.<br>
-As explained above (see <font class="blue">Workspace manager</font> menu), <font class="blue">Workspace</font> is fully customizable: user can define which tags he wish to be listed here. And value of any tag listed in <font class="blue">Workspace</font> can be edited at will.<br>
+As explained above (see <font class="blue">Workspace manager</font> menu), <font class="blue">Workspace</font> is fully customizable: user can define which tags he wish to be listed here. And value of any tag listed in <font class="blue">Workspace</font> can be edited at will.<br><br>
+
+<img src="ExifToolGUI_V652_files/metadataworkspacefind.jpg"><br><br>
+In the <b>Find</b> edit box you can enter a text, press Enter and the first line containing that text in Key or Value is highlighted.<br>
+Pressing Enter again searches for the next occurence.<br>
 <br>
+
 <h3>Edit metadata in Workspace</h3>
-<img src="ExifToolGUI_V652_files/gui16.png"><br>
+<br><img src="ExifToolGUI_V652_files/metadataworkspaceedit.jpg"><br>
 Here's how to edit metadata in <font class="blue">Workspace</font>:
 <li>Click on tag line you wish to modify</li>
 <li>Press Enter key or click into Value edit field (which becomes yellow)</li>
@@ -793,6 +815,7 @@ Here's how to edit metadata in <font class="blue">Workspace</font>:
 <li>Tag name you've previously selected becomes yellow and contain value you've just written</li>
 <li>If needed, pick another tag and repeat process</li>
 <u>Note:</u> Data isn't saved yet!<br>
+
 <br>
 If you've changed your mind and don't wish to change particular tag,
 then select that tag, right-click (to show pop-up menu) and choose <font class="blue">Undo selected editing</font> -this is usefull in cases when many tags are allready edited and not saved.<br>
@@ -802,8 +825,9 @@ If you've changed your mind completely (don't wish to apply any changes), then j
 <li>When you're finished with editing metadata values, click on <font class="blue">Save</font> button.</li>
 <br>
 Some tag values may require a bit longer text to be entered (just <u>a bit</u> longer, please). To do that more comfortable, click on <font class="blue">Large</font> button and you'll get some more space:<br>
-<img src="ExifToolGUI_V652_files/gui17.png"><br>
+<img src="ExifToolGUI_V652_files/metadataworkspacelong.jpg"><br>
 <br>
+
 <b>Editing tags which names ends with ± character</b><br>
 This sign means tag can have multiple values defined (where keywords are
  most known). Posibilities for entering values for such tags:<br>
@@ -817,26 +841,34 @@ or you can delete multiple keywords at once, for example: <font class="brown">-w
 <u>Note:</u> As you know by now, you can't enter keywords which contain + or - sign (which is a bad keywording habbit anyway).<br>
 <u>Advice:</u> Don't write stories into keywords -by it's definition, keyword is ment to be a (single) word.<br>
 <br>
+
 <h3><a name="m_popup_meta">Pop-up menu in Metadata panel</a></h3>
 As mentioned, if you right-click on any tag shown in <font class="blue">Metadata</font> panel, a pop-up menu will appear:<br>
 <br>
-<img src="ExifToolGUI_V652_files/gui18.png">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<img src="ExifToolGUI_V652_files/gui18a.png"><br>
+<img src="ExifToolGUI_V652_files/metadataworkspacepopup.jpg">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<img src="ExifToolGUI_V652_files/metadataworkspacemark.jpg"><br>
 <br>
 <u>Note:</u> Not all options are available all the time.<br>
 <u>Note:</u> Tag names will appear colored (as in image above right) only if <font class="blue">Metadata language</font> in <font class="blue">Preferences</font> is set to <font class="blue">ExifTool standard (short)</font>.<br>
 <br>
+
 <b>Fill in default values</b> -in <font class="blue">Workspace</font> only<br>
 By choosing this option, all tags which names are ending with <font class="red">*</font> character, will be populated with default values (as defined in <font class="blue">Workspace manager</font>).<br>
 <br>
+
 <b>Undo selected editing</b> -in <font class="blue">Workspace</font> only <br>
-As long edited tag value isn't saved (tag name has yellow background), you can "undo" changes for selected tag.<br>
+As long as an edited tag value isn't saved (tag name has a yellow background), you can "undo" the changes for the selected tag.<br>
 <br>
+
 <b>Add tag to Workspace</b> -in <font class="blue">Exif, Xmp</font> and <font class="blue">Iptc</font> view only<br>
-By using this option, you can easy add any Exif, Xmp or Iptc tag into <font class="blue">Workspace</font>. Selected tag will be added at the end of existing <font class="blue">Workspace</font> list of tags. Once tag is added, you can make further customisation by using <font class="blue">Workspace manager</font>.<br>
+By using this option, you can easily add any Exif, Xmp or Iptc tag into the <font class="blue">Workspace</font>. Selected tag will be added at the end of existing <font class="blue">Workspace</font> list of tags.<br>
+Once tag is added, you can make further customisations by using the <font class="blue">Workspace manager</font>.<br>
 <br>
+
 <b>Remove tag from Workspace</b> -in <font class="blue">Workspace</font> only<br>
 Do you really need to edit so many tags? Ok, it's your life :)<br>
 <br>
+Note: If you checked <b>Double Click adds/removes tags</b> in Preferences/Other you can also use Double click to Add/Remove Tags from the Workspace.<br><br>
+
 <b>Add tag to Custom view</b> -NOT in <font class="blue">Workspace</font><br>
 Adds selected tag to be shown in <font class="blue">Custom</font> view.<br>
 <br>
@@ -846,12 +878,14 @@ It is a good practice, to keep only those tags in <font class="ble">Custom</font
 <b>Add tag to Filelist Details</b> -in <font class="blue">Exif, Xmp</font> and <font class="blue">Iptc</font> view only<br>
 This command adds selected tag into Filelist <font class="blue">Details: User defined</font> columns.<br>
 <br>
+
 <b>Mark/Unmark tag</b> -NOT in <font class="blue">Workspace</font><br>
 As name implies, this option serves to mark/unmark tags of interest.
 Marked tag name is shown in red color in any view (except in <font class="blue">Workspace</font>), so you can locate it easier later.<br>
 <u>Note:</u> This selection is only available if <font class="blue">Exiftool standard (short)</font> language is selected in <font class="blue">Preferences</font>.<br>
 <br>
 <br>
+
 <h2><a name="p_googlemap">GoogleMap panel</a></h2>
 <img src="ExifToolGUI_V652_files/gui19.png"><br>
 <br>
