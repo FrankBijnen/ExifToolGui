@@ -38,3 +38,6 @@ Version:        Description             Issue
                 Fix Issue #111          Executing some commands make ExifToolGui hang. (Forgot CRLF)
                 Fix Issue #126          Reverse Geocoding (feature request) 
                 Fix Issue #140          Support long filenames (Path > MAX_PATH)
+6.2.6.0		Fix Issue #163		Add -echo4 CRLF {readyxx} CRLF to args file. so we know when to stop reading StdErr.
+		Fix Issue #164		Update Docs to reflect changes from V5.1.6 to V6.2.6
+		Fix Issue #167		Notice for missing WebView2Loader.dll

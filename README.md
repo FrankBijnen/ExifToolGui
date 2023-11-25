@@ -25,11 +25,13 @@ This updated source addresses the following issues.
 
  To achieve this the source had to be modified quite a lot. Dont expect a flawless product.
 
- See also the ReadMe files for Developers and Users in the Docs directory.
+ See also:
+ - [Readme for Users](Docs/ReadMe%20for%20Users.txt)
+ - [Docs directory](Docs/)
 
 # Useful links
 
-Obtaining Exiftool.
+<h4>Obtaining Exiftool.</h4>
 
 1) The original version by Phil Harvey. https://exiftool.org/ <br>
    Download the zip file called: Windows Executable: exiftool-xx.yy.zip. <br>
@@ -38,20 +40,16 @@ Obtaining Exiftool.
 
 2) An installer provided by Oliver Betz. https://oliverbetz.de/pages/Artikel/ExifTool-for-Windows
 
-Obtaining WebWiew2Loader.dll.
+<h4>Obtaining WebWiew2Loader.dll.</h4>
 
-https://www.nuget.org/packages/Microsoft.Web.WebView2
-See Docs/ReadMe for Users.txt for more info.
+-  https://nuget.info/packages/Microsoft.Web.WebView2/
+-  See [Readme for Users](Docs/ReadMe%20for%20Users.txt) for more info.
 
-Obtaining jhead.exe and jpegtran.exe.
+<h4>Omline Documentation.</h4>
 
-https://exiftool.org/gui/exiftoolgui516.zip
-Just take these executables from that version. You can find them in the zip in folder jhead_jpegtran.
+ - [V516 Documentation html](https://htmlpreview.github.io/?https://github.com/FrankBijnen/ExifToolGui/blob/Development/Docs/Original%20notes/ExifToolGUI_V516.htm)
 
-Documentation.
-
- Online documentation is available at https://exiftool.org/gui/
- It is written with V5 in mind, but most of it still applies. 
-
+ - [V6 Documentation html](https://htmlpreview.github.io/?https://github.com/FrankBijnen/ExifToolGui/blob/Development/Docs/ExifToolGUI_V6.md)
+ - [V6 Documentation md](/Docs/ExifToolGUI_V6.md)
 
 Frank

@@ -79,6 +79,12 @@ var
 begin
   LblVersion.Caption := Application.Title + ' v' +
     GetFileVersionNumber(Application.ExeName, false) +
+{$IFDEF WIN32}
+    ' 32 Bits' +
+{$ENDIF}
+{$IFDEF WIN64}
+    ' 64 Bits' +
+{$ENDIF}
     ' by Bogdan Hrastnik.' + #10 +
     'Adapted for RAD11 by Frank B';
   LblSource.Caption := 'https://github.com/FrankBijnen/ExifToolGui';
