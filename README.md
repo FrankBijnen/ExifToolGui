@@ -47,9 +47,9 @@ This updated source addresses the following issues.
 
 <h4>Online Documentation.</h4>
 
- - [V516 Documentation html](https://htmlpreview.github.io/?https://github.com/FrankBijnen/ExifToolGui/blob/Development/Docs/Original%20notes/ExifToolGUI_V516.htm)
+ - [V516 Documentation html](https://htmlpreview.github.io/?https://github.com/FrankBijnen/ExifToolGui/blob/main/Docs/Original%20notes/ExifToolGUI_V516.htm)
 
- - [V6 Documentation html](https://htmlpreview.github.io/?https://github.com/FrankBijnen/ExifToolGui/blob/Development/Docs/ExifToolGUI_V6.md)
+ - [V6 Documentation html](https://htmlpreview.github.io/?https://github.com/FrankBijnen/ExifToolGui/blob/main/Docs/ExifToolGUI_V6.md)
  - [V6 Documentation md](/Docs/ExifToolGUI_V6.md)
 
 Frank
