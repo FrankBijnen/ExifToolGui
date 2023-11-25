@@ -264,7 +264,7 @@ characters:<br>
 Flash# and Orientation# above), then content of this tag will be 
 displayed as usual. However, when modifying this tag, you need to enter 
 numerical value.<br><br>
-<font class="red">*</font> -if tag name ends with this character (see Artist* above), then that means,
+<font class="red">&ast;</font> -if tag name ends with this character (see Artist* above), then that means,
 that value defined in <font class="blue">Hint text</font> will be used as default value for this tag.
 In this case, if you right-click on <font class="blue">Metadata</font> panel (when in <font class="blue">Workspace</font> view mode),
 pop-up menu appears and there's option <font class="blue">Fill in default values</font> -you get the idea, I hope.<br><br>
@@ -389,7 +389,7 @@ next GUI start. Remaining options settings however, are only temporary
 <h2><a name="m_exp_imp">Export/Import menu</a></h2>
 <h3>Export metadata into : TXT, MIE, XMP, EXIF, HTML files</h3>
 Every of these formats has different purpose: i.e. MIE is for making 
-backup of complete metadata inside image file, HTML is ment for 
+backup of complete metadata inside image file, HTML is meant for 
 "studying" metadata structure, etc. So, try and see what suits your 
 needs.<br>
 <br>
@@ -761,7 +761,7 @@ Notepad:
 <pre>-Exif:Artist="My Name"
 -Exif:Copyright="C2012 by My Name"
 </pre>
-Let's save this text as "MyData.args". <u>Note:</u> File must be saved in the same folder where exiftool.exe is saved (or inside Windows folder).<br>
+Let's save this text as "MyData.args". <u>Note:</u> File must be saved in the same folder where exiftool.exe is saved (or specify the full path to the args file).<br>
 To execute above commands in GUI (after desired image files are selected), we need to write the following Command into <font class="blue">ExifTool direct</font> panel:<br>
 <pre>-@ MyData.args
 </pre>
@@ -769,7 +769,7 @@ To execute above commands in GUI (after desired image files are selected), we ne
 <br>
 
 ExifTool full source version (can be downloaded on top of ExifTool main 
-page) contains several predefined args files, which are ment for 
+page) contains several predefined args files, which are meant for 
 transferring "similar" metadata between sections. One of them is (for 
 example) "xmp2iptc.args" file, which copies all "compatible" metadata 
 from Xmp to Iptc section. And as said, there are more of them.<br>
@@ -782,15 +782,15 @@ If, for example, we select two files and execute following <font class="blue">Ex
 -we will get something like this:<br>
 <img src="ExifToolGUI_V6_files/logwindow.jpg"><br>
 <br>
-<u>Note:</u> In case of errors, <font class="blue">Log window</font> with relevant messages automatically appears after ExifTool ends processing files.<br>
+<u>Note:</u> In case of errors, the <font class="blue">Log window</font> with relevant messages automatically appears after ExifTool ends processing files.<br>
 Starting with version 6.2.0 the Log window will show the last 10 commands. In the top panel you can select the command issued, <br>
 on the left you will see what was sent to ExifTool, on the right you see the output it generated and in the bottom panel the errors, if applicable.<br>
 To help identifying the commands an execnum is send to ExifTool, you can see this in the command window 'execute14 and -echo4 {ready14}', <br>
 Exiftool will return this in the Output and Error. <br>
 GUI uses execnums from 10-99, and when 100 is reached it is reset to 10.<br>
 In the top you will see a checkbox 'Show all commands'. By default only the commands issued from Direct mode, or that return an error, are displayed. <br>
-If you check this also the commands that GUI uses are displayed.<br>
-With the buttons <b>Cmd prompt</b> and <b>PowerShell </b> you can generate a .cmd or .ps1 script to replay the commmands.<br>
+If you check this also the commands that GUI uses internally are displayed.<br>
+With the buttons <b>Cmd prompt</b> and <b>PowerShell</b> you can generate a <b>.cmd</b> or <b>.ps1</b> script to replay the commmands.<br>
 <br>
 <img src="ExifToolGUI_V6_files/powershell.jpg"><br>
 
@@ -799,8 +799,10 @@ With the buttons <b>Cmd prompt</b> and <b>PowerShell </b> you can generate a .cm
 <br>
 By clicking on any button on top row, relevant metadata will be shown -that is, top row is for displaying metadata only.<br>
 <br>
-In second row, there's only one button: <font class="blue">Workspace</font>. This button is "pressed" by default on every GUI startup and this can't be changed by user. And where are "good old" <font class="blue"><b>[ ^ ]</b></font> edit buttons, known from previous GUI versions? They're gone.. they aren't needed anymore.<br>
-As explained above (see <font class="blue">Workspace manager</font> menu), <font class="blue">Workspace</font> is fully customizable: user can define which tags he wishes to be listed here. And value of any tag listed in <font class="blue">Workspace</font> can be edited at will.<br><br>
+In the second row, there's only one button: <font class="blue">Workspace</font>. This button is "pressed" by default on every GUI startup and this can't be changed by user.<br>
+And where are the "good old" <font class="blue"><b>[ ^ ]</b></font> edit buttons, known from previous GUI versions? They're gone.. they aren't needed anymore.<br>
+As explained above (see <font class="blue">Workspace manager</font> menu), <font class="blue">Workspace</font> is fully customizable: user can define which tags he wishes to be listed here.<br>
+And the value of any tag listed in <font class="blue">Workspace</font> can be edited at will.<br><br>
 
 <img src="ExifToolGUI_V6_files/metadataworkspacefind.jpg"><br><br>
 In the <b>Find</b> edit box you can enter a text, press Enter and the first line containing that text in 'Tag name' or 'Value' is highlighted.<br>
