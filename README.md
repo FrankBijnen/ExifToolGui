@@ -45,7 +45,7 @@ This updated source addresses the following issues.
 -  https://nuget.info/packages/Microsoft.Web.WebView2/
 -  See [Readme for Users](Docs/ReadMe%20for%20Users.txt) for more info.
 
-<h4>Omline Documentation.</h4>
+<h4>Online Documentation.</h4>
 
  - [V516 Documentation html](https://htmlpreview.github.io/?https://github.com/FrankBijnen/ExifToolGui/blob/Development/Docs/Original%20notes/ExifToolGUI_V516.htm)
 
