@@ -195,7 +195,7 @@ metadata! -it is just used to separate values when displaying
 multi-value tags on <u>your</u> PC.<br>
 <br>
 <b>Save Filelist Details state on exit</b><br>
-If checked, then <font class="blue">Details:</font> button state and selected Filelist view (Standard filelist, Camera settings,..etc.) are saved when closing GUI. Selected <b>Thumbnails size</b> is always saved.<br>
+If checked, then <font class="blue">Details:</font> button state and selected Filelist view (Standard filelist, Camera settings,..etc.) are saved when closing GUI.<br>
 <br><br>
 
 <img src="ExifToolGUI_V6_files/preferences_thumbnails.jpg"><br>
