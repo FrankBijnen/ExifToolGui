@@ -147,7 +147,7 @@ That's all you need. And when a new ExifTool or GUI version is available, you on
 <li><a href="#m_exp_imp">Export/Import</a> menu</li>
 <li><a href="#m_modify">Modify</a> menu</li>
 <li><a href="#m_various">Various</a> menu</li>
-<li><b>Help/Online Documentation</b> Opens this documentation</li>
+<li><u>Help/Online Documentation</u> Opens this documentation</li>
 <b>Panel:</b><br>
 <li><a href="#p_filelist">Filelist</a> panel</li>
 <li><a href="#p_etdirect">ExifTool direct</a> panel</li>
