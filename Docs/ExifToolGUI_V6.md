@@ -1,8 +1,8 @@
-<html><head>
+ď»ż<html><head>
 <meta http-equiv="Keywords" content="ExifTool,ExifToolGUI,exif,editor,viewer,reader">
 <meta http-equiv="Description" content="ExifToolGUI">
 <meta http-equiv="Content-Language" content="en-us">
-<meta http-equiv="Content-Type" content="text/html; charset=windows-1250">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 <link rel="stylesheet" type="text/css" href="ExifToolGUI_V6_files/page.css">
 </head>
 
@@ -11,7 +11,8 @@
 <tbody><tr><td class="A4">
 <h1>ExifToolGUI for Windows v6.xx</h1><hr>
 <h2>Introduction</h2>
-In the summer of 2023 I decided to revive the ExifToolGui project initally created by <b>Bogdan Hrastnik</b>. Read his complete documentation <a href="https://exiftool.org/gui"><b>here</b></a><br><br>
+In the summer of 2023 I decided to revive the ExifToolGui project initally created by <b>Bogdan Hrastnik</b>.
+Read his complete documentation <a href="https://htmlpreview.github.io/?https://github.com/FrankBijnen/ExifToolGui/blob/Development/Docs/Original%20notes/ExifToolGUI_V516.htm"><b>here</b></a><br><br>
 This was his intro, I will quote it now, because it still holds for me:<br><br>
 <em>
 There are many tools for viewing/editing metadata inside image files. In my opinion, <b>ExifTool</b> by <b>Phil Harvey</b>, is the best I've found so far. Here's why:<br>
@@ -150,7 +151,7 @@ That's all you need. And when a new ExifTool or GUI version is available, you on
 <li><a href="#p_filelist">Filelist</a> panel</li>
 <li><a href="#p_etdirect">ExifTool direct</a> panel</li>
 <li><a href="#p_metadata">Metadata</a> panel</li>
-<li><a href="#p_googlemap">GoogleMap</a> panel</li>
+<li><a href="#p_osmmap">OSM Map</a> panel</li>
 <a href="#final">Final words</a><br>
 
 <br><br>
@@ -271,12 +272,12 @@ pop-up menu appears and there's option <font class="blue">Fill in default values
 Geotagged? above), then that means, that you're not interested on tag
 value itself -what you wish to see is, if particular tag is defined or
 not. <u>Note:</u> You won't be able to edit such tag in <font class="blue">Workspace</font> view.<br><br>
-<font class="red">±</font> -if tag name ends with this character (see
-Type± in main screenshot above), then you'll be allowed to enter
+<font class="red">Â±</font> -if tag name ends with this character (see
+TypeÂ± in main screenshot above), then you'll be allowed to enter
 multiple values for single tag at once (i.e. keywords and similar). Of
 course, you can't use this feature for any tag, so read (Iptc &amp; Xmp)
 metadata documentation to findout what tags support multi-values. Btw.
-you can get ± character with Alt+0177 (typing 0177 on numerical
+you can get Â± character with Alt+0177 (typing 0177 on numerical
 keyboard, while pressing Alt key).<br>
 <br>
 <u>Note:</u> I might use further special ending characters in future, so try to avoid their usage at the end (or start) of tag names.<br>
@@ -828,7 +829,7 @@ Some tag values may require a bit longer text to be entered (just <u>a bit</u> l
 <img src="ExifToolGUI_V6_files/metadataworkspacelong.jpg"><br>
 <br>
 
-<b>Editing tags which names ends with ± character</b><br>
+<b>Editing tags which names ends with Â± character</b><br>
 This sign means tag can have multiple values defined (where keywords are
  most known). Posibilities for entering values for such tags:<br>
 <font class="brown">bird</font> -all existing keywords will be deleted and keyword "bird" will be saved.<br>
@@ -886,7 +887,7 @@ Marked tag name is shown in red color in any view (except in <font class="blue">
 <br>
 <br>
 
-<h2><a name="p_googlemap">GoogleMap panel</a></h2>
+<h2><a name="p_osmmap">OSM Map panel</a></h2>
 <img src="ExifToolGUI_V6_files/osmmap.jpg"><br>
 <br>
 <u>Notes:</u>
