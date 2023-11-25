@@ -887,62 +887,117 @@ Marked tag name is shown in red color in any view (except in <font class="blue">
 <br>
 
 <h2><a name="p_googlemap">GoogleMap panel</a></h2>
-<img src="ExifToolGUI_V6_files/gui19.png"><br>
+<img src="ExifToolGUI_V6_files/osmmap.jpg"><br>
 <br>
-<u>Note:</u> <font class="blue">GoogleMap</font> panel will be available only if chosen in <font class="blue">Preferences</font>.<br>
+<u>Notes:</u>
+<ul>
+<li><font class="blue">OpenStreet Map</font> panel will only be available if chosen in <font class="blue">Preferences</font>.<br> </li>
+<li><font class="blue">GeoCoding</font> Finding places from coordinates and vice versa,  will only be available if chosen in <font class="blue">Preferences</font>.<br> </li>
+</ul>
 <br>
+
 <b>Show on map</b> button<br>
-If selected image is geo-tagged (contains GPS data), then, after
-clicking on this button, you can see that geo-position on the map.<br>
+If selected images are geo-tagged (contain GPS data), clicking this button will display their geo-position on the map.<br><br>
+<img src="ExifToolGUI_V6_files/osmmapshowonmap.jpg"><br>
 <br>
+
+<b><< Back</b> and <b>Forward >></b> buttons<br>
+Selected images are shown as a hyperlink. You can use these buttons to go back to the map.
+Hyperlinks work only for filetypes supported in your browser.<br>
+Jpg usually works, raw formats likely not.<br><br>
+
 <b>Get location</b> button<br>
-Coordinates of current map cursor position on the map are shown in <font class="blue">Find</font> field (for copy/pasting, etc.).<br>
+Tries to get the location (City, Province and Country) from the currently selected center of the map.<br>
+<u>Notes:</u>
+<ul>
+<li>Ctrl Left-click will also retrieve the location.</li>
+<li>You can customize how City and Province are shown by using the <a href="#m_geotag_setup"><b>Setup Geo</b></a> button in the <b>Geotag files</b> function.<br>
+<li>The coordinates of the map, and the bounds, are updated automatically when you zoom or move the map.</li>
+</ul>
 <br>
-<b>Zoom</b> trackbar<br>
-GoogleMap allready contains zoom tool. The difference is, that by using <font class="blue">Zoom</font>
- trackbar, you're zooming on position where map cursor is. That is, when
- zooming, position of map cursor remains in the center of the map.<br>
-<br>
+
 <b>Find</b> field<br>
 -for finding places easier...<br>
 <br>
+<u>Notes:</u>
+<ul>
+<li>If valid lat-lon coordinates are entered (eg. 40.524832, -3.771568) the map is repositioned accordingly.</li>
+<li>If no valid lat-lon coordinates were found, GUI assumes you're searching for a City.</li>
+<li>Enter the name of a City, optionally followed by a comma and the Country. (eg: Amsterdam or Amsterdam, NL) Enter a least 5 characters.</li>
+<li>The <b>Search place</b> dialog appears, where you can adjust your query.<br><br></li>
+<img src="ExifToolGUI_V6_files/osmmapsearch.jpg"><br><br>
+<li>You can disable this dialog in Preferences.<br></li>
+<li>Click on <b>OK</b> to start the search.<br><br></li>
+<li>The <b>Places found</b> dialog appears.<br><br></li>
+<img src="ExifToolGUI_V6_files/osmmapplacesfound.jpg"><br><br>
+<li>Click on <b>OK</b>, or Double-click to reposition the map to the selected place.</li>
+</ul>
+<br>
+<a href="Readme GeoCoding.txt">Readme GeoCoding.txt</a>
+<br>
+<br>
+
 <b>Home</b> button<br>
 -moves the map cursor to your predefined position.<br>
 <br>
+
 <b>Set^</b> button<br>
 Current map cursor position becomes <font class="blue">Home</font> position.<br>
 <br>
+
 <b>Geotag files</b> button<br>
 By clicking on this button, all selected files will be geotagged with current map cursor position.<br>
-<b>Geotag files</b> button<br><br>
-<img src="ExifToolGUI_V6_files/geotagfiles.jpg"><br>
-<a name="m_geotag_setup">Setting up Geo tagging<a><br>
-<img src="ExifToolGUI_V6_files/setupgeotag.jpg">
+<u>Notes:</u>
+<ul>
+<li>The coordinates displayed in the <b>Find:</b> edit box are used. They could be different from the center of the map!<br>
+Examples that have happened to me:</li>
+<ul>
+<li>You type the name of a City, but dont press Enter to search.</li>
+<li>You paste coordinates in the edit box.</li>
+</ul>
+<li>The Geotag files dialog appears.<br></li>
+<li>You can disable this dialog in Preferences.<br><br></li>
+<img src="ExifToolGUI_V6_files/geotagfiles.jpg"><br><br>
+<ul>
+</li><a name="m_geotag_setup">Setting up Geo tagging<a><br></li>
+<li>Use the <b>Setup Geo</b> button to customize how City, Province and Country are filled.<br><br></li>
+<img src="ExifToolGUI_V6_files/setupgeotag.jpg"><br><br>
+</ul>
+<li>You can also manually update these fields.</li>
+<li>Location is an exception, it will never be automatically filled. You can only update it manually.<br></li>
+<li>Choose which fields to update:</li>
+<ul>
+<li>Coordinates (Lat, Lon)</li>
+<li>Location (Country, Province, City)</li>
+<li>Coordinates and Location</li>
+</ul>
+<li>Click on <b>OK</b>, to GeoTag the files.</li>
+</ul>
 <br>
-<br>
-<br>
-<h1><a name="final">Final words</a></h1>
-Many thanks to Phil, for providing space for GUI on his server and for trusting me to access it.<br>
-<br>
-Well.. that's it.<br>
-P.S.: Don't blame me for my English grammar -it's not my native language.<br>
-<br>
-Bogdan Hrastnik<br>
-Modified on May, 2012<br>
-<br>
-And if interested: first ExifToolGUI v1.00 was "published" on May 27th, 2007.<br>
 <br>
 
-<u>Additional info can be found in the ReadMe files</u>
+<h1><a name="final">Final words</a></h1>
+All credits go to Phil and Bogdan. A quote from Bogdan that still applies:<br>
+<em>
+Well.. that's it.<br>
+P.S.: Don't blame me for my English grammar -it's not my native language.<br>
+</em>
+<br>
+Frank<br>
+Modified on November, 2023<br>
+<br>
+
+<u>You may find additional info in the ReadMe files:</u>
 <ul>
-<li><a href="ReadMe for Developers.txt">ReadMe for Developers.txt</a></li>
-<li><a href="..\Source\Vcl.ShellControls\ReadMe.txt">ReadMe ShellControls.txt</a></li>
-<li><a href="ReadMe for Users.txt">ReadMe for Users.txt</a></li>
-<li><a href="Readme GeoCoding.txt">Readme GeoCoding.txt</a></li>
-<li><a href="Readme Long filenames.txt">Readme Long filenames.txt</a></li>
-<li><a href="Readme Lossless rotate_Import_Export previews.txt">Readme Lossless rotate_Import_Export previews.txt</a></li>
-<li><a href="Readme Portable.txt">Readme Portable.txt</a></li>
-<li><a href="Readme Using Codecs.txt">Readme Using Codecs.txt</a></li>
+<li><a href="ReadMe for Developers.txt">ReadMe for Developers</a></li>
+<li><a href="..\Source\Vcl.ShellControls\ReadMe.txt">ReadMe ShellControls</a></li>
+<li><a href="..\Source\NativeJpg\README.txt">ReadMe NativeJpg</a></li>
+<li><a href="ReadMe for Users.txt">ReadMe for Users</a></li>
+<li><a href="Readme GeoCoding.txt">Readme GeoCoding</a></li>
+<li><a href="Readme Long filenames.txt">Readme Long filenames</a></li>
+<li><a href="Readme Lossless rotate_Import_Export previews.txt">Readme Lossless rotate_Import_Export previews</a></li>
+<li><a href="Readme Portable.txt">Readme Portable</a></li>
+<li><a href="Readme Using Codecs.txt">Readme Using Codecs</a></li>
 </ul>
 </td></tr>
 </tbody></table>

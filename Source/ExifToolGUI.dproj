@@ -82,19 +82,25 @@
         <DCC_Namespace>Winapi;System.Win;Data.Win;Datasnap.Win;Web.Win;Soap.Win;Xml.Win;Bde;$(DCC_Namespace)</DCC_Namespace>
         <VerInfo_Locale>1033</VerInfo_Locale>
         <Manifest_File>$(BDS)\bin\default_app.manifest</Manifest_File>
-        <VerInfo_Keys>CompanyName=;FileDescription=GUI for ExifTool;FileVersion=6.0.0.0;InternalName=;LegalCopyright=2012 Bogdan Hrastnik;LegalTrademarks=;OriginalFilename=ExifToolGUI.exe;ProductName=ExifToolGUI;ProductVersion=5.0.0.0;Comments=;ProgramID=com.embarcadero.$(MSBuildProjectName)</VerInfo_Keys>
+        <VerInfo_Keys>CompanyName=;FileDescription=GUI for ExifTool;FileVersion=6.2.6.0;InternalName=;LegalCopyright=2012 Bogdan Hrastnik;LegalTrademarks=;OriginalFilename=ExifToolGUI.exe;ProductName=ExifToolGUI;ProductVersion=5.0.0.0;Comments=;ProgramID=com.embarcadero.$(MSBuildProjectName)</VerInfo_Keys>
         <UWP_DelphiLogo44>$(BDS)\bin\Artwork\Windows\UWP\delphi_UwpDefault_44.png</UWP_DelphiLogo44>
         <UWP_DelphiLogo150>$(BDS)\bin\Artwork\Windows\UWP\delphi_UwpDefault_150.png</UWP_DelphiLogo150>
         <VerInfo_PreRelease>true</VerInfo_PreRelease>
         <AppDPIAwarenessMode>none</AppDPIAwarenessMode>
+        <VerInfo_MinorVer>2</VerInfo_MinorVer>
+        <VerInfo_Release>6</VerInfo_Release>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Base_Win64)'!=''">
         <DCC_Namespace>Winapi;System.Win;Data.Win;Datasnap.Win;Web.Win;Soap.Win;Xml.Win;$(DCC_Namespace)</DCC_Namespace>
         <BT_BuildType>Debug</BT_BuildType>
         <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
-        <VerInfo_Keys>CompanyName=;FileDescription=$(MSBuildProjectName);FileVersion=1.0.0.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProgramID=com.embarcadero.$(MSBuildProjectName);ProductName=$(MSBuildProjectName);ProductVersion=1.0.0.0;Comments=</VerInfo_Keys>
+        <VerInfo_Keys>CompanyName=;FileDescription=$(MSBuildProjectName);FileVersion=6.2.6.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProgramID=com.embarcadero.$(MSBuildProjectName);ProductName=$(MSBuildProjectName);ProductVersion=1.0.0.0;Comments=</VerInfo_Keys>
         <VerInfo_Locale>1033</VerInfo_Locale>
         <Manifest_File>$(BDS)\bin\default_app.manifest</Manifest_File>
+        <AppDPIAwarenessMode>none</AppDPIAwarenessMode>
+        <VerInfo_MajorVer>6</VerInfo_MajorVer>
+        <VerInfo_MinorVer>2</VerInfo_MinorVer>
+        <VerInfo_Release>6</VerInfo_Release>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_1)'!=''">
         <DCC_Define>DEBUG;$(DCC_Define)</DCC_Define>
@@ -106,7 +112,7 @@
     <PropertyGroup Condition="'$(Cfg_1_Win32)'!=''">
         <DCC_WIDECHAR_REDUCED>false</DCC_WIDECHAR_REDUCED>
         <DCC_HIDDEN_VIRTUAL>false</DCC_HIDDEN_VIRTUAL>
-        <VerInfo_Keys>CompanyName=;FileDescription=GUI for ExifTool;FileVersion=6.2.1.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=ExifToolGUI.exe;ProductName=ExifToolGUI;ProductVersion=6.0.5.0;Comments=;ProgramID=com.embarcadero.$(MSBuildProjectName)</VerInfo_Keys>
+        <VerInfo_Keys>CompanyName=;FileDescription=GUI for ExifTool;FileVersion=6.2.6.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=ExifToolGUI.exe;ProductName=ExifToolGUI;ProductVersion=6.2.6;Comments=;ProgramID=com.embarcadero.$(MSBuildProjectName)</VerInfo_Keys>
         <VerInfo_MajorVer>6</VerInfo_MajorVer>
         <Icon_MainIcon>ExifToolGUI.ico</Icon_MainIcon>
         <DCC_DebugInfoInExe>false</DCC_DebugInfoInExe>
@@ -117,23 +123,23 @@
         <DCC_RemoteDebug>false</DCC_RemoteDebug>
         <BT_BuildType>Debug</BT_BuildType>
         <VerInfo_PreRelease>true</VerInfo_PreRelease>
-        <VerInfo_Release>1</VerInfo_Release>
+        <VerInfo_Release>6</VerInfo_Release>
         <UWP_DelphiLogo44>ExifToolGUI.ico</UWP_DelphiLogo44>
         <UWP_DelphiLogo150>ExifToolGUI.ico</UWP_DelphiLogo150>
         <VerInfo_MinorVer>2</VerInfo_MinorVer>
+        <DCC_DebugDCUs>true</DCC_DebugDCUs>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_1_Win64)'!=''">
         <AppDPIAwarenessMode>PerMonitorV2</AppDPIAwarenessMode>
-        <DCC_DebugDCUs>true</DCC_DebugDCUs>
         <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
         <VerInfo_Locale>1033</VerInfo_Locale>
-        <VerInfo_Keys>CompanyName=;FileDescription=$(MSBuildProjectName);FileVersion=6.2.1.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProgramID=com.embarcadero.$(MSBuildProjectName);ProductName=$(MSBuildProjectName);ProductVersion=1.0.0.0;Comments=</VerInfo_Keys>
+        <VerInfo_Keys>CompanyName=;FileDescription=$(MSBuildProjectName);FileVersion=6.2.6.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProgramID=com.embarcadero.$(MSBuildProjectName);ProductName=$(MSBuildProjectName);ProductVersion=6.2.6;Comments=</VerInfo_Keys>
         <Icon_MainIcon>ExifToolGUI.ico</Icon_MainIcon>
         <UWP_DelphiLogo44>ExifToolGUI.ico</UWP_DelphiLogo44>
         <UWP_DelphiLogo150>ExifToolGUI.ico</UWP_DelphiLogo150>
         <VerInfo_MajorVer>6</VerInfo_MajorVer>
         <VerInfo_MinorVer>2</VerInfo_MinorVer>
-        <VerInfo_Release>1</VerInfo_Release>
+        <VerInfo_Release>6</VerInfo_Release>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_2)'!=''">
         <DCC_LocalDebugSymbols>false</DCC_LocalDebugSymbols>
@@ -145,26 +151,26 @@
         <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
         <VerInfo_MajorVer>6</VerInfo_MajorVer>
         <VerInfo_Locale>1033</VerInfo_Locale>
-        <VerInfo_Keys>CompanyName=;FileVersion=6.2.2.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProductVersion=6.2.2.0;Comments=;ProgramID=com.embarcadero.$(MSBuildProjectName);FileDescription=$(MSBuildProjectName);ProductName=$(MSBuildProjectName)</VerInfo_Keys>
+        <VerInfo_Keys>CompanyName=;FileVersion=6.2.6.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProductVersion=6.2.6.0;Comments=;ProgramID=com.embarcadero.$(MSBuildProjectName);FileDescription=$(MSBuildProjectName);ProductName=$(MSBuildProjectName)</VerInfo_Keys>
         <VerInfo_PreRelease>true</VerInfo_PreRelease>
         <BT_BuildType>Debug</BT_BuildType>
         <Icon_MainIcon>ExifToolGUI.ico</Icon_MainIcon>
         <UWP_DelphiLogo44>ExifToolGUI.ico</UWP_DelphiLogo44>
         <UWP_DelphiLogo150>ExifToolGUI.ico</UWP_DelphiLogo150>
         <VerInfo_MinorVer>2</VerInfo_MinorVer>
-        <VerInfo_Release>2</VerInfo_Release>
+        <VerInfo_Release>6</VerInfo_Release>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_2_Win64)'!=''">
         <AppDPIAwarenessMode>PerMonitorV2</AppDPIAwarenessMode>
         <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
         <VerInfo_Locale>1033</VerInfo_Locale>
-        <VerInfo_Keys>CompanyName=;FileDescription=$(MSBuildProjectName);FileVersion=6.2.2.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProgramID=com.embarcadero.$(MSBuildProjectName);ProductName=$(MSBuildProjectName);ProductVersion=6.2.2.0;Comments=</VerInfo_Keys>
+        <VerInfo_Keys>CompanyName=;FileDescription=$(MSBuildProjectName);FileVersion=6.2.6.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProgramID=com.embarcadero.$(MSBuildProjectName);ProductName=$(MSBuildProjectName);ProductVersion=6.2.6.0;Comments=</VerInfo_Keys>
         <Icon_MainIcon>ExifToolGUI.ico</Icon_MainIcon>
         <VerInfo_MajorVer>6</VerInfo_MajorVer>
         <UWP_DelphiLogo44>ExifToolGUI.ico</UWP_DelphiLogo44>
         <UWP_DelphiLogo150>ExifToolGUI.ico</UWP_DelphiLogo150>
         <VerInfo_MinorVer>2</VerInfo_MinorVer>
-        <VerInfo_Release>2</VerInfo_Release>
+        <VerInfo_Release>6</VerInfo_Release>
     </PropertyGroup>
     <ItemGroup>
         <DelphiCompile Include="$(MainSource)">
@@ -180,6 +186,7 @@
         <DCCReference Include="ExifToolsGui_LossLess.pas"/>
         <DCCReference Include="ExifInfo.pas"/>
         <DCCReference Include="ExifTool.pas"/>
+        <DCCReference Include="ExifTool_PipeStream.pas"/>
         <DCCReference Include="Main.pas">
             <Form>FMain</Form>
         </DCCReference>
@@ -229,6 +236,15 @@
         <DCCReference Include="UFrmPlaces.pas">
             <Form>FrmPlaces</Form>
         </DCCReference>
+        <DCCReference Include="UFrmGeoSearch.pas">
+            <Form>FGeoSearch</Form>
+        </DCCReference>
+        <DCCReference Include="UFrmGeoTagFiles.pas">
+            <Form>FGeotagFiles</Form>
+        </DCCReference>
+        <DCCReference Include="UFrmGeoSetup.pas">
+            <Form>FGeoSetup</Form>
+        </DCCReference>
         <DCCReference Include="UFrmStyle.pas">
             <Form>FrmStyle</Form>
         </DCCReference>
@@ -241,7 +257,6 @@
         <DCCReference Include="DateTimeShift.pas">
             <Form>FDateTimeShift</Form>
         </DCCReference>
-        <DCCReference Include="ExifTool_PipeStream.pas"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>

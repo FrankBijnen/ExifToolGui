@@ -334,9 +334,9 @@ uses System.StrUtils, System.Math, System.Masks, System.UITypes,
 const
   GUI_SEP = '-GUI-SEP';
 {$IFDEF DEBUG}
-  ONLINE_DOC_URL = 'https://github.com/FrankBijnen/ExifToolGui/blob/Development/Docs/ExifToolGUI_V652.md';
+  ONLINE_DOC_URL = 'https://github.com/FrankBijnen/ExifToolGui/blob/Development/Docs/ExifToolGUI_V6.md';
 {$ELSE}
-  ONLINE_DOC_URL = 'https://github.com/FrankBijnen/ExifToolGui/blob/main/Docs/ExifToolGUI_V652.md';
+  ONLINE_DOC_URL = 'https://github.com/FrankBijnen/ExifToolGui/blob/main/Docs/ExifToolGUI_V6.md';
 {$ENDIF}
 
 procedure TFMain.WMEndSession(var Msg: TWMEndSession);

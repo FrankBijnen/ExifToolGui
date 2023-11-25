@@ -2,7 +2,7 @@ object FrmPlaces: TFrmPlaces
   Left = 0
   Top = 0
   ActiveControl = Panel1
-  Caption = 'Places Found'
+  Caption = 'Places found'
   ClientHeight = 433
   ClientWidth = 636
   Color = clBtnFace
@@ -29,7 +29,7 @@ object FrmPlaces: TFrmPlaces
       636
       29)
     object BtnOk: TBitBtn
-      Left = 450
+      Left = 446
       Top = 2
       Width = 75
       Height = 25
@@ -55,10 +55,10 @@ object FrmPlaces: TFrmPlaces
       ModalResult = 1
       NumGlyphs = 2
       TabOrder = 0
-      ExplicitLeft = 446
+      ExplicitLeft = 442
     end
     object BtnCancel: TBitBtn
-      Left = 531
+      Left = 527
       Top = 2
       Width = 75
       Height = 25
@@ -86,7 +86,7 @@ object FrmPlaces: TFrmPlaces
       ModalResult = 2
       NumGlyphs = 2
       TabOrder = 1
-      ExplicitLeft = 527
+      ExplicitLeft = 523
     end
   end
   object ListView1: TListView
