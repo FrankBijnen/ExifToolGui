@@ -113,12 +113,10 @@ Double-click on WebView2Loader.dll to start the download.<br><br>
 Download the complete package from <a href="https://www.nuget.org/packages/Microsoft.Web.WebView2"><b>NuGet</b></a> manually.<br>
 Select the version (Eg. 1.0.2194-prerelease) and click on <b>Download package</b>. (on the Right)<br>
 This will get you a file named like 'microsoft.web.webview2.1.0.2194-prerelease.nupkg'.<br>
-Rename the .nupkg file to .zip to open it Windows Explorer, or open with an archiver. <br>(Winrar https://www.win-rar.com/ and 7-Zip https://www.7-zip.org/ are known to work)<br>
+Rename the .nupkg file to .zip to open it in Windows Explorer, or open it with an archiver. <br>(Winrar https://www.win-rar.com/ and 7-Zip https://www.7-zip.org/ are known to work)<br>
 Extract the file 'runtimes\win-x86\native\WebView2Loader.dll' or 'runtimes\win-x64\native\WebView2Loader.dll'.</li>
 </ul>
-<br>
 <a href="https://docwiki.embarcadero.com/RADStudio/Sydney/en/Using_TEdgeBrowser_Component_and_Changes_to_the_TWebBrowser_Component">More info for developers from Embarcadero</a>
-<br>
 <br>
 
 <h3>4. jhead.exe &amp; jpegtran.exe</h3>
@@ -148,14 +146,15 @@ That's all you need. And when a new ExifTool or GUI version is available, you on
 <li><a href="#m_modify">Modify</a> menu</li>
 <li><a href="#m_various">Various</a> menu</li>
 <li><u>Help/Online Documentation</u> menu</li>
-<b>Panel:</b><br>
+<br>
+<b>Panels:</b><br>
 <li><a href="#p_filelist">Filelist</a> panel</li>
 <li><a href="#p_etdirect">ExifTool direct</a> panel</li>
 <li><a href="#p_metadata">Metadata</a> panel</li>
 <li><a href="#p_osmmap">OSM Map</a> panel</li>
-<a href="#final">Final words</a><br>
+<br>
+<a href="#final">Final words</a><br><br>
 
-<br><br>
 <h2><a name="m_program">Program menu</a></h2>
 <h3>About</h3>
 -Displays ExifTool and GUI versions and links.<br>
