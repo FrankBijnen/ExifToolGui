@@ -1,7 +1,11 @@
 # ExifToolGui
 A GUI for ExifTool
 
-Current version: V6.2.5 updated November 12, 2023.
+Current version: <b>V6.2.6</b> updated November 25, 2023.
+Just a few small fixes. And some typos found when updating the docs.
+[Online documentation available](https://htmlpreview.github.io/?https://github.com/FrankBijnen/ExifToolGui/blob/main/Docs/ExifToolGUI_V6.md)
+
+Previous version: <b>V6.2.5</b> updated November 12, 2023.
 The V6.2.5 release features 2 major changes.<br>
 1) [GeoCoding](/Docs/Readme%20GeoCoding.txt) You can now choose from 2 GeoCoding providers, and use Reverse GeoCoding to lookup Country, Province and City from GPS coordinates.<br>
 2) [Lossless rotate and crop, import and export previews](/Docs/Readme%20Lossless%20rotate_Import_Export%20previews.txt) The external programs Jhead and JpegTrans are replaced by native Delphi code, using a modified library NativeJpg by SimDesign B.V. Exporting and Importing previews has been revised.<br>
