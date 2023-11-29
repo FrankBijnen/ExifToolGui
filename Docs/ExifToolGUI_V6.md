@@ -82,13 +82,21 @@ If you want Windows to be able to always find ExifTool, then add the directory w
 
 <h3>2. ExifToolGUI</h3>
 You can download GUI from <a href="https://github.com/FrankBijnen/ExifToolGui/releases"><b>here</b></a>.
-GUI doesn't need to be "installed". Just download the executable for your platform (ExifToolGui.exe or ExifToolGui_X64.exe) into any directory, create Desktop shortcut and GUI is ready to use.<br>
-<font class="red">Note:</font> It is not recommended to put ExifToolGUI.exe into directories owned by operating system (Windows and Program files), unless you <u>know</u> what you're doing.<br>
-<u>Portable notes:</u>
+GUI doesn't need to be "installed". Just download the executable for your platform (ExifToolGui.exe or ExifToolGui_X64.exe) into any directory, create a Desktop shortcut and GUI is ready to use.<br>
+<br>
+<u>Notes:</u>
+<ul>
+<li>It is not recommended to put ExifToolGUI.exe into directories owned by operating system (Windows and Program files), unless you <u>know</u> what you're doing.<br></li>
+<li>If a path is added at the commandline GUI will start in that path. (eg ExifToolGui &quot;c:\foto&quot;)</li>
+<li>If a file is added at the commandline GUI will open that file and start in the path of the file. (eg ExifToolGui &quot;c:\foto\imgp001.jpg&quot;)</li>
+<li>To open a file when GUI is already running, you can use drag and drop a file from Windows Explorer.</li>
+<li>Portable notes:
 GUI doesn't write anything into the registry file. It does however create temporary files in the %TEMP% directory. <br>
 It will save its settings in %APPDATA%\ExifToolGUI\ExifToolV6.ini, unless you use the commandline parameter <u>/DontSaveIni</u>.<br>  
 It was decided not to save the INI file in the same directory as the executable, because that location may not be writable.<br>
 <a href="Readme Portable.txt"><b>See Readme Portable.txt for more info on portable use.</b></a><br>
+</li>
+</ul>
 
 <h3><a name="m_edge">3. Edge browser needed for OSM map<a></h3>
 If you don't need the OSM map functionality, you can skip this step.<br>
