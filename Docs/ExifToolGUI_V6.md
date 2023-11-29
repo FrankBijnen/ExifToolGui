@@ -89,7 +89,7 @@ GUI doesn't need to be "installed". Just download the executable for your platfo
 <li>It is not recommended to put ExifToolGUI.exe into directories owned by operating system (Windows and Program files), unless you <u>know</u> what you're doing.<br></li>
 <li>If a path is added at the commandline GUI will start in that path. (eg ExifToolGui &quot;c:\foto&quot;)</li>
 <li>If a file is added at the commandline GUI will open that file and start in the path of the file. (eg ExifToolGui &quot;c:\foto\imgp001.jpg&quot;)</li>
-<li>To open a file when GUI is already running, you can use drag and drop a file from Windows Explorer.</li>
+<li>To open a file when GUI is already running, you can drag and drop a file from Windows Explorer.</li>
 <li>Portable notes:
 GUI doesn't write anything into the registry file. It does however create temporary files in the %TEMP% directory. <br>
 It will save its settings in %APPDATA%\ExifToolGUI\ExifToolV6.ini, unless you use the commandline parameter <u>/DontSaveIni</u>.<br>  
