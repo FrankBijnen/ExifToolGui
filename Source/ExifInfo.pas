@@ -125,8 +125,7 @@ var
   ChartMaxFLength, ChartMaxFNumber, ChartMaxISO: word;
 
 procedure GetMetadata(FName: string; GetXMP, GetIPTC, GetGPS, GetICC: boolean);
-function GetOrientationValue(FName: string): byte;
-procedure GetJPGsize(const sFile: string; var wWidth, wHeight: word);
+function GetOrientationValue(FName: string): word;
 
 implementation
 
@@ -1200,6 +1199,9 @@ begin
   XMPsize := 0;
   JPGfromRAWoffset := 0; // for Panasonic RW2
 
+  if not FileExists(FName) then
+    exit;
+
   FotoF := TFileStream.Create(FName, fmOpenRead or fmShareDenyNone);
   try
     if (FotoF.Size > 31) then
@@ -1232,10 +1234,10 @@ end;
 
 // ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 // ============================================================================================
-function GetOrientationValue(FName: string): byte;
+function GetOrientationValue(FName: string): word;
 var
   IFDentry: IFDentryRec;
-  Wdata, AppMarker, APPsize, IFDcount, Rotate: word;
+  Wdata, AppMarker, APPsize, IFDcount: word;
   Ldata: longword;
   TIFFoffset, NextAPPmarker: int64;
   IsMM: boolean;
@@ -1273,9 +1275,9 @@ var
             Ldata := IFDentry.ValueOffs;
             if IsMM then
               Ldata := SwapL(Ldata);
-            Rotate := Ldata;
+            result := Ldata;
             if IsMM then
-              Rotate := Swap(Rotate);
+              result := Swap(result);
             IFDcount := 1;
           end;
           Dec(IFDcount);
@@ -1286,7 +1288,12 @@ var
 
 // --------------------------------------------------------------
 begin
-  Rotate := 0;
+  result := 0;
+
+  // Could be directory. Skip.
+  if not FileExists(FName) then
+    exit;
+
   FotoF := TFileStream.Create(FName, fmOpenRead or fmShareDenyNone);
   try
     if (FotoF.Size > 31) then
@@ -1315,7 +1322,7 @@ begin
                 if (TmpTxt = 'Exif') and ((Wdata = $4949) or (Wdata = $4D4D)) then
                   ReadTIFF;
               end;
-              if Rotate <> 0 then
+              if result <> 0 then
                 break;
               FotoF.Seek(NextAPPmarker, TSeekOrigin.soBeginning);
             end;
@@ -1323,13 +1330,13 @@ begin
         end;
       end;
     end;
-    Result := Rotate;
   finally
     FotoF.Free;
   end;
 end;
 
 // =============================== GetJPGsize =================================================
+// Not used
 procedure GetJPGsize(const sFile: string; var wWidth, wHeight: word);
 const
   Parameterless = [$01, $D0, $D1, $D2, $D3, $D4, $D5, $D6, $D7];

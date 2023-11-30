@@ -657,12 +657,21 @@ begin
 end;
 
 function TShellListView.FilePath(ItemIndex: integer = -1): string;
+var SelIndex: integer;
 begin
   Result := '';
-  if (ItemIndex = -1) and (Selected <> nil) then
-    Result := Folders[Selected.Index].PathName
-  else if (ItemIndex > -1) and (ItemIndex < Items.Count) then
-    Result := Folders[ItemIndex].PathName;
+
+  SelIndex := ItemIndex;
+  if (SelIndex = -1) and
+     (Selected <> nil) then
+    SelIndex := Selected.Index;
+
+  if (SelIndex < 0) or
+     (SelIndex >= Items.Count) then
+    exit;
+
+  if (not Folders[SelIndex].IsFolder) then
+    result := Folders[SelIndex].PathName;
 end;
 
 function TShellListView.FileName(ItemIndex: integer = -1): string;
@@ -672,11 +681,7 @@ end;
 
 function TShellListView.FileExt(ItemIndex: integer = -1): string;
 begin
-  Result := '';
-  if (ItemIndex = -1) and (Selected <> nil) then
-    Result := ExtractFileExt(Folders[Selected.Index].PathName)
-  else if (ItemIndex > -1) and (ItemIndex < Items.Count) then
-    Result := ExtractFileExt(Folders[ItemIndex].PathName);
+  Result := ExtractFileExt(FilePath(ItemIndex));
 end;
 
 procedure TShellListView.ColumnClick(Column: TListColumn);
