@@ -308,8 +308,11 @@ type
     { Public declarations }
     function GetFirstSelectedFile: string;
     function GetFirstSelectedFilePath: string;
-    function GetSelectedFiles(FileName: string; MustExpandPath: boolean): string; overload;
-    function GetSelectedFiles(FileName: string = ''): string; overload;
+    function GetFullPath(MustExpandPath: boolean): string;
+    function GetSelectedFile(FileName: string; MustExpandPath: boolean): string; overload;
+    function GetSelectedFile(FileName: string): string; overload;
+    function GetSelectedFiles(MustExpandPath: boolean): string; overload;
+    function GetSelectedFiles: string; overload;
     procedure ExecETEvent_Done(ExecNum: word; EtCmds, EtOuts, EtErrs, StatusLine: string; PopupOnError: boolean);
     procedure ExecRestEvent_Done(Url, Response: string; Succes: boolean);
     procedure UpdateStatusBar_FilesShown;
@@ -323,7 +326,7 @@ var
 
 implementation
 
-uses System.StrUtils, System.Math, System.Masks, System.UITypes,
+uses System.StrUtils, System.Math, System.Masks, System.Types, System.UITypes,
   Vcl.ClipBrd, Winapi.ShlObj, Winapi.ShellAPI, Vcl.Shell.ShellConsts, Vcl.Themes, Vcl.Styles,
   ExifTool, ExifInfo, ExifToolsGui_LossLess, ExifTool_PipeStream,
   MainDef, LogWin, Preferences, EditFFilter, EditFCol, UFrmStyle, UFrmAbout,
@@ -620,30 +623,44 @@ begin
     result := ShellList.FilePath(0);
 end;
 
-function TFMain.GetSelectedFiles(FileName: string; MustExpandPath: boolean): string;
+function TFMain.GetFullPath(MustExpandPath: boolean): string;
+begin
+  result := '';
+  if (MustExpandPath) then
+    result := IncludeTrailingBackslash(ShellList.Path);
+end;
+
+function TFMain.GetSelectedFile(FileName: string; MustExpandPath: boolean): string;
+begin
+  if (FileName = '') then
+    result := ''
+  else
+    result := GetFullPath(MustExpandPath) + FileName;
+end;
+
+function TFMain.GetSelectedFile(FileName: string): string;
+begin
+  result := GetSelectedFile(FileName, ET_Options.ETAPIWindowsWideFile = '');
+end;
+
+function TFMain.GetSelectedFiles(MustExpandPath: boolean): string;
 var
   AnItem: TListItem;
   FullPath: string;
 begin
   result := '';
-  FullPath := '';
-  if (MustExpandPath) then
-    FullPath := IncludeTrailingBackslash(ShellList.Path);
-  if (FileName <> '') then
-    result := FullPath + FileName + CRLF
-  else
+  FullPath := GetFullPath(MustExpandPath);
+  for AnItem in ShellList.Items do
   begin
-    for AnItem in ShellList.Items do
-    begin
-      if AnItem.Selected then
-        result := result + FullPath + ShellList.FileName(AnItem.Index) + CRLF;
-    end;
+    if (AnItem.Selected) and
+       (ShellList.Folders[AnItem.Index].IsFolder = false) then
+      result := result + FullPath +ShellList.FileName(AnItem.Index) + CRLF;
   end;
 end;
 
-function TFMain.GetSelectedFiles(FileName: string = ''): string;
+function TFMain.GetSelectedFiles: string;
 begin
-  result := GetSelectedFiles(FileName, (ET_Options.ETAPIWindowsWideFile = ''));
+  result := GetSelectedFiles(ET_Options.ETAPIWindowsWideFile = '');
 end;
 
 procedure TFMain.EditMapFindKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
@@ -1272,7 +1289,7 @@ begin
           SetLength(Img, n); // filename ending with dot (without extension)
           if FileExists(dirJPG + Img + 'jpg') then
           begin
-            ET_OpenExec('-s3' + CRLF + '-ImageSize', GetSelectedFiles(dirJPG + Img + 'jpg', false), outs, errs);
+            ET_OpenExec('-s3' + CRLF + '-ImageSize', GetSelectedFile(dirJPG + Img + 'jpg', false), outs, errs);
             if (errs <> '') then
             begin
               AllErrs := AllErrs + Img + ' ' + errs + CRLF;
@@ -1289,7 +1306,7 @@ begin
               n := W;
               W := H;
               H := n;
-              ET_OpenExec('-s3' + CRLF + '-exif:Orientation#', GetSelectedFiles(Img + 'cr2', false), outs, errs);
+              ET_OpenExec('-s3' + CRLF + '-exif:Orientation#', GetSelectedFile(Img + 'cr2', false), outs, errs);
               n := StrToIntDef(LeftStr(outs, 1), 1);
             end
             else
@@ -1298,7 +1315,7 @@ begin
             if (W >= 512) and ((W mod 8) = 0) and ((H mod 8) = 0) then
             begin
               // remove all Exif data
-              ET_OpenExec('-m' + CRLF + '-All=', GetSelectedFiles(dirJPG + Img + 'jpg', false));
+              ET_OpenExec('-m' + CRLF + '-All=', GetSelectedFile(dirJPG + Img + 'jpg', false));
               case n of
                 6:
                   tx := 'jpegtran -rotate 270 ';
@@ -1310,7 +1327,7 @@ begin
               tx := '-PreviewImage<=' + dirJPG + '%f.jpg';
               tx := tx + CRLF + '-IFD0:ImageWidth=' + IntToStr(W);
               tx := tx + CRLF + '-IFD0:ImageHeight=' + IntToStr(H);
-              ET_OpenExec(tx, GetSelectedFiles(Img + 'cr2', false));
+              ET_OpenExec(tx, GetSelectedFile(Img + 'cr2', false));
               inc(c);
             end
             else
@@ -1495,7 +1512,7 @@ begin
   try
     if ET_Options.ETLangDef <> '' then
     begin
-      ET_OpenExec('-X' + CRLF + '-l' + CRLF + xMeta + 'All', GetSelectedFiles(ShellList.FileName, false), ETout);
+      ET_OpenExec('-X' + CRLF + '-l' + CRLF + xMeta + 'All', GetSelectedFile(ShellList.FileName), ETout);
       Indx := ETout.Count;
       while Indx > 1 do
       begin
@@ -1760,7 +1777,7 @@ begin
   I := MetadataList.Row;
   MetadataList.Keys[I] := QuickTags[I - 1].Caption;
   Tx := '-s3' + CRLF + '-f' + CRLF + QuickTags[I - 1].Command;
-  ET_OpenExec(Tx, GetSelectedFiles(ShellList.FileName), ETouts, ETerrs);
+  ET_OpenExec(Tx, GetSelectedFile(ShellList.FileName), ETouts, ETerrs);
   MetadataList.Cells[1, I] := ETouts;
   N := MetadataList.RowCount - 1;
   X := 0;
@@ -1854,7 +1871,7 @@ begin
     CrNormal := SetCursor(CrWait);
     SelectedFiles := TStringList.Create;
     try
-      SelectedFiles.Text := GetSelectedFiles('', true);
+      SelectedFiles.Text := GetSelectedFiles(true);   // Need full pathname
       for AFile in SelectedFiles do
       begin
         StatusBar.Panels[1].Text := AFile;
@@ -2162,7 +2179,7 @@ begin
       Rotate := 0;
       if GUIsettings.AutoRotatePreview then
       begin
-        Case GetOrientationValue(FPath) of
+        case GetOrientationValue(FPath) of
           0, 1:
             Rotate := 0; // no tag or don't rotate
           3:
@@ -2660,7 +2677,8 @@ begin
     Item.ImageIndex := AFolder.ImageIndex(AShellList.ViewStyle = vsIcon);
 
   Details := AFolder.DetailStrings;
-  if (Details.Count = 0) then
+  if (Details.Count = 0) and
+     (Afolder.IsFolder = false) then
   begin
     with Foto do
     begin
@@ -2731,7 +2749,7 @@ begin
             ETcmd := '-s3' + CRLF + '-f';
             for Indx := 0 to High(FListColUsr) do
               ETcmd := ETcmd + CRLF + FListColUsr[Indx].Command;
-            ET_OpenExec(ETcmd, GetSelectedFiles(ShellList.FileName(Item.Index)), Details, False); // Dont care about errors
+            ET_OpenExec(ETcmd, GetSelectedFile(ShellList.FileName(Item.Index)), Details, False); // Dont care about errors
           end;
       end;
     end;
@@ -2791,6 +2809,7 @@ begin
 end;
 
 procedure TFMain.ShellTreeChanging(Sender: TObject; Node: TTreeNode; var AllowChange: Boolean);
+var Value: TShellObjectTypes;
 begin
   RotateImg.Picture.Bitmap := nil;
   if Assigned(ETBarSeriesFocal) then
@@ -2799,6 +2818,15 @@ begin
     ETBarSeriesFnum.Clear;
   if Assigned(ETBarSeriesIso) then
     ETBarSeriesIso.Clear;
+
+  Value := ShellList.ObjectTypes;
+  if (GUIsettings.ShowFolders) then
+    include(Value, TshellObjectType.otFolders)
+  else
+    exclude(Value, TshellObjectType.otFolders);
+  if (Value <> ShellList.ObjectTypes) then
+    ShellList.ObjectTypes := Value;
+
 end;
 
 procedure TFMain.RefreshSelected(Sender: TObject);
@@ -2834,7 +2862,8 @@ var
   ETcmd, Item, Tx: string;
   ETResult: TStringList;
 begin
-  Item := GetSelectedFiles(ShellList.FileName);
+  MetadataList.Tag := -1; // Reset hint row
+  Item := GetSelectedFile(ShellList.FileName);
   if (Item = '') then
   begin
     Caption := 'ExifToolGUI';

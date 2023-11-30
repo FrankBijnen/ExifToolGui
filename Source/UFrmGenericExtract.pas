@@ -54,7 +54,7 @@ var SelFiles: TstringList;
     Sep: Char;
 begin
   SelFiles := TStringList.Create;
-  SelFiles.Text := Fmain.GetSelectedFiles('', false);
+  SelFiles.Text := Fmain.GetSelectedFiles(false); //Only filename
   try
     // Crop?
     Modulo := 0;
@@ -85,7 +85,7 @@ begin
         Angle := 0;
         if (ChkAutoRotate.Checked) then
         begin
-          ET_OpenExec('-s3' + CRLF + '-exif:Orientation#', FMain.GetSelectedFiles(AFile, true), ETouts, ETerrs);
+          ET_OpenExec('-s3' + CRLF + '-exif:Orientation#', FMain.GetSelectedFile(AFile), ETouts, ETerrs);
           N := StrToIntDef(LeftStr(ETouts, 1), 1);
           case N of
             3: Angle := 180;

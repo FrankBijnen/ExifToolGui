@@ -141,7 +141,7 @@ begin
   ET_OpenExec(ETcmd, FMain.GetSelectedFiles, ETout, ETerr);
   SelectedFiles := TStringList.Create;
   try
-    SelectedFiles.Text := FMain.GetSelectedFiles('', true); // Need complete path
+    SelectedFiles.Text := FMain.GetSelectedFiles(true); // Need complete path
     for AFile in SelectedFiles do
       FillLocationInImage(AFile);
   finally
