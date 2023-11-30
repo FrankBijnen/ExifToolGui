@@ -278,6 +278,7 @@ type
     procedure UpdateLocationfromGPScoordinatesClick(Sender: TObject);
     procedure EdgeBrowser1CreateWebViewCompleted(Sender: TCustomEdgeBrowser; AResult: HRESULT);
     procedure OnlineDocumentation1Click(Sender: TObject);
+    procedure MetadataListMouseMove(Sender: TObject; Shift: TShiftState; X, Y: Integer);
   private
     { Private declarations }
     ETBarSeriesFocal: TBarSeries;
@@ -816,30 +817,41 @@ begin
     end;
 end;
 
+procedure TFMain.MetadataListMouseMove(Sender: TObject; Shift: TShiftState; X, Y: Integer);
+var
+  ACol, ARow: integer;
+begin
+  TValueListEditor(Sender).MouseToCell(X, Y, ACol, ARow);
+  if (ARow >= 1) and
+     (ARow <= TValueListEditor(Sender).RowCount) and
+     (TValueListEditor(Sender).Tag <> ARow) then  // Hint already shown?
+  begin
+    TValueListEditor(Sender).Tag := ARow;         // Remember the row that has the hint.
+
+    Hint := TValueListEditor(Sender).Cells[1, ARow];
+    Application.ActivateHint(TValueListEditor(Sender).ClientToScreen(Point(X, Y))); // Force hint display
+  end;
+end;
+
 procedure TFMain.MetadataListSelectCell(Sender: TObject; ACol, ARow: integer; var CanSelect: boolean);
+var EditText: string;
 begin
   EditQuick.Text := '';
   MemoQuick.Text := '';
   if (ARow - 1 > High(QuickTags)) then
     exit;
-  if SpeedBtnQuick.Down and not(QuickTags[ARow - 1].NoEdit) then
-    with MetadataList do
-    begin
-      if SpeedBtnLarge.Down then
-      begin
-        if RightStr(Keys[ARow], 1) = #177 then
-          MemoQuick.Text := '+'
-        else
-          MemoQuick.Text := Cells[1, ARow];
-      end
-      else
-      begin
-        if RightStr(Keys[ARow], 1) = #177 then
-          EditQuick.Text := '+'
-        else
-          EditQuick.Text := Cells[1, ARow];
-      end;
-    end;
+  if SpeedBtnQuick.Down and
+     not(QuickTags[ARow - 1].NoEdit) then
+  begin
+    if RightStr(TValueListEditor(Sender).Keys[ARow], 1) = #177 then
+      EditText := '+'
+    else
+      EditText := TValueListEditor(Sender).Cells[1, ARow];
+    if SpeedBtnLarge.Down then
+      MemoQuick.Text := EditText
+    else
+      EditQuick.Text := EditText;
+  end;
 end;
 
 procedure TFMain.MExifDateTimeEqualizeClick(Sender: TObject);

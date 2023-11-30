@@ -348,7 +348,9 @@ object FMain: TFMain
         Font.Style = []
         Options = [goFixedVertLine, goFixedHorzLine, goVertLine, goHorzLine, goColSizing, goRowSelect, goThumbTracking]
         ParentFont = False
+        ParentShowHint = False
         PopupMenu = QuickPopUpMenu
+        ShowHint = True
         TabOrder = 2
         TitleCaptions.Strings = (
           'Tag name'
@@ -358,6 +360,7 @@ object FMain: TFMain
         OnExit = MetadataListExit
         OnKeyDown = MetadataListKeyDown
         OnMouseDown = MetadataListMouseDown
+        OnMouseMove = MetadataListMouseMove
         OnSelectCell = MetadataListSelectCell
         ExplicitHeight = 390
         ColWidths = (
