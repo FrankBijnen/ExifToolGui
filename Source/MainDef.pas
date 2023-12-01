@@ -388,6 +388,7 @@ begin
         TryStrToInt(ReadString(Ini_Settings, 'CLFocal', '$FFDAB6'), CLFocal);
         TryStrToInt(ReadString(Ini_Settings, 'CLISO', '$D0D0D0'), CLISO);
         ShowFolders := ReadBool(Ini_Settings, 'ShowFolders', false);
+        Application.HintHidePause := ReadInteger(Ini_Settings, 'HintHidePause', 5000);
       end;
 
       with ET_Options do
@@ -651,6 +652,7 @@ begin
           WriteString(Ini_Settings, 'CLFocal', '$' + IntToHex(CLFocal, 8));
           WriteString(Ini_Settings, 'CLISO', '$' + IntToHex(CLISO, 8));
           WriteBool(Ini_Settings, 'ShowFolders', ShowFolders);
+          WriteInteger(Ini_Settings, 'HintHidePause', Application.HintHidePause);
         end;
 
         WriteBool(Ini_Options, 'DontBackup', MDontBackup.Checked);

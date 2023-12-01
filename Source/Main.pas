@@ -287,6 +287,7 @@ type
     procedure ImageDrop(var Msg: TWMDROPFILES); message WM_DROPFILES;
     procedure ShowMetadata; // (const LogErr:boolean=true);
     procedure ShowPreview;
+    procedure ShellListSetFolders;
     procedure EnableMenus(Enable: boolean);
     procedure WMEndSession(var Msg: TWMEndSession); message WM_ENDSESSION;
     function TranslateTagName(xMeta, xName: string): string;
@@ -1366,7 +1367,8 @@ begin
   if FPreferences.ShowModal = mrOK then
   begin
     EnableMenus(ET_StayOpen(ShellList.Path)); // Recheck Exiftool.exe.
-    RefreshSelected(Sender);
+    ShellListSetFolders;
+    ShellList.Refresh;
     ShowMetadata;
   end;
 end;
@@ -2780,6 +2782,18 @@ begin
     ShellListClick(Sender);
 end;
 
+procedure TFMain.ShellListSetFolders;
+var Value: TShellObjectTypes;
+begin
+  Value := ShellList.ObjectTypes;
+  if (GUIsettings.ShowFolders) then
+    include(Value, TshellObjectType.otFolders)
+  else
+    exclude(Value, TshellObjectType.otFolders);
+  if (Value <> ShellList.ObjectTypes) then
+    ShellList.ObjectTypes := Value;
+end;
+
 procedure TFMain.EnableMenus(Enable: boolean);
 var
   i: integer;
@@ -2809,7 +2823,6 @@ begin
 end;
 
 procedure TFMain.ShellTreeChanging(Sender: TObject; Node: TTreeNode; var AllowChange: Boolean);
-var Value: TShellObjectTypes;
 begin
   RotateImg.Picture.Bitmap := nil;
   if Assigned(ETBarSeriesFocal) then
@@ -2819,14 +2832,7 @@ begin
   if Assigned(ETBarSeriesIso) then
     ETBarSeriesIso.Clear;
 
-  Value := ShellList.ObjectTypes;
-  if (GUIsettings.ShowFolders) then
-    include(Value, TshellObjectType.otFolders)
-  else
-    exclude(Value, TshellObjectType.otFolders);
-  if (Value <> ShellList.ObjectTypes) then
-    ShellList.ObjectTypes := Value;
-
+  ShellListSetFolders;
 end;
 
 procedure TFMain.RefreshSelected(Sender: TObject);
