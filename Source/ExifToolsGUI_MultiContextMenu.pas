@@ -31,7 +31,6 @@ implementation
 procedure InvokeMultiContextMenu(Owner: TWinControl; AFolder: TShellFolder; MousePos: TPoint;
                                  var ICM2: IContextMenu2; AFileList: TStrings = nil);
 var
-  chEaten, dwAttributes: ULONG;
   PIDL: PItemIDList;
   CM: IContextMenu;
   Menu: HMenu;
@@ -60,11 +59,7 @@ begin
     // Setup ItemIDListArray.
     SetLength(ItemIDListArray, AFileList.Count);
     for Index := 0 to AFileList.Count - 1 do
-    begin
-      // Get the relative PItemIDList of each file in the list
-      OleCheck(AFolder.ShellFolder.ParseDisplayName(Owner.Handle, nil, PWideChar(AFileList[Index]), chEaten, PIDL, dwAttributes));
-      ItemIDListArray[Index] := PIDL;
-    end;
+      ItemIDListArray[Index] := Pointer(AFileList.Objects[Index]);
     AFolder.ShellFolder.GetUIObjectOf(Owner.Handle, AFileList.Count, ItemIDListArray[0], IID_IContextMenu, nil, CM);
   end;
   if CM = nil then

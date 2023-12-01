@@ -23,7 +23,7 @@ object FPreferences: TFPreferences
     DoubleBuffered = True
     ParentDoubleBuffered = False
     TabOrder = 0
-    ExplicitHeight = 390
+    ExplicitHeight = 393
     object AdvTabGeneral: TTabSheet
       Caption = 'General'
       object Label1: TLabel
@@ -532,6 +532,13 @@ object FPreferences: TFPreferences
     end
     object AdvTabOther: TTabSheet
       Caption = 'Other'
+      object Label5: TLabel
+        Left = 104
+        Top = 173
+        Width = 141
+        Height = 13
+        Caption = 'Hint pause timeout in Millisecs'
+      end
       object RgETOverride: TRadioGroup
         Left = 16
         Top = 62
@@ -542,7 +549,7 @@ object FPreferences: TFPreferences
         Items.Strings = (
           '-Default search (See Windows documentation on CreateProcess)'
           '-Specify')
-        TabOrder = 1
+        TabOrder = 2
         OnClick = RadioGroupClick
       end
       object CheckBox4: TCheckBox
@@ -558,7 +565,7 @@ object FPreferences: TFPreferences
         Top = 105
         Width = 365
         Height = 21
-        TabOrder = 2
+        TabOrder = 3
       end
       object BtnETOverride: TButton
         Left = 460
@@ -566,7 +573,7 @@ object FPreferences: TFPreferences
         Width = 28
         Height = 22
         Caption = '...'
-        TabOrder = 3
+        TabOrder = 4
         OnClick = BtnBrowseFolder
       end
       object CheckBox5: TCheckBox
@@ -575,7 +582,33 @@ object FPreferences: TFPreferences
         Width = 337
         Height = 17
         Caption = '-Workspace: Double Click adds/removes tags'
-        TabOrder = 4
+        TabOrder = 1
+      end
+      object CheckBox6: TCheckBox
+        Left = 16
+        Top = 141
+        Width = 337
+        Height = 17
+        Caption = '-Filelist: Show Folders in Filelist'
+        TabOrder = 5
+      end
+      object HintPause: TEdit
+        Left = 16
+        Top = 170
+        Width = 66
+        Height = 21
+        TabOrder = 6
+        Text = '0'
+      end
+      object UpDHintPause: TUpDown
+        Left = 82
+        Top = 170
+        Width = 16
+        Height = 21
+        Associate = HintPause
+        Max = 10000
+        Increment = 10
+        TabOrder = 7
       end
     end
   end

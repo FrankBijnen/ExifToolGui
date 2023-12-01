@@ -454,9 +454,9 @@ begin
     if (AnItem.Selected) then
     begin
       if (FullPaths) then
-        Result.Add(Folders[AnItem.Index].PathName)
+        Result.AddObject(Folders[AnItem.Index].PathName, Pointer(Folders[AnItem.Index].RelativeID))
       else
-        Result.Add(FileName(AnItem.Index));
+        Result.AddObject(FileName(AnItem.Index), Pointer(Folders[AnItem.Index].RelativeID));
     end;
 end;
 

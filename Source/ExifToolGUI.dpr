@@ -57,7 +57,7 @@ begin
   Application.Initialize;
   Application.MainFormOnTaskbar := True;
   Application.Title := 'ExifToolGui';
-  Application.HintHidePause := 5000; // For old people like me!
+
   Application.CreateForm(TFMain, FMain);
   Application.CreateForm(TFLogWin, FLogWin);
   Application.CreateForm(TFPreferences, FPreferences);

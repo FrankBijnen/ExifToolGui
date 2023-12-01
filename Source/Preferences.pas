@@ -57,6 +57,10 @@ type
     UpdThrottleOverpass: TUpDown;
     EdOverPassUrl: TLabeledEdit;
     ChkGeoCodingEnable: TCheckBox;
+    CheckBox6: TCheckBox;
+    Label5: TLabel;
+    HintPause: TEdit;
+    UpDHintPause: TUpDown;
     procedure FormShow(Sender: TObject);
     procedure BtnSaveClick(Sender: TObject);
     procedure BtnBrowseFolder(Sender: TObject);
@@ -76,13 +80,13 @@ var
 implementation
 
 uses Main, ExifTool, MainDef, GeoMap,
-  ExifToolsGUI_Utils, ExifToolsGUI_Thumbnails;
+     ExifToolsGUI_Utils, ExifToolsGUI_Thumbnails;
 
 {$R *.dfm}
 
 procedure TFPreferences.BtnSaveClick(Sender: TObject);
 var
-  i: smallint;
+  i: integer;
   tx: string[7];
 begin
   i := ComboBox1.ItemIndex;
@@ -136,6 +140,8 @@ begin
   GUIsettings.UseExitDetails := CheckBox3.Checked;
   GUIsettings.AutoIncLine := CheckBox4.Checked;
   GUIsettings.DblClickUpdTags := CheckBox5.Checked;
+  GUIsettings.ShowFolders := CheckBox6.Checked;
+  Application.HintHidePause := UpDHintPause.Position;
 
   //GeoCode
   GeoSettings.GeoCodeUrl := EdGeoCodeUrl.Text;
@@ -296,6 +302,8 @@ begin
     CheckBox3.Checked := GUIsettings.UseExitDetails;
     CheckBox4.Checked := GUIsettings.AutoIncLine;
     CheckBox5.Checked := GUIsettings.DblClickUpdTags;
+    CheckBox6.Checked := GUIsettings.ShowFolders;
+    UpDHintPause.Position := Application.HintHidePause;
 
     // GeoCode
     EdGeoCodeUrl.Text := GeoSettings.GeoCodeUrl;
