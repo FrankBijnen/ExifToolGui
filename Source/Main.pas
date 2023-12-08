@@ -175,6 +175,8 @@ type
     UpdateLocationfromGPScoordinates: TMenuItem;
     Help1: TMenuItem;
     OnlineDocumentation1: TMenuItem;
+    MCustomOptions: TMenuItem;
+    N11: TMenuItem;
     procedure ShellListClick(Sender: TObject);
     procedure ShellListKeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
     procedure SpeedBtnExifClick(Sender: TObject);
@@ -279,6 +281,7 @@ type
     procedure EdgeBrowser1CreateWebViewCompleted(Sender: TCustomEdgeBrowser; AResult: HRESULT);
     procedure OnlineDocumentation1Click(Sender: TObject);
     procedure MetadataListMouseMove(Sender: TObject; Shift: TShiftState; X, Y: Integer);
+    procedure MCustomOptionsClick(Sender: TObject);
   private
     { Private declarations }
     ETBarSeriesFocal: TBarSeries;
@@ -1418,6 +1421,11 @@ begin
   // + used by MShowHexID, MGroup_g4, MShowComposite, MShowSorted, MNotDuplicated
   RefreshSelected(Sender);
   ShowMetadata;
+end;
+
+procedure TFMain.MCustomOptionsClick(Sender: TObject);
+begin
+  ET_Options.ETCustomOptions := InputBox('Specify Custom options to add to Exiftool args','Custom options', ET_Options.ETCustomOptions);
 end;
 
 procedure TFMain.MWorkspaceLoadClick(Sender: TObject);
