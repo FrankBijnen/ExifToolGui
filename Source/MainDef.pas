@@ -410,6 +410,7 @@ begin
         MNotDuplicated.Checked := ReadBool(Ini_Options, 'NotDuplicated', false);
         MAPIWindowsWideFile.Checked := ReadBool(Ini_Options, 'APIWindowsWideFile', true);
         SetApiWindowsWideFile(MAPIWindowsWideFile.Checked);
+        SetCustomOptions(ReadString(Ini_Options, 'CustomOptions', ''));
       end;
 
       // Custom FList columns
@@ -667,6 +668,7 @@ begin
         WriteBool(Ini_Options, 'ShowComposite', MShowComposite.Checked);
         WriteBool(Ini_Options, 'NotDuplicated', MNotDuplicated.Checked);
         WriteBool(Ini_Options, 'APIWindowsWideFile', MAPIWindowsWideFile.Checked);
+        WriteString(Ini_Options, 'CustomOptions', ET_Options.GetCustomOptions);
 
         I := length(FListColUsr) - 1;
         for N := 0 to I do

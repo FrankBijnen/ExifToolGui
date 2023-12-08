@@ -1034,6 +1034,13 @@ object FMain: TFMain
         Checked = True
         OnClick = MAPIWindowsWideFileClick
       end
+      object N11: TMenuItem
+        Caption = '-'
+      end
+      object MCustomOptions: TMenuItem
+        Caption = 'Custom options'
+        OnClick = MCustomOptionsClick
+      end
     end
     object MExportImport: TMenuItem
       Caption = 'Export/Import'

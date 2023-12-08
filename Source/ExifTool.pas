@@ -20,8 +20,11 @@ type
     ETCharset: string;
     ETVerbose: string;
     ETAPIWindowsWideFile: string;
+    ETCustomOptions: string;
     procedure SetGpsFormat(UseDecimal: boolean);
     procedure SetApiWindowsWideFile(UseWide: boolean);
+    procedure SetCustomOptions(Custom: string);
+    function GetCustomOptions: string;
     function GetOptions(Charset: boolean = true): string;
   end;
 
@@ -39,7 +42,8 @@ var
     ETGpsFormat: '';                              // See SetGpsFormat
     ETShowNumber: '';                             // or '-n'+CRLF
     ETCharset: '-CHARSET' + CRLF + 'FILENAME=UTF8' + CRLF + '-CHARSET' + CRLF + 'UTF8'; // UTF8 it is. No choice
-    ETVerbose: '-v0' );                           // For file counter
+    ETVerbose: '-v0';                             // For file counter
+    ETCustomOptions: '');                         // or -u + CRLF Unknown Tags
 
 function ETWorkDir: string;
 
@@ -92,6 +96,16 @@ begin
     ETAPIWindowsWideFile := '';
 end;
 
+procedure ET_OptionsRec.SetCustomOptions(Custom: string);
+begin
+  ETCustomOptions := Custom;
+end;
+
+function ET_OptionsRec.GetCustomOptions: string;
+begin
+  result := EndsWithCRLF(ArgsFromDirectCmd(ETCustomOptions));
+end;
+
 function ET_OptionsRec.GetOptions(Charset: boolean = true): string;
 begin
   result := '';
@@ -105,6 +119,7 @@ begin
   result := result + ETMinorError + ETFileDate;
   result := result + ETGpsFormat + ETShowNumber;
   result := result + ETAPIWindowsWideFile;
+  result := result + GetCustomOptions;
   // +further options...
 end;
 
