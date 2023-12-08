@@ -811,6 +811,17 @@ object FMain: TFMain
         OnKeyPress = EditFindMetaKeyPress
         OnKeyUp = ShellListKeyUp
       end
+      object PnlBreadCrumb: TPanel
+        Left = 0
+        Top = 50
+        Width = 534
+        Height = 22
+        Align = alTop
+        BevelOuter = bvNone
+        ShowCaption = False
+        TabOrder = 3
+        ExplicitWidth = 530
+      end
     end
     object AdvTabChart: TTabSheet
       Caption = 'Chart'
