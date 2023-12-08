@@ -16,6 +16,7 @@ uses
   Winapi.WebView2, Winapi.ActiveX, Winapi.EdgeUtils, Vcl.Edge, // Edgebrowser
   VclTee.TeeGDIPlus, VclTee.TeEngine, VclTee.TeeProcs, VclTee.Chart,
   VclTee.Series, // Chart
+  BreadcrumbBar,
   ExifToolsGUI_ShellTree, // Extension of ShellTreeView
   ExifToolsGUI_ShellList, // Extension of ShellListView
   ExifToolsGUI_Thumbnails, // Thumbnails
@@ -177,6 +178,7 @@ type
     OnlineDocumentation1: TMenuItem;
     MCustomOptions: TMenuItem;
     N11: TMenuItem;
+    PnlBreadCrumb: TPanel;
     procedure ShellListClick(Sender: TObject);
     procedure ShellListKeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
     procedure SpeedBtnExifClick(Sender: TObject);
@@ -287,6 +289,8 @@ type
     ETBarSeriesFocal: TBarSeries;
     ETBarSeriesFnum: TBarSeries;
     ETBarSeriesIso: TBarSeries;
+    BreadcrumbBar: TDirBreadcrumbBar;
+
     procedure ImageDrop(var Msg: TWMDROPFILES); message WM_DROPFILES;
     procedure ShowMetadata; // (const LogErr:boolean=true);
     procedure ShowPreview;
@@ -295,6 +299,8 @@ type
     procedure WMEndSession(var Msg: TWMEndSession); message WM_ENDSESSION;
     function TranslateTagName(xMeta, xName: string): string;
 
+    procedure BreadCrumbClick(Sender: TObject);
+    procedure BreadCrumbHome(Sender: TObject);
     procedure RefreshSelected(Sender: TObject);
     procedure ShellTreeBeforeContext(Sender: TObject);
     procedure ShellTreeAfterContext(Sender: TObject);
@@ -2300,6 +2306,13 @@ procedure TFMain.FormCreate(Sender: TObject);
 begin
   ReadGUIini;
 
+  // Create Bread Crumb
+  BreadcrumbBar := TDirBreadcrumbBar.Create(Self);
+  BreadcrumbBar.Parent := PnlBreadCrumb;
+  BreadcrumbBar.Align := alClient;
+  BreadcrumbBar.OnChange := BreadCrumbClick;
+  BreadcrumbBar.OnHome := BreadCrumbHome;
+
   // Create Bar Chart series
   ETBarSeriesFocal := TBarSeries.Create(ETChart);
   ETBarSeriesFocal.Marks.Visible := false;
@@ -2491,6 +2504,25 @@ begin
   ShowPreview;
 end;
 
+procedure TFMain.BreadCrumbClick(Sender: TObject);
+begin
+  if FrmStyle.Showing then
+    exit;
+  ShellTree.Path := BreadcrumbBar.Directory;
+  if (ShellTree.Selected <> nil) then
+    ShellTree.Selected.MakeVisible;
+end;
+
+procedure TFMain.BreadCrumbHome(Sender: TObject);
+begin
+  if FrmStyle.Showing then
+    exit;
+
+  // Setting ObjectTypes will always call RootChanged, even if the value has not changed.
+  ShellTree.ObjectTypes := ShellTree.ObjectTypes;
+  ShellTree.Refresh(ShellTree.TopItem);
+end;
+
 procedure TFMain.ShellListAddItem(Sender: TObject; AFolder: TShellFolder; var CanAdd: boolean);
 var
   FolderName: string;
@@ -2643,6 +2675,13 @@ var
 begin
   if FrmStyle.Showing then
     exit;
+
+  if PnlBreadCrumb.Visible then
+  begin
+    BreadcrumbBar.Home := ShellTree.Items[0].Text;
+    BreadcrumbBar.Directory := TShellListView(Sender).Path;
+  end;
+
   // Start ExifTool in this directory
   ET_Active := ET_StayOpen(TShellListView(Sender).Path);
 
@@ -3301,6 +3340,7 @@ begin
   AStyleService := TStyleManager.Style[GUIsettings.GuiStyle];
   if Assigned(AStyleService) then
     GUIColorWindow := AStyleService.GetStyleColor(scWindow);
+  BreadcrumbBar.Style := GUIsettings.GuiStyle;
 end;
 
 procedure TFMain.ShellistThumbError(Sender: TObject; Item: TListItem; E: Exception);
