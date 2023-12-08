@@ -201,7 +201,7 @@ begin
       for ACmd in MemoCmds.Lines do // Need WordWrap set to false for this.
         PSList.Add(Format('Add-Content -Path $args -Value "%s"', [ACmd]));
       PSList.Add('#echo4 triggers NativeCommand exception. ==>> 2>&1 | %{"$_"} <<= redirects Stderr to Stdout');
-      PSList.Add('exiftool -@ $args  2>&1 | %{"$_"}');
+      PSList.Add('exiftool -@ $args 2>&1 | %{"$_"}');
       PSList.Add('Remove-Item -Path $args');
     end
     else

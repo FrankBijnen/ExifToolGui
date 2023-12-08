@@ -41,6 +41,7 @@ implementation
 uses
   Main,
   MainDef,
+  ExifToolsGUI_Utils,
   Vcl.Themes,
   Vcl.Styles;
 
@@ -50,7 +51,7 @@ procedure TFrmStyle.SetNewStyle(Style: string);
 begin
   GUIsettings.GuiStyle := Style;
   TStyleManager.TrySetStyle(GUIsettings.GuiStyle, false);
-  Fmain.SetGuiColor;
+  Fmain.SetGuiStyle;
 
   if (GUIsettings.GuiStyle = 'Windows') then // AV unregistering style hooks
     exit;
@@ -62,7 +63,8 @@ end;
 procedure TFrmStyle.RequestClose;
 begin
   Close; // First close this form, so items can be added again to the shellist
-  Fmain.ShellTree.Path := CurPath; // restore path
+  if ValidDir(CurPath) then
+    Fmain.ShellTree.Path := CurPath; // restore path
 end;
 
 procedure TFrmStyle.FormShow(Sender: TObject);

@@ -320,9 +320,9 @@ type
     procedure ExecETEvent_Done(ExecNum: word; EtCmds, EtOuts, EtErrs, StatusLine: string; PopupOnError: boolean);
     procedure ExecRestEvent_Done(Url, Response: string; Succes: boolean);
     procedure UpdateStatusBar_FilesShown;
-    procedure SetGuiColor;
+    procedure SetGuiStyle;
     var GUIBorderWidth, GUIBorderHeight: integer; // Initialized in OnShow
-    var GUIcolor: TColor;
+    var GUIColorWindow: TColor;
   end;
 
 var
@@ -2213,7 +2213,7 @@ begin
       end;
       if (ABitMap <> nil) then
       begin
-        ResizeBitmapCanvas(ABitMap, RotateImg.Width, RotateImg.Height, GUIcolor);
+        ResizeBitmapCanvas(ABitMap, RotateImg.Width, RotateImg.Height, GUIColorWindow);
         RotateImg.Picture.Bitmap := ABitMap;
         ABitMap.Free;
       end;
@@ -2312,7 +2312,7 @@ begin
 
   // Set Style
   TStyleManager.TrySetStyle(GUIsettings.GuiStyle, false);
-  SetGuiColor;
+  SetGuiStyle;
 
   // EdgeBrowser
   EdgeBrowser1.UserDataFolder := GetEdgeUserData;
@@ -3293,14 +3293,14 @@ begin // prevent NewSize=0 (disappearing Preview panel)
     NewSize := Splitter3.MinSize + 1;
 end;
 
-procedure TFMain.SetGuiColor;
+procedure TFMain.SetGuiStyle;
 var
   AStyleService: TCustomStyleServices;
 begin
-  GUIcolor := clBlack;
+  GUIColorWindow := clBlack;
   AStyleService := TStyleManager.Style[GUIsettings.GuiStyle];
   if Assigned(AStyleService) then
-    GUIcolor := AStyleService.GetStyleColor(scWindow);
+    GUIColorWindow := AStyleService.GetStyleColor(scWindow);
 end;
 
 procedure TFMain.ShellistThumbError(Sender: TObject; Item: TListItem; E: Exception);
