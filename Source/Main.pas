@@ -673,6 +673,7 @@ end;
 
 procedure TFMain.MGUIStyleClick(Sender: TObject);
 begin
+  ShellTree.SetFocus;
   with FrmStyle do
   begin
     CurPath := ShellList.Path;
@@ -2631,6 +2632,8 @@ procedure TFMain.ShellListPathChange(Sender: TObject);
 var
   ET_Active: boolean;
 begin
+  if FrmStyle.Showing then
+    exit;
   // Start ExifTool in this directory
   ET_Active := ET_StayOpen(TShellListView(Sender).Path);
 
