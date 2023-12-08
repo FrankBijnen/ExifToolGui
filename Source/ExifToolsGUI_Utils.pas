@@ -132,6 +132,20 @@ begin
   result := SFGAO_FILESYSTEM and Flags <> 0;
 end;
 
+function IsDesktop(AFolder: TShellFolder): boolean;
+var
+  DesktopPIDL: PItemIDList;
+  DesktopShellFolder: IShellFolder;
+begin
+  SHGetSpecialFolderLocation(0, CSIDL_DESKTOP, DesktopPIDL);
+  try
+    SHGetDesktopFolder(DesktopShellFolder);
+    result := DesktopShellFolder = AFolder.ShellFolder;
+  finally
+    CoTaskMemFree(DesktopPIDL);
+  end;
+end;
+
 function GetINIPath(AllowCreate: boolean = false): string;
 var
   NameBuffer: PChar;

@@ -534,6 +534,12 @@ function TShellListView.OwnerDataFetch(Item: TListItem; Request: TItemRequest): 
     FThumbNailCache[ItemIndx] := Item.ImageIndex; // Just try it once.
 
     // Allowed to generate?
+
+    // Folders, never.
+    if (Folders[ItemIndx].IsFolder) then
+      exit;
+
+    // AutoGenerate?
     if (FThumbAutoGenerate = false) then
       exit;
 

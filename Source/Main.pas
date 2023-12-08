@@ -2431,6 +2431,7 @@ begin
 
   // The shellList is initally disabled. Now enable and refresh
   PathFromParm := false;
+  ShellListSetFolders;
   ShellList.Enabled := true;
 
   // GUI started as "Send to" or "Open with":
@@ -2501,7 +2502,7 @@ begin
   if (CBoxFileFilter.Text <> SHOWALL) then
   begin
     Filter := CBoxFileFilter.Text;
-    FilterMatches := false;
+    FilterMatches := Afolder.IsFolder;
     while (FilterMatches = false) and (Filter <> '') do
     begin
       FilterItem := NextField(Filter, ';');
@@ -2803,6 +2804,7 @@ begin
     exclude(Value, TshellObjectType.otFolders);
   if (Value <> ShellList.ObjectTypes) then
     ShellList.ObjectTypes := Value;
+  PnlBreadCrumb.Visible := GUIsettings.ShowFolders;
 end;
 
 procedure TFMain.EnableMenus(Enable: boolean);
@@ -2842,8 +2844,6 @@ begin
     ETBarSeriesFnum.Clear;
   if Assigned(ETBarSeriesIso) then
     ETBarSeriesIso.Clear;
-
-  ShellListSetFolders;
 end;
 
 procedure TFMain.RefreshSelected(Sender: TObject);
