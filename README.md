@@ -1,5 +1,5 @@
 # ExifToolGui
-A GUI for ExifTool<br>
+<h4>A GUI for ExifTool</h4><br>
 This is an updated version of the ExifToolGui program created by Bogdan Hrastnik. Many thanks go out to him.
 
 Current version: <b>V6.2.7</b> updated December 25, 2023.<br>
