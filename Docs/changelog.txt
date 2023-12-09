@@ -38,6 +38,12 @@ Version:        Description             Issue
                 Fix Issue #111          Executing some commands make ExifToolGui hang. (Forgot CRLF)
                 Fix Issue #126          Reverse Geocoding (feature request) 
                 Fix Issue #140          Support long filenames (Path > MAX_PATH)
-6.2.6.0		Fix Issue #163		Add -echo4 CRLF {readyxx} CRLF to args file. so we know when to stop reading StdErr.
-		Fix Issue #164		Update Docs to reflect changes from V5.1.6 to V6.2.6
-		Fix Issue #167		Notice for missing WebView2Loader.dll
+6.2.6.0         Fix Issue #163          Add -echo4 CRLF {readyxx} CRLF to args file. so we know when to stop reading StdErr.
+                Fix Issue #164          Update Docs to reflect changes from V5.1.6 to V6.2.6
+                Fix Issue #167          Notice for missing WebView2Loader.dll
+6.2.7.0         Fix Issue #181          Add a peek/preview for strings in right panel
+                Fix Issue #183          Add the option to show folders in FileList
+                Fix Issue #186          Generated Powershell script generates 'Native Command Error'
+                Fix Issue #189          Style fixes for Green
+                Fix Issue #191          Add Custom options
+                Fix Issue #195          Add Breadcrumb bar. If folders are allowed to show
