@@ -1,13 +1,13 @@
 # ExifToolGui
-A GUI for ExifTool
+A GUI for ExifTool<br>
 This is an updated version of the ExifToolGui program created by Bogdan Hrastnik. Many thanks go out to him.
 
-Current version: <b>V6.2.7</b> updated December 25, 2023.
-Just a few small fixes. [Change log](Docs/changelog.txt)
-[Online documentation](https://htmlpreview.github.io/?https://github.com/FrankBijnen/ExifToolGui/blob/main/Docs/ExifToolGUI_V6.md)
-[Download Release](/releases)
+Current version: <b>V6.2.7</b> updated December 25, 2023.<br>
+Just a few small fixes. [Change log](Docs/changelog.txt)<br>
+[Online documentation](https://htmlpreview.github.io/?https://github.com/FrankBijnen/ExifToolGui/blob/main/Docs/ExifToolGUI_V6.md)<br>
+[Download Release](/releases)<br>
 
-More info:
+More info: <br>
  - [Docs directory](Docs/)
 
 Important: <br>
@@ -32,7 +32,7 @@ a stacktrace can be copied to the clipboard if an Exception occurs. Please also 
 
 <h4>Online Documentation.</h4>
 
- - [V6 Documentation html](https://htmlpreview.github.io/?https://github.com/FrankBijnen/ExifToolGui/blob/Development/Docs/ExifToolGUI_V6.md)
+ - [V6 Documentation html](https://htmlpreview.github.io/?https://github.com/FrankBijnen/ExifToolGui/blob/development/Docs/ExifToolGUI_V6.md)
  - [V6 Documentation md](/Docs/ExifToolGUI_V6.md)
 
 Frank
