@@ -8,6 +8,7 @@ Current version: <b>V6.2.7</b> updated December 25, 2023.<br>
 - Added option to add custom tags to Exiftool.<br>
 - Fix for generated Powershell script.<br>
 - Style fixes for Green.<br>
+
 [Change log](Docs/changelog.txt)<br>
 [Online documentation](https://htmlpreview.github.io/?https://github.com/FrankBijnen/ExifToolGui/blob/main/Docs/ExifToolGUI_V6.md)<br>
 [Download Release](https://github.com/FrankBijnen/ExifToolGui/releases/latest)<br>
