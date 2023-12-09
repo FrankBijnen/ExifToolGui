@@ -1,37 +1,18 @@
 # ExifToolGui
 A GUI for ExifTool
+This is an updated version of the ExifToolGui program created by Bogdan Hrastnik. Many thanks go out to him.
 
-Current version: <b>V6.2.6</b> updated November 25, 2023.
-Just a few small fixes. And some typos found when updating the docs.
-[Online documentation available](https://htmlpreview.github.io/?https://github.com/FrankBijnen/ExifToolGui/blob/main/Docs/ExifToolGUI_V6.md)
+Current version: <b>V6.2.7</b> updated December 25, 2023.
+Just a few small fixes. [Change log](Docs/changelog.txt)
+[Online documentation](https://htmlpreview.github.io/?https://github.com/FrankBijnen/ExifToolGui/blob/main/Docs/ExifToolGUI_V6.md)
+[Download Release](/releases)
 
-Previous version: <b>V6.2.5</b> updated November 12, 2023.
-The V6.2.5 release features 2 major changes.<br>
-1) [GeoCoding](/Docs/Readme%20GeoCoding.txt) You can now choose from 2 GeoCoding providers, and use Reverse GeoCoding to lookup Country, Province and City from GPS coordinates.<br>
-2) [Lossless rotate and crop, import and export previews](/Docs/Readme%20Lossless%20rotate_Import_Export%20previews.txt) The external programs Jhead and JpegTrans are replaced by native Delphi code, using a modified library NativeJpg by SimDesign B.V. Exporting and Importing previews has been revised.<br>
-
-Besides these 2 updates, some smaller updates/bugfixes were applied. See the [ChangeLog](Docs/changelog.txt) for more info.
-
-I have noticed that recently ExifToolGui is downloaded from sites that propagate portable use. Please read [Portable use](/Docs/Readme%20Portable.txt) for more info.
+More info:
+ - [Docs directory](Docs/)
 
 Important: <br>
 To help Bug hunting there are also Map files released. If you place the Map file in the same directory as the Executable
 a stacktrace can be copied to the clipboard if an Exception occurs. Please also provide the stacktrace if you report an Exception.
-
-This is an updated version of the ExifToolGui program created by Bogdan Hrastnik. Many thanks go out to him.
-
-This updated source addresses the following issues.
-
-1) Compiles with Delphi Community Edition. Without any 3rd party libraries.
-2) Added styles.
-3) Image preview is done with WIC. The autorotate should be available for more formats then just JPG
-4) The Google Map is replaced by OSM map. The internal browser is now based on Edge, and not on IE.
-
- To achieve this the source had to be modified quite a lot. Dont expect a flawless product.
-
- See also:
- - [Readme for Users](Docs/ReadMe%20for%20Users.txt)
- - [Docs directory](Docs/)
 
 # Useful links
 
@@ -51,9 +32,7 @@ This updated source addresses the following issues.
 
 <h4>Online Documentation.</h4>
 
- - [V516 Documentation html](https://htmlpreview.github.io/?https://github.com/FrankBijnen/ExifToolGui/blob/main/Docs/Original%20notes/ExifToolGUI_V516.htm)
-
- - [V6 Documentation html](https://htmlpreview.github.io/?https://github.com/FrankBijnen/ExifToolGui/blob/main/Docs/ExifToolGUI_V6.md)
+ - [V6 Documentation html](https://htmlpreview.github.io/?https://github.com/FrankBijnen/ExifToolGui/blob/Development/Docs/ExifToolGUI_V6.md)
  - [V6 Documentation md](/Docs/ExifToolGUI_V6.md)
 
 Frank
