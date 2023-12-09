@@ -12,10 +12,10 @@ Current version: <b>V6.2.7</b> updated December 25, 2023.<br>
 [Change log](Docs/changelog.txt)<br>
 [Download Release](https://github.com/FrankBijnen/ExifToolGui/releases/latest)<br>
 
-<h4>Important<h4><br>
-To help Bug hunting there are also Map files released. If you place the Map file in the same directory as the Executable
+<h4>Important</h4><br>
+- [Please <b>read</b> the Requirements and preparation](https://github.com/FrankBijnen/ExifToolGui/blob/main/Docs/ExifToolGUI_V6.md/#m_reqs_general)<br>
+- To help Bug hunting there are also Map files released. If you place the Map file in the same directory as the Executable
 a stacktrace can be copied to the clipboard if an Exception occurs. Please also provide the stacktrace if you report an Exception.<br>
-[Please <b>read</b> the Requirements and preparation](https://github.com/FrankBijnen/ExifToolGui/blob/main/Docs/ExifToolGUI_V6.md/#m_reqs_general)<br>
 
 # Useful links
 
