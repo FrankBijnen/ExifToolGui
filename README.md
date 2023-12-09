@@ -5,7 +5,7 @@ This is an updated version of the ExifToolGui program created by Bogdan Hrastnik
 Current version: <b>V6.2.7</b> updated December 25, 2023.<br>
 Just a few small fixes. [Change log](Docs/changelog.txt)<br>
 [Online documentation](https://htmlpreview.github.io/?https://github.com/FrankBijnen/ExifToolGui/blob/main/Docs/ExifToolGUI_V6.md)<br>
-[Download Release](/releases)<br>
+[Download Release](https://github.com/FrankBijnen/ExifToolGui/releases/latest)<br>
 
 More info: <br>
  - [Docs directory](Docs/)
@@ -32,7 +32,7 @@ a stacktrace can be copied to the clipboard if an Exception occurs. Please also 
 
 <h4>Online Documentation.</h4>
 
- - [V6 Documentation html](https://htmlpreview.github.io/?https://github.com/FrankBijnen/ExifToolGui/blob/development/Docs/ExifToolGUI_V6.md)
+ - [V6 Documentation html](https://htmlpreview.github.io/?https://github.com/FrankBijnen/ExifToolGui/blob/main/Docs/ExifToolGUI_V6.md)
  - [V6 Documentation md](/Docs/ExifToolGUI_V6.md)
 
 Frank
