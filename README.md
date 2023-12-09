@@ -33,7 +33,6 @@ a stacktrace can be copied to the clipboard if an Exception occurs. Please also 
 <h4>Obtaining WebWiew2Loader.dll</h4>
 
 -  https://nuget.info/packages/Microsoft.Web.WebView2/
--  See [Readme for Users](Docs/ReadMe%20for%20Users.txt) for more info.
 
 <h4>Online Documentation</h4>
 
