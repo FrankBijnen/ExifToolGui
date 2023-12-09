@@ -15,7 +15,6 @@ type
     LblSource: TLabel;
     LblForum: TLabel;
     LblExifTool: TLabel;
-    LblJpegTools: TLabel;
     LblScreen: TLabel;
     procedure FormShow(Sender: TObject);
     procedure LblOpenUrl(Sender: TObject);
@@ -94,18 +93,6 @@ begin
     LblExifTool.Caption := LblExifTool.Caption + Output
   else
     LblExifTool.Caption := LblExifTool.Caption + 'MISSING!';
-
-  LblJpegTools.Caption := 'jhead.exe=';
-  if HasJHead then
-    LblJpegTools.Caption := LblJpegTools.Caption + 'ready'
-  else
-    LblJpegTools.Caption := LblJpegTools.Caption + 'missing';
-
-  LblJpegTools.Caption := LblJpegTools.Caption + ',  jpegtran.exe=';
-  if HasJpegTran then
-    LblJpegTools.Caption := LblJpegTools.Caption + 'ready'
-  else
-    LblJpegTools.Caption := LblJpegTools.Caption + 'missing';
 
   X := Screen.Width;
   Y := Screen.Height;

@@ -109,19 +109,12 @@ type
     MImportGPSLog: TMenuItem;
     MImportXMPLog: TMenuItem;
     N7: TMenuItem;
-    MExtractPreview: TMenuItem;
-    MJPGfromCR2: TMenuItem;
-    MJPGfromNEF: TMenuItem;
-    MJPGfromRW2: TMenuItem;
     MExifDateTimeEqualize: TMenuItem;
     N8: TMenuItem;
     MRemoveMeta: TMenuItem;
     MExifLensFromMaker: TMenuItem;
     MVarious: TMenuItem;
     MFileDateFromExif: TMenuItem;
-    MJPGAutorotate: TMenuItem;
-    MEmbedPreview: TMenuItem;
-    MJPGtoCR2: TMenuItem;
     MExportMetaEXIF: TMenuItem;
     MShowSorted: TMenuItem;
     N6: TMenuItem;
@@ -167,7 +160,6 @@ type
     N4: TMenuItem;
     MAPIWindowsWideFile: TMenuItem;
     EditFindMeta: TLabeledEdit;
-    N9: TMenuItem;
     GenericExtractPreviews: TMenuItem;
     GenericImportPreview: TMenuItem;
     JPGGenericlosslessautorotate1: TMenuItem;
@@ -236,13 +228,10 @@ type
     procedure MExportMetaTXTClick(Sender: TObject);
     procedure MImportGPSLogClick(Sender: TObject);
     procedure MImportXMPLogClick(Sender: TObject);
-    procedure MJPGfromCR2Click(Sender: TObject);
     procedure MExifDateTimeEqualizeClick(Sender: TObject);
     procedure MRemoveMetaClick(Sender: TObject);
     procedure MExifLensFromMakerClick(Sender: TObject);
     procedure MFileDateFromExifClick(Sender: TObject);
-    procedure MJPGAutorotateClick(Sender: TObject);
-    procedure MJPGtoCR2Click(Sender: TObject);
     procedure MAboutClick(Sender: TObject);
     procedure QuickPopUp_FillQuickClick(Sender: TObject);
     procedure SpeedBtn_GeotagClick(Sender: TObject);
@@ -1173,55 +1162,6 @@ begin
   end;
 end;
 
-// TODO: deprecated
-procedure TFMain.MJPGAutorotateClick(Sender: TObject);
-var
-  Img: string;
-  FileName: string;
-  AnItem: TListItem;
-begin
-  if not HasJpegTran or
-     not HasJHead then
-  begin
-    ShowMessage('Missing jhead.exe && jpegtran.exe!');
-    exit;
-  end;
-
-  if (ShellList.SelCount < 1) then
-  begin
-    ShowMessage('No files selected.');
-    exit;
-  end;
-
-  if MessageDlg('This will rotate selected JPG files according to' + #10#13 + 'existing Exif:Orientation value.' + #10#13 +
-    'In case menu Preserve Date modified is checked,' + #10#13 + 'Exif DateTime values (on ALL selected files) will' + #10#13 +
-    'be used for this purpose.' + #10#13#10#13 + 'OK to proceed?', mtInformation, [mbOk, mbCancel], 0) = mrOK then
-  begin
-    img := '';
-    for AnItem in ShellList.Items do
-    begin
-      if (AnItem.Selected = false) then
-        continue;
-      if (IsJpeg(ShellList.FileName(AnItem.Index)) = false) then
-        continue;
-      FileName := ShellList.FileName(AnItem.Index);
-      Img := Img + ' "' + FileName + '"';
-    end;
-
-    // Execute at once.
-    if MPreserveDateMod.Checked then
-      Img := ' -ft' + Img;
-    // ^ sets win DateModified as in Exif:DateTimeOriginal>ModifyDate>CreateDate
-    if ExecCMD('jhead -autorot -q' + Img, ShellList.Path) and
-       ExecCMD('jhead -norot -q' + Img, ShellList.Path) then
-      ShowMessage('Autorotate finished.');
-
-    RefreshSelected(Sender);
-    ShowMetadata;
-    ShowPreview;
-  end;
-end;
-
 procedure TFMain.JPGGenericlosslessautorotate1Click(Sender: TObject);
 begin
   if FLossLessRotate.ShowModal = mrOK then
@@ -1229,137 +1169,6 @@ begin
     RefreshSelected(Sender);
     ShowMetadata;
     ShowPreview;
-  end;
-end;
-
-//TODO: Deprecated
-procedure TFMain.MJPGfromCR2Click(Sender: TObject);
-var
-  b: Word;
-  ETcmd, ETout, ETerr: string;
-begin
-  b := MessageDlg('Create JPG files in subfolder?', mtConfirmation, mbYesNoCancel, 0);
-  if b <> mrCancel then
-  begin
-    ETcmd := '-w' + CRLF;
-    if b = mrYes then
-      ETcmd := ETcmd + 'preview\';
-    if b = mrYes then
-      ETcmd := ETcmd + '%f.jpg'
-    else
-      ETcmd := ETcmd + '%f_%e.jpg';
-    ETcmd := ETcmd + CRLF + '-b' + CRLF;
-    if Sender = MJPGfromCR2 then
-      ETcmd := ETcmd + '-PreviewImage' + CRLF + '-ext' + CRLF + 'CR2' + CRLF + '-ext' + CRLF + 'DNG';
-    if Sender = MJPGfromNEF then
-      ETcmd := ETcmd + '-JpgFromRaw' + CRLF + '-ext' + CRLF + 'NEF' + CRLF + '-ext' + CRLF + 'NRW';
-    if Sender = MJPGfromRW2 then
-      ETcmd := ETcmd + '-JpgFromRaw' + CRLF + '-ext' + CRLF + 'RW2' + CRLF + '-ext' + CRLF + 'PEF';
-    ET_OpenExec(ETcmd, GetSelectedFiles, ETout, ETerr);
-    RefreshSelected(Sender);
-    ShowMetadata;
-  end;
-end;
-
-//TODO: Deprecated
-procedure TFMain.MJPGtoCR2Click(Sender: TObject);
-var
-  i, j: integer;
-  n, W, H, c: Word;
-  dirJPG, Img, tx, txH, txW, outs, errs, AllErrs: string;
-begin
-
-  if (not HasJpegTran) then
-  begin
-    ShowMessage('Missing jpegtran.exe!');
-    exit;
-  end;
-
-  n := MessageDlg('Only those JPG images will be embedded into selected'#10#13 + 'CR2 files, where:' + #10#13 + '- CR2/JPG filenames are equal,' +
-    #10#13 + '- JPG width or height is min 512pix,' + #10#13 + '- JPG width & height is multiple of 8.' + #10#13 +
-    'Metadata of imported JPG files will be deleted.' + #10#13#10#13 + 'Next: Select folder containing JPG files. OK to proceed?', mtInformation,
-    [mbOk, mbCancel], 0);
-  j := ShellList.SelCount;
-  if (n = mrOK) and (j > 0) then
-  begin
-    dirJPG := BrowseFolderDlg('Select folder containing JPG images', 1, ShellList.Path);
-    if dirJPG <> '' then
-    begin
-      if dirJPG[length(dirJPG)] <> '\' then
-        dirJPG := dirJPG + '\';
-      AllErrs := '';
-      c := 0;
-      for i := 0 to j - 1 do
-      begin
-        StatusBar.Panels[1].Text := IntToStr(j - i);
-        Img := ShellList.FileName(i);
-        tx := ShellList.FileExt(i);
-        if UpperCase(tx) = '.CR2' then
-        begin
-          n := pos(tx, Img); // get file extension position
-          SetLength(Img, n); // filename ending with dot (without extension)
-          if FileExists(dirJPG + Img + 'jpg') then
-          begin
-            ET_OpenExec('-s3' + CRLF + '-ImageSize', GetSelectedFile(dirJPG + Img + 'jpg', false), outs, errs);
-            if (errs <> '') then
-            begin
-              AllErrs := AllErrs + Img + ' ' + errs + CRLF;
-              continue;
-            end;
-
-            tx := outs;
-            txH := NextField(tx, #13#10);
-            txW := Nextfield(txh, 'x');
-            W := StrToIntDef(txW, 0);
-            H := StrToIntDef(txH, 0);
-            if H > W then
-            begin // jpg is portrait
-              n := W;
-              W := H;
-              H := n;
-              ET_OpenExec('-s3' + CRLF + '-exif:Orientation#', GetSelectedFile(Img + 'cr2', false), outs, errs);
-              n := StrToIntDef(LeftStr(outs, 1), 1);
-            end
-            else
-              n := 1;
-
-            if (W >= 512) and ((W mod 8) = 0) and ((H mod 8) = 0) then
-            begin
-              // remove all Exif data
-              ET_OpenExec('-m' + CRLF + '-All=', GetSelectedFile(dirJPG + Img + 'jpg', false));
-              case n of
-                6:
-                  tx := 'jpegtran -rotate 270 ';
-                8:
-                  tx := 'jpegtran -rotate 90 ';
-              end;
-              if n <> 1 then
-                ExecCMD(tx + Img + 'jpg ' + Img + 'jpg', dirJPG);
-              tx := '-PreviewImage<=' + dirJPG + '%f.jpg';
-              tx := tx + CRLF + '-IFD0:ImageWidth=' + IntToStr(W);
-              tx := tx + CRLF + '-IFD0:ImageHeight=' + IntToStr(H);
-              ET_OpenExec(tx, GetSelectedFile(Img + 'cr2', false));
-              inc(c);
-            end
-            else
-              AllErrs := AllErrs + Img + ' JPG -invalid size' + CRLF
-          end
-          else
-            AllErrs := AllErrs + Img + ' JPG -not found' + CRLF;
-        end;
-      end;
-      StatusBar.Panels[1].Text := IntToStr(c) + ' of ' + IntToStr(j) + ' files updated.';
-      if length(AllErrs) > 0 then
-      with FLogWin do
-      begin
-        // Clear all other data
-        LBExecs.Clear;
-        MemoOuts.Clear;
-        MemoCmds.Clear;
-        MemoErrs.Text := AllErrs;
-        Show;
-      end;
-    end;
   end;
 end;
 
@@ -2350,8 +2159,6 @@ begin
   CBoxFileFilter.Text := SHOWALL;
   ExifTool.ExecETEvent := ExecETEvent_Done;
   Geomap.ExecRestEvent := ExecRestEvent_Done;
-  MEmbedPreview.Enabled := HasJpegTran;
-  MJPGAutorotate.Enabled := HasJHead and HasJpegTran;
 end;
 
 // ---------------Drag_Drop procs --------------------

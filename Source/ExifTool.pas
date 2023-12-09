@@ -58,10 +58,6 @@ procedure ET_OpenExit(WaitForClose: boolean = false);
 function ExecET(ETcmd, FNames, WorkDir: string; var ETouts, ETErrs: string): boolean; overload;
 function ExecET(ETcmd, FNames, WorkDir: string; var ETouts: string): boolean; overload;
 
-//TODO: Deprecated with JHead and JpegTran
-function ExecCMD(xCmd, WorkDir: string; var ETouts, ETErrs: string): boolean; overload;
-function ExecCMD(xCmd, WorkDir: string): boolean; overload;
-
 implementation
 
 uses System.SysUtils, System.SyncObjs, Winapi.Windows, Main, MainDef, ExifToolsGUI_Utils, ExifTool_PipeStream;
@@ -444,89 +440,6 @@ end;
 
 // ^^^^^^^^^^^^^^^^^^^^^^^^^^ End of ET Classic mode ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 //
-// ==============================================================================
-//TODO: Deprecated with JHead and JpegTran
-function ExecCMD(xCmd, WorkDir: string; var ETouts, ETErrs: string): boolean;
-var
-  ReadOut: TReadPipeThread;
-  ReadErr: TReadPipeThread;
-  ProcessInfo: TProcessInformation;
-  SecurityAttr: TSecurityAttributes;
-  StartupInfo: TStartupInfo;
-  PipeOutRead, PipeOutWrite: THandle;
-  PipeErrRead, PipeErrWrite: THandle;
-  PWorkDir: PChar;
-  CrWait, CrNormal: HCURSOR;
-begin
-  FillChar(ProcessInfo, SizeOf(TProcessInformation), #0);
-  FillChar(SecurityAttr, SizeOf(TSecurityAttributes), #0);
-  SecurityAttr.nLength := SizeOf(SecurityAttr);
-  SecurityAttr.bInheritHandle := true;
-  SecurityAttr.lpSecurityDescriptor := nil;
-  CreatePipe(PipeOutRead, PipeOutWrite, @SecurityAttr, 0);
-  CreatePipe(PipeErrRead, PipeErrWrite, @SecurityAttr, 0);
-  FillChar(StartupInfo, SizeOf(TStartupInfo), #0);
-  StartupInfo.cb := SizeOf(StartupInfo);
-  with StartupInfo do
-  begin
-    hStdInput := 0;
-    hStdOutput := PipeOutWrite;
-    hStdError := PipeErrWrite;
-    wShowWindow := SW_HIDE;
-    dwFlags := STARTF_USESHOWWINDOW or STARTF_USESTDHANDLES;
-  end;
-  if WorkDir = '' then
-    PWorkDir := nil
-  else
-    PWorkDir := PChar(WorkDir);
-
-  CrWait := LoadCursor(0, IDC_WAIT);
-  CrNormal := SetCursor(CrWait);
-  try
-    UniqueString(xCmd); // Required by CreateprocessW
-    result := CreateProcess(nil, PChar(xCmd), nil, nil, true,
-                            CREATE_DEFAULT_ERROR_MODE or CREATE_NEW_CONSOLE or NORMAL_PRIORITY_CLASS,
-                            nil, PWorkDir, StartupInfo, ProcessInfo);
-
-    CloseHandle(PipeOutWrite);
-    CloseHandle(PipeErrWrite);
-
-    if result then
-    begin
-      // ========= Read StdOut and stdErr =======================
-      ReadOut := TReadPipeThread.Create(PipeOutRead, SizePipeBuffer);
-      SetCounter(nil, 0);
-      ReadErr := TReadPipeThread.Create(PipeErrRead, SizePipeBuffer);
-      try
-        ReadOut.WaitFor;
-        ETouts := ReadOut.PipeStream.AsString;
-
-        ReadErr.WaitFor;
-        ETErrs := ReadErr.PipeStream.AsString;
-      finally
-        ReadOut.Free;
-        ReadErr.Free;
-      end;
-
-      // ----------------------------------------------
-      WaitForSingleObject(ProcessInfo.hProcess, GUIsettings.ETTimeOut); // msec=5sec /or INFINITE
-      CloseHandle(ProcessInfo.hThread);
-      CloseHandle(ProcessInfo.hProcess);
-    end;
-  finally
-    CloseHandle(PipeOutRead);
-    CloseHandle(PipeErrRead);
-    SetCursor(CrNormal);
-  end;
-end;
-
-//TODO: Deprecated with JHead and JpegTran
-function ExecCMD(xCmd, WorkDir: string): boolean;
-var
-  ETout, ETerr: string;
-begin
-  result := ExecCMD(xCmd, WorkDir, ETout, ETerr);
-end;
 // ==============================================================================
 
 initialization

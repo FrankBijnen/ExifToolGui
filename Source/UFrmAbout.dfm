@@ -105,14 +105,6 @@ object FrmAbout: TFrmAbout
     AutoSize = False
     Caption = 'LblExifTool'
   end
-  object LblJpegTools: TLabel
-    Left = 56
-    Top = 181
-    Width = 340
-    Height = 15
-    AutoSize = False
-    Caption = 'LblJpegTools'
-  end
   object LblScreen: TLabel
     Left = 56
     Top = 208
@@ -129,12 +121,12 @@ object FrmAbout: TFrmAbout
     Align = alBottom
     TabOrder = 0
     ExplicitTop = 223
-    ExplicitWidth = 368
+    ExplicitWidth = 406
     DesignSize = (
       414
       29)
     object BtnOk: TBitBtn
-      Left = 300
+      Left = 292
       Top = 2
       Width = 75
       Height = 25
@@ -160,7 +152,7 @@ object FrmAbout: TFrmAbout
       ModalResult = 1
       NumGlyphs = 2
       TabOrder = 0
-      ExplicitLeft = 254
+      ExplicitLeft = 284
     end
   end
 end
