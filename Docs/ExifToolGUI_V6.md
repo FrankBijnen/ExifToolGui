@@ -995,7 +995,7 @@ P.S.: Don't blame me for my English grammar -it's not my native language.<br>
 </em>
 <br>
 Frank<br>
-Modified on November, 2023<br>
+Modified on December, 2023<br>
 <br>
 
 <u>You may find additional info in the ReadMe files:</u>
@@ -1003,6 +1003,7 @@ Modified on November, 2023<br>
 <li><a href="ReadMe for Developers.txt">ReadMe for Developers</a></li>
 <li><a href="..\Source\Vcl.ShellControls\ReadMe.txt">ReadMe ShellControls</a></li>
 <li><a href="..\Source\NativeJpg\README.txt">ReadMe NativeJpg</a></li>
+<li><a href="..\Source\BeadcrumbBar\README.txt">ReadMe Breaddcrum Bar</a></li>
 <li><a href="ReadMe for Users.txt">ReadMe for Users</a></li>
 <li><a href="Readme GeoCoding.txt">Readme GeoCoding</a></li>
 <li><a href="Readme Long filenames.txt">Readme Long filenames</a></li>
