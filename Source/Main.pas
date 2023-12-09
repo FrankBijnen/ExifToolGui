@@ -2672,13 +2672,19 @@ begin
   end;
 
   if not Enable then
-    MessageDlgEx('ERROR: ExifTool not found!' + #10 + #10 + #10 + 'To resolve this you can:' + #10 + '- Install Exiftool in: ' + GetAppPath + #10 +
-      '- Install Exiftool in a directory in the Windows search sequence.' + #10 + #9 +
-      'For example in a directory specified in the PATH environment variable.' + #10 + #9 +
-      'For more info see the documentation on the CreateProcess function.' + #10 +
-      '- Locate Exiftool.exe and specify the location in Preferences/Other.' + #10 + #10 +
-      'For info on obtaining Exiftool, follow the link in the About box to Github.' + #10 + #10 + 'Metadata operations disabled.', 'ExifToolGUI',
-      TMsgDlgType.mtError, [mbOk], Self);
+    if (MessageDlgEx('ERROR: ExifTool could not be started!' + #10 +  #10 +
+        'To resolve this you can:' + #10 +
+        '- Install Exiftool in: ' + GetAppPath + #10 +
+        '- Install Exiftool in a directory in the Windows search sequence.' + #10 + #9 +
+        'For example in a directory specified in the PATH environment variable.' + #10 + #9 +
+        'For more info see the documentation on the CreateProcess function.' + #10 +
+        '- Locate Exiftool.exe and specify the location in Preferences/Other.' + #10 + #10 +
+        'Metadata operations disabled.' + #10 + #10 +
+        'Note: This error can also occur if you browse to an invalid folder. A DVD/CD drive without media for example.' + #10 + #10 +
+        'Show Online help?', '',
+        TMsgDlgType.mtError, [TMsgDlgBtn.mbYes, TMsgDlgBtn.mbNo]) = ID_YES) then
+      ShellExecute(0, 'Open', PWideChar(ONLINE_DOC_URL + '/#m_reqs_exiftool'), '', '', SW_SHOWNORMAL);
+
 end;
 
 procedure TFMain.ShellTreeChanging(Sender: TObject; Node: TTreeNode; var AllowChange: Boolean);

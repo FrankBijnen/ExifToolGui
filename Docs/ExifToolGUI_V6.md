@@ -12,6 +12,7 @@
 <h1>ExifToolGUI for Windows v6.xx</h1><hr>
 <h2>Introduction</h2>
 In the summer of 2023 I decided to revive the ExifToolGui project initally created by <b>Bogdan Hrastnik</b>.
+This revival resulted in <b>Version 6</b><br>
 Read his complete documentation <a href="https://htmlpreview.github.io/?https://github.com/FrankBijnen/ExifToolGui/blob/Development/Docs/Original%20notes/ExifToolGUI_V516.htm"><b>here</b></a><br><br>
 This was his intro, I will quote it now, because it still holds for me:<br><br>
 <em>
@@ -27,7 +28,7 @@ The only downside for many potential users is the fact, that ExifTool is
  (GUI), so all work must be done by typing commands inside "Command 
 Prompt" window. Such approach gives ExifTool great flexibility, but is 
 somehow difficult to use -especially for those, who don't use ExifTool 
-regulary.<br>
+regularly.<br>
 <br>
 
 So, I've decided to make some simple ExifTool GUI for my private use. 
@@ -56,7 +57,7 @@ Basic idea behind GUI is, to keep it <u>simple!</u> Thus, only those options are
 <li>Better support for international characters. All internal code now uses Unicode (UTF16), to interface with Exiftool UTF8.</li>
 <li>Enhanced Log Window. The last 10 commands are shown, with their respective output and error. Option to replay the command in PowerShell/Cmd prompt.</li>
 <li>The external programs Jhead.exe and Jpegtran.exe are no longer needed. Rotation, and cropping, are handled in Delphi native code. With a modified library called NativeJpg by SimDesign B.V. (I tried contacting SimDesign to verify the Licence requirements, but was unable to.)</li>
-<li>Exporting and Importing previews has been revised, and offer greater flexability.</li>
+<li>Exporting and Importing previews has been revised, and offer greater flexibility.</li>
 <li>GeoCoding has been enhanced. You can now choose from 2 providers (https://overpass-api.de and https://geocode.maps.co) and lookup City, Province and Country from GPS coordinates AKA reverse GeoCoding.</li>
 <li>Option added to show folders in the FileList panel.</li>
 <li>Possibility to add Custom options to Exiftool.</li>
@@ -83,7 +84,6 @@ If you want Windows to be able to always find ExifTool, then add the directory w
 <li>You can overrule the location of exiftool in Preferences/other.</li>
 <li>In case you've done something wrong in this regard, you'll see an error message when GUI starts.</li>
 </ul>
-
 
 <h3><a name="m_reqs_exiftoolgui">2. ExifToolGUI</h3>
 You can download GUI from <a href="https://github.com/FrankBijnen/ExifToolGui/releases"><b>here</b></a>.
