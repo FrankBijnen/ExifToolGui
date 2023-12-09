@@ -253,10 +253,10 @@ If you check this, double-clicking in the Workspace will remove a tag,
 double-clicking on one of the tabs Exif, Xmp, Iptc, Maker, All will add that tag to the Workspace.
 <br><br>
 <b>Exiftool.exe location</b><br>
-If you need to override the location of exiftool.exe you can do that here.
+If you need to override the location of exiftool.exe you can do that here.<br><br>
 <b>Filelist: Show Folders in Filelist</b><br>
-Default only files are shown in the Filelist panel. If you enable this option, also folders (directories) will be shown, allowing easier navigation.<br>
-It will also enable a BreadCrumb bar. 
+The default setting is to only show files in the Filelist panel. If you enable this option, also folders (directories) will be shown, allowing easier navigation.<br>
+It will also enable a BreadCrumb bar.<br><br>
 <b>Hint pause timeout in Millisecs</b><br>
 Hovering over the metadata panel will display the complete metadata value as a hint. This was added because long values are often not completely visible.<br>
 Setting this value to 0 (zero) will effectively disable the hints.
@@ -553,16 +553,6 @@ cases, that will be the same folder where image files reside.</li>
 ...and that's it.<br>
 <br>
 
-<h3>Extract preview image from selected: raw files (Deprecated)</h3>
-This function has been replaced by <b>Generic extract previews</b> and will be
-removed in a next release.
-<br>
-
-<h3>Embed preview image into selected: raw files (Deprecated)</h3>
-This function has been replaced by <b>Generic import preview</b> and will be
-removed in a next release.
-<br>
-
 <h3>Generic extract previews</h3>
 As you may know raw image files can also contain a JPG image, which serves for
 previewing raw image file content. In most cases, this JPG image is "as
@@ -633,11 +623,6 @@ If you have a backup tool that relies on the Date Modified, it will not notice t
 <br>
 <h3>File: Name=DateTime+Name</h3>
 <img src="ExifToolGUI_V6_files/renamefiles.jpg"><br>
-<br>
-
-<h3>JPG: Lossless autorotate (Deprecated)</h3>
-This menu still uses external program jhead.exe. (if available) But will be removed in a next release. Use the next menu-item.<br>
-<br>
 <br>
 
 <h3>JPG: Lossless autorotate + crop</h3>
