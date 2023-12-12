@@ -4,7 +4,7 @@ interface
 
 uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
-  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.ExtCtrls, Vcl.StdCtrls, Vcl.Buttons, Vcl.ComCtrls;
+  Vcl.Controls, UnitScaleForm, Vcl.Dialogs, Vcl.ExtCtrls, Vcl.StdCtrls, Vcl.Buttons, Vcl.ComCtrls;
 
 const
   CM_ThumbGenStart = WM_USer + 1;
@@ -16,7 +16,7 @@ const
   CM_ThumbGenWantsToClose = WM_USer + 3;
 
 type
-  TFrmGenerate = class(TForm)
+  TFrmGenerate = class(TScaleForm)
     LblGenerate: TLabel;
     PnlBottom: TPanel;
     PbProgress: TProgressBar;

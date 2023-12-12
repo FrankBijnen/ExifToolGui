@@ -5,11 +5,11 @@ interface
 uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants,
   System.Classes, Vcl.Graphics,
-  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, Vcl.ExtCtrls,
+  Vcl.Controls, Vcl.Forms, UnitScaleForm, Vcl.Dialogs, Vcl.StdCtrls, Vcl.ExtCtrls,
   Vcl.ComCtrls;
 
 type
-  TFCopyMetaSingle = class(TForm)
+  TFCopyMetaSingle = class(TScaleForm)
     StatusBar1: TStatusBar;
     AdvPanel1: TPanel;
     CheckBox1: TCheckBox;

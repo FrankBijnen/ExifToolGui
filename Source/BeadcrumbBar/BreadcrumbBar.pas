@@ -164,11 +164,12 @@ type
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
     procedure UpdateBreadcrumbs;
-    property EditMode: boolean read IsEditMode;
     function GetBreadcrumb(Index: integer): string;
     function GetBreadcrumbListItem(Index: integer): string;
     property CrumbDown: integer read GetCrumbDown;
     property DoubleBuffered;
+    property EditMode: boolean read IsEditMode;
+    property Font;
     property Home: string read FHome write SetHome;
     property Style: string read FStyle write SetStyle;
   end;
@@ -241,6 +242,7 @@ begin
   inherited;
   FCurrentItems := TStringList.Create;
   FCurrentListItems := TStringList.Create;
+  TStringList(FCurrentListItems).Sorted := true;
 
   FPopupListBox := TPopupListbox.Create(Self);
   FPopupListBox.OnSelect := ArrowItemClick;
@@ -626,7 +628,7 @@ begin
   Canvas.Pen.Style := psSolid;
   with r do
     Rectangle(Canvas.Handle, Left, Top, Right, Bottom);
-
+  Canvas.Font.Assign(Font);
   for i := 0 to FCurrentItems.Count - 1 do
   begin
 

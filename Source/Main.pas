@@ -17,13 +17,14 @@ uses
   VclTee.TeeGDIPlus, VclTee.TeEngine, VclTee.TeeProcs, VclTee.Chart,
   VclTee.Series, // Chart
   BreadcrumbBar,
+  UnitScaleForm,
   ExifToolsGUI_ShellTree, // Extension of ShellTreeView
   ExifToolsGUI_ShellList, // Extension of ShellListView
   ExifToolsGUI_Thumbnails, // Thumbnails
   ExifToolsGUI_Utils; // Various
 
 type
-  TFMain = class(TForm)
+  TFMain = class(TScaleForm)
     MainMenu: TMainMenu;
     MProgram: TMenuItem;
     MAbout: TMenuItem;
@@ -2118,6 +2119,7 @@ begin
   // Create Bread Crumb
   BreadcrumbBar := TDirBreadcrumbBar.Create(Self);
   BreadcrumbBar.Parent := PnlBreadCrumb;
+  BreadcrumbBar.Font := PnlBreadCrumb.Font;
   BreadcrumbBar.Align := alClient;
   BreadcrumbBar.OnChange := BreadCrumbClick;
   BreadcrumbBar.OnHome := BreadCrumbHome;
@@ -2247,7 +2249,7 @@ begin
   if GUIsettings.UseExitDetails then
     CBoxDetailsChange(Sender);
 
-  DontSaveIni := FindCmdLineSwitch('DontSaveIni');
+  DontSaveIni := FindCmdLineSwitch('DontSaveIni', true);
 
   // The shellList is initally disabled. Now enable and refresh
   PathFromParm := false;
@@ -3149,6 +3151,7 @@ procedure TFMain.SetGuiStyle;
 var
   AStyleService: TCustomStyleServices;
 begin
+  GUIsettings.DesignPPI := GetDesignDpi;
   GUIColorWindow := clBlack;
   AStyleService := TStyleManager.Style[GUIsettings.GuiStyle];
   if Assigned(AStyleService) then

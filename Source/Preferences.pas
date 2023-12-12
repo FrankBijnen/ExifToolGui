@@ -6,11 +6,11 @@ interface
 uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants,
   System.Classes, Vcl.Graphics,
-  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls,
+  Vcl.Controls, Vcl.Forms, UnitScaleForm, Vcl.Dialogs, Vcl.StdCtrls,
   Vcl.ComCtrls, Vcl.ExtCtrls, Vcl.Mask, Vcl.Buttons;
 
 type
-  TFPreferences = class(TForm)
+  TFPreferences = class(TScaleForm)
     AdvPageControl1: TPageControl;
     AdvTabGeneral: TTabSheet;
     Label1: TLabel;

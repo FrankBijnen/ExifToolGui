@@ -4,10 +4,10 @@ interface
 
 uses
   Winapi.Windows, Winapi.Messages, Vcl.StdCtrls, Vcl.Buttons, System.Classes,
-  Vcl.Controls, Vcl.ExtCtrls, Vcl.Forms;
+  Vcl.Controls, Vcl.ExtCtrls, Vcl.Forms, UnitScaleForm;
 
 type
-  TFrmStyle = class(TForm)
+  TFrmStyle = class(TScaleForm)
     Panel1: TPanel;
     BtnOk: TBitBtn;
     BtnCancel: TBitBtn;
