@@ -37,7 +37,7 @@ end;
 
 procedure Check(AValue: string); overload;
 begin
-  ShowMessage('Illegal parameter value for /HighDpi' + #10 + AValue);
+  ShowMessage('Illegal parameter /HighDpi' + AValue);
 end;
 
 initialization

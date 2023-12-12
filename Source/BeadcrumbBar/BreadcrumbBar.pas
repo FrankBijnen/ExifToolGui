@@ -19,6 +19,7 @@ interface
 // - Add Home button
 // - Added TPopupListbox for Dropdown. Allows for a scrollbar and selecting current dir.
 // - Removed FImages. Not needed for DrawIconEx
+// - Added DpiScale.
 
 uses
   System.SysUtils, System.Classes, System.Math, System.Types,
@@ -61,7 +62,7 @@ type
 
   TPopupListbox = class(TlistBox)
   const LBHORMARGIN = 10;
-        LBVERMARGIN = 4;
+        LBVERMARGIN = 6;
   private
     FSavedFocus: HWND;
     FBreadCrumbBar: TCustomBreadcrumbBar;
@@ -119,6 +120,8 @@ type
     FHome: string;
     FStyleServices: TCustomStyleServices;
     FStyle: string;
+    FDesignDPI: integer;
+    FScreenDPI: integer;
     procedure DrawArrow(ArrowRect: TRect);
     procedure ResetRectStates;
     function PointInRect(X, Y: integer; const Rect: TRect): boolean; inline;
@@ -145,6 +148,7 @@ type
     function GetPenColor: TColor;
     function GetBackColor(const ASelected: boolean = false): TColor;
     function GetBorderColor: TColor;
+    function DpiScale(const APix: integer): integer;
     procedure Paint; override;
     procedure Loaded; override;
     procedure MouseMove(Shift: TShiftState; X: Integer; Y: Integer); override;
@@ -167,6 +171,8 @@ type
     function GetBreadcrumb(Index: integer): string;
     function GetBreadcrumbListItem(Index: integer): string;
     property CrumbDown: integer read GetCrumbDown;
+    property DesignDPI: integer read FDesignDPI write FDesignDPI;
+    property ScreenDPI: integer read FScreenDPI write FScreenDPI;
     property DoubleBuffered;
     property EditMode: boolean read IsEditMode;
     property Font;
@@ -266,6 +272,8 @@ begin
   MenuItem.OnClick := CopyTextClick;
   FBarPopup.Items.Add(MenuItem);
   FCrumbDown := -1;
+  FDesignDPI := 96;
+  FScreenDPI := 96;
 end;
 
 destructor TCustomBreadcrumbBar.Destroy;
@@ -520,11 +528,11 @@ begin
   Canvas.Brush.Color := GetPenColor;
   Canvas.Pen.Style := psSolid;
   Canvas.Pen.Mode := pmCopy;
-  xleft := ArrowRect.Left + (ArrowRect.Right - ArrowRect.Left - ARROW_SIZE) div 2;
-  xright := xleft + ARROW_SIZE;
-  ytop := (Height - ARROW_SIZE) div 2;
-  ybottom := ytop + ARROW_SIZE;
-  ymiddle := ytop + ARROW_SIZE div 2;
+  xleft := ArrowRect.Left + (ArrowRect.Right - ArrowRect.Left - DpiScale(ARROW_SIZE)) div 2;
+  xright := xleft + DpiScale(ARROW_SIZE);
+  ytop := (Height - DpiScale(ARROW_SIZE)) div 2;
+  ybottom := ytop + DpiScale(ARROW_SIZE);
+  ymiddle := ytop + DpiScale(ARROW_SIZE) div 2;
   arr[0] := Point(xleft, ytop);
   arr[1] := Point(xleft, ybottom);
   arr[2] := Point(xright, ymiddle);
@@ -596,6 +604,11 @@ begin
     result := clSilver;
 end;
 
+function TCustomBreadcrumbBar.DpiScale(const APix: integer): integer;
+begin
+  result := MulDiv(APix, FScreenDPI, FDesignDPI);
+end;
+
 procedure TCustomBreadcrumbBar.Paint;
 var
   i: Integer;
@@ -614,10 +627,10 @@ begin
      (FCurrentItems.Count = 0) then
     Exit;
 
-  MaxWidth := floor(Width / FCurrentItems.Count) - ARROW_BOX_SIZE - SEP_PADDING;
+  MaxWidth := floor(Width / FCurrentItems.Count) - DpiScale(ARROW_BOX_SIZE) - DpiScale(SEP_PADDING);
 
-  A_VERT_PADDING := VERT_PADDING;
-  A_INDENT := INDENT;
+  A_VERT_PADDING := DpiScale(VERT_PADDING);
+  A_INDENT := DpiScale(INDENT);
 
   // Draw background, with a border
   r := ClientRect;
@@ -652,7 +665,7 @@ begin
     FBreadcrumbRects[i].Right := Min(FBreadcrumbRects[i].Right,
       FBreadcrumbRects[i].Left + MaxWidth);
     FBreadcrumbRects[i].Bottom := Height - A_VERT_PADDING;
-    inc(FBreadcrumbRects[i].Right, SEP_PADDING);
+    inc(FBreadcrumbRects[i].Right, DpiScale(SEP_PADDING));
 
 // Background breadcrumb
     Canvas.Brush.Color := GetButtonColor(FBreadcrumbStates[i]);
@@ -683,7 +696,7 @@ begin
     FBreadcrumbArrowRects[i].Left := FBreadcrumbRects[i].Right;
     FBreadcrumbArrowRects[i].Top := A_VERT_PADDING;
     FBreadcrumbArrowRects[i].Bottom := Height - A_VERT_PADDING;
-    FBreadcrumbArrowRects[i].Right := FBreadcrumbArrowRects[i].Left + ARROW_BOX_SIZE;
+    FBreadcrumbArrowRects[i].Right := FBreadcrumbArrowRects[i].Left + DpiScale(ARROW_BOX_SIZE);
 
     Canvas.Brush.Color := GetButtonColor(FArrowStates[i]);
     Canvas.Brush.Style := bsSolid;
@@ -837,7 +850,8 @@ begin
 end;
 
 procedure TPopupListbox.DoDrawItem(Control: TWinControl; Index: Integer; Rect: TRect; State: TOwnerDrawState);
-var ListObject: TListObject;
+var
+  ListObject: TListObject;
 begin
   ListObject := TListObject(Items.Objects[Index]);
   try
@@ -855,7 +869,7 @@ end;
 
 procedure TPopupListbox.Popup(APoint: TPoint; ABreadCrumbIndex: integer; AListItems: TStrings);
 var ALine: string;
-    W, WR: integer;
+    W, WR, HorMargin, VerMargin: integer;
     PopupPoint: TPoint;
 
   // So we dont need Vcl.Forms
@@ -890,17 +904,19 @@ begin
   Canvas.Brush.Assign(FBreadCrumbBar.Canvas.Brush);
 
   // ItemHeight needed for font
-  ItemHeight := Canvas.TextHeight('Q');
+  VerMargin := FBreadCrumbBar.DpiScale(LBVERMARGIN);
+  ItemHeight := Canvas.TextHeight('Q') + VerMargin;
 
   //  Length of largest line
   W := 0;
+  HorMargin := ItemHeight + FBreadCrumbBar.DpiScale(LBHORMARGIN);
   for ALine in FListItems do
   begin
-    WR := Canvas.TextWidth(ALine) + ItemHeight + LBHORMARGIN;
+    WR := Canvas.TextWidth(ALine) + HorMargin;
     if (WR > W) then
       W := WR;
   end;
-  SetBounds(PopupPoint.X, PopupPoint.Y, W, (Count * ItemHeight) + LBVERMARGIN);
+  SetBounds(PopupPoint.X, PopupPoint.Y, W, (Count * ItemHeight) + VerMargin);
 
   // Outside ParentControl?
   if ((Top + Height) > Parent.ClientRect.Height) then
@@ -1115,7 +1131,13 @@ var
     for Drive in Drives do
     begin
       if (DirectoryExists(Drive)) then
-        List.AddObject(Drive, nil);
+      begin
+        if SHGetFileInfo(PChar(Drive), 0, SFI, sizeof(SFI),
+          SHGFI_ICON or SHGFI_SMALLICON) <> 0 then
+          List.AddObject(Drive, TObject(SFI.hIcon))
+        else
+          List.AddObject(Drive, nil);
+       end;
     end;
   end;
 

@@ -36,7 +36,7 @@
     <ItemGroup Condition="'$(BuildGroup)'=='All'">
         <BuildGroupProject Include="ExifToolGUI.dproj">
             <ProjectGuid>{0CEAEC4E-2D51-4DE8-AB15-379B3D181FC6}</ProjectGuid>
-            <Configurations>Release</Configurations>
+            <Configurations>Debug;Release</Configurations>
             <Platforms>Win32;Win64</Platforms>
             <Enabled>True</Enabled>
         </BuildGroupProject>

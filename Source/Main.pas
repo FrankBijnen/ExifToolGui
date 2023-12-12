@@ -3157,6 +3157,8 @@ begin
   if Assigned(AStyleService) then
     GUIColorWindow := AStyleService.GetStyleColor(scWindow);
   BreadcrumbBar.Style := GUIsettings.GuiStyle;
+  BreadcrumbBar.DesignDPI := GUIsettings.DesignPPI;
+  BreadcrumbBar.ScreenDPI := Screen.PixelsPerInch;
 end;
 
 procedure TFMain.ShellistThumbError(Sender: TObject; Item: TListItem; E: Exception);
