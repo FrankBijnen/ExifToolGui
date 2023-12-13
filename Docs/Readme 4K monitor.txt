@@ -5,7 +5,7 @@ The problem with 4K monitors is that they typically have a higher DPI than 96, t
 The result could be that items look too small, or not correctly positioned, or even be unreadable.
 
 Previous versions of Delphi used scaling to overcome that. The problem with scaling is that items could be blurry.
-Recent Delphi versions support the Windows HighDpi Api. (E.g. Via Manifest or API HighDPISetProcessDpiAwareness, SetProcessDpiAwarenessContext)
+Recent Delphi versions support the Windows HighDpi Api. (E.g. Via Manifest or API SetProcessDpiAwareness, SetProcessDpiAwarenessContext)
 
 The current solution implemented in ExiftoolGui:
 
