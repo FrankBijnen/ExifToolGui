@@ -98,4 +98,18 @@ Changed with version 6.2.5
 - Various small fixes, for bugs encountered when testing. 
   If you find a bug, or think you found one, dont hesitate to report. You can create an issue on Github (https://github.com/FrankBijnen/ExifToolGui/issues) or post on the ExifTool forum (https://exiftool.org/forum/index.php?board=7.0). 
 
+Changed with version 6.2.6
+- The documentation has been updated to reflect the changes from V516 to V626. You can access it from the program via 'Help/Online documentation', or by using this link:
+  https://htmlpreview.github.io/?https://github.com/FrankBijnen/ExifToolGui/blob/main/Docs/ExifToolGUI_V6.md
+
+Changed with version 6.2.7
+- Added the option to show folders in the filelist. If you enable it in Preferences/other als a Breadcrumb is shown. No Metadata/Image functions are available.
+  It only serves easier navigation.
+- Some fixes for styles were applied. Especially the style 'Green' was updated, it had some colours wrongly defined and the caption bar was ugly.
+- Added a hint window for the metadata values. It can be disabled in Prefrences/Other by setting the timeout value to 0.
+- Added the option to add Custom Options to Exiftool. Not needed for Normal usage. 
+  If you want to experiment: Add the option '-htmldump'. (without the quotes) Open the log window, and check 'Show all commands'. Select any file.
+  Dont forget to remove the option afterwards! 
+- Fixed an error message in the generated Powershell script. It would always show the error 'Native Command Error'.
+
 Frank
