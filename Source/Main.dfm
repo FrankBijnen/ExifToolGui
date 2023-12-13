@@ -1104,31 +1104,6 @@ object FMain: TFMain
       object N7: TMenuItem
         Caption = '-'
       end
-      object MExtractPreview: TMenuItem
-        Caption = 'Extract preview image from selected (Deprecated)'
-        object MJPGfromCR2: TMenuItem
-          Caption = 'CR2/DNG files'
-          OnClick = MJPGfromCR2Click
-        end
-        object MJPGfromNEF: TMenuItem
-          Caption = 'NEF/NRW files'
-          OnClick = MJPGfromCR2Click
-        end
-        object MJPGfromRW2: TMenuItem
-          Caption = 'RW2/PEF files'
-          OnClick = MJPGfromCR2Click
-        end
-      end
-      object MEmbedPreview: TMenuItem
-        Caption = 'Embed preview image into selected (Deprecated)'
-        object MJPGtoCR2: TMenuItem
-          Caption = 'CR2 files...'
-          OnClick = MJPGtoCR2Click
-        end
-      end
-      object N9: TMenuItem
-        Caption = '-'
-      end
       object GenericExtractPreviews: TMenuItem
         Caption = 'Generic extract previews...'
         OnClick = GenericExtractPreviewsClick
@@ -1176,10 +1151,6 @@ object FMain: TFMain
       object MFileNameDateTime: TMenuItem
         Caption = 'File: Name=DateTime+Name...'
         OnClick = MFileNameDateTimeClick
-      end
-      object MJPGAutorotate: TMenuItem
-        Caption = 'JPG: Lossless autorotate... (Deprecated)'
-        OnClick = MJPGAutorotateClick
       end
       object JPGGenericlosslessautorotate1: TMenuItem
         Caption = 'JPG:  Lossless rotate + crop...'

@@ -5,12 +5,12 @@ interface
 uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants,
   System.Classes, Vcl.Graphics,
-  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, Vcl.Mask, Vcl.ExtCtrls,
+  Vcl.Controls, UnitScaleForm, Vcl.Dialogs, Vcl.StdCtrls, Vcl.Mask, Vcl.ExtCtrls,
   Vcl.ComCtrls, Vcl.Grids, Vcl.ValEdit,
   Geomap;
 
 type
-  TFGeoSetup = class(TForm)
+  TFGeoSetup = class(TScaleForm)
     StatusBar1: TStatusBar;
     BtnCancel: TButton;
     BtnOK: TButton;

@@ -5,11 +5,11 @@ interface
 uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants,
   System.Classes, Vcl.Graphics,
-  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.Grids, Vcl.ExtCtrls,
+  Vcl.Controls, Vcl.Forms, UnitScaleForm, Vcl.Dialogs, Vcl.Grids, Vcl.ExtCtrls,
   Vcl.StdCtrls, Vcl.ComCtrls, Vcl.Mask;
 
 type
-  TFEditFColumn = class(TForm)
+  TFEditFColumn = class(TScaleForm)
     AdvPanel1: TPanel;
     StringGrid1: TStringGrid;
     LabeledEdit1: TLabeledEdit;

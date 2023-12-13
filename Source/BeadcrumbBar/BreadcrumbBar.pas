@@ -18,7 +18,8 @@ interface
 // - Enable/Disable ShellExecute via IFDEF SHELLEXEC
 // - Add Home button
 // - Added TPopupListbox for Dropdown. Allows for a scrollbar and selecting current dir.
-// - Removed FImages. Not needed for DrawIconEx
+// - Removed FImages. Not needed for SharedImages and ImageList_Draw
+// - Added DpiScale. Try to support 4K monitors. DPI not 96 as designed.
 
 uses
   System.SysUtils, System.Classes, System.Math, System.Types,
@@ -56,12 +57,13 @@ type
 
   TListObject = class
     Caption: string;
-    Icon: Hicon;
+    IconIdx: integer;
   end;
 
   TPopupListbox = class(TlistBox)
-  const LBHORMARGIN = 10;
-        LBVERMARGIN = 4;
+  const LBHORSPACE  = 2;
+        LBHORMARGIN = 8;
+        LBVERMARGIN = 2;
   private
     FSavedFocus: HWND;
     FBreadCrumbBar: TCustomBreadcrumbBar;
@@ -69,6 +71,10 @@ type
     FListItems: TStrings;
     FOnClose: TNotifyEvent;
     FOnSelect: TNotifyEvent;
+    FHorSpace: integer;
+    FHorMargin: integer;
+    FVerMargin: integer;
+    FIconSize: integer;
   protected
     procedure Click; override;
     procedure DoExit; override;
@@ -79,6 +85,7 @@ type
   public
     constructor Create(AOwner: TCustomBreadcrumbBar); reintroduce;
     procedure Popup(APoint: TPoint; ABreadCrumbIndex: integer; AListItems: TStrings);
+    procedure ClosePopup;
     property OnClose: TNotifyEvent read FOnClose write FOnClose;
     property OnSelect: TNotifyEvent read FOnSelect write FOnSelect;
     property BreadCrumbIndex: integer read FBreadCrumbIndex;
@@ -119,6 +126,10 @@ type
     FHome: string;
     FStyleServices: TCustomStyleServices;
     FStyle: string;
+    FDesignDPI: integer;
+    FScreenDPI: integer;
+    FSharedImages: THandle;
+    FIconSize: integer;
     procedure DrawArrow(ArrowRect: TRect);
     procedure ResetRectStates;
     function PointInRect(X, Y: integer; const Rect: TRect): boolean; inline;
@@ -140,11 +151,14 @@ type
     procedure ArrowItemClick(Sender: TObject);
     procedure SetHome(const Value: string);
     procedure SetStyle(const Value: string);
+    function GetSharedImages: THandle;
+    function GetIconSize: integer;
   protected
     function GetButtonColor(const ARectState: TRectState): TColor;
     function GetPenColor: TColor;
     function GetBackColor(const ASelected: boolean = false): TColor;
     function GetBorderColor: TColor;
+    function DpiScale(const APix: integer): integer;
     procedure Paint; override;
     procedure Loaded; override;
     procedure MouseMove(Shift: TShiftState; X: Integer; Y: Integer); override;
@@ -164,13 +178,18 @@ type
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
     procedure UpdateBreadcrumbs;
-    property EditMode: boolean read IsEditMode;
     function GetBreadcrumb(Index: integer): string;
     function GetBreadcrumbListItem(Index: integer): string;
     property CrumbDown: integer read GetCrumbDown;
+    property DesignDPI: integer read FDesignDPI write FDesignDPI;
+    property ScreenDPI: integer read FScreenDPI write FScreenDPI;
     property DoubleBuffered;
+    property EditMode: boolean read IsEditMode;
+    property Font;
     property Home: string read FHome write SetHome;
     property Style: string read FStyle write SetStyle;
+    property SharedImages: THandle read GetSharedImages;
+    property IconSize: integer read GetIconSize;
   end;
 
   TBreadcrumbBar = class(TCustomBreadcrumbBar)
@@ -241,6 +260,7 @@ begin
   inherited;
   FCurrentItems := TStringList.Create;
   FCurrentListItems := TStringList.Create;
+  TStringList(FCurrentListItems).Sorted := true;
 
   FPopupListBox := TPopupListbox.Create(Self);
   FPopupListBox.OnSelect := ArrowItemClick;
@@ -264,6 +284,10 @@ begin
   MenuItem.OnClick := CopyTextClick;
   FBarPopup.Items.Add(MenuItem);
   FCrumbDown := -1;
+  FDesignDPI := 96;
+  FScreenDPI := 96;
+  FIconSize := 0;
+  FSharedImages := 0;
 end;
 
 destructor TCustomBreadcrumbBar.Destroy;
@@ -272,6 +296,25 @@ begin
   FCurrentListItems.Free;
   FCurrentItems.Free;
   inherited;
+end;
+
+function TCustomBreadcrumbBar.GetSharedImages: Thandle;
+var
+  FileInfo: TSHFileInfo;
+begin
+  if (FSharedImages = 0) then
+  begin
+    FSharedImages := SHGetFileInfo('C:\',     { Do not localize }
+      0, FileInfo, SizeOf(FileInfo), SHGFI_SYSICONINDEX or SHGFI_SMALLICON);
+  end;
+  result := FSharedImages;
+end;
+
+function TCustomBreadcrumbBar.GetIconSize: Integer;
+var
+  FImageWidth: integer;
+begin
+  ImageList_GetIconSize(SharedImages, FImageWidth, result);
 end;
 
 procedure TCustomBreadcrumbBar.Loaded;
@@ -439,6 +482,7 @@ begin
     if FBreadcrumbStates[i] = rsDown then
     begin
       FCrumbDown := i;
+      FPopupListBox.ClosePopup;
       break;
     end;
 end;
@@ -518,11 +562,11 @@ begin
   Canvas.Brush.Color := GetPenColor;
   Canvas.Pen.Style := psSolid;
   Canvas.Pen.Mode := pmCopy;
-  xleft := ArrowRect.Left + (ArrowRect.Right - ArrowRect.Left - ARROW_SIZE) div 2;
-  xright := xleft + ARROW_SIZE;
-  ytop := (Height - ARROW_SIZE) div 2;
-  ybottom := ytop + ARROW_SIZE;
-  ymiddle := ytop + ARROW_SIZE div 2;
+  xleft := ArrowRect.Left + (ArrowRect.Right - ArrowRect.Left - DpiScale(ARROW_SIZE)) div 2;
+  xright := xleft + DpiScale(ARROW_SIZE);
+  ytop := (Height - DpiScale(ARROW_SIZE)) div 2;
+  ybottom := ytop + DpiScale(ARROW_SIZE);
+  ymiddle := ytop + DpiScale(ARROW_SIZE) div 2;
   arr[0] := Point(xleft, ytop);
   arr[1] := Point(xleft, ybottom);
   arr[2] := Point(xright, ymiddle);
@@ -594,6 +638,11 @@ begin
     result := clSilver;
 end;
 
+function TCustomBreadcrumbBar.DpiScale(const APix: integer): integer;
+begin
+  result := MulDiv(APix, FScreenDPI, FDesignDPI);
+end;
+
 procedure TCustomBreadcrumbBar.Paint;
 var
   i: Integer;
@@ -612,10 +661,10 @@ begin
      (FCurrentItems.Count = 0) then
     Exit;
 
-  MaxWidth := floor(Width / FCurrentItems.Count) - ARROW_BOX_SIZE - SEP_PADDING;
+  MaxWidth := floor(Width / FCurrentItems.Count) - DpiScale(ARROW_BOX_SIZE) - DpiScale(SEP_PADDING);
 
-  A_VERT_PADDING := VERT_PADDING;
-  A_INDENT := INDENT;
+  A_VERT_PADDING := DpiScale(VERT_PADDING);
+  A_INDENT := DpiScale(INDENT);
 
   // Draw background, with a border
   r := ClientRect;
@@ -626,7 +675,7 @@ begin
   Canvas.Pen.Style := psSolid;
   with r do
     Rectangle(Canvas.Handle, Left, Top, Right, Bottom);
-
+  Canvas.Font.Assign(Font);
   for i := 0 to FCurrentItems.Count - 1 do
   begin
 
@@ -650,7 +699,7 @@ begin
     FBreadcrumbRects[i].Right := Min(FBreadcrumbRects[i].Right,
       FBreadcrumbRects[i].Left + MaxWidth);
     FBreadcrumbRects[i].Bottom := Height - A_VERT_PADDING;
-    inc(FBreadcrumbRects[i].Right, SEP_PADDING);
+    inc(FBreadcrumbRects[i].Right, DpiScale(SEP_PADDING));
 
 // Background breadcrumb
     Canvas.Brush.Color := GetButtonColor(FBreadcrumbStates[i]);
@@ -681,7 +730,7 @@ begin
     FBreadcrumbArrowRects[i].Left := FBreadcrumbRects[i].Right;
     FBreadcrumbArrowRects[i].Top := A_VERT_PADDING;
     FBreadcrumbArrowRects[i].Bottom := Height - A_VERT_PADDING;
-    FBreadcrumbArrowRects[i].Right := FBreadcrumbArrowRects[i].Left + ARROW_BOX_SIZE;
+    FBreadcrumbArrowRects[i].Right := FBreadcrumbArrowRects[i].Left + DpiScale(ARROW_BOX_SIZE);
 
     Canvas.Brush.Color := GetButtonColor(FArrowStates[i]);
     Canvas.Brush.Style := bsSolid;
@@ -804,6 +853,10 @@ end;
 
 procedure TPopupListbox.DoClose;
 begin
+  // Failsafe. Should not be needed.
+  if not Assigned(Parent) then
+    exit;
+
   Winapi.Windows.SetFocus(FSavedFocus); // Restore Focus
   Parent := nil;                        // Hides popup listbox
 
@@ -828,33 +881,38 @@ begin
     if (Index > -1) and
        (Index < FListItems.Count) then
     begin
-      Icon := Hicon(FListItems.Objects[Index]);
+      IconIdx := Hicon(FListItems.Objects[Index]);
       Caption := FListItems[Index];
     end;
   end;
 end;
 
 procedure TPopupListbox.DoDrawItem(Control: TWinControl; Index: Integer; Rect: TRect; State: TOwnerDrawState);
-var ListObject: TListObject;
+var
+  AListObject: TListObject;
+  ARect: TRect;
 begin
-  ListObject := TListObject(Items.Objects[Index]);
+  AListObject := TListObject(Items.Objects[Index]);
+  ARect := Rect;
   try
     Canvas.Brush.Color := FBreadCrumbBar.GetBackColor(odSelected in State);
-    Canvas.FillRect(Rect);
-    DrawIconEx(Canvas.Handle, Rect.Left, Rect.Top, ListObject.Icon,
-               ItemHeight - LBVERMARGIN, ItemHeight - LBVERMARGIN,  0, 0, DI_NORMAL);
-    Rect.Left := Rect.Left + ItemHeight;
+    Canvas.FillRect(ARect);
+    ImageList_Draw(FBreadCrumbBar.SharedImages, AListObject.IconIdx, Canvas.Handle,
+                   ARect.Left, ARect.Top + FVerMargin, ILD_TRANSPARENT);
+    ARect.Left := ARect.Left + FIconSize + FHorSpace;
     Canvas.Font.Assign(FBreadCrumbBar.Canvas.Font);
-    Canvas.TextRect(Rect, Rect.Left, Rect.Top, ListObject.Caption);
+    Canvas.TextRect(ARect, AListObject.Caption, [tfSingleLine, tfVerticalCenter]);
   finally
-    ListObject.Free;
+    AListObject.Free;
   end;
 end;
 
 procedure TPopupListbox.Popup(APoint: TPoint; ABreadCrumbIndex: integer; AListItems: TStrings);
-var ALine: string;
-    W, WR: integer;
-    PopupPoint: TPoint;
+var
+  ALine: string;
+  W: integer;
+  H: integer;
+  PopupPoint: TPoint;
 
   // So we dont need Vcl.Forms
   function GetTopParent(AControl: TWinControl): TWinControl;
@@ -887,18 +945,22 @@ begin
   Canvas.Font.Assign(FBreadCrumbBar.Canvas.Font);
   Canvas.Brush.Assign(FBreadCrumbBar.Canvas.Brush);
 
+  // Calculate margins
+  FHorSpace  := FBreadCrumbBar.DpiScale(LBHORSPACE);
+  FHorMargin := FBreadCrumbBar.DpiScale(LBHORMARGIN);
+  FVerMargin := FBreadCrumbBar.DpiScale(LBVERMARGIN);
+  FIconSize  := FBreadCrumbBar.DpiScale(FBreadCrumbBar.IconSize);
+
   // ItemHeight needed for font
-  ItemHeight := Canvas.TextHeight('Q');
+  ItemHeight := Max(Canvas.TextHeight('Q'), FIconSize) + (FVerMargin * 2);
 
   //  Length of largest line
   W := 0;
   for ALine in FListItems do
-  begin
-    WR := Canvas.TextWidth(ALine) + ItemHeight + LBHORMARGIN;
-    if (WR > W) then
-      W := WR;
-  end;
-  SetBounds(PopupPoint.X, PopupPoint.Y, W, (Count * ItemHeight) + LBVERMARGIN);
+    W := Max(Canvas.TextWidth(ALine), W);
+  W := FIconSize + FHorSpace + W + FHorMargin;
+  H := (Count * ItemHeight) + (FVerMargin * 2);
+  SetBounds(PopupPoint.X, PopupPoint.Y, W, H);
 
   // Outside ParentControl?
   if ((Top + Height) > Parent.ClientRect.Height) then
@@ -921,6 +983,12 @@ begin
   FBreadCrumbIndex := ABreadCrumbIndex;
   ItemIndex := FListItems.IndexOf(GetCallerText);
   TopIndex := ItemIndex;
+end;
+
+procedure TPopupListBox.ClosePopup;
+begin
+  if Assigned(Parent) then
+    SendMessage(Self.Handle, CM_EXIT, 0, 0);
 end;
 
 { TDirBreadcrumbBar }
@@ -1082,27 +1150,6 @@ var
   SubPath: string;
   SR: TSearchRec;
   SFI: TSHFileInfo;
-  IconHandles: IntegerArray;
-
-  function IconHandlesContains(h: integer): boolean;
-  var
-    j: Integer;
-  begin
-    result := false;
-    for j := 0 to high(IconHandles) do
-      if IconHandles[j] = h then
-        Exit(true);
-  end;
-
-  function IconHandlesIndexOf(h: integer): integer;
-  var
-    j: Integer;
-  begin
-    result := 0;
-    for j := 0 to high(IconHandles) do
-      if IconHandles[j] = h then
-        Exit(j);
-  end;
 
   procedure GetDrives;
   var
@@ -1113,7 +1160,13 @@ var
     for Drive in Drives do
     begin
       if (DirectoryExists(Drive)) then
-        List.AddObject(Drive, nil);
+      begin
+        if SHGetFileInfo(PChar(Drive), 0, SFI, sizeof(SFI),
+          SHGFI_SYSICONINDEX or SHGFI_SMALLICON) <> 0 then
+          List.AddObject(Drive, TObject(SFI.iIcon))
+        else
+          List.AddObject(Drive, nil);
+       end;
     end;
   end;
 
@@ -1127,8 +1180,10 @@ begin
 
   SubPath := GetDirUpTo(BreadcrumbIndex);
 
-  if not DirectoryExists(SubPath) then Exit;
-    SubPath := IncludeTrailingBackslash(SubPath);
+  if not DirectoryExists(SubPath) then
+    Exit;
+  SubPath := IncludeTrailingBackslash(SubPath);
+
   if System.SysUtils.FindFirst(SubPath + '*.*', faDirectory or faHidden, SR) = 0 then
     try
       repeat
@@ -1137,8 +1192,8 @@ begin
           and (Copy(SR.Name, 1, 1) <> '.'))) then
           begin
             if SHGetFileInfo(PChar(SubPath + SR.Name), 0, SFI, sizeof(SFI),
-              SHGFI_ICON or SHGFI_SMALLICON) <> 0 then
-              List.AddObject(SR.Name, TObject(SFI.hIcon))
+              SHGFI_SYSICONINDEX or SHGFI_SMALLICON) <> 0 then
+              List.AddObject(SR.Name, TObject(SFI.iIcon))
             else
               List.AddObject(SR.Name, nil);
           end;

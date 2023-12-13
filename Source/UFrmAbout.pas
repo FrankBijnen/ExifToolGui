@@ -4,10 +4,10 @@ interface
 
 uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
-  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, Vcl.Buttons, Vcl.ExtCtrls;
+  Vcl.Controls, Vcl.Forms, UnitScaleForm, Vcl.Dialogs, Vcl.StdCtrls, Vcl.Buttons, Vcl.ExtCtrls;
 
 type
-  TFrmAbout = class(TForm)
+  TFrmAbout = class(TScaleForm)
     Panel1: TPanel;
     BtnOk: TBitBtn;
     Image1: TImage;
@@ -15,7 +15,6 @@ type
     LblSource: TLabel;
     LblForum: TLabel;
     LblExifTool: TLabel;
-    LblJpegTools: TLabel;
     LblScreen: TLabel;
     procedure FormShow(Sender: TObject);
     procedure LblOpenUrl(Sender: TObject);
@@ -94,18 +93,6 @@ begin
     LblExifTool.Caption := LblExifTool.Caption + Output
   else
     LblExifTool.Caption := LblExifTool.Caption + 'MISSING!';
-
-  LblJpegTools.Caption := 'jhead.exe=';
-  if HasJHead then
-    LblJpegTools.Caption := LblJpegTools.Caption + 'ready'
-  else
-    LblJpegTools.Caption := LblJpegTools.Caption + 'missing';
-
-  LblJpegTools.Caption := LblJpegTools.Caption + ',  jpegtran.exe=';
-  if HasJpegTran then
-    LblJpegTools.Caption := LblJpegTools.Caption + 'ready'
-  else
-    LblJpegTools.Caption := LblJpegTools.Caption + 'missing';
 
   X := Screen.Width;
   Y := Screen.Height;

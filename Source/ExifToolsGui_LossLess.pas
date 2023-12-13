@@ -6,23 +6,11 @@ uses ExifTool, System.Types;
 
 type TLossLessMethod = (NotTested, JheadJpegTran, Internal);
 
-function HasJHead: boolean;
-function HasJpegTran: boolean;
 function PerformLossLess(AJpeg: string; Angle, Modulo: integer; OJpeg: string = ''): TSize;
 
 implementation
 
 uses sdJpegLossless, sdJpegImage, sdJpegTypes, sdJpegMarkers;
-
-function HasJHead: boolean;
-begin
-  result := ExecCMD('jhead', '');
-end;
-
-function HasJpegTran: boolean;
-begin
-  result := ExecCMD('jpegtran', '');
-end;
 
 function PerformLossLess(AJpeg: string; Angle, Modulo: integer; OJpeg: string = ''): TSize;
 var LossLess: TsdLosslessOperation;

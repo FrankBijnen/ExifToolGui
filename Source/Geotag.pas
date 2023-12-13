@@ -5,11 +5,11 @@ interface
 uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants,
   System.Classes, Vcl.Graphics,
-  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, Vcl.ComCtrls,
+  Vcl.Controls, Vcl.Forms, UnitScaleForm, Vcl.Dialogs, Vcl.StdCtrls, Vcl.ComCtrls,
   Vcl.ExtCtrls, Vcl.Mask;
 
 type
-  TFGeotag = class(TForm)
+  TFGeotag = class(TScaleForm)
     StatusBar1: TStatusBar;
     AdvPanel1: TPanel;
     LabeledEdit1: TLabeledEdit;
