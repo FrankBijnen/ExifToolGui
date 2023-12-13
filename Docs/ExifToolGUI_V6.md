@@ -61,7 +61,7 @@ Basic idea behind GUI is, to keep it <u>simple!</u> Thus, only those options are
 <li>GeoCoding has been enhanced. You can now choose from 2 providers (https://overpass-api.de and https://geocode.maps.co) and lookup City, Province and Country from GPS coordinates AKA reverse GeoCoding.</li>
 <li>Option added to show folders in the FileList panel.</li>
 <li>Possibility to add Custom options to Exiftool.</li>
-<li>Experimental support for href="Readme%204K%20monitors.txt"><b>4K monitors.<b></a></li>
+<li>Experimental support for <a href="Readme%204K%20monitors.txt"><b>4K monitors.</b></a></li>
 </ul>
 <a href="changelog.txt"><b>See changelog.txt for a complete list of issues.</b></a>
 
