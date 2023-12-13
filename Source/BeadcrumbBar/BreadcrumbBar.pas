@@ -19,7 +19,7 @@ interface
 // - Add Home button
 // - Added TPopupListbox for Dropdown. Allows for a scrollbar and selecting current dir.
 // - Removed FImages. Not needed for SharedImages and ImageList_Draw
-// - Added DpiScale.
+// - Added DpiScale. Try to support 4K monitors. DPI not 96 as designed.
 
 uses
   System.SysUtils, System.Classes, System.Math, System.Types,
@@ -61,8 +61,9 @@ type
   end;
 
   TPopupListbox = class(TlistBox)
-  const LBHORMARGIN = 10;
-        LBVERMARGIN = 6;
+  const LBHORSPACE  = 2;
+        LBHORMARGIN = 8;
+        LBVERMARGIN = 2;
   private
     FSavedFocus: HWND;
     FBreadCrumbBar: TCustomBreadcrumbBar;
@@ -70,6 +71,10 @@ type
     FListItems: TStrings;
     FOnClose: TNotifyEvent;
     FOnSelect: TNotifyEvent;
+    FHorSpace: integer;
+    FHorMargin: integer;
+    FVerMargin: integer;
+    FIconSize: integer;
   protected
     procedure Click; override;
     procedure DoExit; override;
@@ -80,6 +85,7 @@ type
   public
     constructor Create(AOwner: TCustomBreadcrumbBar); reintroduce;
     procedure Popup(APoint: TPoint; ABreadCrumbIndex: integer; AListItems: TStrings);
+    procedure ClosePopup;
     property OnClose: TNotifyEvent read FOnClose write FOnClose;
     property OnSelect: TNotifyEvent read FOnSelect write FOnSelect;
     property BreadCrumbIndex: integer read FBreadCrumbIndex;
@@ -476,6 +482,7 @@ begin
     if FBreadcrumbStates[i] = rsDown then
     begin
       FCrumbDown := i;
+      FPopupListBox.ClosePopup;
       break;
     end;
 end;
@@ -846,6 +853,10 @@ end;
 
 procedure TPopupListbox.DoClose;
 begin
+  // Failsafe. Should not be needed.
+  if not Assigned(Parent) then
+    exit;
+
   Winapi.Windows.SetFocus(FSavedFocus); // Restore Focus
   Parent := nil;                        // Hides popup listbox
 
@@ -878,25 +889,30 @@ end;
 
 procedure TPopupListbox.DoDrawItem(Control: TWinControl; Index: Integer; Rect: TRect; State: TOwnerDrawState);
 var
-  ListObject: TListObject;
+  AListObject: TListObject;
+  ARect: TRect;
 begin
-  ListObject := TListObject(Items.Objects[Index]);
+  AListObject := TListObject(Items.Objects[Index]);
+  ARect := Rect;
   try
     Canvas.Brush.Color := FBreadCrumbBar.GetBackColor(odSelected in State);
-    Canvas.FillRect(Rect);
-    ImageList_Draw(FBreadCrumbBar.SharedImages, ListObject.IconIdx, Canvas.Handle, Rect.Left, Rect.Top, ILD_TRANSPARENT);
-    Rect.Left := Rect.Left + ItemHeight;
+    Canvas.FillRect(ARect);
+    ImageList_Draw(FBreadCrumbBar.SharedImages, AListObject.IconIdx, Canvas.Handle,
+                   ARect.Left, ARect.Top + FVerMargin, ILD_TRANSPARENT);
+    ARect.Left := ARect.Left + FIconSize + FHorSpace;
     Canvas.Font.Assign(FBreadCrumbBar.Canvas.Font);
-    Canvas.TextRect(Rect, Rect.Left, Rect.Top, ListObject.Caption);
+    Canvas.TextRect(ARect, AListObject.Caption, [tfSingleLine, tfVerticalCenter]);
   finally
-    ListObject.Free;
+    AListObject.Free;
   end;
 end;
 
 procedure TPopupListbox.Popup(APoint: TPoint; ABreadCrumbIndex: integer; AListItems: TStrings);
-var ALine: string;
-    W, WR, HorMargin, VerMargin: integer;
-    PopupPoint: TPoint;
+var
+  ALine: string;
+  W: integer;
+  H: integer;
+  PopupPoint: TPoint;
 
   // So we dont need Vcl.Forms
   function GetTopParent(AControl: TWinControl): TWinControl;
@@ -929,20 +945,22 @@ begin
   Canvas.Font.Assign(FBreadCrumbBar.Canvas.Font);
   Canvas.Brush.Assign(FBreadCrumbBar.Canvas.Brush);
 
+  // Calculate margins
+  FHorSpace  := FBreadCrumbBar.DpiScale(LBHORSPACE);
+  FHorMargin := FBreadCrumbBar.DpiScale(LBHORMARGIN);
+  FVerMargin := FBreadCrumbBar.DpiScale(LBVERMARGIN);
+  FIconSize  := FBreadCrumbBar.DpiScale(FBreadCrumbBar.IconSize);
+
   // ItemHeight needed for font
-  VerMargin := FBreadCrumbBar.DpiScale(LBVERMARGIN);
-  ItemHeight := Max(Canvas.TextHeight('Q'), FBreadCrumbBar.IconSize) + VerMargin;
+  ItemHeight := Max(Canvas.TextHeight('Q'), FIconSize) + (FVerMargin * 2);
 
   //  Length of largest line
   W := 0;
-  HorMargin := ItemHeight + FBreadCrumbBar.DpiScale(LBHORMARGIN);
   for ALine in FListItems do
-  begin
-    WR := Canvas.TextWidth(ALine) + HorMargin;
-    if (WR > W) then
-      W := WR;
-  end;
-  SetBounds(PopupPoint.X, PopupPoint.Y, W, (Count * ItemHeight) + VerMargin);
+    W := Max(Canvas.TextWidth(ALine), W);
+  W := FIconSize + FHorSpace + W + FHorMargin;
+  H := (Count * ItemHeight) + (FVerMargin * 2);
+  SetBounds(PopupPoint.X, PopupPoint.Y, W, H);
 
   // Outside ParentControl?
   if ((Top + Height) > Parent.ClientRect.Height) then
@@ -965,6 +983,12 @@ begin
   FBreadCrumbIndex := ABreadCrumbIndex;
   ItemIndex := FListItems.IndexOf(GetCallerText);
   TopIndex := ItemIndex;
+end;
+
+procedure TPopupListBox.ClosePopup;
+begin
+  if Assigned(Parent) then
+    SendMessage(Self.Handle, CM_EXIT, 0, 0);
 end;
 
 { TDirBreadcrumbBar }

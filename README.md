@@ -9,6 +9,7 @@ Current version: <b>V6.2.7</b> updated December 25, 2023.<br>
 - Added option to add custom tags to Exiftool.<br>
 - Fix for generated Powershell script.<br>
 - Style fixes for Green.<br>
+- Experimental support for [4K Monitors](Docs/Readme%204K%20monitor.txt).<br>
 
 [Change log](Docs/changelog.txt)<br>
 [Download Release](https://github.com/FrankBijnen/ExifToolGui/releases/latest)<br>
