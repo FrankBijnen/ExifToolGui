@@ -18,7 +18,7 @@ interface
 // - Enable/Disable ShellExecute via IFDEF SHELLEXEC
 // - Add Home button
 // - Added TPopupListbox for Dropdown. Allows for a scrollbar and selecting current dir.
-// - Removed FImages. Not needed for DrawIconEx
+// - Removed FImages. Not needed for SharedImages and ImageList_Draw
 // - Added DpiScale.
 
 uses
@@ -57,7 +57,7 @@ type
 
   TListObject = class
     Caption: string;
-    Icon: Hicon;
+    IconIdx: integer;
   end;
 
   TPopupListbox = class(TlistBox)
@@ -122,6 +122,8 @@ type
     FStyle: string;
     FDesignDPI: integer;
     FScreenDPI: integer;
+    FSharedImages: THandle;
+    FIconSize: integer;
     procedure DrawArrow(ArrowRect: TRect);
     procedure ResetRectStates;
     function PointInRect(X, Y: integer; const Rect: TRect): boolean; inline;
@@ -143,6 +145,8 @@ type
     procedure ArrowItemClick(Sender: TObject);
     procedure SetHome(const Value: string);
     procedure SetStyle(const Value: string);
+    function GetSharedImages: THandle;
+    function GetIconSize: integer;
   protected
     function GetButtonColor(const ARectState: TRectState): TColor;
     function GetPenColor: TColor;
@@ -178,6 +182,8 @@ type
     property Font;
     property Home: string read FHome write SetHome;
     property Style: string read FStyle write SetStyle;
+    property SharedImages: THandle read GetSharedImages;
+    property IconSize: integer read GetIconSize;
   end;
 
   TBreadcrumbBar = class(TCustomBreadcrumbBar)
@@ -274,6 +280,8 @@ begin
   FCrumbDown := -1;
   FDesignDPI := 96;
   FScreenDPI := 96;
+  FIconSize := 0;
+  FSharedImages := 0;
 end;
 
 destructor TCustomBreadcrumbBar.Destroy;
@@ -282,6 +290,25 @@ begin
   FCurrentListItems.Free;
   FCurrentItems.Free;
   inherited;
+end;
+
+function TCustomBreadcrumbBar.GetSharedImages: Thandle;
+var
+  FileInfo: TSHFileInfo;
+begin
+  if (FSharedImages = 0) then
+  begin
+    FSharedImages := SHGetFileInfo('C:\',     { Do not localize }
+      0, FileInfo, SizeOf(FileInfo), SHGFI_SYSICONINDEX or SHGFI_SMALLICON);
+  end;
+  result := FSharedImages;
+end;
+
+function TCustomBreadcrumbBar.GetIconSize: Integer;
+var
+  FImageWidth: integer;
+begin
+  ImageList_GetIconSize(SharedImages, FImageWidth, result);
 end;
 
 procedure TCustomBreadcrumbBar.Loaded;
@@ -843,7 +870,7 @@ begin
     if (Index > -1) and
        (Index < FListItems.Count) then
     begin
-      Icon := Hicon(FListItems.Objects[Index]);
+      IconIdx := Hicon(FListItems.Objects[Index]);
       Caption := FListItems[Index];
     end;
   end;
@@ -857,8 +884,7 @@ begin
   try
     Canvas.Brush.Color := FBreadCrumbBar.GetBackColor(odSelected in State);
     Canvas.FillRect(Rect);
-    DrawIconEx(Canvas.Handle, Rect.Left, Rect.Top, ListObject.Icon,
-               ItemHeight - LBVERMARGIN, ItemHeight - LBVERMARGIN,  0, 0, DI_NORMAL);
+    ImageList_Draw(FBreadCrumbBar.SharedImages, ListObject.IconIdx, Canvas.Handle, Rect.Left, Rect.Top, ILD_TRANSPARENT);
     Rect.Left := Rect.Left + ItemHeight;
     Canvas.Font.Assign(FBreadCrumbBar.Canvas.Font);
     Canvas.TextRect(Rect, Rect.Left, Rect.Top, ListObject.Caption);
@@ -905,7 +931,7 @@ begin
 
   // ItemHeight needed for font
   VerMargin := FBreadCrumbBar.DpiScale(LBVERMARGIN);
-  ItemHeight := Canvas.TextHeight('Q') + VerMargin;
+  ItemHeight := Max(Canvas.TextHeight('Q'), FBreadCrumbBar.IconSize) + VerMargin;
 
   //  Length of largest line
   W := 0;
@@ -1100,27 +1126,6 @@ var
   SubPath: string;
   SR: TSearchRec;
   SFI: TSHFileInfo;
-  IconHandles: IntegerArray;
-
-  function IconHandlesContains(h: integer): boolean;
-  var
-    j: Integer;
-  begin
-    result := false;
-    for j := 0 to high(IconHandles) do
-      if IconHandles[j] = h then
-        Exit(true);
-  end;
-
-  function IconHandlesIndexOf(h: integer): integer;
-  var
-    j: Integer;
-  begin
-    result := 0;
-    for j := 0 to high(IconHandles) do
-      if IconHandles[j] = h then
-        Exit(j);
-  end;
 
   procedure GetDrives;
   var
@@ -1133,8 +1138,8 @@ var
       if (DirectoryExists(Drive)) then
       begin
         if SHGetFileInfo(PChar(Drive), 0, SFI, sizeof(SFI),
-          SHGFI_ICON or SHGFI_SMALLICON) <> 0 then
-          List.AddObject(Drive, TObject(SFI.hIcon))
+          SHGFI_SYSICONINDEX or SHGFI_SMALLICON) <> 0 then
+          List.AddObject(Drive, TObject(SFI.iIcon))
         else
           List.AddObject(Drive, nil);
        end;
@@ -1151,8 +1156,10 @@ begin
 
   SubPath := GetDirUpTo(BreadcrumbIndex);
 
-  if not DirectoryExists(SubPath) then Exit;
-    SubPath := IncludeTrailingBackslash(SubPath);
+  if not DirectoryExists(SubPath) then
+    Exit;
+  SubPath := IncludeTrailingBackslash(SubPath);
+
   if System.SysUtils.FindFirst(SubPath + '*.*', faDirectory or faHidden, SR) = 0 then
     try
       repeat
@@ -1161,8 +1168,8 @@ begin
           and (Copy(SR.Name, 1, 1) <> '.'))) then
           begin
             if SHGetFileInfo(PChar(SubPath + SR.Name), 0, SFI, sizeof(SFI),
-              SHGFI_ICON or SHGFI_SMALLICON) <> 0 then
-              List.AddObject(SR.Name, TObject(SFI.hIcon))
+              SHGFI_SYSICONINDEX or SHGFI_SMALLICON) <> 0 then
+              List.AddObject(SR.Name, TObject(SFI.iIcon))
             else
               List.AddObject(SR.Name, nil);
           end;
