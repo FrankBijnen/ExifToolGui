@@ -12,7 +12,6 @@
 <h1>ExifToolGUI for Windows v6.xx</h1><hr>
 <h2>Introduction</h2>
 In the summer of 2023 I decided to revive the ExifToolGui project initally created by <b>Bogdan Hrastnik</b>.
-This revival resulted in <b>Version 6</b><br>
 Read his complete documentation <a href="https://htmlpreview.github.io/?https://github.com/FrankBijnen/ExifToolGui/blob/Development/Docs/Original%20notes/ExifToolGUI_V516.htm"><b>here</b></a><br><br>
 This was his intro, I will quote it now, because it still holds for me:<br><br>
 <em>
@@ -28,7 +27,7 @@ The only downside for many potential users is the fact, that ExifTool is
  (GUI), so all work must be done by typing commands inside "Command 
 Prompt" window. Such approach gives ExifTool great flexibility, but is 
 somehow difficult to use -especially for those, who don't use ExifTool 
-regularly.<br>
+regulary.<br>
 <br>
 
 So, I've decided to make some simple ExifTool GUI for my private use. 
@@ -57,20 +56,15 @@ Basic idea behind GUI is, to keep it <u>simple!</u> Thus, only those options are
 <li>Better support for international characters. All internal code now uses Unicode (UTF16), to interface with Exiftool UTF8.</li>
 <li>Enhanced Log Window. The last 10 commands are shown, with their respective output and error. Option to replay the command in PowerShell/Cmd prompt.</li>
 <li>The external programs Jhead.exe and Jpegtran.exe are no longer needed. Rotation, and cropping, are handled in Delphi native code. With a modified library called NativeJpg by SimDesign B.V. (I tried contacting SimDesign to verify the Licence requirements, but was unable to.)</li>
-<li>Exporting and Importing previews has been revised, and offer greater flexibility.</li>
+<li>Exporting and Importing previews has been revised, and offer greater flexability.</li>
 <li>GeoCoding has been enhanced. You can now choose from 2 providers (https://overpass-api.de and https://geocode.maps.co) and lookup City, Province and Country from GPS coordinates AKA reverse GeoCoding.</li>
-<li>Option added to show folders in the FileList panel.</li>
-<li>Possibility to add Custom options to Exiftool.</li>
-<li>Experimental support for <a href="Readme%204K%20monitor.txt"><b>4K monitors.</b></a></li>
 </ul>
 <a href="changelog.txt"><b>See changelog.txt for a complete list of issues.</b></a>
 
-<a name="m_reqs_general">
 <h2>Requirements and preparations</h2>
 ExiftoolGUI should run on Windows 7, 8 32-64bit. However, it is highly recommended to use Windows 10 or 11 when you plan to use the OSM map, or GEOcoding.<br>
 It will not run on Windows XP or earlier!<br>
 
-<a name="m_reqs_exiftool">
 <h3>1. ExifTool</h3>
 You only need to download the "Windows Executable" zip file from <a href="https://exiftool.org/"><b>here</b></a>.
 After unzipping, depending on your Windows Explorer settings, you will see:<font color="CC0000">exiftool(-k)</font> or <font color="CC0000">exiftool(-k).exe</font>
@@ -86,7 +80,7 @@ If you want Windows to be able to always find ExifTool, then add the directory w
 <li>In case you've done something wrong in this regard, you'll see an error message when GUI starts.</li>
 </ul>
 
-<h3><a name="m_reqs_exiftoolgui">2. ExifToolGUI</h3>
+<h3>2. ExifToolGUI</h3>
 You can download GUI from <a href="https://github.com/FrankBijnen/ExifToolGui/releases"><b>here</b></a>.
 GUI doesn't need to be "installed". Just download the executable for your platform (ExifToolGui.exe or ExifToolGui_X64.exe) into any directory, create a Desktop shortcut and GUI is ready to use.<br>
 <br>
@@ -104,7 +98,7 @@ It was decided not to save the INI file in the same directory as the executable,
 </li>
 </ul>
 
-<h3><a name="m_reqs_exiftoolgui"><a name="m_edge">3. Edge browser needed for OSM map<a></h3>
+<h3><a name="m_edge">3. Edge browser needed for OSM map<a></h3>
 If you don't need the OSM map functionality, you can skip this step.<br>
 The OSM map is hosted by an internal web browser based on Edge. There are 2 requirements. The <b>Edge Runtime</b> and the <b>WebView2Loader.dll</b>.
 
@@ -133,14 +127,15 @@ Extract the file 'runtimes\win-x86\native\WebView2Loader.dll' or 'runtimes\win-x
 <a href="https://docwiki.embarcadero.com/RADStudio/Sydney/en/Using_TEdgeBrowser_Component_and_Changes_to_the_TWebBrowser_Component">More info for developers from Embarcadero</a>
 <br>
 
-<h3>4. Wish to see thumbnails of raw image files?</h3>
+<h3>4. jhead.exe &amp; jpegtran.exe</h3>
+These files are no longer needed, but can still be used if available.<br>
+The menu-items that use these programs are marked <u>deprecated</u> and will be removed in a next release.</br>
+
+<h3>5. Wish to see thumbnails of raw image files?</h3>
 Of course you do. What you need is a "raw codec", usually available for free from the camera manufacturer.
 The best I've found so far is "FastPictureViewer codec" (from <a href="http://www.fastpictureviewer.com/codecs/">here</a>).
 It is very fast, covers many raw formats and is free for personal use.<br>
 <a href="Readme Using Codecs.txt"><b>Readme Using Codecs.txt</b></a>
-
-<h3>5. jhead.exe &amp; jpegtran.exe</h3>
-These files are no longer needed.<br>
 <br>
 <br>
 
@@ -254,13 +249,7 @@ If you check this, double-clicking in the Workspace will remove a tag,
 double-clicking on one of the tabs Exif, Xmp, Iptc, Maker, All will add that tag to the Workspace.
 <br><br>
 <b>Exiftool.exe location</b><br>
-If you need to override the location of exiftool.exe you can do that here.<br><br>
-<b>Filelist: Show Folders in Filelist</b><br>
-The default setting is to only show files in the Filelist panel. If you enable this option, also folders (directories) will be shown, allowing easier navigation.<br>
-It will also enable a BreadCrumb bar.<br><br>
-<b>Hint pause timeout in Millisecs</b><br>
-Hovering over the metadata panel will display the complete metadata value as a hint. This was added because long values are often not completely visible.<br>
-Setting this value to 0 (zero) will effectively disable the hints.
+If you need to override the location of exiftool.exe you can do that here.
 <br><br>
 
 <h3><a name="m_workspace">Workspace manager</a></h3>
@@ -402,10 +391,7 @@ next GUI start. Remaining options settings however, are only temporary
 
 <h3>Group tag names by instance (-g4)</h3></font> -This can help you to identify duplicated tags when viewing in <font class="blue">Metadata</font> panel.<br>
 
-<h3>API WindowsWideFile (requires Exiftool v12.66)</h3> -Force the use of wide-character Windows I/O functions when the CharsetFileName option is used.<br>
-
-<h3>Custom options</h3> -You can specify additonal options that exiftool should use. Expert option. Normally used with the Log Window.<br>
-Possible use case is the option <b>-htmldump</b> and use the log window to catch the output.<br>
+<h3>API WindowsWideFile (requires Exiftool v12.66)</h3></font> -Force the use of wide-character Windows I/O functions when the CharsetFileName option is used.<br>
 <br>
 <br>
 <h2><a name="m_exp_imp">Export/Import menu</a></h2>
@@ -554,6 +540,16 @@ cases, that will be the same folder where image files reside.</li>
 ...and that's it.<br>
 <br>
 
+<h3>Extract preview image from selected: raw files (Deprecated)</h3>
+This function has been replaced by <b>Generic extract previews</b> and will be
+removed in a next release.
+<br>
+
+<h3>Embed preview image into selected: raw files (Deprecated)</h3>
+This function has been replaced by <b>Generic import preview</b> and will be
+removed in a next release.
+<br>
+
 <h3>Generic extract previews</h3>
 As you may know raw image files can also contain a JPG image, which serves for
 previewing raw image file content. In most cases, this JPG image is "as
@@ -626,6 +622,11 @@ If you have a backup tool that relies on the Date Modified, it will not notice t
 <img src="ExifToolGUI_V6_files/renamefiles.jpg"><br>
 <br>
 
+<h3>JPG: Lossless autorotate (Deprecated)</h3>
+This menu still uses external program jhead.exe. (if available) But will be removed in a next release. Use the next menu-item.<br>
+<br>
+<br>
+
 <h3>JPG: Lossless autorotate + crop</h3>
 This will physically rotate selected JPG images according to Exif:Orientation value inside files.<br>
 It uses a library NativeJpg by SimDesign B.V. to do the actual rotating. No external program is needed.<br>
@@ -660,9 +661,7 @@ appropriate raw "codec", to be able to see thumbnails and previews.<br>
 <br>
 
 <b>Details</b> drop-down box<br>
--is set to <font class="blue">Standard filelist</font> by default. This drop-down box also contain few predefined details views:<br>
-<font class="blue">Camera settings, Location info</font> and <font class="blue">About photo</font> -where each of these views shows few metadata values inside files; i.e.:<br> 
-<u><b>Note:</b></u> The Folders and the Breadcrumb bar are shown only when enabled in Preferences/Other.<br>
+-is set to <font class="blue">Standard filelist</font> by default. This drop-down box also contain few predefined details views: <font class="blue">Camera settings, Location info</font> and <font class="blue">About photo</font> -where each of these views shows few metadata values inside files; i.e.:<br> 
 <img src="ExifToolGUI_V6_files/filelistcamerasettings.jpg"><br>
 <br>
 
@@ -996,7 +995,7 @@ P.S.: Don't blame me for my English grammar -it's not my native language.<br>
 </em>
 <br>
 Frank<br>
-Modified on December, 2023<br>
+Modified on November, 2023<br>
 <br>
 
 <u>You may find additional info in the ReadMe files:</u>
@@ -1004,7 +1003,6 @@ Modified on December, 2023<br>
 <li><a href="ReadMe for Developers.txt">ReadMe for Developers</a></li>
 <li><a href="..\Source\Vcl.ShellControls\ReadMe.txt">ReadMe ShellControls</a></li>
 <li><a href="..\Source\NativeJpg\README.txt">ReadMe NativeJpg</a></li>
-<li><a href="..\Source\BeadcrumbBar\README.txt">ReadMe Breaddcrum Bar</a></li>
 <li><a href="ReadMe for Users.txt">ReadMe for Users</a></li>
 <li><a href="Readme GeoCoding.txt">Readme GeoCoding</a></li>
 <li><a href="Readme Long filenames.txt">Readme Long filenames</a></li>
