@@ -25,7 +25,7 @@ Notes:
 - Microsoft states that is recommended to use a Manifest in stead of the API's, but then it would not be easy to switch at runtime.
 - The API's have to be called very early, and only once, at startup.
 - You can override the settings in the shortcut. Properties/Compatibility/Change high DPI settings.
-- To help troubleshoot any problems the following command line parameters are introced:
+- To help troubleshoot any problems the following command line parameters are introduced:
 
   /Scale                     Turn on Scaling for all forms. 
 
