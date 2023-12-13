@@ -4,7 +4,7 @@ Issue #199 tries to improve 4K support.
 The problem with 4K monitors is that they typically have a higher DPI than 96, the DPI ExifToolGui is designed for.
 The result could be that items look too small, or not correctly positioned, or even be unreadable.
 
-Previous versions of Delphi used scaling to overcome that. The problem with scaling is that item could be blurry.
+Previous versions of Delphi used scaling to overcome that. The problem with scaling is that items could be blurry.
 Recent Delphi versions support the Windows HighDpi Api. (E.g. Via Manifest or API HighDPISetProcessDpiAwareness, SetProcessDpiAwarenessContext)
 
 The current solution implemented in ExiftoolGui:
@@ -45,5 +45,3 @@ The problem that I face is that I dont own a 4K monitor, so it's very hard to te
 Anyone with such a monitor willing to help? Create an issue on Github with your testresults. https://github.com/FrankBijnen/ExifToolGui/issues
 
 Frank
-
-
