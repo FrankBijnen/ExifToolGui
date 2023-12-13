@@ -13,12 +13,11 @@ implementation
 
 uses System.SysUtils, Winapi.Windows, Winapi.ShellScaling, Vcl.Dialogs;
 
-var DontScale: boolean;
+var DoScale: boolean;
 
 procedure TScaleForm.Loaded;
 begin
-  if DontScale then
-    Scaled := false;
+  Scaled := DoScale;
 
   inherited;
 end;
@@ -44,7 +43,7 @@ initialization
 var
   DpiAware: string;
 begin
-  DontScale := FindCmdLineSwitch('DontScale', true);
+  DoScale := FindCmdLineSwitch('Scale', true);
 
   if CheckWin32Version(10, 0) and (TOSversion.Build >= 15063) then // Windows 10 1703 has 15063 as the Build number
   begin
