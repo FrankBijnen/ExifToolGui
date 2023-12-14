@@ -513,7 +513,9 @@ object FMain: TFMain
         TabOrder = 2
         UserDataFolder = '%LOCALAPPDATA%\bds.exe.WebView2'
         OnCreateWebViewCompleted = EdgeBrowser1CreateWebViewCompleted
+        OnNavigationStarting = EdgeBrowser1NavigationStarting
         OnWebMessageReceived = EdgeBrowser1WebMessageReceived
+        OnZoomFactorChanged = EdgeBrowser1ZoomFactorChanged
       end
     end
   end

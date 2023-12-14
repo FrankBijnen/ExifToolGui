@@ -36,7 +36,6 @@ type
     CLFocal: integer;
     CLISO: integer;
     ShowFolders: boolean;
-    DesignPPI: integer;
   end;
 
   FListColUsrRec = record

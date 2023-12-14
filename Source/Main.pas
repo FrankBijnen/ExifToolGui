@@ -274,13 +274,15 @@ type
     procedure OnlineDocumentation1Click(Sender: TObject);
     procedure MetadataListMouseMove(Sender: TObject; Shift: TShiftState; X, Y: Integer);
     procedure MCustomOptionsClick(Sender: TObject);
+    procedure EdgeBrowser1ZoomFactorChanged(Sender: TCustomEdgeBrowser; AZoomFactor: Double);
+    procedure EdgeBrowser1NavigationStarting(Sender: TCustomEdgeBrowser; Args: TNavigationStartingEventArgs);
   private
     { Private declarations }
     ETBarSeriesFocal: TBarSeries;
     ETBarSeriesFnum: TBarSeries;
     ETBarSeriesIso: TBarSeries;
     BreadcrumbBar: TDirBreadcrumbBar;
-
+    EdgeZoom: double;
     procedure ImageDrop(var Msg: TWMDROPFILES); message WM_DROPFILES;
     procedure ShowMetadata; // (const LogErr:boolean=true);
     procedure ShowPreview;
@@ -1748,6 +1750,17 @@ begin
 
 end;
 
+// Retain zoomfactor
+procedure TFMain.EdgeBrowser1NavigationStarting(Sender: TCustomEdgeBrowser; Args: TNavigationStartingEventArgs);
+begin
+  Sender.ZoomFactor := EdgeZoom;
+end;
+
+procedure TFMain.EdgeBrowser1ZoomFactorChanged(Sender: TCustomEdgeBrowser; AZoomFactor: Double);
+begin
+  EdgeZoom := AZoomFactor;
+end;
+
 procedure TFMain.EdgeBrowser1WebMessageReceived(Sender: TCustomEdgeBrowser; Args: TWebMessageReceivedEventArgs);
 var
   Message: PChar;
@@ -3151,13 +3164,13 @@ procedure TFMain.SetGuiStyle;
 var
   AStyleService: TCustomStyleServices;
 begin
-  GUIsettings.DesignPPI := GetDesignDpi;
   GUIColorWindow := clBlack;
   AStyleService := TStyleManager.Style[GUIsettings.GuiStyle];
   if Assigned(AStyleService) then
     GUIColorWindow := AStyleService.GetStyleColor(scWindow);
+
   BreadcrumbBar.Style := GUIsettings.GuiStyle;
-  BreadcrumbBar.DesignDPI := GUIsettings.DesignPPI;
+  BreadcrumbBar.DesignDPI := GetDesignDpi;
   BreadcrumbBar.ScreenDPI := Screen.PixelsPerInch;
 end;
 

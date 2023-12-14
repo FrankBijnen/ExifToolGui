@@ -10,6 +10,7 @@ Current version: <b>V6.2.7</b> updated December 25, 2023.<br>
 - Fix for generated Powershell script.<br>
 - Style fixes for Green.<br>
 - Experimental support for [4K Monitors](Docs/Readme%204K%20monitor.txt).<br>
+  If you experience problems with scaling, window positions etc. add <b>/HighDpi=UnAware /Scale</b> as parameters to the shortcut.
 
 [Change log](Docs/changelog.txt)<br>
 [Download Release](https://github.com/FrankBijnen/ExifToolGui/releases/latest)<br>
