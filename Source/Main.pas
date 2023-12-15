@@ -1449,50 +1449,57 @@ procedure TFMain.QuickPopUp_AddQuickClick(Sender: TObject);
 var
   I, N, X: smallint;
   Tx, Ty, Tz, T1: string;
+  CrWait, CrNormal: HCURSOR;
 begin
-  I := Length(QuickTags);
-  SetLength(QuickTags, I + 1);
-  N := MetadataList.Row;
-  if SpeedBtnExif.Down then
-    Tz := 'Exif:'
-  else if SpeedBtnXmp.Down then
-    Tz := 'Xmp:'
-  else if SpeedBtnIptc.Down then
-    Tz := 'Iptc:'
-  else
-    Tz := '';
+  CrWait := LoadCursor(0, IDC_WAIT);
+  CrNormal := SetCursor(CrWait);
+  try
+    I := Length(QuickTags);
+    SetLength(QuickTags, I + 1);
+    N := MetadataList.Row;
+    if SpeedBtnExif.Down then
+      Tz := 'Exif:'
+    else if SpeedBtnXmp.Down then
+      Tz := 'Xmp:'
+    else if SpeedBtnIptc.Down then
+      Tz := 'Iptc:'
+    else
+      Tz := '';
 
-  if MGroup_g4.Checked then
-    Tx := Tz
-  else
-  begin // find group
-    X := N;
-    repeat
-      Dec(X);
-      Tx := MetadataList.Keys[X];
-    until length(Tx) = 0;
-    Tx := MetadataList.Cells[1, X]; // eg '---- IFD0 ----'
-    Delete(Tx, 1, 5);               // -> 'IFD0 ----'
-    X := pos(' ', Tx);
-    SetLength(Tx, X - 1);           // -> 'IFD0'
-    Tx := Tx + ':';                 // -> 'IFD0:'
-  end;
+    if MGroup_g4.Checked then
+      Tx := Tz
+    else
+    begin // find group
+      X := N;
+      repeat
+        Dec(X);
+        Tx := MetadataList.Keys[X];
+      until length(Tx) = 0;
+      Tx := MetadataList.Cells[1, X]; // eg '---- IFD0 ----'
+      Delete(Tx, 1, 5);               // -> 'IFD0 ----'
+      X := pos(' ', Tx);
+      SetLength(Tx, X - 1);           // -> 'IFD0'
+      Tx := Tx + ':';                 // -> 'IFD0:'
+    end;
 
-  Ty := MetadataList.Keys[N];       // e.g. 'Make' or '0x010f Make' or '- Rating'
-  if LeftStr(Ty, 2) = '0x' then
-    Delete(Ty, 1, 7)
-  else if LeftStr(Ty, 2) = '- ' then
-    Delete(Ty, 1, 2);
-  Ty := TrimRight(Ty);
-  T1 := Ty;                         // tl=language specific tag name
-  Ty := TranslateTagName('-' + Tz, Ty);
-  with QuickTags[I] do
-  begin
-    Caption := Tz + T1;
-    Command := '-' + Tx + Ty;       // ='-IFD0:Make'
-    Help := 'No Hint defined';
+    Ty := MetadataList.Keys[N];       // e.g. 'Make' or '0x010f Make' or '- Rating'
+    if LeftStr(Ty, 2) = '0x' then
+      Delete(Ty, 1, 7)
+    else if LeftStr(Ty, 2) = '- ' then
+      Delete(Ty, 1, 2);
+    Ty := TrimRight(Ty);
+    T1 := Ty;                         // tl=language specific tag name
+    Ty := TranslateTagName('-' + Tz, Ty);
+    with QuickTags[I] do
+    begin
+      Caption := Tz + T1;
+      Command := '-' + Tx + Ty;       // ='-IFD0:Make'
+      Help := 'No Hint defined';
+    end;
+  finally
+    MetadataList.Refresh;
+    SetCursor(CrNormal);
   end;
-  ShowMetadata;
 end;
 
 procedure TFMain.QuickPopUp_DelCustomClick(Sender: TObject);
