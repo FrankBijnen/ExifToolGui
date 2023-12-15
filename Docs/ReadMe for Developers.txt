@@ -39,7 +39,7 @@ Adding reverse geocoding involved adding a 2nd provider: Overpass. The simple so
 I do agree it would be better to create classes and subclasses. We'll leave that for a next release.
 
 To finally resolve the issue that ExifToolGui would hang, because the ExifTool cmd was not terminated by a CRLF, I decided to add a CRLF in ET_OpenExec if it does not end with a CRLF.
-Note that in stead of a CRLF, a bare LF will also work, but I decided to leave that as-is.
+Note that instead of a CRLF, a bare LF will also work, but I decided to leave that as-is.
 
 When looking at the original code to format the output of ExifTool I figured it needed an overhaul. So I created TPipeStream in Exiftool_PipeStream.pas. 
 TPipeStream handles: Conversion to UTF8, Scanning for {Ready..., Scanning for ======= (it indicates a new file) and uses an event to communicate.

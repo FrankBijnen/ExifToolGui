@@ -1492,6 +1492,7 @@ begin
     Command := '-' + Tx + Ty;       // ='-IFD0:Make'
     Help := 'No Hint defined';
   end;
+  ShowMetadata;
 end;
 
 procedure TFMain.QuickPopUp_DelCustomClick(Sender: TObject);

@@ -7,25 +7,28 @@ The result could be that items look too small, or not correctly positioned, or e
 Previous versions of Delphi used scaling to overcome that. The problem with scaling is that items could be blurry.
 Recent Delphi versions support the Windows HighDpi Api. (E.g. Via Manifest or API SetProcessDpiAwareness, SetProcessDpiAwarenessContext)
 
-The current solution implemented in ExiftoolGui:
+As of version 6.2.7 this solution is implemented in ExiftoolGui:
 
-- Turn off Scaling for all forms. Using command line parameter /Scale you can restore the old behaviour.
+- Scaling is turned off by default, but can be re-enabled with the command line parameter /Scale.
 
-- Set the process-default DPI awareness level to System-Aware.
+- DPI Awareness.
 
-  Windows 10 1703 or higher
-  - SetProcessDpiAwarenessContext(DPI_AWARENESS_CONTEXT_SYSTEM_AWARE)
-    see: https://learn.microsoft.com/en-us/windows/win32/hidpi/dpi-awareness-context
+  Below Window 8.1
+  - No calls are made to set DPI Awareness.
   
   Windows 8.1 or higher
   - SetProcessDpiAwareness(TProcessDpiAwareness.PROCESS_SYSTEM_DPI_AWARE)
     see: https://learn.microsoft.com/en-us/windows/win32/api/shellscalingapi/ne-shellscalingapi-process_dpi_awareness
 
+  Windows 10 1703 or higher
+  - SetProcessDpiAwarenessContext(DPI_AWARENESS_CONTEXT_SYSTEM_AWARE)
+    see: https://learn.microsoft.com/en-us/windows/win32/hidpi/dpi-awareness-context
+
 Notes:
-- Microsoft states that is recommended to use a Manifest in stead of the API's, but then it would not be easy to switch at runtime.
+- Microsoft states that is recommended to use a Manifest instead of the API's, but then it would not be easy to switch at runtime.
 - The API's have to be called very early, and only once, at startup.
 - You can override the settings in the shortcut. Properties/Compatibility/Change high DPI settings.
-- To help troubleshoot any problems the following command line parameters are introduced:
+- To help troubleshoot any problems the following command line parameters are introduced to override the default behaviour:
 
   /Scale                     Turn on Scaling for all forms. 
 
@@ -40,6 +43,10 @@ Notes:
   /HighDPI=UnAware           SetProcessDpiAwareness(TProcessDpiAwareness.PROCESS_DPI_UNAWARE)
   /HighDPI=SystemAware       SetProcessDpiAwareness(TProcessDpiAwareness.PROCESS_SYSTEM_DPI_AWARE)
   /HighDPI=PerMonitorAware   SetProcessDpiAwareness(TProcessDpiAwareness.PROCESS_PER_MONITOR_DPI_AWARE)
+
+The reasons for using command line parameters instead of adding options in preferences:
+- They are hopefully only temporary. The long term solution is to use the manifest.
+- The preferences are read too late. A window handle is already created.
 
 The problem that I face is that I dont own a 4K monitor, so it's very hard to test. I can only test a lower DPI.
 Anyone with such a monitor willing to help? Create an issue on Github with your testresults. https://github.com/FrankBijnen/ExifToolGui/issues
