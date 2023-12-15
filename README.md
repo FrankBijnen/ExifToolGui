@@ -4,6 +4,7 @@
 This is an updated version of the ExifToolGui program created by Bogdan Hrastnik. Many thanks go out to him.
 
 Current version: <b>V6.2.7</b> updated December 25, 2023.<br>
+- Deprecated functions that use Jhead or JpegTran have been removed.<br>
 - Added peek preview for metadata panel. Shown as hint.<br>
 - Added option to show Folders in filelist, including a Breadcrumb Bar.<br>
 - Added option to add custom tags to Exiftool.<br>
