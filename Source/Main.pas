@@ -213,7 +213,6 @@ type
     procedure Splitter1CanResize(Sender: TObject; var NewSize: integer; var Accept: boolean);
     procedure Splitter2CanResize(Sender: TObject; var NewSize: integer; var Accept: boolean);
     procedure FormCanResize(Sender: TObject; var NewWidth, NewHeight: integer; var Resize: boolean);
-    procedure Splitter3CanResize(Sender: TObject; var NewSize: integer; var Accept: boolean);
     procedure ShellListChange(Sender: TObject; Item: TListItem; Change: TItemChange);
     procedure QuickPopUpMenuPopup(Sender: TObject);
     procedure QuickPopUp_UndoEditClick(Sender: TObject);
@@ -276,6 +275,8 @@ type
     procedure MCustomOptionsClick(Sender: TObject);
     procedure EdgeBrowser1ZoomFactorChanged(Sender: TCustomEdgeBrowser; AZoomFactor: Double);
     procedure EdgeBrowser1NavigationStarting(Sender: TCustomEdgeBrowser; Args: TNavigationStartingEventArgs);
+    procedure Splitter2Moved(Sender: TObject);
+    procedure Splitter1Moved(Sender: TObject);
   private
     { Private declarations }
     ETBarSeriesFocal: TBarSeries;
@@ -283,6 +284,8 @@ type
     ETBarSeriesIso: TBarSeries;
     BreadcrumbBar: TDirBreadcrumbBar;
     EdgeZoom: double;
+    MinFileListWidth: integer;
+    procedure AlignStatusBar;
     procedure ImageDrop(var Msg: TWMDROPFILES); message WM_DROPFILES;
     procedure ShowMetadata; // (const LogErr:boolean=true);
     procedure ShowPreview;
@@ -2103,26 +2106,26 @@ begin
   end;
 end;
 
+procedure TFMain.AlignStatusBar;
+begin
+  StatusBar.Panels[0].Width := AdvPageBrowse.Width + Splitter1.Width;
+  StatusBar.Panels[1].Width := AdvPageFilelist.Width + Splitter2.Width;
+end;
+
 procedure TFMain.FormCanResize(Sender: TObject; var NewWidth, NewHeight: integer; var Resize: boolean);
 var
-  n, X: integer;
+  N: integer;
 begin
-  if WindowState <> wsMinimized then
+  if (WindowState <> wsMinimized) and
+     (NewWidth < ClientWidth) then
   begin
-    n := GUIBorderWidth + AdvPanelBrowse.Width + AdvPageMetadata.Width + Splitter1.Width;
-    X := n + Splitter2.MinSize + Splitter2.Width;
-    if NewWidth < X then
-      Resize := false;
-
-    X := GUIBorderHeight + AdvPagePreview.Height + StatusBar.Height;
-    if NewHeight < X + 128 then
-      Resize := false;
-
+    N := GUIBorderWidth + AdvPanelBrowse.Width + Splitter1.Width +
+                          MinFileListWidth + Splitter2.Width +
+                          AdvPageMetadata.Width;
+    if NewWidth < N then
+      NewWidth := N;
     if Resize then
-    begin
-      with StatusBar do
-        Panels[1].Width := NewWidth - n;
-    end;
+      AlignStatusBar;
   end;
 end;
 
@@ -2135,6 +2138,9 @@ end;
 
 procedure TFMain.FormCreate(Sender: TObject);
 begin
+  MinFileListWidth := AdvPageFilelist.Constraints.MinWidth;
+  AdvPageFilelist.Constraints.MinWidth := 0;
+
   ReadGUIini;
 
   // Create Bread Crumb
@@ -2226,13 +2232,13 @@ var
   AnItem: TListItem;
   Param: string;
   Lat, Lon: string;
-  I: smallint;
+  I: integer;
   PathFromParm: boolean;
 begin
-  I := Screen.PixelsPerInch;
-  AdvPanelETdirect.Height := MulDiv(32, I, 96);
-  AdvPanelMetaBottom.Height := MulDiv(32, I, 96);
-  MetadataList.DefaultRowHeight := MulDiv(19, I, 96);
+  AdvPanelETdirect.Height := MulDiv(32, Screen.PixelsPerInch, GetDesignDpi);
+  AdvPanelMetaBottom.Height := MulDiv(32, Screen.PixelsPerInch, GetDesignDpi);
+  MetadataList.DefaultRowHeight := MulDiv(19, Screen.PixelsPerInch, GetDesignDpi);
+//
   // This must be in OnShow event -for OnCanResize event (probably bug in XE2):
   GUIBorderWidth := Width - ClientWidth;
   GUIBorderHeight := Height - ClientHeight;
@@ -3013,23 +3019,23 @@ end;
 
 procedure TFMain.SpeedBtnLargeClick(Sender: TObject);
 var
-  i, F: smallint;
+  I, F: integer;
 begin
-  i := Screen.PixelsPerInch;
+  I := Screen.PixelsPerInch;
   F := ShellList.ItemIndex;
   if SpeedBtnLarge.Down then
   begin
     MemoQuick.Clear;
     MemoQuick.Text := EditQuick.Text;
     EditQuick.Visible := false;
-    AdvPanelMetaBottom.Height := MulDiv(105, i, 96);
+    AdvPanelMetaBottom.Height := MulDiv(105, I, GetDesignDpi);
     if F <> -1 then
       MemoQuick.SetFocus;
   end
   else
   begin
     EditQuick.Text := MemoQuick.Text;
-    AdvPanelMetaBottom.Height := MulDiv(32, i, 96);
+    AdvPanelMetaBottom.Height := MulDiv(32, I, GetDesignDpi);
     EditQuick.Visible := true;
     if F <> -1 then
       EditQuick.SetFocus;
@@ -3054,12 +3060,12 @@ begin
       H := 184 // min 181
     else
       H := 105;
-    AdvPanelETdirect.Height := MulDiv(H, I, 96);
+    AdvPanelETdirect.Height := MulDiv(H, I, GetDesignDpi);
     EditETdirect.SetFocus;
   end
   else
   begin
-    AdvPanelETdirect.Height := MulDiv(32, I, 96);
+    AdvPanelETdirect.Height := MulDiv(32, I, GetDesignDpi);
     ShellList.SetFocus;
   end;
 end;
@@ -3077,7 +3083,7 @@ begin
     H := 181
   else
     H := 105;
-  AdvPanelETdirect.Height := MulDiv(H, Screen.PixelsPerInch, 96);
+  AdvPanelETdirect.Height := MulDiv(H, Screen.PixelsPerInch, GetDesignDpi);
 end;
 
 procedure TFMain.SpeedBtn_GeotagClick(Sender: TObject);
@@ -3137,7 +3143,7 @@ end;
 
 procedure TFMain.Splitter1CanResize(Sender: TObject; var NewSize: integer; var Accept: boolean);
 var
-  X: smallint;
+  X: integer;
 begin
   if NewSize <= Splitter1.Left then
   begin // limit to min. Browse panel
@@ -3145,27 +3151,33 @@ begin
       NewSize := Splitter1.MinSize + 1;
   end
   else
-    with Splitter2 do
-    begin // limit to min. Filelist panel
-      X := Left - NewSize;
-      if X < MinSize then
-        NewSize := Left - MinSize - 5;
-    end;
-  StatusBar.Panels[0].Width := NewSize + 5;
+  begin // limit to min. Filelist panel
+    X := Splitter2.Left - NewSize;
+    if X < MinFileListWidth then
+      NewSize := Splitter2.Left - MinFileListWidth - Splitter2.Width;
+  end;
+end;
+
+procedure TFMain.Splitter1Moved(Sender: TObject);
+begin
+  AlignStatusBar;
 end;
 
 procedure TFMain.Splitter2CanResize(Sender: TObject; var NewSize: integer; var Accept: boolean);
+var
+  LeftOver: integer;
 begin
-  if NewSize < 320 then
-    NewSize := 320; // limit to min. Metadata panel
-  with StatusBar do
-    Panels[1].Width := Width - Panels[0].Width - NewSize;
+  if NewSize < Splitter2.MinSize then
+    NewSize := Splitter2.MinSize; // limit to min. Metadata panel
+  LeftOver := ClientWidth - Splitter1.Left - Splitter1.Width - Splitter2.Width - NewSize;
+  Accept := LeftOver > MinFileListWidth;
+  if not Accept then
+    NewSize := MinFileListWidth;
 end;
 
-procedure TFMain.Splitter3CanResize(Sender: TObject; var NewSize: integer; var Accept: boolean);
-begin // prevent NewSize=0 (disappearing Preview panel)
-  if NewSize <= Splitter3.MinSize then
-    NewSize := Splitter3.MinSize + 1;
+procedure TFMain.Splitter2Moved(Sender: TObject);
+begin
+  AlignStatusBar;
 end;
 
 procedure TFMain.SetGuiStyle;
