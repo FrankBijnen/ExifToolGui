@@ -2116,14 +2116,12 @@ procedure TFMain.FormCanResize(Sender: TObject; var NewWidth, NewHeight: integer
 var
   N: integer;
 begin
-  if (WindowState <> wsMinimized) and
-     (NewWidth < ClientWidth) then
+  if (WindowState <> wsMinimized) then
   begin
     N := GUIBorderWidth + AdvPanelBrowse.Width + Splitter1.Width +
                           MinFileListWidth + Splitter2.Width +
                           AdvPageMetadata.Width;
-    if NewWidth < N then
-      NewWidth := N;
+    Resize := (NewWidth > N);
     if Resize then
       AlignStatusBar;
   end;

@@ -168,8 +168,8 @@ object FMain: TFMain
     DoubleBuffered = True
     ParentDoubleBuffered = False
     TabOrder = 2
-    ExplicitLeft = 629
-    ExplicitTop = -6
+    ExplicitLeft = 624
+    ExplicitHeight = 562
     object AdvTabMetadata: TTabSheet
       Caption = 'Metadata'
       object AdvPanelMetaTop: TPanel
@@ -537,7 +537,8 @@ object FMain: TFMain
     DoubleBuffered = True
     ParentDoubleBuffered = False
     TabOrder = 3
-    ExplicitTop = 1
+    ExplicitWidth = 374
+    ExplicitHeight = 562
     object AdvTabFilelist: TTabSheet
       Caption = 'Filelist'
       object AdvPanelFileTop: TPanel
@@ -819,8 +820,6 @@ object FMain: TFMain
         ViewStyle = vsReport
         OnKeyPress = EditFindMetaKeyPress
         OnKeyUp = ShellListKeyUp
-        ExplicitWidth = 366
-        ExplicitHeight = 271
       end
       object PnlBreadCrumb: TPanel
         Left = 0
