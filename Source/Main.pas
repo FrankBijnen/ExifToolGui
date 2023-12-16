@@ -3155,7 +3155,7 @@ end;
 
 procedure TFMain.Splitter1CanResize(Sender: TObject; var NewSize: integer; var Accept: boolean);
 begin
-  Accept := ((Splitter2.Left - Splitter2.Width - NewSize) > MinFileListWidth);
+  Accept := ((Splitter2.Left - Splitter2.Width - Splitter1.Width - NewSize) > MinFileListWidth);
 end;
 
 procedure TFMain.Splitter1Moved(Sender: TObject);
