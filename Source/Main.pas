@@ -42,9 +42,8 @@ type
     AdvPanelETdirect: TPanel;
     AdvPanelMetaTop: TPanel;
     AdvPanelMetaBottom: TPanel;
-    ShellTree: ExifToolsGUI_ShellTree.TShellTreeView;
-    // Need to create our own version!
-    ShellList: ExifToolsGUI_ShellList.TShellListView;
+    ShellTree: ExifToolsGUI_ShellTree.TShellTreeView; // Need to create our own version!
+    ShellList: ExifToolsGUI_ShellList.TShellListView; // Need to create our own version!
     MetadataList: TValueListEditor;
     SpeedBtnExif: TSpeedButton;
     SpeedBtnIptc: TSpeedButton;
@@ -287,7 +286,7 @@ type
     MinFileListWidth: integer;
     procedure AlignStatusBar;
     procedure ImageDrop(var Msg: TWMDROPFILES); message WM_DROPFILES;
-    procedure ShowMetadata; // (const LogErr:boolean=true);
+    procedure ShowMetadata;
     procedure ShowPreview;
     procedure ShellListSetFolders;
     procedure EnableMenus(Enable: boolean);
@@ -322,7 +321,7 @@ type
     procedure ExecRestEvent_Done(Url, Response: string; Succes: boolean);
     procedure UpdateStatusBar_FilesShown;
     procedure SetGuiStyle;
-    var GUIBorderWidth, GUIBorderHeight: integer; // Initialized in OnShow
+    var GUIBorderWidth, GUIBorderHeight: integer;
     var GUIColorWindow: TColor;
   end;
 
@@ -899,8 +898,9 @@ procedure TFMain.MExifLensFromMakerClick(Sender: TObject);
 var
   ETcmd, ETout, ETerr: string;
 begin
-  if MessageDlg('This will fill Exif:LensInfo of selected files with relevant' + #10#13 + 'values from Makernotes data (where possible).' +
-    #10#13#10#13 + 'OK to proceed?', mtInformation, [mbOk, mbCancel], 0) = mrOK then
+  if MessageDlg('This will fill Exif:LensInfo of selected files with relevant' + #10#13 +
+                'values from Makernotes data (where possible).' + #10#13#10#13 +
+                'OK to proceed?', mtInformation, [mbOk, mbCancel], 0) = mrOK then
   begin
     ETcmd := '-Exif:LensInfo<LensID' + CRLF + '-Exif:LensModel<LensID' + CRLF;
     ET_OpenExec(ETcmd, GetSelectedFiles, ETout, ETerr);
@@ -949,8 +949,9 @@ procedure TFMain.MFileDateFromExifClick(Sender: TObject);
 var
   ETout, ETerr: string;
 begin
-  if MessageDlg('This will set "Date modified" of selected files' + #10#13 + 'according to Exif:DateTimeOriginal value.' + #10#13#10#13 +
-    'OK to proceed?', mtInformation, [mbOk, mbCancel], 0) = mrOK then
+  if MessageDlg('This will set "Date modified" of selected files' + #10#13 +
+                'according to Exif:DateTimeOriginal value.' + #10#13#10#13 +
+                'OK to proceed?', mtInformation, [mbOk, mbCancel], 0) = mrOK then
   begin
     ET_OpenExec('-FileModifyDate<Exif:DateTimeOriginal', GetSelectedFiles, ETout, ETerr);
     RefreshSelected(Sender);
@@ -987,9 +988,12 @@ begin
   begin
     j := ShellList.SelCount;
     if j > 1 then // message appears only if multi files selected
-      if MessageDlg('This will copy ALL metadata from any source into' + #10#13 + 'currently *selected* ' + DstExt + ' files.' + #10#13 +
-        'Only those selected files will be processed,' + #10#13 + 'where source and destination filename is equal.' + #10#13#10#13 +
-        'Next: Select source file. OK to proceed?', mtInformation, [mbOk, mbCancel], 0) <> mrOK then
+      if MessageDlg('This will copy ALL metadata from any source into' + #10#13 +
+                    'currently *selected* ' + DstExt + ' files.' + #10#13 +
+                    'Only those selected files will be processed,' + #10#13 +
+                    'where source and destination filename is equal.' + #10#13#10#13 +
+                    'Next: Select source file. OK to proceed?',
+                    mtInformation, [mbOk, mbCancel], 0) <> mrOK then
         j := 0;
     if j <> 0 then
     begin
@@ -1078,10 +1082,13 @@ begin
   Delete(DstExt, 1, 1);
   if (DstExt = 'jpg') or (DstExt = 'tif') then
   begin
-    i := MessageDlg('This will copy metadata from files in another folder' + #10#13 + 'into *all* ' + UpperCase(DstExt) +
-      ' files inside currently *selected* folder.' + #10#13 + 'Only those files will be processed, where' + #10#13 +
-      'source and destination filename is equal.' + #10#13#10#13 + 'Should files in subfolders also be processed?', mtInformation,
-      [mbYes, mbNo, mbCancel], 0);
+    i := MessageDlg('This will copy metadata from files in another folder' + #10#13 +
+                    'into *all* ' + UpperCase(DstExt) +
+                    ' files inside currently *selected* folder.' + #10#13 +
+                    'Only those files will be processed, where' + #10#13 +
+                    'source and destination filename is equal.' + #10#13#10#13 +
+                    'Should files in subfolders also be processed?', mtInformation,
+                    [mbYes, mbNo, mbCancel], 0);
     if i <> mrCancel then
     begin
       with OpenPictureDlg do
@@ -1141,9 +1148,12 @@ procedure TFMain.MImportXMPLogClick(Sender: TObject);
 var
   SrcDir, ETcmd, ETout, ETerr: string;
 begin
-  if MessageDlg('This will import GPS data from XMP sidecar files into' + #10#13 + 'Exif GPS region of currently selected files.' + #10#13 +
-    'Only those selected files will be processed, where' + #10#13 + 'source and destination filename is equal.' + #10#13#10#13 +
-    'Next: Select folder containing XMP files. OK to proceed?', mtInformation, [mbOk, mbCancel], 0) = mrOK then
+  if MessageDlg('This will import GPS data from XMP sidecar files into' + #10#13 +
+                'Exif GPS region of currently selected files.' + #10#13 +
+                'Only those selected files will be processed, where' + #10#13 +
+                'source and destination filename is equal.' + #10#13#10#13 +
+                'Next: Select folder containing XMP files. OK to proceed?',
+                mtInformation, [mbOk, mbCancel], 0) = mrOK then
   begin
     if GpsXmpDir <> '' then
       SrcDir := GpsXmpDir
@@ -1238,15 +1248,16 @@ begin
       else
         ETShowNumber := '';
   if Sender = MShowGPSdecimal then
-    ET_Options.SetGpsFormat(MShowGPSdecimal.Checked);
-  // + used by MShowHexID, MGroup_g4, MShowComposite, MShowSorted, MNotDuplicated
+    ET_Options.SetGpsFormat(MShowGPSdecimal.Checked); // + used by MShowHexID, MGroup_g4, MShowComposite, MShowSorted, MNotDuplicated
   RefreshSelected(Sender);
   ShowMetadata;
 end;
 
 procedure TFMain.MCustomOptionsClick(Sender: TObject);
 begin
-  ET_Options.ETCustomOptions := InputBox('Specify Custom options to add to Exiftool args','Custom options', ET_Options.ETCustomOptions);
+  ET_Options.ETCustomOptions := InputBox('Specify Custom options to add to Exiftool args',
+                                         'Custom options',
+                                         ET_Options.ETCustomOptions);
 end;
 
 procedure TFMain.MWorkspaceLoadClick(Sender: TObject);
@@ -1701,7 +1712,8 @@ begin
 
   if not (ValidLatLon(FGeoSetup.Lat, FGeoSetup.Lon)) then
   begin
-    MessageDlgEx('Selected file has no valid Lat Lon coordinates.', '', TMsgDlgType.mtError, [TMsgDlgBtn.mbOK]);
+    MessageDlgEx('Selected file has no valid Lat Lon coordinates.', '',
+                 TMsgDlgType.mtError, [TMsgDlgBtn.mbOK]);
     exit;
   end;
 
@@ -2121,10 +2133,10 @@ begin
     N := GUIBorderWidth + AdvPanelBrowse.Width + Splitter1.Width +
                           MinFileListWidth + Splitter2.Width +
                           AdvPageMetadata.Width;
-    Resize := (NewWidth > N);
-    if Resize then
-      AlignStatusBar;
+    if (NewWidth < N) then
+      NewWidth := N;
   end;
+  AlignStatusBar;
 end;
 
 procedure TFMain.FormClose(Sender: TObject; var Action: TCloseAction);
@@ -2136,6 +2148,8 @@ end;
 
 procedure TFMain.FormCreate(Sender: TObject);
 begin
+  // AdvPageFilelist.Constraints.MinWidth only used at design time. Form does not align well.
+  // We check for MinFileListWidth in code.
   MinFileListWidth := AdvPageFilelist.Constraints.MinWidth;
   AdvPageFilelist.Constraints.MinWidth := 0;
 
@@ -3140,20 +3154,8 @@ begin
 end;
 
 procedure TFMain.Splitter1CanResize(Sender: TObject; var NewSize: integer; var Accept: boolean);
-var
-  X: integer;
 begin
-  if NewSize <= Splitter1.Left then
-  begin // limit to min. Browse panel
-    if NewSize <= Splitter1.MinSize then
-      NewSize := Splitter1.MinSize + 1;
-  end
-  else
-  begin // limit to min. Filelist panel
-    X := Splitter2.Left - NewSize;
-    if X < MinFileListWidth then
-      NewSize := Splitter2.Left - MinFileListWidth - Splitter2.Width;
-  end;
+  Accept := ((Splitter2.Left - Splitter2.Width - NewSize) > MinFileListWidth);
 end;
 
 procedure TFMain.Splitter1Moved(Sender: TObject);
@@ -3162,15 +3164,8 @@ begin
 end;
 
 procedure TFMain.Splitter2CanResize(Sender: TObject; var NewSize: integer; var Accept: boolean);
-var
-  LeftOver: integer;
 begin
-  if NewSize < Splitter2.MinSize then
-    NewSize := Splitter2.MinSize; // limit to min. Metadata panel
-  LeftOver := ClientWidth - Splitter1.Left - Splitter1.Width - Splitter2.Width - NewSize;
-  Accept := LeftOver > MinFileListWidth;
-  if not Accept then
-    NewSize := MinFileListWidth;
+  Accept := ((ClientWidth - Splitter1.Left - Splitter1.Width - Splitter2.Width - NewSize) > MinFileListWidth);
 end;
 
 procedure TFMain.Splitter2Moved(Sender: TObject);

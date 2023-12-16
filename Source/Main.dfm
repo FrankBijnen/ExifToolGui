@@ -28,7 +28,7 @@ object FMain: TFMain
     Color = clBtnFace
     MinSize = 160
     ParentColor = False
-    ResizeStyle = rsUpdate
+    ResizeStyle = rsLine
     OnCanResize = Splitter1CanResize
     OnMoved = Splitter1Moved
   end
@@ -40,7 +40,7 @@ object FMain: TFMain
     Align = alRight
     AutoSnap = False
     MinSize = 320
-    ResizeStyle = rsUpdate
+    ResizeStyle = rsLine
     OnCanResize = Splitter2CanResize
     OnMoved = Splitter2Moved
     ExplicitTop = -6
@@ -88,7 +88,7 @@ object FMain: TFMain
       Align = alBottom
       AutoSnap = False
       MinSize = 128
-      ResizeStyle = rsUpdate
+      ResizeStyle = rsLine
       ExplicitTop = 362
     end
     object AdvPageBrowse: TPageControl
@@ -548,7 +548,6 @@ object FMain: TFMain
         Height = 57
         Align = alTop
         BevelOuter = bvNone
-        Constraints.MinWidth = 366
         Font.Charset = DEFAULT_CHARSET
         Font.Color = clWindowText
         Font.Height = -11
@@ -733,7 +732,7 @@ object FMain: TFMain
         object EditETdirect: TLabeledEdit
           Left = 1
           Top = 50
-          Width = 341
+          Width = 337
           Height = 23
           Hint = 
             'Spaces in data require double quotes, double quotes in data requ' +
@@ -756,7 +755,7 @@ object FMain: TFMain
           Text = ''
           OnChange = EditETdirectChange
           OnKeyDown = EditETdirectKeyDown
-          ExplicitWidth = 337
+          ExplicitWidth = 333
         end
         object CBoxETdirect: TComboBox
           Left = 1
