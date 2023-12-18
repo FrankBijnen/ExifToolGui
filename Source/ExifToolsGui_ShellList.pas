@@ -729,6 +729,11 @@ end;
 procedure TShellListView.InitThumbNails;
 var
   AQuestionMark: TBitmap;
+//TODO: Set IconSpacing
+//  Spacing: DWORD;
+//const
+//  X = -50;
+//  y = 0;
 begin
   FThumbNails.Clear;
   if (FThumbNailSize <> 0) then
@@ -747,6 +752,11 @@ begin
     end;
     // Set the imagelist to our thumbnail list.
     SendMessage(Handle, LVM_SETIMAGELIST, LVSIL_NORMAL, FThumbNails.Handle);
+//TODO: Set IconSpacing. Add to preferences?
+//
+//  Spacing := ListView_SetIconSpacing(Handle, WORD(-1), WORD(-1));
+//  ListView_SetIconSpacing(Handle,
+//                          LoWord(Spacing) + X, HiWord(Spacing) + Y);
   end;
 end;
 
