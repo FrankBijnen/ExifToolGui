@@ -308,6 +308,7 @@ type
     procedure ShellListItemsLoaded(Sender: TObject);
     procedure ShellListOwnerDataFetch(Sender: TObject; Item: TListItem; Request: TItemRequest; AFolder: TShellFolder);
     procedure ShellListColumnResized(Sender: TObject);
+    procedure ShellListMouseWheel(Sender: TObject; Shift: TShiftState; WheelDelta: Integer; MousePos: TPoint; var Handled: Boolean);
     procedure CounterETEvent(Counter: integer);
   public
     { Public declarations }
@@ -2199,13 +2200,22 @@ begin
   ShellList.OnColumnResized := ShellListColumnResized;
   ShellList.OnThumbGenerate := ShellistThumbGenerate;
   ShellList.OnThumbError := ShellistThumbError;
-
+  ShellList.OnMouseWheel := ShellListMouseWheel;
   // Enable Column sorting if Sorted = true. Disables Sorted.
   ShellList.ColumnSorted := ShellList.Sorted;
 
   CBoxFileFilter.Text := SHOWALL;
   ExifTool.ExecETEvent := ExecETEvent_Done;
   Geomap.ExecRestEvent := ExecRestEvent_Done;
+end;
+
+procedure TFMain.ShellListMouseWheel(Sender: TObject; Shift: TShiftState; WheelDelta: Integer; MousePos: TPoint; var Handled: Boolean);
+begin
+  Handled := false;
+  if (ssCtrl in Shift) then
+    ShellList.SetIconSpacing(WheelDelta, 0);
+  if (ssAlt in shift) then
+    ShellList.SetIconSpacing(0, 0);
 end;
 
 // ---------------Drag_Drop procs --------------------
@@ -2685,6 +2695,13 @@ begin
     ShellList.PasteFilesFromClipboard;
   if (Key = VK_PRIOR) or (Key = VK_NEXT) then // PageUp/Down
     ShellListClick(Sender);
+
+  if (Key = VK_ADD) and (ssCtrl in Shift) then
+    ShellList.SetIconSpacing(1, 0);
+  if (Key = VK_SUBTRACT) and (ssCtrl in Shift) then
+    ShellList.SetIconSpacing(-1, 0);
+  if ((Key = Ord('0')) or (Key = VK_NUMPAD0)) and (ssCtrl in Shift) then
+    ShellList.SetIconSpacing(0, 0);
 end;
 
 procedure TFMain.ShellListSetFolders;

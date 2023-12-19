@@ -92,6 +92,9 @@ type
     procedure PasteFilesFromClipboard;
     procedure ExecuteCommandExif(Verb: string; var Handled: boolean);
     procedure ShellListOnGenerateReady(Sender: TObject);
+    function GetIconSpacing: dword;
+    procedure SetIconSpacing(Cx, Cy: word); overload;
+    procedure SetIconSpacing(Cx, Cy: integer); overload;
 
     property OnColumnResized: TNotifyEvent read FonColumnResized write FonColumnResized;
     property ColumnSorted: boolean read FColumnSorted write SetColumnSorted;
@@ -108,6 +111,7 @@ type
     property OnPathChange: TNotifyEvent read FOnPathChange write FOnPathChange;
     property OnItemsLoaded: TNotifyEvent read FOnItemsLoaded write FOnItemsLoaded;
     property OnOwnerDataFetchEvent: TOwnerDataFetchEvent read FOnOwnerDataFetchEvent write FOnOwnerDataFetchEvent;
+    property OnMouseWheel;
   end;
 
 implementation
@@ -582,7 +586,6 @@ begin
 
   FThumbNailSize := 0;
   FGenerating := 0;
-
   InitSortSpec(0, THeaderSortState.hssNone);
   FThumbTasks := Tlist.Create;
   FThumbNails := TImageList.Create(Self);
@@ -726,14 +729,40 @@ begin
     Sorted := false;
 end;
 
+function TShellListView.GetIconSpacing: dword;
+begin
+  result := ListView_SetIconSpacing(Handle, WORD(-1), WORD(-1));
+end;
+
+procedure TShellListView.SetIconSpacing(Cx, Cy: word);
+var
+  Spacing: DWORD;
+begin
+  Spacing := GetIconSpacing;
+  if (Cx <> 0) or
+     (Cy <> 0) then
+    ListView_SetIconSpacing(Handle, LoWord(Spacing) + Cx, HiWord(Spacing) + Cy);
+  GetThumbNails;
+end;
+
+procedure TShellListView.SetIconSpacing(Cx, Cy: integer);
+
+  function Delta(AValue:integer): word;
+  begin
+    result := 0;
+    if (Avalue > 0) then
+      result := 2
+    else if (AValue < 0) then
+      result := word(-2);
+  end;
+
+begin
+  SetIconSpacing(Delta(Cx), Delta(Cy));
+end;
+
 procedure TShellListView.InitThumbNails;
 var
   AQuestionMark: TBitmap;
-//TODO: Set IconSpacing
-//  Spacing: DWORD;
-//const
-//  X = -50;
-//  y = 0;
 begin
   FThumbNails.Clear;
   if (FThumbNailSize <> 0) then
@@ -752,11 +781,6 @@ begin
     end;
     // Set the imagelist to our thumbnail list.
     SendMessage(Handle, LVM_SETIMAGELIST, LVSIL_NORMAL, FThumbNails.Handle);
-//TODO: Set IconSpacing. Add to preferences?
-//
-//  Spacing := ListView_SetIconSpacing(Handle, WORD(-1), WORD(-1));
-//  ListView_SetIconSpacing(Handle,
-//                          LoWord(Spacing) + X, HiWord(Spacing) + Y);
   end;
 end;
 
