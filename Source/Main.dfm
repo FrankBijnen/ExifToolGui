@@ -138,6 +138,7 @@ object FMain: TFMain
       ActivePage = AdvTabPreview
       Align = alBottom
       TabOrder = 1
+      OnResize = AdvPagePreviewResize
       object AdvTabPreview: TTabSheet
         Caption = 'Preview '
         object RotateImg: TImage
@@ -146,8 +147,6 @@ object FMain: TFMain
           Width = 230
           Height = 193
           Align = alClient
-          Proportional = True
-          Stretch = True
           ExplicitLeft = 46
           ExplicitTop = 60
           ExplicitWidth = 105
@@ -166,6 +165,8 @@ object FMain: TFMain
     DoubleBuffered = True
     ParentDoubleBuffered = False
     TabOrder = 2
+    ExplicitLeft = 620
+    ExplicitHeight = 561
     object AdvTabMetadata: TTabSheet
       Caption = 'Metadata'
       object AdvPanelMetaTop: TPanel
@@ -263,7 +264,7 @@ object FMain: TFMain
       end
       object AdvPanelMetaBottom: TPanel
         Left = 0
-        Top = 429
+        Top = 428
         Width = 312
         Height = 106
         Align = alBottom
@@ -275,7 +276,7 @@ object FMain: TFMain
         Font.Style = []
         ParentFont = False
         TabOrder = 1
-        ExplicitTop = 428
+        ExplicitTop = 427
         DesignSize = (
           312
           106)
@@ -365,6 +366,7 @@ object FMain: TFMain
         OnMouseDown = MetadataListMouseDown
         OnMouseMove = MetadataListMouseMove
         OnSelectCell = MetadataListSelectCell
+        ExplicitHeight = 370
         ColWidths = (
           150
           160)
@@ -458,7 +460,7 @@ object FMain: TFMain
       end
       object AdvPanel_MapBottom: TPanel
         Left = 0
-        Top = 503
+        Top = 502
         Width = 312
         Height = 32
         Align = alBottom
@@ -510,7 +512,7 @@ object FMain: TFMain
         Left = 0
         Top = 57
         Width = 312
-        Height = 446
+        Height = 445
         Align = alClient
         TabOrder = 2
         UserDataFolder = '%LOCALAPPDATA%\bds.exe.WebView2'
@@ -528,16 +530,18 @@ object FMain: TFMain
     Height = 562
     ActivePage = AdvTabFilelist
     Align = alClient
-    Constraints.MinWidth = 374
+    Constraints.MinWidth = 370
     DoubleBuffered = True
     ParentDoubleBuffered = False
     TabOrder = 3
+    ExplicitWidth = 370
+    ExplicitHeight = 561
     object AdvTabFilelist: TTabSheet
       Caption = 'Filelist'
       object AdvPanelFileTop: TPanel
         Left = 0
         Top = 0
-        Width = 370
+        Width = 366
         Height = 57
         Align = alTop
         BevelOuter = bvNone
@@ -548,7 +552,7 @@ object FMain: TFMain
         Font.Style = []
         ParentFont = False
         TabOrder = 0
-        ExplicitWidth = 366
+        ExplicitWidth = 362
         object SpeedBtnDetails: TSpeedButton
           Left = 2
           Top = 29
@@ -629,6 +633,8 @@ object FMain: TFMain
         Font.Style = []
         ParentFont = False
         TabOrder = 1
+        ExplicitTop = 349
+        ExplicitWidth = 362
         DesignSize = (
           366
           184)
@@ -746,7 +752,7 @@ object FMain: TFMain
           Text = ''
           OnChange = EditETdirectChange
           OnKeyDown = EditETdirectKeyDown
-          ExplicitWidth = 333
+          ExplicitWidth = 325
         end
         object CBoxETdirect: TComboBox
           Left = 1
@@ -810,8 +816,6 @@ object FMain: TFMain
         ViewStyle = vsReport
         OnKeyPress = EditFindMetaKeyPress
         OnKeyUp = ShellListKeyUp
-        ExplicitWidth = 374
-        ExplicitHeight = 272
       end
       object PnlBreadCrumb: TPanel
         Left = 0
@@ -822,6 +826,7 @@ object FMain: TFMain
         BevelOuter = bvNone
         ShowCaption = False
         TabOrder = 3
+        ExplicitWidth = 362
       end
     end
     object AdvTabChart: TTabSheet
@@ -829,7 +834,7 @@ object FMain: TFMain
       object AdvPanel1: TPanel
         Left = 0
         Top = 0
-        Width = 370
+        Width = 366
         Height = 137
         Align = alTop
         BevelOuter = bvNone
@@ -840,7 +845,6 @@ object FMain: TFMain
         Font.Style = []
         ParentFont = False
         TabOrder = 0
-        ExplicitWidth = 374
         object SpeedBtnChartRefresh: TSpeedButton
           Left = 214
           Top = 104
@@ -898,8 +902,8 @@ object FMain: TFMain
       object ETChart: TChart
         Left = 0
         Top = 137
-        Width = 370
-        Height = 398
+        Width = 366
+        Height = 397
         Legend.Visible = False
         Title.Font.Color = clBlack
         Title.Font.Height = -19

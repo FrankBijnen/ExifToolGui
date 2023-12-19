@@ -276,6 +276,7 @@ type
     procedure EdgeBrowser1NavigationStarting(Sender: TCustomEdgeBrowser; Args: TNavigationStartingEventArgs);
     procedure Splitter2Moved(Sender: TObject);
     procedure Splitter1Moved(Sender: TObject);
+    procedure AdvPagePreviewResize(Sender: TObject);
   private
     { Private declarations }
     ETBarSeriesFocal: TBarSeries;
@@ -2073,6 +2074,11 @@ begin
       SetCursor(CrNormal);
     end;
   end;
+end;
+
+procedure TFMain.AdvPagePreviewResize(Sender: TObject);
+begin
+  ShowPreview;
 end;
 
 procedure TFMain.CBoxETdirectChange(Sender: TObject);
