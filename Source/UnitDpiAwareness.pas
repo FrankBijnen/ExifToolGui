@@ -6,7 +6,12 @@ interface
 // how the app was designed (96 DPI usual)
 // The default is to use 'SystemAware', but you can override with the command line parm /HighDpi=
 // or by using the Manifest options, in the delphi project
-// or by changing the properties of the shortcut
+// or by changing the properties of the shortcut.
+
+// To use this unit, set 'DPI Awareness' to 'None' in the 'Manifest' of the Options/Application/Manifest.
+// Subsequent calls to SetProcessDpiAwarenessContext, SetProcessDpiAwareness will fail
+
+// Also needs Windows 8.1 or higher.
 
 implementation
 
