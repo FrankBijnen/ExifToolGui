@@ -52,3 +52,5 @@ Version:        Description             Issue
                                         - Remove deprecated functions Jhead and Jpegtran
                                         - Update docs
                 Fix Issue #199          Experimental support for 4K monitors
+                Fix Issue #202          Window opens very small on Win11 with x64 build
+                Fix Issue #203          Preview cuts off part of images
