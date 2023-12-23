@@ -2135,7 +2135,8 @@ procedure TFMain.FormCanResize(Sender: TObject; var NewWidth, NewHeight: integer
 var
   N: integer;
 begin
-  if (WindowState <> wsMinimized) then
+  if (WindowState <> wsMinimized) and
+     (Showing) then
   begin
     N := GUIBorderWidth + AdvPanelBrowse.Width + Splitter1.Width +
                           MinFileListWidth + Splitter2.Width +
@@ -2265,6 +2266,7 @@ var
 begin
   AdvPanelETdirect.Height := ScaleDesignDpi(32);
   AdvPanelMetaBottom.Height := ScaleDesignDpi(32);
+  Splitter2.MinSize := ScaleDesignDpi(320);
 
   // This must be in OnShow event -for OnCanResize event (probably bug in XE2):
   GUIBorderWidth := Width - ClientWidth;
