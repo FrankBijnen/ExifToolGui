@@ -11,6 +11,8 @@ uses Vcl.Forms;
 type TScaleForm = class(TForm)
 protected
   procedure Loaded; override;
+public
+  function ScaleDesignDpi(const Apt: integer): integer;
 end;
 
 implementation
@@ -25,6 +27,12 @@ begin
   Scaled := Scale;
 
   inherited;
+end;
+
+// Provide 1 point for scaling
+function TScaleForm.ScaleDesignDpi(const Apt: integer): integer;
+begin
+  result := ScaleValue(Apt);
 end;
 
 initialization

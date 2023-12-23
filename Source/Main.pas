@@ -2263,8 +2263,8 @@ var
   I: integer;
   PathFromParm: boolean;
 begin
-  AdvPanelETdirect.Height := MulDiv(32, GetDesignDpi,Screen.PixelsPerInch);
-  AdvPanelMetaBottom.Height := MulDiv(32, GetDesignDpi, Screen.PixelsPerInch);
+  AdvPanelETdirect.Height := ScaleDesignDpi(32);
+  AdvPanelMetaBottom.Height := ScaleDesignDpi(32);
 
   // This must be in OnShow event -for OnCanResize event (probably bug in XE2):
   GUIBorderWidth := Width - ClientWidth;
@@ -3053,24 +3053,22 @@ end;
 
 procedure TFMain.SpeedBtnLargeClick(Sender: TObject);
 var
-  I, F, G: integer;
+  F: integer;
 begin
-  I := Screen.PixelsPerInch;
   F := ShellList.ItemIndex;
-  G := GetDesignDpi;
   if SpeedBtnLarge.Down then
   begin
     MemoQuick.Clear;
     MemoQuick.Text := EditQuick.Text;
     EditQuick.Visible := false;
-    AdvPanelMetaBottom.Height := MulDiv(105, G, I);
+    AdvPanelMetaBottom.Height := ScaleDesignDpi(105);
     if F <> -1 then
       MemoQuick.SetFocus;
   end
   else
   begin
     EditQuick.Text := MemoQuick.Text;
-    AdvPanelMetaBottom.Height := MulDiv(32, G, I);
+    AdvPanelMetaBottom.Height := ScaleDesignDpi(32);
     EditQuick.Visible := true;
     if F <> -1 then
       EditQuick.SetFocus;
@@ -3086,22 +3084,20 @@ end;
 
 procedure TFMain.SpeedBtn_ETdirectClick(Sender: TObject);
 var
-  G, I, H: integer;
+  H: integer;
 begin
-  I := Screen.PixelsPerInch;
-  G := GetDesignDpi;
   if SpeedBtn_ETdirect.Down then
   begin
     if SpeedBtn_ETedit.Down then
       H := 184 // min 181
     else
       H := 105;
-    AdvPanelETdirect.Height := MulDiv(H, G, I);
+    AdvPanelETdirect.Height := ScaleDesignDpi(H);
     EditETdirect.SetFocus;
   end
   else
   begin
-    AdvPanelETdirect.Height := MulDiv(32, G, I);
+    AdvPanelETdirect.Height := ScaleDesignDpi(32);
     ShellList.SetFocus;
   end;
 end;
@@ -3119,7 +3115,7 @@ begin
     H := 181
   else
     H := 105;
-  AdvPanelETdirect.Height := MulDiv(H, GetDesignDpi, Screen.PixelsPerInch);
+  AdvPanelETdirect.Height := ScaleDesignDpi(H);
 end;
 
 procedure TFMain.SpeedBtn_GeotagClick(Sender: TObject);
@@ -3207,8 +3203,6 @@ begin
     GUIColorWindow := AStyleService.GetStyleColor(scWindow);
 
   BreadcrumbBar.Style := GUIsettings.GuiStyle;
-  BreadcrumbBar.DesignDPI := GetDesignDpi;
-  BreadcrumbBar.ScreenDPI := Screen.PixelsPerInch;
 end;
 
 procedure TFMain.ShellistThumbError(Sender: TObject; Item: TListItem; E: Exception);

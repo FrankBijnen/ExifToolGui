@@ -43,7 +43,6 @@ type
   TOnBreadcrumbClick = procedure(Sender: TObject; BreadcrumbIndex: integer) of object;
   TOnBreadcrumbListItemClick = procedure(Sender: TObject; BreadcrumbIndex, ListIndex: integer) of object;
   TOnBreadcrumbBarGetText = procedure(Sender: TObject; var Text: string) of object;
-
   TCustomBreadcrumbBar = class;
 
   TPopupMenu = class(Vcl.Menus.TPopupMenu)
@@ -126,8 +125,6 @@ type
     FHome: string;
     FStyleServices: TCustomStyleServices;
     FStyle: string;
-    FDesignDPI: integer;
-    FScreenDPI: integer;
     FSharedImages: THandle;
     FIconSize: integer;
     procedure DrawArrow(ArrowRect: TRect);
@@ -181,8 +178,6 @@ type
     function GetBreadcrumb(Index: integer): string;
     function GetBreadcrumbListItem(Index: integer): string;
     property CrumbDown: integer read GetCrumbDown;
-    property DesignDPI: integer read FDesignDPI write FDesignDPI;
-    property ScreenDPI: integer read FScreenDPI write FScreenDPI;
     property DoubleBuffered;
     property EditMode: boolean read IsEditMode;
     property Font;
@@ -284,8 +279,6 @@ begin
   MenuItem.OnClick := CopyTextClick;
   FBarPopup.Items.Add(MenuItem);
   FCrumbDown := -1;
-  FDesignDPI := 96;
-  FScreenDPI := 96;
   FIconSize := 0;
   FSharedImages := 0;
 end;
@@ -640,7 +633,7 @@ end;
 
 function TCustomBreadcrumbBar.DpiScale(const APix: integer): integer;
 begin
-  result := MulDiv(APix, FDesignDPI, FScreenDPI);
+  result := ScaleValue(APix);
 end;
 
 procedure TCustomBreadcrumbBar.Paint;
