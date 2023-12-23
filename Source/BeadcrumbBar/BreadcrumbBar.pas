@@ -640,7 +640,7 @@ end;
 
 function TCustomBreadcrumbBar.DpiScale(const APix: integer): integer;
 begin
-  result := MulDiv(APix, FScreenDPI, FDesignDPI);
+  result := MulDiv(APix, FDesignDPI, FScreenDPI);
 end;
 
 procedure TCustomBreadcrumbBar.Paint;

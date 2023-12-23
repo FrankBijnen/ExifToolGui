@@ -2263,10 +2263,9 @@ var
   I: integer;
   PathFromParm: boolean;
 begin
-  AdvPanelETdirect.Height := MulDiv(32, Screen.PixelsPerInch, GetDesignDpi);
-  AdvPanelMetaBottom.Height := MulDiv(32, Screen.PixelsPerInch, GetDesignDpi);
-  MetadataList.DefaultRowHeight := MulDiv(19, Screen.PixelsPerInch, GetDesignDpi);
-//
+  AdvPanelETdirect.Height := MulDiv(32, GetDesignDpi,Screen.PixelsPerInch);
+  AdvPanelMetaBottom.Height := MulDiv(32, GetDesignDpi, Screen.PixelsPerInch);
+
   // This must be in OnShow event -for OnCanResize event (probably bug in XE2):
   GUIBorderWidth := Width - ClientWidth;
   GUIBorderHeight := Height - ClientHeight;
@@ -3054,23 +3053,24 @@ end;
 
 procedure TFMain.SpeedBtnLargeClick(Sender: TObject);
 var
-  I, F: integer;
+  I, F, G: integer;
 begin
   I := Screen.PixelsPerInch;
   F := ShellList.ItemIndex;
+  G := GetDesignDpi;
   if SpeedBtnLarge.Down then
   begin
     MemoQuick.Clear;
     MemoQuick.Text := EditQuick.Text;
     EditQuick.Visible := false;
-    AdvPanelMetaBottom.Height := MulDiv(105, I, GetDesignDpi);
+    AdvPanelMetaBottom.Height := MulDiv(105, G, I);
     if F <> -1 then
       MemoQuick.SetFocus;
   end
   else
   begin
     EditQuick.Text := MemoQuick.Text;
-    AdvPanelMetaBottom.Height := MulDiv(32, I, GetDesignDpi);
+    AdvPanelMetaBottom.Height := MulDiv(32, G, I);
     EditQuick.Visible := true;
     if F <> -1 then
       EditQuick.SetFocus;
@@ -3086,21 +3086,22 @@ end;
 
 procedure TFMain.SpeedBtn_ETdirectClick(Sender: TObject);
 var
-  I, H: smallint;
+  G, I, H: integer;
 begin
   I := Screen.PixelsPerInch;
+  G := GetDesignDpi;
   if SpeedBtn_ETdirect.Down then
   begin
     if SpeedBtn_ETedit.Down then
       H := 184 // min 181
     else
       H := 105;
-    AdvPanelETdirect.Height := MulDiv(H, I, GetDesignDpi);
+    AdvPanelETdirect.Height := MulDiv(H, G, I);
     EditETdirect.SetFocus;
   end
   else
   begin
-    AdvPanelETdirect.Height := MulDiv(32, I, GetDesignDpi);
+    AdvPanelETdirect.Height := MulDiv(32, G, I);
     ShellList.SetFocus;
   end;
 end;
@@ -3112,13 +3113,13 @@ end;
 
 procedure TFMain.SpeedBtn_ETeditClick(Sender: TObject);
 var
-  H: smallint;
+  H: integer;
 begin
   if SpeedBtn_ETedit.Down then
     H := 181
   else
     H := 105;
-  AdvPanelETdirect.Height := MulDiv(H, Screen.PixelsPerInch, GetDesignDpi);
+  AdvPanelETdirect.Height := MulDiv(H, GetDesignDpi, Screen.PixelsPerInch);
 end;
 
 procedure TFMain.SpeedBtn_GeotagClick(Sender: TObject);
