@@ -1,41 +1,31 @@
 # ExifToolGui
-A GUI for ExifTool
-
-Current version: <b>V6.2.6</b> updated November 25, 2023.
-Just a few small fixes. And some typos found when updating the docs.
-[Online documentation available](https://htmlpreview.github.io/?https://github.com/FrankBijnen/ExifToolGui/blob/main/Docs/ExifToolGUI_V6.md)
-
-Previous version: <b>V6.2.5</b> updated November 12, 2023.
-The V6.2.5 release features 2 major changes.<br>
-1) [GeoCoding](/Docs/Readme%20GeoCoding.txt) You can now choose from 2 GeoCoding providers, and use Reverse GeoCoding to lookup Country, Province and City from GPS coordinates.<br>
-2) [Lossless rotate and crop, import and export previews](/Docs/Readme%20Lossless%20rotate_Import_Export%20previews.txt) The external programs Jhead and JpegTrans are replaced by native Delphi code, using a modified library NativeJpg by SimDesign B.V. Exporting and Importing previews has been revised.<br>
-
-Besides these 2 updates, some smaller updates/bugfixes were applied. See the [ChangeLog](Docs/changelog.txt) for more info.
-
-I have noticed that recently ExifToolGui is downloaded from sites that propagate portable use. Please read [Portable use](/Docs/Readme%20Portable.txt) for more info.
-
-Important: <br>
-To help Bug hunting there are also Map files released. If you place the Map file in the same directory as the Executable
-a stacktrace can be copied to the clipboard if an Exception occurs. Please also provide the stacktrace if you report an Exception.
+<h4>A GUI for ExifTool</h4>
 
 This is an updated version of the ExifToolGui program created by Bogdan Hrastnik. Many thanks go out to him.
 
-This updated source addresses the following issues.
+Current version: <b>V6.2.7</b> updated December 24, 2023.<br>
+- Deprecated functions that use Jhead or JpegTran have been removed.<br>
+- Added peek preview for metadata panel. Shown as hint.<br>
+- Added option to show Folders in filelist, including a Breadcrumb Bar.<br>
+- Added option to add custom tags to Exiftool.<br>
+- Fix for generated Powershell script.<br>
+- Style fixes for Green.<br>
+- Fixes for resizing, size of preview image.<br>
+- Experimental support for [4K Monitors](Docs/Readme%204K%20monitor.txt).<br>
+  If you experience problems with scaling, window positions etc. add <b>/HighDpi=UnAware /Scale</b> as parameters to the shortcut.
 
-1) Compiles with Delphi Community Edition. Without any 3rd party libraries.
-2) Added styles.
-3) Image preview is done with WIC. The autorotate should be available for more formats then just JPG
-4) The Google Map is replaced by OSM map. The internal browser is now based on Edge, and not on IE.
+[Change log](Docs/changelog.txt)<br>
+[Download Release](https://github.com/FrankBijnen/ExifToolGui/releases/latest)<br>
 
- To achieve this the source had to be modified quite a lot. Dont expect a flawless product.
+<h4>Important</h4>
 
- See also:
- - [Readme for Users](Docs/ReadMe%20for%20Users.txt)
- - [Docs directory](Docs/)
+- [Please <b>read</b> the Requirements and preparation](https://github.com/FrankBijnen/ExifToolGui/blob/main/Docs/ExifToolGUI_V6.md/#m_reqs_general)<br>
+- To help Bug hunting there are also Map files released. If you place the Map file in the same directory as the Executable
+a stacktrace can be copied to the clipboard if an Exception occurs. Please also provide the stacktrace if you report an Exception.<br>
 
 # Useful links
 
-<h4>Obtaining Exiftool.</h4>
+<h4>Obtaining Exiftool</h4>
 
 1) The original version by Phil Harvey. https://exiftool.org/ <br>
    Download the zip file called: Windows Executable: exiftool-xx.yy.zip. <br>
@@ -44,16 +34,14 @@ This updated source addresses the following issues.
 
 2) An installer provided by Oliver Betz. https://oliverbetz.de/pages/Artikel/ExifTool-for-Windows
 
-<h4>Obtaining WebWiew2Loader.dll.</h4>
+<h4>Obtaining WebWiew2Loader.dll</h4>
 
 -  https://nuget.info/packages/Microsoft.Web.WebView2/
--  See [Readme for Users](Docs/ReadMe%20for%20Users.txt) for more info.
 
-<h4>Online Documentation.</h4>
-
- - [V516 Documentation html](https://htmlpreview.github.io/?https://github.com/FrankBijnen/ExifToolGui/blob/main/Docs/Original%20notes/ExifToolGUI_V516.htm)
+<h4>Online Documentation</h4>
 
  - [V6 Documentation html](https://htmlpreview.github.io/?https://github.com/FrankBijnen/ExifToolGui/blob/main/Docs/ExifToolGUI_V6.md)
  - [V6 Documentation md](/Docs/ExifToolGUI_V6.md)
+ - [Docs directory](Docs/)
 
 Frank

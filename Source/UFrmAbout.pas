@@ -66,6 +66,8 @@ begin
       result := result + '.' + IntToStr(dwFileVersionMS and $FFFF);
       result := result + '.' + IntToStr(dwFileVersionLS shr 16);
       result := result + '.' + IntToStr(dwFileVersionLS and $FFFF);
+      if (dwFileFlags and VS_FF_PRERELEASE <> 0) then
+        result := result + ' Pre.';
     end;
     FreeMem(verInfo, verInfoSize);
   end;

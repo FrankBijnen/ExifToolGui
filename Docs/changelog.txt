@@ -47,3 +47,11 @@ Version:        Description             Issue
                 Fix Issue #189          Style fixes for Green
                 Fix Issue #191          Add Custom options
                 Fix Issue #195          Add Breadcrumb bar. If folders are allowed to show
+                Fix Issue #197          Fix issues for V6.2.7 
+                                        - Resizing issues
+                                        - Remove deprecated functions Jhead and Jpegtran
+                                        - Update docs
+                Fix Issue #199          Experimental support for 4K monitors
+                Fix Issue #202          Window opens very small on Win11 with x64 build
+                Fix Issue #203          Preview cuts off part of images
+                Fix Issue #204          Request: Make 'BreadCrumBar' a standalone option in Preferences

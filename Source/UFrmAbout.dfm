@@ -47,9 +47,9 @@ object FrmAbout: TFrmAbout
       00000000}
   end
   object LblVersion: TLabel
-    Left = 56
+    Left = 45
     Top = 8
-    Width = 340
+    Width = 360
     Height = 65
     AutoSize = False
     Caption = 'LblVersion'
@@ -62,9 +62,9 @@ object FrmAbout: TFrmAbout
     WordWrap = True
   end
   object LblSource: TLabel
-    Left = 56
+    Left = 45
     Top = 95
-    Width = 340
+    Width = 360
     Height = 15
     AutoSize = False
     Caption = 'LblSource'
@@ -80,9 +80,9 @@ object FrmAbout: TFrmAbout
     OnMouseLeave = LblUrlLeave
   end
   object LblForum: TLabel
-    Left = 56
+    Left = 45
     Top = 116
-    Width = 340
+    Width = 360
     Height = 15
     AutoSize = False
     Caption = 'LblForum'
@@ -98,17 +98,17 @@ object FrmAbout: TFrmAbout
     OnMouseLeave = LblUrlLeave
   end
   object LblExifTool: TLabel
-    Left = 56
+    Left = 45
     Top = 133
-    Width = 340
+    Width = 360
     Height = 15
     AutoSize = False
     Caption = 'LblExifTool'
   end
   object LblScreen: TLabel
-    Left = 56
+    Left = 45
     Top = 208
-    Width = 340
+    Width = 360
     Height = 15
     AutoSize = False
     Caption = 'LblScreen'
@@ -126,7 +126,7 @@ object FrmAbout: TFrmAbout
       414
       29)
     object BtnOk: TBitBtn
-      Left = 292
+      Left = 331
       Top = 2
       Width = 75
       Height = 25
@@ -153,7 +153,6 @@ object FrmAbout: TFrmAbout
       ModalResult = 1
       NumGlyphs = 2
       TabOrder = 0
-      ExplicitLeft = 284
     end
   end
 end

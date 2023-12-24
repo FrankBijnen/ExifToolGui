@@ -9,6 +9,7 @@ uses
   {$IFDEF STACKTRACE}
   UnitStackTrace,
   {$ENDIF }
+  UnitDpiAwareness,
   Vcl.Forms,
   Vcl.Themes,
   Vcl.Styles,

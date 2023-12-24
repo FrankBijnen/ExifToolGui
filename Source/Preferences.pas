@@ -61,6 +61,7 @@ type
     Label5: TLabel;
     HintPause: TEdit;
     UpDHintPause: TUpDown;
+    CheckBox7: TCheckBox;
     procedure FormShow(Sender: TObject);
     procedure BtnSaveClick(Sender: TObject);
     procedure BtnBrowseFolder(Sender: TObject);
@@ -141,6 +142,7 @@ begin
   GUIsettings.AutoIncLine := CheckBox4.Checked;
   GUIsettings.DblClickUpdTags := CheckBox5.Checked;
   GUIsettings.ShowFolders := CheckBox6.Checked;
+  GUIsettings.ShowBreadCrumb := CheckBox7.Checked;
   Application.HintHidePause := UpDHintPause.Position;
 
   //GeoCode
@@ -303,6 +305,7 @@ begin
     CheckBox4.Checked := GUIsettings.AutoIncLine;
     CheckBox5.Checked := GUIsettings.DblClickUpdTags;
     CheckBox6.Checked := GUIsettings.ShowFolders;
+    CheckBox7.Checked := GUIsettings.ShowBreadCrumb;
     UpDHintPause.Position := Application.HintHidePause;
 
     // GeoCode

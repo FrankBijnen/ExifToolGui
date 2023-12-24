@@ -42,9 +42,8 @@ type
     AdvPanelETdirect: TPanel;
     AdvPanelMetaTop: TPanel;
     AdvPanelMetaBottom: TPanel;
-    ShellTree: ExifToolsGUI_ShellTree.TShellTreeView;
-    // Need to create our own version!
-    ShellList: ExifToolsGUI_ShellList.TShellListView;
+    ShellTree: ExifToolsGUI_ShellTree.TShellTreeView; // Need to create our own version!
+    ShellList: ExifToolsGUI_ShellList.TShellListView; // Need to create our own version!
     MetadataList: TValueListEditor;
     SpeedBtnExif: TSpeedButton;
     SpeedBtnIptc: TSpeedButton;
@@ -213,7 +212,6 @@ type
     procedure Splitter1CanResize(Sender: TObject; var NewSize: integer; var Accept: boolean);
     procedure Splitter2CanResize(Sender: TObject; var NewSize: integer; var Accept: boolean);
     procedure FormCanResize(Sender: TObject; var NewWidth, NewHeight: integer; var Resize: boolean);
-    procedure Splitter3CanResize(Sender: TObject; var NewSize: integer; var Accept: boolean);
     procedure ShellListChange(Sender: TObject; Item: TListItem; Change: TItemChange);
     procedure QuickPopUpMenuPopup(Sender: TObject);
     procedure QuickPopUp_UndoEditClick(Sender: TObject);
@@ -274,15 +272,22 @@ type
     procedure OnlineDocumentation1Click(Sender: TObject);
     procedure MetadataListMouseMove(Sender: TObject; Shift: TShiftState; X, Y: Integer);
     procedure MCustomOptionsClick(Sender: TObject);
+    procedure EdgeBrowser1ZoomFactorChanged(Sender: TCustomEdgeBrowser; AZoomFactor: Double);
+    procedure EdgeBrowser1NavigationStarting(Sender: TCustomEdgeBrowser; Args: TNavigationStartingEventArgs);
+    procedure Splitter2Moved(Sender: TObject);
+    procedure Splitter1Moved(Sender: TObject);
+    procedure AdvPagePreviewResize(Sender: TObject);
   private
     { Private declarations }
     ETBarSeriesFocal: TBarSeries;
     ETBarSeriesFnum: TBarSeries;
     ETBarSeriesIso: TBarSeries;
     BreadcrumbBar: TDirBreadcrumbBar;
-
+    EdgeZoom: double;
+    MinFileListWidth: integer;
+    procedure AlignStatusBar;
     procedure ImageDrop(var Msg: TWMDROPFILES); message WM_DROPFILES;
-    procedure ShowMetadata; // (const LogErr:boolean=true);
+    procedure ShowMetadata;
     procedure ShowPreview;
     procedure ShellListSetFolders;
     procedure EnableMenus(Enable: boolean);
@@ -303,6 +308,7 @@ type
     procedure ShellListItemsLoaded(Sender: TObject);
     procedure ShellListOwnerDataFetch(Sender: TObject; Item: TListItem; Request: TItemRequest; AFolder: TShellFolder);
     procedure ShellListColumnResized(Sender: TObject);
+    procedure ShellListMouseWheel(Sender: TObject; Shift: TShiftState; WheelDelta: Integer; MousePos: TPoint; var Handled: Boolean);
     procedure CounterETEvent(Counter: integer);
   public
     { Public declarations }
@@ -317,7 +323,7 @@ type
     procedure ExecRestEvent_Done(Url, Response: string; Succes: boolean);
     procedure UpdateStatusBar_FilesShown;
     procedure SetGuiStyle;
-    var GUIBorderWidth, GUIBorderHeight: integer; // Initialized in OnShow
+    var GUIBorderWidth, GUIBorderHeight: integer;
     var GUIColorWindow: TColor;
   end;
 
@@ -894,8 +900,9 @@ procedure TFMain.MExifLensFromMakerClick(Sender: TObject);
 var
   ETcmd, ETout, ETerr: string;
 begin
-  if MessageDlg('This will fill Exif:LensInfo of selected files with relevant' + #10#13 + 'values from Makernotes data (where possible).' +
-    #10#13#10#13 + 'OK to proceed?', mtInformation, [mbOk, mbCancel], 0) = mrOK then
+  if MessageDlg('This will fill Exif:LensInfo of selected files with relevant' + #10#13 +
+                'values from Makernotes data (where possible).' + #10#13#10#13 +
+                'OK to proceed?', mtInformation, [mbOk, mbCancel], 0) = mrOK then
   begin
     ETcmd := '-Exif:LensInfo<LensID' + CRLF + '-Exif:LensModel<LensID' + CRLF;
     ET_OpenExec(ETcmd, GetSelectedFiles, ETout, ETerr);
@@ -944,8 +951,9 @@ procedure TFMain.MFileDateFromExifClick(Sender: TObject);
 var
   ETout, ETerr: string;
 begin
-  if MessageDlg('This will set "Date modified" of selected files' + #10#13 + 'according to Exif:DateTimeOriginal value.' + #10#13#10#13 +
-    'OK to proceed?', mtInformation, [mbOk, mbCancel], 0) = mrOK then
+  if MessageDlg('This will set "Date modified" of selected files' + #10#13 +
+                'according to Exif:DateTimeOriginal value.' + #10#13#10#13 +
+                'OK to proceed?', mtInformation, [mbOk, mbCancel], 0) = mrOK then
   begin
     ET_OpenExec('-FileModifyDate<Exif:DateTimeOriginal', GetSelectedFiles, ETout, ETerr);
     RefreshSelected(Sender);
@@ -982,9 +990,12 @@ begin
   begin
     j := ShellList.SelCount;
     if j > 1 then // message appears only if multi files selected
-      if MessageDlg('This will copy ALL metadata from any source into' + #10#13 + 'currently *selected* ' + DstExt + ' files.' + #10#13 +
-        'Only those selected files will be processed,' + #10#13 + 'where source and destination filename is equal.' + #10#13#10#13 +
-        'Next: Select source file. OK to proceed?', mtInformation, [mbOk, mbCancel], 0) <> mrOK then
+      if MessageDlg('This will copy ALL metadata from any source into' + #10#13 +
+                    'currently *selected* ' + DstExt + ' files.' + #10#13 +
+                    'Only those selected files will be processed,' + #10#13 +
+                    'where source and destination filename is equal.' + #10#13#10#13 +
+                    'Next: Select source file. OK to proceed?',
+                    mtInformation, [mbOk, mbCancel], 0) <> mrOK then
         j := 0;
     if j <> 0 then
     begin
@@ -1073,10 +1084,13 @@ begin
   Delete(DstExt, 1, 1);
   if (DstExt = 'jpg') or (DstExt = 'tif') then
   begin
-    i := MessageDlg('This will copy metadata from files in another folder' + #10#13 + 'into *all* ' + UpperCase(DstExt) +
-      ' files inside currently *selected* folder.' + #10#13 + 'Only those files will be processed, where' + #10#13 +
-      'source and destination filename is equal.' + #10#13#10#13 + 'Should files in subfolders also be processed?', mtInformation,
-      [mbYes, mbNo, mbCancel], 0);
+    i := MessageDlg('This will copy metadata from files in another folder' + #10#13 +
+                    'into *all* ' + UpperCase(DstExt) +
+                    ' files inside currently *selected* folder.' + #10#13 +
+                    'Only those files will be processed, where' + #10#13 +
+                    'source and destination filename is equal.' + #10#13#10#13 +
+                    'Should files in subfolders also be processed?', mtInformation,
+                    [mbYes, mbNo, mbCancel], 0);
     if i <> mrCancel then
     begin
       with OpenPictureDlg do
@@ -1136,9 +1150,12 @@ procedure TFMain.MImportXMPLogClick(Sender: TObject);
 var
   SrcDir, ETcmd, ETout, ETerr: string;
 begin
-  if MessageDlg('This will import GPS data from XMP sidecar files into' + #10#13 + 'Exif GPS region of currently selected files.' + #10#13 +
-    'Only those selected files will be processed, where' + #10#13 + 'source and destination filename is equal.' + #10#13#10#13 +
-    'Next: Select folder containing XMP files. OK to proceed?', mtInformation, [mbOk, mbCancel], 0) = mrOK then
+  if MessageDlg('This will import GPS data from XMP sidecar files into' + #10#13 +
+                'Exif GPS region of currently selected files.' + #10#13 +
+                'Only those selected files will be processed, where' + #10#13 +
+                'source and destination filename is equal.' + #10#13#10#13 +
+                'Next: Select folder containing XMP files. OK to proceed?',
+                mtInformation, [mbOk, mbCancel], 0) = mrOK then
   begin
     if GpsXmpDir <> '' then
       SrcDir := GpsXmpDir
@@ -1233,15 +1250,16 @@ begin
       else
         ETShowNumber := '';
   if Sender = MShowGPSdecimal then
-    ET_Options.SetGpsFormat(MShowGPSdecimal.Checked);
-  // + used by MShowHexID, MGroup_g4, MShowComposite, MShowSorted, MNotDuplicated
+    ET_Options.SetGpsFormat(MShowGPSdecimal.Checked); // + used by MShowHexID, MGroup_g4, MShowComposite, MShowSorted, MNotDuplicated
   RefreshSelected(Sender);
   ShowMetadata;
 end;
 
 procedure TFMain.MCustomOptionsClick(Sender: TObject);
 begin
-  ET_Options.ETCustomOptions := InputBox('Specify Custom options to add to Exiftool args','Custom options', ET_Options.ETCustomOptions);
+  ET_Options.ETCustomOptions := InputBox('Specify Custom options to add to Exiftool args',
+                                         'Custom options',
+                                         ET_Options.ETCustomOptions);
 end;
 
 procedure TFMain.MWorkspaceLoadClick(Sender: TObject);
@@ -1447,48 +1465,56 @@ procedure TFMain.QuickPopUp_AddQuickClick(Sender: TObject);
 var
   I, N, X: smallint;
   Tx, Ty, Tz, T1: string;
+  CrWait, CrNormal: HCURSOR;
 begin
-  I := Length(QuickTags);
-  SetLength(QuickTags, I + 1);
-  N := MetadataList.Row;
-  if SpeedBtnExif.Down then
-    Tz := 'Exif:'
-  else if SpeedBtnXmp.Down then
-    Tz := 'Xmp:'
-  else if SpeedBtnIptc.Down then
-    Tz := 'Iptc:'
-  else
-    Tz := '';
+  CrWait := LoadCursor(0, IDC_WAIT);
+  CrNormal := SetCursor(CrWait);
+  try
+    I := Length(QuickTags);
+    SetLength(QuickTags, I + 1);
+    N := MetadataList.Row;
+    if SpeedBtnExif.Down then
+      Tz := 'Exif:'
+    else if SpeedBtnXmp.Down then
+      Tz := 'Xmp:'
+    else if SpeedBtnIptc.Down then
+      Tz := 'Iptc:'
+    else
+      Tz := '';
 
-  if MGroup_g4.Checked then
-    Tx := Tz
-  else
-  begin // find group
-    X := N;
-    repeat
-      Dec(X);
-      Tx := MetadataList.Keys[X];
-    until length(Tx) = 0;
-    Tx := MetadataList.Cells[1, X]; // eg '---- IFD0 ----'
-    Delete(Tx, 1, 5);               // -> 'IFD0 ----'
-    X := pos(' ', Tx);
-    SetLength(Tx, X - 1);           // -> 'IFD0'
-    Tx := Tx + ':';                 // -> 'IFD0:'
-  end;
+    if MGroup_g4.Checked then
+      Tx := Tz
+    else
+    begin // find group
+      X := N;
+      repeat
+        Dec(X);
+        Tx := MetadataList.Keys[X];
+      until length(Tx) = 0;
+      Tx := MetadataList.Cells[1, X]; // eg '---- IFD0 ----'
+      Delete(Tx, 1, 5);               // -> 'IFD0 ----'
+      X := pos(' ', Tx);
+      SetLength(Tx, X - 1);           // -> 'IFD0'
+      Tx := Tx + ':';                 // -> 'IFD0:'
+    end;
 
-  Ty := MetadataList.Keys[N];       // e.g. 'Make' or '0x010f Make' or '- Rating'
-  if LeftStr(Ty, 2) = '0x' then
-    Delete(Ty, 1, 7)
-  else if LeftStr(Ty, 2) = '- ' then
-    Delete(Ty, 1, 2);
-  Ty := TrimRight(Ty);
-  T1 := Ty;                         // tl=language specific tag name
-  Ty := TranslateTagName('-' + Tz, Ty);
-  with QuickTags[I] do
-  begin
-    Caption := Tz + T1;
-    Command := '-' + Tx + Ty;       // ='-IFD0:Make'
-    Help := 'No Hint defined';
+    Ty := MetadataList.Keys[N];       // e.g. 'Make' or '0x010f Make' or '- Rating'
+    if LeftStr(Ty, 2) = '0x' then
+      Delete(Ty, 1, 7)
+    else if LeftStr(Ty, 2) = '- ' then
+      Delete(Ty, 1, 2);
+    Ty := TrimRight(Ty);
+    T1 := Ty;                         // tl=language specific tag name
+    Ty := TranslateTagName('-' + Tz, Ty);
+    with QuickTags[I] do
+    begin
+      Caption := Tz + T1;
+      Command := '-' + Tx + Ty;       // ='-IFD0:Make'
+      Help := 'No Hint defined';
+    end;
+  finally
+    MetadataList.Refresh;
+    SetCursor(CrNormal);
   end;
 end;
 
@@ -1688,7 +1714,8 @@ begin
 
   if not (ValidLatLon(FGeoSetup.Lat, FGeoSetup.Lon)) then
   begin
-    MessageDlgEx('Selected file has no valid Lat Lon coordinates.', '', TMsgDlgType.mtError, [TMsgDlgBtn.mbOK]);
+    MessageDlgEx('Selected file has no valid Lat Lon coordinates.', '',
+                 TMsgDlgType.mtError, [TMsgDlgBtn.mbOK]);
     exit;
   end;
 
@@ -1746,6 +1773,17 @@ begin
       ShellExecute(0, 'Open', PWideChar(ONLINE_DOC_URL + Url), '', '', SW_SHOWNORMAL);
   end;
 
+end;
+
+// Retain zoomfactor
+procedure TFMain.EdgeBrowser1NavigationStarting(Sender: TCustomEdgeBrowser; Args: TNavigationStartingEventArgs);
+begin
+  Sender.ZoomFactor := EdgeZoom;
+end;
+
+procedure TFMain.EdgeBrowser1ZoomFactorChanged(Sender: TCustomEdgeBrowser; AZoomFactor: Double);
+begin
+  EdgeZoom := AZoomFactor;
 end;
 
 procedure TFMain.EdgeBrowser1WebMessageReceived(Sender: TCustomEdgeBrowser; Args: TWebMessageReceivedEventArgs);
@@ -2039,6 +2077,11 @@ begin
   end;
 end;
 
+procedure TFMain.AdvPagePreviewResize(Sender: TObject);
+begin
+  ShowPreview;
+end;
+
 procedure TFMain.CBoxETdirectChange(Sender: TObject);
 var
   i: smallint;
@@ -2082,27 +2125,26 @@ begin
   end;
 end;
 
+procedure TFMain.AlignStatusBar;
+begin
+  StatusBar.Panels[0].Width := AdvPageBrowse.Width + Splitter1.Width;
+  StatusBar.Panels[1].Width := AdvPageFilelist.Width + Splitter2.Width;
+end;
+
 procedure TFMain.FormCanResize(Sender: TObject; var NewWidth, NewHeight: integer; var Resize: boolean);
 var
-  n, X: integer;
+  N: integer;
 begin
-  if WindowState <> wsMinimized then
+  if (WindowState <> wsMinimized) and
+     (Showing) then
   begin
-    n := GUIBorderWidth + AdvPanelBrowse.Width + AdvPageMetadata.Width + Splitter1.Width;
-    X := n + Splitter2.MinSize + Splitter2.Width;
-    if NewWidth < X then
-      Resize := false;
-
-    X := GUIBorderHeight + AdvPagePreview.Height + StatusBar.Height;
-    if NewHeight < X + 128 then
-      Resize := false;
-
-    if Resize then
-    begin
-      with StatusBar do
-        Panels[1].Width := NewWidth - n;
-    end;
+    N := GUIBorderWidth + AdvPanelBrowse.Width + Splitter1.Width +
+                          MinFileListWidth + Splitter2.Width +
+                          AdvPageMetadata.Width;
+    if (NewWidth < N) then
+      NewWidth := N;
   end;
+  AlignStatusBar;
 end;
 
 procedure TFMain.FormClose(Sender: TObject; var Action: TCloseAction);
@@ -2114,6 +2156,11 @@ end;
 
 procedure TFMain.FormCreate(Sender: TObject);
 begin
+  // AdvPageFilelist.Constraints.MinWidth only used at design time. Form does not align well.
+  // We check for MinFileListWidth in code.
+  MinFileListWidth := AdvPageFilelist.Constraints.MinWidth;
+  AdvPageFilelist.Constraints.MinWidth := 0;
+
   ReadGUIini;
 
   // Create Bread Crumb
@@ -2154,13 +2201,22 @@ begin
   ShellList.OnColumnResized := ShellListColumnResized;
   ShellList.OnThumbGenerate := ShellistThumbGenerate;
   ShellList.OnThumbError := ShellistThumbError;
-
+  ShellList.OnMouseWheel := ShellListMouseWheel;
   // Enable Column sorting if Sorted = true. Disables Sorted.
   ShellList.ColumnSorted := ShellList.Sorted;
 
   CBoxFileFilter.Text := SHOWALL;
   ExifTool.ExecETEvent := ExecETEvent_Done;
   Geomap.ExecRestEvent := ExecRestEvent_Done;
+end;
+
+procedure TFMain.ShellListMouseWheel(Sender: TObject; Shift: TShiftState; WheelDelta: Integer; MousePos: TPoint; var Handled: Boolean);
+begin
+  Handled := false;
+  if (ssCtrl in Shift) then
+    ShellList.SetIconSpacing(WheelDelta, 0);
+  if (ssAlt in shift) then
+    ShellList.SetIconSpacing(0, 0);
 end;
 
 // ---------------Drag_Drop procs --------------------
@@ -2205,13 +2261,13 @@ var
   AnItem: TListItem;
   Param: string;
   Lat, Lon: string;
-  I: smallint;
+  I: integer;
   PathFromParm: boolean;
 begin
-  I := Screen.PixelsPerInch;
-  AdvPanelETdirect.Height := MulDiv(32, I, 96);
-  AdvPanelMetaBottom.Height := MulDiv(32, I, 96);
-  MetadataList.DefaultRowHeight := MulDiv(19, I, 96);
+  AdvPanelETdirect.Height := ScaleDesignDpi(32);
+  AdvPanelMetaBottom.Height := ScaleDesignDpi(32);
+  Splitter2.MinSize := ScaleDesignDpi(320);
+
   // This must be in OnShow event -for OnCanResize event (probably bug in XE2):
   GUIBorderWidth := Width - ClientWidth;
   GUIBorderHeight := Height - ClientHeight;
@@ -2640,6 +2696,13 @@ begin
     ShellList.PasteFilesFromClipboard;
   if (Key = VK_PRIOR) or (Key = VK_NEXT) then // PageUp/Down
     ShellListClick(Sender);
+
+  if (Key = VK_ADD) and (ssCtrl in Shift) then
+    ShellList.SetIconSpacing(1, 0);
+  if (Key = VK_SUBTRACT) and (ssCtrl in Shift) then
+    ShellList.SetIconSpacing(-1, 0);
+  if ((Key = Ord('0')) or (Key = VK_NUMPAD0)) and (ssCtrl in Shift) then
+    ShellList.SetIconSpacing(0, 0);
 end;
 
 procedure TFMain.ShellListSetFolders;
@@ -2652,7 +2715,7 @@ begin
     exclude(Value, TshellObjectType.otFolders);
   if (Value <> ShellList.ObjectTypes) then
     ShellList.ObjectTypes := Value;
-  PnlBreadCrumb.Visible := GUIsettings.ShowFolders;
+  PnlBreadCrumb.Visible := GUIsettings.ShowBreadCrumb;
 end;
 
 procedure TFMain.EnableMenus(Enable: boolean);
@@ -2992,23 +3055,22 @@ end;
 
 procedure TFMain.SpeedBtnLargeClick(Sender: TObject);
 var
-  i, F: smallint;
+  F: integer;
 begin
-  i := Screen.PixelsPerInch;
   F := ShellList.ItemIndex;
   if SpeedBtnLarge.Down then
   begin
     MemoQuick.Clear;
     MemoQuick.Text := EditQuick.Text;
     EditQuick.Visible := false;
-    AdvPanelMetaBottom.Height := MulDiv(105, i, 96);
+    AdvPanelMetaBottom.Height := ScaleDesignDpi(105);
     if F <> -1 then
       MemoQuick.SetFocus;
   end
   else
   begin
     EditQuick.Text := MemoQuick.Text;
-    AdvPanelMetaBottom.Height := MulDiv(32, i, 96);
+    AdvPanelMetaBottom.Height := ScaleDesignDpi(32);
     EditQuick.Visible := true;
     if F <> -1 then
       EditQuick.SetFocus;
@@ -3024,21 +3086,20 @@ end;
 
 procedure TFMain.SpeedBtn_ETdirectClick(Sender: TObject);
 var
-  I, H: smallint;
+  H: integer;
 begin
-  I := Screen.PixelsPerInch;
   if SpeedBtn_ETdirect.Down then
   begin
     if SpeedBtn_ETedit.Down then
       H := 184 // min 181
     else
       H := 105;
-    AdvPanelETdirect.Height := MulDiv(H, I, 96);
+    AdvPanelETdirect.Height := ScaleDesignDpi(H);
     EditETdirect.SetFocus;
   end
   else
   begin
-    AdvPanelETdirect.Height := MulDiv(32, I, 96);
+    AdvPanelETdirect.Height := ScaleDesignDpi(32);
     ShellList.SetFocus;
   end;
 end;
@@ -3050,13 +3111,13 @@ end;
 
 procedure TFMain.SpeedBtn_ETeditClick(Sender: TObject);
 var
-  H: smallint;
+  H: integer;
 begin
   if SpeedBtn_ETedit.Down then
     H := 181
   else
     H := 105;
-  AdvPanelETdirect.Height := MulDiv(H, Screen.PixelsPerInch, 96);
+  AdvPanelETdirect.Height := ScaleDesignDpi(H);
 end;
 
 procedure TFMain.SpeedBtn_GeotagClick(Sender: TObject);
@@ -3115,50 +3176,35 @@ begin
 end;
 
 procedure TFMain.Splitter1CanResize(Sender: TObject; var NewSize: integer; var Accept: boolean);
-var
-  X: smallint;
 begin
-  if NewSize <= Splitter1.Left then
-  begin // limit to min. Browse panel
-    if NewSize <= Splitter1.MinSize then
-      NewSize := Splitter1.MinSize + 1;
-  end
-  else
-    with Splitter2 do
-    begin // limit to min. Filelist panel
-      X := Left - NewSize;
-      if X < MinSize then
-        NewSize := Left - MinSize - 5;
-    end;
-  StatusBar.Panels[0].Width := NewSize + 5;
+  Accept := ((Splitter2.Left - Splitter2.Width - Splitter1.Width - NewSize) > MinFileListWidth);
+end;
+
+procedure TFMain.Splitter1Moved(Sender: TObject);
+begin
+  AlignStatusBar;
 end;
 
 procedure TFMain.Splitter2CanResize(Sender: TObject; var NewSize: integer; var Accept: boolean);
 begin
-  if NewSize < 320 then
-    NewSize := 320; // limit to min. Metadata panel
-  with StatusBar do
-    Panels[1].Width := Width - Panels[0].Width - NewSize;
+  Accept := ((ClientWidth - Splitter1.Left - Splitter1.Width - Splitter2.Width - NewSize) > MinFileListWidth);
 end;
 
-procedure TFMain.Splitter3CanResize(Sender: TObject; var NewSize: integer; var Accept: boolean);
-begin // prevent NewSize=0 (disappearing Preview panel)
-  if NewSize <= Splitter3.MinSize then
-    NewSize := Splitter3.MinSize + 1;
+procedure TFMain.Splitter2Moved(Sender: TObject);
+begin
+  AlignStatusBar;
 end;
 
 procedure TFMain.SetGuiStyle;
 var
   AStyleService: TCustomStyleServices;
 begin
-  GUIsettings.DesignPPI := GetDesignDpi;
   GUIColorWindow := clBlack;
   AStyleService := TStyleManager.Style[GUIsettings.GuiStyle];
   if Assigned(AStyleService) then
     GUIColorWindow := AStyleService.GetStyleColor(scWindow);
+
   BreadcrumbBar.Style := GUIsettings.GuiStyle;
-  BreadcrumbBar.DesignDPI := GUIsettings.DesignPPI;
-  BreadcrumbBar.ScreenDPI := Screen.PixelsPerInch;
 end;
 
 procedure TFMain.ShellistThumbError(Sender: TObject; Item: TListItem; E: Exception);

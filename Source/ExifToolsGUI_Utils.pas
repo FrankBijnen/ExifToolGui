@@ -35,6 +35,9 @@ function GetEdgeUserData: string;
 function GetNrOfFiles(StartDir, FileMask: string; subDir: boolean): integer;
 function GetComSpec: string;
 
+// Swap
+procedure Swap(var A, B: Cardinal);
+
 // String
 function NextField(var AString: string; const ADelimiter: string): string;
 function QuotedFileName(FileName: string): string;
@@ -275,6 +278,15 @@ begin
   end;
 end;
 
+procedure Swap(var A, B: Cardinal);
+var
+  Temp: Cardinal;
+begin
+  Temp := A;
+  A := B;
+  B := Temp;
+end;
+
 // String
 
 function NextField(var AString: string; const ADelimiter: string): string;
@@ -478,6 +490,8 @@ var
   IwdR: IWICBitmapFlipRotator;
   IwdS: IWICBitmapScaler;
   W, H, NewW, NewH: cardinal;
+  Portrait: boolean;
+  ImgRatio: double;
 begin
   result := nil;
   GlobalImgFact.CreateDecoderFromFilename(PWideChar(AImg), GUID_VendorMicrosoftBuiltIn, // Use only builtin codecs. No additional installs needed.
@@ -498,16 +512,30 @@ begin
   result.GetSize(W, H);
   if (W = 0) or (H = 0) then
     exit;
-  if (H < W) then
-  begin
-    NewW := MaxW;
-    NewH := Round((MaxW * H) / W);
-  end
+
+  Portrait :=(Rotate = 90) or
+             (Rotate = 270);
+  // Compute NewW, NewH.
+  // Take largest Ratio possible
+  if Portrait then
+    ImgRatio := W / H
   else
-  begin
+    ImgRatio := H / W;
+
+  // Assume Preview Width is limiting
+  NewW := MaxW;
+  NewH := Round(MaxW * ImgRatio);
+  if (NewH > MaxH) then
+  begin  // No. Preview Height is limiting
     NewH := MaxH;
-    NewW := Round((MaxH * W) / H);
+    NewW := Round(MaxH / ImgRatio);
   end;
+
+  // Scaling occurs before Rotating (performs better).
+  // In portrait mode swap NewW and NewH
+  if Portrait then
+    Swap(NewW, NewH);
+
   IwdS.Initialize(result, NewW, NewH, WICBitmapInterpolationModeNearestNeighbor);
   result := IwdS;
 
@@ -528,6 +556,7 @@ begin
   end;
 end;
 
+// The image size of the Bitmap passed should not exceed W or H!
 procedure ResizeBitmapCanvas(Bitmap: TBitmap; W, H: integer; BackColor: TColor);
 var
   Bmp: TBitmap;
