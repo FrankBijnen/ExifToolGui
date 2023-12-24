@@ -71,8 +71,8 @@ And various fixes like: generating Thumbnails, selecting a directory while the s
  
 Version 6.2.7.
 
-Option to add folders (Directories) to the filelist. If enabled also the control BreadCrumbBar by Andreas Rejbrand, is instantiated. 
-You can find the source in the subdirectory BreadbrumbBar.
-Added experimental support for 4K monitors. See UnitScaleForm.pas
+Option to add folders (Directories) to the filelist.
+Option to enable the control BreadCrumbBar by Andreas Rejbrand. You can find the source in the subdirectory BreadbrumbBar.
+Added experimental support for 4K monitors. See UnitScaleForm.pas and UnitDpiAwareness.pas
 
 Frank

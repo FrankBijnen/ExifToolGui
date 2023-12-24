@@ -60,6 +60,7 @@ Basic idea behind GUI is, to keep it <u>simple!</u> Thus, only those options are
 <li>Exporting and Importing previews has been revised, and offer greater flexibility.</li>
 <li>GeoCoding has been enhanced. You can now choose from 2 providers (https://overpass-api.de and https://geocode.maps.co) and lookup City, Province and Country from GPS coordinates AKA reverse GeoCoding.</li>
 <li>Option added to show folders in the FileList panel.</li>
+<li>Option added to show a Breadcrumb (Address bar) in the FileList panel.</li>
 <li>Possibility to add Custom options to Exiftool.</li>
 <li>Experimental support for <a href="Readme%204K%20monitor.txt"><b>4K monitors.</b></a></li>
 </ul>
@@ -257,7 +258,8 @@ double-clicking on one of the tabs Exif, Xmp, Iptc, Maker, All will add that tag
 If you need to override the location of exiftool.exe you can do that here.<br><br>
 <b>Filelist: Show Folders in Filelist</b><br>
 The default setting is to only show files in the Filelist panel. If you enable this option, also folders (directories) will be shown, allowing easier navigation.<br>
-It will also enable a BreadCrumb bar.<br><br>
+<b>Filelist: Show Breadcrumb (Address bar) in Filelist</b><br>
+Enable a BreadCrumb bar on top of the filelist. Allows for easier navigating.<br><br>
 <b>Hint pause timeout in Millisecs</b><br>
 Hovering over the metadata panel will display the complete metadata value as a hint. This was added because long values are often not completely visible.<br>
 Setting this value to 0 (zero) will effectively disable the hints.

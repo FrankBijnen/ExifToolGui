@@ -2715,7 +2715,7 @@ begin
     exclude(Value, TshellObjectType.otFolders);
   if (Value <> ShellList.ObjectTypes) then
     ShellList.ObjectTypes := Value;
-  PnlBreadCrumb.Visible := GUIsettings.ShowFolders;
+  PnlBreadCrumb.Visible := GUIsettings.ShowBreadCrumb;
 end;
 
 procedure TFMain.EnableMenus(Enable: boolean);

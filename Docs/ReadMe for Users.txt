@@ -103,13 +103,17 @@ Changed with version 6.2.6
   https://htmlpreview.github.io/?https://github.com/FrankBijnen/ExifToolGui/blob/main/Docs/ExifToolGUI_V6.md
 
 Changed with version 6.2.7
-- Added the option to show folders in the filelist. If you enable it in Preferences/other als a Breadcrumb is shown. No Metadata/Image functions are available.
-  It only serves easier navigation.
+- Added the option to show folders (Directories) in the filelist. No Metadata/Image functions are available on the folders.
+- Added the option to show a Breadcrumb (Address bar)in the filelist. 
+  Both options can be dis/enabled in Preferences/other and only serve for easier navigation.
 - Some fixes for styles were applied. Especially the style 'Green' was updated, it had some colours wrongly defined and the caption bar was ugly.
 - Added a hint window for the metadata values. It can be disabled in Prefrences/Other by setting the timeout value to 0.
 - Added the option to add Custom Options to Exiftool. Not needed for Normal usage. 
   If you want to experiment: Add the option '-htmldump'. (without the quotes) Open the log window, and check 'Show all commands'. Select any file.
   Dont forget to remove the option afterwards! 
 - Fixed an error message in the generated Powershell script. It would always show the error 'Native Command Error'.
+- Fixed an error message in the generated Powershell script. It would always show the error 'Native Command Error'.
+- Added experimental support for 4K monitors. Or better: Monitors with a non-standard resolution or scaling. 
+  If you want to experiment with this see: Readme 4K monitor.txt in the Docs directory.
 
 Frank

@@ -534,7 +534,7 @@ object FPreferences: TFPreferences
       Caption = 'Other'
       object Label5: TLabel
         Left = 104
-        Top = 173
+        Top = 190
         Width = 141
         Height = 13
         Caption = 'Hint pause timeout in Millisecs'
@@ -594,7 +594,7 @@ object FPreferences: TFPreferences
       end
       object HintPause: TEdit
         Left = 16
-        Top = 170
+        Top = 187
         Width = 66
         Height = 21
         TabOrder = 6
@@ -602,13 +602,21 @@ object FPreferences: TFPreferences
       end
       object UpDHintPause: TUpDown
         Left = 82
-        Top = 170
+        Top = 187
         Width = 16
         Height = 21
         Associate = HintPause
         Max = 10000
         Increment = 10
         TabOrder = 7
+      end
+      object CheckBox7: TCheckBox
+        Left = 16
+        Top = 164
+        Width = 337
+        Height = 17
+        Caption = '-Filelist: Show Breadcrumb (Address Bar) in Filelist'
+        TabOrder = 8
       end
     end
   end

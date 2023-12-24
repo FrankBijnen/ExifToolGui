@@ -54,3 +54,4 @@ Version:        Description             Issue
                 Fix Issue #199          Experimental support for 4K monitors
                 Fix Issue #202          Window opens very small on Win11 with x64 build
                 Fix Issue #203          Preview cuts off part of images
+                Fix Issue #204          Request: Make 'BreadCrumBar' a standalone option in Preferences
