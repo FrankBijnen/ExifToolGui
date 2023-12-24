@@ -257,7 +257,7 @@ double-clicking on one of the tabs Exif, Xmp, Iptc, Maker, All will add that tag
 <b>Exiftool.exe location</b><br>
 If you need to override the location of exiftool.exe you can do that here.<br><br>
 <b>Filelist: Show Folders in Filelist</b><br>
-The default setting is to only show files in the Filelist panel. If you enable this option, also folders (directories) will be shown, allowing easier navigation.<br>
+The default setting is to only show files in the Filelist panel. If you enable this option, also folders (directories) will be shown, allowing easier navigation.<br><br>
 <b>Filelist: Show Breadcrumb (Address bar) in Filelist</b><br>
 Enable a BreadCrumb bar on top of the filelist. Allows for easier navigating.<br><br>
 <b>Hint pause timeout in Millisecs</b><br>
