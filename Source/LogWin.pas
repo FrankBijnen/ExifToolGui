@@ -205,7 +205,10 @@ begin
       PSList.Add('Remove-Item -Path $args');
     end
     else
-      PSList.Add('exiftool ' + MemoCmds.Text);
+    begin
+      ACmd := StringReplace(StringReplace(MemoCmds.Text, '}', '`}', [rfReplaceAll]), '{', '`{', [rfReplaceAll]);
+      PSList.Add('exiftool ' + ACmd + ' 2>&1 | %{"$_"}');
+    end;
 
     PSList.Add('pause');
     WriteArgsFile(PSList.Text, SaveDialogPS.FileName, (RadShowCmds.ItemIndex = 0));
