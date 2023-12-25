@@ -137,15 +137,18 @@ begin
     else
       ETcmd := ETcmd + 'CreateDate"';
   end;
-
   ET_OpenExec(ETcmd, FMain.GetSelectedFiles, ETout, ETerr);
-  SelectedFiles := TStringList.Create;
-  try
-    SelectedFiles.Text := FMain.GetSelectedFiles(true); // Need complete path
-    for AFile in SelectedFiles do
-      FillLocationInImage(AFile);
-  finally
-    SelectedFiles.Free;
+
+  if (ChkUpdateLocation.Checked) then
+  begin
+    SelectedFiles := TStringList.Create;
+    try
+      SelectedFiles.Text := FMain.GetSelectedFiles(true); // Need complete path
+      for AFile in SelectedFiles do
+        FillLocationInImage(AFile);
+    finally
+      SelectedFiles.Free;
+    end;
   end;
 
   ModalResult := mrOK;
