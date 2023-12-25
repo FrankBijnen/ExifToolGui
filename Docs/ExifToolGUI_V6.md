@@ -985,7 +985,7 @@ Examples that have happened to me:</li>
 <li>Location (Country, Province, City)</li>
 <li>Coordinates and Location</li>
 </ul>
-<li>Click on <b>OK</b>, to GeoTag the files.</li><br><br>
+<li>Click on <b>OK</b>, to GeoTag the files.</li><br>
 <li>Only tags from the <b>GPS</b> group are updated.</li><br>
 </ul>
 <br>
