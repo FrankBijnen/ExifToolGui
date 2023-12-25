@@ -20,7 +20,7 @@ Current version: <b>V6.2.7</b> updated December 24, 2023.<br>
 <h4>Important</h4>
 
 - [Please <b>read</b> the Requirements and preparation](https://github.com/FrankBijnen/ExifToolGui/blob/main/Docs/ExifToolGUI_V6.md/#m_reqs_general)<br>
-- To help Bug hunting there are also Map files released. If you place the Map file in the same directory as the Executable
+- To help Bug hunting also Map files are released. If you place the Map file in the same directory as the Executable
 a stacktrace can be copied to the clipboard if an Exception occurs. Please also provide the stacktrace if you report an Exception.<br>
 
 # Useful links
@@ -34,7 +34,7 @@ a stacktrace can be copied to the clipboard if an Exception occurs. Please also 
 
 2) An installer provided by Oliver Betz. https://oliverbetz.de/pages/Artikel/ExifTool-for-Windows
 
-<h4>Obtaining WebWiew2Loader.dll</h4>
+<h4>Obtaining WebView2Loader.dll</h4>
 
 -  https://nuget.info/packages/Microsoft.Web.WebView2/
 
