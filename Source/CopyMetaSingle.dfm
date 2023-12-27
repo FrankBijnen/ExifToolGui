@@ -3,7 +3,7 @@ object FCopyMetaSingle: TFCopyMetaSingle
   Top = 0
   BorderStyle = bsDialog
   Caption = 'Import into selected files'
-  ClientHeight = 229
+  ClientHeight = 264
   ClientWidth = 502
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
@@ -15,23 +15,25 @@ object FCopyMetaSingle: TFCopyMetaSingle
   TextHeight = 13
   object Label1: TLabel
     Left = 433
-    Top = 161
+    Top = 195
     Width = 31
     Height = 13
     Caption = 'Label1'
   end
   object StatusBar1: TStatusBar
     Left = 0
-    Top = 210
+    Top = 245
     Width = 502
     Height = 19
     Panels = <>
+    ExplicitTop = 209
+    ExplicitWidth = 498
   end
   object AdvPanel1: TPanel
     Left = 0
     Top = 0
     Width = 417
-    Height = 210
+    Height = 245
     Align = alLeft
     DoubleBuffered = True
     Font.Charset = DEFAULT_CHARSET
@@ -42,6 +44,7 @@ object FCopyMetaSingle: TFCopyMetaSingle
     ParentDoubleBuffered = False
     ParentFont = False
     TabOrder = 1
+    ExplicitHeight = 209
     object CheckBox1: TCheckBox
       Left = 24
       Top = 16
@@ -55,7 +58,7 @@ object FCopyMetaSingle: TFCopyMetaSingle
       Left = 24
       Top = 39
       Width = 369
-      Height = 166
+      Height = 200
       BevelOuter = bvLowered
       Font.Charset = DEFAULT_CHARSET
       Font.Color = clWindowText
@@ -118,6 +121,15 @@ object FCopyMetaSingle: TFCopyMetaSingle
         TabOrder = 5
         OnClick = CheckBox2Click
       end
+      object CheckBox8: TCheckBox
+        Left = 16
+        Top = 170
+        Width = 73
+        Height = 17
+        Caption = '-Gps:All'
+        TabOrder = 6
+        OnClick = CheckBox2Click
+      end
     end
   end
   object Button1: TButton
@@ -131,7 +143,7 @@ object FCopyMetaSingle: TFCopyMetaSingle
   end
   object Button2: TButton
     Left = 433
-    Top = 180
+    Top = 214
     Width = 64
     Height = 25
     Caption = 'Execute'

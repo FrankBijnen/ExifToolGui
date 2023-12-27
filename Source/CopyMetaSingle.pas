@@ -23,6 +23,7 @@ type
     Button1: TButton;
     Button2: TButton;
     Label1: TLabel;
+    CheckBox8: TCheckBox;
     procedure FormShow(Sender: TObject);
     procedure CheckBox1Click(Sender: TObject);
     procedure CheckBox2Click(Sender: TObject);
@@ -107,6 +108,8 @@ begin
       ETcmd := ETcmd + CRLF + '-IPTC:all';
     if CheckBox7.Checked then
       ETcmd := ETcmd + CRLF + '-ICC_Profile';
+    if CheckBox8.Checked then
+      ETcmd := ETcmd + CRLF + '-Gps:All';
   end;
 
   ET_OpenExec(ETcmd, FMain.GetSelectedFiles, ETout, ETerr);
