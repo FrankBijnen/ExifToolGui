@@ -1017,6 +1017,69 @@ begin
   until (APPmark <> $FFE0) and (APPmark <> $FFE1) and (APPmark <> $FFE2) and (APPmark <> $FFED);
 end;
 
+(*
+Fuji Raw File (RAF)
+
+RAF File Header
+
+0x00    16    'FUJIFILMCCD-RAW ' Magic word
+0x10    4     '020x' Format version
+              0200: Fuji S2
+              0201: Fuji S3
+0x14    8     Camera number ID
+0x1C    32    Camera body name
+
+RAF File subHeader (01.00)
+
+0x00    4     '0100' Version
+0x04    5*4   Unknown
+0x18    4     Jpeg Image data offset <== This is the pointer we need
+0x1C    4     Jpeg Image data byte size
+0x20    4     First RAW image header offset
+0x24    4     First RAW image header byte size;
+0x28    4     First RAW image data offset
+0x2c    4     First RAW image data byte size
+0x30    3*4   Unknown
+0x3c    4     Second RAW image header offset
+0x40    4     Second RAW image header byte size;
+0x44    4     Second RAW image data offset
+0x48    4     Second RAW image data byte size
+0x4c    3*4   Unknown
+*)
+
+function SkipFujiHeader: word;
+var
+  SavePos: Int64;
+  FujiMagic:array[0..7] of AnsiChar;
+  JpegOffset: longword;
+const
+  JpegOffsetOffset = 16 + 4 + 8 + 32 + 4 + (5*4);
+begin
+  SavePos := FotoF.Position;
+  FotoF.Seek(0, TSeekOrigin.soBeginning);
+  FotoF.Read(FujiMagic, SizeOf(FujiMagic));
+
+  if (FujiMagic = 'FUJIFILM') then
+  begin
+    FotoF.Seek(JpegOffsetOffset, TSeekOrigin.soBeginning);
+    FotoF.Read(JpegOffset, SizeOf(JpegOffset));      // Offset to JpegImage
+    JpegOffset := SwapL(JpegOffset);
+    FotoF.Seek(JpegOffset, TSeekOrigin.soBeginning); // Set File pointer
+  end
+  else
+    FotoF.Seek(SavePos, TSeekOrigin.soBeginning);    // Restore file pointer, no FujiFilm
+
+// Return first word.
+  FotoF.Read(result, SizeOf(result));
+  result := Swap(result);
+end;
+
+procedure ReadFuji;
+begin
+  if (SkipFujiHeader = $FFD8) then
+    ReadJpeg;
+end;
+
 // ==============================================================================
 procedure ReadXMP;
 var
@@ -1209,6 +1272,8 @@ begin
       FotoF.Read(Wdata, 2);
       Wdata := Swap(Wdata);
       case Wdata of
+        $4655:
+          ReadFuji;
         $FFD8:
           ReadJPEG;
         $4949:
@@ -1304,6 +1369,8 @@ begin
         ReadTIFF
       else
       begin
+        if Wdata = $4655 then
+          Wdata := SkipFujiHeader;
         if Wdata = $FFD8 then
         begin
           repeat
