@@ -1,3 +1,15 @@
+
+Important:
+
+Geocode.maps.co started requiring an api-key. If it is not supplied you will get a response code 401. (Unautorized)
+ExifToolGUI 6.2.8 adds the option to specify this api-key in preferences. Earlier versions will throw an Access violation.
+
+If you want to keep using GeoCode:
+- Register yourself
+- Obtain your api-key
+- Fill out the api-key in preferences
+- Set the throttle value to 1000 ms or higher for a free account.
+
 Starting with Version 6.2.5 GeoCoding has been revised.
 
 In a nutshell:

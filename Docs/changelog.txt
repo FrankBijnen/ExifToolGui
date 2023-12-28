@@ -55,3 +55,8 @@ Version:        Description             Issue
                 Fix Issue #202          Window opens very small on Win11 with x64 build
                 Fix Issue #203          Preview cuts off part of images
                 Fix Issue #204          Request: Make 'BreadCrumBar' a standalone option in Preferences
+6.2.8.0         Fix Issue #208          Import GPS Data ignores checkbox 'Update Geo Location'
+                Fix Issue #214          Copy GPS info only when copying metadata?
+                Fix Issue #215          Camera settings display in Filelist (for FujiFilm RAW)
+                Fix Issue #219          Geocode requires an API Key
+
