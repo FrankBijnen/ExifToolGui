@@ -24,6 +24,7 @@ type
     Button2: TButton;
     Label1: TLabel;
     CheckBox8: TCheckBox;
+    CheckBox9: TCheckBox;
     procedure FormShow(Sender: TObject);
     procedure CheckBox1Click(Sender: TObject);
     procedure CheckBox2Click(Sender: TObject);
@@ -111,6 +112,8 @@ begin
     if CheckBox8.Checked then
       ETcmd := ETcmd + CRLF + '-Gps:All';
   end;
+  if CheckBox9.Checked then
+    ETcmd := ETcmd + CRLF + '-wm' + CRLF + 'cg';
 
   ET_OpenExec(ETcmd, FMain.GetSelectedFiles, ETout, ETerr);
   ModalResult := mrOK;
@@ -188,6 +191,7 @@ begin
   EventOn := true;
   CheckBox1.Checked := true;
   CheckBox1Click(Sender); // set all to checked
+  CheckBox9.Checked := false;
 end;
 
 end.
