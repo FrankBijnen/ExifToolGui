@@ -56,7 +56,7 @@ begin
         Check(DpiAware);
     end
     else
-      SetProcessDpiAwarenessContext(DPI_AWARENESS_CONTEXT_SYSTEM_AWARE); // Dont check default
+      SetProcessDpiAwarenessContext(DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE); // Dont check default
   end
   else if CheckWin32Version(6, 3) then  // Windows 8.1
   begin
@@ -72,7 +72,7 @@ begin
         Check(DpiAware);
     end
     else
-      SetProcessDpiAwareness(TProcessDpiAwareness.PROCESS_SYSTEM_DPI_AWARE);  // Dont check default
+      SetProcessDpiAwareness(TProcessDpiAwareness.PROCESS_PER_MONITOR_DPI_AWARE);  // Dont check default
   end;
 end;
 

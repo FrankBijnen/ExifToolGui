@@ -2161,6 +2161,13 @@ begin
   MinFileListWidth := AdvPageFilelist.Constraints.MinWidth;
   AdvPageFilelist.Constraints.MinWidth := 0;
 
+// Scaling for the menu items.
+// Note: When DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE_V2 is active and a style <> Windows
+//       The (sub)items are larger than the items.
+//       Could this be a bug in themes?
+  if (Scaled) then
+    Screen.MenuFont.Size := MulDiv(Screen.MenuFont.Size, Monitor.PixelsPerInch, Screen.DefaultPixelsPerInch);
+
   ReadGUIini;
 
   // Create Bread Crumb
