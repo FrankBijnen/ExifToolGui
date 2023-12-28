@@ -5,7 +5,7 @@ This is an updated version of the ExifToolGui program created by Bogdan Hrastnik
 
 <b>Hotfix for GeoCode queries: <b>V6.2.8</b> updated December 28, 2023.</b><br>
 
-Current version: <b>V6.2.7</b> updated December 24, 2023.<br>
+Version: <b>V6.2.7</b> updated December 24, 2023.<br>
 - Deprecated functions that use Jhead or JpegTran have been removed.<br>
 - Added peek preview for metadata panel. Shown as hint.<br>
 - Added option to show Folders in filelist, including a Breadcrumb Bar.<br>
