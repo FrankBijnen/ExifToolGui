@@ -17,6 +17,7 @@ type
     GetCoordProvider: TGeoCodeProvider;
     GetPlaceProvider: TGeoCodeProvider;
     GeoCodeUrl: string;
+    GeoCodeApiKey: string;
     ThrottleGeoCode: integer;
     OverPassUrl: string;
     OverPassCaseSensitive: boolean;
@@ -522,6 +523,8 @@ begin
   try
     try
       RESTRequest.Execute;
+      if (RESTRequest.Response.StatusCode >= 400) then
+        raise exception.Create('Request failed with HTTP Response:' + #10 + RESTRequest.Response.StatusText);
     except
       on E:Exception do
       begin
@@ -710,6 +713,10 @@ begin
     RESTRequest.params.Clear;
     RESTRequest.params.AddItem('lat', LatE, TRESTRequestParameterKind.pkGETorPOST);
     RESTRequest.params.AddItem('lon', LonE, TRESTRequestParameterKind.pkGETorPOST);
+
+    if (GeoSettings.GeoCodeApiKey <> '') then
+      RESTRequest.params.AddItem('api_key', GeoSettings.GeoCodeApiKey , TRESTRequestParameterKind.pkGETorPOST);
+
     if not ExecuteRest(RESTRequest) then
       exit;
 
@@ -990,6 +997,9 @@ begin
     else
       RESTRequest.params.AddItem('q', City, TRESTRequestParameterKind.pkGETorPOST);
 
+    if (GeoSettings.GeoCodeApiKey <> '') then
+      RESTRequest.params.AddItem('api_key', GeoSettings.GeoCodeApiKey , TRESTRequestParameterKind.pkGETorPOST);
+
     if not ExecuteRest(RESTRequest) then
       exit;
 
@@ -1117,7 +1127,9 @@ begin
   GeoSettings.GetCoordProvider := TGeoCodeProvider(GUIini.ReadInteger(Geo_Settings, 'GetCoordProvider', 0));
   GeoSettings.GetPlaceProvider := TGeoCodeProvider(GUIini.ReadInteger(Geo_Settings, 'GetPlaceProvider', 1));
   GeoSettings.GeoCodeUrl := GUIini.ReadString(Geo_Settings, 'GeoCodeUrl', 'https://geocode.maps.co');
-  GeoSettings.ThrottleGeoCode := GUIini.ReadInteger(Geo_Settings, 'ThrottleGeoCode', 500);
+  GeoSettings.GeoCodeApiKey := GUIini.ReadString(Geo_Settings, 'GeoCodeApiKey', '');
+
+  GeoSettings.ThrottleGeoCode := GUIini.ReadInteger(Geo_Settings, 'ThrottleGeoCode', 1000);
   GeoSettings.OverPassUrl := GUIini.ReadString(Geo_Settings, 'OverPassUrl', 'https://overpass-api.de/api');
   GeoSettings.ThrottleOverPass := GUIini.ReadInteger(Geo_Settings, 'ThrottleOverPass', 10);
   GeoSettings.OverPassCaseSensitive := GUIini.ReadBool(Geo_Settings, 'OverPassCaseSensitive', True);
@@ -1141,6 +1153,7 @@ var
 begin
   GUIini.WriteString(Geo_Settings, 'GeoCodeUrl', GeoSettings.GeoCodeUrl);
   GUIini.WriteString(Geo_Settings, 'OverPassUrl', GeoSettings.OverPassUrl);
+  GUIini.WriteString(Geo_Settings, 'GeoCodeApiKey', GeoSettings.GeoCodeApiKey);
   GUIini.WriteInteger(Geo_Settings, 'GetCoordProvider', Ord(GeoSettings.GetCoordProvider));
   GUIini.WriteInteger(Geo_Settings, 'ThrottleGeoCode', GeoSettings.ThrottleGeoCode);
   GUIini.WriteInteger(Geo_Settings, 'GetPlaceProvider', Ord(GeoSettings.GetPlaceProvider));

@@ -18,7 +18,7 @@ object FPreferences: TFPreferences
     Top = 0
     Width = 521
     Height = 394
-    ActivePage = AdvTabGeneral
+    ActivePage = TabGeoCoding
     Align = alLeft
     DoubleBuffered = True
     ParentDoubleBuffered = False
@@ -433,12 +433,12 @@ object FPreferences: TFPreferences
         Left = 24
         Top = 117
         Width = 464
-        Height = 80
+        Height = 108
         Caption = 'GeoCode Maps:'
         TabOrder = 1
         object Label3: TLabel
           Left = 140
-          Top = 50
+          Top = 75
           Width = 146
           Height = 13
           Caption = '(Min. time between calls in Ms)'
@@ -457,18 +457,19 @@ object FPreferences: TFPreferences
         end
         object UpdThrottleGeoCode: TUpDown
           Left = 109
-          Top = 46
+          Top = 75
           Width = 16
           Height = 21
           Associate = EdThrottleGeoCode
           Min = 500
           Max = 10000
-          Position = 500
+          Increment = 50
+          Position = 1000
           TabOrder = 1
         end
         object EdThrottleGeoCode: TLabeledEdit
           Left = 60
-          Top = 46
+          Top = 75
           Width = 49
           Height = 21
           EditLabel.Width = 38
@@ -476,12 +477,24 @@ object FPreferences: TFPreferences
           EditLabel.Caption = 'Throttle'
           LabelPosition = lpLeft
           TabOrder = 2
-          Text = '500'
+          Text = '1000'
+        end
+        object EdGeoCodeApiKey: TLabeledEdit
+          Left = 60
+          Top = 46
+          Width = 365
+          Height = 21
+          EditLabel.Width = 36
+          EditLabel.Height = 21
+          EditLabel.Caption = 'Api Key'
+          LabelPosition = lpLeft
+          TabOrder = 3
+          Text = ''
         end
       end
       object GrpOverPass: TGroupBox
         Left = 24
-        Top = 203
+        Top = 231
         Width = 464
         Height = 80
         Caption = 'OverPass Api'

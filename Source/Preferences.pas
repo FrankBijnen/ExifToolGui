@@ -62,6 +62,7 @@ type
     HintPause: TEdit;
     UpDHintPause: TUpDown;
     CheckBox7: TCheckBox;
+    EdGeoCodeApiKey: TLabeledEdit;
     procedure FormShow(Sender: TObject);
     procedure BtnSaveClick(Sender: TObject);
     procedure BtnBrowseFolder(Sender: TObject);
@@ -147,12 +148,18 @@ begin
 
   //GeoCode
   GeoSettings.GeoCodeUrl := EdGeoCodeUrl.Text;
+  GeoSettings.GeoCodeApiKey := EdGeoCodeApiKey.Text;
   GeoSettings.ThrottleGeoCode := UpdThrottleGeoCode.Position;
   GeoSettings.OverPassUrl := EdOverPassUrl.Text;
   GeoSettings.ThrottleOverPass := UpdThrottleOverpass.Position;
   GeoSettings.GeoCodeDialog := ChkGeoCodeDialog.Checked;
   GeoSettings.GeoCodingEnable := ChkGeoCodingEnable.Checked;
   GeoSettings.ReverseGeoCodeDialog := ChkReverseGeoCodeDialog.Checked;
+
+  if (GeoSettings.GeoCodingEnable) and
+      ((GeoSettings.GeoCodeApiKey = '') or
+       (GeoSettings.ThrottleGeoCode < 1000)) then
+    ShowMessage('Check the GeoCode requirements. (Apikey required. Max 1 call per second for a free account)');
 end;
 
 procedure TFPreferences.BtnSetupCleanClick(Sender: TObject);
@@ -310,6 +317,7 @@ begin
 
     // GeoCode
     EdGeoCodeUrl.Text := GeoSettings.GeoCodeUrl;
+    EdGeoCodeApiKey.Text := GeoSettings.GeoCodeApiKey;
     UpdThrottleGeoCode.Position := GeoSettings.ThrottleGeoCode;
     EdOverPassUrl.Text := GeoSettings.OverPassUrl;
     UpdThrottleOverpass.Position := GeoSettings.ThrottleOverPass;
