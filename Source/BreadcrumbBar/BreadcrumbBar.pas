@@ -942,10 +942,10 @@ begin
   FHorSpace  := FBreadCrumbBar.DpiScale(LBHORSPACE);
   FHorMargin := FBreadCrumbBar.DpiScale(LBHORMARGIN);
   FVerMargin := FBreadCrumbBar.DpiScale(LBVERMARGIN);
-  FIconSize  := FBreadCrumbBar.DpiScale(FBreadCrumbBar.IconSize);
+  FIconSize  := FBreadCrumbBar.IconSize;
 
   // ItemHeight needed for font
-  ItemHeight := Max(Canvas.TextHeight('Q'), FIconSize) + (FVerMargin * 2);
+  ItemHeight := Max(Canvas.TextHeight('Q'), FIconSize) + FVerMargin;
 
   //  Length of largest line
   W := 0;

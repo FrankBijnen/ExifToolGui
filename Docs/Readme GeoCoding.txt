@@ -29,8 +29,10 @@ In Preferences a tab is added called 'GeoCoding'. Here you can:
 - Enable/Disable the dialogs that have been added, when searching for Locations or Coordinates.
 
 - For both providers, you can change the URL (normally not needed) and a 'throttle'. Throttling has been added to prevent overloading the providers.
-  For example GeoCode.maps.co states that 2 requests per second is the max. Hence a default throttle value of 500 ms.
+  For example GeoCode.maps.co states that 1 requests per second is the max. Hence a default throttle value of 1000 ms.
   Normally there will be no need to change the default settings.
+
+- Setup you api-key for GeoCode.
 
 Search for the coordinates of a location.
    In the 'Find' edit box on the OSM map tab, you can enter:
