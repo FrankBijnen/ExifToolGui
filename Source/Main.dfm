@@ -14,6 +14,7 @@ object FMain: TFMain
   Font.Style = []
   Menu = MainMenu
   Position = poDesigned
+  OnAfterMonitorDpiChanged = FormAfterMonitorDpiChanged
   OnCanResize = FormCanResize
   OnClose = FormClose
   OnCreate = FormCreate
@@ -63,6 +64,8 @@ object FMain: TFMain
       item
         Width = 50
       end>
+    ExplicitTop = 561
+    ExplicitWidth = 940
   end
   object AdvPanelBrowse: TPanel
     Left = 0
@@ -79,9 +82,10 @@ object FMain: TFMain
     ParentDoubleBuffered = False
     ParentFont = False
     TabOrder = 1
+    ExplicitHeight = 561
     object Splitter3: TSplitter
       Left = 1
-      Top = 337
+      Top = 336
       Width = 238
       Height = 4
       Cursor = crVSplit
@@ -95,18 +99,18 @@ object FMain: TFMain
       Left = 1
       Top = 1
       Width = 238
-      Height = 336
+      Height = 335
       ActivePage = AdvTabBrowse
       Align = alClient
       TabOrder = 0
-      ExplicitHeight = 335
+      ExplicitHeight = 334
       object AdvTabBrowse: TTabSheet
         Caption = 'Browse'
         object ShellTree: TShellTreeView
           Left = 0
           Top = 0
           Width = 230
-          Height = 308
+          Height = 307
           ObjectTypes = [otFolders]
           Root = 'rfDesktop'
           ShellListView = ShellList
@@ -127,6 +131,7 @@ object FMain: TFMain
           ShowRoot = False
           TabOrder = 0
           OnChanging = ShellTreeChanging
+          ExplicitHeight = 306
         end
       end
     end
@@ -139,6 +144,7 @@ object FMain: TFMain
       Align = alBottom
       TabOrder = 1
       OnResize = AdvPagePreviewResize
+      ExplicitTop = 339
       object AdvTabPreview: TTabSheet
         Caption = 'Preview '
         object RotateImg: TImage
@@ -940,7 +946,7 @@ object FMain: TFMain
   end
   object MainMenu: TMainMenu
     Left = 184
-    Top = 47
+    Top = 46
     object MProgram: TMenuItem
       Caption = 'Program'
       object MAbout: TMenuItem
