@@ -277,6 +277,7 @@ type
     procedure Splitter2Moved(Sender: TObject);
     procedure Splitter1Moved(Sender: TObject);
     procedure AdvPagePreviewResize(Sender: TObject);
+    procedure FormAfterMonitorDpiChanged(Sender: TObject; OldDPI, NewDPI: Integer);
   private
     { Private declarations }
     ETBarSeriesFocal: TBarSeries;
@@ -285,6 +286,7 @@ type
     BreadcrumbBar: TDirBreadcrumbBar;
     EdgeZoom: double;
     MinFileListWidth: integer;
+    OrgScreenFontSize: integer;
     procedure AlignStatusBar;
     procedure ImageDrop(var Msg: TWMDROPFILES); message WM_DROPFILES;
     procedure ShowMetadata;
@@ -2131,6 +2133,30 @@ begin
   StatusBar.Panels[1].Width := AdvPageFilelist.Width + Splitter2.Width;
 end;
 
+procedure TFMain.FormAfterMonitorDpiChanged(Sender: TObject; OldDPI, NewDPI: Integer);
+var MenuScaleFactor: Single;
+begin
+
+// Scaling for the menu items.
+// Note: When DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE_V2 is active and a style <> Windows
+//       The (sub)items are larger than the items.
+//       Could this be a bug in themes?
+  if (Scaled) then
+  begin
+    Screen.MenuFont.Size := OrgScreenFontSize;
+    MenuScaleFactor := ScaleDesignDpi(100);
+    if (MenuScaleFactor > 150) then  // Not enough room on Menubar
+      MenuScaleFactor := 150;
+    Screen.MenuFont.Size := MulDiv(OrgScreenFontSize, Round(MenuScaleFactor), 100);
+  end;
+
+  AdvPanelETdirect.Height := ScaleDesignDpi(32);
+  AdvPanelMetaBottom.Height := ScaleDesignDpi(32);
+  Splitter2.MinSize := ScaleDesignDpi(320);
+
+  MakeFullyVisible;
+end;
+
 procedure TFMain.FormCanResize(Sender: TObject; var NewWidth, NewHeight: integer; var Resize: boolean);
 var
   N: integer;
@@ -2161,12 +2187,8 @@ begin
   MinFileListWidth := AdvPageFilelist.Constraints.MinWidth;
   AdvPageFilelist.Constraints.MinWidth := 0;
 
-// Scaling for the menu items.
-// Note: When DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE_V2 is active and a style <> Windows
-//       The (sub)items are larger than the items.
-//       Could this be a bug in themes?
-  if (Scaled) then
-    Screen.MenuFont.Size := MulDiv(Screen.MenuFont.Size, Monitor.PixelsPerInch, Screen.DefaultPixelsPerInch);
+  // Save original screen fontsize
+  OrgScreenFontSize := Screen.MenuFont.Size;
 
   ReadGUIini;
 
@@ -2271,9 +2293,8 @@ var
   I: integer;
   PathFromParm: boolean;
 begin
-  AdvPanelETdirect.Height := ScaleDesignDpi(32);
-  AdvPanelMetaBottom.Height := ScaleDesignDpi(32);
-  Splitter2.MinSize := ScaleDesignDpi(320);
+
+  OnAfterMonitorDpiChanged(Sender, 0, 0); // DPI Values are not used
 
   // This must be in OnShow event -for OnCanResize event (probably bug in XE2):
   GUIBorderWidth := Width - ClientWidth;
