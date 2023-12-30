@@ -236,7 +236,7 @@ begin
   Left := FMain.Left + FMain.GUIBorderWidth + FMain.AdvPageFilelist.Left;
   Top := FMain.Top + FMain.GUIBorderHeight;
 
-  if FMain.MDontBackup.Checked then
+  if FMain.MaDontBackup.Checked then
     Label1.Caption := 'Backup: OFF'
   else
     Label1.Caption := 'Backup: ON';

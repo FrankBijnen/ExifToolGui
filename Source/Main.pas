@@ -16,18 +16,16 @@ uses
   Winapi.WebView2, Winapi.ActiveX, Winapi.EdgeUtils, Vcl.Edge, // Edgebrowser
   VclTee.TeeGDIPlus, VclTee.TeEngine, VclTee.TeeProcs, VclTee.Chart,
   VclTee.Series, // Chart
-  BreadcrumbBar,
-  UnitScaleForm,
-  ExifToolsGUI_ShellTree, // Extension of ShellTreeView
-  ExifToolsGUI_ShellList, // Extension of ShellListView
+  BreadcrumbBar, // BreadcrumbBar
+  UnitScaleForm, // Scale form from Commandline parm.
+  ExifToolsGUI_ShellTree,  // Extension of ShellTreeView
+  ExifToolsGUI_ShellList,  // Extension of ShellListView
   ExifToolsGUI_Thumbnails, // Thumbnails
-  ExifToolsGUI_Utils; // Various
+  ExifToolsGUI_Utils,      // Various
+  Vcl.ToolWin, Vcl.ActnMan, Vcl.ActnCtrls, Vcl.ActnMenus, System.Actions, Vcl.ActnList, Vcl.PlatformDefaultStyleActnCtrls;
 
 type
   TFMain = class(TScaleForm)
-    MainMenu: TMainMenu;
-    MProgram: TMenuItem;
-    MAbout: TMenuItem;
     StatusBar: TStatusBar;
     AdvPanelBrowse: TPanel;
     AdvPageBrowse: TPageControl;
@@ -63,31 +61,16 @@ type
     EditETcmdName: TLabeledEdit;
     CBoxFileFilter: TComboBox;
     SpeedBtnQuick: TSpeedButton;
-    MPreferences: TMenuItem;
-    MOptions: TMenuItem;
-    MDontBackup: TMenuItem;
-    MPreserveDateMod: TMenuItem;
-    MIgnoreErrors: TMenuItem;
-    N1: TMenuItem;
-    MShowGPSdecimal: TMenuItem;
-    MShowNumbers: TMenuItem;
     QuickPopUpMenu: TPopupMenu;
     QuickPopUp_UndoEdit: TMenuItem;
     QuickPopUp_MarkTag: TMenuItem;
     QuickPopUp_AddCustom: TMenuItem;
     QuickPopUp_DelCustom: TMenuItem;
     QuickPopUp_AddQuick: TMenuItem;
-    MQuickManager: TMenuItem;
-    N5: TMenuItem;
-    MExit: TMenuItem;
     MemoQuick: TMemo;
     SpeedBtnLarge: TSpeedButton;
     QuickPopUp_DelQuick: TMenuItem;
-    MModify: TMenuItem;
-    MExifDateTimeshift: TMenuItem;
     EditQuick: TEdit;
-    MShowHexID: TMenuItem;
-    MGroup_g4: TMenuItem;
     SpeedBtnFListRefresh: TSpeedButton;
     SpeedBtnFilterEdit: TSpeedButton;
     SpeedBtnColumnEdit: TSpeedButton;
@@ -96,30 +79,8 @@ type
     SpeedBtnETdirectDel: TSpeedButton;
     SpeedBtnETdirectReplace: TSpeedButton;
     SpeedBtnETdirectAdd: TSpeedButton;
-    MGUIStyle: TMenuItem;
-    MExportImport: TMenuItem;
-    MExportMeta: TMenuItem;
-    MExportMetaTXT: TMenuItem;
-    MExportMetaMIE: TMenuItem;
-    MExportMetaXMP: TMenuItem;
-    MExportMetaHTM: TMenuItem;
-    MImportMetaSelected: TMenuItem;
     OpenPictureDlg: TOpenPictureDialog;
-    MImportGPS: TMenuItem;
-    MImportGPSLog: TMenuItem;
-    MImportXMPLog: TMenuItem;
-    N7: TMenuItem;
-    MExifDateTimeEqualize: TMenuItem;
-    N8: TMenuItem;
-    MRemoveMeta: TMenuItem;
-    MExifLensFromMaker: TMenuItem;
-    MVarious: TMenuItem;
-    MFileDateFromExif: TMenuItem;
-    MExportMetaEXIF: TMenuItem;
-    MShowSorted: TMenuItem;
-    N6: TMenuItem;
     QuickPopUp_FillQuick: TMenuItem;
-    MShowComposite: TMenuItem;
     AdvTabOSMMap: TTabSheet;
     AdvPanel_MapTop: TPanel;
     SpeedBtn_ShowOnMap: TSpeedButton;
@@ -130,14 +91,8 @@ type
     SpeedBtn_MapSetHome: TSpeedButton;
     N2: TMenuItem;
     QuickPopUp_AddDetailsUser: TMenuItem;
-    MImportMetaSingle: TMenuItem;
-    MNotDuplicated: TMenuItem;
     N3: TMenuItem;
     QuickPopUp_CopyTag: TMenuItem;
-    MFileNameDateTime: TMenuItem;
-    MWorkspace: TMenuItem;
-    MWorkspaceLoad: TMenuItem;
-    MWorkspaceSave: TMenuItem;
     OpenFileDlg: TOpenDialog;
     SaveFileDlg: TSaveDialog;
     AdvTabChart: TTabSheet;
@@ -146,7 +101,6 @@ type
     AdvCheckBox_Subfolders: TCheckBox;
     AdvRadioGroup1: TRadioGroup;
     AdvRadioGroup2: TRadioGroup;
-    MImportRecursiveAll: TMenuItem;
     SpeedBtn_ETdSetDef: TSpeedButton;
     SpeedBtn_ETclear: TSpeedButton;
     RotateImg: TImage;
@@ -157,20 +111,52 @@ type
     Spb_Forward: TSpeedButton;
     SpeedBtn_GetLoc: TSpeedButton;
     CmbETDirectMode: TComboBox;
-    N4: TMenuItem;
-    MAPIWindowsWideFile: TMenuItem;
     EditFindMeta: TLabeledEdit;
-    GenericExtractPreviews: TMenuItem;
-    GenericImportPreview: TMenuItem;
-    JPGGenericlosslessautorotate1: TMenuItem;
     EditMapBounds: TLabeledEdit;
-    N10: TMenuItem;
-    UpdateLocationfromGPScoordinates: TMenuItem;
-    Help1: TMenuItem;
-    OnlineDocumentation1: TMenuItem;
-    MCustomOptions: TMenuItem;
-    N11: TMenuItem;
     PnlBreadCrumb: TPanel;
+    MainActionManager: TActionManager;
+    MaAbout: TAction;
+    MaPreferences: TAction;
+    MaQuickManager: TAction;
+    MaGUIStyle: TAction;
+    MaExit: TAction;
+    MaWorkspaceLoad: TAction;
+    MaWorkspaceSave: TAction;
+    ActionMainMenuBar: TActionMainMenuBar;
+    MaDontBackup: TAction;
+    MaPreserveDateMod: TAction;
+    MaIgnoreErrors: TAction;
+    MaShowGPSdecimal: TAction;
+    MaShowSorted: TAction;
+    MaShowComposite: TAction;
+    MaNotDuplicated: TAction;
+    MaShowNumbers: TAction;
+    MaShowHexID: TAction;
+    MaGroup_g4: TAction;
+    MaAPIWindowsWideFile: TAction;
+    MaCustomOptions: TAction;
+    MaExportMetaTXT: TAction;
+    MaExportMetaMIE: TAction;
+    MaExportMetaXMP: TAction;
+    MaExportMetaEXIF: TAction;
+    MaExportMetaHTML: TAction;
+    MaImportMetaSingle: TAction;
+    MaImportMetaSelected: TAction;
+    MaImportRecursiveAll: TAction;
+    MaImportGPS: TAction;
+    MaImportGPSLog: TAction;
+    Action1: TAction;
+    MaGenericExtractPreviews: TAction;
+    MaGenericImportPreview: TAction;
+    MaExifDateTimeshift: TAction;
+    MaExifDateTimeEqualize: TAction;
+    MaExifLensFromMaker: TAction;
+    MaRemoveMeta: TAction;
+    MaUpdateLocationfromGPScoordinates: TAction;
+    MaFileDateFromExif: TAction;
+    MaFileNameDateTime: TAction;
+    MaJPGGenericlosslessautorotate: TAction;
+    MaOnlineDocumentation: TAction;
     procedure ShellListClick(Sender: TObject);
     procedure ShellListKeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
     procedure SpeedBtnExifClick(Sender: TObject);
@@ -286,13 +272,15 @@ type
     BreadcrumbBar: TDirBreadcrumbBar;
     EdgeZoom: double;
     MinFileListWidth: integer;
-    OrgScreenFontSize: integer;
+    MenusEnabled: boolean;
     procedure AlignStatusBar;
     procedure ImageDrop(var Msg: TWMDROPFILES); message WM_DROPFILES;
     procedure ShowMetadata;
     procedure ShowPreview;
     procedure ShellListSetFolders;
     procedure EnableMenus(Enable: boolean);
+    procedure EnableMenuItems;
+
     procedure WMEndSession(var Msg: TWMEndSession); message WM_ENDSESSION;
     function TranslateTagName(xMeta, xName: string): string;
 
@@ -311,6 +299,7 @@ type
     procedure ShellListOwnerDataFetch(Sender: TObject; Item: TListItem; Request: TItemRequest; AFolder: TShellFolder);
     procedure ShellListColumnResized(Sender: TObject);
     procedure ShellListMouseWheel(Sender: TObject; Shift: TShiftState; WheelDelta: Integer; MousePos: TPoint; var Handled: Boolean);
+
     procedure CounterETEvent(Counter: integer);
   public
     { Public declarations }
@@ -697,13 +686,13 @@ end;
 procedure TFMain.MAPIWindowsWideFileClick(Sender: TObject);
 begin
   with ET_Options do
-    SetApiWindowsWideFile(MAPIWindowsWideFile.Checked);
+    SetApiWindowsWideFile(MaAPIWindowsWideFile.Checked);
 end;
 
 procedure TFMain.MDontBackupClick(Sender: TObject);
 begin
   with ET_Options do
-    if MDontBackup.Checked then
+    if MaDontBackup.Checked then
       ETBackupMode := '-overwrite_original' + CRLF
     else
       ETBackupMode := '';
@@ -933,15 +922,15 @@ begin
         xDir := xDir + '\';
   end;
 
-  if Sender = MExportMetaTXT then
+  if Sender = MaExportMetaTXT then
     ETcmd := '-w' + CRLF + xDir + '%f.txt' + CRLF + '-g0' + CRLF + '-a' + CRLF + '-All:All';
-  if Sender = MExportMetaMIE then
+  if Sender = MaExportMetaMIE then
     ETcmd := '-o' + CRLF + xDir + '%f.mie' + CRLF + '-All:All';
-  if Sender = MExportMetaXMP then
+  if Sender = MaExportMetaXMP then
     ETcmd := '-o' + CRLF + xDir + '%f.xmp' + CRLF + '-Xmp:All';
-  if Sender = MExportMetaEXIF then
+  if Sender = MaExportMetaEXIF then
     ETcmd := '-TagsFromFile' + CRLF + '@' + CRLF + '-All:All' + CRLF + '-o' + CRLF + '%f.exif';
-  if Sender = MExportMetaHTM then
+  if Sender = MaExportMetaHTML then
     ETcmd := '-w' + CRLF + xDir + '%f.html' + CRLF + '-htmldump';
 
   ET_OpenExec(ETcmd, GetSelectedFiles, ETout, ETerr);
@@ -972,7 +961,7 @@ end;
 procedure TFMain.MIgnoreErrorsClick(Sender: TObject);
 begin
   with ET_Options do
-    if MIgnoreErrors.Checked then
+    if MaIgnoreErrors.Checked then
       ETMinorError := '-m' + CRLF
     else
       ET_Options.ETMinorError := '';
@@ -1215,7 +1204,7 @@ end;
 procedure TFMain.MPreserveDateModClick(Sender: TObject);
 begin
   with ET_Options do
-    if MPreserveDateMod.Checked then
+    if MaPreserveDateMod.Checked then
       ETFileDate := '-P' + CRLF
     else
       ETFileDate := '';
@@ -1245,14 +1234,14 @@ end;
 
 procedure TFMain.MShowNumbersClick(Sender: TObject);
 begin
-  if Sender = MShowNumbers then
+  if Sender = MaShowNumbers then
     with ET_Options do
-      if MShowNumbers.Checked then
+      if MaShowNumbers.Checked then
         ETShowNumber := '-n' + CRLF
       else
         ETShowNumber := '';
-  if Sender = MShowGPSdecimal then
-    ET_Options.SetGpsFormat(MShowGPSdecimal.Checked); // + used by MShowHexID, MGroup_g4, MShowComposite, MShowSorted, MNotDuplicated
+  if Sender = MaShowGPSdecimal then
+    ET_Options.SetGpsFormat(MaShowGPSdecimal.Checked); // + used by MaShowHexID, MaGroup_g4, MaShowComposite, MaShowSorted, MaNotDuplicated
   RefreshSelected(Sender);
   ShowMetadata;
 end;
@@ -1484,7 +1473,7 @@ begin
     else
       Tz := '';
 
-    if MGroup_g4.Checked then
+    if MaGroup_g4.Checked then
       Tx := Tz
     else
     begin // find group
@@ -2134,21 +2123,9 @@ begin
 end;
 
 procedure TFMain.FormAfterMonitorDpiChanged(Sender: TObject; OldDPI, NewDPI: Integer);
-var MenuScaleFactor: Single;
 begin
-
-// Scaling for the menu items.
-// Note: When DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE_V2 is active and a style <> Windows
-//       The (sub)items are larger than the items.
-//       Could this be a bug in themes?
-  if (Scaled) then
-  begin
-    Screen.MenuFont.Size := OrgScreenFontSize;
-    MenuScaleFactor := ScaleDesignDpi(100);
-    if (MenuScaleFactor > 150) then  // Not enough room on Menubar
-      MenuScaleFactor := 150;
-    Screen.MenuFont.Size := MulDiv(OrgScreenFontSize, Round(MenuScaleFactor), 100);
-  end;
+  GUIBorderWidth := Width - ClientWidth;
+  GUIBorderHeight := Height - ClientHeight;
 
   AdvPanelETdirect.Height := ScaleDesignDpi(32);
   AdvPanelMetaBottom.Height := ScaleDesignDpi(32);
@@ -2186,9 +2163,6 @@ begin
   // We check for MinFileListWidth in code.
   MinFileListWidth := AdvPageFilelist.Constraints.MinWidth;
   AdvPageFilelist.Constraints.MinWidth := 0;
-
-  // Save original screen fontsize
-  OrgScreenFontSize := Screen.MenuFont.Size;
 
   ReadGUIini;
 
@@ -2296,19 +2270,15 @@ begin
 
   OnAfterMonitorDpiChanged(Sender, 0, 0); // DPI Values are not used
 
-  // This must be in OnShow event -for OnCanResize event (probably bug in XE2):
-  GUIBorderWidth := Width - ClientWidth;
-  GUIBorderHeight := Height - ClientHeight;
-
   AdvPageMetadata.ActivePage := AdvTabMetadata;
   AdvPageFilelist.ActivePage := AdvTabFilelist;
 
-  UpdateLocationfromGPScoordinates.Enabled := false;
+  MaUpdateLocationfromGPScoordinates.Enabled := false;
   AdvTabOSMMap.Enabled := false;
   if GUIsettings.EnableGMap then
   begin
     try
-      UpdateLocationfromGPScoordinates.Enabled := true;
+      MaUpdateLocationfromGPScoordinates.Enabled := true;
       ParseLatLon(GUIsettings.DefGMapHome, Lat, Lon);
       OSMMapInit(EdgeBrowser1, Lat, Lon, OSMHome, InitialZoom_Out);
       AdvTabOSMMap.Enabled := true;
@@ -2439,26 +2409,16 @@ end;
 
 procedure TFMain.ShellListChange(Sender: TObject; Item: TListItem; Change: TItemChange);
 begin
-  // This event isn't executed when/after deleting files! -after deletion,
-  // as soon some remained file is clicked, event is execuded.
   UpdateStatusBar_FilesShown;
 end;
 
 procedure TFMain.ShellListClick(Sender: TObject);
-var
-  I: integer;
 begin
   ShowPreview;
   ShowMetadata;
-
-  if (ETWorkDir = '') then
-    exit;
-
-  I := ShellList.SelCount;
-  MExportImport.Enabled := (I > 0);
-  MModify.Enabled := (I > 0);
-  MVarious.Enabled := (I > 0);
   SpeedBtnQuickSave.Enabled := false;
+
+  EnableMenuItems;
 end;
 
 procedure TFMain.ShellListColumnClick(Sender: TObject; Column: TListColumn);
@@ -2596,6 +2556,8 @@ begin
     if (Assigned(AShellList.OnClick)) then
       AShellList.OnClick(Sender);
   end;
+
+  EnableMenuItems;
 end;
 
 procedure TFMain.ShellListOwnerDataFetch(Sender: TObject; Item: TListItem; Request: TItemRequest; AFolder: TShellFolder);
@@ -2747,22 +2709,13 @@ begin
 end;
 
 procedure TFMain.EnableMenus(Enable: boolean);
-var
-  i: integer;
 begin
+  MenusEnabled := Enable;
+  EnableMenuItems;
+
   AdvPageMetadata.Enabled := Enable;
   AdvPanelETdirect.Enabled := Enable;
   AdvPanelFileTop.Enabled := Enable;
-  MOptions.Enabled := Enable;
-  MExportImport.Enabled := Enable;
-  MModify.Enabled := Enable;
-  MVarious.Enabled := Enable;
-  for i := 0 to MProgram.Count - 1 do
-  begin // dont disable About, Exit or Preferences menu
-    if (MProgram.Items[i].Tag <> 0) then
-      continue;
-    MProgram.Items[i].Enabled := Enable;
-  end;
 
   if not Enable then
     if (MessageDlgEx('ERROR: ExifTool could not be started!' + #10 +  #10 +
@@ -2778,6 +2731,33 @@ begin
         TMsgDlgType.mtError, [TMsgDlgBtn.mbYes, TMsgDlgBtn.mbNo]) = ID_YES) then
       ShellExecute(0, 'Open', PWideChar(ONLINE_DOC_URL + '/#m_reqs_exiftool'), '', '', SW_SHOWNORMAL);
 
+end;
+
+procedure TFMain.EnableMenuItems;
+var
+  EnableItem: boolean;
+  Indx: integer;
+begin
+//  0: Program (Has also 99, never disable)
+// 10: Options
+// 20: Export/Import
+// 30: Modify
+// 40: Various
+// 50: Help
+
+  EnableItem := (ShellList.SelCount > 0);
+  for Indx := 0 to MainActionManager.ActionCount -1 do
+  begin
+
+    case MainActionManager.Actions[Indx].Tag of
+      50, 99:
+        continue;
+      20, 30, 40:
+        MainActionManager.Actions[Indx].Enabled := MenusEnabled and EnableItem;
+      else
+        MainActionManager.Actions[Indx].Enabled := MenusEnabled;
+    end;
+  end;
 end;
 
 procedure TFMain.ShellTreeChanging(Sender: TObject; Node: TTreeNode; var AllowChange: Boolean);
@@ -2887,15 +2867,15 @@ begin
     end
     else
     begin
-      if MGroup_g4.Checked then
+      if MaGroup_g4.Checked then
         ETcmd := '-g4' + CRLF
       else
         ETcmd := '-g1' + CRLF;
-      if not MNotDuplicated.Checked then
+      if not MaNotDuplicated.Checked then
         ETcmd := ETcmd + '-a' + CRLF;
-      if MShowSorted.Checked then
+      if MaShowSorted.Checked then
         ETcmd := ETcmd + '-sort' + CRLF;
-      if MShowHexID.Checked then
+      if MaShowHexID.Checked then
         ETcmd := ETcmd + '-H' + CRLF;
       if ET_Options.ETLangDef = '' then
         ETcmd := ETcmd + '-S' + CRLF;
@@ -2910,7 +2890,7 @@ begin
       if SpeedBtnALL.Down then
       begin
         ETcmd := ETcmd + '-All:All'; // +CRLF+'-e';
-        if not MShowComposite.Checked then
+        if not MaShowComposite.Checked then
           ETcmd := ETcmd + CRLF + '-e';
       end;
 

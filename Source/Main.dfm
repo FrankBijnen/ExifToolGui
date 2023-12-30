@@ -12,7 +12,6 @@ object FMain: TFMain
   Font.Height = -11
   Font.Name = 'Tahoma'
   Font.Style = []
-  Menu = MainMenu
   Position = poDesigned
   OnAfterMonitorDpiChanged = FormAfterMonitorDpiChanged
   OnCanResize = FormCanResize
@@ -22,9 +21,9 @@ object FMain: TFMain
   TextHeight = 13
   object Splitter1: TSplitter
     Left = 240
-    Top = 0
+    Top = 25
     Width = 5
-    Height = 562
+    Height = 537
     AutoSnap = False
     Color = clBtnFace
     MinSize = 160
@@ -32,13 +31,14 @@ object FMain: TFMain
     ResizeStyle = rsLine
     OnCanResize = Splitter1CanResize
     OnMoved = Splitter1Moved
+    ExplicitTop = 0
     ExplicitHeight = 563
   end
   object Splitter2: TSplitter
     Left = 619
-    Top = 0
+    Top = 25
     Width = 5
-    Height = 562
+    Height = 537
     Align = alRight
     AutoSnap = False
     MinSize = 320
@@ -69,9 +69,9 @@ object FMain: TFMain
   end
   object AdvPanelBrowse: TPanel
     Left = 0
-    Top = 0
+    Top = 25
     Width = 240
-    Height = 562
+    Height = 537
     Align = alLeft
     DoubleBuffered = True
     Font.Charset = DEFAULT_CHARSET
@@ -82,10 +82,10 @@ object FMain: TFMain
     ParentDoubleBuffered = False
     ParentFont = False
     TabOrder = 1
-    ExplicitHeight = 561
+    ExplicitHeight = 536
     object Splitter3: TSplitter
       Left = 1
-      Top = 336
+      Top = 311
       Width = 238
       Height = 4
       Cursor = crVSplit
@@ -99,18 +99,18 @@ object FMain: TFMain
       Left = 1
       Top = 1
       Width = 238
-      Height = 335
+      Height = 310
       ActivePage = AdvTabBrowse
       Align = alClient
       TabOrder = 0
-      ExplicitHeight = 334
+      ExplicitHeight = 309
       object AdvTabBrowse: TTabSheet
         Caption = 'Browse'
         object ShellTree: TShellTreeView
           Left = 0
           Top = 0
           Width = 230
-          Height = 307
+          Height = 282
           ObjectTypes = [otFolders]
           Root = 'rfDesktop'
           ShellListView = ShellList
@@ -131,20 +131,21 @@ object FMain: TFMain
           ShowRoot = False
           TabOrder = 0
           OnChanging = ShellTreeChanging
-          ExplicitHeight = 306
+          ExplicitLeft = -5
+          ExplicitTop = 2
         end
       end
     end
     object AdvPagePreview: TPageControl
       Left = 1
-      Top = 340
+      Top = 315
       Width = 238
       Height = 221
       ActivePage = AdvTabPreview
       Align = alBottom
       TabOrder = 1
       OnResize = AdvPagePreviewResize
-      ExplicitTop = 339
+      ExplicitTop = 314
       object AdvTabPreview: TTabSheet
         Caption = 'Preview '
         object RotateImg: TImage
@@ -153,26 +154,24 @@ object FMain: TFMain
           Width = 230
           Height = 193
           Align = alClient
-          ExplicitLeft = 46
-          ExplicitTop = 60
-          ExplicitWidth = 105
-          ExplicitHeight = 105
+          ExplicitLeft = -1
+          ExplicitTop = -1
         end
       end
     end
   end
   object AdvPageMetadata: TPageControl
     Left = 624
-    Top = 0
+    Top = 25
     Width = 320
-    Height = 562
+    Height = 537
     ActivePage = AdvTabMetadata
     Align = alRight
     DoubleBuffered = True
     ParentDoubleBuffered = False
     TabOrder = 2
     ExplicitLeft = 620
-    ExplicitHeight = 561
+    ExplicitHeight = 536
     object AdvTabMetadata: TTabSheet
       Caption = 'Metadata'
       object AdvPanelMetaTop: TPanel
@@ -270,7 +269,7 @@ object FMain: TFMain
       end
       object AdvPanelMetaBottom: TPanel
         Left = 0
-        Top = 428
+        Top = 403
         Width = 312
         Height = 106
         Align = alBottom
@@ -282,7 +281,7 @@ object FMain: TFMain
         Font.Style = []
         ParentFont = False
         TabOrder = 1
-        ExplicitTop = 427
+        ExplicitTop = 402
         DesignSize = (
           312
           106)
@@ -347,7 +346,7 @@ object FMain: TFMain
         Left = 0
         Top = 57
         Width = 312
-        Height = 371
+        Height = 346
         Align = alClient
         BorderStyle = bsNone
         DefaultRowHeight = 19
@@ -372,7 +371,7 @@ object FMain: TFMain
         OnMouseDown = MetadataListMouseDown
         OnMouseMove = MetadataListMouseMove
         OnSelectCell = MetadataListSelectCell
-        ExplicitHeight = 370
+        ExplicitHeight = 345
         ColWidths = (
           150
           160)
@@ -466,7 +465,7 @@ object FMain: TFMain
       end
       object AdvPanel_MapBottom: TPanel
         Left = 0
-        Top = 502
+        Top = 477
         Width = 312
         Height = 32
         Align = alBottom
@@ -518,7 +517,7 @@ object FMain: TFMain
         Left = 0
         Top = 57
         Width = 312
-        Height = 445
+        Height = 420
         Align = alClient
         TabOrder = 2
         UserDataFolder = '%LOCALAPPDATA%\bds.exe.WebView2'
@@ -531,9 +530,9 @@ object FMain: TFMain
   end
   object AdvPageFilelist: TPageControl
     Left = 245
-    Top = 0
+    Top = 25
     Width = 374
-    Height = 562
+    Height = 537
     ActivePage = AdvTabFilelist
     Align = alClient
     Constraints.MinWidth = 370
@@ -541,7 +540,7 @@ object FMain: TFMain
     ParentDoubleBuffered = False
     TabOrder = 3
     ExplicitWidth = 370
-    ExplicitHeight = 561
+    ExplicitHeight = 536
     object AdvTabFilelist: TTabSheet
       Caption = 'Filelist'
       object AdvPanelFileTop: TPanel
@@ -627,7 +626,7 @@ object FMain: TFMain
       end
       object AdvPanelETdirect: TPanel
         Left = 0
-        Top = 350
+        Top = 325
         Width = 366
         Height = 184
         Align = alBottom
@@ -639,7 +638,7 @@ object FMain: TFMain
         Font.Style = []
         ParentFont = False
         TabOrder = 1
-        ExplicitTop = 349
+        ExplicitTop = 324
         ExplicitWidth = 362
         DesignSize = (
           366
@@ -735,7 +734,7 @@ object FMain: TFMain
         object EditETdirect: TLabeledEdit
           Left = 1
           Top = 50
-          Width = 329
+          Width = 321
           Height = 23
           Hint = 
             'Spaces in data require double quotes, double quotes in data requ' +
@@ -758,7 +757,7 @@ object FMain: TFMain
           Text = ''
           OnChange = EditETdirectChange
           OnKeyDown = EditETdirectKeyDown
-          ExplicitWidth = 325
+          ExplicitWidth = 317
         end
         object CBoxETdirect: TComboBox
           Left = 1
@@ -793,7 +792,7 @@ object FMain: TFMain
         Left = 0
         Top = 79
         Width = 366
-        Height = 271
+        Height = 246
         ObjectTypes = [otNonFolders]
         Root = 'rfDesktop'
         ShellTreeView = ShellTree
@@ -822,6 +821,7 @@ object FMain: TFMain
         ViewStyle = vsReport
         OnKeyPress = EditFindMetaKeyPress
         OnKeyUp = ShellListKeyUp
+        ExplicitLeft = 2
       end
       object PnlBreadCrumb: TPanel
         Left = 0
@@ -909,7 +909,7 @@ object FMain: TFMain
         Left = 0
         Top = 137
         Width = 366
-        Height = 397
+        Height = 372
         Legend.Visible = False
         Title.Font.Color = clBlack
         Title.Font.Height = -19
@@ -944,238 +944,25 @@ object FMain: TFMain
       end
     end
   end
-  object MainMenu: TMainMenu
-    Left = 184
-    Top = 46
-    object MProgram: TMenuItem
-      Caption = 'Program'
-      object MAbout: TMenuItem
-        Tag = 1
-        Caption = 'About...'
-        OnClick = MAboutClick
-      end
-      object MPreferences: TMenuItem
-        Tag = 1
-        Caption = 'Preferences...'
-        OnClick = MPreferencesClick
-      end
-      object MQuickManager: TMenuItem
-        Caption = 'Workspace manager...'
-        OnClick = MQuickManagerClick
-      end
-      object MWorkspace: TMenuItem
-        Caption = 'Workspace definition file'
-        object MWorkspaceLoad: TMenuItem
-          Caption = 'Load...'
-          OnClick = MWorkspaceLoadClick
-        end
-        object MWorkspaceSave: TMenuItem
-          Caption = 'Save...'
-          OnClick = MWorkspaceSaveClick
-        end
-      end
-      object MGUIStyle: TMenuItem
-        AutoHotkeys = maManual
-        Caption = 'Style...'
-        OnClick = MGUIStyleClick
-      end
-      object N5: TMenuItem
-        Caption = '-'
-      end
-      object MExit: TMenuItem
-        Tag = 1
-        Caption = 'Exit'
-        OnClick = MExitClick
-      end
-    end
-    object MOptions: TMenuItem
-      Caption = 'Options'
-      object MDontBackup: TMenuItem
-        AutoCheck = True
-        Caption = 'Don'#39't make backup files'
-        Checked = True
-        OnClick = MDontBackupClick
-      end
-      object MPreserveDateMod: TMenuItem
-        AutoCheck = True
-        Caption = 'Preserve Date modified of files'
-        OnClick = MPreserveDateModClick
-      end
-      object MIgnoreErrors: TMenuItem
-        AutoCheck = True
-        Caption = 'Ignore minor errors in metadata'
-        OnClick = MIgnoreErrorsClick
-      end
-      object N1: TMenuItem
-        Caption = '-'
-      end
-      object MShowGPSdecimal: TMenuItem
-        AutoCheck = True
-        Caption = 'Show Exif:GPS in decimal notation'
-        Checked = True
-        OnClick = MShowNumbersClick
-      end
-      object MShowSorted: TMenuItem
-        AutoCheck = True
-        Caption = 'Show sorted tags (not in Workspace)'
-        OnClick = MShowNumbersClick
-      end
-      object MShowComposite: TMenuItem
-        AutoCheck = True
-        Caption = 'Show Composite tags in view ALL'
-        OnClick = MShowNumbersClick
-      end
-      object MNotDuplicated: TMenuItem
-        AutoCheck = True
-        Caption = 'Don'#39't show duplicated tags'
-        OnClick = MShowNumbersClick
-      end
-      object N6: TMenuItem
-        Caption = '-'
-      end
-      object MShowNumbers: TMenuItem
-        AutoCheck = True
-        Caption = 'Show tag values as numbers'
-        OnClick = MShowNumbersClick
-      end
-      object MShowHexID: TMenuItem
-        AutoCheck = True
-        Caption = 'Prefix tag names with ID number'
-        OnClick = MShowNumbersClick
-      end
-      object MGroup_g4: TMenuItem
-        AutoCheck = True
-        Caption = 'Group tags by instance (-g4)'
-        OnClick = MShowNumbersClick
-      end
-      object N4: TMenuItem
-        Caption = '-'
-      end
-      object MAPIWindowsWideFile: TMenuItem
-        AutoCheck = True
-        Caption = 'API WindowsWideFile (Requires Exiftool V12.66)'
-        Checked = True
-        OnClick = MAPIWindowsWideFileClick
-      end
-      object N11: TMenuItem
-        Caption = '-'
-      end
-      object MCustomOptions: TMenuItem
-        Caption = 'Custom options'
-        OnClick = MCustomOptionsClick
-      end
-    end
-    object MExportImport: TMenuItem
-      Caption = 'Export/Import'
-      object MExportMeta: TMenuItem
-        Caption = 'Export metadata into'
-        object MExportMetaTXT: TMenuItem
-          Caption = 'TXT files'
-          OnClick = MExportMetaTXTClick
-        end
-        object MExportMetaMIE: TMenuItem
-          Caption = 'MIE files'
-          OnClick = MExportMetaTXTClick
-        end
-        object MExportMetaXMP: TMenuItem
-          Caption = 'XMP files'
-          OnClick = MExportMetaTXTClick
-        end
-        object MExportMetaEXIF: TMenuItem
-          Caption = 'EXIF files'
-          OnClick = MExportMetaTXTClick
-        end
-        object MExportMetaHTM: TMenuItem
-          Caption = 'HTML files'
-          OnClick = MExportMetaTXTClick
-        end
-      end
-      object MImportMetaSingle: TMenuItem
-        Caption = 'Copy metadata from single file...'
-        OnClick = MImportMetaSingleClick
-      end
-      object MImportMetaSelected: TMenuItem
-        Caption = 'Copy metadata into JPG or TIF files...'
-        OnClick = MImportMetaSelectedClick
-      end
-      object MImportRecursiveAll: TMenuItem
-        Caption = 'Copy metadata into all JPG or TIF files...'
-        OnClick = MImportRecursiveAllClick
-      end
-      object MImportGPS: TMenuItem
-        Caption = 'Import GPS data from'
-        object MImportGPSLog: TMenuItem
-          Caption = 'Log files...'
-          OnClick = MImportGPSLogClick
-        end
-        object MImportXMPLog: TMenuItem
-          Caption = 'Xmp files...'
-          OnClick = MImportXMPLogClick
-        end
-      end
-      object N7: TMenuItem
-        Caption = '-'
-      end
-      object GenericExtractPreviews: TMenuItem
-        Caption = 'Generic extract previews...'
-        OnClick = GenericExtractPreviewsClick
-      end
-      object GenericImportPreview: TMenuItem
-        Caption = 'Generic import preview...'
-        OnClick = GenericImportPreviewClick
-      end
-    end
-    object MModify: TMenuItem
-      Caption = 'Modify'
-      object MExifDateTimeshift: TMenuItem
-        Caption = 'Exif: DateTime shift...'
-        OnClick = MExifDateTimeshiftClick
-      end
-      object MExifDateTimeEqualize: TMenuItem
-        Caption = 'Exif: DateTime equalize...'
-        OnClick = MExifDateTimeEqualizeClick
-      end
-      object MExifLensFromMaker: TMenuItem
-        Caption = 'Exif: LensInfo from Makernotes...'
-        OnClick = MExifLensFromMakerClick
-      end
-      object N8: TMenuItem
-        Caption = '-'
-      end
-      object MRemoveMeta: TMenuItem
-        Caption = 'Remove metadata...'
-        OnClick = MRemoveMetaClick
-      end
-      object N10: TMenuItem
-        Caption = '-'
-      end
-      object UpdateLocationfromGPScoordinates: TMenuItem
-        Caption = 'Update City, Province, Country from GPS coordinates...'
-        OnClick = UpdateLocationfromGPScoordinatesClick
-      end
-    end
-    object MVarious: TMenuItem
-      Caption = 'Various'
-      object MFileDateFromExif: TMenuItem
-        Caption = 'File: Date modified as in Exif...'
-        OnClick = MFileDateFromExifClick
-      end
-      object MFileNameDateTime: TMenuItem
-        Caption = 'File: Name=DateTime+Name...'
-        OnClick = MFileNameDateTimeClick
-      end
-      object JPGGenericlosslessautorotate1: TMenuItem
-        Caption = 'JPG:  Lossless rotate + crop...'
-        OnClick = JPGGenericlosslessautorotate1Click
-      end
-    end
-    object Help1: TMenuItem
-      Caption = 'Help'
-      object OnlineDocumentation1: TMenuItem
-        Caption = 'Online Documentation'
-        OnClick = OnlineDocumentation1Click
-      end
-    end
+  object ActionMainMenuBar: TActionMainMenuBar
+    Left = 0
+    Top = 0
+    Width = 944
+    Height = 25
+    ActionManager = MainActionManager
+    Caption = 'ActionMainMenuBar'
+    Color = clMenuBar
+    ColorMap.DisabledFontColor = 7171437
+    ColorMap.HighlightColor = clWhite
+    ColorMap.BtnSelectedFont = clBlack
+    ColorMap.UnusedColor = clWhite
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clWindowText
+    Font.Height = -12
+    Font.Name = 'Segoe UI'
+    Font.Style = []
+    Spacing = 0
+    ExplicitWidth = 940
   end
   object QuickPopUpMenu: TPopupMenu
     OnPopup = QuickPopUpMenuPopup
@@ -1508,17 +1295,506 @@ object FMain: TFMain
   end
   object OpenPictureDlg: TOpenPictureDialog
     Options = [ofHideReadOnly, ofNoValidate, ofPathMustExist, ofFileMustExist, ofEnableSizing, ofDontAddToRecent]
-    Left = 184
-    Top = 112
+    Left = 166
+    Top = 113
   end
   object OpenFileDlg: TOpenDialog
     Options = [ofFileMustExist, ofEnableSizing, ofDontAddToRecent]
-    Left = 184
-    Top = 168
+    Left = 162
+    Top = 178
   end
   object SaveFileDlg: TSaveDialog
     Options = [ofHideReadOnly, ofEnableSizing, ofDontAddToRecent]
-    Left = 184
-    Top = 216
+    Left = 157
+    Top = 245
+  end
+  object MainActionManager: TActionManager
+    ActionBars = <
+      item
+        Items = <
+          item
+            Items = <
+              item
+                Action = MaAbout
+                Caption = '&About...'
+              end
+              item
+                Action = MaPreferences
+                Caption = '&Preferences...'
+              end
+              item
+                Action = MaQuickManager
+                Caption = '&Workspace manager...'
+              end
+              item
+                Items = <
+                  item
+                    Action = MaWorkspaceLoad
+                    Caption = '&Load..'
+                  end
+                  item
+                    Action = MaWorkspaceSave
+                    Caption = '&Save...'
+                  end>
+                Caption = 'W&orkspace definition file'
+                UsageCount = 1
+              end
+              item
+                Action = MaGUIStyle
+                Caption = '&Style...'
+              end
+              item
+                Caption = '-'
+              end
+              item
+                Action = MaExit
+                Caption = '&Exit'
+              end>
+            Caption = '&Program'
+          end
+          item
+            Items = <
+              item
+                Action = MaDontBackup
+                Caption = '&Don'#39't make backup files'
+              end
+              item
+                Action = MaPreserveDateMod
+                Caption = '&Preserve Date modified of files'
+              end
+              item
+                Action = MaIgnoreErrors
+                Caption = '&Ignore minor errors in metadata'
+              end
+              item
+                Caption = '-'
+              end
+              item
+                Action = MaShowGPSdecimal
+                Caption = '&Show Exif:GPS in decimal notation'
+              end
+              item
+                Action = MaShowSorted
+                Caption = 'S&how sorted tags (not in Workspace)'
+              end
+              item
+                Action = MaShowComposite
+                Caption = 'Sh&ow Composite tags in view ALL'
+              end
+              item
+                Action = MaNotDuplicated
+                Caption = 'Do&n'#39't show duplicated tags'
+              end
+              item
+                Caption = '-'
+              end
+              item
+                Action = MaShowNumbers
+                Caption = 'Sho&w tag values as numbers'
+              end
+              item
+                Action = MaShowHexID
+                Caption = 'P&refix tag names with ID number'
+              end
+              item
+                Action = MaGroup_g4
+                Caption = '&Group tags by instance (-g4)'
+              end
+              item
+                Caption = '-'
+              end
+              item
+                Action = MaAPIWindowsWideFile
+                Caption = '&API WindowsWideFile (Requires Exiftool V12.66)'
+              end
+              item
+                Caption = '-'
+              end
+              item
+                Action = MaCustomOptions
+                Caption = '&Custom options'
+              end>
+            Tag = 1
+            Caption = '&Options'
+          end
+          item
+            Items = <
+              item
+                Items = <
+                  item
+                    Action = MaExportMetaTXT
+                    Caption = '&TXT files'
+                  end
+                  item
+                    Action = MaExportMetaMIE
+                    Caption = '&MIE files'
+                  end
+                  item
+                    Action = MaExportMetaXMP
+                    Caption = '&XMP files'
+                  end
+                  item
+                    Action = MaExportMetaEXIF
+                    Caption = '&EXIF files'
+                  end
+                  item
+                    Action = MaExportMetaHTML
+                    Caption = '&HTML files'
+                  end>
+                Caption = '&Export metadata into'
+                UsageCount = 1
+              end
+              item
+                Action = MaImportMetaSingle
+                Caption = '&Copy metadata from single file...'
+              end
+              item
+                Action = MaImportMetaSelected
+                Caption = 'C&opy metadata into JPG or TIF files...'
+              end
+              item
+                Action = MaImportRecursiveAll
+                Caption = 'Co&py metadata into all JPG or TIF files...'
+              end
+              item
+                Items = <
+                  item
+                    Action = MaImportGPSLog
+                    Caption = '&Log files...'
+                  end
+                  item
+                    Action = Action1
+                    Caption = '&Xmp files...'
+                  end>
+                Caption = '&Import GPS data from'
+                UsageCount = 1
+              end
+              item
+                Caption = '-'
+              end
+              item
+                Action = MaGenericExtractPreviews
+                Caption = '&Generic extract previews...'
+              end
+              item
+                Action = MaGenericImportPreview
+                Caption = 'Ge&neric import preview...'
+              end>
+            Caption = '&Export/Import'
+          end
+          item
+            Items = <
+              item
+                Action = MaExifDateTimeshift
+                Caption = '&Exif: DateTime shift...'
+              end
+              item
+                Action = MaExifDateTimeEqualize
+                Caption = 'E&xif: DateTime equalize...'
+              end
+              item
+                Action = MaExifLensFromMaker
+                Caption = 'Ex&if: LensInfo from Makernotes...'
+              end
+              item
+                Caption = '-'
+              end
+              item
+                Action = MaRemoveMeta
+                Caption = '&Remove metadata...'
+              end
+              item
+                Caption = '-'
+              end
+              item
+                Action = MaUpdateLocationfromGPScoordinates
+                Caption = '&Update City, Province, Country from GPS coordinates...'
+              end>
+            Caption = '&Modify'
+          end
+          item
+            Items = <
+              item
+                Action = MaFileDateFromExif
+                Caption = '&File: Date modified as in Exif...'
+              end
+              item
+                Action = MaFileNameDateTime
+                Caption = 'F&ile: Name=DateTime+Name...'
+              end
+              item
+                Action = MaJPGGenericlosslessautorotate
+                Caption = '&JPG:  Lossless rotate + crop...'
+              end>
+            Caption = '&Various'
+          end
+          item
+            Items = <
+              item
+                Action = MaOnlineDocumentation
+                Caption = '&Online Documentation'
+              end>
+            Caption = '&Help'
+          end>
+        ActionBar = ActionMainMenuBar
+      end>
+    Left = 163
+    Top = 53
+    StyleName = 'Platform Default'
+    object MaExportMetaTXT: TAction
+      Tag = 20
+      Category = 'Export_Metadata'
+      Caption = 'TXT files'
+      OnExecute = MExportMetaTXTClick
+    end
+    object MaExportMetaMIE: TAction
+      Tag = 20
+      Category = 'Export_Metadata'
+      Caption = 'MIE files'
+      OnExecute = MExportMetaTXTClick
+    end
+    object MaAbout: TAction
+      Tag = 99
+      Category = 'Program'
+      Caption = 'About...'
+      OnExecute = MAboutClick
+    end
+    object MaPreferences: TAction
+      Tag = 99
+      Category = 'Program'
+      Caption = 'Preferences...'
+      OnExecute = MPreferencesClick
+    end
+    object MaQuickManager: TAction
+      Category = 'Program'
+      Caption = 'Workspace manager...'
+      OnExecute = MQuickManagerClick
+    end
+    object MaGUIStyle: TAction
+      Category = 'Program'
+      Caption = 'Style...'
+      OnExecute = MGUIStyleClick
+    end
+    object MaExit: TAction
+      Tag = 99
+      Category = 'Program'
+      Caption = 'Exit'
+      OnExecute = MExitClick
+    end
+    object MaWorkspaceLoad: TAction
+      Category = 'Program_Workspace'
+      Caption = 'Load..'
+      OnExecute = MWorkspaceLoadClick
+    end
+    object MaWorkspaceSave: TAction
+      Category = 'Program_Workspace'
+      Caption = 'Save...'
+      OnExecute = MWorkspaceSaveClick
+    end
+    object MaDontBackup: TAction
+      Tag = 10
+      Category = 'Options'
+      AutoCheck = True
+      Caption = 'Don'#39't make backup files'
+      Checked = True
+      OnExecute = MDontBackupClick
+    end
+    object MaPreserveDateMod: TAction
+      Tag = 10
+      Category = 'Options'
+      AutoCheck = True
+      Caption = 'Preserve Date modified of files'
+      OnExecute = MPreserveDateModClick
+    end
+    object MaIgnoreErrors: TAction
+      Tag = 10
+      Category = 'Options'
+      AutoCheck = True
+      Caption = 'Ignore minor errors in metadata'
+      OnExecute = MIgnoreErrorsClick
+    end
+    object MaShowGPSdecimal: TAction
+      Tag = 10
+      Category = 'Options'
+      AutoCheck = True
+      Caption = 'Show Exif:GPS in decimal notation'
+      Checked = True
+      OnExecute = MShowNumbersClick
+    end
+    object MaShowSorted: TAction
+      Tag = 10
+      Category = 'Options'
+      AutoCheck = True
+      Caption = 'Show sorted tags (not in Workspace)'
+      OnExecute = MShowNumbersClick
+    end
+    object MaShowComposite: TAction
+      Tag = 10
+      Category = 'Options'
+      AutoCheck = True
+      Caption = 'Show Composite tags in view ALL'
+      OnExecute = MShowNumbersClick
+    end
+    object MaNotDuplicated: TAction
+      Tag = 10
+      Category = 'Options'
+      AutoCheck = True
+      Caption = 'Don'#39't show duplicated tags'
+      OnExecute = MShowNumbersClick
+    end
+    object MaShowNumbers: TAction
+      Tag = 10
+      Category = 'Options'
+      AutoCheck = True
+      Caption = 'Show tag values as numbers'
+      OnExecute = MShowNumbersClick
+    end
+    object MaShowHexID: TAction
+      Tag = 10
+      Category = 'Options'
+      AutoCheck = True
+      Caption = 'Prefix tag names with ID number'
+      OnExecute = MShowNumbersClick
+    end
+    object MaGroup_g4: TAction
+      Tag = 10
+      Category = 'Options'
+      AutoCheck = True
+      Caption = 'Group tags by instance (-g4)'
+      OnExecute = MShowNumbersClick
+    end
+    object MaAPIWindowsWideFile: TAction
+      Tag = 10
+      Category = 'Options'
+      AutoCheck = True
+      Caption = 'API WindowsWideFile (Requires Exiftool V12.66)'
+      Checked = True
+      OnExecute = MAPIWindowsWideFileClick
+    end
+    object MaCustomOptions: TAction
+      Tag = 10
+      Category = 'Options'
+      Caption = 'Custom options'
+      OnExecute = MCustomOptionsClick
+    end
+    object MaExportMetaXMP: TAction
+      Tag = 20
+      Category = 'Export_Metadata'
+      Caption = 'XMP files'
+      OnExecute = MExportMetaTXTClick
+    end
+    object MaExportMetaEXIF: TAction
+      Tag = 20
+      Category = 'Export_Metadata'
+      Caption = 'EXIF files'
+      OnExecute = MExportMetaTXTClick
+    end
+    object MaExportMetaHTML: TAction
+      Tag = 20
+      Category = 'Export_Metadata'
+      Caption = 'HTML files'
+      OnExecute = MExportMetaTXTClick
+    end
+    object MaImportMetaSingle: TAction
+      Tag = 20
+      Category = 'Export_Import'
+      Caption = 'Copy metadata from single file...'
+      OnExecute = MImportMetaSingleClick
+    end
+    object MaImportMetaSelected: TAction
+      Tag = 20
+      Category = 'Export_Import'
+      Caption = 'Copy metadata into JPG or TIF files...'
+      OnExecute = MImportMetaSelectedClick
+    end
+    object MaImportRecursiveAll: TAction
+      Tag = 20
+      Category = 'Export_Import'
+      Caption = 'Copy metadata into all JPG or TIF files...'
+      OnExecute = MImportRecursiveAllClick
+    end
+    object MaImportGPS: TAction
+      Tag = 20
+      Category = 'Export_Import'
+      Caption = 'Import GPS data from'
+    end
+    object MaImportGPSLog: TAction
+      Tag = 20
+      Category = 'Import_GPS'
+      Caption = 'Log files...'
+      OnExecute = MImportGPSLogClick
+    end
+    object Action1: TAction
+      Tag = 20
+      Category = 'Import_GPS'
+      Caption = 'Xmp files...'
+      OnExecute = MImportXMPLogClick
+    end
+    object MaGenericExtractPreviews: TAction
+      Tag = 20
+      Category = 'Export_Import'
+      Caption = 'Generic extract previews...'
+      OnExecute = GenericExtractPreviewsClick
+    end
+    object MaGenericImportPreview: TAction
+      Tag = 20
+      Category = 'Export_Import'
+      Caption = 'Generic import preview...'
+      OnExecute = GenericImportPreviewClick
+    end
+    object MaExifDateTimeshift: TAction
+      Tag = 30
+      Category = 'Modify'
+      Caption = 'Exif: DateTime shift...'
+      OnExecute = MExifDateTimeshiftClick
+    end
+    object MaExifDateTimeEqualize: TAction
+      Tag = 30
+      Category = 'Modify'
+      Caption = 'Exif: DateTime equalize...'
+      OnExecute = MExifDateTimeEqualizeClick
+    end
+    object MaExifLensFromMaker: TAction
+      Tag = 30
+      Category = 'Modify'
+      Caption = 'Exif: LensInfo from Makernotes...'
+      OnExecute = MExifLensFromMakerClick
+    end
+    object MaRemoveMeta: TAction
+      Tag = 30
+      Category = 'Modify'
+      Caption = 'Remove metadata...'
+      OnExecute = MRemoveMetaClick
+    end
+    object MaUpdateLocationfromGPScoordinates: TAction
+      Tag = 30
+      Category = 'Modify'
+      Caption = 'Update City, Province, Country from GPS coordinates...'
+      OnExecute = UpdateLocationfromGPScoordinatesClick
+    end
+    object MaFileDateFromExif: TAction
+      Tag = 40
+      Category = 'Various'
+      Caption = 'File: Date modified as in Exif...'
+      OnExecute = MFileDateFromExifClick
+    end
+    object MaFileNameDateTime: TAction
+      Tag = 40
+      Category = 'Various'
+      Caption = 'File: Name=DateTime+Name...'
+      OnExecute = MFileNameDateTimeClick
+    end
+    object MaJPGGenericlosslessautorotate: TAction
+      Tag = 40
+      Category = 'Various'
+      Caption = 'JPG:  Lossless rotate + crop...'
+      OnExecute = JPGGenericlosslessautorotate1Click
+    end
+    object MaOnlineDocumentation: TAction
+      Tag = 50
+      Category = 'Help'
+      Caption = 'Online Documentation'
+      OnExecute = OnlineDocumentation1Click
+    end
   end
 end

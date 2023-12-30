@@ -396,23 +396,23 @@ begin
 
       with ET_Options do
       begin
-        MDontBackup.Checked := ReadBool(Ini_Options, 'DontBackup', True);
-        if not MDontBackup.Checked then
+        MaDontBackup.Checked := ReadBool(Ini_Options, 'DontBackup', True);
+        if not MaDontBackup.Checked then
           ETBackupMode := '';
-        MPreserveDateMod.Checked := ReadBool(Ini_Options, 'PreserveDateMod', false);
-        if MPreserveDateMod.Checked then
+        MaPreserveDateMod.Checked := ReadBool(Ini_Options, 'PreserveDateMod', false);
+        if MaPreserveDateMod.Checked then
           ETFileDate := '-P' + CRLF;
         ETSeparator := '-sep' + CRLF + ReadString(Ini_Options, 'KeySeparator', '*') + CRLF;
-        MIgnoreErrors.Checked := ReadBool(Ini_Options, 'IgnoreErrors', false);
-        if MIgnoreErrors.Checked then
+        MaIgnoreErrors.Checked := ReadBool(Ini_Options, 'IgnoreErrors', false);
+        if MaIgnoreErrors.Checked then
           ETMinorError := '-m' + CRLF;
-        MShowGPSdecimal.Checked := ReadBool(Ini_Options, 'GPSinDecimal', True);
-        ET_Options.SetGpsFormat(MShowGPSdecimal.Checked);
-        MShowSorted.Checked := ReadBool(Ini_Options, 'ShowSorted', false);
-        MShowComposite.Checked := ReadBool(Ini_Options, 'ShowComposite', false);
-        MNotDuplicated.Checked := ReadBool(Ini_Options, 'NotDuplicated', false);
-        MAPIWindowsWideFile.Checked := ReadBool(Ini_Options, 'APIWindowsWideFile', true);
-        SetApiWindowsWideFile(MAPIWindowsWideFile.Checked);
+        MaShowGPSdecimal.Checked := ReadBool(Ini_Options, 'GPSinDecimal', True);
+        ET_Options.SetGpsFormat(MaShowGPSdecimal.Checked);
+        MaShowSorted.Checked := ReadBool(Ini_Options, 'ShowSorted', false);
+        MaShowComposite.Checked := ReadBool(Ini_Options, 'ShowComposite', false);
+        MaNotDuplicated.Checked := ReadBool(Ini_Options, 'NotDuplicated', false);
+        MaAPIWindowsWideFile.Checked := ReadBool(Ini_Options, 'APIWindowsWideFile', true);
+        SetApiWindowsWideFile(MaAPIWindowsWideFile.Checked);
         SetCustomOptions(ReadString(Ini_Options, 'CustomOptions', ''));
       end;
 
@@ -660,18 +660,18 @@ begin
           WriteInteger(Ini_Settings, 'HintHidePause', Application.HintHidePause);
         end;
 
-        WriteBool(Ini_Options, 'DontBackup', MDontBackup.Checked);
-        WriteBool(Ini_Options, 'PreserveDateMod', MPreserveDateMod.Checked);
+        WriteBool(Ini_Options, 'DontBackup', MaDontBackup.Checked);
+        WriteBool(Ini_Options, 'PreserveDateMod', MaPreserveDateMod.Checked);
         Tx := ET_Options.ETSeparator;
         Delete(Tx, 1, 6);
         SetLength(Tx, 1);
         WriteString(Ini_Options, 'KeySeparator', Tx);
-        WriteBool(Ini_Options, 'IgnoreErrors', MIgnoreErrors.Checked);
-        WriteBool(Ini_Options, 'GPSinDecimal', MShowGPSdecimal.Checked);
-        WriteBool(Ini_Options, 'ShowSorted', MShowSorted.Checked);
-        WriteBool(Ini_Options, 'ShowComposite', MShowComposite.Checked);
-        WriteBool(Ini_Options, 'NotDuplicated', MNotDuplicated.Checked);
-        WriteBool(Ini_Options, 'APIWindowsWideFile', MAPIWindowsWideFile.Checked);
+        WriteBool(Ini_Options, 'IgnoreErrors', MaIgnoreErrors.Checked);
+        WriteBool(Ini_Options, 'GPSinDecimal', MaShowGPSdecimal.Checked);
+        WriteBool(Ini_Options, 'ShowSorted', MaShowSorted.Checked);
+        WriteBool(Ini_Options, 'ShowComposite', MaShowComposite.Checked);
+        WriteBool(Ini_Options, 'NotDuplicated', MaNotDuplicated.Checked);
+        WriteBool(Ini_Options, 'APIWindowsWideFile', MaAPIWindowsWideFile.Checked);
         WriteString(Ini_Options, 'CustomOptions', ET_Options.GetCustomOptions);
 
         I := length(FListColUsr) - 1;
