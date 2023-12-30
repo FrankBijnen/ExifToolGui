@@ -121,7 +121,7 @@ begin
       ETcmd := '-exif:Orientation#=' + ETcmd;
 
     // Modified date
-    if Fmain.MPreserveDateMod.Checked then
+    if Fmain.MaPreserveDateMod.Checked then
       ETcmd := ETcmd + CRLF + '-FileModifyDate<Exif:DateTimeOriginal' + CRLF;
 
     if (Etcmd <> '') then

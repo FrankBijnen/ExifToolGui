@@ -57,7 +57,7 @@ begin
     Enabled := CheckBox2.Checked;
   end;
 
-  if FMain.MDontBackup.Checked then
+  if FMain.MaDontBackup.Checked then
     Label1.Caption := 'Backup: OFF'
   else
     Label1.Caption := 'Backup: ON';
