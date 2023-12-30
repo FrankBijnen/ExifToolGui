@@ -131,8 +131,6 @@ object FMain: TFMain
           ShowRoot = False
           TabOrder = 0
           OnChanging = ShellTreeChanging
-          ExplicitLeft = -5
-          ExplicitTop = 2
         end
       end
     end
@@ -821,7 +819,6 @@ object FMain: TFMain
         ViewStyle = vsReport
         OnKeyPress = EditFindMetaKeyPress
         OnKeyUp = ShellListKeyUp
-        ExplicitLeft = 2
       end
       object PnlBreadCrumb: TPanel
         Left = 0
