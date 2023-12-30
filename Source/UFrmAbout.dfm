@@ -65,7 +65,7 @@ object FrmAbout: TFrmAbout
     Left = 45
     Top = 95
     Width = 360
-    Height = 15
+    Height = 18
     AutoSize = False
     Caption = 'LblSource'
     Font.Charset = DEFAULT_CHARSET
@@ -81,9 +81,9 @@ object FrmAbout: TFrmAbout
   end
   object LblForum: TLabel
     Left = 45
-    Top = 116
+    Top = 121
     Width = 360
-    Height = 15
+    Height = 18
     AutoSize = False
     Caption = 'LblForum'
     Font.Charset = DEFAULT_CHARSET
@@ -99,9 +99,9 @@ object FrmAbout: TFrmAbout
   end
   object LblExifTool: TLabel
     Left = 45
-    Top = 133
+    Top = 148
     Width = 360
-    Height = 15
+    Height = 18
     AutoSize = False
     Caption = 'LblExifTool'
   end
@@ -109,7 +109,7 @@ object FrmAbout: TFrmAbout
     Left = 45
     Top = 208
     Width = 360
-    Height = 15
+    Height = 22
     AutoSize = False
     Caption = 'LblScreen'
   end
@@ -126,7 +126,7 @@ object FrmAbout: TFrmAbout
       414
       29)
     object BtnOk: TBitBtn
-      Left = 331
+      Left = 315
       Top = 2
       Width = 75
       Height = 25
@@ -153,6 +153,7 @@ object FrmAbout: TFrmAbout
       ModalResult = 1
       NumGlyphs = 2
       TabOrder = 0
+      ExplicitLeft = 307
     end
   end
 end

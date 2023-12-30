@@ -78,6 +78,11 @@ var
   Output: string;
   I, X, Y: smallint;
 begin
+  // These Labels dont have a styled font, copy it from a styled one.
+  LblSource.Font.Assign(LblExifTool.Font);
+  LblForum.Font.Assign(LblExifTool.Font);
+
+  // Setup captions dynamically.
   LblVersion.Caption := Application.Title + ' v' +
     GetFileVersionNumber(Application.ExeName, false) +
 {$IFDEF WIN32}
@@ -99,7 +104,8 @@ begin
   X := Screen.Width;
   Y := Screen.Height;
   I := Screen.PixelsPerInch;
-  LblScreen.Caption := 'Screen resolution: ' + IntToStr(X) + 'x' + IntToStr(Y) + ' at ' + IntToStr(I) + 'DPI';
+  LblScreen.Caption := 'Screen resolution: ' + IntToStr(X) + 'x' + IntToStr(Y) + ' at ' + IntToStr(I) + 'DPI, ' +
+                       'Scaled: ' + IntToStr(ScaleDesignDpi(100)) + '%';
 end;
 
 procedure TFrmAbout.LblUrlEnter(Sender: TObject);
