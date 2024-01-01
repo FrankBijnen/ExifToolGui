@@ -75,4 +75,14 @@ Option to add folders (Directories) to the filelist.
 Option to enable the control BreadCrumbBar by Andreas Rejbrand. You can find the source in the subdirectory BreadbrumbBar.
 Added experimental support for 4K monitors. See UnitScaleForm.pas and UnitDpiAwareness.pas
 
+Version 6.2.8.
+
+Hotfix for Gecode requiring an Api-key. See Geomap.pas
+
+Version 6.2.9
+
+Changed the TMainMenu to TActionMainMenuBar in Main.pas to overcome scaling issues.
+Reviewed the bitmaps used. Created a subdirectory images, old ones are moved to Images_original
+
+
 Frank

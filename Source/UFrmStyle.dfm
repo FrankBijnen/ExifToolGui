@@ -24,12 +24,13 @@ object FrmStyle: TFrmStyle
     Height = 29
     Align = alBottom
     TabOrder = 0
-    ExplicitWidth = 411
+    ExplicitTop = 372
+    ExplicitWidth = 385
     DesignSize = (
       389
       29)
     object BtnOk: TBitBtn
-      Left = 215
+      Left = 211
       Top = 2
       Width = 75
       Height = 25
@@ -56,9 +57,10 @@ object FrmStyle: TFrmStyle
       NumGlyphs = 2
       TabOrder = 0
       OnClick = BtnOkClick
+      ExplicitLeft = 207
     end
     object BtnCancel: TBitBtn
-      Left = 296
+      Left = 292
       Top = 2
       Width = 75
       Height = 25
@@ -87,6 +89,7 @@ object FrmStyle: TFrmStyle
       NumGlyphs = 2
       TabOrder = 1
       OnClick = BtnCancelClick
+      ExplicitLeft = 288
     end
   end
   object LstStyles: TListBox
@@ -99,6 +102,7 @@ object FrmStyle: TFrmStyle
     Sorted = True
     TabOrder = 1
     OnClick = LstStylesClick
-    ExplicitWidth = 411
+    ExplicitWidth = 385
+    ExplicitHeight = 372
   end
 end

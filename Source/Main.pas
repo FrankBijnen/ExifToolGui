@@ -22,7 +22,8 @@ uses
   ExifToolsGUI_ShellList,  // Extension of ShellListView
   ExifToolsGUI_Thumbnails, // Thumbnails
   ExifToolsGUI_Utils,      // Various
-  Vcl.ToolWin, Vcl.ActnMan, Vcl.ActnCtrls, Vcl.ActnMenus, System.Actions, Vcl.ActnList, Vcl.PlatformDefaultStyleActnCtrls;
+  Vcl.ToolWin, Vcl.ActnMan, Vcl.ActnCtrls, Vcl.ActnMenus, System.Actions, Vcl.ActnList, Vcl.PlatformDefaultStyleActnCtrls,
+  Vcl.ActnPopup, Vcl.BaseImageCollection, Vcl.ImageCollection, Vcl.VirtualImageList;
 
 type
   TFMain = class(TScaleForm)
@@ -61,15 +62,8 @@ type
     EditETcmdName: TLabeledEdit;
     CBoxFileFilter: TComboBox;
     SpeedBtnQuick: TSpeedButton;
-    QuickPopUpMenu: TPopupMenu;
-    QuickPopUp_UndoEdit: TMenuItem;
-    QuickPopUp_MarkTag: TMenuItem;
-    QuickPopUp_AddCustom: TMenuItem;
-    QuickPopUp_DelCustom: TMenuItem;
-    QuickPopUp_AddQuick: TMenuItem;
     MemoQuick: TMemo;
     SpeedBtnLarge: TSpeedButton;
-    QuickPopUp_DelQuick: TMenuItem;
     EditQuick: TEdit;
     SpeedBtnFListRefresh: TSpeedButton;
     SpeedBtnFilterEdit: TSpeedButton;
@@ -80,7 +74,6 @@ type
     SpeedBtnETdirectReplace: TSpeedButton;
     SpeedBtnETdirectAdd: TSpeedButton;
     OpenPictureDlg: TOpenPictureDialog;
-    QuickPopUp_FillQuick: TMenuItem;
     AdvTabOSMMap: TTabSheet;
     AdvPanel_MapTop: TPanel;
     SpeedBtn_ShowOnMap: TSpeedButton;
@@ -89,10 +82,6 @@ type
     EditMapFind: TLabeledEdit;
     SpeedBtn_MapHome: TSpeedButton;
     SpeedBtn_MapSetHome: TSpeedButton;
-    N2: TMenuItem;
-    QuickPopUp_AddDetailsUser: TMenuItem;
-    N3: TMenuItem;
-    QuickPopUp_CopyTag: TMenuItem;
     OpenFileDlg: TOpenDialog;
     SaveFileDlg: TSaveDialog;
     AdvTabChart: TTabSheet;
@@ -157,6 +146,20 @@ type
     MaFileNameDateTime: TAction;
     MaJPGGenericlosslessautorotate: TAction;
     MaOnlineDocumentation: TAction;
+    QuickPopUpMenu: TPopupMenu;
+    QuickPopUp_FillQuickAct: TMenuItem;
+    ImageCollectionMetadata: TImageCollection;
+    QuickPopUp_UndoEditAct: TMenuItem;
+    QuickPopUp_AddQuickAct: TMenuItem;
+    QuickPopUp_DelQuickAct: TMenuItem;
+    N1: TMenuItem;
+    QuickPopUp_AddCustomAct: TMenuItem;
+    QuickPopUp_DelCustomAct: TMenuItem;
+    QuickPopUp_AddDetailsUserAct: TMenuItem;
+    QuickPopUp_MarkTagAct: TMenuItem;
+    N4: TMenuItem;
+    QuickPopUp_CopyTagAct: TMenuItem;
+    VirtualImageListMetadata: TVirtualImageList;
     procedure ShellListClick(Sender: TObject);
     procedure ShellListKeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
     procedure SpeedBtnExifClick(Sender: TObject);
@@ -1322,21 +1325,21 @@ var
 begin
   i := MetadataList.Row;
   tx := MetadataList.Keys[i];
-  QuickPopUp_UndoEdit.Visible := (pos('*', tx) = 1);
+  QuickPopUp_UndoEditAct.Visible := (pos('*', tx) = 1);
   IsSep := (length(tx) = 0);
 
-  QuickPopUp_AddQuick.Visible := not(SpeedBtnQuick.Down or SpeedBtnCustom.Down or IsSep);
-  QuickPopUp_AddCustom.Visible := not(SpeedBtnQuick.Down or SpeedBtnCustom.Down or IsSep);
-  QuickPopUp_DelCustom.Visible := SpeedBtnCustom.Down and not(IsSep);
-  QuickPopUp_AddDetailsUser.Visible := not IsSep and (SpeedBtnExif.Down or SpeedBtnXmp.Down or SpeedBtnIptc.Down);
+  QuickPopUp_AddQuickAct.Visible := not(SpeedBtnQuick.Down or SpeedBtnCustom.Down or IsSep);
+  QuickPopUp_AddCustomAct.Visible := not(SpeedBtnQuick.Down or SpeedBtnCustom.Down or IsSep);
+  QuickPopUp_DelCustomAct.Visible := SpeedBtnCustom.Down and not(IsSep);
+  QuickPopUp_AddDetailsUserAct.Visible := not IsSep and (SpeedBtnExif.Down or SpeedBtnXmp.Down or SpeedBtnIptc.Down);
 
   Other := (GUIsettings.Language <> '') or IsSep;
 
-  QuickPopUp_MarkTag.Visible := not(SpeedBtnQuick.Down or SpeedBtnCustom.Down or Other);
+  QuickPopUp_MarkTagAct.Visible := not(SpeedBtnQuick.Down or SpeedBtnCustom.Down or Other);
 
-  QuickPopUp_DelQuick.Visible := not(IsSep) and SpeedBtnQuick.Down;
-  QuickPopUp_FillQuick.Visible := QuickPopUp_DelQuick.Visible;
-  QuickPopUp_CopyTag.Visible := not IsSep;
+  QuickPopUp_DelQuickAct.Visible := not(IsSep) and SpeedBtnQuick.Down;
+  QuickPopUp_FillQuickAct.Visible := QuickPopUp_DelQuickAct.Visible;
+  QuickPopUp_CopyTagAct.Visible := not IsSep;
 end;
 
 function TFMain.TranslateTagName(xMeta, xName: string): string;

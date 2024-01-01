@@ -22,6 +22,7 @@ uses System.SysUtils;
 var Scale: boolean;
 
 // Scaling has to be set before 'Loaded'
+// Default = Scale. Disable scaling with commandline /DontScale
 procedure TScaleForm.Loaded;
 begin
   Scaled := Scale;
@@ -37,7 +38,7 @@ end;
 
 initialization
 begin
-  Scale := FindCmdLineSwitch('Scale', true);
+  Scale := not FindCmdLineSwitch('DontScale', true);
 end;
 
 end.
