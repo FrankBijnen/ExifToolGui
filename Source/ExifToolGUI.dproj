@@ -86,12 +86,14 @@
         <UWP_DelphiLogo44>$(BDS)\bin\Artwork\Windows\UWP\delphi_UwpDefault_44.png</UWP_DelphiLogo44>
         <UWP_DelphiLogo150>$(BDS)\bin\Artwork\Windows\UWP\delphi_UwpDefault_150.png</UWP_DelphiLogo150>
         <AppDPIAwarenessMode>none</AppDPIAwarenessMode>
+        <Icon_MainIcon>Images\ExifToolGUI.ico</Icon_MainIcon>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Base_Win64)'!=''">
         <DCC_Namespace>Winapi;System.Win;Data.Win;Datasnap.Win;Web.Win;Soap.Win;Xml.Win;$(DCC_Namespace)</DCC_Namespace>
         <BT_BuildType>Debug</BT_BuildType>
         <Manifest_File>$(BDS)\bin\default_app.manifest</Manifest_File>
         <AppDPIAwarenessMode>none</AppDPIAwarenessMode>
+        <Icon_MainIcon>Images\ExifToolGUI.ico</Icon_MainIcon>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_1)'!=''">
         <DCC_Define>DEBUG;$(DCC_Define)</DCC_Define>
@@ -103,19 +105,16 @@
     <PropertyGroup Condition="'$(Cfg_1_Win32)'!=''">
         <DCC_WIDECHAR_REDUCED>false</DCC_WIDECHAR_REDUCED>
         <DCC_HIDDEN_VIRTUAL>false</DCC_HIDDEN_VIRTUAL>
-        <Icon_MainIcon>ExifToolGUI.ico</Icon_MainIcon>
+        <Icon_MainIcon>Images\ExifToolGUI.ico</Icon_MainIcon>
         <DCC_DebugInfoInExe>false</DCC_DebugInfoInExe>
         <DCC_IMPLICIT_STRING_CAST>false</DCC_IMPLICIT_STRING_CAST>
         <DCC_IMPLICIT_STRING_CAST_LOSS>false</DCC_IMPLICIT_STRING_CAST_LOSS>
         <DCC_RemoteDebug>false</DCC_RemoteDebug>
         <BT_BuildType>Debug</BT_BuildType>
-        <UWP_DelphiLogo44>ExifToolGUI.ico</UWP_DelphiLogo44>
-        <UWP_DelphiLogo150>ExifToolGUI.ico</UWP_DelphiLogo150>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_1_Win64)'!=''">
-        <Icon_MainIcon>ExifToolGUI.ico</Icon_MainIcon>
-        <UWP_DelphiLogo44>ExifToolGUI.ico</UWP_DelphiLogo44>
-        <UWP_DelphiLogo150>ExifToolGUI.ico</UWP_DelphiLogo150>
+        <Icon_MainIcon>Images\ExifToolGUI.ico</Icon_MainIcon>
+        <DCC_DebugDCUs>true</DCC_DebugDCUs>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_2)'!=''">
         <DCC_LocalDebugSymbols>false</DCC_LocalDebugSymbols>
@@ -125,14 +124,10 @@
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_2_Win32)'!=''">
         <BT_BuildType>Debug</BT_BuildType>
-        <Icon_MainIcon>ExifToolGUI.ico</Icon_MainIcon>
-        <UWP_DelphiLogo44>ExifToolGUI.ico</UWP_DelphiLogo44>
-        <UWP_DelphiLogo150>ExifToolGUI.ico</UWP_DelphiLogo150>
+        <Icon_MainIcon>Images\ExifToolGUI.ico</Icon_MainIcon>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_2_Win64)'!=''">
-        <Icon_MainIcon>ExifToolGUI.ico</Icon_MainIcon>
-        <UWP_DelphiLogo44>ExifToolGUI.ico</UWP_DelphiLogo44>
-        <UWP_DelphiLogo150>ExifToolGUI.ico</UWP_DelphiLogo150>
+        <Icon_MainIcon>Images\ExifToolGUI.ico</Icon_MainIcon>
     </PropertyGroup>
     <ItemGroup>
         <DelphiCompile Include="$(MainSource)">
@@ -272,6 +267,34 @@
                 </Source>
             </Delphi.Personality>
             <Deployment Version="4">
+                <DeployFile LocalName="$(BDS)\bin\Artwork\Windows\UWP\delphi_UwpDefault_150.png" Configuration="Debug" Class="UWP_DelphiLogo150">
+                    <Platform Name="Win32">
+                        <RemoteDir>Assets\</RemoteDir>
+                        <RemoteName>Logo150x150.png</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="$(BDS)\bin\Artwork\Windows\UWP\delphi_UwpDefault_150.png" Configuration="Debug" Class="UWP_DelphiLogo150">
+                    <Platform Name="Win64">
+                        <RemoteDir>Assets\</RemoteDir>
+                        <RemoteName>Logo150x150.png</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="$(BDS)\bin\Artwork\Windows\UWP\delphi_UwpDefault_44.png" Configuration="Debug" Class="UWP_DelphiLogo44">
+                    <Platform Name="Win32">
+                        <RemoteDir>Assets\</RemoteDir>
+                        <RemoteName>Logo44x44.png</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="$(BDS)\bin\Artwork\Windows\UWP\delphi_UwpDefault_44.png" Configuration="Debug" Class="UWP_DelphiLogo44">
+                    <Platform Name="Win64">
+                        <RemoteDir>Assets\</RemoteDir>
+                        <RemoteName>Logo44x44.png</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
                 <DeployFile LocalName="ExifToolGUI.ico" Configuration="Release" Class="UWP_DelphiLogo44">
                     <Platform Name="Win32">
                         <RemoteDir>Assets\</RemoteDir>
