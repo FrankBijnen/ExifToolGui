@@ -31,47 +31,9 @@ var
 
 implementation
 
-uses ExifTool, ExifToolsGui_LossLess, ShellAPI;
+uses ExifTool, ExifToolsGUI_Utils, ExifToolsGui_LossLess, ShellAPI;
 
 {$R *.dfm}
-
-function GetFileVersionNumber(Fname: string; vShort: boolean): string;
-var
-  v, verInfoSize, verValueSize: longword;
-  minor: Word;
-  verInfo: pointer;
-  VerValue: PVSFixedFileInfo;
-begin
-  if vShort then
-  begin
-    v := GetFileVersion(Fname);
-    minor := v and $FFFF;
-    result := IntToStr(v shr 16) + '.';
-    if minor < 10 then
-      result := result + '0';
-    result := result + IntToStr(minor);
-  end
-  else
-  begin
-    result := '-.-.-.-';
-    verInfoSize := GetFileVersionInfoSize(@Fname[1], v);
-    if verInfoSize = 0 then
-      exit;
-    GetMem(verInfo, verInfoSize);
-    GetFileVersionInfo(@Fname[1], 0, verInfoSize, verInfo);
-    VerQueryValue(verInfo, '\', pointer(VerValue), verValueSize);
-    with VerValue^ do
-    begin
-      result := IntToStr(dwFileVersionMS shr 16);
-      result := result + '.' + IntToStr(dwFileVersionMS and $FFFF);
-      result := result + '.' + IntToStr(dwFileVersionLS shr 16);
-      result := result + '.' + IntToStr(dwFileVersionLS and $FFFF);
-      if (dwFileFlags and VS_FF_PRERELEASE <> 0) then
-        result := result + ' Pre.';
-    end;
-    FreeMem(verInfo, verInfoSize);
-  end;
-end;
 
 procedure TFrmAbout.FormShow(Sender: TObject);
 var
@@ -83,14 +45,7 @@ begin
   LblForum.Font.Assign(LblExifTool.Font);
 
   // Setup captions dynamically.
-  LblVersion.Caption := Application.Title + ' v' +
-    GetFileVersionNumber(Application.ExeName, false) +
-{$IFDEF WIN32}
-    ' 32 Bits' +
-{$ENDIF}
-{$IFDEF WIN64}
-    ' 64 Bits' +
-{$ENDIF}
+  LblVersion.Caption := GetFileVersionNumber(Application.ExeName) +
     ' by Bogdan Hrastnik.' + #10 +
     'Adapted for RAD11 by Frank B';
   LblSource.Caption := 'https://github.com/FrankBijnen/ExifToolGui';

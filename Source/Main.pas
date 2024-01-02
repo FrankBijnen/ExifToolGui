@@ -134,7 +134,7 @@ type
     MaImportRecursiveAll: TAction;
     MaImportGPS: TAction;
     MaImportGPSLog: TAction;
-    Action1: TAction;
+    MaImportXmpLog: TAction;
     MaGenericExtractPreviews: TAction;
     MaGenericImportPreview: TAction;
     MaExifDateTimeshift: TAction;
@@ -160,6 +160,12 @@ type
     N4: TMenuItem;
     QuickPopUp_CopyTagAct: TMenuItem;
     VirtualImageListMetadata: TVirtualImageList;
+    TrayIcon: TTrayIcon;
+    TrayPopupMenu: TPopupMenu;
+    Tray_Resetwindowsize: TMenuItem;
+    ImgListTray: TImageList;
+    Tray_ExifToolGui: TMenuItem;
+    N2: TMenuItem;
     procedure ShellListClick(Sender: TObject);
     procedure ShellListKeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
     procedure SpeedBtnExifClick(Sender: TObject);
@@ -267,6 +273,9 @@ type
     procedure Splitter1Moved(Sender: TObject);
     procedure AdvPagePreviewResize(Sender: TObject);
     procedure FormAfterMonitorDpiChanged(Sender: TObject; OldDPI, NewDPI: Integer);
+    procedure Tray_ResetwindowsizeClick(Sender: TObject);
+    procedure TrayIconMouseUp(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
+    procedure Tray_ExifToolGuiClick(Sender: TObject);
   private
     { Private declarations }
     ETBarSeriesFocal: TBarSeries;
@@ -1373,6 +1382,12 @@ begin
   finally
     ETout.Free;
   end;
+end;
+
+procedure TFMain.TrayIconMouseUp(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
+begin
+  Tray_ExifToolGui.Caption := GetFileVersionNumber(Application.ExeName);
+  TrayPopupMenu.Popup(X, Y);
 end;
 
 procedure TFMain.QuickPopUp_AddCustomClick(Sender: TObject);
@@ -2785,6 +2800,19 @@ begin
       AnItem.Update;
     end;
   end;
+end;
+
+procedure TFMain.Tray_ExifToolGuiClick(Sender: TObject);
+begin
+  Application.Restore;
+  Application.BringToFront;
+end;
+
+procedure TFMain.Tray_ResetwindowsizeClick(Sender: TObject);
+begin
+  ResetWindowSizes;
+  ShellList.Refresh;
+  Realign;
 end;
 
 // Close Exiftool before context menu. Delete directory fails

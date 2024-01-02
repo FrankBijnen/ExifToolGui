@@ -92,6 +92,7 @@ var
 
 function GetIniFilePath(AllowPrevVer: boolean): string;
 procedure ReadGUILog;
+procedure ResetWindowSizes;
 procedure ReadGUIini;
 procedure SaveGUIini;
 function LoadWorkspaceIni(IniFName: string): boolean;
@@ -257,6 +258,71 @@ begin
   end;
 end;
 
+procedure ReadMainWindowSizes(const AIniFile: TMemIniFile);
+var
+  N: integer;
+begin
+  with AIniFile, FMain do
+  begin
+    N := 0;
+    if WindowState = wsMaximized then
+      inc(N); // check shortcut setting
+    if ReadBool(Ini_ETGUI, 'StartMax', false) then
+      inc(N);
+    Top := ReadInteger(Ini_ETGUI, 'WinTop', 40);
+    Left := ReadInteger(Ini_ETGUI, 'WinLeft', 60);
+    Width := ReadInteger(Ini_ETGUI, 'WinWidth', 1024);
+    Height := ReadInteger(Ini_ETGUI, 'WinHeight', 660);
+    if N > 0 then
+      WindowState := wsMaximized;
+    AdvPanelBrowse.Width := ReadInteger(Ini_ETGUI, 'BrowseWidth', ScaleDesignDpi(240));
+    AdvPagePreview.Height := ReadInteger(Ini_ETGUI, 'PreviewHeight', 220);
+    AdvPageMetadata.Width := ReadInteger(Ini_ETGUI, 'MetadataWidth', ScaleDesignDpi(322));
+    MetadataList.ColWidths[0] := ReadInteger(Ini_ETGUI, 'MetadataTagWidth', ScaleDesignDpi(144));
+
+    FListStdColWidth[0] := ReadInteger(Ini_ETGUI, 'StdColWidth0', 200);
+    FListStdColWidth[1] := ReadInteger(Ini_ETGUI, 'StdColWidth1', 88);
+    FListStdColWidth[2] := ReadInteger(Ini_ETGUI, 'StdColWidth2', 80);
+    FListStdColWidth[3] := ReadInteger(Ini_ETGUI, 'StdColWidth3', 120);
+
+    // Column widths Camera settings
+    FListColDef1[0].Width := ReadInteger(Ini_ETGUI, 'Def1ColWidth0', 64);
+    FListColDef1[1].Width := ReadInteger(Ini_ETGUI, 'Def1ColWidth1', 64);
+    FListColDef1[2].Width := ReadInteger(Ini_ETGUI, 'Def1ColWidth2', 48);
+    FListColDef1[3].Width := ReadInteger(Ini_ETGUI, 'Def1ColWidth3', 73);
+    FListColDef1[4].Width := ReadInteger(Ini_ETGUI, 'Def1ColWidth4', 73);
+    FListColDef1[5].Width := ReadInteger(Ini_ETGUI, 'Def1ColWidth5', 56);
+    FListColDef1[6].Width := ReadInteger(Ini_ETGUI, 'Def1ColWidth6', 88);
+    FListColDef1[7].Width := ReadInteger(Ini_ETGUI, 'Def1ColWidth7', 80);
+
+    // Column widths Location info
+    FListColDef2[0].Width := ReadInteger(Ini_ETGUI, 'Def2ColWidth0', 120);
+    FListColDef2[1].Width := ReadInteger(Ini_ETGUI, 'Def2ColWidth1', 48);
+    FListColDef2[2].Width := ReadInteger(Ini_ETGUI, 'Def2ColWidth2', 80);
+    FListColDef2[3].Width := ReadInteger(Ini_ETGUI, 'Def2ColWidth3', 80);
+    FListColDef2[4].Width := ReadInteger(Ini_ETGUI, 'Def2ColWidth4', 120);
+    FListColDef2[5].Width := ReadInteger(Ini_ETGUI, 'Def2ColWidth5', 120);
+
+    // Column widths About photo
+    FListColDef3[0].Width := ReadInteger(Ini_ETGUI, 'Def3ColWidth0', 120);
+    FListColDef3[1].Width := ReadInteger(Ini_ETGUI, 'Def3ColWidth1', 48);
+    FListColDef3[2].Width := ReadInteger(Ini_ETGUI, 'Def3ColWidth2', 120);
+    FListColDef3[3].Width := ReadInteger(Ini_ETGUI, 'Def3ColWidth3', 120);
+    FListColDef3[4].Width := ReadInteger(Ini_ETGUI, 'Def3ColWidth4', 120);
+  end;
+end;
+
+procedure ReadLogWindowSizes(const AIniFile: TMemIniFile);
+begin
+  with AIniFile, FLogWin do
+  begin
+    Top := ReadInteger(Ini_ETGUI, 'LogWinTop', 106);
+    Left := ReadInteger(Ini_ETGUI, 'LogWinLeft', 108);
+    Width := ReadInteger(Ini_ETGUI, 'LogWinWidth', ScaleDesignDpi(580));
+    Height := ReadInteger(Ini_ETGUI, 'LogWinHeight', ScaleDesignDpi(580));
+  end;
+end;
+
 procedure ReadGUIini;
 var
   I, N, X: integer;
@@ -274,55 +340,11 @@ begin
   try
     with GUIini, FMain do
     begin
-      N := 0;
-      if WindowState = wsMaximized then
-        inc(N); // check shortcut setting
-      if ReadBool(Ini_ETGUI, 'StartMax', false) then
-        inc(N);
-      Top := ReadInteger(Ini_ETGUI, 'WinTop', 40);
-      Left := ReadInteger(Ini_ETGUI, 'WinLeft', 60);
-      Width := ReadInteger(Ini_ETGUI, 'WinWidth', 1024);
-      Height := ReadInteger(Ini_ETGUI, 'WinHeight', 660);
-      if N > 0 then
-        WindowState := wsMaximized;
-      AdvPanelBrowse.Width := ReadInteger(Ini_ETGUI, 'BrowseWidth', 240);
-      AdvPagePreview.Height := ReadInteger(Ini_ETGUI, 'PreviewHeight', 220);
-      AdvPageMetadata.Width := ReadInteger(Ini_ETGUI, 'MetadataWidth', 322);
-      MetadataList.ColWidths[0] := ReadInteger(Ini_ETGUI, 'MetadataTagWidth', 144);
-      StatusBar.Panels[0].Width := AdvPanelBrowse.Width + 5;
       DefaultDir := ReadString(Ini_ETGUI, 'DefaultDir', 'c:\');
       if (ValidDir(DefaultDir)) then
         GUIsettings.InitialDir := DefaultDir;
 
-      FListStdColWidth[0] := ReadInteger(Ini_ETGUI, 'StdColWidth0', 200);
-      FListStdColWidth[1] := ReadInteger(Ini_ETGUI, 'StdColWidth1', 88);
-      FListStdColWidth[2] := ReadInteger(Ini_ETGUI, 'StdColWidth2', 80);
-      FListStdColWidth[3] := ReadInteger(Ini_ETGUI, 'StdColWidth3', 120);
-
-      // Column widths Camera settings
-      FListColDef1[0].Width := ReadInteger(Ini_ETGUI, 'Def1ColWidth0', 64);
-      FListColDef1[1].Width := ReadInteger(Ini_ETGUI, 'Def1ColWidth1', 64);
-      FListColDef1[2].Width := ReadInteger(Ini_ETGUI, 'Def1ColWidth2', 48);
-      FListColDef1[3].Width := ReadInteger(Ini_ETGUI, 'Def1ColWidth3', 73);
-      FListColDef1[4].Width := ReadInteger(Ini_ETGUI, 'Def1ColWidth4', 73);
-      FListColDef1[5].Width := ReadInteger(Ini_ETGUI, 'Def1ColWidth5', 56);
-      FListColDef1[6].Width := ReadInteger(Ini_ETGUI, 'Def1ColWidth6', 88);
-      FListColDef1[7].Width := ReadInteger(Ini_ETGUI, 'Def1ColWidth7', 80);
-
-      // Column widths Location info
-      FListColDef2[0].Width := ReadInteger(Ini_ETGUI, 'Def2ColWidth0', 120);
-      FListColDef2[1].Width := ReadInteger(Ini_ETGUI, 'Def2ColWidth1', 48);
-      FListColDef2[2].Width := ReadInteger(Ini_ETGUI, 'Def2ColWidth2', 80);
-      FListColDef2[3].Width := ReadInteger(Ini_ETGUI, 'Def2ColWidth3', 80);
-      FListColDef2[4].Width := ReadInteger(Ini_ETGUI, 'Def2ColWidth4', 120);
-      FListColDef2[5].Width := ReadInteger(Ini_ETGUI, 'Def2ColWidth5', 120);
-
-      // Column widths About photo
-      FListColDef3[0].Width := ReadInteger(Ini_ETGUI, 'Def3ColWidth0', 120);
-      FListColDef3[1].Width := ReadInteger(Ini_ETGUI, 'Def3ColWidth1', 48);
-      FListColDef3[2].Width := ReadInteger(Ini_ETGUI, 'Def3ColWidth2', 120);
-      FListColDef3[3].Width := ReadInteger(Ini_ETGUI, 'Def3ColWidth3', 120);
-      FListColDef3[4].Width := ReadInteger(Ini_ETGUI, 'Def3ColWidth4', 120);
+      ReadMainWindowSizes(GUIini);
 
       with GUIsettings do
       begin
@@ -533,16 +555,23 @@ begin
   except
     GUIini := TMemIniFile.Create(GetIniFilePath(True));
   end;
+
   try
-    with GUIini, FLogWin do
-    begin
-      Top := ReadInteger(Ini_ETGUI, 'LogWinTop', 106);
-      Left := ReadInteger(Ini_ETGUI, 'LogWinLeft', 108);
-      Width := ReadInteger(Ini_ETGUI, 'LogWinWidth', 580);
-      Height := ReadInteger(Ini_ETGUI, 'LogWinHeight', 580);
-    end;
+    ReadLogWindowSizes(GUIini);
   finally
     GUIini.Free;
+  end;
+end;
+
+procedure ResetWindowSizes;
+var TempIni: TMemIniFile;
+begin
+  TempIni := TMemIniFile.Create('NUL'); // Should not exist, forcing all values to default
+  try
+    ReadMainWindowSizes(TempIni);
+    ReadLogWindowSizes(TempIni);
+  finally
+    TempIni.Free;
   end;
 end;
 
