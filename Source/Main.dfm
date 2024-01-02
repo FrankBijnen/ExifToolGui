@@ -82,8 +82,7 @@ object FMain: TFMain
     ParentDoubleBuffered = False
     ParentFont = False
     TabOrder = 1
-    ExplicitTop = 54
-    ExplicitHeight = 507
+    ExplicitHeight = 536
     object Splitter3: TSplitter
       Left = 1
       Top = 311
@@ -104,7 +103,7 @@ object FMain: TFMain
       ActivePage = AdvTabBrowse
       Align = alClient
       TabOrder = 0
-      ExplicitHeight = 280
+      ExplicitHeight = 309
       object AdvTabBrowse: TTabSheet
         Caption = 'Browse'
         object ShellTree: TShellTreeView
@@ -132,7 +131,7 @@ object FMain: TFMain
           ShowRoot = False
           TabOrder = 0
           OnChanging = ShellTreeChanging
-          ExplicitHeight = 252
+          ExplicitHeight = 281
         end
       end
     end
@@ -145,7 +144,7 @@ object FMain: TFMain
       Align = alBottom
       TabOrder = 1
       OnResize = AdvPagePreviewResize
-      ExplicitTop = 285
+      ExplicitTop = 314
       object AdvTabPreview: TTabSheet
         Caption = 'Preview '
         object RotateImg: TImage
@@ -171,8 +170,7 @@ object FMain: TFMain
     ParentDoubleBuffered = False
     TabOrder = 2
     ExplicitLeft = 620
-    ExplicitTop = 54
-    ExplicitHeight = 507
+    ExplicitHeight = 536
     object AdvTabMetadata: TTabSheet
       Caption = 'Metadata'
       object AdvPanelMetaTop: TPanel
@@ -282,7 +280,7 @@ object FMain: TFMain
         Font.Style = []
         ParentFont = False
         TabOrder = 1
-        ExplicitTop = 373
+        ExplicitTop = 402
         DesignSize = (
           312
           106)
@@ -372,7 +370,7 @@ object FMain: TFMain
         OnMouseDown = MetadataListMouseDown
         OnMouseMove = MetadataListMouseMove
         OnSelectCell = MetadataListSelectCell
-        ExplicitLeft = 2
+        ExplicitHeight = 345
         ColWidths = (
           150
           160)
@@ -478,7 +476,6 @@ object FMain: TFMain
         Font.Style = []
         ParentFont = False
         TabOrder = 1
-        ExplicitTop = 448
         object SpeedBtn_Geotag: TSpeedButton
           AlignWithMargins = True
           Left = 3
@@ -527,7 +524,6 @@ object FMain: TFMain
         OnNavigationStarting = EdgeBrowser1NavigationStarting
         OnWebMessageReceived = EdgeBrowser1WebMessageReceived
         OnZoomFactorChanged = EdgeBrowser1ZoomFactorChanged
-        ExplicitHeight = 391
       end
     end
   end
@@ -542,9 +538,8 @@ object FMain: TFMain
     DoubleBuffered = True
     ParentDoubleBuffered = False
     TabOrder = 3
-    ExplicitTop = 54
     ExplicitWidth = 370
-    ExplicitHeight = 507
+    ExplicitHeight = 536
     object AdvTabFilelist: TTabSheet
       Caption = 'Filelist'
       object AdvPanelFileTop: TPanel
@@ -642,7 +637,7 @@ object FMain: TFMain
         Font.Style = []
         ParentFont = False
         TabOrder = 1
-        ExplicitTop = 295
+        ExplicitTop = 324
         ExplicitWidth = 362
         DesignSize = (
           366
@@ -825,7 +820,6 @@ object FMain: TFMain
         ViewStyle = vsReport
         OnKeyPress = EditFindMetaKeyPress
         OnKeyUp = ShellListKeyUp
-        ExplicitHeight = 217
       end
       object PnlBreadCrumb: TPanel
         Left = 0
@@ -925,7 +919,6 @@ object FMain: TFMain
         LeftAxis.Maximum = 15.000000000000000000
         Align = alClient
         TabOrder = 1
-        ExplicitHeight = 343
         DefaultCanvas = 'TGDIPlusCanvas'
         PrintMargins = (
           27
@@ -1477,8 +1470,8 @@ object FMain: TFMain
   object QuickPopUpMenu: TPopupMenu
     Images = VirtualImageListMetadata
     OnPopup = QuickPopUpMenuPopup
-    Left = 715
-    Top = 155
+    Left = 702
+    Top = 159
     object QuickPopUp_FillQuickAct: TMenuItem
       Caption = 'Fill in default values'
       ImageIndex = 0
@@ -2776,8 +2769,8 @@ object FMain: TFMain
               FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00}
           end>
       end>
-    Left = 717
-    Top = 291
+    Left = 702
+    Top = 295
   end
   object VirtualImageListMetadata: TVirtualImageList
     Images = <
@@ -2829,8 +2822,8 @@ object FMain: TFMain
     ImageCollection = ImageCollectionMetadata
     ImageNameAvailable = False
     PreserveItems = True
-    Left = 717
-    Top = 217
+    Left = 702
+    Top = 221
   end
   object TrayIcon: TTrayIcon
     Icon.Data = {
@@ -2858,19 +2851,20 @@ object FMain: TFMain
       0001F0000001F0000001F0000001F0000001F0000001F0000001000000000000
       0000000000000000000000000000000000000000000000000000000000000000
       000000000000000000000000000000000000000000000000000000000000}
+    PopupMenu = TrayPopupMenu
     Visible = True
     OnMouseUp = TrayIconMouseUp
     Left = 836
     Top = 155
   end
   object TrayPopupMenu: TPopupMenu
-    Images = ImgListTray
+    Images = ImgListTray_TaskBar
+    OnPopup = TrayPopupMenuPopup
     Left = 836
     Top = 217
     object Tray_ExifToolGui: TMenuItem
       Caption = 'ExifToolGui'
       ImageIndex = 0
-      OnClick = Tray_ExifToolGuiClick
     end
     object N2: TMenuItem
       Caption = '-'
@@ -2881,7 +2875,7 @@ object FMain: TFMain
       OnClick = Tray_ResetwindowsizeClick
     end
   end
-  object ImgListTray: TImageList
+  object ImgListTray_TaskBar: TImageList
     Left = 836
     Top = 290
     Bitmap = {
@@ -3023,5 +3017,63 @@ object FMain: TFMain
       0000000000000000CC7E000000000000943E0000000000008002000000000000
       0000000000000000000000000000000000000000000000000000000000000000
       000000000000}
+  end
+  object Taskbar: TTaskbar
+    TaskBarButtons = <
+      item
+        Action = TaskBarResetWindow
+        Hint = 'Reset window sizes to default'
+        Icon.Data = {
+          0000010001001010200000000000680400001600000028000000100000002000
+          000001002000000000000004000000000000000000000000000000000000B5B5
+          B5FFB5B5B5FFB5B5B5FFB5B5B5FFB5B5B5FFB5B5B5FFB5B5B5FFB5B5B5FFB5B5
+          B5FFB5B5B5FFB5B5B5FFB5B5B5FFB5B5B5FFB5B5B5FFB5B5B5FFB5B5B5FFCCCC
+          CCFFCCCCCCFFCCCCCCFFCCCCCCFFCCCCCCFFCCCCCCFFCCCCCCFFCCCCCCFFCCCC
+          CCFFCCCCCCFFCCCCCCFFCCCCCCFFCCCCCCFFCCCCCCFFCCCCCCFFCCCCCCFFCCCC
+          CCFFCCCCCCFFCCCCCCFFCCCCCCFFCCCCCCFFCCCCCCFFCCCCCCFFCCCCCCFF7DE5
+          7DFF00B036FFC1E1B1FFCCCCCCFFCCCCCCFFCCCCCCFFCCCCCCFFCCCCCCFFE0E0
+          E0FFE0E0E0FFE0E0E0FFE0E0E0FFE0E0E0FFE0E0E0FFE0E0E0FFE0E0E0FFE0E0
+          E0FF7DE57DFF00B036FF007022FFE0E0E0FFE0E0E0FFE0E0E0FFE0E0E0FFE0E0
+          E0FFE0E0E0FFE0E0E0FFE0E0E0FFE0E0E0FFE0E0E0FFE0E0E0FFE0E0E0FFE0E0
+          E0FFE0E0E0FF7DE57DFF00B036FF007022FFE0E0E0FFE0E0E0FFE0E0E0FFF2F2
+          F2FFF2F2F2FFF2F2F2FFF2F2F2FFF2F2F2FFF2F2F2FFF2F2F2FFF2F2F2FFF2F2
+          F2FFF2F2F2FFF2F2F2FF7DE57DFF00B036FF007022FFF2F2F2FFF2F2F2FF0070
+          22FF007022FF007022FF007022FF007022FF007022FF007022FF007022FF0070
+          22FFF2F2F2FFF2F2F2FFC1E1B1FF00B036FF00B036FF00B036FFF2F2F2FF00B0
+          36FF00B036FF00B036FF00B036FF00B036FF00B036FF00B036FF007022FFFFFF
+          FFFFFFFFFFFFFFFFFFFFFFFFFFFF7DE57DFF00B036FF007022FFFFFFFFFF00B0
+          36FF00B036FF00B036FF00B036FF00B036FF00B036FF007022FFFFFFFFFFFFFF
+          FFFFFFFFFFFFFFFFFFFFFFFFFFFF7DE57DFF00B036FF007022FFFFFFFFFF00B0
+          36FF00B036FF00B036FF00B036FF00B036FF007022FFFFFFFFFFFFFFFFFFFFFF
+          FFFFFFFFFFFFFFFFFFFFFFFFFFFF7DE57DFF00B036FF007022FFFFFFFFFF00B0
+          36FF00B036FF00B036FF00B036FF00B036FF00B036FF007022FFFFFFFFFFFFFF
+          FFFFFFFFFFFFFFFFFFFF7DE57DFF7DE57DFF00B036FF007022FFFFFFFFFF00B0
+          36FF00B036FF00B036FF007022FF00B036FF00B036FF00B036FF007022FF00B0
+          36FFC1E1B1FFC1E1B1FF00B036FF00B036FF00B036FF00B036FFFFFFFFFF00B0
+          36FF00B036FF007022FFC1E1B1FF7DE57DFF00B036FF00B036FF00B036FF00B0
+          36FF00B036FF00B036FF00B036FF00B036FF00B036FFFFFFFFFFFFFFFFFF00B0
+          36FF007022FFFFFFFFFFFFFFFFFFFFFFFFFF7DE57DFF7DE57DFF00B036FF00B0
+          36FF00B036FF00B036FF00B036FF00B036FFFFFFFFFFFFFFFFFFFFFFFFFF0070
+          22FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFC1E1B1FF7DE57DFF7DE5
+          7DFF00B036FF00B036FFC1E1B1FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+          FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+          FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF0000
+          0000000000000000000000000000000000000000000000000000000000000000
+          000000000000000000000000000000000000000000000000000000000000}
+      end>
+    TabProperties = [AppThumbAlways]
+    OnThumbButtonClick = TaskbarThumbButtonClick
+    Left = 702
+    Top = 377
+  end
+  object ActLstTaskbar: TActionList
+    Images = ImgListTray_TaskBar
+    Left = 840
+    Top = 383
+    object TaskBarResetWindow: TAction
+      Caption = 'Reset window sizes to default'
+      Hint = 'Reset window sizes to default'
+      ImageIndex = 1
+    end
   end
 end

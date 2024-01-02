@@ -22,8 +22,9 @@ uses
   ExifToolsGUI_ShellList,  // Extension of ShellListView
   ExifToolsGUI_Thumbnails, // Thumbnails
   ExifToolsGUI_Utils,      // Various
-  Vcl.ToolWin, Vcl.ActnMan, Vcl.ActnCtrls, Vcl.ActnMenus, System.Actions, Vcl.ActnList, Vcl.PlatformDefaultStyleActnCtrls,
-  Vcl.ActnPopup, Vcl.BaseImageCollection, Vcl.ImageCollection, Vcl.VirtualImageList;
+  Vcl.ActnMan, Vcl.ActnCtrls, Vcl.ActnMenus, System.Actions, Vcl.ActnList, Vcl.PlatformDefaultStyleActnCtrls,
+  Vcl.ActnPopup, Vcl.BaseImageCollection, Vcl.ImageCollection, Vcl.VirtualImageList,
+  System.Win.TaskbarCore, Vcl.Taskbar, Vcl.ToolWin;
 
 type
   TFMain = class(TScaleForm)
@@ -163,9 +164,12 @@ type
     TrayIcon: TTrayIcon;
     TrayPopupMenu: TPopupMenu;
     Tray_Resetwindowsize: TMenuItem;
-    ImgListTray: TImageList;
+    ImgListTray_TaskBar: TImageList;
     Tray_ExifToolGui: TMenuItem;
     N2: TMenuItem;
+    Taskbar: TTaskbar;
+    ActLstTaskbar: TActionList;
+    TaskBarResetWindow: TAction;
     procedure ShellListClick(Sender: TObject);
     procedure ShellListKeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
     procedure SpeedBtnExifClick(Sender: TObject);
@@ -275,7 +279,8 @@ type
     procedure FormAfterMonitorDpiChanged(Sender: TObject; OldDPI, NewDPI: Integer);
     procedure Tray_ResetwindowsizeClick(Sender: TObject);
     procedure TrayIconMouseUp(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
-    procedure Tray_ExifToolGuiClick(Sender: TObject);
+    procedure TrayPopupMenuPopup(Sender: TObject);
+    procedure TaskbarThumbButtonClick(Sender: TObject; AButtonID: Integer);
   private
     { Private declarations }
     ETBarSeriesFocal: TBarSeries;
@@ -1351,6 +1356,13 @@ begin
   QuickPopUp_CopyTagAct.Visible := not IsSep;
 end;
 
+procedure TFMain.TaskbarThumbButtonClick(Sender: TObject; AButtonID: Integer);
+begin
+  case (AButtonID) of
+    0: Tray_ResetwindowsizeClick(Sender);
+  end;
+end;
+
 function TFMain.TranslateTagName(xMeta, xName: string): string;
 var
   Indx: integer; // xMeta~'-Exif:' or '-IFD0:' or ...
@@ -1386,8 +1398,15 @@ end;
 
 procedure TFMain.TrayIconMouseUp(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
 begin
-  Tray_ExifToolGui.Caption := GetFileVersionNumber(Application.ExeName);
+  Application.Restore;
+  Application.BringToFront;
+
   TrayPopupMenu.Popup(X, Y);
+end;
+
+procedure TFMain.TrayPopupMenuPopup(Sender: TObject);
+begin
+  Tray_ExifToolGui.Caption := TrayIcon.Hint;
 end;
 
 procedure TFMain.QuickPopUp_AddCustomClick(Sender: TObject);
@@ -2184,6 +2203,9 @@ begin
 
   ReadGUIini;
 
+  // Tray Icon
+  TrayIcon.Hint := GetFileVersionNumber(Application.ExeName);
+
   // Create Bread Crumb
   BreadcrumbBar := TDirBreadcrumbBar.Create(Self);
   BreadcrumbBar.Parent := PnlBreadCrumb;
@@ -2247,7 +2269,7 @@ var
   Buffer: array of Char;
   PBuffer: PChar absolute Buffer;
   LBuffer: integer;
-  Fname: string;
+  FName: string;
   AnItem: TListItem;
 begin
   NumFiles := DragQueryFile(Msg.Drop, UINT(-1), nil, 0);
@@ -2258,15 +2280,22 @@ begin
     LBuffer := DragQueryFile(Msg.Drop, 0, nil, 0) +1;
     SetLength(Buffer, LBuffer);
     DragQueryFile(Msg.Drop, 0, PBuffer, LBuffer);
-    ShellTree.Path := ExtractFileDir(PBuffer);
-    Fname := ExtractFileName(PBuffer);
+    FName := PBuffer;
+
     ShellList.ItemIndex := -1;
-    for AnItem in ShellList.Items do
+    if (DirectoryExists(FName)) then
+      ShellTree.Path := FName
+    else
     begin
-      if ShellList.FileName(AnItem.Index) = Fname then
+      ShellTree.Path := ExtractFileDir(FName);
+      FName := ExtractFileName(FName);
+      for AnItem in ShellList.Items do
       begin
-        ShellList.ItemIndex := AnItem.Index;
-        break;
+        if ShellList.FileName(AnItem.Index) = FName then
+        begin
+          ShellList.ItemIndex := AnItem.Index;
+          break;
+        end;
       end;
     end;
     ShowPreview;
@@ -2800,12 +2829,6 @@ begin
       AnItem.Update;
     end;
   end;
-end;
-
-procedure TFMain.Tray_ExifToolGuiClick(Sender: TObject);
-begin
-  Application.Restore;
-  Application.BringToFront;
 end;
 
 procedure TFMain.Tray_ResetwindowsizeClick(Sender: TObject);
