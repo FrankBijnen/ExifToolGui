@@ -22,6 +22,9 @@ type
 procedure BreakPoint;
 procedure DebugMsg(const Msg: array of variant);
 
+// Version
+function GetFileVersionNumber(Fname: string): string;
+
 // FileSystem
 function ValidDir(ADir: string): boolean;
 function ValidFile(AFolder: TShellFolder): boolean;
@@ -108,6 +111,43 @@ begin
 begin
 {$ENDIF}
 end;
+
+// Version
+function GetFileVersionNumber(Fname: string): string;
+var
+  V, VerInfoSize, VerValueSize: cardinal;
+  VerInfo: pointer;
+  VerValue: PVSFixedFileInfo;
+begin
+  result := 'No version info';
+  VerInfoSize := GetFileVersionInfoSize(@Fname[1], V);
+  if VerInfoSize = 0 then
+    exit;
+
+  GetMem(VerInfo, VerInfoSize);
+  GetFileVersionInfo(@Fname[1], 0, VerInfoSize, VerInfo);
+  VerQueryValue(VerInfo, '\', pointer(VerValue), VerValueSize);
+  with VerValue^ do
+  begin
+    result := IntToStr(dwFileVersionMS shr 16);
+    result := result + '.' + IntToStr(dwFileVersionMS and $FFFF);
+    result := result + '.' + IntToStr(dwFileVersionLS shr 16);
+    result := result + '.' + IntToStr(dwFileVersionLS and $FFFF);
+    if (dwFileFlags and VS_FF_PRERELEASE <> 0) then
+      result := result + ' Pre.';
+  end;
+  FreeMem(VerInfo, VerInfoSize);
+
+  result := Application.Title + ' V' + result +
+{$IFDEF WIN32}
+    ' 32 Bits'
+{$ENDIF}
+{$IFDEF WIN64}
+    ' 64 Bits'
+{$ENDIF}
+  ;
+end;
+
 
 // Directories
 function ValidDir(ADir: string): boolean;
