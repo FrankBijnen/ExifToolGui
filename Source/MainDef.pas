@@ -36,6 +36,7 @@ type
     CLFocal: integer;
     CLISO: integer;
     ShowFolders: boolean;
+    ShowHidden: boolean;
     ShowBreadCrumb: boolean;
   end;
 
@@ -412,6 +413,7 @@ begin
         TryStrToInt(ReadString(Ini_Settings, 'CLISO', '$D0D0D0'), CLISO);
 
         ShowFolders := ReadBool(Ini_Settings, 'ShowFolders', false);
+        ShowHidden := ReadBool(Ini_Settings, 'ShowHidden', false);
         ShowBreadCrumb := ReadBool(Ini_Settings, 'ShowBreadCrumb', true);
         Application.HintHidePause := ReadInteger(Ini_Settings, 'HintHidePause', 5000);
       end;
@@ -685,6 +687,7 @@ begin
           WriteString(Ini_Settings, 'CLFocal', '$' + IntToHex(CLFocal, 8));
           WriteString(Ini_Settings, 'CLISO', '$' + IntToHex(CLISO, 8));
           WriteBool(Ini_Settings, 'ShowFolders', ShowFolders);
+          WriteBool(Ini_Settings, 'ShowHidden', ShowHidden);
           WriteBool(Ini_Settings, 'ShowBreadCrumb', ShowBreadCrumb);
           WriteInteger(Ini_Settings, 'HintHidePause', Application.HintHidePause);
         end;

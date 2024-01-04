@@ -65,6 +65,9 @@ procedure FillPreviewInListView(SelectedFile: string; LvPreviews: TListView);
 // GeoCoding
 procedure FillLocationInImage(const ANImage: string);
 
+// Running elevated?
+var IsElevated: boolean;
+
 implementation
 
 uses Winapi.ShellAPI, Winapi.KnownFolders, System.Win.Registry, System.UITypes, UFrmGenerate, MainDef, ExifTool, ExifInfo;
@@ -764,12 +767,51 @@ begin
   end;
 end;
 
+function GetIsElevated: Boolean;
+const
+  TokenElevation = TTokenInformationClass(20);
+type
+  TOKEN_ELEVATION = record
+    TokenIsElevated: DWORD;
+  end;
+var
+  TokenHandle: THandle;
+  ResultLength: Cardinal;
+  ATokenElevation: TOKEN_ELEVATION;
+  HaveToken: Boolean;
+begin
+  if CheckWin32Version(6, 0) then
+  begin
+    TokenHandle := 0;
+    HaveToken := OpenThreadToken(GetCurrentThread, TOKEN_QUERY, True, TokenHandle);
+    if (not HaveToken) and (GetLastError = ERROR_NO_TOKEN) then
+      HaveToken := OpenProcessToken(GetCurrentProcess, TOKEN_QUERY, TokenHandle);
+    if HaveToken then
+    begin
+      try
+        ResultLength := 0;
+        if GetTokenInformation(TokenHandle, TokenElevation, @ATokenElevation, SizeOf(ATokenElevation), ResultLength) then
+          Result := ATokenElevation.TokenIsElevated <> 0
+        else
+          Result := False;
+      finally
+        CloseHandle(TokenHandle);
+      end;
+    end
+    else
+      Result := False;
+  end
+  else
+    Result := True;
+end;
+
 initialization
 
 begin
   TempDirectory := IncludeTrailingBackslash(CreateTempPath(TempPrefix));
   CoCreateInstance(CLSID_WICImagingFactory, nil, CLSCTX_INPROC_SERVER or CLSCTX_LOCAL_SERVER, IUnknown, GlobalImgFact);
   UTF8Encoding := TEncoding.GetEncoding(CP_UTF8);
+  IsElevated := GetIsElevated;
 end;
 
 finalization

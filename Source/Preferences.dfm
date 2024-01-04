@@ -493,7 +493,7 @@ object FPreferences: TFPreferences
         object UpdThrottleGeoCode: TUpDown
           Left = 109
           Top = 75
-          Width = 16
+          Width = 17
           Height = 21
           Associate = EdThrottleGeoCode
           Min = 500
@@ -501,6 +501,7 @@ object FPreferences: TFPreferences
           Increment = 50
           Position = 1000
           TabOrder = 1
+          Thousands = False
         end
         object EdThrottleGeoCode: TLabeledEdit
           Left = 60
@@ -556,13 +557,14 @@ object FPreferences: TFPreferences
         object UpdThrottleOverpass: TUpDown
           Left = 109
           Top = 50
-          Width = 16
+          Width = 17
           Height = 21
           Associate = EdThrottleOverPass
           Min = 10
           Max = 10000
           Position = 10
           TabOrder = 1
+          Thousands = False
         end
         object EdOverPassUrl: TLabeledEdit
           Left = 60
@@ -581,8 +583,8 @@ object FPreferences: TFPreferences
     object AdvTabOther: TTabSheet
       Caption = 'Other'
       object Label5: TLabel
-        Left = 104
-        Top = 190
+        Left = 103
+        Top = 217
         Width = 141
         Height = 13
         Caption = 'Hint pause timeout in Millisecs'
@@ -642,29 +644,39 @@ object FPreferences: TFPreferences
       end
       object HintPause: TEdit
         Left = 16
-        Top = 187
+        Top = 214
         Width = 66
         Height = 21
-        TabOrder = 6
+        TabOrder = 8
         Text = '0'
       end
       object UpDHintPause: TUpDown
         Left = 82
-        Top = 187
+        Top = 214
         Width = 16
         Height = 21
         Associate = HintPause
         Max = 10000
         Increment = 10
-        TabOrder = 7
+        TabOrder = 9
       end
       object CheckBox7: TCheckBox
         Left = 16
-        Top = 164
+        Top = 189
         Width = 337
         Height = 17
         Caption = '-Filelist: Show Breadcrumb (Address Bar) in Filelist'
-        TabOrder = 8
+        TabOrder = 7
+      end
+      object CheckBox8: TCheckBox
+        Left = 16
+        Top = 165
+        Width = 337
+        Height = 17
+        Caption = 
+          '-Filelist: Show Hidden Folders and Files in Filelist (Admin requ' +
+          'ired)'
+        TabOrder = 6
       end
     end
   end

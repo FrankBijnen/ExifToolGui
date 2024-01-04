@@ -63,6 +63,7 @@ type
     UpDHintPause: TUpDown;
     CheckBox7: TCheckBox;
     EdGeoCodeApiKey: TLabeledEdit;
+    CheckBox8: TCheckBox;
     procedure FormShow(Sender: TObject);
     procedure BtnSaveClick(Sender: TObject);
     procedure BtnBrowseFolder(Sender: TObject);
@@ -143,6 +144,7 @@ begin
   GUIsettings.AutoIncLine := CheckBox4.Checked;
   GUIsettings.DblClickUpdTags := CheckBox5.Checked;
   GUIsettings.ShowFolders := CheckBox6.Checked;
+  GUIsettings.ShowHidden := CheckBox8.Checked;
   GUIsettings.ShowBreadCrumb := CheckBox7.Checked;
   Application.HintHidePause := UpDHintPause.Position;
 
@@ -312,6 +314,8 @@ begin
     CheckBox4.Checked := GUIsettings.AutoIncLine;
     CheckBox5.Checked := GUIsettings.DblClickUpdTags;
     CheckBox6.Checked := GUIsettings.ShowFolders;
+    CheckBox8.Checked := GUIsettings.ShowHidden;
+    CheckBox8.Enabled := IsElevated;
     CheckBox7.Checked := GUIsettings.ShowBreadCrumb;
     UpDHintPause.Position := Application.HintHidePause;
 

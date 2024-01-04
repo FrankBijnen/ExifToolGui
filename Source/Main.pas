@@ -292,6 +292,7 @@ type
     MenusEnabled: boolean;
     procedure AlignStatusBar;
     procedure ImageDrop(var Msg: TWMDROPFILES); message WM_DROPFILES;
+    procedure SetCaption(AnItem: string = '');
     procedure ShowMetadata;
     procedure ShowPreview;
     procedure ShellListSetFolders;
@@ -2314,6 +2315,7 @@ var
   I: integer;
   PathFromParm: boolean;
 begin
+  SetCaption;
 
   OnAfterMonitorDpiChanged(Sender, 0, 0); // DPI Values are not used
 
@@ -2744,15 +2746,29 @@ end;
 
 procedure TFMain.ShellListSetFolders;
 var Value: TShellObjectTypes;
+
+  function AddHiddenIfPossible(ObjectTypes: TShellObjectTypes): TShellObjectTypes;
+  begin
+    result := ObjectTypes;
+    if IsElevated and GUIsettings.ShowHidden then
+      Include(result, TShellObjectType.otHidden);
+  end;
+
 begin
-  Value := ShellList.ObjectTypes;
+  Value := AddHiddenIfPossible(ShellList.ObjectTypes);
   if (GUIsettings.ShowFolders) then
-    include(Value, TshellObjectType.otFolders)
+    include(Value, TShellObjectType.otFolders)
   else
-    exclude(Value, TshellObjectType.otFolders);
+    exclude(Value, TShellObjectType.otFolders);
   if (Value <> ShellList.ObjectTypes) then
     ShellList.ObjectTypes := Value;
+
+  Value := AddHiddenIfPossible(ShellTree.ObjectTypes);
+  if (Value <> ShellTree.ObjectTypes) then
+    ShellTree.ObjectTypes := Value;
+
   PnlBreadCrumb.Visible := GUIsettings.ShowBreadCrumb;
+  BreadcrumbBar.ShowHiddenDirs := IsElevated and GUIsettings.ShowHidden;
 end;
 
 procedure TFMain.EnableMenus(Enable: boolean);
@@ -2833,6 +2849,7 @@ end;
 
 procedure TFMain.Tray_ResetwindowsizeClick(Sender: TObject);
 begin
+  WindowState := TWindowState.wsNormal;
   ResetWindowSizes;
   ShellList.Refresh;
   Realign;
@@ -2851,6 +2868,19 @@ begin
     ET_StayOpen(ShellList.Path);
 end;
 
+procedure TFMain.SetCaption(AnItem: string = '');
+var
+  NewCaption: string;
+begin
+  NewCaption := '';
+  if (IsElevated) then
+    NewCaption := 'Administrator: ';
+  NewCaption := NewCaption  + 'ExifToolGUI';
+  if (AnItem <> '') then
+    NewCaption := NewCaption + ' - ' + AnItem;
+  Caption := NewCaption
+end;
+
 // =========================== Show Metadata ====================================
 procedure TFMain.ShowMetadata;
 var
@@ -2860,9 +2890,9 @@ var
 begin
   MetadataList.Tag := -1; // Reset hint row
   Item := GetSelectedFile(ShellList.FileName);
+  SetCaption(Item);
   if (Item = '') then
   begin
-    Caption := 'ExifToolGUI';
     with MetadataList do
     begin
       Row := 1;
@@ -2875,7 +2905,6 @@ begin
 
   ETResult := TStringList.Create;
   try
-    Caption := 'ExifToolGUI - ' + Item;
     if SpeedBtnQuick.Down then
     begin
       N := Length(QuickTags) - 1;
