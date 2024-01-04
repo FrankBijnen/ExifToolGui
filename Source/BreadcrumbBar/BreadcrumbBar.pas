@@ -1143,6 +1143,7 @@ var
   SubPath: string;
   SR: TSearchRec;
   SFI: TSHFileInfo;
+  DirMask: Integer;
 
   procedure GetDrives;
   var
@@ -1175,21 +1176,24 @@ begin
 
   if not DirectoryExists(SubPath) then
     Exit;
-  SubPath := IncludeTrailingBackslash(SubPath);
 
-  if System.SysUtils.FindFirst(SubPath + '*.*', faDirectory or faHidden, SR) = 0 then
+  SubPath := IncludeTrailingBackslash(SubPath);
+  DirMask := faDirectory;
+  if (FShowHiddenDirs) then
+    DirMask := DirMask or faHidden or faSysFile or faReadOnly;
+  if System.SysUtils.FindFirst(SubPath + '*.*', DirMask, SR) = 0 then
     try
       repeat
-        if (SR.Attr and faDirectory <> 0) and (SR.Name <> '..') and
-          (SR.Name <> '.') and (FShowHiddenDirs or ((SR.Attr and faHidden = 0)
-          and (Copy(SR.Name, 1, 1) <> '.'))) then
-          begin
-            if SHGetFileInfo(PChar(SubPath + SR.Name), 0, SFI, sizeof(SFI),
-              SHGFI_SYSICONINDEX or SHGFI_SMALLICON) <> 0 then
-              List.AddObject(SR.Name, TObject(SFI.iIcon))
-            else
-              List.AddObject(SR.Name, nil);
-          end;
+        if (SR.Attr and faDirectory <> 0) and
+           (SR.Name <> '..') and
+           (SR.Name <> '.') then
+        begin
+          if SHGetFileInfo(PChar(SubPath + SR.Name), 0, SFI, sizeof(SFI),
+            SHGFI_SYSICONINDEX or SHGFI_SMALLICON) <> 0 then
+            List.AddObject(SR.Name, TObject(SFI.iIcon))
+          else
+            List.AddObject(SR.Name, nil);
+        end;
       until System.Sysutils.FindNext(SR) <> 0;
     finally
       System.Sysutils.FindClose(SR);

@@ -134,7 +134,7 @@ uses Main, SysUtils, Forms, Dialogs, Windows;
 var
   Encoding: TEncoding;
   GpsFormatSettings: TFormatSettings; // for StrToFloatDef -see Initialization
-  FotoF: TFileStream;
+  FotoF: THandleStream;
   IsMM, doIPTC, doGPS, doICC: boolean;
   Wdata: word;
   Ldata: longint;
@@ -1250,6 +1250,8 @@ end;
 
 // ======================================== MAIN ==============================================
 procedure GetMetadata(FName: string; GetXMP, GetIPTC, GetGPS, GetICC: boolean);
+var
+  FotoHandle: THandle;
 begin
   if (FName = '') then
     exit;
@@ -1265,7 +1267,12 @@ begin
   if not FileExists(FName) then
     exit;
 
-  FotoF := TFileStream.Create(FName, fmOpenRead or fmShareDenyNone);
+  // Open the file ourselves. We dont want an exception
+  FotoHandle := FileOpen(FName, fmOpenRead or fmShareDenyNone);
+  if (FotoHandle = INVALID_HANDLE_VALUE) then
+    exit;
+
+  FotoF := THandleStream.Create(FotoHandle);
   try
     if (FotoF.Size > 31) then
     begin // size must be at least 32 bytes
@@ -1294,6 +1301,7 @@ begin
     end;
   finally
     FotoF.Free;
+    FileClose(FotoHandle);
   end;
 end;
 
@@ -1307,6 +1315,7 @@ var
   TIFFoffset, NextAPPmarker: int64;
   IsMM: boolean;
   TmpTxt: string[7];
+  FotoHandle: THandle;
 
   procedure ReadTIFF;
   begin
@@ -1359,7 +1368,12 @@ begin
   if not FileExists(FName) then
     exit;
 
-  FotoF := TFileStream.Create(FName, fmOpenRead or fmShareDenyNone);
+  // Open the file ourselves. We dont want an exception
+  FotoHandle := FileOpen(FName, fmOpenRead or fmShareDenyNone);
+  if (FotoHandle = INVALID_HANDLE_VALUE) then
+    exit;
+
+  FotoF := THandleStream.Create(FotoHandle);
   try
     if (FotoF.Size > 31) then
     begin // size must be at least 32 bytes
@@ -1399,6 +1413,7 @@ begin
     end;
   finally
     FotoF.Free;
+    FileClose(FotoHandle);
   end;
 end;
 
