@@ -1,6 +1,9 @@
 unit ExifToolsGUI_Utils;
 {$WARN SYMBOL_PLATFORM OFF}
 
+{.$DEFINE GETELEVATION}
+{$DEFINE GETWINDOWSADMIN}
+
 interface
 
 uses Winapi.ShlObj, Winapi.ActiveX, Winapi.Wincodec, Winapi.Windows, Winapi.Messages,
@@ -65,8 +68,11 @@ procedure FillPreviewInListView(SelectedFile: string; LvPreviews: TListView);
 // GeoCoding
 procedure FillLocationInImage(const ANImage: string);
 
-// Running elevated?
-var IsElevated: boolean;
+// Running elevated or admin?
+var
+  IsElevated: boolean;
+  IsAdminUser: boolean;
+  IsElevatedOrAdmin: boolean;
 
 implementation
 
@@ -805,13 +811,74 @@ begin
     Result := True;
 end;
 
+function GetIsWindowsAdmin: Boolean;
+var
+   HAccessToken: THandle;
+   PtgGroups: PTokenGroups;
+   DwInfoBufferSize: DWORD;
+   PsidAdministrators: PSID;
+   Indx: Integer;
+   Success: BOOL;
+
+const SECURITY_NT_AUTHORITY: TSIDIdentifierAuthority = (Value: (0, 0, 0, 0, 0, 5));
+      SUBAUTHORITYCOUNT: byte = 2;
+      SECURITY_BUILTIN_DOMAIN_RID: cardinal = 32;
+      DOMAIN_ALIAS_RID_ADMINS: cardinal = 544;
+      GroupSize = 4096;
+
+begin
+   Result:= False;
+   Success:= OpenThreadToken(GetCurrentThread, TOKEN_QUERY, True, HAccessToken);
+   if not Success then
+   begin
+     if GetLastError = ERROR_NO_TOKEN then
+       Success:= OpenProcessToken(GetCurrentProcess, TOKEN_QUERY, HAccessToken);
+   end;
+
+   if Success then
+   begin
+     GetMem(PtgGroups, GroupSize);
+     Success:= GetTokenInformation(HAccessToken, TokenGroups, PtgGroups, GroupSize, DwInfoBufferSize);
+     CloseHandle(HAccessToken);
+     if Success then
+     begin
+       AllocateAndInitializeSid(SECURITY_NT_AUTHORITY, SUBAUTHORITYCOUNT,
+                                SECURITY_BUILTIN_DOMAIN_RID, DOMAIN_ALIAS_RID_ADMINS,
+                                0, 0, 0, 0, 0, 0, PsidAdministrators);
+       for Indx:= 0 to PtgGroups.GroupCount - 1 do
+       begin
+         if EqualSid(PsidAdministrators, PtgGroups.Groups[Indx].Sid) then
+         begin
+           Result:= True;
+           Break;
+         end;
+       end;
+       FreeSid(PsidAdministrators);
+     end;
+     FreeMem(PtgGroups);
+   end;
+end;
+
 initialization
 
 begin
   TempDirectory := IncludeTrailingBackslash(CreateTempPath(TempPrefix));
   CoCreateInstance(CLSID_WICImagingFactory, nil, CLSCTX_INPROC_SERVER or CLSCTX_LOCAL_SERVER, IUnknown, GlobalImgFact);
   UTF8Encoding := TEncoding.GetEncoding(CP_UTF8);
+
+{$IFDEF GETELEVATION}
   IsElevated := GetIsElevated;
+{$ELSE}
+  IsElevated := false;
+{$ENDIF}
+
+{$IFDEF GETWINDOWSADMIN}
+  IsAdminUser := GetIsWindowsAdmin;
+{$ELSE}
+  IsAdminUser := false;
+{$ENDIF}
+  IsElevatedOrAdmin := IsElevated or IsAdminUser;
+
 end;
 
 finalization

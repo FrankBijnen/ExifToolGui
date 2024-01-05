@@ -2750,7 +2750,7 @@ var Value: TShellObjectTypes;
   function AddHiddenIfPossible(ObjectTypes: TShellObjectTypes): TShellObjectTypes;
   begin
     result := ObjectTypes;
-    if IsElevated and GUIsettings.ShowHidden then
+    if IsElevatedOrAdmin and GUIsettings.ShowHidden then
       Include(result, TShellObjectType.otHidden);
   end;
 
@@ -2768,7 +2768,7 @@ begin
     ShellTree.ObjectTypes := Value;
 
   PnlBreadCrumb.Visible := GUIsettings.ShowBreadCrumb;
-  BreadcrumbBar.ShowHiddenDirs := IsElevated and GUIsettings.ShowHidden;
+  BreadcrumbBar.ShowHiddenDirs := IsElevatedOrAdmin and GUIsettings.ShowHidden;
 end;
 
 procedure TFMain.EnableMenus(Enable: boolean);
@@ -2873,7 +2873,7 @@ var
   NewCaption: string;
 begin
   NewCaption := '';
-  if (IsElevated) then
+  if (IsElevatedOrAdmin) then
     NewCaption := 'Administrator: ';
   NewCaption := NewCaption  + 'ExifToolGUI';
   if (AnItem <> '') then
