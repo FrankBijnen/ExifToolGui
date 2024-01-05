@@ -265,17 +265,7 @@ var
 begin
   with AIniFile, FMain do
   begin
-    N := 0;
-    if WindowState = wsMaximized then
-      inc(N); // check shortcut setting
-    if ReadBool(Ini_ETGUI, 'StartMax', false) then
-      inc(N);
-    Top := ReadInteger(Ini_ETGUI, 'WinTop', 40);
-    Left := ReadInteger(Ini_ETGUI, 'WinLeft', 60);
-    Width := ReadInteger(Ini_ETGUI, 'WinWidth', 1024);
-    Height := ReadInteger(Ini_ETGUI, 'WinHeight', 660);
-    if N > 0 then
-      WindowState := wsMaximized;
+    // First do the Panels
     AdvPanelBrowse.Width := ReadInteger(Ini_ETGUI, 'BrowseWidth', ScaleDesignDpi(240));
     AdvPagePreview.Height := ReadInteger(Ini_ETGUI, 'PreviewHeight', 220);
     AdvPageMetadata.Width := ReadInteger(Ini_ETGUI, 'MetadataWidth', ScaleDesignDpi(322));
@@ -310,6 +300,20 @@ begin
     FListColDef3[2].Width := ReadInteger(Ini_ETGUI, 'Def3ColWidth2', 120);
     FListColDef3[3].Width := ReadInteger(Ini_ETGUI, 'Def3ColWidth3', 120);
     FListColDef3[4].Width := ReadInteger(Ini_ETGUI, 'Def3ColWidth4', 120);
+
+    // When the panels have been resized, we can resize the Main Form.
+    // The constraints of the panels, and or the minsize of the splitters, can prevent resizing the main form
+    N := 0;
+    if WindowState = wsMaximized then
+      inc(N); // check shortcut setting
+    if ReadBool(Ini_ETGUI, 'StartMax', false) then
+      inc(N);
+    Top := ReadInteger(Ini_ETGUI, 'WinTop', 40);
+    Left := ReadInteger(Ini_ETGUI, 'WinLeft', 60);
+    Width := ReadInteger(Ini_ETGUI, 'WinWidth', 1024);
+    Height := ReadInteger(Ini_ETGUI, 'WinHeight', 660);
+    if N > 0 then
+      WindowState := wsMaximized;
   end;
 end;
 
