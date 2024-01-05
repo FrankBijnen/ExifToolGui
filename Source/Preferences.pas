@@ -315,7 +315,7 @@ begin
     CheckBox5.Checked := GUIsettings.DblClickUpdTags;
     CheckBox6.Checked := GUIsettings.ShowFolders;
     CheckBox8.Checked := GUIsettings.ShowHidden;
-    CheckBox8.Enabled := IsElevated;
+    CheckBox8.Enabled := IsElevatedOrAdmin;
     CheckBox7.Checked := GUIsettings.ShowBreadCrumb;
     UpDHintPause.Position := Application.HintHidePause;
 
