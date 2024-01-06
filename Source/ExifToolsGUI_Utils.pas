@@ -773,90 +773,92 @@ begin
   end;
 end;
 
-function GetIsElevated: Boolean;
-const
-  TokenElevation = TTokenInformationClass(20);
-type
-  TOKEN_ELEVATION = record
-    TokenIsElevated: DWORD;
-  end;
-var
-  TokenHandle: THandle;
-  ResultLength: Cardinal;
-  ATokenElevation: TOKEN_ELEVATION;
-  HaveToken: Boolean;
+function GetTokenHandle(var Tokenhandle: THandle): boolean;
 begin
-  if CheckWin32Version(6, 0) then
-  begin
-    TokenHandle := 0;
-    HaveToken := OpenThreadToken(GetCurrentThread, TOKEN_QUERY, True, TokenHandle);
-    if (not HaveToken) and (GetLastError = ERROR_NO_TOKEN) then
-      HaveToken := OpenProcessToken(GetCurrentProcess, TOKEN_QUERY, TokenHandle);
-    if HaveToken then
-    begin
-      try
-        ResultLength := 0;
-        if GetTokenInformation(TokenHandle, TokenElevation, @ATokenElevation, SizeOf(ATokenElevation), ResultLength) then
-          Result := ATokenElevation.TokenIsElevated <> 0
-        else
-          Result := False;
-      finally
-        CloseHandle(TokenHandle);
-      end;
-    end
-    else
-      Result := False;
-  end
-  else
-    Result := True;
+  result := OpenThreadToken(GetCurrentThread, TOKEN_QUERY, True, Tokenhandle);
+  if (not result) and
+     (GetLastError = ERROR_NO_TOKEN) then
+    result := OpenProcessToken(GetCurrentProcess, TOKEN_QUERY, Tokenhandle);
 end;
 
-function GetIsWindowsAdmin: Boolean;
+function GetIsElevated: BOOL;
 var
-   HAccessToken: THandle;
+  TokenHandle: THandle;
+  DwInfoBufferSize: DWORD;
+  ATokenElevation: TOKEN_ELEVATION;
+begin
+  result := not CheckWin32Version(6, 0);  //Lower Windows versions run always elevated
+  if not result then
+  begin
+    if not GetTokenHandle(TokenHandle) then
+      exit;
+    try
+      if GetTokenInformation(TokenHandle,
+                             TTokenInformationClass.TokenElevation,
+                             @ATokenElevation,
+                             SizeOf(ATokenElevation),
+                             DwInfoBufferSize) then
+        result := ATokenElevation.TokenIsElevated <> 0;
+    finally
+      CloseHandle(TokenHandle);
+    end;
+  end;
+end;
+
+function GetIsWindowsAdmin: BOOL;
+var
+   TokenHandle: THandle;
    PtgGroups: PTokenGroups;
    DwInfoBufferSize: DWORD;
    PsidAdministrators: PSID;
    Indx: Integer;
-   Success: BOOL;
 
+// Info from Inno Setup
 const SECURITY_NT_AUTHORITY: TSIDIdentifierAuthority = (Value: (0, 0, 0, 0, 0, 5));
       SUBAUTHORITYCOUNT: byte = 2;
       SECURITY_BUILTIN_DOMAIN_RID: cardinal = 32;
       DOMAIN_ALIAS_RID_ADMINS: cardinal = 544;
-      GroupSize = 4096;
-
 begin
-   Result:= False;
-   Success:= OpenThreadToken(GetCurrentThread, TOKEN_QUERY, True, HAccessToken);
-   if not Success then
-   begin
-     if GetLastError = ERROR_NO_TOKEN then
-       Success:= OpenProcessToken(GetCurrentProcess, TOKEN_QUERY, HAccessToken);
-   end;
+  result := false;
+  if not GetTokenHandle(TokenHandle) then
+    exit;
 
-   if Success then
-   begin
-     GetMem(PtgGroups, GroupSize);
-     Success:= GetTokenInformation(HAccessToken, TokenGroups, PtgGroups, GroupSize, DwInfoBufferSize);
-     CloseHandle(HAccessToken);
-     if Success then
-     begin
-       AllocateAndInitializeSid(SECURITY_NT_AUTHORITY, SUBAUTHORITYCOUNT,
-                                SECURITY_BUILTIN_DOMAIN_RID, DOMAIN_ALIAS_RID_ADMINS,
-                                0, 0, 0, 0, 0, 0, PsidAdministrators);
-       for Indx:= 0 to PtgGroups.GroupCount - 1 do
-       begin
-         if EqualSid(PsidAdministrators, PtgGroups.Groups[Indx].Sid) then
-         begin
-           Result:= True;
-           Break;
-         end;
-       end;
-       FreeSid(PsidAdministrators);
-     end;
-     FreeMem(PtgGroups);
-   end;
+  try
+    // Get size of buffer required in DwInfoBufferSize
+    // If we pass 0 for 4th parm, the function fails and the required size is passed in the 5th parm.
+    DwInfoBufferSize := 0;
+    GetTokenInformation(TokenHandle, TokenGroups, nil, 0, DwInfoBufferSize);
+    if (DwInfoBufferSize = 0) then // We need a buffersize
+      exit;
+
+    // Allocate buffer
+    GetMem(PtgGroups, DwInfoBufferSize);
+    try
+      // Now the call should succeed and return all the Sid's for the user.
+      if not GetTokenInformation(TokenHandle, TokenGroups, PtgGroups, DwInfoBufferSize, DwInfoBufferSize) then
+        exit;
+
+      // Get Sid for BuiltIn local admin
+      if not AllocateAndInitializeSid(SECURITY_NT_AUTHORITY,
+                                      SUBAUTHORITYCOUNT,
+                                      SECURITY_BUILTIN_DOMAIN_RID,
+                                      DOMAIN_ALIAS_RID_ADMINS,
+                                      0, 0, 0, 0, 0, 0,
+                                      PsidAdministrators) then
+        exit;
+      try
+        for Indx := 0 to PtgGroups.GroupCount -1 do
+          if EqualSid(PsidAdministrators, PtgGroups.Groups[Indx].Sid) then
+            exit(true);  // Found. The try finally  blocks ensure freeing resources allocated.
+      finally
+        FreeSid(PsidAdministrators);
+      end;
+    finally
+      FreeMem(PtgGroups);
+    end;
+  finally
+    CloseHandle(TokenHandle);
+  end;
 end;
 
 initialization
@@ -877,8 +879,8 @@ begin
 {$ELSE}
   IsAdminUser := false;
 {$ENDIF}
-  IsElevatedOrAdmin := IsElevated or IsAdminUser;
 
+  IsElevatedOrAdmin := IsElevated or IsAdminUser;
 end;
 
 finalization

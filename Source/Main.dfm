@@ -3068,8 +3068,8 @@ object FMain: TFMain
   end
   object ActLstTaskbar: TActionList
     Images = ImgListTray_TaskBar
-    Left = 840
-    Top = 383
+    Left = 831
+    Top = 380
     object TaskBarResetWindow: TAction
       Caption = 'Reset window sizes to default'
       Hint = 'Reset window sizes to default'
