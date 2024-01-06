@@ -154,7 +154,7 @@ end;
 
 function GUIsettingsRec.CanShowHidden: boolean;
 begin
-  result := ShowHidden or IsElevated or IsAdminUser;
+  result := (ShowHidden and IsAdminUser) or IsElevated;
 end;
 
 constructor FListColDefRec.Create(AListColUsrRec: FListColUsrRec);

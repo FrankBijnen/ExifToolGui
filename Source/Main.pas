@@ -2751,7 +2751,9 @@ var Value: TShellObjectTypes;
   begin
     result := ObjectTypes;
     if GUIsettings.CanShowHidden then
-      Include(result, TShellObjectType.otHidden);
+      include(result, TShellObjectType.otHidden)
+    else
+      exclude(result, TShellObjectType.otHidden);
   end;
 
 begin
