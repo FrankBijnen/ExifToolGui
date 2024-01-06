@@ -1,7 +1,7 @@
 unit ExifToolsGUI_Utils;
 {$WARN SYMBOL_PLATFORM OFF}
 
-{.$DEFINE GETELEVATION}
+{$DEFINE GETELEVATION}
 {$DEFINE GETWINDOWSADMIN}
 
 interface
@@ -72,7 +72,6 @@ procedure FillLocationInImage(const ANImage: string);
 var
   IsElevated: boolean;
   IsAdminUser: boolean;
-  IsElevatedOrAdmin: boolean;
 
 implementation
 
@@ -879,8 +878,6 @@ begin
 {$ELSE}
   IsAdminUser := false;
 {$ENDIF}
-
-  IsElevatedOrAdmin := IsElevated or IsAdminUser;
 end;
 
 finalization
