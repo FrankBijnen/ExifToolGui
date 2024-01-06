@@ -38,6 +38,7 @@ type
     ShowFolders: boolean;
     ShowHidden: boolean;
     ShowBreadCrumb: boolean;
+    function CanShowHidden: boolean;
   end;
 
   FListColUsrRec = record
@@ -149,6 +150,11 @@ begin
     exit(PrevPath);
 
   // If we get here, the default result is returned.
+end;
+
+function GUIsettingsRec.CanShowHidden: boolean;
+begin
+  result := ShowHidden or IsElevated or IsAdminUser;
 end;
 
 constructor FListColDefRec.Create(AListColUsrRec: FListColUsrRec);
