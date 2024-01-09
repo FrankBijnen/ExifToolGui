@@ -64,6 +64,7 @@ type
     CheckBox7: TCheckBox;
     EdGeoCodeApiKey: TLabeledEdit;
     CheckBox8: TCheckBox;
+    CheckBox9: TCheckBox;
     procedure FormShow(Sender: TObject);
     procedure BtnSaveClick(Sender: TObject);
     procedure BtnBrowseFolder(Sender: TObject);
@@ -146,6 +147,7 @@ begin
   GUIsettings.ShowFolders := CheckBox6.Checked;
   GUIsettings.ShowHidden := CheckBox8.Checked;
   GUIsettings.ShowBreadCrumb := CheckBox7.Checked;
+  GUIsettings.MinimizeToTray := CheckBox9.Checked;
   Application.HintHidePause := UpDHintPause.Position;
 
   //GeoCode
@@ -317,6 +319,7 @@ begin
     CheckBox8.Checked := GUIsettings.ShowHidden;
     CheckBox8.Enabled := IsAdminUser or IsElevated;
     CheckBox7.Checked := GUIsettings.ShowBreadCrumb;
+    CheckBox9.Checked := GUIsettings.MinimizeToTray;
     UpDHintPause.Position := Application.HintHidePause;
 
     // GeoCode

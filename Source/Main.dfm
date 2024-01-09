@@ -2826,6 +2826,8 @@ object FMain: TFMain
     Top = 221
   end
   object TrayIcon: TTrayIcon
+    BalloonTimeout = 5000
+    BalloonFlags = bfInfo
     Icon.Data = {
       0000010001002020100000000000E80200001600000028000000200000004000
       0000010004000000000080020000000000000000000000000000000000000000
@@ -2851,14 +2853,13 @@ object FMain: TFMain
       0001F0000001F0000001F0000001F0000001F0000001F0000001000000000000
       0000000000000000000000000000000000000000000000000000000000000000
       000000000000000000000000000000000000000000000000000000000000}
-    PopupMenu = TrayPopupMenu
-    Visible = True
     OnMouseUp = TrayIconMouseUp
     Left = 836
-    Top = 155
+    Top = 154
   end
   object TrayPopupMenu: TPopupMenu
     Images = ImgListTray_TaskBar
+    OnClose = TrayPopupMenuClose
     OnPopup = TrayPopupMenuPopup
     Left = 836
     Top = 217
@@ -3075,5 +3076,10 @@ object FMain: TFMain
       Hint = 'Reset window sizes to default'
       ImageIndex = 1
     end
+  end
+  object ApplicationEvents: TApplicationEvents
+    OnMinimize = ApplicationEventsMinimize
+    Left = 72
+    Top = 383
   end
 end

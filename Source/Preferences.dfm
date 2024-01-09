@@ -3,8 +3,8 @@ object FPreferences: TFPreferences
   Top = 0
   BorderStyle = bsDialog
   Caption = 'Preferences'
-  ClientHeight = 393
-  ClientWidth = 592
+  ClientHeight = 387
+  ClientWidth = 640
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -17,12 +17,13 @@ object FPreferences: TFPreferences
     Left = 0
     Top = 0
     Width = 521
-    Height = 393
+    Height = 387
     ActivePage = AdvTabGeneral
     Align = alLeft
     DoubleBuffered = True
     ParentDoubleBuffered = False
     TabOrder = 0
+    ExplicitHeight = 392
     object AdvTabGeneral: TTabSheet
       Caption = 'General'
       object Label1: TLabel
@@ -131,11 +132,19 @@ object FPreferences: TFPreferences
       end
       object CheckBox3: TCheckBox
         Left = 16
-        Top = 321
+        Top = 308
         Width = 185
         Height = 17
         Caption = '-save Filelist Details state on exit'
         TabOrder = 10
+      end
+      object CheckBox9: TCheckBox
+        Left = 16
+        Top = 336
+        Width = 369
+        Height = 17
+        Caption = '-application When minimized move to tray'
+        TabOrder = 11
       end
     end
     object AdvTabSheetThumbs: TTabSheet
