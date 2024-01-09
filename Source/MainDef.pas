@@ -38,6 +38,7 @@ type
     ShowFolders: boolean;
     ShowHidden: boolean;
     ShowBreadCrumb: boolean;
+    MinimizeToTray: boolean;
     function CanShowHidden: boolean;
   end;
 
@@ -425,6 +426,8 @@ begin
         ShowFolders := ReadBool(Ini_Settings, 'ShowFolders', false);
         ShowHidden := ReadBool(Ini_Settings, 'ShowHidden', false);
         ShowBreadCrumb := ReadBool(Ini_Settings, 'ShowBreadCrumb', true);
+        MinimizeToTray := ReadBool(Ini_Settings, 'MinimizeToTray', false);
+
         Application.HintHidePause := ReadInteger(Ini_Settings, 'HintHidePause', 5000);
       end;
 
@@ -699,6 +702,8 @@ begin
           WriteBool(Ini_Settings, 'ShowFolders', ShowFolders);
           WriteBool(Ini_Settings, 'ShowHidden', ShowHidden);
           WriteBool(Ini_Settings, 'ShowBreadCrumb', ShowBreadCrumb);
+          WriteBool(Ini_Settings, 'MinimizeToTray', MinimizeToTray);
+
           WriteInteger(Ini_Settings, 'HintHidePause', Application.HintHidePause);
         end;
 

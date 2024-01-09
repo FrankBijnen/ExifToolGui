@@ -24,7 +24,7 @@ uses
   ExifToolsGUI_Utils,      // Various
   Vcl.ActnMan, Vcl.ActnCtrls, Vcl.ActnMenus, System.Actions, Vcl.ActnList, Vcl.PlatformDefaultStyleActnCtrls,
   Vcl.ActnPopup, Vcl.BaseImageCollection, Vcl.ImageCollection, Vcl.VirtualImageList,
-  System.Win.TaskbarCore, Vcl.Taskbar, Vcl.ToolWin;
+  System.Win.TaskbarCore, Vcl.Taskbar, Vcl.ToolWin, Vcl.AppEvnts;
 
 type
   TFMain = class(TScaleForm)
@@ -170,6 +170,7 @@ type
     Taskbar: TTaskbar;
     ActLstTaskbar: TActionList;
     TaskBarResetWindow: TAction;
+    ApplicationEvents: TApplicationEvents;
     procedure ShellListClick(Sender: TObject);
     procedure ShellListKeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
     procedure SpeedBtnExifClick(Sender: TObject);
@@ -281,6 +282,8 @@ type
     procedure TrayIconMouseUp(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
     procedure TrayPopupMenuPopup(Sender: TObject);
     procedure TaskbarThumbButtonClick(Sender: TObject; AButtonID: Integer);
+    procedure ApplicationEventsMinimize(Sender: TObject);
+    procedure TrayPopupMenuClose(Sender: TObject);
   private
     { Private declarations }
     ETBarSeriesFocal: TBarSeries;
@@ -295,6 +298,7 @@ type
     procedure SetCaption(AnItem: string = '');
     procedure ShowMetadata;
     procedure ShowPreview;
+    procedure RestoreGUI;
     procedure ShellListSetFolders;
     procedure EnableMenus(Enable: boolean);
     procedure EnableMenuItems;
@@ -1399,10 +1403,20 @@ end;
 
 procedure TFMain.TrayIconMouseUp(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
 begin
+  TrayPopupMenu.Popup(X, Y);
+end;
+procedure TFMain.RestoreGUI;
+begin
   Application.Restore;
   Application.BringToFront;
 
-  TrayPopupMenu.Popup(X, Y);
+  Show;
+end;
+
+procedure TFMain.TrayPopupMenuClose(Sender: TObject);
+begin
+  RestoreGUI;
+  TrayIcon.Visible := false;
 end;
 
 procedure TFMain.TrayPopupMenuPopup(Sender: TObject);
@@ -2160,6 +2174,18 @@ begin
   StatusBar.Panels[1].Width := AdvPageFilelist.Width + Splitter2.Width;
 end;
 
+procedure TFMain.ApplicationEventsMinimize(Sender: TObject);
+begin
+  if (GUIsettings.MinimizeToTray) then
+  begin
+    TrayIcon.BalloonHint := Application.Title + ' minimized to tray.';
+    TrayIcon.ShowBalloonHint;
+    TrayIcon.BalloonTimeout := Application.HintHidePause;
+    TrayIcon.Visible := true;
+    Hide;
+  end;
+end;
+
 procedure TFMain.FormAfterMonitorDpiChanged(Sender: TObject; OldDPI, NewDPI: Integer);
 begin
   GUIBorderWidth := Width - ClientWidth;
@@ -2851,7 +2877,7 @@ end;
 
 procedure TFMain.Tray_ResetwindowsizeClick(Sender: TObject);
 begin
-  WindowState := TWindowState.wsNormal;
+  RestoreGUI;
   ResetWindowSizes;
   ShellList.Refresh;
   Realign;
