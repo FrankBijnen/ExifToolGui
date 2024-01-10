@@ -68,6 +68,10 @@ procedure FillPreviewInListView(SelectedFile: string; LvPreviews: TListView);
 // GeoCoding
 procedure FillLocationInImage(const ANImage: string);
 
+// Context menu
+procedure Add2Context(const AppTitle, Description: string);
+procedure RemoveFromContext(const AppTitle: string);
+
 // Running elevated or admin?
 var
   IsElevated: boolean;
@@ -857,6 +861,43 @@ begin
     end;
   finally
     CloseHandle(TokenHandle);
+  end;
+end;
+
+const
+  ETGContextKey = 'SOFTWARE\Classes\Folder\Shell\';
+  ETGCommandKey = '\command';
+
+procedure Add2Context(const AppTitle, Description: string);
+var
+  Reg: TRegistry;
+begin
+  Reg := TRegistry.Create(KEY_WRITE);
+  try
+    Reg.RootKey := HKEY_LOCAL_MACHINE;
+    Reg.OpenKey(ETGContextKey + AppTitle, true);
+    Reg.WriteString('', Description);
+    Reg.CloseKey;
+
+    Reg.OpenKey(ETGContextKey + AppTitle + ETGCommandKey, true);
+    Reg.WriteString('', '"'+ ParamStr(0) + '" "%L"');
+    Reg.CloseKey;
+  finally
+    Reg.Free;
+  end;
+end;
+
+procedure RemoveFromContext(const AppTitle: string);
+var
+  Reg: TRegistry;
+begin
+  Reg := TRegistry.Create(KEY_WRITE);
+  try
+    Reg.RootKey := HKEY_LOCAL_MACHINE;
+    Reg.DeleteKey(ETGContextKey + AppTitle + ETGCommandKey);
+    Reg.DeleteKey(ETGContextKey + AppTitle);
+  finally
+    Reg.Free
   end;
 end;
 

@@ -9,6 +9,7 @@ uses
   {$IFDEF STACKTRACE}
   UnitStackTrace,
   {$ENDIF }
+  UnitSingleApp,
   UnitDpiAwareness,
   Vcl.Forms,
   Vcl.Themes,
@@ -55,6 +56,15 @@ begin
 {$IFDEF DEBUG}
   ReportMemoryLeaksOnShutdown := true;
 {$ENDIF}
+
+  if ReadSingleInstanceApp and
+     not CreateMapping then
+  begin
+    ActivateCurrentWindow;
+    halt;
+  end;
+
+
   Application.Initialize;
   Application.MainFormOnTaskbar := True;
   Application.Title := 'ExifToolGui';

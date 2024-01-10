@@ -65,6 +65,9 @@ type
     EdGeoCodeApiKey: TLabeledEdit;
     CheckBox8: TCheckBox;
     CheckBox9: TCheckBox;
+    GrpContextMenu: TGroupBox;
+    BtnAdd2Context: TButton;
+    BtnRemoveFromContextMenu: TButton;
     procedure FormShow(Sender: TObject);
     procedure BtnSaveClick(Sender: TObject);
     procedure BtnBrowseFolder(Sender: TObject);
@@ -72,6 +75,8 @@ type
     procedure BtnSetupCleanClick(Sender: TObject);
     procedure BtnCleanClick(Sender: TObject);
     procedure BtnGenThumbsClick(Sender: TObject);
+    procedure BtnAdd2ContextClick(Sender: TObject);
+    procedure BtnRemoveFromContextMenuClick(Sender: TObject);
   private
     { Private declarations }
   public
@@ -183,6 +188,16 @@ begin
     if not RunAsAdmin(Handle, GetComSpec, '/c' + Parm, SW_HIDE) then
       MessageDlgEx(Format('Run ''%s'' as Admin failed.', [Parm]), '', TMsgDlgType.mtError, [mbOK]);
   end;
+end;
+
+procedure TFPreferences.BtnAdd2ContextClick(Sender: TObject);
+begin
+  Add2Context(Application.Title, 'Open with ExifToolGUI');
+end;
+
+procedure TFPreferences.BtnRemoveFromContextMenuClick(Sender: TObject);
+begin
+  RemoveFromContext(Application.Title);
 end;
 
 procedure TFPreferences.BtnCleanClick(Sender: TObject);
@@ -333,6 +348,10 @@ begin
     ChkReverseGeoCodeDialog.Checked := GeoSettings.ReverseGeoCodeDialog;
 
     AdvPageControl1.ActivePage := AdvTabGeneral;
+
+    GrpContextMenu.Enabled := IsElevated;
+    BtnAdd2Context.Enabled := IsElevated;
+    BtnRemoveFromContextMenu.Enabled := IsElevated;
   finally
     ETResult.Free;
   end;

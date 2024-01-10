@@ -18,6 +18,7 @@ uses
   VclTee.Series, // Chart
   BreadcrumbBar, // BreadcrumbBar
   UnitScaleForm, // Scale form from Commandline parm.
+  UnitSingleApp, // Single Instance App.
   ExifToolsGUI_ShellTree,  // Extension of ShellTreeView
   ExifToolsGUI_ShellList,  // Extension of ShellListView
   ExifToolsGUI_Thumbnails, // Thumbnails
@@ -279,11 +280,10 @@ type
     procedure AdvPagePreviewResize(Sender: TObject);
     procedure FormAfterMonitorDpiChanged(Sender: TObject; OldDPI, NewDPI: Integer);
     procedure Tray_ResetwindowsizeClick(Sender: TObject);
-    procedure TrayIconMouseUp(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
     procedure TrayPopupMenuPopup(Sender: TObject);
     procedure TaskbarThumbButtonClick(Sender: TObject; AButtonID: Integer);
     procedure ApplicationEventsMinimize(Sender: TObject);
-    procedure TrayPopupMenuClose(Sender: TObject);
+    procedure TrayIconMouseUp(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
   private
     { Private declarations }
     ETBarSeriesFocal: TBarSeries;
@@ -303,6 +303,7 @@ type
     procedure EnableMenus(Enable: boolean);
     procedure EnableMenuItems;
 
+    procedure CMActivateWindow(var Message: TMessage); message CM_ActivateWindow;
     procedure WMEndSession(var Msg: TWMEndSession); message WM_ENDSESSION;
     function TranslateTagName(xMeta, xName: string): string;
 
@@ -366,6 +367,20 @@ procedure TFMain.WMEndSession(var Msg: TWMEndSession);
 begin // for Windows Shutdown/Log-off while GUI is open
   if Msg.EndSession = true then
     SaveGUIini;
+  inherited;
+end;
+
+procedure TFMain.CMActivateWindow(var Message: TMessage);
+var
+  NewDirectory: string;
+begin
+
+  RestoreGUI;
+
+  NewDirectory := ReadNewDir;
+  ShellTree.Path := NewDirectory;
+
+  Message.Result := 0;
   inherited;
 end;
 
@@ -1401,22 +1416,21 @@ begin
   end;
 end;
 
-procedure TFMain.TrayIconMouseUp(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
-begin
-  TrayPopupMenu.Popup(X, Y);
-end;
 procedure TFMain.RestoreGUI;
 begin
   Application.Restore;
   Application.BringToFront;
-
   Show;
+
+  TrayIcon.Visible := false;
 end;
 
-procedure TFMain.TrayPopupMenuClose(Sender: TObject);
+procedure TFMain.TrayIconMouseUp(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
 begin
-  RestoreGUI;
-  TrayIcon.Visible := false;
+  if (Button = TMouseButton.mbRight) then
+    TrayPopupMenu.Popup(X, Y)
+  else
+    RestoreGUI;
 end;
 
 procedure TFMain.TrayPopupMenuPopup(Sender: TObject);
@@ -2178,11 +2192,12 @@ procedure TFMain.ApplicationEventsMinimize(Sender: TObject);
 begin
   if (GUIsettings.MinimizeToTray) then
   begin
-    TrayIcon.BalloonHint := Application.Title + ' minimized to tray.';
-    TrayIcon.ShowBalloonHint;
-    TrayIcon.BalloonTimeout := Application.HintHidePause;
-    TrayIcon.Visible := true;
+    Application.Minimize;
     Hide;
+
+    TrayIcon.ShowBalloonHint;
+    TrayIcon.BalloonHint := 'Minimized to tray.';
+    TrayIcon.Visible := true;
   end;
 end;
 
@@ -2223,12 +2238,12 @@ end;
 
 procedure TFMain.FormCreate(Sender: TObject);
 begin
+  ReadGUIini;
   // AdvPageFilelist.Constraints.MinWidth only used at design time. Form does not align well.
   // We check for MinFileListWidth in code.
   MinFileListWidth := AdvPageFilelist.Constraints.MinWidth;
   AdvPageFilelist.Constraints.MinWidth := 0;
 
-  ReadGUIini;
 
   // Tray Icon
   TrayIcon.Hint := GetFileVersionNumber(Application.ExeName);
@@ -2341,6 +2356,11 @@ var
   I: integer;
   PathFromParm: boolean;
 begin
+  if TrayIcon.Visible then
+    exit;
+
+  WriteWindowHandle(Self.Handle);
+
   SetCaption;
 
   OnAfterMonitorDpiChanged(Sender, 0, 0); // DPI Values are not used
@@ -2389,6 +2409,7 @@ begin
   if ParamCount > 0 then
   begin
     Param := ParamStr(1);
+
     if DirectoryExists(Param) then
     begin
       PathFromParm := true;

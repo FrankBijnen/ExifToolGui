@@ -95,6 +95,7 @@ var
 
 function GetIniFilePath(AllowPrevVer: boolean): string;
 procedure ReadGUILog;
+function ReadSingleInstanceApp: boolean;
 procedure ResetWindowSizes;
 procedure ReadGUIini;
 procedure SaveGUIini;
@@ -573,6 +574,21 @@ begin
 
   try
     ReadLogWindowSizes(GUIini);
+  finally
+    GUIini.Free;
+  end;
+end;
+
+function ReadSingleInstanceApp: boolean;
+begin
+  try
+    GUIini := TMemIniFile.Create(GetIniFilePath(True), TEncoding.UTF8);
+  except
+    GUIini := TMemIniFile.Create(GetIniFilePath(True));
+  end;
+
+  try
+    result := GUIini.ReadBool(Ini_ETGUI, 'SingleInstanceApp', true);
   finally
     GUIini.Free;
   end;

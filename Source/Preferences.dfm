@@ -23,7 +23,7 @@ object FPreferences: TFPreferences
     DoubleBuffered = True
     ParentDoubleBuffered = False
     TabOrder = 0
-    ExplicitHeight = 392
+    ExplicitHeight = 386
     object AdvTabGeneral: TTabSheet
       Caption = 'General'
       object Label1: TLabel
@@ -685,6 +685,32 @@ object FPreferences: TFPreferences
           '-Filelist: Show Hidden Folders and Files in Filelist (Admin requ' +
           'ired)'
         TabOrder = 6
+      end
+      object GrpContextMenu: TGroupBox
+        Left = 16
+        Top = 251
+        Width = 450
+        Height = 87
+        Caption = 'Register ExiftoolGui in Contextmenu (Requires elevation)'
+        TabOrder = 10
+        object BtnAdd2Context: TButton
+          Left = 3
+          Top = 21
+          Width = 150
+          Height = 25
+          Caption = 'Add to contextmenu'
+          TabOrder = 0
+          OnClick = BtnAdd2ContextClick
+        end
+        object BtnRemoveFromContextMenu: TButton
+          Left = 3
+          Top = 52
+          Width = 150
+          Height = 25
+          Caption = 'Remove from coontextmenu'
+          TabOrder = 1
+          OnClick = BtnRemoveFromContextMenuClick
+        end
       end
     end
   end

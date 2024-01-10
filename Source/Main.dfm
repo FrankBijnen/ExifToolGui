@@ -2826,7 +2826,6 @@ object FMain: TFMain
     Top = 221
   end
   object TrayIcon: TTrayIcon
-    BalloonTimeout = 5000
     BalloonFlags = bfInfo
     Icon.Data = {
       0000010001002020100000000000E80200001600000028000000200000004000
@@ -2859,7 +2858,6 @@ object FMain: TFMain
   end
   object TrayPopupMenu: TPopupMenu
     Images = ImgListTray_TaskBar
-    OnClose = TrayPopupMenuClose
     OnPopup = TrayPopupMenuPopup
     Left = 836
     Top = 217
