@@ -3,6 +3,8 @@
 
 This is an updated version of the ExifToolGui program created by Bogdan Hrastnik. Many thanks go out to him.
 
+<img src="Docs/Screenshot.png" alt="A screenshot of the ExifTool GUI. It prominently displays a directory tree browser, preview of the image, filelist, and finally all metadata" width="640px" />
+
 <b>Hotfix for GeoCode queries: <b>V6.2.8</b> updated December 28, 2023.</b><br>
 
 Version: <b>V6.2.7</b> updated December 24, 2023.<br>
@@ -24,6 +26,11 @@ Version: <b>V6.2.7</b> updated December 24, 2023.<br>
 - [Please <b>read</b> the Requirements and preparation](https://github.com/FrankBijnen/ExifToolGui/blob/main/Docs/ExifToolGUI_V6.md/#m_reqs_general)<br>
 - To help Bug hunting also Map files are released. If you place the Map file in the same directory as the Executable
 a stacktrace can be copied to the clipboard if an Exception occurs. Please also provide the stacktrace if you report an Exception.<br>
+
+<h4>Notice</h4>
+
+This project contains NativeJpg, which is licensed under [The 2-Clause BSD License](https://opensource.org/license/bsd-2-clause/), which can be found in [Source/NativeJpg/LICENSE.txt](Source/NativeJpg/LICENSE.txt).
+
 
 # Useful links
 
