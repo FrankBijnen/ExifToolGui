@@ -113,6 +113,8 @@ type
     procedure Clear;
   end;
 
+  TParseIFDProc = procedure(IFDentry: IFDentryRec);
+
 var
   Foto: FotoRec;
   FotoKeySep: string[3] = '*';
@@ -788,6 +790,39 @@ begin
   end;
 end;
 
+
+procedure ParseIfd(Offset: int64; ParseProc: TParseIFDProc);
+var
+  IFDcount: word;
+  IFDentry: IFDentryRec;
+
+  procedure GetIFDentry;
+  begin
+    FotoF.Read(IFDentry, 12);
+    if IsMM then
+      with IFDentry do
+      begin
+        Tag := Swap(Tag);
+        FieldType := Swap(FieldType);
+        TypeCount := SwapL(TypeCount);
+        ValueOffs := SwapL(ValueOffs);
+      end;
+  end;
+
+begin
+  FotoF.Seek(Offset, TSeekOrigin.soBeginning);
+  FotoF.Read(IFDcount, 2);
+  if IsMM then
+    IFDcount := Swap(IFDcount);
+  while IFDcount > 0 do
+  begin
+    GetIFDentry;
+    ParseProc(IFDentry);
+    Dec(IFDcount);
+  end;
+
+end;
+
 // ==============================================================================
 procedure ReadTIFF;
 var
@@ -825,33 +860,11 @@ begin
     FotoF.Read(Ldata, 4);
     if IsMM then
       Ldata := SwapL(Ldata); // Read IFD0offset
-    if Ldata > 0 then
-    begin
-      FotoF.Seek(TIFFoffset + Ldata, TSeekOrigin.soBeginning);
-      FotoF.Read(IFDcount, 2);
-      if IsMM then
-        IFDcount := Swap(IFDcount);
-      while IFDcount > 0 do
-      begin
-        GetIFDentry;
-        ParseIFD0(IFDentry);
-        Dec(IFDcount);
-      end;
-    end;
+
+    ParseIfd(TIFFoffset + Ldata, ParseIFD0);
 
     if ExifIFDoffset > 0 then
-    begin
-      FotoF.Seek(TIFFoffset + ExifIFDoffset, TSeekOrigin.soBeginning);
-      FotoF.Read(IFDcount, 2);
-      if IsMM then
-        IFDcount := Swap(IFDcount);
-      while IFDcount > 0 do
-      begin
-        GetIFDentry;
-        ParseExifIFD(IFDentry);
-        Dec(IFDcount);
-      end;
-    end;
+      ParseIFD(TIFFoffset + ExifIFDoffset, ParseExifIFD);
 
     if InteropOffset > 0 then
     begin
@@ -873,16 +886,7 @@ begin
 
     if doGPS and (GPSoffset > 0) then
     begin
-      FotoF.Seek(TIFFoffset + GPSoffset, TSeekOrigin.soBeginning);
-      FotoF.Read(IFDcount, 2);
-      if IsMM then
-        IFDcount := Swap(IFDcount);
-      while IFDcount > 0 do
-      begin
-        GetIFDentry;
-        ParseGPS(IFDentry);
-        Dec(IFDcount);
-      end;
+      ParseIFD(TIFFoffset + GPSoffset, ParseGPS);
       // for OSM Map
       with Foto.GPS do
       begin
@@ -1080,6 +1084,7 @@ begin
     ReadJpeg;
 end;
 
+
 // ==============================================================================
 procedure ReadXMP;
 var
@@ -1248,6 +1253,104 @@ begin
   XMPdata := '';
 end;
 
+// https://github.com/lclevy/canon_cr3/blob/master/readme.md
+function SkipCr3Header: word;
+var
+  SavePos, EndPos: Int64;
+  Cr3Magic:array[0..6] of AnsiChar;
+  TagLen: DWORD;
+  TagName:array[0..3] of AnsiChar;
+
+const
+  MoovSize = 24;
+  TiffHeader = 8;
+begin
+  SavePos := FotoF.Position;
+  fotoF.Seek(4, TSeekOrigin.soBeginning);
+  FotoF.Read(Cr3Magic, SizeOf(Cr3Magic));
+
+  if (Cr3Magic = 'ftypcrx') then
+  begin
+    fotoF.Seek(0, TSeekOrigin.soBeginning);
+    FotoF.Read(TagLen, SizeOf(TagLen));
+    TagLen := SwapL(TagLen) - Sizeof(TagLen) - Sizeof(TagName);
+    FotoF.Read(TagName, SizeOf(TagName));
+    EndPos := FotoF.Size;
+    while (FotoF.Position + TagLen <  EndPos) do
+    begin
+      if (TagName = 'moov') then
+      begin
+        EndPos := Fotof.Position + TagLen;
+        Fotof.Seek(MoovSize, TSeekOrigin.soCurrent);
+      end
+      else
+        fotoF.Seek(TagLen, TSeekOrigin.soCurrent);
+
+      FotoF.Read(TagLen, SizeOf(TagLen));
+      TagLen := SwapL(TagLen) - Sizeof(TagLen) - Sizeof(TagName);
+      FotoF.Read(TagName, SizeOf(TagName));
+
+      if (TagName = 'CMT1') then
+        break;
+    end;
+  end
+  else
+    FotoF.Seek(SavePos, TSeekOrigin.soBeginning); // No CR3
+
+// Return first word.
+  FotoF.Read(result, SizeOf(result));
+  result := Swap(result);
+end;
+
+procedure ReadCr3;
+var
+  EndPos: Int64;
+  XmpMagic:array[0..3] of AnsiChar;
+  TagLen: DWORD;
+  TagName:array[0..3] of AnsiChar;
+
+const
+  TiffHeaderLen = 8;
+  UuidLen = 16;
+  CMT1Len = 10;
+begin
+  SkipCr3Header;
+  FotoF.Seek(-CMT1Len, TSeekOrigin.soCurrent); //position before CMT1 to get the len
+
+  FotoF.Read(TagLen, SizeOf(TagLen));
+  TagLen := SwapL(TagLen) - Sizeof(TagLen) - Sizeof(TagName);
+  FotoF.Read(TagName, SizeOf(TagName));
+  EndPos := FotoF.Size;
+  while (FotoF.Position + TagLen < EndPos) do
+  begin
+    TIFFoffset := FotoF.Position;
+    FotoF.Read(Wdata, SizeOf(Wdata));
+    if (TagName = 'CMT1') then
+      ParseIfd(TIFFoffset + TiffHeaderLen, ParseIFD0);
+    if (TagName = 'CMT2') then
+      ParseIfd(TIFFoffset + TiffHeaderLen, ParseExifIFD);
+    if (doGPS) and (TagName = 'CMT4') then
+      ParseIfd(TIFFoffset + TiffHeaderLen, ParseGPS);
+    if (TagName = 'uuid') then
+    begin
+      FotoF.Seek(-SizeOf(Wdata), TSeekOrigin.soCurrent);
+      FotoF.Read(XmpMagic, SizeOf(XmpMagic));
+      if XmpMagic = #$be + #$7a + #$cf + #$cb then
+      begin
+        XMPsize := TagLen - UuidLen;
+        XMPoffset := TIFFoffset + UuidLen;
+        ReadXMP;
+      end;
+    end;
+
+    FotoF.Seek(TIFFoffset + TagLen, TSeekOrigin.soBeginning);
+    FotoF.Read(TagLen, SizeOf(TagLen));
+    TagLen := SwapL(TagLen) - Sizeof(TagLen) - Sizeof(TagName);
+    FotoF.Read(TagName, SizeOf(TagName));
+
+  end;
+end;
+
 // ======================================== MAIN ==============================================
 procedure GetMetadata(FName: string; GetXMP, GetIPTC, GetGPS, GetICC: boolean);
 var
@@ -1279,6 +1382,8 @@ begin
       FotoF.Read(Wdata, 2);
       Wdata := Swap(Wdata);
       case Wdata of
+        $0000:
+          ReadCr3;
         $4655:
           ReadFuji;
         $FFD8:
@@ -1317,7 +1422,7 @@ var
   TmpTxt: string[7];
   FotoHandle: THandle;
 
-  procedure ReadTIFF;
+  procedure ReadTIFFOrient;
   begin
     IsMM := (Wdata = $4D4D);
     TIFFoffset := FotoF.Position - 2;
@@ -1379,12 +1484,17 @@ begin
     begin // size must be at least 32 bytes
       FotoF.Read(Wdata, 2);
       Wdata := Swap(Wdata);
+
+      if Wdata = $0000 then
+        Wdata := SkipCr3Header;
+
       if (Wdata = $4949) or (Wdata = $4D4D) then
-        ReadTIFF
+        ReadTIFFOrient
       else
       begin
         if Wdata = $4655 then
           Wdata := SkipFujiHeader;
+
         if Wdata = $FFD8 then
         begin
           repeat
@@ -1401,7 +1511,7 @@ begin
                 TmpTxt[0] := #4;
                 FotoF.Read(Wdata, 2);
                 if (TmpTxt = 'Exif') and ((Wdata = $4949) or (Wdata = $4D4D)) then
-                  ReadTIFF;
+                  ReadTIFFOrient;
               end;
               if result <> 0 then
                 break;
