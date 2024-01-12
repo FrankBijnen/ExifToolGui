@@ -300,7 +300,7 @@ object FMain: TFMain
           Width = 42
           Height = 22
           Anchors = [akTop, akRight]
-          Caption = 'Save'
+          Caption = '&Save'
           OnClick = BtnQuickSaveClick
         end
         object MemoQuick: TMemo
@@ -733,7 +733,7 @@ object FMain: TFMain
         object EditETdirect: TLabeledEdit
           Left = 1
           Top = 50
-          Width = 293
+          Width = 289
           Height = 23
           Hint = 
             'Spaces in data require double quotes, double quotes in data requ' +
@@ -756,7 +756,7 @@ object FMain: TFMain
           Text = ''
           OnChange = EditETdirectChange
           OnKeyDown = EditETdirectKeyDown
-          ExplicitWidth = 289
+          ExplicitWidth = 285
         end
         object CBoxETdirect: TComboBox
           Left = 1

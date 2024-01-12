@@ -17,6 +17,7 @@ uses
   MainDef in 'MainDef.pas',
   ExifToolsGUI_Utils in 'ExifToolsGUI_Utils.pas',
   UnitFilesOnClipBoard in 'UnitFilesOnClipBoard.pas',
+  ExifToolsGui_ValEdit in 'ExifToolsGui_ValEdit.pas',
   ExifToolsGui_ShellList in 'ExifToolsGui_ShellList.pas',
   ExifToolsGui_ShellTree in 'ExifToolsGui_ShellTree.pas',
   ExifToolsGUI_MultiContextMenu in 'ExifToolsGUI_MultiContextMenu.pas',
