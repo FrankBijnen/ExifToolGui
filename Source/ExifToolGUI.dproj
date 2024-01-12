@@ -214,6 +214,7 @@
         <DCCReference Include="DateTimeShift.pas">
             <Form>FDateTimeShift</Form>
         </DCCReference>
+        <DCCReference Include="ExifToolsGui_ValEdit.pas"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>

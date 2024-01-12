@@ -22,6 +22,7 @@ uses
   ExifToolsGUI_ShellTree,  // Extension of ShellTreeView
   ExifToolsGUI_ShellList,  // Extension of ShellListView
   ExifToolsGUI_Thumbnails, // Thumbnails
+  ExifToolsGUI_ValEdit,    // MetaData
   ExifToolsGUI_Utils,      // Various
   Vcl.ActnMan, Vcl.ActnCtrls, Vcl.ActnMenus, System.Actions, Vcl.ActnList, Vcl.PlatformDefaultStyleActnCtrls,
   Vcl.ActnPopup, Vcl.BaseImageCollection, Vcl.ImageCollection, Vcl.VirtualImageList,
@@ -48,7 +49,7 @@ type
     AdvPanelMetaBottom: TPanel;
     ShellTree: ExifToolsGUI_ShellTree.TShellTreeView; // Need to create our own version!
     ShellList: ExifToolsGUI_ShellList.TShellListView; // Need to create our own version!
-    MetadataList: TValueListEditor;
+    MetadataList: ExifToolsGui_ValEdit.TValueListEditor; // Need to create our own version!
     SpeedBtnExif: TSpeedButton;
     SpeedBtnIptc: TSpeedButton;
     SpeedBtnXmp: TSpeedButton;
@@ -327,6 +328,8 @@ type
     procedure ShellListColumnResized(Sender: TObject);
     procedure ShellListMouseWheel(Sender: TObject; Shift: TShiftState; WheelDelta: Integer; MousePos: TPoint; var Handled: Boolean);
 
+    procedure MetadataListCtrlKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
+
     procedure CounterETEvent(Counter: integer);
   public
     { Public declarations }
@@ -351,7 +354,7 @@ var
 implementation
 
 uses System.StrUtils, System.Math, System.Masks, System.Types, System.UITypes,
-  Vcl.ClipBrd, Winapi.ShlObj, Winapi.ShellAPI, Vcl.Shell.ShellConsts, Vcl.Themes, Vcl.Styles,
+  Vcl.ClipBrd, Winapi.ShlObj, Winapi.ShellAPI, Winapi.CommCtrl, Vcl.Shell.ShellConsts, Vcl.Themes, Vcl.Styles,
   ExifTool, ExifInfo, ExifToolsGui_LossLess, ExifTool_PipeStream,
   MainDef, LogWin, Preferences, EditFFilter, EditFCol, UFrmStyle, UFrmAbout,
   QuickMngr, DateTimeShift, DateTimeEqual, CopyMeta, RemoveMeta, Geotag, Geomap, CopyMetaSingle, FileDateTime,
@@ -843,19 +846,85 @@ end;
 
 procedure TFMain.MetadataListKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
 var
-  i: smallint;
+  I: integer;
 begin
-  i := MetadataList.Row;
-  if (Key = VK_Return) and SpeedBtnQuick.Down and not(QuickTags[i - 1].NoEdit) then
+  I := MetadataList.Row;
+  if (Key = VK_Return) and SpeedBtnQuick.Down and not(QuickTags[I - 1].NoEdit) then
   begin
     if SpeedBtnLarge.Down then
       MemoQuick.SetFocus
     else
       EditQuick.SetFocus;
   end;
-  if (Shift = [ssCTRL]) and (Key = Ord('C')) then
-    Clipboard.AsText := MetadataList.Cells[1, i];
 end;
+
+// Event handler for CTRL Keydown.
+// Allows intercepting CTRL/VK_UP CTRL/VK_DOWN
+procedure TFMain.MetadataListCtrlKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
+
+  function CheckIndex(var Indx: integer): boolean;
+  begin
+    result := (ShellList.Items.Count > 0);
+    if (Indx < 0) then
+      Indx := 0;
+    if (Indx > ShellList.Items.Count -1) then
+      Indx := ShellList.Items.Count -1;
+  end;
+
+  procedure SelectPrevNext(const Down: boolean);
+  var
+    Old: integer;
+    New: integer;
+    MetaDataRow: integer;
+  begin
+    // Save MetaData Row
+    MetaDataRow := MetadataList.Row;
+
+    // Current
+    if Assigned(ShellList.Selected) then
+      Old := ShellList.Selected.Index
+    else
+      Old := ShellList.ItemIndex;
+    if not CheckIndex(Old) then
+      exit;
+
+    If (Down) then
+      New := Old + 1
+    else
+      New := Old - 1;
+    if (New < 0) then
+      New := 0;
+    if not CheckIndex(New) then
+      exit;
+
+    // Select only then item, and make that visible
+    ShellList.ClearSelection;
+    ShellList.Items[New].Selected := true;
+    ShellList.Items[New].MakeVisible(false);
+
+    // Simulate a click on the new item, will load Metadata etc.
+    ShellListClick(ShellList);
+
+    // Focus back on original Metadata Row
+    MetadataList.SetFocus;
+    if (MetadataList.RowCount >= MetaDataRow) then
+      MetadataList.Row := MetaDataRow;
+  end;
+
+begin
+  case Key of
+    Ord('C'):
+      Clipboard.AsText := MetadataList.Cells[1, MetadataList.Row];
+    Ord('S'):
+      BtnQuickSaveClick(Sender);
+    VK_UP, VK_DOWN:
+      begin
+        SelectPrevNext(Key = VK_DOWN);
+        Key := 0; // Dont want the inherited code. Scrolls to begin/end of Metadatalist
+      end;
+    end;
+end;
+
 
 procedure TFMain.MetadataListMouseDown(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: integer);
 var
@@ -888,6 +957,7 @@ end;
 procedure TFMain.MetadataListSelectCell(Sender: TObject; ACol, ARow: integer; var CanSelect: boolean);
 var EditText: string;
 begin
+
   EditQuick.Text := '';
   MemoQuick.Text := '';
   if (ARow - 1 > High(QuickTags)) then
@@ -2301,6 +2371,9 @@ begin
   ShellList.OnMouseWheel := ShellListMouseWheel;
   // Enable Column sorting if Sorted = true. Disables Sorted.
   ShellList.ColumnSorted := ShellList.Sorted;
+
+  // Metadatalist Ctrl handler
+  MetadataList.OnCtrlKeyDown := MetadataListCtrlKeyDown;
 
   CBoxFileFilter.Text := SHOWALL;
   ExifTool.ExecETEvent := ExecETEvent_Done;
