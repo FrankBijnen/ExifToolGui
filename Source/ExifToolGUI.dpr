@@ -58,9 +58,9 @@ begin
 {$ENDIF}
 
   if ReadSingleInstanceApp and
-     not CreateMapping then
+     not FSharedMem.IsOwner then
   begin
-    ActivateCurrentWindow;
+    FSharedMem.ActivateCurrentWindow;
     halt;
   end;
 

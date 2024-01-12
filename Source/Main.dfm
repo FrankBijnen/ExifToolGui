@@ -1208,7 +1208,7 @@ object FMain: TFMain
           end>
         ActionBar = ActionMainMenuBar
       end>
-    Left = 163
+    Left = 164
     Top = 53
     StyleName = 'Platform Default'
     object MaExportMetaTXT: TAction
@@ -2852,6 +2852,7 @@ object FMain: TFMain
       0001F0000001F0000001F0000001F0000001F0000001F0000001000000000000
       0000000000000000000000000000000000000000000000000000000000000000
       000000000000000000000000000000000000000000000000000000000000}
+    OnBalloonClick = TrayIconBalloonClick
     OnMouseUp = TrayIconMouseUp
     Left = 836
     Top = 154

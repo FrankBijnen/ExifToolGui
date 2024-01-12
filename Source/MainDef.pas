@@ -39,6 +39,8 @@ type
     ShowHidden: boolean;
     ShowBreadCrumb: boolean;
     MinimizeToTray: boolean;
+    SingleInstanceApp: boolean;
+    ShowBalloon: boolean;
     function CanShowHidden: boolean;
   end;
 
@@ -428,6 +430,8 @@ begin
         ShowHidden := ReadBool(Ini_Settings, 'ShowHidden', false);
         ShowBreadCrumb := ReadBool(Ini_Settings, 'ShowBreadCrumb', true);
         MinimizeToTray := ReadBool(Ini_Settings, 'MinimizeToTray', false);
+        SingleInstanceApp := ReadBool(Ini_Settings, 'SingleInstanceApp', false);
+        ShowBalloon := ReadBool(Ini_Settings, 'ShowBalloon', true);
 
         Application.HintHidePause := ReadInteger(Ini_Settings, 'HintHidePause', 5000);
       end;
@@ -588,7 +592,7 @@ begin
   end;
 
   try
-    result := GUIini.ReadBool(Ini_ETGUI, 'SingleInstanceApp', true);
+    result := GUIini.ReadBool(Ini_Settings, 'SingleInstanceApp', false);
   finally
     GUIini.Free;
   end;
@@ -719,6 +723,8 @@ begin
           WriteBool(Ini_Settings, 'ShowHidden', ShowHidden);
           WriteBool(Ini_Settings, 'ShowBreadCrumb', ShowBreadCrumb);
           WriteBool(Ini_Settings, 'MinimizeToTray', MinimizeToTray);
+          WriteBool(Ini_Settings, 'SingleInstanceApp', SingleInstanceApp);
+          WriteBool(Ini_Settings, 'ShowBalloon', ShowBalloon);
 
           WriteInteger(Ini_Settings, 'HintHidePause', Application.HintHidePause);
         end;

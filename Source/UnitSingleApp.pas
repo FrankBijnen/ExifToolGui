@@ -6,147 +6,134 @@ uses
   Winapi.Windows, WInapi.Messages;
 
 const AppGuid  = '{29D8E36F-9AC8-4B6A-BA34-9BE3FDBF7724}';
-      CM_ActivateWindow = WM_USER + 100;
 
 type
   TSharedData = record
-    Wnd: HWnd;
+    Wnd: HWND;
+    MessageId: Cardinal;
     NewDirectory: array[0..MAX_PATH] of char;
   end;
   PSharedData = ^TSharedData;
 
-function CreateMapping: boolean;
-procedure WriteWindowHandle(const AWnd: HWND);
-procedure WriteNewDir(const ADir: string);
-function ReadWindowHandle: HWnd;
-function ReadNewDir: string;
-procedure ActivateCurrentWindow;
+  TSharedMem = class
+  private
+    FFileMapping: THandle;
+    FAppId: string;
+    FIsOwner: boolean;
+    FSharedData: PSharedData;
+    function GetNewDirectory: string;
+  public
+    constructor Create(AppId: string);
+    destructor Destroy; override;
+    procedure LockSharedData;
+    procedure UnlockSharedData;
+    procedure RegisterOwner(AWnd: HWND; AMessageid: Cardinal);
+    procedure ActivateCurrentWindow;
+
+    property IsOwner: boolean read FIsOwner;
+    property SharedData: PSharedData read FSharedData;
+    property NewDirectory: string read GetNewDirectory;
+  end;
+
+var FSharedMem: TSharedMem;
 
 implementation
 
 uses
   System.SysUtils, ExifToolsGUI_Utils;
 
-
-function CreateMapping: boolean;
+constructor TSharedMem.Create(AppId: string);
 var
   FileMappingHandle: THandle;
 begin
+  inherited Create;
+  FAppId := AppId;
+  FSharedData := nil;
+  FFileMapping := 0;
   FileMappingHandle := CreateFileMapping(INVALID_HANDLE_VALUE,
                                          nil,
                                          PAGE_READWRITE,
                                          0,
                                          SizeOf(TSharedData),
-                                         PChar(AppGuid));
+                                         PChar(FAppId));
   // Should not happen
   if (FileMappingHandle = 0) then
     RaiseLastOSError;
 
-  result := (GetLastError <> ERROR_ALREADY_EXISTS);
+  FIsOwner := (GetLastError <> ERROR_ALREADY_EXISTS);
 end;
 
-procedure CloseFileMapping;
-var
-  FileMappingHandle: THandle;
+destructor TSharedMem.Destroy;
 begin
-  FileMappingHandle := OpenFileMapping(FILE_MAP_ALL_ACCESS, TRUE, PWideChar(AppGuid));
-  if (FileMappingHandle <> 0) then
-    CloseHandle(FileMappingHandle);
+  FAppId := '';
+  FFileMapping := OpenFileMapping(FILE_MAP_ALL_ACCESS, TRUE, PWideChar(FAppId));
+  if (FFileMapping <> 0) then
+    CloseHandle(FFileMapping);
+  inherited;
 end;
 
-function LockSharedData(var FileMapping: THandle): PSharedData;
+procedure TSharedMem.LockSharedData;
 begin
-  FileMapping := OpenFileMapping(FILE_MAP_ALL_ACCESS, TRUE, PWideChar(AppGuid));
-  result := MapViewOfFile(FileMapping, FILE_MAP_ALL_ACCESS, 0, 0, SizeOf(TSharedData));
+  FFileMapping := OpenFileMapping(FILE_MAP_ALL_ACCESS, TRUE, PWideChar(FAppId));
+  FSharedData := MapViewOfFile(FFileMapping, FILE_MAP_ALL_ACCESS, 0, 0, SizeOf(TSharedData));
 end;
 
-procedure UnlockSharedData(const FileMapping: THandle; SharedData: PSharedData);
+procedure TSharedMem.UnlockSharedData;
 begin
-  if (SharedData <> nil) then
-      UnmapViewOfFile(SharedData);
-  if (FileMapping <> 0) then
-    CloseHandle(FileMapping);
+  if (FSharedData <> nil) then
+      UnmapViewOfFile(FSharedData);
+  if (FFileMapping <> 0) then
+    CloseHandle(FFileMapping);
 end;
 
-function ReadShared: TSharedData;
-var
-  HFileMapping: THandle;
-  SharedData: PSharedData;
+procedure TSharedMem.RegisterOwner(AWnd: HWND; AMessageid: Cardinal);
 begin
-  SharedData := LockSharedData(HFileMapping);
+  LockSharedData;
   try
-    result := SharedData^;
+    SharedData.Wnd := AWnd;
+    SharedData.MessageId := AMessageid;
   finally
-    UnlockSharedData(HFileMapping, SharedData);
+    UnlockSharedData;
   end;
 end;
 
-procedure WriteShared(const AShared: TSharedData);
-var
-  SharedData: PSharedData;
-  HFileMapping: THandle;
+function TSharedMem.GetNewDirectory: string;
 begin
-  SharedData := LockSharedData(HFileMapping);
+  LockSharedData;
   try
-    SharedData^ := AShared;
+    result := SharedData.NewDirectory;
   finally
-    UnlockSharedData(HFileMapping, SharedData);
+    UnlockSharedData;
   end;
 end;
 
-procedure WriteWindowHandle(const AWnd: HWND);
-var
-  Shared: TSharedData;
+procedure TSharedMem.ActivateCurrentWindow;
 begin
-  Shared := ReadShared;
-  Shared.Wnd := AWnd;
-  WriteShared(Shared);
-end;
+  LockSharedData;
+  try
+    if (not IsWindow(SharedData.Wnd)) then
+      exit;
 
-procedure WriteNewDir(const ADir: string);
-var
-  Shared: TSharedData;
-begin
-  Shared := ReadShared;
-  StrPCopy(Shared.NewDirectory, Adir);
-  WriteShared(Shared);
-end;
+    StrPCopy(SharedData.NewDirectory, '');
+    if (Length(ParamStr(1)) < MAX_PATH) then
+      StrPCopy(SharedData.NewDirectory, ParamStr(1));
 
-function ReadWindowHandle: HWnd;
-var
-  Shared: TSharedData;
-begin
-  Shared := ReadShared;
-  result := Shared.Wnd;
-end;
+    SetForegroundWindow(SharedData.Wnd);
 
-function ReadNewDir: string;
-var
-  Shared: TSharedData;
-begin
-  Shared := ReadShared;
-  result := Strpas(Shared.NewDirectory);
-end;
+    SendMessage(SharedData.Wnd, SharedData.MessageId, 0, 0);
 
-procedure ActivateCurrentWindow;
-var
-  Handle: THandle;
-begin
-  Handle := ReadWindowHandle;
-  if (not IsWindow(Handle)) then
-    exit;
-
-  ShowWindow(Handle, SW_RESTORE And SW_SHOW);
-  SetForegroundWindow(Handle);
-  WriteNewDir(Paramstr(1));
-  SendMessage(Handle, CM_ActivateWindow, 0, 0);
+  finally
+    UnlockSharedData;
+  end;
 end;
 
 initialization
 
+  FSharedMem := TSharedMem.Create(AppGuid);
+
 finalization
 
-  CloseFileMapping;
+  FSharedMem.Free;
 
 end.
 
