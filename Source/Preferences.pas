@@ -64,10 +64,14 @@ type
     CheckBox7: TCheckBox;
     EdGeoCodeApiKey: TLabeledEdit;
     CheckBox8: TCheckBox;
+    AdvTabIntegration: TTabSheet;
     CheckBox9: TCheckBox;
     GrpContextMenu: TGroupBox;
-    BtnAdd2Context: TButton;
-    BtnRemoveFromContextMenu: TButton;
+    BtnAdd2Context: TBitBtn;
+    BtnRemoveFromContextMenu: TBitBtn;
+    CheckBox10: TCheckBox;
+    EdCommand: TLabeledEdit;
+    Memo1: TMemo;
     procedure FormShow(Sender: TObject);
     procedure BtnSaveClick(Sender: TObject);
     procedure BtnBrowseFolder(Sender: TObject);
@@ -77,8 +81,11 @@ type
     procedure BtnGenThumbsClick(Sender: TObject);
     procedure BtnAdd2ContextClick(Sender: TObject);
     procedure BtnRemoveFromContextMenuClick(Sender: TObject);
+    procedure CheckBox9Click(Sender: TObject);
   private
     { Private declarations }
+    var InstalledContext: boolean;
+    procedure SetContextButtons;
   public
     { Public declarations }
   end;
@@ -92,6 +99,21 @@ uses Main, ExifTool, MainDef, GeoMap,
      ExifToolsGUI_Utils, ExifToolsGUI_Thumbnails;
 
 {$R *.dfm}
+
+procedure TFPreferences.SetContextButtons;
+var
+  InstalledVerb: string;
+begin
+  InstalledVerb := ContextInstalled(Application.Title);
+  InstalledContext := (InstalledVerb <> '');
+  if (InstalledContext) then
+    EdCommand.Text := InstalledVerb
+  else
+    EdCommand.Text := '(Not installed)';
+
+  BtnAdd2Context.Enabled := IsElevated and not InstalledContext;
+  BtnRemoveFromContextMenu.Enabled := IsElevated and InstalledContext;
+end;
 
 procedure TFPreferences.BtnSaveClick(Sender: TObject);
 var
@@ -153,6 +175,7 @@ begin
   GUIsettings.ShowHidden := CheckBox8.Checked;
   GUIsettings.ShowBreadCrumb := CheckBox7.Checked;
   GUIsettings.MinimizeToTray := CheckBox9.Checked;
+  GUIsettings.SingleInstanceApp := CheckBox10.Checked;
   Application.HintHidePause := UpDHintPause.Position;
 
   //GeoCode
@@ -190,14 +213,28 @@ begin
   end;
 end;
 
-procedure TFPreferences.BtnAdd2ContextClick(Sender: TObject);
+procedure TFPreferences.CheckBox9Click(Sender: TObject);
 begin
-  Add2Context(Application.Title, 'Open with ExifToolGUI');
+  GUIsettings.ShowBalloon := Checkbox9.Checked;
+end;
+
+procedure TFPreferences.BtnAdd2ContextClick(Sender: TObject);
+var
+  Verb: string;
+begin
+  Verb := 'Open with ' + Application.Title;
+  Verb := InputBox('Verb to add to Contextmenu', 'Verb', Verb);
+  if (Verb = '') then
+    MessageDlgEx('A Verb is required.', '', TMsgDlgType.mtError, [mbOK])
+  else
+    Add2Context(Application.Title, Verb);
+  SetContextButtons;
 end;
 
 procedure TFPreferences.BtnRemoveFromContextMenuClick(Sender: TObject);
 begin
   RemoveFromContext(Application.Title);
+  SetContextButtons;
 end;
 
 procedure TFPreferences.BtnCleanClick(Sender: TObject);
@@ -253,6 +290,7 @@ var
   Tx: string;
   ETResult: TStringList;
 begin
+  memo1.Visible := CheckWin32Version(10, 0) and (TOSversion.Build >= 22000); //WIN11
   ETResult := TStringList.Create;
   try
     Left := FMain.Left + 8;
@@ -335,6 +373,7 @@ begin
     CheckBox8.Enabled := IsAdminUser or IsElevated;
     CheckBox7.Checked := GUIsettings.ShowBreadCrumb;
     CheckBox9.Checked := GUIsettings.MinimizeToTray;
+    CheckBox10.Checked := GUIsettings.SingleInstanceApp;
     UpDHintPause.Position := Application.HintHidePause;
 
     // GeoCode
@@ -350,8 +389,9 @@ begin
     AdvPageControl1.ActivePage := AdvTabGeneral;
 
     GrpContextMenu.Enabled := IsElevated;
-    BtnAdd2Context.Enabled := IsElevated;
-    BtnRemoveFromContextMenu.Enabled := IsElevated;
+    SetContextButtons;
+
+    BtnSetupClean.Enabled := IsAdminUser;
   finally
     ETResult.Free;
   end;

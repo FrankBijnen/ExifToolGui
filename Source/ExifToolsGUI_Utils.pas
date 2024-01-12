@@ -69,6 +69,7 @@ procedure FillPreviewInListView(SelectedFile: string; LvPreviews: TListView);
 procedure FillLocationInImage(const ANImage: string);
 
 // Context menu
+function ContextInstalled(const AppTitle: string): string;
 procedure Add2Context(const AppTitle, Description: string);
 procedure RemoveFromContext(const AppTitle: string);
 
@@ -867,6 +868,22 @@ end;
 const
   ETGContextKey = 'SOFTWARE\Classes\Folder\Shell\';
   ETGCommandKey = '\command';
+
+function ContextInstalled(const AppTitle: string): string;
+var
+  Reg: TRegistry;
+begin
+  result := '';
+  Reg := TRegistry.Create(KEY_READ);
+  try
+    Reg.RootKey := HKEY_LOCAL_MACHINE;
+    if Reg.OpenKey(ETGContextKey + AppTitle, false) then
+      result := Reg.ReadString('');
+    Reg.CloseKey;
+  finally
+    Reg.Free;
+  end;
+end;
 
 procedure Add2Context(const AppTitle, Description: string);
 var

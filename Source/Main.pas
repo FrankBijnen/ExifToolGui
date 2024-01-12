@@ -27,6 +27,9 @@ uses
   Vcl.ActnPopup, Vcl.BaseImageCollection, Vcl.ImageCollection, Vcl.VirtualImageList,
   System.Win.TaskbarCore, Vcl.Taskbar, Vcl.ToolWin, Vcl.AppEvnts;
 
+const
+  CM_ActivateWindow = WM_USER + 100;
+
 type
   TFMain = class(TScaleForm)
     StatusBar: TStatusBar;
@@ -284,6 +287,7 @@ type
     procedure TaskbarThumbButtonClick(Sender: TObject; AButtonID: Integer);
     procedure ApplicationEventsMinimize(Sender: TObject);
     procedure TrayIconMouseUp(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
+    procedure TrayIconBalloonClick(Sender: TObject);
   private
     { Private declarations }
     ETBarSeriesFocal: TBarSeries;
@@ -371,14 +375,10 @@ begin // for Windows Shutdown/Log-off while GUI is open
 end;
 
 procedure TFMain.CMActivateWindow(var Message: TMessage);
-var
-  NewDirectory: string;
 begin
-
   RestoreGUI;
 
-  NewDirectory := ReadNewDir;
-  ShellTree.Path := NewDirectory;
+  ShellTree.Path := FSharedMem.NewDirectory;
 
   Message.Result := 0;
   inherited;
@@ -1425,6 +1425,11 @@ begin
   TrayIcon.Visible := false;
 end;
 
+procedure TFMain.TrayIconBalloonClick(Sender: TObject);
+begin
+  GUIsettings.ShowBalloon := false;
+end;
+
 procedure TFMain.TrayIconMouseUp(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
 begin
   if (Button = TMouseButton.mbRight) then
@@ -2195,8 +2200,15 @@ begin
     Application.Minimize;
     Hide;
 
-    TrayIcon.ShowBalloonHint;
-    TrayIcon.BalloonHint := 'Minimized to tray.';
+    if (GUIsettings.ShowBalloon) then
+    begin
+      TrayIcon.ShowBalloonHint;
+      TrayIcon.BalloonHint := 'Minimized to tray.' + #10 +
+                              'Click to disable this hint.';
+    end
+    else
+      TrayIcon.BalloonHint := '';
+
     TrayIcon.Visible := true;
   end;
 end;
@@ -2359,7 +2371,7 @@ begin
   if TrayIcon.Visible then
     exit;
 
-  WriteWindowHandle(Self.Handle);
+  FSharedMem.RegisterOwner(Self.Handle, CM_ActivateWindow);
 
   SetCaption;
 
