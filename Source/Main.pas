@@ -2176,7 +2176,8 @@ begin
       Rotate := 0;
       if GUIsettings.AutoRotatePreview then
       begin
-        case GetOrientationValue(FPath) of
+        GetMetadata(FPath, false, false, false, false);
+        case Foto.IFD0.Orientation of
           0, 1:
             Rotate := 0; // no tag or don't rotate
           3:
@@ -2186,8 +2187,10 @@ begin
           8:
             Rotate := 270;
         end;
+{$IFDEF DEBUG}
+        AdvTabPreview.Caption := 'Preview '+ IntToStr(Rotate);
+{$ENDIF}
       end;
-
       ABitMap := GetBitmapFromWic(WicPreview(FPath, Rotate, RotateImg.Width, RotateImg.Height));
       if (ABitMap = nil) then
       begin

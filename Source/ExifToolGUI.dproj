@@ -136,6 +136,7 @@
         <DCCReference Include="MainDef.pas"/>
         <DCCReference Include="ExifToolsGUI_Utils.pas"/>
         <DCCReference Include="UnitFilesOnClipBoard.pas"/>
+        <DCCReference Include="ExifToolsGui_ValEdit.pas"/>
         <DCCReference Include="ExifToolsGui_ShellList.pas"/>
         <DCCReference Include="ExifToolsGui_ShellTree.pas"/>
         <DCCReference Include="ExifToolsGUI_MultiContextMenu.pas"/>
@@ -214,7 +215,6 @@
         <DCCReference Include="DateTimeShift.pas">
             <Form>FDateTimeShift</Form>
         </DCCReference>
-        <DCCReference Include="ExifToolsGui_ValEdit.pas"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>
