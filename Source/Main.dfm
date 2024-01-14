@@ -818,7 +818,6 @@ object FMain: TFMain
         ParentFont = False
         TabOrder = 2
         ViewStyle = vsReport
-        OnKeyPress = EditFindMetaKeyPress
         OnKeyUp = ShellListKeyUp
       end
       object PnlBreadCrumb: TPanel

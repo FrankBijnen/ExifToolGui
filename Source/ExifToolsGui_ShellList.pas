@@ -55,6 +55,7 @@ type
     FOnItemsLoaded: TNotifyEvent;
     FOnOwnerDataFetchEvent: TOwnerDataFetchEvent;
     ICM2: IContextMenu2;
+    FRefreshAfterContext: boolean;
     procedure SetColumnSorted(AValue: boolean);
     procedure InitThumbNails;
     procedure SetThumbNailSize(AValue: integer);
@@ -293,6 +294,8 @@ begin
     GenerateThumbs(RootFolder.PathName, true, ThumbNailSize, ShellListOnGenerateReady);
     Handled := true;
   end;
+  if (Verb = SCmdVerbRename) then
+    FRefreshAfterContext := false;
 end;
 
 procedure TShellListView.ShowMultiContextMenu(MousePos: TPoint);
@@ -300,10 +303,12 @@ var FileList: TStringList;
 begin
   FileList := CreateSelectedFileList(false);
   try
+    FRefreshAfterContext := true;
     InvokeMultiContextMenu(Self, RootFolder, MousePos, ICM2, FileList);
   finally
     FileList.Free;
-    Refresh;
+    if FRefreshAfterContext then
+      Refresh;
   end;
 end;
 

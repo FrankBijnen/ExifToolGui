@@ -2878,6 +2878,8 @@ begin
     ShellList.SetIconSpacing(-1, 0);
   if ((Key = Ord('0')) or (Key = VK_NUMPAD0)) and (ssCtrl in Shift) then
     ShellList.SetIconSpacing(0, 0);
+  if (Key = VK_F2) and (ShellList.Selected <> nil) then
+    ShellList.Selected.EditCaption;
 end;
 
 procedure TFMain.ShellListSetFolders;
