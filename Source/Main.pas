@@ -200,6 +200,8 @@ type
     procedure MetadataListSelectCell(Sender: TObject; ACol, ARow: integer; var CanSelect: boolean);
     procedure MetadataListKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
     procedure MetadataListExit(Sender: TObject);
+    procedure MetadataListMouseDown(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: integer);
+    procedure MetadataListCtrlKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
     procedure EditQuickEnter(Sender: TObject);
     procedure EditQuickExit(Sender: TObject);
     procedure EditQuickKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
@@ -247,7 +249,6 @@ type
     procedure MImportMetaSingleClick(Sender: TObject);
     procedure QuickPopUp_CopyTagClick(Sender: TObject);
     procedure MFileNameDateTimeClick(Sender: TObject);
-    procedure MetadataListMouseDown(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: integer);
     procedure MWorkspaceLoadClick(Sender: TObject);
     procedure MWorkspaceSaveClick(Sender: TObject);
     procedure SpeedBtnChartRefreshClick(Sender: TObject);
@@ -327,8 +328,6 @@ type
     procedure ShellListOwnerDataFetch(Sender: TObject; Item: TListItem; Request: TItemRequest; AFolder: TShellFolder);
     procedure ShellListColumnResized(Sender: TObject);
     procedure ShellListMouseWheel(Sender: TObject; Shift: TShiftState; WheelDelta: Integer; MousePos: TPoint; var Handled: Boolean);
-
-    procedure MetadataListCtrlKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
 
     procedure CounterETEvent(Counter: integer);
   public
@@ -525,29 +524,31 @@ end;
 
 procedure TFMain.BtnQuickSaveClick(Sender: TObject);
 var
-  i, j, k: smallint;
+  I, J, K: integer;
   ETcmd, TagValue, Tx: string;
   ETout, ETerr: string;
 begin
-  ETcmd := '';
+  if (SpeedBtnQuickSave.Enabled = false) then // If called from CTRL+S from metadatalist
+    exit;
   SpeedBtnQuickSave.Enabled := false;
-  j := MetadataList.RowCount - 1; // Rotated:=false;
-  for i := 1 to j do
+  ETcmd := '';
+  J := MetadataList.RowCount - 1;
+  for I := 1 to J do
   begin
-    if pos('*', MetadataList.Keys[i]) = 1 then
+    if pos('*', MetadataList.Keys[I]) = 1 then
     begin
-      TagValue := MetadataList.Cells[1, i];
+      TagValue := MetadataList.Cells[1, I];
 
-      Tx := MetadataList.Keys[i];
-      k := pos(#177, Tx); // is it multi-value tag?
-      if (k = 0) or (TagValue = '') then
+      Tx := MetadataList.Keys[I];
+      K := pos(#177, Tx); // is it multi-value tag?
+      if (K = 0) or
+         (TagValue = '') then
       begin // no: standard tag
-
-        k := 0;
+        K := 0;
         if RightStr(Tx, 1) = '#' then
-          inc(k);
-        Tx := LowerCase(QuickTags[i - 1].Command);
-        if k > 0 then
+          Inc(K);
+        Tx := LowerCase(QuickTags[I - 1].Command);
+        if K > 0 then
         begin
           if RightStr(Tx, 1) <> '#' then
             Tx := Tx + '#';
@@ -557,7 +558,7 @@ begin
       else
       begin // it is multi-value tag (ie.keywords)
         repeat
-          ETcmd := ETcmd + QuickTags[i - 1].Command;
+          ETcmd := ETcmd + QuickTags[I - 1].Command;
           case TagValue[1] of
             '+':
               begin
@@ -572,23 +573,23 @@ begin
           else
             ETcmd := ETcmd + '=';
           end;
-          k := pos('+', TagValue);
-          if k > 0 then
-            Tx := Copy(TagValue, 1, k - 1)
+          K := pos('+', TagValue);
+          if K > 0 then
+            Tx := Copy(TagValue, 1, K - 1)
           else
           begin
-            k := pos('-', TagValue);
-            if k > 0 then
-              Tx := Copy(TagValue, 1, k - 1)
+            K := pos('-', TagValue);
+            if K > 0 then
+              Tx := Copy(TagValue, 1, K - 1)
             else
               Tx := TagValue;
           end;
-          if k > 0 then
-            Delete(TagValue, 1, k - 1)
+          if K > 0 then
+            Delete(TagValue, 1, K - 1)
           else
             TagValue := '';
           ETcmd := ETcmd + Tx + CRLF;
-        until length(TagValue) = 0;
+        until Length(TagValue) = 0;
       end;
     end;
   end;
