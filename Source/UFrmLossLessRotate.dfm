@@ -21,7 +21,7 @@ object FLossLessRotate: TFLossLessRotate
     Height = 19
     Panels = <>
     SimplePanel = True
-    ExplicitTop = 299
+    ExplicitTop = 381
     ExplicitWidth = 603
   end
   object AdvPanel1: TPanel
@@ -39,8 +39,7 @@ object FLossLessRotate: TFLossLessRotate
     ParentDoubleBuffered = False
     ParentFont = False
     TabOrder = 0
-    ExplicitTop = -6
-    ExplicitHeight = 390
+    ExplicitHeight = 381
     object LblPreview: TLabel
       Left = 10
       Top = 20
@@ -161,6 +160,7 @@ object FLossLessRotate: TFLossLessRotate
     Width = 69
     Height = 25
     Caption = 'Execute'
+    Default = True
     TabOrder = 2
     OnClick = BtnExecuteClick
   end

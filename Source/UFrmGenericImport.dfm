@@ -113,7 +113,7 @@ object FGenericImport: TFGenericImport
     end
   end
   object BtnCancel: TButton
-    Left = 518
+    Left = 515
     Top = 14
     Width = 69
     Height = 25
@@ -122,11 +122,12 @@ object FGenericImport: TFGenericImport
     TabOrder = 1
   end
   object BtnExecute: TButton
-    Left = 518
-    Top = 264
+    Left = 515
+    Top = 287
     Width = 69
     Height = 25
     Caption = 'Execute'
+    Default = True
     TabOrder = 2
     OnClick = BtnExecuteClick
   end

@@ -26,7 +26,8 @@ object FCopyMetaSingle: TFCopyMetaSingle
     Width = 502
     Height = 19
     Panels = <>
-    ExplicitTop = 288
+    ExplicitTop = 276
+    ExplicitWidth = 498
   end
   object AdvPanel1: TPanel
     Left = 0
@@ -43,7 +44,7 @@ object FCopyMetaSingle: TFCopyMetaSingle
     ParentDoubleBuffered = False
     ParentFont = False
     TabOrder = 1
-    ExplicitHeight = 283
+    ExplicitHeight = 276
     object CheckBox1: TCheckBox
       Left = 24
       Top = 16
@@ -154,6 +155,8 @@ object FCopyMetaSingle: TFCopyMetaSingle
     Width = 64
     Height = 25
     Caption = 'Execute'
+    Default = True
+    ModalResult = 1
     TabOrder = 3
     OnClick = Button2Click
   end

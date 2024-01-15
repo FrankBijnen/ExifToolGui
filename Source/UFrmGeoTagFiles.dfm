@@ -39,6 +39,7 @@ object FGeotagFiles: TFGeotagFiles
     Width = 80
     Height = 25
     Caption = 'Execute'
+    Default = True
     TabOrder = 1
     OnClick = BtnExecuteClick
   end

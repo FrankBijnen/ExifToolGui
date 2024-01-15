@@ -26,8 +26,8 @@ object FDateTimeEqual: TFDateTimeEqual
     Width = 470
     Height = 19
     Panels = <>
-    ExplicitTop = 124
-    ExplicitWidth = 450
+    ExplicitTop = 128
+    ExplicitWidth = 466
   end
   object AdvPanel1: TPanel
     Left = 0
@@ -44,7 +44,7 @@ object FDateTimeEqual: TFDateTimeEqual
     ParentDoubleBuffered = False
     ParentFont = False
     TabOrder = 1
-    ExplicitHeight = 124
+    ExplicitHeight = 128
     object LabeledEdit1: TLabeledEdit
       Left = 120
       Top = 24
@@ -132,6 +132,7 @@ object FDateTimeEqual: TFDateTimeEqual
     Width = 65
     Height = 25
     Caption = 'Execute'
+    Default = True
     TabOrder = 3
     OnClick = Button2Click
   end

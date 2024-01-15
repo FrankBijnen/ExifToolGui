@@ -29,12 +29,13 @@ object FrmPlaces: TFrmPlaces
       636
       29)
     object BtnOk: TBitBtn
-      Left = 446
+      Left = 442
       Top = 2
       Width = 75
       Height = 25
       Anchors = [akRight, akBottom]
       Caption = 'OK'
+      Default = True
       Glyph.Data = {
         DE010000424DDE01000000000000760000002800000024000000120000000100
         0400000000006801000000000000000000001000000000000000000000000000
@@ -55,10 +56,10 @@ object FrmPlaces: TFrmPlaces
       ModalResult = 1
       NumGlyphs = 2
       TabOrder = 0
-      ExplicitLeft = 442
+      ExplicitLeft = 438
     end
     object BtnCancel: TBitBtn
-      Left = 527
+      Left = 523
       Top = 2
       Width = 75
       Height = 25
@@ -86,7 +87,7 @@ object FrmPlaces: TFrmPlaces
       ModalResult = 2
       NumGlyphs = 2
       TabOrder = 1
-      ExplicitLeft = 523
+      ExplicitLeft = 519
     end
   end
   object ListView1: TListView

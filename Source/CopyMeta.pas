@@ -26,7 +26,6 @@ type
     CheckBox8: TCheckBox;
     Label3: TLabel;
     procedure FormShow(Sender: TObject);
-    procedure Button2Click(Sender: TObject);
   private
     { Private declarations }
     procedure DisplayHint(Sender: TObject);
@@ -53,11 +52,6 @@ begin
   else
     Label1.Caption := 'Backup: ON';
   Application.OnHint := DisplayHint;
-end;
-
-procedure TFCopyMetadata.Button2Click(Sender: TObject);
-begin
-  ModalResult := mrOK;
 end;
 
 procedure TFCopyMetadata.DisplayHint(Sender: TObject);

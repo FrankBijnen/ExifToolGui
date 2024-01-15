@@ -527,11 +527,14 @@ end;
 procedure TFMain.BtnQuickSaveClick(Sender: TObject);
 var
   I, J, K: integer;
+  SavedRow: integer;
   ETcmd, TagValue, Tx: string;
   ETout, ETerr: string;
 begin
   if (SpeedBtnQuickSave.Enabled = false) then // If called from CTRL+S from metadatalist
     exit;
+
+  SavedRow := MetadataList.Row;
   SpeedBtnQuickSave.Enabled := false;
   ETcmd := '';
   J := MetadataList.RowCount - 1;
@@ -603,6 +606,7 @@ begin
     ShowPreview;
   end;
   MetadataList.SetFocus;
+  Metadatalist.Row := SavedRow;
 end;
 
 procedure TFMain.BtnShowLogClick(Sender: TObject);

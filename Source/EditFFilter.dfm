@@ -110,6 +110,7 @@ object FEditFFilter: TFEditFFilter
     Width = 65
     Height = 25
     Caption = 'Save'
+    Default = True
     TabOrder = 2
     OnClick = Button4Click
   end

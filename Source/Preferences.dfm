@@ -28,6 +28,7 @@ object FPreferences: TFPreferences
     Width = 67
     Height = 25
     Caption = 'Save'
+    Default = True
     ModalResult = 1
     TabOrder = 2
     OnClick = BtnSaveClick
