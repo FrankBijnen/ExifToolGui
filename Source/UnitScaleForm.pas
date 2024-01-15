@@ -6,18 +6,20 @@ unit UnitScaleForm;
 
 interface
 
-uses Vcl.Forms;
+uses Vcl.Forms, Winapi.Messages, Vcl.Controls;
 
 type TScaleForm = class(TForm)
 protected
   procedure Loaded; override;
+  procedure CMDialogKey(var Message: TCMDialogKey); message CM_DIALOGKEY;
+
 public
   function ScaleDesignDpi(const Apt: integer): integer;
 end;
 
 implementation
 
-uses System.SysUtils;
+uses System.SysUtils, System.UITypes, Winapi.Windows;
 
 var Scale: boolean;
 
@@ -27,6 +29,14 @@ procedure TScaleForm.Loaded;
 begin
   Scaled := Scale;
 
+  inherited;
+end;
+
+procedure TScaleForm.CMDialogKey(var Message: TCMDialogKey);
+begin
+  if (Message.CharCode = VK_ESCAPE) and
+     (fsModal in FormState) then
+    ModalResult := System.UITypes.mrCancel;
   inherited;
 end;
 

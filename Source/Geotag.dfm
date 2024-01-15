@@ -168,6 +168,7 @@ object FGeotag: TFGeotag
     Width = 80
     Height = 25
     Caption = 'Execute'
+    Default = True
     TabOrder = 3
     OnClick = Button2Click
   end

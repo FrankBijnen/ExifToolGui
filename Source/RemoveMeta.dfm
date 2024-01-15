@@ -27,6 +27,8 @@ object FRemoveMeta: TFRemoveMeta
     Height = 19
     Panels = <>
     SimplePanel = True
+    ExplicitTop = 323
+    ExplicitWidth = 530
   end
   object AdvPanel1: TPanel
     Left = 0
@@ -43,6 +45,7 @@ object FRemoveMeta: TFRemoveMeta
     ParentDoubleBuffered = False
     ParentFont = False
     TabOrder = 1
+    ExplicitHeight = 323
     object CheckBox1: TCheckBox
       Left = 24
       Top = 16
@@ -241,6 +244,7 @@ object FRemoveMeta: TFRemoveMeta
     Width = 65
     Height = 25
     Caption = 'Execute'
+    Default = True
     Enabled = False
     TabOrder = 3
     OnClick = Button2Click

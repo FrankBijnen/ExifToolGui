@@ -132,6 +132,7 @@ object FQuickManager: TFQuickManager
     Width = 65
     Height = 25
     Caption = 'Save'
+    Default = True
     TabOrder = 2
     OnClick = Button5Click
   end

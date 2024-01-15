@@ -41,6 +41,7 @@ object FGeoSetup: TFGeoSetup
     Width = 69
     Height = 25
     Caption = 'OK'
+    Default = True
     TabOrder = 1
     OnClick = BtnOKClick
   end

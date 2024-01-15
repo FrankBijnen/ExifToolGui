@@ -147,7 +147,8 @@ object FCopyMetadata: TFCopyMetadata
     Width = 65
     Height = 25
     Caption = 'Execute'
+    Default = True
+    ModalResult = 1
     TabOrder = 3
-    OnClick = Button2Click
   end
 end
