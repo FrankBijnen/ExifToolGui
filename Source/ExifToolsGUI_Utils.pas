@@ -764,8 +764,6 @@ var
 begin
   ETcmd := '-s3' + CRLF + '-f' + CRLF + '-n' + CRLF + '-q';
   ETcmd := ETcmd + CRLF + '-Filename';
-//  ETcmd := ETcmd + CRLF + '-GPS:GpsLatitude' + CRLF + '-GPS:GpsLatitudeRef';
-//  ETcmd := ETcmd + CRLF + '-GPS:GpsLongitude' + CRLF + '-GPS:GpsLongitudeRef';
   ETcmd := ETcmd + CRLF + '-GpsLatitude' + CRLF + '-GpsLatitudeRef';
   ETcmd := ETcmd + CRLF + '-GpsLongitude' + CRLF + '-GpsLongitudeRef';
   ETcmd := ETcmd + CRLF + '-QuickTime:MajorBrand';
