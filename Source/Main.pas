@@ -369,6 +369,8 @@ const
   ONLINE_DOC_URL = 'https://github.com/FrankBijnen/ExifToolGui/blob/main/Docs/ExifToolGUI_V6.md';
 {$ENDIF}
 
+  NotSupported = 'File type unsupported';
+
 procedure TFMain.WMEndSession(var Msg: TWMEndSession);
 begin // for Windows Shutdown/Log-off while GUI is open
   if Msg.EndSession = true then
@@ -1840,10 +1842,20 @@ var
   CrWait, CrNormal: HCURSOR;
   SelectedFiles: TStringList;
   AFile: string;
+  GPSCoordinates: string;
+  IsQuickTime: boolean;
 begin
   GetMetadata(GetFirstSelectedFilePath, false, false, true, false);
-  FGeoSetup.Lat := Foto.GPS.GeoLat;
-  FGeoSetup.Lon := Foto.GPS.GeoLon;
+  if (Foto.GPS.Supported) then
+  begin
+    FGeoSetup.Lat := Foto.GPS.GeoLat;
+    FGeoSetup.Lon := Foto.GPS.GeoLon;
+  end
+  else
+  begin
+    GPSCoordinates := GetGpsCoordinates(GetFirstSelectedFilePath);
+    AnalyzeGPSCoords(GPSCoordinates, FGeoSetup.Lat, FGeoSetup.Lon, IsQuickTime);
+  end;
 
   if not (ValidLatLon(FGeoSetup.Lat, FGeoSetup.Lon)) then
   begin
@@ -2779,10 +2791,14 @@ begin
         1:
           begin
             GetMetadata(AFolder.PathName, false, false, false, false);
-
-            Tx := ExifIFD.ExposureTime;
-            Tx.PadLeft(7);
-            Details.Add(Tx);
+            if (Foto.ExifIFD.Supported = false) then
+              Details.Add(NotSupported)
+            else
+            begin
+              Tx := ExifIFD.ExposureTime;
+              Tx.PadLeft(7);
+              Details.Add(Tx);
+            end;
             Tx := ExifIFD.FNumber;
             Tx.PadLeft(4);
             Details.Add(Tx);
@@ -2818,7 +2834,10 @@ begin
         2:
           begin
             GetMetadata(AFolder.PathName, true, false, true, false);
-            Details.Add(ExifIFD.DateTimeOriginal);
+            if foto.ExifIFD.Supported = false then
+              Details.Add(NotSupported)
+            else
+              Details.Add(ExifIFD.DateTimeOriginal);
             if GPS.Latitude <> '' then
               Details.Add('Yes')
             else
@@ -2831,7 +2850,10 @@ begin
         3:
           begin
             GetMetadata(AFolder.PathName, true, false, false, false);
-            Details.Add(IFD0.Artist);
+            if foto.IFD0.Supported = false then
+              Details.Add(NotSupported)
+            else
+              Details.Add(IFD0.Artist);
             Details.Add(Xmp.Rating);
             Details.Add(Xmp.PhotoType);
             Details.Add(Xmp.Event);
@@ -2859,7 +2881,7 @@ end;
 
 procedure TFMain.ShellListKeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
 begin
-  if (Key = VK_UP) or (Key = VK_DOWN) then // Up-Down arrow
+  if (Key = VK_UP) or (Key = VK_DOWN) then       // Up-Down arrow
     ShellListClick(Sender);
   if (Key = Ord('A')) and (ssCTRL in Shift) then // Ctrl+A
     ShellList.SelectAll;
@@ -2869,7 +2891,7 @@ begin
     ShellList.FileNamesToClipboard(True);
   if (Key = Ord('V')) and (ssCTRL in Shift) then // Ctrl+V
     ShellList.PasteFilesFromClipboard;
-  if (Key = VK_PRIOR) or (Key = VK_NEXT) then // PageUp/Down
+  if (Key = VK_PRIOR) or (Key = VK_NEXT) then    // PageUp/Down
     ShellListClick(Sender);
 
   if (Key = VK_ADD) and (ssCtrl in Shift) then
@@ -3389,19 +3411,9 @@ begin
 end;
 
 procedure TFMain.SpeedBtn_ShowOnMapClick(Sender: TObject);
-var
-  ETcmd: string;
-  ETouts, ETerrs: string;
 begin
   if ShellList.SelectedFolder <> nil then
-  begin
-    ETcmd := '-s3' + CRLF + '-f' + CRLF + '-n' + CRLF + '-q';
-    ETcmd := ETcmd + CRLF + '-Filename';
-    ETcmd := ETcmd + CRLF + '-GPS:GpsLatitude' + CRLF + '-GPS:GpsLatitudeRef';
-    ETcmd := ETcmd + CRLF + '-GPS:GpsLongitude' + CRLF + '-GPS:GpsLongitudeRef';
-    ET_OpenExec(ETcmd, GetSelectedFiles, ETouts, ETerrs, False);
-    ShowImagesOnMap(EdgeBrowser1, ShellList.Path, ETouts);
-  end
+    ShowImagesOnMap(EdgeBrowser1, ShellList.Path, GetGpsCoordinates(GetSelectedFiles))
   else
     ShowMessage('No file selected.');
 end;

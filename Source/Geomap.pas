@@ -554,7 +554,8 @@ end;
 procedure ShowImagesOnMap(Browser: TEdgeBrowser; Apath, ETOuts: string);
 var
   OsmHelper: TOSMHelper;
-  ETout, Lat, LatRef, Lon, LonRef, Filename: string;
+  ETout, Lat, Lon, Filename: string;
+  IsQuickTime: boolean;
 begin
   OsmHelper := TOSMHelper.Create(GetHtmlTmp, InitialZoom_Out);
   try
@@ -564,18 +565,7 @@ begin
 
     while (ETout <> '') do
     begin
-      Filename := NextField(ETout, CRLF);
-
-      Lat := NextField(ETout, CRLF);
-      LatRef := NextField(ETout, CRLF);
-      if (LatRef = 'S') then
-        Insert('-', Lat, 1);
-
-      Lon := NextField(ETout, CRLF);
-      LonRef := NextField(ETout, CRLF);
-      if (LonRef = 'W') then
-        Insert('-', Lon, 1);
-
+      FileName := AnalyzeGPSCoords(ETOut, Lat, Lon, IsQuickTime);
       if (Lat <> '-') and (Lon <> '-') then
         OsmHelper.WritePoint(Lat, Lon, IncludeTrailingBackslash(Apath) + Filename, true);
     end;

@@ -3,7 +3,7 @@ object FGeotagFiles: TFGeotagFiles
   Top = 0
   BorderStyle = bsDialog
   Caption = 'Geotag files'
-  ClientHeight = 379
+  ClientHeight = 411
   ClientWidth = 603
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
@@ -16,11 +16,13 @@ object FGeotagFiles: TFGeotagFiles
   TextHeight = 13
   object StatusBar1: TStatusBar
     Left = 0
-    Top = 360
+    Top = 392
     Width = 603
     Height = 19
     Panels = <>
     SimplePanel = True
+    ExplicitTop = 391
+    ExplicitWidth = 599
   end
   object BtnCancel: TButton
     Left = 514
@@ -32,8 +34,8 @@ object FGeotagFiles: TFGeotagFiles
     TabOrder = 0
   end
   object BtnExecute: TButton
-    Left = 514
-    Top = 331
+    Left = 513
+    Top = 357
     Width = 80
     Height = 25
     Caption = 'Execute'
@@ -44,7 +46,7 @@ object FGeotagFiles: TFGeotagFiles
     Left = 8
     Top = 8
     Width = 500
-    Height = 348
+    Height = 378
     ActivePage = TabGeoTagData
     TabOrder = 3
     object TabGeoTagData: TTabSheet
@@ -53,7 +55,7 @@ object FGeotagFiles: TFGeotagFiles
         Left = 0
         Top = 0
         Width = 495
-        Height = 320
+        Height = 350
         Align = alLeft
         DoubleBuffered = True
         Font.Charset = DEFAULT_CHARSET
@@ -75,7 +77,7 @@ object FGeotagFiles: TFGeotagFiles
         end
         object Label1: TLabel
           Left = 10
-          Top = 270
+          Top = 294
           Width = 131
           Height = 14
           Caption = 'Update in selected files:'
@@ -92,7 +94,7 @@ object FGeotagFiles: TFGeotagFiles
         end
         object CmbGeoTagMode: TComboBox
           Left = 10
-          Top = 290
+          Top = 314
           Width = 470
           Height = 22
           Style = csDropDownList
@@ -105,12 +107,20 @@ object FGeotagFiles: TFGeotagFiles
             'Location (Country, Province, City)'
             'Coordinates and Location')
         end
+        object ChkRemoveExisting: TCheckBox
+          Left = 14
+          Top = 263
+          Width = 454
+          Height = 17
+          Caption = 'First remove existing GPS tags from all groups'
+          TabOrder = 2
+        end
       end
     end
   end
   object BtnSetupGeoCode: TButton
-    Left = 514
-    Top = 284
+    Left = 513
+    Top = 309
     Width = 80
     Height = 25
     Caption = 'Setup Geo'

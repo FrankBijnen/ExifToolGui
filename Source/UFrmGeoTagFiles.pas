@@ -22,6 +22,7 @@ type
     BtnSetupGeoCode: TButton;
     CmbGeoTagMode: TComboBox;
     Label1: TLabel;
+    ChkRemoveExisting: TCheckBox;
     procedure FormShow(Sender: TObject);
     procedure BtnExecuteClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
@@ -36,6 +37,7 @@ type
     { Public declarations }
     var
       Lat, Lon: string;
+      IsQuickTime: boolean;
     procedure FillPreview;
     procedure Execute;
   end;
@@ -100,6 +102,7 @@ begin
       TGeoTagMode.gtmCoordinates,
       TGeoTagMode.gtmCoordinatesLocation:
       begin
+(*
         ETcmd := '-GPS:All=';
         if (Lat <> '') then
         begin
@@ -124,6 +127,42 @@ begin
           else
             ETcmd := ETcmd + 'E';
           ETcmd := ETcmd + CRLF + '-GPS:GpsLongitude=' + Lon;
+        end;
+*)
+        ETcmd := '';
+        if (ChkRemoveExisting.Checked) then
+          ETcmd := ETcmd + '-a' + CRLF + '-Gps*=' + CRLF + '--GPSversion*';
+        if (IsQuickTime) then
+        begin
+          AdjustLatLon(Lat, Lon, 5);
+          ETCmd := ETcmd + CRLF + Format('-GPSCoordinates=''%s, %s, %s''', [Lat, Lon, '0']);
+        end
+        else
+        begin
+          if (Lat <> '') then
+          begin
+            ETcmd := ETcmd + CRLF + '-GpsLatitudeRef=';
+            if Lat[1] = '-' then
+            begin
+              ETcmd := ETcmd + 'S';
+              Delete(Lat, 1, 1);
+            end
+            else
+              ETcmd := ETcmd + 'N';
+            ETcmd := ETcmd + CRLF + '-GpsLatitude=' + Lat;
+          end;
+          if (Lon <> '') then
+          begin
+            ETcmd := ETcmd + CRLF + '-GpsLongitudeRef=';
+            if Lon[1] = '-' then
+            begin
+              ETcmd := ETcmd + 'W';
+              Delete(Lon, 1, 1);
+            end
+            else
+              ETcmd := ETcmd + 'E';
+            ETcmd := ETcmd + CRLF + '-GpsLongitude=' + Lon;
+          end;
         end;
       end;
     end;
@@ -156,16 +195,19 @@ end;
 
 procedure TFGeotagFiles.FormCreate(Sender: TObject);
 begin
+  ChkRemoveExisting.Checked := true;
   CmbGeoTagMode.ItemIndex := Ord(GeoSettings.GeoTagMode);
 end;
 
 procedure TFGeotagFiles.FormShow(Sender: TObject);
+const
+  IsQuickTimeStr: array[False..True] of string = ('','QuickTime ');
 begin
   Left := FMain.Left + FMain.GUIBorderWidth + FMain.AdvPageFilelist.Left;
   Top := FMain.Top + FMain.GUIBorderHeight;
   StatusBar1.SimpleText := '';
-  LblSample.Caption := Format('Sample: %s', [ExtractFileName(Fmain.GetFirstSelectedFile)]);
-
+  IsQuickTime := GetIsQuickTime(Fmain.GetFirstSelectedFile);
+  LblSample.Caption := Format('%sSample: %s', [IsQuickTimeStr[IsQuickTime], ExtractFileName(Fmain.GetFirstSelectedFile)]);
   FillPreview;
 end;
 
