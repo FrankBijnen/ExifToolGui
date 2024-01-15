@@ -66,7 +66,10 @@ function GetPreviews(ETResult: TStringList; var Biggest: integer): TPreviewInfoL
 procedure FillPreviewInListView(SelectedFile: string; LvPreviews: TListView);
 
 // GeoCoding
+function GetGpsCoordinates(const Images: string): string;
+function AnalyzeGPSCoords(var ETout, Lat, Lon: string; var IsQuickTime: boolean): string;
 procedure FillLocationInImage(const ANImage: string);
+function GetIsQuickTime(const AFile: string): boolean;
 
 // Context menu
 function ContextInstalled(const AppTitle: string): string;
@@ -754,15 +757,59 @@ begin
   end;
 end;
 
+function GetGpsCoordinates(const Images: string): string;
+var
+  ETCmd: string;
+  ETerrs: string;
+begin
+  ETcmd := '-s3' + CRLF + '-f' + CRLF + '-n' + CRLF + '-q';
+  ETcmd := ETcmd + CRLF + '-Filename';
+//  ETcmd := ETcmd + CRLF + '-GPS:GpsLatitude' + CRLF + '-GPS:GpsLatitudeRef';
+//  ETcmd := ETcmd + CRLF + '-GPS:GpsLongitude' + CRLF + '-GPS:GpsLongitudeRef';
+  ETcmd := ETcmd + CRLF + '-GpsLatitude' + CRLF + '-GpsLatitudeRef';
+  ETcmd := ETcmd + CRLF + '-GpsLongitude' + CRLF + '-GpsLongitudeRef';
+  ETcmd := ETcmd + CRLF + '-QuickTime:MajorBrand';
+  ET_OpenExec(ETcmd, Images, result, ETerrs, false);
+end;
+
+function AnalyzeGPSCoords(var ETout, Lat, Lon: string; var IsQuickTime: boolean): string;
+var
+  LatRef, LonRef, QuickTimeMajorBrand: string;
+begin
+  result := NextField(ETout, CRLF);
+
+  Lat := NextField(ETout, CRLF);
+  LatRef := NextField(ETout, CRLF);
+  if (LatRef = 'S') then
+    Insert('-', Lat, 1);
+
+  Lon := NextField(ETout, CRLF);
+  LonRef := NextField(ETout, CRLF);
+  if (LonRef = 'W') then
+    Insert('-', Lon, 1);
+  QuickTimeMajorBrand := NextField(ETout, CRLF);
+  IsQuickTime := QuickTimeMajorBrand <> '-';
+end;
+
 procedure FillLocationInImage(const ANImage: string);
 var
   ETCmd: string;
   APlace: TPlace;
-  Lat, Lon: string;
+  GPSCoordinates, Lat, Lon: string;
+  IsQuickTime: boolean;
 begin
   GetMetadata(ANImage, false, false, true, false);
-  Lat := Foto.GPS.GeoLat;
-  Lon := Foto.GPS.GeoLon;
+  if (Foto.GPS.Supported) then
+  begin
+    Lat := Foto.GPS.GeoLat;
+    Lon := Foto.GPS.GeoLon;
+    IsQuickTime := false;
+  end
+  else
+  begin
+    GPSCoordinates := GetGpsCoordinates(ANImage);
+    AnalyzeGPSCoords(GPSCoordinates, Lat, Lon, IsQuickTime);
+  end;
   if (ValidLatLon(Lat, Lon)) then
   begin
     AdjustLatLon(Lat, Lon, Place_Decimals);
@@ -775,6 +822,16 @@ begin
 
     ET_OpenExec(ETcmd, ANImage);
   end;
+end;
+
+function GetIsQuickTime(const AFile: string): boolean;
+var
+  ETCmd, ETOuts, ETErrs: string;
+begin
+  ETcmd := '-s3' + CRLF + '-f' + CRLF + '-n' + CRLF + '-q' + CRLF + '-QuickTime:MajorBrand';
+  ET_OpenExec(ETcmd, AFile, ETOuts, ETErrs, false);
+  ETOuts := NextField(ETOuts, CRLF);
+  result := ETOuts <> '-';
 end;
 
 function GetTokenHandle(var Tokenhandle: THandle): boolean;

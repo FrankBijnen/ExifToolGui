@@ -17,6 +17,7 @@ type
   end;
 
   IPTCrec = packed record
+    Supported: boolean;
     ObjectName: string;
     Category: string;
     SuppCategories: string;
@@ -31,6 +32,7 @@ type
   end;
 
   IFD0rec = packed record
+    Supported: boolean;
     Make, Model: string;
     PreviewOffset, PreviewSize: longint;
     Orientation: word; // 1=Normal, 3=180, 6=90right, 8=90left, else=Mirror
@@ -44,6 +46,7 @@ type
   end;
 
   ExifIFDrec = packed record
+    Supported: boolean;
     ExposureTime: string[7];
     FNumber: string[5];
     ExposureProgram: string;
@@ -61,11 +64,13 @@ type
   end;
 
   InteropIFDrec = packed record
+    Supported: boolean;
     InteropIndex: string[9];
     procedure Clear;
   end;
 
   GPSrec = packed record
+    Supported: boolean;
     LatitudeRef: string[1]; // North/South
     Latitude: string[11];
     LongitudeRef: string[1]; // East/West
@@ -77,11 +82,13 @@ type
   end;
 
   MakernotesRec = packed record
+    Supported: boolean;
     LensFocalRange: string[11]; // i.e."17-55"
     procedure Clear;
   end;
 
   XMPrec = packed record
+    Supported: boolean;
     Creator, Rights: string;
     Date: string[19];
     PhotoType: string;
@@ -94,6 +101,7 @@ type
   end;
 
   ICCrec = packed record
+    Supported: boolean;
     ProfileCMMType: string[4];
     ProfileClass: string[4];
     ColorSpaceData: string[4];
@@ -501,6 +509,7 @@ begin
   Dec(IPTCsize, IPTCtagSz);
   with Foto.IPTC do
   begin
+    Supported := true;
     case IPTCtagID of
       5:
         ObjectName := StripLen(32);
@@ -542,6 +551,7 @@ begin
   SavePos := FotoF.Position;
   with Foto.IFD0 do
   begin
+    Supported := true;
     case IFDentry.Tag of
       $002E:
         JPGfromRAWoffset := IFDentry.ValueOffs; // Panasonic RW2
@@ -610,6 +620,7 @@ begin
   SavePos := FotoF.Position;
   with Foto.ExifIFD do
   begin
+    Supported := true;
     case IFDentry.Tag of
       $829A:
         ExposureTime := ConvertRational(IFDentry, false);
@@ -688,6 +699,7 @@ begin
   SavePos := FotoF.Position;
   with Foto.InteropIFD do
   begin
+    Supported := true;
     case IFDentry.Tag of
       $0001:
         begin
@@ -710,6 +722,7 @@ begin
   SavePos := FotoF.Position;
   with Foto.GPS do
   begin
+    Supported := true;
     case IFDentry.Tag of
       $01:
         LatitudeRef := DecodeASCII(IFDentry);
@@ -742,6 +755,7 @@ begin
   FotoF.Read(Tx[1], 4); // skip ICC size
   with Foto do
   begin
+    ICC.Supported := true;
     FotoF.Read(ICC.ProfileCMMType[1], 4);
     ICC.ProfileCMMType[0] := #4;
     FotoF.Read(Tx[1], 4); // skip ProfileVersion
@@ -1129,6 +1143,7 @@ begin
 
   with Foto.XMP do
   begin
+    Supported := true;
     Creator := GetAltData('<dc:creator>');
     Rights := GetAltData('<dc:rights>');
     Date := GetAltData('<dc:date>');
