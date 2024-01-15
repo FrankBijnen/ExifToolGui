@@ -102,8 +102,9 @@ begin
       TGeoTagMode.gtmCoordinates,
       TGeoTagMode.gtmCoordinatesLocation:
       begin
-(*
-        ETcmd := '-GPS:All=';
+        ETcmd := '';
+        if (ChkRemoveExisting.Checked) then
+          ETcmd := ETcmd + '-a' + CRLF + '-Gps*=' + CRLF + '--GPSversion*';
         if (Lat <> '') then
         begin
           ETcmd := ETcmd + CRLF + '-GPS:GpsLatitudeRef=';
@@ -128,42 +129,8 @@ begin
             ETcmd := ETcmd + 'E';
           ETcmd := ETcmd + CRLF + '-GPS:GpsLongitude=' + Lon;
         end;
-*)
-        ETcmd := '';
-        if (ChkRemoveExisting.Checked) then
-          ETcmd := ETcmd + '-a' + CRLF + '-Gps*=' + CRLF + '--GPSversion*';
-        if (IsQuickTime) then
-        begin
-          AdjustLatLon(Lat, Lon, 5);
-          ETCmd := ETcmd + CRLF + Format('-GPSCoordinates=''%s, %s, %s''', [Lat, Lon, '0']);
-        end
-        else
-        begin
-          if (Lat <> '') then
-          begin
-            ETcmd := ETcmd + CRLF + '-GpsLatitudeRef=';
-            if Lat[1] = '-' then
-            begin
-              ETcmd := ETcmd + 'S';
-              Delete(Lat, 1, 1);
-            end
-            else
-              ETcmd := ETcmd + 'N';
-            ETcmd := ETcmd + CRLF + '-GpsLatitude=' + Lat;
-          end;
-          if (Lon <> '') then
-          begin
-            ETcmd := ETcmd + CRLF + '-GpsLongitudeRef=';
-            if Lon[1] = '-' then
-            begin
-              ETcmd := ETcmd + 'W';
-              Delete(Lon, 1, 1);
-            end
-            else
-              ETcmd := ETcmd + 'E';
-            ETcmd := ETcmd + CRLF + '-GpsLongitude=' + Lon;
-          end;
-        end;
+        AdjustLatLon(Lat, Lon, 5);
+        ETCmd := ETcmd + CRLF + Format('-QuickTime:GPSCoordinates=''%s, %s, %s''', [Lat, Lon, '0']);
       end;
     end;
 
