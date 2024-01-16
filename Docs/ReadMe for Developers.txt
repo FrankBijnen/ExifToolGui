@@ -81,8 +81,20 @@ Hotfix for Gecode requiring an Api-key. See Geomap.pas
 
 Version 6.2.9
 
-Changed the TMainMenu to TActionMainMenuBar in Main.pas to overcome scaling issues.
+To overcome scaling issues:
+Changed default to DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE_V2 and Scaled
+Changed the TMainMenu to TActionMainMenuBar in Main.pas
 Reviewed the bitmaps used. Created a subdirectory images, old ones are moved to Images_original
+Added a TrayIcon, which display version info and resets window sizes
+Moved GetFileVersionNumber to ExifToolGui_Utils.pas
+Added a MonitorDpiChanged event
+Code in MainDefs.pas reviewed, to be able to reset window sizes.
+Added scaling factor to About
 
+In order to only show hidden files for admins, code has been added to ExiftoolGui_utils to check for Elevated and Admin usage.
+Added 'Administrator:' to caption if applicable.
+Changed TFileStream to ThandleStream in ExifInfo.pas. To open the file ourselves with FileOpen, to prevent an exception.
+
+Fixed typo in BreadcrumbBar directory name
 
 Frank

@@ -116,4 +116,16 @@ Changed with version 6.2.7
 - Added experimental support for 4K monitors. Or better: Monitors with a non-standard resolution or scaling. 
   If you want to experiment with this see: Readme 4K monitor.txt in the Docs directory.
 
+Changed with version 6.2.8
+  This was a hotfix release. Primarily released to fix issue #219, because https://geocode.maps.co started requiring an api_key.
+  With this version you can add your api_key, that you can get for free after registering, to the preferences.
+  These fixes are also included:
+  - Camera settings for FujiFilm RAW are displayed in the Filelist.
+  - Added '-Gps:all' and '-wm cg' to 'Export/Import/Copy from single file...' allowing to only copy Gps data, and not overwrite existing data.
+
+Changed with version 6.2.9
+- The experimental support for 4K monitor has become much more mature. The default settings should be correct, and provide scaling while maintaining a crisp look.
+- Added a tray icon in the windows taskbar to reset the window size to default. You need to make sure the icon is not hidden in Windows.
+- Optionally show hidden files and folders. You need to be an admin and enable the option in Preferences.
+
 Frank

@@ -34,6 +34,8 @@ As of version 6.2.9 this is implemented in ExiftoolGui:
   Below Window 8.1
   - No calls are made to set DPI Awareness.
 
+A Tray icon is added to the Windows Taskbar, that shows the current ExifToolGui version, and enables you to reset the window sizes to their default values.
+
 Notes:
 - Microsoft states that it is recommended to use a Manifest instead of the API's, but then it would not be easy to switch at runtime.
 - The API's have to be called very early, and only once, at startup.
