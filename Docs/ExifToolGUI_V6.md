@@ -446,7 +446,7 @@ next GUI start. Remaining options settings however, are only temporary
 <h3>API WindowsWideFile (requires Exiftool v12.66)</h3> -Force the use of wide-character Windows I/O functions when the CharsetFileName option is used.<br>
 
 <h3>Custom options</h3> -You can specify additonal options that exiftool should use. Expert option. Normally used with the Log Window.<br>
-Possible use case is the option <b>-htmldump</b> and use the log window to catch the output.<br>
+Possible use case is the option <b>-htmldump</b> and use the log window to catch the output. Or <b>-API LargeFileSupport=1</b> to support large files.<br>
 <br>
 <br>
 <h2><a name="m_exp_imp">Export/Import menu</a></h2>
