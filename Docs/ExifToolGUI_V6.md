@@ -260,7 +260,7 @@ Allow only one running instance of GUI. If you try to start a second instance of
 Use this option when you have registered GUI in the Contextmenu, or you will get a new instance of GUI everytime you use the context menu.<br>
 <br>
 <b>Register ExifToolGui in Contextmenu (Requires elevation)</b><br>
-The buttons Add and Remove are only enable when you have started GUI as Admin.<br>
+The buttons <b>Add</b> and <b>Remove</b> are only enabled when you have started GUI as Admin.<br>
 If you have added GUI to the contextmenu you can start it by Right clicking on a folder.<br>
 <img src="ExifToolGUI_V6_files/contextmenu.jpg"><br>
 <br><br>
@@ -292,8 +292,6 @@ The default setting is to only show files in the Filelist panel. If you enable t
 Will also show hidden Folders and Files in the Folder Treeview and the Filelist panels. You need to be Admin to use this, and not everything you see may be readable/writeable.<br><br>
 <b>Filelist: Show Breadcrumb (Address bar) in Filelist</b><br>
 Enable a BreadCrumb bar on top of the filelist. Allows for easier navigating.<br><br>
-<b>Filelist: Show Hidden Folders and Files in Filelist (Admin required)</b><br>
-Will also show hidden Folders and Files in the Folder Treeview and the Filelist panels. You need to be Admin to use this, and not everything you see may be readable/writeable.<br><br>
 <b>Filelist: Enable 'Camera Settings', 'Location info and 'About photo' for all file types. (Slower)</b><br>
 If you have set the <b>Details</b> of the filelist panel to any of the above options, GUI will show that info only for known filetypes.<br>
 If a file is not supported, or it does not contain the data, GUI will show 'File type unsupported'.<br>
