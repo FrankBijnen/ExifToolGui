@@ -407,10 +407,14 @@ begin // for Windows Shutdown/Log-off while GUI is open
 end;
 
 procedure TFMain.CMActivateWindow(var Message: TMessage);
+var
+  NewSharedDir: string;
 begin
   RestoreGUI;
 
-  ShellTree.Path := FSharedMem.NewDirectory;
+  NewSharedDir := FSharedMem.NewDirectory;
+  if (ValidDir(NewSharedDir)) then
+    ShellTree.Path := NewSharedDir;
 
   Message.Result := 0;
   inherited;
