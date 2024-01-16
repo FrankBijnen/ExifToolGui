@@ -31,12 +31,14 @@ type
     InitialDir: string;
     ETOverrideDir: string;
     ETTimeOut: integer;
-  // Colors of the Bar charts.
+  // Colors of the Bar charts. Not configurable in UI
     CLFNumber: integer;
     CLFocal: integer;
     CLISO: integer;
+
     ShowFolders: boolean;
     ShowHidden: boolean;
+    EnableUnsupported: boolean;
     ShowBreadCrumb: boolean;
     MinimizeToTray: boolean;
     SingleInstanceApp: boolean;
@@ -428,6 +430,7 @@ begin
 
         ShowFolders := ReadBool(Ini_Settings, 'ShowFolders', false);
         ShowHidden := ReadBool(Ini_Settings, 'ShowHidden', false);
+        EnableUnsupported := ReadBool(Ini_Settings, 'EnableUnsupported', false);
         ShowBreadCrumb := ReadBool(Ini_Settings, 'ShowBreadCrumb', true);
         MinimizeToTray := ReadBool(Ini_Settings, 'MinimizeToTray', false);
         SingleInstanceApp := ReadBool(Ini_Settings, 'SingleInstanceApp', false);
@@ -721,6 +724,7 @@ begin
           WriteString(Ini_Settings, 'CLISO', '$' + IntToHex(CLISO, 8));
           WriteBool(Ini_Settings, 'ShowFolders', ShowFolders);
           WriteBool(Ini_Settings, 'ShowHidden', ShowHidden);
+          WriteBool(Ini_Settings, 'EnableUnsupported', EnableUnsupported);
           WriteBool(Ini_Settings, 'ShowBreadCrumb', ShowBreadCrumb);
           WriteBool(Ini_Settings, 'MinimizeToTray', MinimizeToTray);
           WriteBool(Ini_Settings, 'SingleInstanceApp', SingleInstanceApp);

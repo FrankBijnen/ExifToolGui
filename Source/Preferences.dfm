@@ -38,7 +38,7 @@ object FPreferences: TFPreferences
     Top = 0
     Width = 521
     Height = 373
-    ActivePage = AdvTabIntegration
+    ActivePage = AdvTabGeneral
     Align = alLeft
     DoubleBuffered = True
     ParentDoubleBuffered = False
@@ -819,7 +819,7 @@ object FPreferences: TFPreferences
       Caption = 'Other'
       object Label5: TLabel
         Left = 103
-        Top = 217
+        Top = 243
         Width = 141
         Height = 13
         Caption = 'Hint pause timeout in Millisecs'
@@ -872,14 +872,14 @@ object FPreferences: TFPreferences
       object CheckBox6: TCheckBox
         Left = 16
         Top = 141
-        Width = 337
+        Width = 485
         Height = 17
         Caption = '-Filelist: Show Folders in Filelist'
         TabOrder = 5
       end
       object HintPause: TEdit
         Left = 16
-        Top = 214
+        Top = 240
         Width = 66
         Height = 21
         TabOrder = 8
@@ -887,7 +887,7 @@ object FPreferences: TFPreferences
       end
       object UpDHintPause: TUpDown
         Left = 82
-        Top = 214
+        Top = 240
         Width = 16
         Height = 21
         Associate = HintPause
@@ -897,21 +897,31 @@ object FPreferences: TFPreferences
       end
       object CheckBox7: TCheckBox
         Left = 16
-        Top = 189
-        Width = 337
+        Top = 188
+        Width = 485
         Height = 17
         Caption = '-Filelist: Show Breadcrumb (Address Bar) in Filelist'
         TabOrder = 7
       end
       object CheckBox8: TCheckBox
         Left = 16
-        Top = 165
-        Width = 337
+        Top = 164
+        Width = 485
         Height = 17
         Caption = 
           '-Filelist: Show Hidden Folders and Files in Filelist (Admin requ' +
           'ired)'
         TabOrder = 6
+      end
+      object CheckBox11: TCheckBox
+        Left = 16
+        Top = 212
+        Width = 485
+        Height = 17
+        Caption = 
+          '-Filelist: Enable '#39'Camera Settings'#39', '#39'Location info'#39' and '#39'About ' +
+          'photo'#39' for all file types. (Slower)'
+        TabOrder = 10
       end
     end
   end
