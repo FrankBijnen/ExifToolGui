@@ -226,27 +226,23 @@ var
 begin
   W1 := IFDentry.TypeCount - 1; // last byte is #0
   SetLength(Bytes, W1);
-  SetLength(Result, W1);
   L1 := IFDentry.ValueOffs;
   if W1 > 3 then
   begin
     FotoF.Seek(TIFFoffset + L1, TSeekOrigin.soBeginning);
     FotoF.Read(Bytes[0], W1);
-    result := '';
-    if (Encoding.GetCharCount(Bytes) > 0) then
-      Result := Encoding.GetString(Bytes);
-    W1 := Pos(Char(0), Result);
-    if W1 > 0 then
-      SetLength(Result, W1 - 1); // only if UserComment is ASCII!
   end
   else
   begin
     if IsMM then
       L1 := SwapL(L1);
-    Move(L1, Result[1], W1);
-    if Pos(Char(0), Result) = 1 then
-      Result := '-'; // in case tag is defined and empty
+    Move(L1, Bytes[0], W1);
   end;
+  result := '';
+  if (Encoding.GetCharCount(Bytes) > 0) then
+    result := Encoding.GetString(Bytes);
+  if Pos(Char(0), Result) = 1 then
+    result := '-'; // in case tag is defined and empty
 end;
 
 function DecodeWord(IFDentry: IFDentryRec): word;

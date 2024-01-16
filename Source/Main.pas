@@ -383,9 +383,11 @@ const
     '-IFD0:Orientation';
 
   LocationFields =
-    '-s3' + CRLF + '-f' + CRLF +
+    '-s3' + CRLF + '-f' + CRLF + '-api' + CRLF + 'QuickTimeUTC' + CRLF +
+    // In code we take DateTimeOriginal or CreateDate
     '-ExifIFD:DateTimeOriginal' + CRLF +
-    '-Composite:GPSLatitude' + CRLF +
+    '-CreateDate' + CRLF +
+    '-GPSLatitude' + CRLF +
     '-XMP-iptcExt:LocationShownCountryName' + CRLF +
     '-XMP-iptcExt:LocationShownProvinceState' + CRLF +
     '-XMP-iptcExt:LocationShownCity' + CRLF +
@@ -393,7 +395,7 @@ const
 
   AboutFields =
     '-s3' + CRLF + '-f' + CRLF +
-    '-IFD0:Artist' + CRLF +
+    '-exif:Artist' + CRLF +
     '-XMP-xmp:Rating' + CRLF +
     '-XMP-dc:Type' + CRLF +
     '-XMP-iptcExt:Event' + CRLF +
@@ -2892,10 +2894,21 @@ begin
               if (GUIsettings.EnableUnsupported) then
               begin
                 ET_OpenExec(LocationFields, GetSelectedFile(ShellList.FileName(Item.Index)), Details, False);
+
+                // Details[0] = DateTimeOriginal
+                // Details[1] = CreateDate
+                if (Details[0] = '-') then
+                  Details.Delete(0)
+                else
+                  Details.Delete(1);
+
+                // Now Details[1] = GPS:GPSLatitude
+                // GPS tagged?
                 if (Details[1] = '-') then
                   Details[1] := 'No'
                 else
                   Details[1] := 'Yes';
+
               end
               else
                 Details.Add(NotSupported);
