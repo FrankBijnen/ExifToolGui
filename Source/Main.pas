@@ -371,6 +371,34 @@ const
 
   NotSupported = 'File type unsupported';
 
+  CameraFields =
+    '-s3' + CRLF + '-f' + CRLF +
+    '-ExifIFD:ExposureTime' + CRLF +
+    '-ExifIFD:FNumber' + CRLF +
+    '-ExifIFD:ISO' + CRLF +
+    '-ExifIFD:ExposureCompensation' + CRLF +
+    '-ExifIFD:FocalLength' + CRLF +
+    '-ExifIFD:Flash' + CRLF +
+    '-ExifIFD:ExposureProgram' + CRLF +
+    '-IFD0:Orientation';
+
+  LocationFields =
+    '-s3' + CRLF + '-f' + CRLF +
+    '-ExifIFD:DateTimeOriginal' + CRLF +
+    '-Composite:GPSLatitude' + CRLF +
+    '-XMP-iptcExt:LocationShownCountryName' + CRLF +
+    '-XMP-iptcExt:LocationShownProvinceState' + CRLF +
+    '-XMP-iptcExt:LocationShownCity' + CRLF +
+    '-XMP-iptcExt:LocationShownSublocation';
+
+  AboutFields =
+    '-s3' + CRLF + '-f' + CRLF +
+    '-IFD0:Artist' + CRLF +
+    '-XMP-xmp:Rating' + CRLF +
+    '-XMP-dc:Type' + CRLF +
+    '-XMP-iptcExt:Event' + CRLF +
+    '-XMP-iptcExt:PersonInImage';
+
 procedure TFMain.WMEndSession(var Msg: TWMEndSession);
 begin // for Windows Shutdown/Log-off while GUI is open
   if Msg.EndSession = true then
@@ -2795,80 +2823,105 @@ begin
         1:
           begin
             GetMetadata(AFolder.PathName, false, false, false, false);
-            if (Foto.ExifIFD.Supported = false) then
-              Details.Add(NotSupported)
-            else
+            if (Foto.ExifIFD.Supported) then
             begin
               Tx := ExifIFD.ExposureTime;
               Tx.PadLeft(7);
               Details.Add(Tx);
+              Tx := ExifIFD.FNumber;
+              Tx.PadLeft(4);
+              Details.Add(Tx);
+              Tx := ExifIFD.ISO;
+              Tx.PadLeft(5);
+              Details.Add(Tx);
+              Tx := ExifIFD.ExposureBias;
+              Tx.PadLeft(4);
+              Details.Add(Tx);
+              Tx := ExifIFD.FocalLength;
+              Tx.PadLeft(6);
+              Details.Add(Tx);
+              if (ExifIFD.Flash and $FF00) <> 0 then
+              begin
+                if (ExifIFD.Flash and 1) = 1 then
+                  Details.Add('Yes')
+                else
+                  Details.Add('No');
+              end
+              else
+                Details.Add('');
+              Details.Add(ExifIFD.ExposureProgram);
+              if IFD0.Orientation > 0 then
+              begin
+                if (IFD0.Orientation and 1) = 1 then
+                  Details.Add('Hor.')
+                else
+                  Details.Add('Ver.');
+              end
+              else
+                Details.Add('');
+            end
+            else
+            begin
+              if (GUIsettings.EnableUnsupported) then
+                ET_OpenExec(CameraFields, GetSelectedFile(ShellList.FileName(Item.Index)), Details, False)
+              else
+                Details.Add(NotSupported);
             end;
-            Tx := ExifIFD.FNumber;
-            Tx.PadLeft(4);
-            Details.Add(Tx);
-            Tx := ExifIFD.ISO;
-            Tx.PadLeft(5);
-            Details.Add(Tx);
-            Tx := ExifIFD.ExposureBias;
-            Tx.PadLeft(4);
-            Details.Add(Tx);
-            Tx := ExifIFD.FocalLength;
-            Tx.PadLeft(6);
-            Details.Add(Tx);
-            if (ExifIFD.Flash and $FF00) <> 0 then
-            begin
-              if (ExifIFD.Flash and 1) = 1 then
-                Details.Add('Yes')
-              else
-                Details.Add('No');
-            end
-            else
-              Details.Add('');
-            Details.Add(ExifIFD.ExposureProgram);
-            if IFD0.Orientation > 0 then
-            begin
-              if (IFD0.Orientation and 1) = 1 then
-                Details.Add('Hor.')
-              else
-                Details.Add('Ver.');
-            end
-            else
-              Details.Add('');
           end;
         2:
           begin
             GetMetadata(AFolder.PathName, true, false, true, false);
-            if foto.ExifIFD.Supported = false then
-              Details.Add(NotSupported)
-            else
+            if (Foto.ExifIFD.Supported) then
+            begin
               Details.Add(ExifIFD.DateTimeOriginal);
-            if GPS.Latitude <> '' then
-              Details.Add('Yes')
+              if GPS.Latitude <> '' then
+                Details.Add('Yes')
+              else
+                Details.Add('No');
+              Details.Add(Xmp.CountryShown);
+              Details.Add(Xmp.ProvinceShown);
+              Details.Add(Xmp.CityShown);
+              Details.Add(Xmp.LocationShown);
+            end
             else
-              Details.Add('No');
-            Details.Add(Xmp.CountryShown);
-            Details.Add(Xmp.ProvinceShown);
-            Details.Add(Xmp.CityShown);
-            Details.Add(Xmp.LocationShown);
+            begin
+              if (GUIsettings.EnableUnsupported) then
+              begin
+                ET_OpenExec(LocationFields, GetSelectedFile(ShellList.FileName(Item.Index)), Details, False);
+                if (Details[1] = '-') then
+                  Details[1] := 'No'
+                else
+                  Details[1] := 'Yes';
+              end
+              else
+                Details.Add(NotSupported);
+            end;
           end;
         3:
           begin
             GetMetadata(AFolder.PathName, true, false, false, false);
-            if foto.IFD0.Supported = false then
-              Details.Add(NotSupported)
-            else
+            if (Foto.IFD0.Supported) then
+            begin
               Details.Add(IFD0.Artist);
-            Details.Add(Xmp.Rating);
-            Details.Add(Xmp.PhotoType);
-            Details.Add(Xmp.Event);
-            Details.Add(Xmp.PersonInImage);
+              Details.Add(Xmp.Rating);
+              Details.Add(Xmp.PhotoType);
+              Details.Add(Xmp.Event);
+              Details.Add(Xmp.PersonInImage);
+            end
+            else
+            begin
+              if (GUIsettings.EnableUnsupported) then
+                ET_OpenExec(AboutFields, GetSelectedFile(ShellList.FileName(Item.Index)), Details, False)
+              else
+                Details.Add(NotSupported);
+            end;
           end;
         4:
           begin
             ETcmd := '-s3' + CRLF + '-f';
             for Indx := 0 to High(FListColUsr) do
               ETcmd := ETcmd + CRLF + FListColUsr[Indx].Command;
-            ET_OpenExec(ETcmd, GetSelectedFile(ShellList.FileName(Item.Index)), Details, False); // Dont care about errors
+            ET_OpenExec(ETcmd, GetSelectedFile(ShellList.FileName(Item.Index)), Details, False);
           end;
       end;
     end;
