@@ -745,7 +745,7 @@ begin
         WriteBool(Ini_Options, 'ShowComposite', MaShowComposite.Checked);
         WriteBool(Ini_Options, 'NotDuplicated', MaNotDuplicated.Checked);
         WriteBool(Ini_Options, 'APIWindowsWideFile', MaAPIWindowsWideFile.Checked);
-        WriteString(Ini_Options, 'CustomOptions', ET_Options.GetCustomOptions);
+        WriteString(Ini_Options, 'CustomOptions', ET_Options.ETCustomOptions);
 
         I := length(FListColUsr) - 1;
         for N := 0 to I do
