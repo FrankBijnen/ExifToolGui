@@ -389,7 +389,7 @@ const
     // In code we take DateTimeOriginal or CreateDate
     '-ExifIFD:DateTimeOriginal' + CRLF +
     '-CreateDate' + CRLF +
-    '-GPSLatitude' + CRLF +
+    '-GPSLatitude#' + CRLF +
     '-XMP-iptcExt:LocationShownCountryName' + CRLF +
     '-XMP-iptcExt:LocationShownProvinceState' + CRLF +
     '-XMP-iptcExt:LocationShownCity' + CRLF +
@@ -2912,7 +2912,8 @@ begin
 
                 // Now Details[1] = GPS:GPSLatitude
                 // GPS tagged?
-                if (Details[1] = '-') then
+                if (Details[1] = '-') or
+                   (Details[1] = '0') then
                   Details[1] := 'No'
                 else
                   Details[1] := 'Yes';
@@ -3131,6 +3132,7 @@ var
   E, N: integer;
   ETcmd, Item, Tx: string;
   ETResult: TStringList;
+  NoChars:  TSysCharSet;
 begin
   MetadataList.Tag := -1; // Reset hint row
   Item := GetSelectedFile(ShellList.FileName);
@@ -3156,7 +3158,7 @@ begin
 
       for E := 0 to N do
       begin
-        tx := QuickTags[E].Command;
+        Tx := QuickTags[E].Command;
         if UpperCase(LeftStr(tx, Length(GUI_SEP))) = GUI_SEP then
           Tx := GUI_SEP;
         ETcmd := ETcmd + CRLF + Tx;
@@ -3178,9 +3180,13 @@ begin
           else
           begin
             Tx := QuickTags[E].Caption;
-            if RightStr(Tx, 1) = '?' then
+            if (Pos('?', Tx) > 0) then
             begin
-              if ETResult[E] = '-' then
+              Include(NoChars, '-');
+              if (Pos('??', Tx) > 0) then
+                Include(NoChars, '0');
+
+              if CharInSet(ETResult[E][1], NoChars) then
                 Tx := Tx + '=*NO*'
               else
                 Tx := Tx + '=*YES*';
