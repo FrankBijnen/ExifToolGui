@@ -4,11 +4,15 @@ program ExifToolGUI;
 // Will show a dialog when an exception occurs to copy the Stacktrace on the clipboard.
 
 {.$DEFINE STACKTRACE}
+{.$DEFINE LANGOVERRIDE}
 
 uses
   {$IFDEF STACKTRACE}
   UnitStackTrace,
   {$ENDIF }
+  {$IFDEF LANGOVERRIDE}
+  UnitLangOverride,
+  {$ENDIF}
   UnitSingleApp,
   UnitDpiAwareness,
   Vcl.Forms,
@@ -54,6 +58,7 @@ uses
 {$R *.res}
 
 begin
+
 {$IFDEF DEBUG}
   ReportMemoryLeaksOnShutdown := true;
 {$ENDIF}
@@ -64,7 +69,6 @@ begin
     FSharedMem.ActivateCurrentWindow;
     halt;
   end;
-
 
   Application.Initialize;
   Application.MainFormOnTaskbar := True;
