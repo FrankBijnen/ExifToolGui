@@ -176,6 +176,7 @@ type
     ActLstTaskbar: TActionList;
     TaskBarResetWindow: TAction;
     ApplicationEvents: TApplicationEvents;
+    MaAPILargeFileSupport: TAction;
     procedure ShellListClick(Sender: TObject);
     procedure ShellListKeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
     procedure SpeedBtnExifClick(Sender: TObject);
@@ -290,6 +291,7 @@ type
     procedure ApplicationEventsMinimize(Sender: TObject);
     procedure TrayIconMouseUp(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
     procedure TrayIconBalloonClick(Sender: TObject);
+    procedure MaAPILargeFileSupportExecute(Sender: TObject);
   private
     { Private declarations }
     ETBarSeriesFocal: TBarSeries;
@@ -768,6 +770,12 @@ procedure TFMain.MAPIWindowsWideFileClick(Sender: TObject);
 begin
   with ET_Options do
     SetApiWindowsWideFile(MaAPIWindowsWideFile.Checked);
+end;
+
+procedure TFMain.MaAPILargeFileSupportExecute(Sender: TObject);
+begin
+  with ET_Options do
+    SetApiLargeFileSupport(MaAPILargeFileSupport.Checked);
 end;
 
 procedure TFMain.MDontBackupClick(Sender: TObject);

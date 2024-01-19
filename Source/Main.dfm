@@ -1077,6 +1077,9 @@ object FMain: TFMain
                 Caption = '&API WindowsWideFile (Requires Exiftool V12.66)'
               end
               item
+                Action = MaAPILargeFileSupport
+              end
+              item
                 Caption = '-'
               end
               item
@@ -1207,7 +1210,7 @@ object FMain: TFMain
           end>
         ActionBar = ActionMainMenuBar
       end>
-    Left = 164
+    Left = 163
     Top = 53
     StyleName = 'Platform Default'
     object MaExportMetaTXT: TAction
@@ -1340,12 +1343,6 @@ object FMain: TFMain
       Checked = True
       OnExecute = MAPIWindowsWideFileClick
     end
-    object MaCustomOptions: TAction
-      Tag = 10
-      Category = 'Options'
-      Caption = 'Custom options'
-      OnExecute = MCustomOptionsClick
-    end
     object MaExportMetaXMP: TAction
       Tag = 20
       Category = 'Export_Metadata'
@@ -1464,6 +1461,19 @@ object FMain: TFMain
       Category = 'Help'
       Caption = 'Online Documentation'
       OnExecute = OnlineDocumentation1Click
+    end
+    object MaAPILargeFileSupport: TAction
+      Tag = 10
+      Category = 'Options'
+      AutoCheck = True
+      Caption = 'API LargeFileSupport'
+      OnExecute = MaAPILargeFileSupportExecute
+    end
+    object MaCustomOptions: TAction
+      Tag = 10
+      Category = 'Options'
+      Caption = 'Custom options'
+      OnExecute = MCustomOptionsClick
     end
   end
   object QuickPopUpMenu: TPopupMenu
