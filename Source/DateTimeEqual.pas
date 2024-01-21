@@ -38,7 +38,7 @@ var
 
 implementation
 
-uses Main, ExifTool;
+uses Main, ExifTool, UnitLangResources;
 
 {$R *.dfm}
 
@@ -81,16 +81,19 @@ begin
     Top := FMain.Top + FMain.GUIBorderHeight;
 
     if FMain.MaDontBackup.Checked then
-      Label1.Caption := 'Backup: OFF'
+      Label1.Caption := StrBackupOFF
     else
-      Label1.Caption := 'Backup: ON';
+      Label1.Caption := StrBackupON;
     Application.OnHint := DisplayHint;
 
     ETcmd := '-s3' + CRLF + '-f' + CRLF + CmdDateOriginal + CRLF + CmdDateCreate + CRLF + CmdDateModify;
-    ET_OpenExec(ETcmd, FMain.GetFirstSelectedFile, ETresult);
-    LabeledEdit1.Text := ETresult[0];
-    LabeledEdit2.Text := ETresult[1];
-    LabeledEdit3.Text := ETresult[2];
+    ET_OpenExec(ETcmd, FMain.GetFirstSelectedFile, ETresult, false);
+    if (ETresult.Count > 2) then
+    begin
+      LabeledEdit1.Text := ETresult[0];
+      LabeledEdit2.Text := ETresult[1];
+      LabeledEdit3.Text := ETresult[2];
+    end;
     RadioButton1.SetFocus;
   finally
     ETresult.Free;

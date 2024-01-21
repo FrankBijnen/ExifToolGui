@@ -10,9 +10,7 @@ uses
   {$IFDEF STACKTRACE}
   UnitStackTrace,
   {$ENDIF }
-  {$IFDEF LANGOVERRIDE}
   UnitLangOverride,
-  {$ENDIF}
   UnitSingleApp,
   UnitDpiAwareness,
   Vcl.Forms,
@@ -97,5 +95,6 @@ begin
   Application.CreateForm(TFGeoSearch, FGeoSearch);
   Application.CreateForm(TFGeotagFiles, FGeotagFiles);
   Application.CreateForm(TFGeoSetup, FGeoSetup);
+
   Application.Run;
 end.

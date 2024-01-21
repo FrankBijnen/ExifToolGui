@@ -2,15 +2,14 @@ unit UnitLangOverride;
 
 interface
 
-uses
-  Winapi.Windows;
-
-function LoadNewResourceModule(Locale: string): HINST;
+procedure SetLanguage(const Locale: string);
 
 implementation
 
 uses
-  System.SysUtils;
+  System.SysUtils,
+  Winapi.Windows,
+  Vcl.Forms;
 
 function SetResourceHInstance(NewInstance: HINST): HINST;
 var
@@ -33,27 +32,34 @@ begin
 end;
 
 function LoadNewResourceModule(Locale: string): HINST;
-var
-  FileName: array [0..260] of char;
-  DllName: string;
 begin
-  GetModuleFileName(HInstance, FileName, SizeOf(FileName));
-  DllName := ChangeFileExt(Filename, '.' + Locale);
-  result := LoadLibraryEx(PChar(DllName), 0, LOAD_LIBRARY_AS_DATAFILE);
+  // First search for Basename
+  result := LoadLibraryEx(PChar(ChangeFileExt(Application.Title, '.' + Locale)),
+                          0,
+                          LOAD_LIBRARY_AS_DATAFILE);
+  // Not found, search for exename
+  if (result = 0) then
+    result := LoadLibraryEx(PChar(ChangeFileExt(Application.ExeName, '.' + Locale)),
+                            0,
+                            LOAD_LIBRARY_AS_DATAFILE);
+
   if result <> 0 then
     result := SetResourceHInstance(result);
 end;
 
-procedure LoadOverrideLanguage;
+procedure SetLanguage(const Locale: string);
+begin
+  LoadNewResourceModule(Locale); // This will not reload Resourcestrings!
+  ResStringCleanupCache;         // That's why we need this.
+end;
+
+initialization
 var
   Locale: string;
 begin
   if (FindCmdLineSwitch('LangOverride', Locale, true)) then
-    LoadNewResourceModule(Copy(Locale, 2)); // Skip =
+    SetLanguage(Copy(Locale, 2));
 end;
-
-initialization
-  LoadOverrideLanguage;
 
 end.
 
