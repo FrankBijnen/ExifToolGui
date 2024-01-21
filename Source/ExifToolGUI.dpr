@@ -1,10 +1,12 @@
 program ExifToolGUI;
 
+{.$DEFINE STACKTRACE}
 // Requires JCL to compile. https://github.com/project-jedi/jcl
 // Will show a dialog when an exception occurs to copy the Stacktrace on the clipboard.
 
-{.$DEFINE STACKTRACE}
 {.$DEFINE LANGOVERRIDE}
+// Allows for overriding the default language, without writing to the registry.
+// CommandLine example: /OverrideLanguage=NLD
 
 uses
 {$IFDEF STACKTRACE}
