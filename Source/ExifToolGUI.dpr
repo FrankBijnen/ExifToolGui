@@ -7,10 +7,12 @@ program ExifToolGUI;
 {.$DEFINE LANGOVERRIDE}
 
 uses
-  {$IFDEF STACKTRACE}
+{$IFDEF STACKTRACE}
   UnitStackTrace,
-  {$ENDIF }
+{$ENDIF }
+{$IFDEF LANGOVERRIDE}
   UnitLangOverride,
+{$ENDIF}
   UnitSingleApp,
   UnitDpiAwareness,
   Vcl.Forms,
