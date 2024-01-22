@@ -43,7 +43,7 @@ var
 
 implementation
 
-uses Main, MainDef, ExifTool, ExifToolsGUI_Utils, UFrmGeoSetup, Geomap;
+uses Main, MainDef, ExifTool, ExifToolsGUI_Utils, UFrmGeoSetup, Geomap, UnitLangResources;
 
 {$R *.dfm}
 
@@ -58,18 +58,18 @@ begin
   end;
 
   if FMain.MaDontBackup.Checked then
-    Label1.Caption := 'Backup: OFF'
+    Label1.Caption := StrBackupOFF
   else
-    Label1.Caption := 'Backup: ON';
+    Label1.Caption := StrBackupON;
   with FMain.OpenPictureDlg do
   begin
     if GpsXmpDir <> '' then
       InitialDir := GpsXmpDir
     else
       InitialDir := FMain.ShellList.Path;
-    Filter := 'Any GPS log file|*.*';
+    Filter := StrAnyGPSLogFile + '|*.*';
     Options := [ofFileMustExist];
-    Title := 'Select GPS log file';
+    Title := StrSelectGPSLogFile;
     FileName := '';
   end;
   Button2.Enabled := false;
@@ -102,8 +102,7 @@ begin
   ParseLatLon(Fmain.EditMapFind.Text, FGeoSetup.Lat, FGeoSetup.Lon);
   if not (ValidLatLon(FGeoSetup.Lat, FGeoSetup.Lon)) then
   begin
-    MessageDlgEx('No valid Lat Lon coordinates selected.' + #10 +
-                 'Use the OSM Map to select', '', TMsgDlgType.mtError, [TMsgDlgBtn.mbOK]);
+    MessageDlgEx(StrNoValidLatLon + #10 + StrUseTheOSMMap, '', TMsgDlgType.mtError, [TMsgDlgBtn.mbOK]);
     exit;
   end;
   FGeoSetup.ShowModal;

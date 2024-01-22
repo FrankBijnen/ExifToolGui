@@ -7,7 +7,6 @@ uses System.Classes, ExifTool, GEOMap;
 
 const
   SHOWALL = 'Show All Files';
-  EmptyCustomview = '-Echo' + CRLF + 'No custom tags defined ';
 
 type
   GUIsettingsRec = record
@@ -113,7 +112,7 @@ implementation
 uses System.SysUtils, System.StrUtils, System.IniFiles,
   Winapi.Windows, Winapi.ShellAPI, Winapi.ShlObj,
   Vcl.Forms, Vcl.ComCtrls, Vcl.Dialogs,
-  Main, LogWin, ExifToolsGUI_Utils, ExifInfo;
+  Main, LogWin, ExifToolsGUI_Utils, ExifInfo, UnitLangResources;
 
 const
   CRLF = #13#10;
@@ -785,7 +784,7 @@ begin
   except
     on E: Exception do
     begin
-      ShowMessage('Cannot save GUI settings.' + #10 + E.Message);
+      ShowMessage(StrCannotSaveGUI + #10 + E.Message);
     end;
   end;
 end;

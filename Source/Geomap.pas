@@ -126,7 +126,7 @@ uses
   System.Variants, System.JSON,  System.NetEncoding, System.Math, System.StrUtils, System.DateUtils,
   Winapi.Windows, Vcl.Dialogs,
   REST.Types, REST.Client, REST.Utils,
-  UFrmPlaces, UFrmGeoSearch, ExifToolsGUI_Utils;
+  UFrmPlaces, UFrmGeoSearch, ExifToolsGUI_Utils, UnitLangResources;
 
 var
   CoordFormatSettings: TFormatSettings; // for StrToFloatDef -see Initialization
@@ -524,12 +524,12 @@ begin
     try
       RESTRequest.Execute;
       if (RESTRequest.Response.StatusCode >= 400) then
-        raise exception.Create('Request failed with HTTP Response:' + #10 + RESTRequest.Response.StatusText);
+        raise exception.Create(StrRequestFailedWith + #10 + RESTRequest.Response.StatusText);
     except
       on E:Exception do
       begin
         result := false;
-        if (MessageDlgEx('Request failed with' + E.Message + #10 + 'Continue ? (Re-enable in Preferences)', '',
+        if (MessageDlgEx(E.Message + #10 + StrContinueReenabl, '',
                          TMsgDlgType.mtInformation,
                          [TMsgDlgBtn.mbYes, TMsgDlgBtn.mbNo]) = IDNO) then
           GeoSettings.GeoCodingEnable := false;

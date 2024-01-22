@@ -60,7 +60,7 @@ var
 
 implementation
 
-uses System.StrUtils, Main, ExifTool, ExifToolsGUI_Utils;
+uses System.StrUtils, Main, ExifTool, ExifToolsGUI_Utils, UnitLangResources;
 
 {$R *.dfm}
 
@@ -75,22 +75,22 @@ begin
   APlace := GetPlaceOfCoords(Lat, Lon, GeoSettings.GetPlaceProvider);
   if (APlace = nil) then
     exit;
-  LblCountrySettings.Caption := 'Settings for: ' + APlace.CountryLocation;
+  LblCountrySettings.Caption := StrSettingsFor + APlace.CountryLocation;
 
   if (APlace.PrioProvince <> '') then
     LblProvince.Caption := APlace.PrioProvince
   else
-    LblProvince.Caption := 'Fallback: ' + APlace.Province;
+    LblProvince.Caption := StrFallback + APlace.Province;
   LblProvince.Caption := LblProvince.Caption + #10 +
-                        'Available data:' + #10 +
+                         StrAvailableData + #10 +
                          APlace.FProvinceList.Text;
 
   if (APlace.PrioCity <> '') then
     LblCity.Caption := APlace.PrioCity
   else
-    LblCity.Caption := 'Fallback: ' + APlace.City;
+    LblCity.Caption := StrFallback + APlace.City;
   LblCity.Caption := LblCity.Caption +  #10 +
-                    'Available data:' + #10+
+                     StrAvailableData + #10+
                      APlace.FCityList.Text;
 
 end;

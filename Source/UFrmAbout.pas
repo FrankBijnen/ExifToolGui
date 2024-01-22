@@ -31,7 +31,8 @@ var
 
 implementation
 
-uses ExifTool, ExifToolsGUI_Utils, ExifToolsGui_LossLess, ShellAPI;
+uses ExifTool, ExifToolsGUI_Utils, ExifToolsGui_LossLess, ShellAPI, UnitLangResources;
+
 
 {$R *.dfm}
 
@@ -59,8 +60,8 @@ begin
   X := Screen.Width;
   Y := Screen.Height;
   I := Screen.PixelsPerInch;
-  LblScreen.Caption := 'Screen resolution: ' + IntToStr(X) + 'x' + IntToStr(Y) + ' at ' + IntToStr(I) + 'DPI, ' +
-                       'Scaled: ' + IntToStr(ScaleDesignDpi(100)) + '%';
+  LblScreen.Caption := StrScreenResolution + IntToStr(X) + 'x' + IntToStr(Y) + ' at ' + IntToStr(I) + 'DPI, ' +
+                       StrScaled + IntToStr(ScaleDesignDpi(100)) + '%';
 end;
 
 procedure TFrmAbout.LblUrlEnter(Sender: TObject);

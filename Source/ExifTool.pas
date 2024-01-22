@@ -62,7 +62,9 @@ function ExecET(ETcmd, FNames, WorkDir: string; var ETouts: string): boolean; ov
 
 implementation
 
-uses System.SysUtils, System.SyncObjs, Winapi.Windows, Main, MainDef, ExifToolsGUI_Utils, ExifTool_PipeStream;
+uses
+  System.SysUtils, System.SyncObjs, Winapi.Windows, Main, MainDef, ExifToolsGUI_Utils, ExifTool_PipeStream,
+  UnitLangResources;
 
 const
   SizePipeBuffer = 65535;
@@ -242,7 +244,7 @@ begin
       ETEvent.SetEvent;
       result := false;
       ETouts := '';
-      ETErrs := 'Time out waiting for Event' + CRLF;
+      ETErrs := StrTimeOutWaitingFor + CRLF;
       exit;
     end;
     ETEvent.ReSetEvent;

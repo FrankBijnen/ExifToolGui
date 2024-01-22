@@ -87,6 +87,7 @@ object FLogWin: TFLogWin
       Align = alLeft
       Constraints.MinWidth = 285
       TabOrder = 1
+      ExplicitHeight = 209
       object TabCommands: TTabSheet
         Caption = 'Executed commands'
         object MemoCmds: TMemo
@@ -107,9 +108,7 @@ object FLogWin: TFLogWin
           TabOrder = 0
           WordWrap = False
           OnKeyDown = MemoKeyDown
-          ExplicitTop = 28
-          ExplicitWidth = 279
-          ExplicitHeight = 154
+          ExplicitHeight = 141
         end
         object PnlCommands: TPanel
           Left = 0
@@ -149,8 +148,6 @@ object FLogWin: TFLogWin
               'CmdLine')
             TabOrder = 2
             OnClick = RadShowCmdsClick
-            ExplicitLeft = 0
-            ExplicitTop = -4
           end
         end
       end
@@ -164,8 +161,7 @@ object FLogWin: TFLogWin
       Align = alClient
       Constraints.MinWidth = 100
       TabOrder = 0
-      ExplicitLeft = 294
-      ExplicitWidth = 283
+      ExplicitWidth = 245
       ExplicitHeight = 209
       object TabOutput: TTabSheet
         Caption = 'Output from commands'
@@ -186,7 +182,7 @@ object FLogWin: TFLogWin
           ScrollBars = ssVertical
           TabOrder = 0
           OnKeyDown = MemoKeyDown
-          ExplicitWidth = 275
+          ExplicitWidth = 237
           ExplicitHeight = 181
         end
       end

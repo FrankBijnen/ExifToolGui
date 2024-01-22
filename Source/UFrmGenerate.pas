@@ -38,13 +38,13 @@ var
 
 implementation
 
-uses exiftoolsgui_utils;
+uses ExifToolsGUI_Utils, UnitLangResources;
 
 {$R *.dfm}
 
 procedure TFrmGenerate.CM_Start(var Message: TMessage);
 begin
-  Caption := Format('Generating %d thumbnails for: %s', [Message.WParam, string(Message.LParam)]);
+  Caption := Format(StrGeneratingDThumbn, [Message.WParam, string(Message.LParam)]);
   PbProgress.Position := 0;
   PbProgress.Max := Message.WParam;
 end;
@@ -63,7 +63,7 @@ end;
 
 procedure TFrmGenerate.BtnCloseClick(Sender: TObject);
 begin
-  Caption := 'Waiting for active tasks to complete';
+  Caption := StrWaitingForActive;
   WantsToClose := true;
 end;
 

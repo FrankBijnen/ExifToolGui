@@ -4,7 +4,7 @@ program ExifToolGUI;
 // Requires JCL to compile. https://github.com/project-jedi/jcl
 // Will show a dialog when an exception occurs to copy the Stacktrace on the clipboard.
 
-{.$DEFINE LANGOVERRIDE}
+{$DEFINE LANGOVERRIDE}
 // Allows for overriding the default language, without writing to the registry.
 // CommandLine example: /OverrideLanguage=NLD
 
@@ -21,6 +21,7 @@ uses
   Vcl.Themes,
   Vcl.Styles,
   MainDef in 'MainDef.pas',
+  UnitLangResources in 'UnitLangResources.pas',
   ExifToolsGUI_Utils in 'ExifToolsGUI_Utils.pas',
   UnitFilesOnClipBoard in 'UnitFilesOnClipBoard.pas',
   ExifToolsGui_ValEdit in 'ExifToolsGui_ValEdit.pas',

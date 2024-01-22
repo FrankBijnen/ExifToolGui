@@ -23,7 +23,7 @@ implementation
 uses
   System.UITypes,
   Winapi.ShlObj, Winapi.UrlMon, Winapi.ShellAPI,
-  ExifToolsGUI_Utils;
+  ExifToolsGUI_Utils, UnitLangResources;
 
 var
   CF_PREFERREDDROPEFFECT: TClipFormat = 0;
@@ -230,7 +230,7 @@ end;
 
 procedure ClipboardError;
 begin
-  raise Exception.Create('Could not complete clipboard operation.');
+  raise Exception.Create(StrCouldNotCompleteC);
 end;
 
 procedure CheckHR(Hr: HResult);
@@ -400,7 +400,7 @@ begin
       // Dont copy to same directory.
       TargetFile := IncludeTrailingBackslash(TargetDir) + ExtractFileName(AFile);
       if (CompareText(TargetFile, AFile) = 0) then
-        raise Exception.Create('Source and target should be different!');
+        raise Exception.Create(StrSourceAndTargetSh);
 
       // Overwrite ?
       WriteFile := OverWriteAll;
@@ -408,7 +408,7 @@ begin
         WriteFile := not FileExists(TargetFile);
       if not WriteFile then
       begin
-        Confirmation := MessageDlgEx(Format('File %s exists. Overwrite?', [TargetFile]), '',
+        Confirmation := MessageDlgEx(Format(StrFileSExistsOver, [TargetFile]), '',
                                      TMsgDlgType.mtWarning,
                                      [TMsgDlgBtn.mbYes, TMsgDlgBtn.mbNo, TMsgDlgBtn.mbCancel, TMsgDlgBtn.mbYesToAll]
                                     );
@@ -437,7 +437,7 @@ begin
       else
         Succes := CopyFile(PWideChar(AFile), PWideChar(TargetFile), false);
       if not Succes then
-        raise Exception.Create(Format('Overwrite %s failed.', [AFile]));
+        raise Exception.Create(Format(StrOverwriteSFailed, [AFile]));
     end;
   finally
     SetCursor(CrNormal);

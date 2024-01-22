@@ -8,6 +8,9 @@ interface
 uses System.Classes, System.Win.Comobj, System.Sysutils,
      Winapi.Windows, Winapi.ShlObj, Vcl.Controls, Vcl.Shell.ShellCtrls;
 
+// Do not localize.
+// Localized strings are found in UnitLangResources
+
 const SCmdVerbRefresh       = 'Refresh';
       IDVerbRefresh         = $8000;
 const SCmdVerbGenThumbs     = 'Generate Thumbnails';
@@ -26,6 +29,8 @@ procedure InvokeMultiContextMenu(Owner: TWinControl; AFolder: TShellFolder; Mous
                                  var ICM2: IContextMenu2; AFileList: TStrings = nil);
 
 implementation
+
+uses UnitLangResources;
 
   // Contextmenu supporting multi select
 
@@ -73,9 +78,9 @@ begin
     CM.QueryInterface(IID_IContextMenu2, ICM2); // To handle submenus. Note: See WndProc of ShellTree and ShellList
 
     // Add Custom items on top
-    InsertMenu(Menu, 0, MF_STRING or MF_BYPOSITION, IDVerbRefresh +1, PWideChar(SCmdVerbRefresh));
-    InsertMenu(Menu, 1, MF_STRING or MF_BYPOSITION, IDVerbGenThumbs +1, PWideChar(SCmdVerbGenThumbs));
-    InsertMenu(Menu, 2, MF_STRING or MF_BYPOSITION, IDVerbGenThumbsSub  +1, PWideChar(SCmdVerbGenThumbsSub));
+    InsertMenu(Menu, 0, MF_STRING or MF_BYPOSITION, IDVerbRefresh +1, PWideChar(SrCmdVerbRefresh));
+    InsertMenu(Menu, 1, MF_STRING or MF_BYPOSITION, IDVerbGenThumbs +1, PWideChar(SrCmdVerbGenThumbs));
+    InsertMenu(Menu, 2, MF_STRING or MF_BYPOSITION, IDVerbGenThumbsSub  +1, PWideChar(SrCmdVerbGenThumbsSub));
     InsertMenu(Menu, 3, MF_SEPARATOR or MF_BYPOSITION, 0, PWideChar('-'));
     // Until here
 

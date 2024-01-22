@@ -126,7 +126,7 @@ object FrmAbout: TFrmAbout
       414
       29)
     object BtnOk: TBitBtn
-      Left = 291
+      Left = 283
       Top = 2
       Width = 75
       Height = 25
@@ -153,7 +153,7 @@ object FrmAbout: TFrmAbout
       ModalResult = 1
       NumGlyphs = 2
       TabOrder = 0
-      ExplicitLeft = 283
+      ExplicitLeft = 275
     end
   end
 end
