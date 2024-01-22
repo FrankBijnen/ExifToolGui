@@ -21,6 +21,7 @@ type
     procedure ExecuteCommandExif(Verb: string; var Handled: boolean);
   end;
 
+procedure DoContextMenuVerb(AFolder: TShellFolder; Verb: PAnsiChar);
 procedure InvokeMultiContextMenu(Owner: TWinControl; AFolder: TShellFolder; MousePos: TPoint;
                                  var ICM2: IContextMenu2; AFileList: TStrings = nil);
 
@@ -138,6 +139,27 @@ begin
   finally
     DestroyMenu(Menu);
   end;
+end;
+
+procedure DoContextMenuVerb(AFolder: TShellFolder; Verb: PAnsiChar);
+var
+  ICI: TCMInvokeCommandInfo;
+  CM: IContextMenu;
+  PIDL: PItemIDList;
+begin
+  if AFolder = nil then Exit;
+  FillChar(ICI, SizeOf(ICI), #0);
+  with ICI do
+  begin
+    cbSize := SizeOf(ICI);
+    fMask := CMIC_MASK_ASYNCOK;
+    hWND := 0;
+    lpVerb := Verb;
+    nShow := SW_SHOWNORMAL;
+  end;
+  PIDL := AFolder.RelativeID;
+  AFolder.ParentShellFolder.GetUIObjectOf(0, 1, PIDL, IID_IContextMenu, nil, CM);
+  CM.InvokeCommand(ICI);
 end;
 
 end.

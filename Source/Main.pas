@@ -356,7 +356,7 @@ implementation
 
 uses System.StrUtils, System.Math, System.Masks, System.Types, System.UITypes,
   Vcl.ClipBrd, Winapi.ShlObj, Winapi.ShellAPI, Winapi.CommCtrl, Vcl.Shell.ShellConsts, Vcl.Themes, Vcl.Styles,
-  ExifTool, ExifInfo, ExifToolsGui_LossLess, ExifTool_PipeStream,
+  ExifTool, ExifInfo, ExifToolsGui_LossLess, ExifTool_PipeStream, ExifToolsGUI_MultiContextMenu,
   MainDef, LogWin, Preferences, EditFFilter, EditFCol, UFrmStyle, UFrmAbout,
   QuickMngr, DateTimeShift, DateTimeEqual, CopyMeta, RemoveMeta, Geotag, Geomap, CopyMetaSingle, FileDateTime,
   UFrmGenericExtract, UFrmGenericImport, UFrmLossLessRotate, UFrmGeoTagFiles, UFrmGeoSetup;
@@ -2963,6 +2963,42 @@ begin // event is executed for each deleted file -so make it fast!
 end;
 
 procedure TFMain.ShellListKeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
+
+  procedure DeleteSelected;
+  var
+    ANItem: TListItem;
+    CurIndex: integer;
+    CrWait, CrNormal: HCURSOR;
+  begin
+    if (ShellList.SelCount = 0) then
+      exit;
+
+    CrWait := LoadCursor(0, IDC_WAIT);
+    CrNormal := SetCursor(CrWait);
+    ShellList.Items.BeginUpdate;
+    try
+      CurIndex := ShellList.Selected.Index -1;
+      for ANItem in ShellList.Items do
+      begin
+        if (ANItem.Selected = false) then
+          Continue;
+        DoContextMenuVerb(ShellList.Folders[ANItem.Index], SCmdVerbDelete);
+      end;
+
+      ShellList.Refresh;
+      ShellList.ClearSelection;
+      if (CurIndex < 0) then
+        CurIndex := 0;
+      if (CurIndex > ShellList.Items.Count -1) then
+        CurIndex := ShellList.Items.Count -1;
+      ShellList.Selected := ShellList.Items[CurIndex];
+      ShellList.ItemFocused := ShellList.Items[CurIndex];
+    finally
+      ShellList.Items.EndUpdate;
+      SetCursor(CrNormal);
+    end;
+  end;
+
 begin
   if (Key = VK_UP) or (Key = VK_DOWN) then       // Up-Down arrow
     ShellListClick(Sender);
@@ -2985,6 +3021,10 @@ begin
     ShellList.SetIconSpacing(0, 0);
   if (Key = VK_F2) and (ShellList.Selected <> nil) then
     ShellList.Selected.EditCaption;
+{$IFDEF NOTYET}
+  if (Key = VK_DELETE) and (ssCtrl in Shift) then
+    DeleteSelected;
+{$ENDIF}    
 end;
 
 procedure TFMain.ShellListSetFolders;

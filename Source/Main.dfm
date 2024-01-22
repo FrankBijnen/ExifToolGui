@@ -1078,6 +1078,7 @@ object FMain: TFMain
               end
               item
                 Action = MaAPILargeFileSupport
+                Caption = 'API &LargeFileSupport'
               end
               item
                 Caption = '-'
