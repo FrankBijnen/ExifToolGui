@@ -3220,7 +3220,7 @@ begin
         for E := 0 to N do
         begin
           Tx := QuickTags[E].Command;
-          if UpperCase(LeftStr(tx, length(GUI_SEP))) = GUI_SEP then
+          if UpperCase(LeftStr(Tx, Length(GUI_SEP))) = GUI_SEP then
             Tx := '=' + QuickTags[E].Caption
           else
           begin

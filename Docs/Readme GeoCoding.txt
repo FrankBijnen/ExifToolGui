@@ -1,3 +1,36 @@
+Lessons learned from user testing.
+
+A few users have done some testing with GeoCoding. A few issues found are resolved in code, other issues are worth documenting.
+
+General remarks:
+
+- If you run into problems, it's a good idea to replay the commands with the Log Window open. That information helps solving issues.
+- The 2 providers currently available, Geocode and Overpass, will drop requests when you generate too many per second.
+  Please use the 'Throttle values' in preferences. They specify a minimum nr of milliseconds between calls. For example 2000 means you can only do 1 call per 2 seconds!
+
+Issues found with 'Video files' (No Jpeg (JPG) or Camera-Raw (DNG, CRW, NEF etc), but Video's like MP4 or Mov)
+
+- You are more likely to have files bigger than 2 GB.
+  This requires enabling the option 'API LargeFileSupport'. Be patient with large files!
+
+- ExifToolGui may not display acurate info for these file types.
+
+  - In the Metadata panel. The item 'Geotagged?' will always show *NO* for Video files.
+    In the Workspace manager change the 'tag definition' for this item from: '-Gps:GPSLatitude' to '-GPSLatitude'. 
+    Explanation: Video files have the GPSLatitude stored in the 'QuickTime' group, so 'Gps:GPSLatitude' will not retrieve a value.
+                 Removing the prefix will take it from the 'Composite' group, that will work for both images and video. 
+
+    Sometimes the GPSLatitude will be stored with a value of '0'. While technically this is a good value when you're at the equator,
+    it is often because the GPS Sensor was not yet initialized at the time of recording, and the file still needs GeoTagging.
+    If you want to show the value '0' as Geotagged *NO* change the 'Tag name to display' from 'Geotagged?' to 'Geotagged??' (2 questionmarks) in the Workspace manager. 
+             
+  - In the Filelist panel. When you set it to 'Camera settings', 'Location info' or 'About photo'. 
+    Initially these settings where meant for Camera files only. ExifToolGui would read these files directly without calling ExifTool to speed up processing.
+    The drawback is that for other filetypes the data can not obtained. Changed with version 6.2.9:
+    - Added code to be able to read FujiFilm (RAF) and Canon CR3 directly.
+    - If the filetype is not recognized, it will now show 'File type unsupported'. Previous versions did not warn you.
+    - You can enable the option 'Enable 'Camera Settings', 'Location info' and 'About photo' for all file types. (Slower)' in 'Preferences/Other'.
+      This will call ExifTool for unsupported filetypes. 
 
 Important:
 
