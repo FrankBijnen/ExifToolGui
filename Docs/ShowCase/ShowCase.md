@@ -9,7 +9,7 @@ The same folder, but showing thumbnails, and the log window showing the commands
 
 <img src="2_Main_thumbnails_log.jpg">
 
-Geocoding. Tagging you files, and showing them on an OpenStreetMap map.<br>
+Geocoding. Tagging your files, and showing them on an OpenStreetMap map.<br>
 
 <img src="3_Main_geocode.jpg">
 
@@ -25,7 +25,7 @@ Geocoding. Tagging you files, and showing them on an OpenStreetMap map.<br>
 
 <img src="6_Export_import.jpg">
 
-<img src="6_Export_previews.jpg">
+<img src="7_Export_previews.jpg">
 
 <h4>Modify</h4>
 
