@@ -331,7 +331,9 @@ pop-up menu appears and there's option <font class="blue">Fill in default values
 <font class="red">?</font> -if tag name ends with this character (see
 Geotagged? above), then that means, that you're not interested on tag
 value itself -what you wish to see is, if particular tag is defined or
-not. <u>Note:</u> You won't be able to edit such tag in <font class="blue">Workspace</font> view.<br><br>
+not.
+<u>Notes:</u> You won't be able to edit such tag in <font class="blue">Workspace</font> view.<br>
+Use 2 questionmarks <font class="red">??</font> to show the value <font class="red">0</font> as undefined.<br><br>
 <font class="red">±</font> -if tag name ends with this character (see
 Type± in main screenshot above), then you'll be allowed to enter
 multiple values for single tag at once (i.e. keywords and similar). Of
