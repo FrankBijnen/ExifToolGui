@@ -17,26 +17,30 @@ Geocoding. Tagging your files, and showing them on an OpenStreetMap map.<br>
 
 <img src="4_Preferences.jpg">
 
+<h4>Styles</h4>
+
+<img src="5_Styles.jpg">
+
 <h4>Options</h4>
 
-<img src="5_Options.jpg">
+<img src="6_Options.jpg">
 
 <h4>Export Import</h4>
 
-<img src="6_Export_import.jpg">
+<img src="7_Export_import.jpg">
 
-<img src="7_Export_previews.jpg">
+<img src="8_Export_previews.jpg">
 
 <h4>Modify</h4>
 
-<img src="8_Modify.jpg">
+<img src="9_Modify.jpg">
 
 <h4>Various</h4>
 
-<img src="9_Various.jpg">
+<img src="10_Various.jpg">
 
-<img src="10_Various_lossless_rotate.jpg">
+<img src="11_Various_lossless_rotate.jpg">
 
 <h4>Online Documentation</h4>
 
-<img src="11_OnlineDocs.jpg">
+<img src="12_OnlineDocs.jpg">

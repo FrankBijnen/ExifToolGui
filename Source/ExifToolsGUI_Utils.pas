@@ -675,7 +675,7 @@ var
   BufSize: integer; // buffer size required for value
 begin
   result := '';
-  // Get required buffer size (inc. terminal #0)
+  // Get required buffer size (inc. terminating #0)
   BufSize := GetEnvironmentVariable(PChar(VarName), nil, 0);
   if BufSize > 0 then
   begin

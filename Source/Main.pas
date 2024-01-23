@@ -1139,7 +1139,7 @@ begin
     j := ShellList.SelCount;
     if j > 1 then // message appears only if multi files selected
       if MessageDlg(ImportMetaSel1 + #10 +
-                    ImportMetaSel2 + DstExt + ' files.' + #10 +
+                    Format(ImportMetaSel2, [DstExt]) + #10 +
                     ImportMetaSel3 + #10 +
                     ImportMetaSel4 + #10#10 +
                     ImportMetaSel5 + #10 +
@@ -1236,7 +1236,7 @@ begin
   if (DstExt = 'jpg') or (DstExt = 'tif') then
   begin
     i := MessageDlg(ImportRecursive1 + #10 +
-                    ImportRecursive2 + UpperCase(DstExt) +
+                    Format(ImportRecursive2, [UpperCase(DstExt)]) +
                     ImportRecursive3 + #10 +
                     ImportRecursive4 + #10 +
                     ImportRecursive5 + #10#10 +
@@ -1938,11 +1938,8 @@ begin
 end;
 
 procedure TFMain.UpdateStatusBar_FilesShown;
-var
-  I: smallint;
 begin
-  I := ShellList.Items.Count;
-  StatusBar.Panels[0].Text := StrFiles + IntToStr(I);
+  StatusBar.Panels[0].Text := Format(StrFiles, [ShellList.Items.Count]);
 end;
 
 procedure TFMain.EdgeBrowser1CreateWebViewCompleted(Sender: TCustomEdgeBrowser; AResult: HRESULT);
@@ -2251,9 +2248,6 @@ begin
           8:
             Rotate := 270;
         end;
-{$IFDEF DEBUG}
-        AdvTabPreview.Caption := StrPreview + IntToStr(Rotate);
-{$ENDIF}
       end;
       ABitMap := GetBitmapFromWic(WicPreview(FPath, Rotate, RotateImg.Width, RotateImg.Height));
       if (ABitMap = nil) then
@@ -3164,8 +3158,8 @@ var
 begin
   NewCaption := '';
   if (IsElevated) then
-    NewCaption := StrAdministrator;
-  NewCaption := NewCaption  + Application.Title;
+    NewCaption := StrAdministrator + ' ';
+  NewCaption := NewCaption + Application.Title;
   if (AnItem <> '') then
     NewCaption := NewCaption + ' - ' + AnItem;
   Caption := NewCaption
@@ -3548,7 +3542,7 @@ begin
   if ShellList.SelectedFolder <> nil then
     ShowImagesOnMap(EdgeBrowser1, ShellList.Path, GetGpsCoordinates(GetSelectedFiles))
   else
-    ShowMessage(StrNoFileSelected);
+    ShowMessage(StrNoFilesSelected);
 end;
 
 procedure TFMain.Splitter1CanResize(Sender: TObject; var NewSize: integer; var Accept: boolean);
