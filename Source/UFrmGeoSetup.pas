@@ -80,7 +80,7 @@ begin
   if (APlace.PrioProvince <> '') then
     LblProvince.Caption := APlace.PrioProvince
   else
-    LblProvince.Caption := StrFallback + APlace.Province;
+    LblProvince.Caption := StrResult + APlace.Province;
   LblProvince.Caption := LblProvince.Caption + #10 +
                          StrAvailableData + #10 +
                          APlace.FProvinceList.Text;
@@ -88,7 +88,7 @@ begin
   if (APlace.PrioCity <> '') then
     LblCity.Caption := APlace.PrioCity
   else
-    LblCity.Caption := StrFallback + APlace.City;
+    LblCity.Caption := StrResult + APlace.City;
   LblCity.Caption := LblCity.Caption +  #10 +
                      StrAvailableData + #10+
                      APlace.FCityList.Text;

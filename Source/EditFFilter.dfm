@@ -58,7 +58,7 @@ object FEditFFilter: TFEditFFilter
     object Button2: TButton
       Left = 8
       Top = 207
-      Width = 97
+      Width = 131
       Height = 25
       Caption = 'Delete selected'
       TabOrder = 3

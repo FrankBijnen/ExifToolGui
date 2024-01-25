@@ -38,7 +38,7 @@ object FPreferences: TFPreferences
     Top = 0
     Width = 521
     Height = 373
-    ActivePage = AdvTabGeneral
+    ActivePage = AdvTabOther
     Align = alLeft
     DoubleBuffered = True
     ParentDoubleBuffered = False
@@ -64,7 +64,7 @@ object FPreferences: TFPreferences
       object CheckBox1: TCheckBox
         Left = 16
         Top = 48
-        Width = 265
+        Width = 450
         Height = 17
         Caption = '-in preview, let GUI temporary rotate images'
         TabOrder = 1
@@ -145,15 +145,16 @@ object FPreferences: TFPreferences
       object CheckBox2: TCheckBox
         Left = 16
         Top = 71
-        Width = 297
+        Width = 450
         Height = 17
         Caption = '-enable internet access for OSM Map (requires restart)'
+        Constraints.MinWidth = 450
         TabOrder = 9
       end
       object CheckBox3: TCheckBox
         Left = 16
         Top = 308
-        Width = 185
+        Width = 450
         Height = 17
         Caption = '-save Filelist Details state on exit'
         TabOrder = 10
@@ -203,7 +204,7 @@ object FPreferences: TFPreferences
       object BtnSetupClean: TBitBtn
         Left = 37
         Top = 181
-        Width = 210
+        Width = 225
         Height = 25
         Caption = 'Setup Disk cleanup for thumbnails'
         Glyph.Data = {
@@ -294,7 +295,7 @@ object FPreferences: TFPreferences
       object BtnClean: TBitBtn
         Left = 37
         Top = 224
-        Width = 210
+        Width = 225
         Height = 25
         Caption = 'Cleanup thumbnails'
         Glyph.Data = {
@@ -616,13 +617,13 @@ object FPreferences: TFPreferences
         Left = 16
         Top = 67
         Width = 480
-        Height = 189
+        Height = 220
         Caption = 'Register ExiftoolGui in Contextmenu (Requires elevation)'
         TabOrder = 1
         object BtnAdd2Context: TBitBtn
-          Left = 3
-          Top = 21
-          Width = 175
+          Left = 5
+          Top = 43
+          Width = 180
           Height = 25
           Caption = 'Add to contextmenu'
           Glyph.Data = {
@@ -696,9 +697,9 @@ object FPreferences: TFPreferences
           OnClick = BtnAdd2ContextClick
         end
         object BtnRemoveFromContextMenu: TBitBtn
-          Left = 3
-          Top = 52
-          Width = 175
+          Left = 5
+          Top = 74
+          Width = 180
           Height = 25
           Caption = 'Remove from contextmenu'
           Glyph.Data = {
@@ -772,22 +773,21 @@ object FPreferences: TFPreferences
           OnClick = BtnRemoveFromContextMenuClick
         end
         object EdCommand: TLabeledEdit
-          Left = 250
-          Top = 23
-          Width = 221
+          Left = 190
+          Top = 43
+          Width = 282
           Height = 21
           EditLabel.Width = 59
-          EditLabel.Height = 21
+          EditLabel.Height = 13
           EditLabel.Caption = 'Installed as:'
-          LabelPosition = lpLeft
           ReadOnly = True
           TabOrder = 2
           Text = ''
         end
         object Memo1: TMemo
-          Left = 3
-          Top = 83
-          Width = 471
+          Left = 5
+          Top = 105
+          Width = 470
           Height = 100
           Lines.Strings = (
             
@@ -840,15 +840,15 @@ object FPreferences: TFPreferences
       object CheckBox4: TCheckBox
         Left = 16
         Top = 16
-        Width = 337
+        Width = 485
         Height = 17
         Caption = '-Workspace: Move focus to next tag/line after value is entered'
         TabOrder = 0
       end
       object EdETOverride: TEdit
-        Left = 87
+        Left = 103
         Top = 105
-        Width = 365
+        Width = 349
         Height = 21
         TabOrder = 3
       end
@@ -864,7 +864,7 @@ object FPreferences: TFPreferences
       object CheckBox5: TCheckBox
         Left = 16
         Top = 39
-        Width = 337
+        Width = 485
         Height = 17
         Caption = '-Workspace: Double Click adds/removes tags'
         TabOrder = 1

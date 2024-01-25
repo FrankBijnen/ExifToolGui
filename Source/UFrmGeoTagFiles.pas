@@ -174,7 +174,7 @@ begin
   Top := FMain.Top + FMain.GUIBorderHeight;
   StatusBar1.SimpleText := '';
   IsQuickTime := GetIsQuickTime(Fmain.GetFirstSelectedFile);
-  LblSample.Caption := Format(StrSampleS, [IsQuickTimeStr[IsQuickTime], ExtractFileName(Fmain.GetFirstSelectedFile)]);
+  LblSample.Caption := Format(StrSampleS, [IsQuickTimeStr[IsQuickTime] + ExtractFileName(Fmain.GetFirstSelectedFile)]);
   FillPreview;
 end;
 

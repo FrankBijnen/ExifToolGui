@@ -173,6 +173,7 @@ begin
   Left := FMain.Left + FMain.GUIBorderWidth + FMain.AdvPageFilelist.Left;
   Top := FMain.Top + FMain.GUIBorderHeight;
   RadioGroup3Click(Sender);
+  CheckBox1Click(Sender);
   Application.OnHint := DisplayHint;
 end;
 

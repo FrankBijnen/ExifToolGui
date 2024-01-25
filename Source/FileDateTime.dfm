@@ -159,7 +159,7 @@ object FFileDateTime: TFFileDateTime
       object RadioButton1: TRadioButton
         Left = 24
         Top = 8
-        Width = 241
+        Width = 340
         Height = 17
         Caption = 'Use Filename from Exif:DocumentName'
         Checked = True
@@ -193,7 +193,7 @@ object FFileDateTime: TFFileDateTime
       object RadioButton2: TRadioButton
         Left = 24
         Top = 8
-        Width = 241
+        Width = 340
         Height = 17
         Caption = 'Remove leading DateTime (incl. SPACE)'
         Checked = True

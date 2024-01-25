@@ -46,8 +46,6 @@ const
   CmdDateOriginal = '-exif:DateTimeOriginal';
   CmdDateCreate = '-exif:CreateDate';
   CmdDateModify = '-exif:ModifyDate';
-  srcTx: string[23] = '-use as source';
-  dstTx: string[23] = '-and copy here';
 
 var
   ETcmd: string;
@@ -80,6 +78,8 @@ begin
     Left := FMain.Left + FMain.GUIBorderWidth + FMain.AdvPageFilelist.Left;
     Top := FMain.Top + FMain.GUIBorderHeight;
 
+    RadioButton1Click(Sender);
+
     if FMain.MaDontBackup.Checked then
       Label1.Caption := StrBackupOFF
     else
@@ -104,21 +104,21 @@ procedure TFDateTimeEqual.RadioButton1Click(Sender: TObject);
 begin
   if Sender = RadioButton1 then
   begin
-    RadioButton1.Caption := srcTx;
-    RadioButton2.Caption := dstTx;
-    RadioButton3.Caption := dstTx;
+    RadioButton1.Caption := StrUseSrc;
+    RadioButton2.Caption := StrUseDest;
+    RadioButton3.Caption := StrUseDest;
   end;
   if Sender = RadioButton2 then
   begin
-    RadioButton1.Caption := dstTx;
-    RadioButton2.Caption := srcTx;
-    RadioButton3.Caption := dstTx;
+    RadioButton1.Caption := StrUseDest;
+    RadioButton2.Caption := StrUseSrc;
+    RadioButton3.Caption := StrUseDest;
   end;
   if Sender = RadioButton3 then
   begin
-    RadioButton1.Caption := dstTx;
-    RadioButton2.Caption := dstTx;
-    RadioButton3.Caption := srcTx;
+    RadioButton1.Caption := StrUseDest;
+    RadioButton2.Caption := StrUseDest;
+    RadioButton3.Caption := StrUseSrc;
   end;
 end;
 

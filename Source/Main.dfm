@@ -187,55 +187,56 @@ object FMain: TFMain
         Font.Style = []
         ParentFont = False
         TabOrder = 0
+        ExplicitLeft = 2
         object SpeedBtnExif: TSpeedButton
           Left = 2
           Top = 2
-          Width = 50
+          Width = 45
           Height = 21
           GroupIndex = 1
           Caption = 'Exif'
           OnClick = SpeedBtnExifClick
         end
         object SpeedBtnIptc: TSpeedButton
-          Left = 94
+          Left = 88
           Top = 2
-          Width = 42
+          Width = 45
           Height = 21
           GroupIndex = 1
           Caption = 'Iptc'
           OnClick = SpeedBtnExifClick
         end
         object SpeedBtnXmp: TSpeedButton
-          Left = 52
+          Left = 45
           Top = 2
-          Width = 42
+          Width = 45
           Height = 21
           GroupIndex = 1
           Caption = 'Xmp'
           OnClick = SpeedBtnExifClick
         end
         object SpeedBtnMaker: TSpeedButton
-          Left = 136
+          Left = 131
           Top = 2
-          Width = 42
+          Width = 45
           Height = 21
           GroupIndex = 1
           Caption = 'Maker'
           OnClick = SpeedBtnExifClick
         end
         object SpeedBtnALL: TSpeedButton
-          Left = 178
+          Left = 175
           Top = 2
-          Width = 32
+          Width = 45
           Height = 21
           GroupIndex = 1
           Caption = 'ALL'
           OnClick = SpeedBtnExifClick
         end
         object SpeedBtnCustom: TSpeedButton
-          Left = 210
+          Left = 219
           Top = 2
-          Width = 50
+          Width = 65
           Height = 21
           GroupIndex = 1
           Caption = 'Custom'
@@ -254,7 +255,7 @@ object FMain: TFMain
         object EditFindMeta: TLabeledEdit
           Left = 124
           Top = 29
-          Width = 136
+          Width = 160
           Height = 21
           Color = clWhite
           EditLabel.Width = 20
@@ -370,7 +371,8 @@ object FMain: TFMain
         OnMouseDown = MetadataListMouseDown
         OnMouseMove = MetadataListMouseMove
         OnSelectCell = MetadataListSelectCell
-        ExplicitHeight = 344
+        ExplicitLeft = 2
+        ExplicitTop = 56
         ColWidths = (
           150
           160)
@@ -718,7 +720,7 @@ object FMain: TFMain
           Top = 6
           Width = 114
           Height = 21
-          Hint = 'Choose how the command(s) must be executed '
+          Hint = 'Choose how the command(s) must be executed'
           DropDownWidth = 200
           ParentShowHint = False
           ShowHint = True
@@ -1212,7 +1214,7 @@ object FMain: TFMain
         ActionBar = ActionMainMenuBar
       end>
     Left = 163
-    Top = 53
+    Top = 52
     StyleName = 'Platform Default'
     object MaExportMetaTXT: TAction
       Tag = 20

@@ -135,7 +135,7 @@ object FGeotag: TFGeotag
       Width = 232
       Height = 27
       Hint = 
-        'Set TimeZone offset =difference between logget time (UTC) and ca' +
+        'Set TimeZone offset =difference between logged time (UTC) and ca' +
         'mera DateTime'
       Enabled = False
       Max = 11

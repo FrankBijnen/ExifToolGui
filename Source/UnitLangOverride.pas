@@ -57,7 +57,7 @@ initialization
 var
   Locale: string;
 begin
-  if (FindCmdLineSwitch('LangOverride', Locale, true)) then
+  if (FindCmdLineSwitch('Lang', Locale, true)) then
     SetLanguage(Copy(Locale, 2));
 end;
 

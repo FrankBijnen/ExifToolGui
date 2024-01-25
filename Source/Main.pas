@@ -1236,11 +1236,10 @@ begin
   if (DstExt = 'jpg') or (DstExt = 'tif') then
   begin
     i := MessageDlg(ImportRecursive1 + #10 +
-                    Format(ImportRecursive2, [UpperCase(DstExt)]) +
+                    Format(ImportRecursive2, [UpperCase(DstExt)]) + #10 +
                     ImportRecursive3 + #10 +
-                    ImportRecursive4 + #10 +
-                    ImportRecursive5 + #10#10 +
-                    ImportRecursive6, mtInformation,
+                    ImportRecursive4 + #10#10 +
+                    ImportRecursive5, mtInformation,
                     [mbYes, mbNo, mbCancel], 0);
     if i <> mrCancel then
     begin
@@ -1447,7 +1446,7 @@ begin
     DefaultExt := 'ini';
     InitialDir := WrkIniDir;
     Filter := 'Ini file|*.ini';
-    Title := StrSaveWorspaceDefini;
+    Title := StrSaveWorkspaceDefini;
     repeat
       IsOK := false;
       DoSave := Execute;
@@ -3505,7 +3504,7 @@ begin
   ParseLatLon(EditMapFind.Text, FGeotagFiles.Lat, FGeotagFiles.Lon);
   if not (ValidLatLon(FGeotagFiles.Lat, FGeotagFiles.Lon)) then
   begin
-    MessageDlgEx(StrNoValidLatLonCoo, '', TMsgDlgType.mtError, [TMsgDlgBtn.mbOK]);
+    MessageDlgEx(StrNoValidLatLon, '', TMsgDlgType.mtError, [TMsgDlgBtn.mbOK]);
     exit;
   end;
 
@@ -3585,7 +3584,7 @@ end;
 procedure TFMain.ShellistThumbGenerate(Sender: TObject; Item: TListItem; Status: TThumbGenStatus; Total, Remaining: integer);
 begin
   if (Remaining > 0) then
-    StatusBar.Panels[1].Text := StrRemainingThumbnails + IntToStr(Remaining)
+    StatusBar.Panels[1].Text := Format(StrRemainingThumbnails, [Remaining])
   else
     StatusBar.Panels[1].Text := '';
 end;

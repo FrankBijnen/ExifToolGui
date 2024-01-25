@@ -66,6 +66,8 @@ begin
   ReportMemoryLeaksOnShutdown := true;
 {$ENDIF}
 
+  Application.Title := 'ExifToolGui';
+
   if ReadSingleInstanceApp and
      not FSharedMem.IsOwner then
   begin
@@ -75,7 +77,6 @@ begin
 
   Application.Initialize;
   Application.MainFormOnTaskbar := True;
-  Application.Title := 'ExifToolGui';
 
   Application.CreateForm(TFMain, FMain);
   Application.CreateForm(TFLogWin, FLogWin);

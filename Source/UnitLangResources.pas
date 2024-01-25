@@ -35,7 +35,7 @@ resourcestring
   StrSelectingADiff         = 'Selecting a different font for the cmd window may help.';
   StrTypeSToExecute         = 'type "%s" to execute the generated CMD file.';
 
-  StrNoCustomTags           = 'No custom tags defined ';
+  StrNoCustomTags           = 'No custom tags defined';
   StrCannotSaveGUI          = 'Cannot save GUI settings.';
 
   StrNotInstalled           = '(Not installed)';
@@ -58,6 +58,9 @@ resourcestring
   StrGeneratingDThumbn      = 'Generating %d thumbnails for: %s';
   StrWaitingForActive       = 'Waiting for active tasks to complete';
 
+  StrUseSrc                 = '-use as source';
+  StrUseDest                = '-and copy here';
+
   StrRotatingSAngle         = 'Rotating %s Angle: %d Modulo: %d';
   StrCheckAtLeast1Pre       = 'Check at least 1 preview to extract';
   StrExtractingPreviews     = 'Extracting previews';
@@ -69,7 +72,7 @@ resourcestring
   StrUpdatingPreviewIn      = 'Updating preview in: %s';
 
   StrSettingsFor            = 'Settings for: ';
-  StrFallback               = 'Fallback: ';
+  StrResult                 = 'Result: ';
   StrAvailableData          = 'Available data:';
 
   StrResettingOrient        = 'Resetting Orientation, ModifyDate: %s';
@@ -100,19 +103,18 @@ resourcestring
   StrSelectedDestination    = 'Selected destination file must be JPG or TIF!';
   ImportMetaSingle1         = 'This will copy metadata from single source file,';
   ImportMetaSingle2         = 'into currently selected files.';
-  ImportMetaSingle3         = 'Next: 1.Select source file,  2.Select metadata to copy';
+  ImportMetaSingle3         = 'Next: 1.Select source file, 2.Select metadata to copy.';
   StrSelectSourceFile       = 'Select source file';
   ImportRecursive1          = 'This will copy metadata from files in another folder';
-  ImportRecursive2          = 'into *all* %s';
-  ImportRecursive3          = ' files inside currently *selected* folder.';
-  ImportRecursive4          = 'Only those files will be processed, where';
-  ImportRecursive5          = 'source and destination filename is equal.';
-  ImportRecursive6          = 'Should files in subfolders also be processed?';
+  ImportRecursive2          = 'into *all* %s files inside currently *selected* folder.';
+  ImportRecursive3          = 'Only those files will be processed, where';
+  ImportRecursive4          = 'source and destination filename is equal.';
+  ImportRecursive5          = 'Should files in subfolders also be processed?';
   StrSelectAnyOfSource      = 'Select any of source files';
   ImportXMP1                = 'This will import GPS data from XMP sidecar files into';
   ImportXMP2                = 'Exif GPS region of currently selected files.';
   ImportXMP3                = 'Only those selected files will be processed,';
-  ImportXMP4                = 'source and destination filename is equal.';
+  ImportXMP4                = 'where source and destination filename is equal.';
   ImportXMP5                = 'Next: Select folder containing XMP files.';
   StrChooseFolderContai     = 'Choose folder containing XMP sidecar files';
   StrSpecifyCustomOptio     = 'Specify Custom options to add to Exiftool args';
@@ -120,7 +122,7 @@ resourcestring
   StrLoadWorkspaceDefin     = 'Load Workspace definition file';
   StrNewWorkspaceLoaded     = 'New Workspace loaded.';
   StrIniFileDoesntCon       = 'Ini file does not contain Workspace data -nothing changed.';
-  StrSaveWorspaceDefini     = 'Save Worspace definition file';
+  StrSaveWorkspaceDefini    = 'Save Workspace definition file';
   StrUseAnotherNameFor      = 'Use another name for Workspace definition file!';
   StrWorkspaceDefinition    = 'Workspace definition file saved.';
   StrWorkspaceDefNotSaved   = 'Workspace definition file couldn''t be saved!?';
@@ -160,10 +162,9 @@ resourcestring
   StrYESAst                 = '*YES*';
   StrExifToolExecuted       = 'ExifTool executed';
   StrNoData                 = 'No data';
-  StrNoValidLatLonCoo       = 'No valid Lat Lon coordinates selected.';
   StrNoFilesSelected        = 'No files selected.';
   StrErrorSSCreating        = 'Error %s %s creating thumbnail for: %s';
-  StrRemainingThumbnails    = 'Remaining Thumbnails to generate: ';
+  StrRemainingThumbnails    = 'Remaining Thumbnails to generate: %d';
   StrDFilesRemaining        = '%d Files remaining';
 
 implementation
