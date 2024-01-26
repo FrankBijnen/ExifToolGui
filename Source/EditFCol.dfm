@@ -19,7 +19,7 @@ object FEditFColumn: TFEditFColumn
   object AdvPanel1: TPanel
     Left = 0
     Top = 0
-    Width = 538
+    Width = 534
     Height = 186
     Align = alLeft
     Anchors = [akLeft, akTop, akRight, akBottom]
@@ -32,15 +32,15 @@ object FEditFColumn: TFEditFColumn
     ParentDoubleBuffered = False
     ParentFont = False
     TabOrder = 0
-    ExplicitWidth = 534
+    ExplicitWidth = 530
     ExplicitHeight = 185
     DesignSize = (
-      538
+      534
       186)
     object StringGrid1: TStringGrid
       Left = 16
       Top = 7
-      Width = 513
+      Width = 509
       Height = 81
       Anchors = [akLeft, akTop, akRight]
       ColCount = 1
@@ -51,6 +51,7 @@ object FEditFColumn: TFEditFColumn
       ScrollBars = ssHorizontal
       TabOrder = 0
       OnSelectCell = StringGrid1SelectCell
+      ExplicitWidth = 505
     end
     object LabeledEdit1: TLabeledEdit
       Left = 16
@@ -105,7 +106,7 @@ object FEditFColumn: TFEditFColumn
     end
   end
   object Button4: TButton
-    Left = 544
+    Left = 540
     Top = 16
     Width = 64
     Height = 25
@@ -113,10 +114,10 @@ object FEditFColumn: TFEditFColumn
     Caption = 'Cancel'
     ModalResult = 2
     TabOrder = 1
-    ExplicitLeft = 540
+    ExplicitLeft = 536
   end
   object Button5: TButton
-    Left = 544
+    Left = 540
     Top = 151
     Width = 64
     Height = 25
@@ -125,7 +126,7 @@ object FEditFColumn: TFEditFColumn
     Default = True
     TabOrder = 2
     OnClick = Button5Click
-    ExplicitLeft = 540
+    ExplicitLeft = 536
   end
   object StatusBar1: TStatusBar
     Left = 0

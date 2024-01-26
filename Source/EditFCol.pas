@@ -60,46 +60,46 @@ end;
 
 procedure TMyGrid.InsertColumn(AColumn: Integer);
 var
-  i: smallint;
+  I: integer;
 begin
-  i := Col;
+  I := Col;
   while AColumn < FixedCols do
     Inc(AColumn);
   ColCount := ColCount + 1;
   MoveColumn(ColCount - 1, AColumn);
-  Col := i;
+  Col := I;
   Cols[Col].Clear;
 end;
 
 procedure TFEditFColumn.Button1Click(Sender: TObject);
 var
-  i: smallint; // Delete column
+  I: integer; // Delete column
 begin
 
   with StringGrid1 do
   begin
-    i := LeftCol;
+    I := LeftCol;
     if ColCount > 1 then
       TMyGrid(StringGrid1).DeleteColumn(Col);
-    LeftCol := i;
+    LeftCol := I;
     Button1.Enabled := (ColCount > 1);
   end;
 end;
 
 procedure TFEditFColumn.Button2Click(Sender: TObject);
 var
-  i: smallint;
-  tx: string; // Save changes
+  I: integer;
+  Tx: string; // Save changes
 begin
-  tx := Trim(LabeledEdit1.Text);
-  LabeledEdit1.Text := tx;
-  if Length(tx) = 0 then
+  Tx := Trim(LabeledEdit1.Text);
+  LabeledEdit1.Text := Tx;
+  if Length(Tx) = 0 then
     LabeledEdit1.SetFocus
   else
   begin
-    tx := Trim(LabeledEdit2.Text);
-    LabeledEdit2.Text := tx;
-    if (Length(tx) < 4) or (pos('-', tx) <> 1) or (pos(' ', tx) > 0) then
+    Tx := Trim(LabeledEdit2.Text);
+    LabeledEdit2.Text := Tx;
+    if (Length(Tx) < 4) or (pos('-', Tx) <> 1) or (pos(' ', Tx) > 0) then
       LabeledEdit2.SetFocus
     else
       with StringGrid1 do
@@ -113,18 +113,18 @@ end;
 
 procedure TFEditFColumn.Button3Click(Sender: TObject);
 var
-  i: smallint;
-  tx: string; // Add column
+  I: integer;
+  Tx: string; // Add column
 begin
-  tx := Trim(LabeledEdit1.Text);
-  LabeledEdit1.Text := tx;
-  if Length(tx) = 0 then
+  Tx := Trim(LabeledEdit1.Text);
+  LabeledEdit1.Text := Tx;
+  if Length(Tx) = 0 then
     LabeledEdit1.SetFocus
   else
   begin
-    tx := Trim(LabeledEdit2.Text);
-    LabeledEdit2.Text := tx;
-    if (Length(tx) < 4) or (pos('-', tx) <> 1) or (pos(' ', tx) > 0) then
+    Tx := Trim(LabeledEdit2.Text);
+    LabeledEdit2.Text := Tx;
+    if (Length(Tx) < 4) or (pos('-', Tx) <> 1) or (pos(' ', Tx) > 0) then
       LabeledEdit2.SetFocus
     else
       with StringGrid1 do
@@ -141,18 +141,18 @@ end;
 
 procedure TFEditFColumn.Button5Click(Sender: TObject);
 var
-  i, n: smallint;
+  I, N: integer;
 begin
   with StringGrid1 do
   begin
-    i := ColCount;
-    SetLength(FListColUsr, i);
-    for n := 0 to i - 1 do
+    I := ColCount;
+    SetLength(FListColUsr, I);
+    for N := 0 to I - 1 do
     begin
-      FListColUsr[n].Caption := Cells[n, 0];
-      FListColUsr[n].Command := Cells[n, 1];
-      FListColUsr[n].Width := ColWidths[n];
-      FListColUsr[n].AlignR := 0;
+      FListColUsr[N].Caption := Cells[N, 0];
+      FListColUsr[N].Command := Cells[N, 1];
+      FListColUsr[N].Width := ColWidths[N];
+      FListColUsr[N].AlignR := 0;
     end;
   end;
   ModalResult := mrOK;
@@ -160,24 +160,26 @@ end;
 
 procedure TFEditFColumn.FormShow(Sender: TObject);
 var
-  i, n: smallint; // clLite,clDark:TColor;
+  I, N: integer;
+  CanSelect: boolean;
 begin
   Left := FMain.Left + 8;
   Top := FMain.Top + 56;
   Width := FMain.Width - FMain.GUIBorderWidth;
 
-  i := Length(FListColUsr);
+  I := Length(FListColUsr);
   with StringGrid1 do
   begin
-    ColCount := i;
-    for n := 0 to i - 1 do
+    ColCount := I;
+    for N := 0 to I - 1 do
     begin
-      ColWidths[n] := FListColUsr[n].Width;
-      Cells[n, 0] := FListColUsr[n].Caption;
-      Cells[n, 1] := FListColUsr[n].Command;
+      ColWidths[N] := FListColUsr[N].Width;
+      Cells[N, 0] := FListColUsr[N].Caption;
+      Cells[N, 1] := FListColUsr[N].Command;
     end;
     Button1.Enabled := (ColCount > 1);
   end;
+  StringGrid1SelectCell(Sender, 0, 0, CanSelect);
   Application.OnHint := DisplayHint;
 end;
 

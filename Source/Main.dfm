@@ -187,7 +187,6 @@ object FMain: TFMain
         Font.Style = []
         ParentFont = False
         TabOrder = 0
-        ExplicitLeft = 2
         object SpeedBtnExif: TSpeedButton
           Left = 2
           Top = 2
@@ -371,8 +370,7 @@ object FMain: TFMain
         OnMouseDown = MetadataListMouseDown
         OnMouseMove = MetadataListMouseMove
         OnSelectCell = MetadataListSelectCell
-        ExplicitLeft = 2
-        ExplicitTop = 56
+        ExplicitHeight = 344
         ColWidths = (
           150
           160)
@@ -3087,10 +3085,5 @@ object FMain: TFMain
       Hint = 'Reset window sizes to default'
       ImageIndex = 1
     end
-  end
-  object ApplicationEvents: TApplicationEvents
-    OnMinimize = ApplicationEventsMinimize
-    Left = 72
-    Top = 383
   end
 end

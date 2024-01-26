@@ -26,7 +26,7 @@ uses
   ExifToolsGUI_Utils,      // Various
   Vcl.ActnMan, Vcl.ActnCtrls, Vcl.ActnMenus, System.Actions, Vcl.ActnList, Vcl.PlatformDefaultStyleActnCtrls,
   Vcl.ActnPopup, Vcl.BaseImageCollection, Vcl.ImageCollection, Vcl.VirtualImageList,
-  System.Win.TaskbarCore, Vcl.Taskbar, Vcl.ToolWin, Vcl.AppEvnts;
+  System.Win.TaskbarCore, Vcl.Taskbar, Vcl.ToolWin;
 
 const
   CM_ActivateWindow = WM_USER + 100;
@@ -175,7 +175,6 @@ type
     Taskbar: TTaskbar;
     ActLstTaskbar: TActionList;
     TaskBarResetWindow: TAction;
-    ApplicationEvents: TApplicationEvents;
     MaAPILargeFileSupport: TAction;
     procedure ShellListClick(Sender: TObject);
     procedure ShellListKeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
@@ -288,7 +287,7 @@ type
     procedure Tray_ResetwindowsizeClick(Sender: TObject);
     procedure TrayPopupMenuPopup(Sender: TObject);
     procedure TaskbarThumbButtonClick(Sender: TObject; AButtonID: Integer);
-    procedure ApplicationEventsMinimize(Sender: TObject);
+    procedure ApplicationMinimize(Sender: TObject);
     procedure TrayIconMouseUp(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
     procedure TrayIconBalloonClick(Sender: TObject);
     procedure MaAPILargeFileSupportExecute(Sender: TObject);
@@ -2323,7 +2322,7 @@ begin
   StatusBar.Panels[1].Width := AdvPageFilelist.Width + Splitter2.Width;
 end;
 
-procedure TFMain.ApplicationEventsMinimize(Sender: TObject);
+procedure TFMain.ApplicationMinimize(Sender: TObject);
 begin
   if (GUIsettings.MinimizeToTray) then
   begin
@@ -2380,6 +2379,8 @@ end;
 
 procedure TFMain.FormCreate(Sender: TObject);
 begin
+  Application.OnMinimize := ApplicationMinimize;
+
   ReadGUIini;
   // AdvPageFilelist.Constraints.MinWidth only used at design time. Form does not align well.
   // We check for MinFileListWidth in code.
