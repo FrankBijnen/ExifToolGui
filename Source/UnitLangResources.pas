@@ -167,6 +167,29 @@ resourcestring
   StrRemainingThumbnails    = 'Remaining Thumbnails to generate: %d';
   StrDFilesRemaining        = '%d Files remaining';
 
+  StrFLName                 = 'Name';
+  StrFLExpTime              = 'ExpTime';
+  StrFLFNumber              = 'FNumber';
+  StrFLISO                  = 'ISO';
+  StrFLExpComp              = 'ExpComp.';
+  StrFLFLength              = 'FLength';
+  StrFLFlash                = 'Flash';
+  StrFLExpProgram           = 'ExpProgram';
+  StrFLOrientation          = 'Orientation';
+
+  StrFLDateTime             = 'DateTime';
+  StrFLGPS                  = 'GPS';
+  StrFLCountry              = 'Country';
+  StrFLProvince             = 'Province';
+  StrFLCity                 = 'City';
+  StrFLLocation             = 'Location';
+
+  StrFLArtist               = 'Artist';
+  StrFLRating               = 'Rating';
+  StrFLType                 = 'Type';
+  StrFLEvent                = 'Event';
+  StrFLPersonInImage        = 'PersonInImage';
+
 implementation
 
 uses

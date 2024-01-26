@@ -3,7 +3,7 @@ unit MainDef;
 
 interface
 
-uses System.Classes, ExifTool, GEOMap;
+uses System.Classes, ExifTool, GEOMap, UnitLangResources;
 
 const
   SHOWALL = 'Show All Files';
@@ -53,10 +53,9 @@ type
   end;
 
   FListColDefRec = record
-    Caption: string;
+    Caption: PResStringRec;
     Width: smallint;
     AlignR: smallint;
-    constructor Create(AListColUsrRec: FListColUsrRec);
   end;
 
   QuickTagRec = record
@@ -70,20 +69,21 @@ var
   FListStdColWidth: array [0 .. 3] of smallint; // [Filename][Size][Type][Date modified]
 
   // Note: Default widths are in ReadGui
+  // Captions will be loaded at runtime from resourcestrings
   FListColDef1: array [0 .. 7] of FListColDefRec = (
     (
-      Caption: 'ExpTime'; AlignR: 6), (Caption: 'FNumber'; AlignR: 4), (Caption: 'ISO'; AlignR: 5), (Caption: 'ExpComp.'; AlignR: 4),
-    (Caption: 'FLength'; AlignR: 8), (Caption: 'Flash'; AlignR: 0), (Caption: 'ExpProgram'; AlignR: 0), (Caption: 'Orientation'; AlignR: 0));
+      Caption: @StrFLExpTime; AlignR: 6), (Caption: @StrFLFNumber; AlignR: 4), (Caption: @StrFLISO; AlignR: 5), (Caption: @StrFLExpComp; AlignR: 4),
+    (Caption: @StrFLFLength; AlignR: 8), (Caption: @StrFLFlash; AlignR: 0), (Caption: @StrFLExpProgram; AlignR: 0), (Caption: @StrFLOrientation; AlignR: 0));
 
   FListColDef2: array [0 .. 5] of FListColDefRec = (
     (
-      Caption: 'DateTime'; AlignR: 0), (Caption: 'GPS'; AlignR: 0), (Caption: 'Country'; AlignR: 0), (Caption: 'Province'; AlignR: 0),
-    (Caption: 'City'; AlignR: 0), (Caption: 'Location'; AlignR: 0));
+      Caption: @StrFLDateTime; AlignR: 0), (Caption: @StrFLGPS; AlignR: 0), (Caption: @StrFLCountry; AlignR: 0), (Caption: @StrFLProvince; AlignR: 0),
+    (Caption: @StrFLCity; AlignR: 0), (Caption: @StrFLLocation; AlignR: 0));
 
   FListColDef3: array [0 .. 4] of FListColDefRec = (
     (
-      Caption: 'Artist'; AlignR: 0), (Caption: 'Rating'; AlignR: 0), (Caption: 'Type'; AlignR: 0), (Caption: 'Event'; AlignR: 0),
-    (Caption: 'PersonInImage'; AlignR: 0));
+      Caption: @StrFLArtist; AlignR: 0), (Caption: @StrFLRating; AlignR: 0), (Caption: @StrFLType; AlignR: 0), (Caption: @StrFLEvent; AlignR: 0),
+    (Caption: @StrFLPersonInImage; AlignR: 0));
 
   FListColUsr: array of FListColUsrRec;
 
@@ -112,7 +112,7 @@ implementation
 uses System.SysUtils, System.StrUtils, System.IniFiles,
   Winapi.Windows, Winapi.ShellAPI, Winapi.ShlObj,
   Vcl.Forms, Vcl.ComCtrls, Vcl.Dialogs,
-  Main, LogWin, ExifToolsGUI_Utils, ExifInfo, UnitLangResources;
+  Main, LogWin, ExifToolsGUI_Utils, ExifInfo;
 
 const
   CRLF = #13#10;
@@ -160,13 +160,6 @@ end;
 function GUIsettingsRec.CanShowHidden: boolean;
 begin
   result := (ShowHidden and IsAdminUser) or IsElevated;
-end;
-
-constructor FListColDefRec.Create(AListColUsrRec: FListColUsrRec);
-begin
-  Caption := AListColUsrRec.Caption;
-  Width := AListColUsrRec.Width;
-  AlignR := AListColUsrRec.AlignR;
 end;
 
 function SetQuickTag(const AIndex: integer; const ACaption, ACommand: string; const AHelp: string = ''): integer;

@@ -2723,27 +2723,28 @@ procedure TFMain.ShellListAfterEnumColumns(Sender: TObject);
 
   procedure AddColumns(ColumnDefs: array of FListColDefRec); overload;
   var
-    i: integer;
+    I: integer;
   begin
     with ShellList do
     begin
       Columns.Clear;
-      AddColumn(SShellDefaultNameStr, FListStdColWidth[0]); // Name field
-      for i := 0 to High(ColumnDefs) do
-        AddColumn(ColumnDefs[i].Caption, ColumnDefs[i].Width, ColumnDefs[i].AlignR);
+      AddColumn(LoadResString(@StrFLName) , FListStdColWidth[0]); // Name field
+      for I := 0 to High(ColumnDefs) do
+        AddColumn(LoadResString(ColumnDefs[I].Caption), ColumnDefs[I].Width, ColumnDefs[I].AlignR);
     end;
   end;
 
   procedure AddColumns(ColumnDefs: array of FListColUsrRec); overload;
   var
-    DefRecords: array of FListColDefRec;
-    i: integer;
+    I: integer;
   begin
-    SetLength(DefRecords, length(ColumnDefs));
-    for i := 0 to length(DefRecords) - 1 do
-      DefRecords[i] := FListColDefRec.Create(ColumnDefs[i]);
-
-    AddColumns(DefRecords);
+    with ShellList do
+    begin
+      Columns.Clear;
+      AddColumn(LoadResString(@StrFLName) , FListStdColWidth[0]); // Name field
+      for I := 0 to High(ColumnDefs) do
+        AddColumn(ColumnDefs[I].Caption, ColumnDefs[I].Width, ColumnDefs[I].AlignR);
+    end;
   end;
 
 begin
