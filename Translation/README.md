@@ -20,6 +20,11 @@ It should contain:
 
 <h4>Things to keep in mind when translating</h4>
 
+<li>Verify the source and target language</li>
+- If not correct, you can change them.
+
+<img src="source_target.jpg">
+
 <li>At the time of writing 2 languages are working</li>
 - EN (English) The languge that ExifToolGui was originally developed in. This is the default, it does not need a separate module.<br>
 - NL (Dutch) I did this translation myself to make sure it works.<br>
