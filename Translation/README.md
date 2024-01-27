@@ -50,9 +50,8 @@ When translating you have 1 source and 1 target language. The modules supplied a
   
 - You can type the translation directly in the grid. But I find it clearer to keep the texteditor window open. You can access it via a small button on the right of the line. 
 
-<img src="texteditor.jpg">
+<img src="texteditor.jpg"><br>
 
-
-<h4>Contact me by creating an issue on GitHub.</h4>
+<h4>If you want to help translating, contact me by creating an issue on GitHub.</h4>
 
 Frank
