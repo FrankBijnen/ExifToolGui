@@ -192,7 +192,4 @@ resourcestring
 
 implementation
 
-uses
-  System.SysUtils;
-
 end.

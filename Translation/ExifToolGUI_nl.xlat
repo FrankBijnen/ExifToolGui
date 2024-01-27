@@ -14,13 +14,7 @@
   </options>
   <project sourcefile=".\ExifToolGUI.exe" stringsymbolfile=".\ExifToolGUI.drc" language="en-US" properties="622">
     <targetlanguages>
-      <language language="pt" translated="0"/>
-      <language language="es" translated="0"/>
       <language language="nl" translated="627"/>
-      <language language="de" translated="0"/>
-      <language language="en" translated="0"/>
-      <language language="fr" translated="0"/>
-      <language language="it" translated="0"/>
     </targetlanguages>
     <modules>
       <module name="resourcestrings" type="strings" properties="166">
