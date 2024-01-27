@@ -29,7 +29,7 @@ It should contain:
 - EN (English) The languge that ExifToolGui was originally developed in. This is the default, it does not need a separate module.<br>
 - NL (Dutch) I did this translation myself to make sure it works.<br>
 
-When translating you have 1 source and 1 target language. The modules supplied all have source language EN. But anyone that would prefer to have NL as source language contact me.
+When translating you have 1 source and 1 target language. The modules supplied all have source language EN. But anyone who would prefer to have NL as source language contact me.
 
 <li>Not all text's need translating</li>
 - I have marked a lot of text's as 'Dont Translate'. These text's normally dont show up. But even then there are about 622 text's to translate.
@@ -51,7 +51,7 @@ When translating you have 1 source and 1 target language. The modules supplied a
 - Special characters.<br>
   When you see %s, %d etc. then at runtime a value is substituted. Keep these, or the program will give an error. <br>
   When you see an & it can define a shortcut in a menu. Likely they will need changing after translation. <br>
-  Example: &Save will underline the letter S, and make that the keyboard shortcut.
+  Example: &Save will underline the letter S, and make that the keyboard shortcut.<br>
   
 - You can type the translation directly in the grid. But I find it clearer to keep the texteditor window open. You can access it via a small button on the right of the line. 
 
