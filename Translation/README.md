@@ -32,7 +32,7 @@ When translating you have 1 source and 1 target language. The modules supplied a
 <img src="filter_Status.jpg">
 
 <li>Keep track of what's remaining</li>
-- When the state moves from 'pending' to 'proposed' consider it done. You can use 'accepted' if you want to review all your 'proposed' text's and mark them as OK.
+- When the state moves from 'pending' to 'proposed' consider it done. You can use 'accepted' if you want to review all your 'proposed' text's and mark them as OK.<br>
 - If the text is equal in the source and target language, use right-click and set it to 'accepted'.
 
 <img src="filter_State.jpg">
