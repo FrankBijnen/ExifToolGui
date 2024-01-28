@@ -3,18 +3,17 @@
 
 This is an updated version of the ExifToolGui program created by Bogdan Hrastnik. Many thanks go out to him.
 
-<b>Hotfix for GeoCode queries: <b>V6.2.8</b> updated December 28, 2023.</b><br>
+<b>Released version: <b>V6.2.9</b> updated January 28, 2024.</b><br>
 
-Version: <b>V6.2.7</b> updated December 24, 2023.<br>
-- Deprecated functions that use Jhead or JpegTran have been removed.<br>
-- Added peek preview for metadata panel. Shown as hint.<br>
-- Added option to show Folders in filelist, including a Breadcrumb Bar.<br>
-- Added option to add custom tags to Exiftool.<br>
-- Fix for generated Powershell script.<br>
-- Style fixes for Green.<br>
-- Fixes for resizing, size of preview image.<br>
-- Experimental support for [4K Monitors](Docs/Readme%204K%20monitor.txt).<br>
-  If you experience problems with scaling, window positions etc. add <b>/HighDpi=UnAware /Scale</b> as parameters to the shortcut.
+- Support for 4K monitors, including scaling and resizing, completed. Commandline parameters not needed anymore.<br>
+- Fixes for issues found in Geocoding. Especially Video files. [Readme GeoCoding](Docs/Readme%20GeoCoding.txt)<br>
+- Optionally show hidden files & folders.<br>
+- Added keyboard shortcuts.<br>
+- Integration in Windows Explorer. [Readme Shell integration](Docs/Readme%20Shell%20integration.txt)<br>
+- Added support for more filetypes in FileList. (Camera settings, Location info and About photo)<br>
+- Add option LargeFileSupport<br>
+- Preparations for multi-language
+  If you're interested in creating/updating a translation, see: [Translation](Translation/README.md) <br>
 
 [Change log](Docs/changelog.txt)<br>
 [Download Release](https://github.com/FrankBijnen/ExifToolGui/releases/latest)<br>
@@ -45,5 +44,15 @@ a stacktrace can be copied to the clipboard if an Exception occurs. Please also 
  - [V6 Documentation html](https://htmlpreview.github.io/?https://github.com/FrankBijnen/ExifToolGui/blob/main/Docs/ExifToolGUI_V6.md)
  - [V6 Documentation md](/Docs/ExifToolGUI_V6.md)
  - [Docs directory](Docs/)
+
+<h4>Showcase</h4>
+
+[Showcase](Docs/ShowCase/ShowCase.md)<br>
+
+<h4>Legal, Copyright etc.</h4>
+
+This is a continuation of the project started by Bogdan Hrastnik. He did not mention any License, and or Copyrights. Likewise I will not. 
+I have used some open source components, you can find their legal info in the corresponding subdirectories.
+
 
 Frank
