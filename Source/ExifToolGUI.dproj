@@ -134,6 +134,7 @@
             <MainSource>MainSource</MainSource>
         </DelphiCompile>
         <DCCReference Include="MainDef.pas"/>
+        <DCCReference Include="UnitLangResources.pas"/>
         <DCCReference Include="ExifToolsGUI_Utils.pas"/>
         <DCCReference Include="UnitFilesOnClipBoard.pas"/>
         <DCCReference Include="ExifToolsGui_ValEdit.pas"/>

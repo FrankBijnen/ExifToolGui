@@ -31,7 +31,7 @@ var
 
 implementation
 
-uses ExifTool, ExifToolsGUI_Utils, ExifToolsGui_LossLess, ShellAPI;
+uses ExifTool, ExifToolsGUI_Utils, ExifToolsGui_LossLess, ShellAPI, UnitLangResources;
 
 {$R *.dfm}
 
@@ -46,21 +46,20 @@ begin
 
   // Setup captions dynamically.
   LblVersion.Caption := GetFileVersionNumber(Application.ExeName) +
-    ' by Bogdan Hrastnik.' + #10 +
-    'Adapted for RAD11 by Frank B';
-  LblSource.Caption := 'https://github.com/FrankBijnen/ExifToolGui';
-  LblForum.Caption := 'https://exiftool.org/forum/index.php';
-  LblExifTool.Caption := 'ExifTool by Phil Harvey ';
+    ' by Bogdan Hrastnik.' + #10 +  // Do not localize
+    'Adapted for RAD11 by Frank B'; // Do not localize
+  LblSource.Caption := 'https://github.com/FrankBijnen/ExifToolGui'; // Do not localize
+  LblForum.Caption := 'https://exiftool.org/forum/index.php';        // Do not localize
+  LblExifTool.Caption := 'ExifTool by Phil Harvey ';                 // Do not localize
   if ExecET('-ver', '', '', Output) then
     LblExifTool.Caption := LblExifTool.Caption + Output
   else
-    LblExifTool.Caption := LblExifTool.Caption + 'MISSING!';
+    LblExifTool.Caption := LblExifTool.Caption + StrMISSING;
 
   X := Screen.Width;
   Y := Screen.Height;
   I := Screen.PixelsPerInch;
-  LblScreen.Caption := 'Screen resolution: ' + IntToStr(X) + 'x' + IntToStr(Y) + ' at ' + IntToStr(I) + 'DPI, ' +
-                       'Scaled: ' + IntToStr(ScaleDesignDpi(100)) + '%';
+  LblScreen.Caption := Format(StrScreenResolution, [X, Y, I, ScaleDesignDpi(100)]);
 end;
 
 procedure TFrmAbout.LblUrlEnter(Sender: TObject);

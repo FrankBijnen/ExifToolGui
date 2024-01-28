@@ -83,7 +83,9 @@ var
 
 implementation
 
-uses Winapi.ShellAPI, Winapi.KnownFolders, System.Win.Registry, System.UITypes, UFrmGenerate, MainDef, ExifTool, ExifInfo;
+uses
+  Winapi.ShellAPI, Winapi.KnownFolders, System.Win.Registry, System.UITypes, UFrmGenerate, MainDef, ExifTool, ExifInfo,
+  UnitLangResources;
 
 var
   GlobalImgFact: IWICImagingFactory;
@@ -283,7 +285,7 @@ begin
   ShOp.fFlags := AFlags;
   ShResult := SHFileOperation(ShOp);
   if (ShResult <> 0) and (ShOp.fAnyOperationsAborted = false) then
-    raise Exception.Create(Format('Remove directory failed code %u', [ShResult]));
+    raise Exception.Create(Format(StrRemDirectoryFail, [ShResult]));
   result := (ShResult = 0);
 end;
 
@@ -452,7 +454,7 @@ begin
       begin
         WriteFile(Handle, Bytes[0], S, W, nil);
         if (W <> S) then
-          raise Exception.Create(Format('Write to %s failed', [Argsfile]));
+          raise Exception.Create(Format(StrWriteToSFailed, [Argsfile]));
       end;
     end;
 
@@ -461,7 +463,7 @@ begin
     S := Length(Bytes);
     WriteFile(Handle, Bytes[0], S, W, nil);
     if (W <> S) then
-      raise Exception.Create(Format('Write to %s failed', [Argsfile]));
+      raise Exception.Create(Format(StrWriteToSFailed, [Argsfile]));
 
   finally
     CloseHandle(Handle);
@@ -673,7 +675,7 @@ var
   BufSize: integer; // buffer size required for value
 begin
   result := '';
-  // Get required buffer size (inc. terminal #0)
+  // Get required buffer size (inc. terminating #0)
   BufSize := GetEnvironmentVariable(PChar(VarName), nil, 0);
   if BufSize > 0 then
   begin

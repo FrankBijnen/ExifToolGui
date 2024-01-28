@@ -38,7 +38,9 @@ var
 
 implementation
 
-uses System.StrUtils, Main, ExifTool, ExifToolsGUI_Utils, ExifToolsGui_LossLess, MainDef;
+uses
+  System.StrUtils, Main, ExifTool, ExifToolsGUI_Utils, ExifToolsGui_LossLess, MainDef,
+  UnitLangResources;
 
 {$R *.dfm}
 
@@ -105,7 +107,7 @@ begin
     if (Angle <> 0) or
        (Modulo <> 0) then
     begin
-      StatusBar1.SimpleText := Format('Rotating %s Angle: %d Modulo: %d', [FullPathName, Angle, Modulo]);
+      StatusBar1.SimpleText := Format(StrRotatingSAngle, [FullPathName, Angle, Modulo]);
       ASize := PerformLossLess(FullPathName, Angle, Modulo);
     end;
 
@@ -126,7 +128,7 @@ begin
 
     if (Etcmd <> '') then
     begin
-      StatusBar1.SimpleText := Format('Resetting Orientation, ModifyDate: %s', [FileName]);
+      StatusBar1.SimpleText := Format(StrResettingOrient, [FileName]);
       ET_OpenExec(ETcmd, FileName, ETouts, ETerrs);
       result := result and (ETerrs = '');
     end;
@@ -136,15 +138,15 @@ begin
     begin
       ETcmd := '-b' + CRLF + '-W!' + CRLF + GetPreviewTmp + CRLF;
       ETcmd := ETcmd + Preview;
-      StatusBar1.SimpleText := Format('Extracting preview from: %s', [FileName]);
+      StatusBar1.SimpleText := Format(StrExtractingPreviewF, [FileName]);
       ET_OpenExec(ETcmd, FileName, ETouts, ETerrs);
       result := result and (ETerrs = '');
 
-      StatusBar1.SimpleText := Format('Rotating preview %s Angle: %d Modulo: %d', [GetPreviewTmp, Angle, Modulo]);
+      StatusBar1.SimpleText := Format(StrRotatingPreviewS, [GetPreviewTmp, Angle, Modulo]);
       ASize := PerformLossLess(GetPreviewTmp, Angle, 0);
 
       ETcmd := Preview + '<=' + GetPreviewTmp + CRLF;
-      StatusBar1.SimpleText := Format('Importing preview into: %s', [FileName]);
+      StatusBar1.SimpleText := Format(StrImportingPreviewIn, [FileName]);
       ET_OpenExec(ETcmd, FileName, ETouts, ETerrs);
       result := result and (ETerrs = '');
     end;
@@ -160,7 +162,7 @@ begin
   CrNormal := SetCursor(CrWait);
   try
     RotateStatus := DoRotate(Sender);
-    StatusBar1.SimpleText := 'All Done';
+    StatusBar1.SimpleText := StrAllDone;
   finally
     SetCursor(CrNormal);
   end;
@@ -180,7 +182,7 @@ begin
   Left := FMain.Left + FMain.GUIBorderWidth + FMain.AdvPageFilelist.Left;
   Top := FMain.Top + FMain.GUIBorderHeight;
   StatusBar1.SimpleText := '';
-  LblSample.Caption := Format('Sample: %s', [ExtractFileName(Fmain.GetFirstSelectedFile)]);
+  LblSample.Caption := Format(StrSampleS, [ExtractFileName(Fmain.GetFirstSelectedFile)]);
   FillPreviewInListView(FMain.GetFirstSelectedFile, LvPreviews);
 end;
 

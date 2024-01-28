@@ -38,7 +38,7 @@ var
 
 implementation
 
-uses System.StrUtils, Main, ExifTool, ExifToolsGUI_Utils, ExifToolsGui_LossLess;
+uses System.StrUtils, Main, ExifTool, ExifToolsGUI_Utils, ExifToolsGui_LossLess, UnitLangResources;
 
 {$R *.dfm}
 
@@ -93,7 +93,7 @@ begin
             8: Angle := 270;
           end;
         end;
-        StatusBar1.SimpleText := Format('Rotating %s Angle: %d Modulo: %d', [AnExtract, Angle, Modulo]);
+        StatusBar1.SimpleText := Format(StrRotatingSAngle, [AnExtract, Angle, Modulo]);
         PerformLossLess(AnExtract, Angle, Modulo);
       end;
     end;
@@ -133,17 +133,17 @@ begin
     end;
     if (HasChecks = false) then
     begin
-      ShowMessage('Check at least 1 preview to extract');
+      ShowMessage(StrCheckAtLeast1Pre);
       exit;
     end;
 
-    StatusBar1.SimpleText := 'Extracting previews';
+    StatusBar1.SimpleText := StrExtractingPreviews;
     ET_OpenExec(ETcmd, FMain.GetSelectedFiles, ETouts, ETerrs);
 
     // Do AfterExtract always, even if errors occurred.
     AfterExtract(Sender);
 
-    StatusBar1.SimpleText := 'All Done';
+    StatusBar1.SimpleText := StrAllDone;
   finally
     SetCursor(CrNormal);
   end;
@@ -165,7 +165,7 @@ begin
   Left := FMain.Left + FMain.GUIBorderWidth + FMain.AdvPageFilelist.Left;
   Top := FMain.Top + FMain.GUIBorderHeight;
   StatusBar1.SimpleText := '';
-  LblSample.Caption := Format('Sample: %s', [ExtractFileName(Fmain.GetFirstSelectedFile)]);
+  LblSample.Caption := Format(StrSampleS, [ExtractFileName(Fmain.GetFirstSelectedFile)]);
   FillPreviewInListView(FMain.GetFirstSelectedFile, LvPreviews);
   BtnExecute.Enabled := LvPreviews.Items.Count > 0;
 end;

@@ -26,7 +26,7 @@ uses
   ExifToolsGUI_Utils,      // Various
   Vcl.ActnMan, Vcl.ActnCtrls, Vcl.ActnMenus, System.Actions, Vcl.ActnList, Vcl.PlatformDefaultStyleActnCtrls,
   Vcl.ActnPopup, Vcl.BaseImageCollection, Vcl.ImageCollection, Vcl.VirtualImageList,
-  System.Win.TaskbarCore, Vcl.Taskbar, Vcl.ToolWin, Vcl.AppEvnts;
+  System.Win.TaskbarCore, Vcl.Taskbar, Vcl.ToolWin;
 
 const
   CM_ActivateWindow = WM_USER + 100;
@@ -175,7 +175,7 @@ type
     Taskbar: TTaskbar;
     ActLstTaskbar: TActionList;
     TaskBarResetWindow: TAction;
-    ApplicationEvents: TApplicationEvents;
+    MaAPILargeFileSupport: TAction;
     procedure ShellListClick(Sender: TObject);
     procedure ShellListKeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
     procedure SpeedBtnExifClick(Sender: TObject);
@@ -287,9 +287,10 @@ type
     procedure Tray_ResetwindowsizeClick(Sender: TObject);
     procedure TrayPopupMenuPopup(Sender: TObject);
     procedure TaskbarThumbButtonClick(Sender: TObject; AButtonID: Integer);
-    procedure ApplicationEventsMinimize(Sender: TObject);
+    procedure ApplicationMinimize(Sender: TObject);
     procedure TrayIconMouseUp(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
     procedure TrayIconBalloonClick(Sender: TObject);
+    procedure MaAPILargeFileSupportExecute(Sender: TObject);
   private
     { Private declarations }
     ETBarSeriesFocal: TBarSeries;
@@ -354,10 +355,12 @@ implementation
 
 uses System.StrUtils, System.Math, System.Masks, System.Types, System.UITypes,
   Vcl.ClipBrd, Winapi.ShlObj, Winapi.ShellAPI, Winapi.CommCtrl, Vcl.Shell.ShellConsts, Vcl.Themes, Vcl.Styles,
-  ExifTool, ExifInfo, ExifToolsGui_LossLess, ExifTool_PipeStream,
+  ExifTool, ExifInfo, ExifToolsGui_LossLess, ExifTool_PipeStream, ExifToolsGUI_MultiContextMenu,
   MainDef, LogWin, Preferences, EditFFilter, EditFCol, UFrmStyle, UFrmAbout,
   QuickMngr, DateTimeShift, DateTimeEqual, CopyMeta, RemoveMeta, Geotag, Geomap, CopyMetaSingle, FileDateTime,
-  UFrmGenericExtract, UFrmGenericImport, UFrmLossLessRotate, UFrmGeoTagFiles, UFrmGeoSetup;
+  UFrmGenericExtract, UFrmGenericImport, UFrmLossLessRotate, UFrmGeoTagFiles, UFrmGeoSetup,
+  UnitLangResources;
+
 
 {$R *.dfm}
 
@@ -369,8 +372,7 @@ const
   ONLINE_DOC_URL = 'https://github.com/FrankBijnen/ExifToolGui/blob/main/Docs/ExifToolGUI_V6.md';
 {$ENDIF}
 
-  NotSupported = 'File type unsupported';
-
+const
   CameraFields =
     '-s3' + CRLF + '-f' + CRLF +
     '-ExifIFD:ExposureTime' + CRLF +
@@ -383,9 +385,11 @@ const
     '-IFD0:Orientation';
 
   LocationFields =
-    '-s3' + CRLF + '-f' + CRLF +
+    '-s3' + CRLF + '-f' + CRLF + '-api' + CRLF + 'QuickTimeUTC' + CRLF +
+    // In code we take DateTimeOriginal or CreateDate
     '-ExifIFD:DateTimeOriginal' + CRLF +
-    '-Composite:GPSLatitude' + CRLF +
+    '-CreateDate' + CRLF +
+    '-GPSLatitude#' + CRLF +
     '-XMP-iptcExt:LocationShownCountryName' + CRLF +
     '-XMP-iptcExt:LocationShownProvinceState' + CRLF +
     '-XMP-iptcExt:LocationShownCity' + CRLF +
@@ -393,7 +397,7 @@ const
 
   AboutFields =
     '-s3' + CRLF + '-f' + CRLF +
-    '-IFD0:Artist' + CRLF +
+    '-exif:Artist' + CRLF +
     '-XMP-xmp:Rating' + CRLF +
     '-XMP-dc:Type' + CRLF +
     '-XMP-iptcExt:Event' + CRLF +
@@ -407,10 +411,14 @@ begin // for Windows Shutdown/Log-off while GUI is open
 end;
 
 procedure TFMain.CMActivateWindow(var Message: TMessage);
+var
+  NewSharedDir: string;
 begin
   RestoreGUI;
 
-  ShellTree.Path := FSharedMem.NewDirectory;
+  NewSharedDir := FSharedMem.NewDirectory;
+  if (ValidDir(NewSharedDir)) then
+    ShellTree.Path := NewSharedDir;
 
   Message.Result := 0;
   inherited;
@@ -440,7 +448,7 @@ begin
 
   with ETChart.LeftAxis do
   begin
-    Title.Text := 'Nr of photos';
+    Title.Text := StrNrOfPhotos;
     Visible := true;
     Automatic := false;
     AutomaticMaximum := false;
@@ -452,19 +460,19 @@ begin
     0:
       begin
         ETChart.LeftAxis.Maximum := ChartMaxFLength;
-        ETChart.Title.Text.Text := 'Focal length';
+        ETChart.Title.Text.Text := StrFocalLength;
         ETChart.AddSeries(ETBarSeriesFocal);
       end;
     1:
       begin
         ETChart.LeftAxis.Maximum := ChartMaxFNumber;
-        ETChart.Title.Text.Text := 'F-Number';
+        ETChart.Title.Text.Text := StrFNumber;
         ETChart.AddSeries(ETBarSeriesFnum);
       end;
     2:
       begin
         ETChart.LeftAxis.Maximum := ChartMaxISO;
-        ETChart.Title.Text.Text := 'ISO';
+        ETChart.Title.Text.Text := StrISO;
         ETChart.AddSeries(ETBarSeriesIso);
       end;
   end;
@@ -719,15 +727,22 @@ function TFMain.GetSelectedFiles(MustExpandPath: boolean): string;
 var
   AnItem: TListItem;
   FullPath: string;
+  Cnt: integer;
 begin
+  Cnt := 0;
   result := '';
   FullPath := GetFullPath(MustExpandPath);
   for AnItem in ShellList.Items do
   begin
     if (AnItem.Selected) and
        (ShellList.Folders[AnItem.Index].IsFolder = false) then
-      result := result + FullPath +ShellList.FileName(AnItem.Index) + CRLF;
+    begin
+      result := result + FullPath + ShellList.FileName(AnItem.Index) + CRLF;
+      Inc(Cnt);
+    end;
   end;
+  if (Cnt > 1) then
+    SetCounter(CounterETEvent, Cnt);
 end;
 
 function TFMain.GetSelectedFiles: string;
@@ -762,6 +777,12 @@ procedure TFMain.MAPIWindowsWideFileClick(Sender: TObject);
 begin
   with ET_Options do
     SetApiWindowsWideFile(MaAPIWindowsWideFile.Checked);
+end;
+
+procedure TFMain.MaAPILargeFileSupportExecute(Sender: TObject);
+begin
+  with ET_Options do
+    SetApiLargeFileSupport(MaAPILargeFileSupport.Checked);
 end;
 
 procedure TFMain.MDontBackupClick(Sender: TObject);
@@ -1033,9 +1054,9 @@ procedure TFMain.MExifLensFromMakerClick(Sender: TObject);
 var
   ETcmd, ETout, ETerr: string;
 begin
-  if MessageDlg('This will fill Exif:LensInfo of selected files with relevant' + #10#13 +
-                'values from Makernotes data (where possible).' + #10#13#10#13 +
-                'OK to proceed?', mtInformation, [mbOk, mbCancel], 0) = mrOK then
+  if MessageDlg(StrThisWillFillExif1 + #10 +
+                StrThisWillFillExif2 + #10#10 +
+                StrOKToProceed, mtInformation, [mbOk, mbCancel], 0) = mrOK then
   begin
     ETcmd := '-Exif:LensInfo<LensID' + CRLF + '-Exif:LensModel<LensID' + CRLF;
     ET_OpenExec(ETcmd, GetSelectedFiles, ETout, ETerr);
@@ -1084,9 +1105,9 @@ procedure TFMain.MFileDateFromExifClick(Sender: TObject);
 var
   ETout, ETerr: string;
 begin
-  if MessageDlg('This will set "Date modified" of selected files' + #10#13 +
-                'according to Exif:DateTimeOriginal value.' + #10#13#10#13 +
-                'OK to proceed?', mtInformation, [mbOk, mbCancel], 0) = mrOK then
+  if MessageDlg(FileDateFromExif1 + #10 +
+                FileDateFromExif2 + #10#10 +
+                StrOKToProceed, mtInformation, [mbOk, mbCancel], 0) = mrOK then
   begin
     ET_OpenExec('-FileModifyDate<Exif:DateTimeOriginal', GetSelectedFiles, ETout, ETerr);
     RefreshSelected(Sender);
@@ -1123,11 +1144,12 @@ begin
   begin
     j := ShellList.SelCount;
     if j > 1 then // message appears only if multi files selected
-      if MessageDlg('This will copy ALL metadata from any source into' + #10#13 +
-                    'currently *selected* ' + DstExt + ' files.' + #10#13 +
-                    'Only those selected files will be processed,' + #10#13 +
-                    'where source and destination filename is equal.' + #10#13#10#13 +
-                    'Next: Select source file. OK to proceed?',
+      if MessageDlg(ImportMetaSel1 + #10 +
+                    Format(ImportMetaSel2, [DstExt]) + #10 +
+                    ImportMetaSel3 + #10 +
+                    ImportMetaSel4 + #10#10 +
+                    ImportMetaSel5 + #10 +
+                    StrOKToProceed,
                     mtInformation, [mbOk, mbCancel], 0) <> mrOK then
         j := 0;
     if j <> 0 then
@@ -1179,20 +1201,22 @@ begin
     end;
   end
   else
-    ShowMessage('Selected destination file must be JPG or TIF!');
+    ShowMessage(StrSelectedDestination);
 end;
 
 procedure TFMain.MImportMetaSingleClick(Sender: TObject);
 begin
-  if MessageDlg('This will copy metadata from single source file,' + #10 + #13 + 'into currently selected files.' + #10 + #13 + #10 + #13 +
-    'Next: 1.Select source file,  2.Select metadata to copy' + #10 + #13 + 'OK to proceed?', mtInformation, [mbOk, mbCancel], 0) = mrOK then
+  if MessageDlg(ImportMetaSingle1 + #10 +
+                ImportMetaSingle2 + #10#10 +
+                ImportMetaSingle3 + #10 +
+                StrOKToProceed, mtInformation, [mbOk, mbCancel], 0) = mrOK then
   begin
     with OpenPictureDlg do
     begin
       InitialDir := ShellList.Path;
       Filter := 'Image & Metadata files|*.jpg;*.jpeg;*.cr2;*.dng;*.nef;*.tif;*.tiff;*.mie;*.xmp;*.rw2';
       Options := [ofFileMustExist];
-      Title := 'Select source file';
+      Title := StrSelectSourceFile;
       FileName := '';
     end;
     if OpenPictureDlg.Execute then
@@ -1217,12 +1241,11 @@ begin
   Delete(DstExt, 1, 1);
   if (DstExt = 'jpg') or (DstExt = 'tif') then
   begin
-    i := MessageDlg('This will copy metadata from files in another folder' + #10#13 +
-                    'into *all* ' + UpperCase(DstExt) +
-                    ' files inside currently *selected* folder.' + #10#13 +
-                    'Only those files will be processed, where' + #10#13 +
-                    'source and destination filename is equal.' + #10#13#10#13 +
-                    'Should files in subfolders also be processed?', mtInformation,
+    i := MessageDlg(ImportRecursive1 + #10 +
+                    Format(ImportRecursive2, [UpperCase(DstExt)]) + #10 +
+                    ImportRecursive3 + #10 +
+                    ImportRecursive4 + #10#10 +
+                    ImportRecursive5, mtInformation,
                     [mbYes, mbNo, mbCancel], 0);
     if i <> mrCancel then
     begin
@@ -1231,7 +1254,7 @@ begin
         InitialDir := ShellList.Path;
         Filter := 'Image & Metadata files|*.*';
         Options := [ofFileMustExist];
-        Title := 'Select any of source files';
+        Title := StrSelectAnyOfSource;
         FileName := '';
       end;
       if OpenPictureDlg.Execute then
@@ -1276,25 +1299,26 @@ begin
     end;
   end
   else
-    ShowMessage('Selected destination file must be JPG or TIF!');
+    ShowMessage(StrSelectedDestination);
 end;
 
 procedure TFMain.MImportXMPLogClick(Sender: TObject);
 var
   SrcDir, ETcmd, ETout, ETerr: string;
 begin
-  if MessageDlg('This will import GPS data from XMP sidecar files into' + #10#13 +
-                'Exif GPS region of currently selected files.' + #10#13 +
-                'Only those selected files will be processed, where' + #10#13 +
-                'source and destination filename is equal.' + #10#13#10#13 +
-                'Next: Select folder containing XMP files. OK to proceed?',
+  if MessageDlg(ImportXMP1 + #10+
+                ImportXMP2 + #10 +
+                ImportXMP3 + #10 +
+                ImportXMP4 + #10#10 +
+                ImportXMP5 + #10#10 +
+                StrOKToProceed,
                 mtInformation, [mbOk, mbCancel], 0) = mrOK then
   begin
     if GpsXmpDir <> '' then
       SrcDir := GpsXmpDir
     else
       SrcDir := ShellList.Path;
-    SrcDir := BrowseFolderDlg('Choose folder containing XMP sidecar files', 1, SrcDir);
+    SrcDir := BrowseFolderDlg(StrChooseFolderContai, 1, SrcDir);
     if SrcDir <> '' then
     begin
       if SrcDir[length(SrcDir)] <> '\' then
@@ -1390,8 +1414,8 @@ end;
 
 procedure TFMain.MCustomOptionsClick(Sender: TObject);
 begin
-  ET_Options.ETCustomOptions := InputBox('Specify Custom options to add to Exiftool args',
-                                         'Custom options',
+  ET_Options.ETCustomOptions := InputBox(StrSpecifyCustomOptio,
+                                         StrCustomOptions,
                                          ET_Options.ETCustomOptions);
 end;
 
@@ -1402,7 +1426,7 @@ begin
     // DefaultExt:='ini';
     InitialDir := WrkIniDir;
     Filter := 'Ini file|*.ini';
-    Title := 'Load Workspace definition file';
+    Title := StrLoadWorkspaceDefin;
     if Execute then
     begin
       if LoadWorkspaceIni(FileName) then
@@ -1410,10 +1434,10 @@ begin
         if SpeedBtnQuick.Down then
           ShowMetadata
         else
-          ShowMessage('New Workspace loaded.');
+          ShowMessage(StrNewWorkspaceLoaded);
       end
       else
-        ShowMessage('Ini file doesn''t contain Workspace data -nothing changed.');
+        ShowMessage(StrIniFileDoesntCon);
       WrkIniDir := ExtractFileDir(FileName);
     end;
   end;
@@ -1428,7 +1452,7 @@ begin
     DefaultExt := 'ini';
     InitialDir := WrkIniDir;
     Filter := 'Ini file|*.ini';
-    Title := 'Save Worspace definition file';
+    Title := StrSaveWorkspaceDefini;
     repeat
       IsOK := false;
       DoSave := Execute;
@@ -1437,15 +1461,15 @@ begin
       begin
         IsOK := (ExtractFileName(FileName) <> ExtractFileName(GetIniFilePath(false)));
         if not IsOK then
-          ShowMessage('Use another name for Workspace definition file!');
+          ShowMessage(StrUseAnotherNameFor);
       end;
     until not DoSave or IsOK;
     if DoSave then
     begin
       if SaveWorkspaceIni(FileName) then
-        ShowMessage('Workspace definition file saved.')
+        ShowMessage(StrWorkspaceDefinition)
       else
-        ShowMessage('Workspace definition file couldn''t be saved!?');
+        ShowMessage(StrWorkspaceDefNotSaved);
       WrkIniDir := ExtractFileDir(FileName);
     end;
   end;
@@ -1582,7 +1606,7 @@ begin
     ts := '-';
   tx := ts + TranslateTagName(ts, tx);
   if pos(tx, CustomViewTags) > 0 then
-    ShowMessage('Tag already exists in Custom view.')
+    ShowMessage(StrTagAlreadyExistsI)
   else
     CustomViewTags := CustomViewTags + tx + ' ';
 end;
@@ -1818,10 +1842,10 @@ begin
     if (PopupOnError) then
     begin
       if (ETerrs = '') then
-        ErrStatus := 'OK'
+        ErrStatus := StrOK
       else
       begin
-        ErrStatus := 'Not OK';
+        ErrStatus := StrNotOK;
         Show; // Popup Log window when there's an error.
       end;
       // Try to show 'xxx image files read'.
@@ -1832,7 +1856,7 @@ begin
        ((ChkShowAll.Checked) or (ErrStatus <> '-')) then
     begin
       Indx := NextLogId;
-      FExecs[Indx] := Format('Execute: %d %s Update/ET Direct status: %s', [ExecNum, TimeToStr(now), ErrStatus]);
+      FExecs[Indx] := Format(StrExecuteDSUpdat, [ExecNum, TimeToStr(now), ErrStatus]);
       FCmds[Indx] := EtCmds;
       FEtOuts[Indx] := EtOuts;
       FEtErrs[Indx] := EtErrs;
@@ -1855,10 +1879,10 @@ begin
     begin
       Indx := NextLogId;
       if (Succes) then
-        ErrStatus := 'Ok'
+        ErrStatus := StrOk
       else
-        ErrStatus := 'NOT Ok';
-      FExecs[Indx] := Format('Rest request: %s Update/ET Direct status: %s', [TimeToStr(now), ErrStatus]);
+        ErrStatus := StrNOTOk;
+      FExecs[Indx] := Format(StrRestRequestSUpd, [TimeToStr(now), ErrStatus]);
       FCmds[Indx] := Url;
       FEtOuts[Indx] := Response;
 
@@ -1891,7 +1915,7 @@ begin
 
   if not (ValidLatLon(FGeoSetup.Lat, FGeoSetup.Lon)) then
   begin
-    MessageDlgEx('Selected file has no valid Lat Lon coordinates.', '',
+    MessageDlgEx(StrSelectedFileHasNo, '',
                  TMsgDlgType.mtError, [TMsgDlgBtn.mbOK]);
     exit;
   end;
@@ -1919,11 +1943,8 @@ begin
 end;
 
 procedure TFMain.UpdateStatusBar_FilesShown;
-var
-  I: smallint;
 begin
-  I := ShellList.Items.Count;
-  StatusBar.Panels[0].Text := 'Files: ' + IntToStr(I);
+  StatusBar.Panels[0].Text := Format(StrFiles, [ShellList.Items.Count]);
 end;
 
 procedure TFMain.EdgeBrowser1CreateWebViewCompleted(Sender: TCustomEdgeBrowser; AResult: HRESULT);
@@ -1934,15 +1955,15 @@ begin
     Url := '';
     if not CheckWebView2Loaded then
     begin
-      if (MessageDlgEx('The WebView2Loader.dll could not be loaded.' + #10 +
-                       'Show Online help?',
+      if (MessageDlgEx(StrTheWebView2Loaderd + #10 +
+                       StrShowOnlineHelp,
                        '', TMsgDlgType.mtError, [TMsgDlgBtn.mbYes, TMsgDlgBtn.mbNo]) = ID_YES) then
         Url := '/#m_edge_dll';
     end
     else
     begin
-      if (MessageDlgEx('Unable to start Edge browser.' +#10 +
-                       'Show Online help?',
+      if (MessageDlgEx(StrUnableToStartEdge +#10 +
+                       StrShowOnlineHelp,
                        '', TMsgDlgType.mtError, [TMsgDlgBtn.mbYes, TMsgDlgBtn.mbNo]) = ID_YES) then
         Url := '/#m_edge_runtime';
     end;
@@ -2085,7 +2106,7 @@ begin
     end;
 
     if not ETResult then
-      ShowMessage('ExifTool not executed!?');
+      ShowMessage(StrExifToolNotExecute);
 
     RefreshSelected(Sender);
     ShowMetadata;
@@ -2110,7 +2131,7 @@ begin
       end;
       Inc(NewRow);
     end;
-    StatusBar.Panels[1].Text := 'No (more) matches found.';
+    StatusBar.Panels[1].Text := StrNoMoreMatchesFo;
   end;
   MetadataList.Row := 1;
 end;
@@ -2232,9 +2253,6 @@ begin
           8:
             Rotate := 270;
         end;
-{$IFDEF DEBUG}
-        AdvTabPreview.Caption := 'Preview '+ IntToStr(Rotate);
-{$ENDIF}
       end;
       ABitMap := GetBitmapFromWic(WicPreview(FPath, Rotate, RotateImg.Width, RotateImg.Height));
       if (ABitMap = nil) then
@@ -2311,7 +2329,7 @@ begin
   StatusBar.Panels[1].Width := AdvPageFilelist.Width + Splitter2.Width;
 end;
 
-procedure TFMain.ApplicationEventsMinimize(Sender: TObject);
+procedure TFMain.ApplicationMinimize(Sender: TObject);
 begin
   if (GUIsettings.MinimizeToTray) then
   begin
@@ -2321,8 +2339,8 @@ begin
     if (GUIsettings.ShowBalloon) then
     begin
       TrayIcon.ShowBalloonHint;
-      TrayIcon.BalloonHint := 'Minimized to tray.' + #10 +
-                              'Click to disable this hint.';
+      TrayIcon.BalloonHint := StrMinimizedToTray + #10 +
+                              StrClickToDisableThi;
     end
     else
       TrayIcon.BalloonHint := '';
@@ -2368,6 +2386,8 @@ end;
 
 procedure TFMain.FormCreate(Sender: TObject);
 begin
+  Application.OnMinimize := ApplicationMinimize;
+
   ReadGUIini;
   // AdvPageFilelist.Constraints.MinWidth only used at design time. Form does not align well.
   // We check for MinFileListWidth in code.
@@ -2449,7 +2469,7 @@ var
 begin
   NumFiles := DragQueryFile(Msg.Drop, UINT(-1), nil, 0);
   if NumFiles > 1 then
-    ShowMessage('Drop only one file at a time!')
+    ShowMessage(StrDropOnlyOneFileA)
   else
   begin
     LBuffer := DragQueryFile(Msg.Drop, 0, nil, 0) +1;
@@ -2512,7 +2532,7 @@ begin
       AdvTabOSMMap.Enabled := true;
     except
       on E:Exception do
-        MessageDlgEx(E.Message, 'Error positioning Home', TMsgDlgType.mtWarning, [TMsgDlgBtn.mbOK]);
+        MessageDlgEx(E.Message, StrErrorPositioningHo, TMsgDlgType.mtWarning, [TMsgDlgBtn.mbOK]);
     end;
   end;
 
@@ -2710,27 +2730,28 @@ procedure TFMain.ShellListAfterEnumColumns(Sender: TObject);
 
   procedure AddColumns(ColumnDefs: array of FListColDefRec); overload;
   var
-    i: integer;
+    I: integer;
   begin
     with ShellList do
     begin
       Columns.Clear;
-      AddColumn(SShellDefaultNameStr, FListStdColWidth[0]); // Name field
-      for i := 0 to High(ColumnDefs) do
-        AddColumn(ColumnDefs[i].Caption, ColumnDefs[i].Width, ColumnDefs[i].AlignR);
+      AddColumn(LoadResString(@StrFLName) , FListStdColWidth[0]); // Name field
+      for I := 0 to High(ColumnDefs) do
+        AddColumn(LoadResString(ColumnDefs[I].Caption), ColumnDefs[I].Width, ColumnDefs[I].AlignR);
     end;
   end;
 
   procedure AddColumns(ColumnDefs: array of FListColUsrRec); overload;
   var
-    DefRecords: array of FListColDefRec;
-    i: integer;
+    I: integer;
   begin
-    SetLength(DefRecords, length(ColumnDefs));
-    for i := 0 to length(DefRecords) - 1 do
-      DefRecords[i] := FListColDefRec.Create(ColumnDefs[i]);
-
-    AddColumns(DefRecords);
+    with ShellList do
+    begin
+      Columns.Clear;
+      AddColumn(LoadResString(@StrFLName) , FListStdColWidth[0]); // Name field
+      for I := 0 to High(ColumnDefs) do
+        AddColumn(ColumnDefs[I].Caption, ColumnDefs[I].Width, ColumnDefs[I].AlignR);
+    end;
   end;
 
 begin
@@ -2843,9 +2864,9 @@ begin
               if (ExifIFD.Flash and $FF00) <> 0 then
               begin
                 if (ExifIFD.Flash and 1) = 1 then
-                  Details.Add('Yes')
+                  Details.Add(StrYes)
                 else
-                  Details.Add('No');
+                  Details.Add(StrNo);
               end
               else
                 Details.Add('');
@@ -2853,9 +2874,9 @@ begin
               if IFD0.Orientation > 0 then
               begin
                 if (IFD0.Orientation and 1) = 1 then
-                  Details.Add('Hor.')
+                  Details.Add(StrHor)
                 else
-                  Details.Add('Ver.');
+                  Details.Add(StrVer);
               end
               else
                 Details.Add('');
@@ -2875,9 +2896,9 @@ begin
             begin
               Details.Add(ExifIFD.DateTimeOriginal);
               if GPS.Latitude <> '' then
-                Details.Add('Yes')
+                Details.Add(StrYes)
               else
-                Details.Add('No');
+                Details.Add(StrNo);
               Details.Add(Xmp.CountryShown);
               Details.Add(Xmp.ProvinceShown);
               Details.Add(Xmp.CityShown);
@@ -2888,10 +2909,22 @@ begin
               if (GUIsettings.EnableUnsupported) then
               begin
                 ET_OpenExec(LocationFields, GetSelectedFile(ShellList.FileName(Item.Index)), Details, False);
-                if (Details[1] = '-') then
-                  Details[1] := 'No'
+
+                // Details[0] = DateTimeOriginal
+                // Details[1] = CreateDate
+                if (Details[0] = '-') then
+                  Details.Delete(0)
                 else
-                  Details[1] := 'Yes';
+                  Details.Delete(1);
+
+                // Now Details[1] = GPS:GPSLatitude
+                // GPS tagged?
+                if (Details[1] = '-') or
+                   (Details[1] = '0') then
+                  Details[1] := StrNo
+                else
+                  Details[1] := StrYes;
+
               end
               else
                 Details.Add(NotSupported);
@@ -2937,6 +2970,42 @@ begin // event is executed for each deleted file -so make it fast!
 end;
 
 procedure TFMain.ShellListKeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
+
+  procedure DeleteSelected;
+  var
+    ANItem: TListItem;
+    CurIndex: integer;
+    CrWait, CrNormal: HCURSOR;
+  begin
+    if (ShellList.SelCount = 0) then
+      exit;
+
+    CrWait := LoadCursor(0, IDC_WAIT);
+    CrNormal := SetCursor(CrWait);
+    ShellList.Items.BeginUpdate;
+    try
+      CurIndex := ShellList.Selected.Index -1;
+      for ANItem in ShellList.Items do
+      begin
+        if (ANItem.Selected = false) then
+          Continue;
+        DoContextMenuVerb(ShellList.Folders[ANItem.Index], SCmdVerbDelete);
+      end;
+
+      ShellList.Refresh;
+      ShellList.ClearSelection;
+      if (CurIndex < 0) then
+        CurIndex := 0;
+      if (CurIndex > ShellList.Items.Count -1) then
+        CurIndex := ShellList.Items.Count -1;
+      ShellList.Selected := ShellList.Items[CurIndex];
+      ShellList.ItemFocused := ShellList.Items[CurIndex];
+    finally
+      ShellList.Items.EndUpdate;
+      SetCursor(CrNormal);
+    end;
+  end;
+
 begin
   if (Key = VK_UP) or (Key = VK_DOWN) then       // Up-Down arrow
     ShellListClick(Sender);
@@ -2959,6 +3028,10 @@ begin
     ShellList.SetIconSpacing(0, 0);
   if (Key = VK_F2) and (ShellList.Selected <> nil) then
     ShellList.Selected.EditCaption;
+{$IFDEF NOTYET}
+  if (Key = VK_DELETE) and (ssCtrl in Shift) then
+    DeleteSelected;
+{$ENDIF}
 end;
 
 procedure TFMain.ShellListSetFolders;
@@ -3000,16 +3073,16 @@ begin
   AdvPanelFileTop.Enabled := Enable;
 
   if not Enable then
-    if (MessageDlgEx('ERROR: ExifTool could not be started!' + #10 +  #10 +
-        'To resolve this you can:' + #10 +
-        '- Install Exiftool in: ' + GetAppPath + #10 +
-        '- Install Exiftool in a directory in the Windows search sequence.' + #10 + #9 +
-        'For example in a directory specified in the PATH environment variable.' + #10 + #9 +
-        'For more info see the documentation on the CreateProcess function.' + #10 +
-        '- Locate Exiftool.exe and specify the location in Preferences/Other.' + #10 + #10 +
-        'Metadata operations disabled.' + #10 + #10 +
-        'Note: This error can also occur if you browse to an invalid folder. A DVD/CD drive without media for example.' + #10 + #10 +
-        'Show Online help?', '',
+    if (MessageDlgEx(StrERRORExifTool1 + #10 +  #10 +
+        StrERRORExifTool2 + #10 +
+        StrERRORExifTool3 + GetAppPath + #10 +
+        StrERRORExifTool4 + #10 + #9 +
+        StrERRORExifTool5 + #10 + #9 +
+        StrERRORExifTool6 + #10 +
+        StrERRORExifTool7 + #10 + #10 +
+        StrERRORExifTool8 + #10 + #10 +
+        StrERRORExifTool9 + #10 + #10 +
+        StrShowOnlineHelp, '',
         TMsgDlgType.mtError, [TMsgDlgBtn.mbYes, TMsgDlgBtn.mbNo]) = ID_YES) then
       ShellExecute(0, 'Open', PWideChar(ONLINE_DOC_URL + '/#m_reqs_exiftool'), '', '', SW_SHOWNORMAL);
 
@@ -3093,8 +3166,8 @@ var
 begin
   NewCaption := '';
   if (IsElevated) then
-    NewCaption := 'Administrator: ';
-  NewCaption := NewCaption  + 'ExifToolGUI';
+    NewCaption := StrAdministrator + ' ';
+  NewCaption := NewCaption + Application.Title;
   if (AnItem <> '') then
     NewCaption := NewCaption + ' - ' + AnItem;
   Caption := NewCaption
@@ -3106,6 +3179,7 @@ var
   E, N: integer;
   ETcmd, Item, Tx: string;
   ETResult: TStringList;
+  NoChars:  TSysCharSet;
 begin
   MetadataList.Tag := -1; // Reset hint row
   Item := GetSelectedFile(ShellList.FileName);
@@ -3131,7 +3205,7 @@ begin
 
       for E := 0 to N do
       begin
-        tx := QuickTags[E].Command;
+        Tx := QuickTags[E].Command;
         if UpperCase(LeftStr(tx, Length(GUI_SEP))) = GUI_SEP then
           Tx := GUI_SEP;
         ETcmd := ETcmd + CRLF + Tx;
@@ -3143,22 +3217,26 @@ begin
         Strings.Clear;
         if (ETResult.Count < Length(QuickTags)) and
            (ETResult.Count > 0) then
-          Strings.Append(Format('=Warning. Only %d results returned from %d workspace commands.',
+          Strings.Append(Format('=' + StrWarningOnlyDRes,
                                 [ETResult.Count, Length(QuickTags)]));
         for E := 0 to N do
         begin
           Tx := QuickTags[E].Command;
-          if UpperCase(LeftStr(tx, length(GUI_SEP))) = GUI_SEP then
+          if UpperCase(LeftStr(Tx, Length(GUI_SEP))) = GUI_SEP then
             Tx := '=' + QuickTags[E].Caption
           else
           begin
             Tx := QuickTags[E].Caption;
-            if RightStr(Tx, 1) = '?' then
+            if (Pos('?', Tx) > 0) then
             begin
-              if ETResult[E] = '-' then
-                Tx := Tx + '=*NO*'
+              Include(NoChars, '-');
+              if (Pos('??', Tx) > 0) then
+                Include(NoChars, '0');
+
+              if CharInSet(ETResult[E][1], NoChars) then
+                Tx := Tx + '='+ StrNOAst
               else
-                Tx := Tx + '=*YES*';
+                Tx := Tx + '=' + StrYESAst;
             end
             else
               Tx := QuickTags[E].Caption + '=' + ETResult[E];
@@ -3201,7 +3279,7 @@ begin
         if (Trim(CustomViewTags) = '') then
         begin
           // Show only message, no data.
-          ETcmd := ETcmd + '-f' + CRLF + EmptyCustomview;
+          ETcmd := ETcmd + '-f' + CRLF +  '-Echo' + CRLF + StrNoCustomTags;
           Item := '';
         end
         else
@@ -3217,8 +3295,8 @@ begin
       E := 0;
       if ETResult.Count = 0 then
       begin
-        ETResult.Append('=ExifTool executed');
-        ETResult.Append('=No data');
+        ETResult.Append('=' + StrExifToolExecuted);
+        ETResult.Append('=' + StrNoData);
       end
       else
       begin
@@ -3435,13 +3513,13 @@ begin
   ParseLatLon(EditMapFind.Text, FGeotagFiles.Lat, FGeotagFiles.Lon);
   if not (ValidLatLon(FGeotagFiles.Lat, FGeotagFiles.Lon)) then
   begin
-    MessageDlgEx('No valid Lat Lon coordinates selected.', '', TMsgDlgType.mtError, [TMsgDlgBtn.mbOK]);
+    MessageDlgEx(StrNoValidLatLon, '', TMsgDlgType.mtError, [TMsgDlgBtn.mbOK]);
     exit;
   end;
 
   if ShellList.SelectedFolder = nil then
   begin
-    MessageDlgEx('No files selected.', '', TMsgDlgType.mtError, [TMsgDlgBtn.mbOK]);
+    MessageDlgEx(StrNoFilesSelected, '', TMsgDlgType.mtError, [TMsgDlgBtn.mbOK]);
     exit;
   end;
 
@@ -3472,7 +3550,7 @@ begin
   if ShellList.SelectedFolder <> nil then
     ShowImagesOnMap(EdgeBrowser1, ShellList.Path, GetGpsCoordinates(GetSelectedFiles))
   else
-    ShowMessage('No file selected.');
+    ShowMessage(StrNoFilesSelected);
 end;
 
 procedure TFMain.Splitter1CanResize(Sender: TObject; var NewSize: integer; var Accept: boolean);
@@ -3509,20 +3587,20 @@ end;
 
 procedure TFMain.ShellistThumbError(Sender: TObject; Item: TListItem; E: Exception);
 begin
-  raise Exception.Create(Format('Error %s %s creating thumbnail for : %s', [E.Message, #10, ShellList.Folders[Item.Index].PathName]));
+  raise Exception.Create(Format(StrErrorSSCreating, [E.Message, #10, ShellList.Folders[Item.Index].PathName]));
 end;
 
 procedure TFMain.ShellistThumbGenerate(Sender: TObject; Item: TListItem; Status: TThumbGenStatus; Total, Remaining: integer);
 begin
   if (Remaining > 0) then
-    StatusBar.Panels[1].Text := 'Remaining Thumbnails to generate: ' + IntToStr(Remaining)
+    StatusBar.Panels[1].Text := Format(StrRemainingThumbnails, [Remaining])
   else
     StatusBar.Panels[1].Text := '';
 end;
 
 procedure TFMain.CounterETEvent(Counter: integer);
 begin
-  StatusBar.Panels[1].Text := Format('%d Files remaining', [Counter]);
+  StatusBar.Panels[1].Text := Format(StrDFilesRemaining, [Counter]);
   StatusBar.Update;
 end;
 

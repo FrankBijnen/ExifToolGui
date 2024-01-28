@@ -45,7 +45,7 @@ var
 
 implementation
 
-uses Main, ExifTool;
+uses Main, ExifTool, UnitLangResources;
 
 {$R *.dfm}
 
@@ -184,9 +184,9 @@ begin
   Top := FMain.Top + FMain.GUIBorderHeight;
 
   if FMain.MaDontBackup.Checked then
-    Label1.Caption := 'Backup: OFF'
+    Label1.Caption := StrBackupOFF
   else
-    Label1.Caption := 'Backup: ON';
+    Label1.Caption := StrBackupON;
   Application.OnHint := DisplayHint;
   EventOn := true;
   CheckBox1.Checked := true;

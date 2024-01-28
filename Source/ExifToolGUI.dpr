@@ -1,20 +1,27 @@
 program ExifToolGUI;
 
+{.$DEFINE STACKTRACE}
 // Requires JCL to compile. https://github.com/project-jedi/jcl
 // Will show a dialog when an exception occurs to copy the Stacktrace on the clipboard.
 
-{.$DEFINE STACKTRACE}
+{$DEFINE LANGOVERRIDE}
+// Allows for overriding the default language, without writing to the registry.
+// CommandLine example: /OverrideLanguage=NLD
 
 uses
-  {$IFDEF STACKTRACE}
+{$IFDEF STACKTRACE}
   UnitStackTrace,
-  {$ENDIF }
+{$ENDIF }
+{$IFDEF LANGOVERRIDE}
+  UnitLangOverride,
+{$ENDIF}
   UnitSingleApp,
   UnitDpiAwareness,
   Vcl.Forms,
   Vcl.Themes,
   Vcl.Styles,
   MainDef in 'MainDef.pas',
+  UnitLangResources in 'UnitLangResources.pas',
   ExifToolsGUI_Utils in 'ExifToolsGUI_Utils.pas',
   UnitFilesOnClipBoard in 'UnitFilesOnClipBoard.pas',
   ExifToolsGui_ValEdit in 'ExifToolsGui_ValEdit.pas',
@@ -54,9 +61,12 @@ uses
 {$R *.res}
 
 begin
+
 {$IFDEF DEBUG}
   ReportMemoryLeaksOnShutdown := true;
 {$ENDIF}
+
+  Application.Title := 'ExifToolGui';
 
   if ReadSingleInstanceApp and
      not FSharedMem.IsOwner then
@@ -65,10 +75,8 @@ begin
     halt;
   end;
 
-
   Application.Initialize;
   Application.MainFormOnTaskbar := True;
-  Application.Title := 'ExifToolGui';
 
   Application.CreateForm(TFMain, FMain);
   Application.CreateForm(TFLogWin, FLogWin);
@@ -93,5 +101,6 @@ begin
   Application.CreateForm(TFGeoSearch, FGeoSearch);
   Application.CreateForm(TFGeotagFiles, FGeotagFiles);
   Application.CreateForm(TFGeoSetup, FGeoSetup);
+
   Application.Run;
 end.

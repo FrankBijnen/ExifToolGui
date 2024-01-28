@@ -59,9 +59,9 @@ object FDateTimeShift: TFDateTimeShift
       Top = 16
       Width = 129
       Height = 22
-      EditLabel.Width = 103
+      EditLabel.Width = 105
       EditLabel.Height = 22
-      EditLabel.Caption = '*DateTimeOriginal:'
+      EditLabel.Caption = '*DateTime original:'
       LabelPosition = lpLeft
       ReadOnly = True
       TabOrder = 0
@@ -164,7 +164,7 @@ object FDateTimeShift: TFDateTimeShift
     object CheckBox5: TCheckBox
       Left = 120
       Top = 180
-      Width = 193
+      Width = 232
       Height = 17
       Hint = 'File: Date modified becomes (shifted) DateTimeOriginal value'
       Caption = '-change File: Date modified'

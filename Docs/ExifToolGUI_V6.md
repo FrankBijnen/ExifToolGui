@@ -62,7 +62,10 @@ Basic idea behind GUI is, to keep it <u>simple!</u> Thus, only those options are
 <li>Option added to show folders in the FileList panel.</li>
 <li>Option added to show a Breadcrumb (Address bar) in the FileList panel.</li>
 <li>Possibility to add Custom options to Exiftool.</li>
-<li>Experimental support for <a href="Readme%204K%20monitor.txt"><b>4K monitors.</b></a></li>
+<li>Support for <a href="Readme%204K%20monitor.txt"><b>4K monitors.</b></a></li>
+<li>Option added to show hidden files and folders. <b>Admins only</b></li>
+<li>Enhanced integration. Add to Context menu in Windows explorer, Single instance App and minimize to Tray</b></li>
+<li>Camera settings, Location info and About photo in Filelist detail supported for more File types</b></li>
 </ul>
 <a href="changelog.txt"><b>See changelog.txt for a complete list of issues.</b></a>
 
@@ -241,6 +244,33 @@ Here you can setup the GeoCoding parameters. Typically you only have to check <b
 For an in-depth explanation see <a href="Readme GeoCoding.txt"><b>Readme GeoCoding.txt</b></a>
 <br><br>
 
+<img src="ExifToolGUI_V6_files/preferences_shell.jpg"><br>
+<br><br>
+<b><u>Shell Integration</u></b> settings tab<br>
+<br>
+<b>-application When minimized move to tray</b><br>
+Put an icon for GUI in the Windows System Tray, also known as the notification area, when GUI is minimized.<br>
+You will likely have to make the icon visible in <b>Windows Taskbar Settings</b>.<br>
+By clicking on the icon on the taskbar you can easily start GUI. A Right Click on the icon will show a menu with Version info, and the option to reset the window sizes.<br>
+<br>
+<img src="ExifToolGUI_V6_files/trayicon.jpg"><br>
+<br>
+<b>-application Single instance</b><br>
+Allow only one running instance of GUI. If you try to start a second instance of GUI, it will try to make the running instance visible.<br>
+Use this option when you have registered GUI in the Contextmenu, or you will get a new instance of GUI everytime you use the context menu.<br>
+<br>
+<b>Register ExifToolGui in Contextmenu (Requires elevation)</b><br>
+The buttons <b>Add</b> and <b>Remove</b> are only enabled when you have started GUI as Admin.<br>
+If you have added GUI to the contextmenu you can start it by Right clicking on a folder.<br>
+<img src="ExifToolGUI_V6_files/contextmenu.jpg"><br>
+<br><br>
+<u>Notes:</u>
+<ul>
+<li>For Windows 11 you can find the context menu item under 'Show more options', or use SHIFT/Right click. If you search the net you can also find 'registry tweaks' that show the contextmenu directly.<br></li>
+<li>When you decide to add GUI to the Contextmenu data is written to the registry. If you have concerns with that, because GUI is not <b>Portable</b>, dont use it.<br> </li>
+</ul>
+<br><br>
+
 <img src="ExifToolGUI_V6_files/preferences_other.jpg"><br>
 <br><br>
 <b><u>Other</u></b> settings tab<br>
@@ -258,8 +288,17 @@ double-clicking on one of the tabs Exif, Xmp, Iptc, Maker, All will add that tag
 If you need to override the location of exiftool.exe you can do that here.<br><br>
 <b>Filelist: Show Folders in Filelist</b><br>
 The default setting is to only show files in the Filelist panel. If you enable this option, also folders (directories) will be shown, allowing easier navigation.<br><br>
+<b>Filelist: Show Hidden Folders and Files in Filelist (Admin required)</b><br>
+Will also show hidden Folders and Files in the Folder Treeview and the Filelist panels. You need to be Admin to use this, and not everything you see may be readable/writeable.<br><br>
 <b>Filelist: Show Breadcrumb (Address bar) in Filelist</b><br>
 Enable a BreadCrumb bar on top of the filelist. Allows for easier navigating.<br><br>
+<b>Filelist: Enable 'Camera Settings', 'Location info and 'About photo' for all file types. (Slower)</b><br>
+If you have set the <b>Details</b> of the filelist panel to any of the above options, GUI will show that info only for known filetypes.<br>
+If a file is not supported, or it does not contain the data, GUI will show 'File type unsupported'.<br>
+Generally speaking this works only for filetypes that have <b>IFD0, ExifIFD or XMP</b> groups. <br>
+Examples that work: Tiff based raw (PEF, NEF, CRW, CR2, DNG), Jpeg, and recently I added FujiFilm (RAF) and CR3.<br>
+Examples that do not work: PDF, MP4<br> 
+Enabling this option will result in calling Exiftool to get the data. While this works, it will slow-down getting the filedetails considerably. It is thus not enabled by default.<br><br>
 <b>Hint pause timeout in Millisecs</b><br>
 Hovering over the metadata panel will display the complete metadata value as a hint. This was added because long values are often not completely visible.<br>
 Setting this value to 0 (zero) will effectively disable the hints.
@@ -292,7 +331,9 @@ pop-up menu appears and there's option <font class="blue">Fill in default values
 <font class="red">?</font> -if tag name ends with this character (see
 Geotagged? above), then that means, that you're not interested on tag
 value itself -what you wish to see is, if particular tag is defined or
-not. <u>Note:</u> You won't be able to edit such tag in <font class="blue">Workspace</font> view.<br><br>
+not.<br>
+<u>Notes:</u> You won't be able to edit such tag in <font class="blue">Workspace</font> view.<br>
+Use 2 questionmarks <font class="red">??</font> to show the value <font class="red">0</font> as undefined.<br><br>
 <font class="red">±</font> -if tag name ends with this character (see
 Type± in main screenshot above), then you'll be allowed to enter
 multiple values for single tag at once (i.e. keywords and similar). Of
@@ -407,7 +448,7 @@ next GUI start. Remaining options settings however, are only temporary
 <h3>API WindowsWideFile (requires Exiftool v12.66)</h3> -Force the use of wide-character Windows I/O functions when the CharsetFileName option is used.<br>
 
 <h3>Custom options</h3> -You can specify additonal options that exiftool should use. Expert option. Normally used with the Log Window.<br>
-Possible use case is the option <b>-htmldump</b> and use the log window to catch the output.<br>
+Possible use case is the option <b>-htmldump</b> and use the log window to catch the output. Or <b>-API LargeFileSupport=1</b> to support large files.<br>
 <br>
 <br>
 <h2><a name="m_exp_imp">Export/Import menu</a></h2>
@@ -840,6 +881,16 @@ If you've changed your mind completely (don't wish to apply any changes), then j
 <br>
 Some tag values may require a bit longer text to be entered (just <u>a bit</u> longer, please). To do that more comfortable, click on <font class="blue">Large</font> button and you'll get some more space:<br>
 <img src="ExifToolGUI_V6_files/metadataworkspacelong.jpg"><br>
+<br>
+
+<b>Keyboard shortcuts</b><br>
+These keyboard shortcuts are recognized:
+<li>Enter, Starts editing the field, confirms editing the value.</li>
+<li>Esc, Abandons editing the value.</li>
+<li>CTRL + C, Copies the value of the current row to the Clipboard.</li>
+<li>CTRL + S, Saves the pending changes. (Same as clicking Save)</li>
+<li>CTRL + Home, CTRL + End, Moves to first, last line of the metadata.</li>
+<li>CTRL + Up, CTRL + Down, Loads the previous, next file. The changed data is not saved.</li>
 <br>
 
 <b>Editing tags which names ends with ± character</b><br>

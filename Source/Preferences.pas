@@ -97,7 +97,7 @@ var
 implementation
 
 uses Main, ExifTool, MainDef, GeoMap,
-     ExifToolsGUI_Utils, ExifToolsGUI_Thumbnails;
+     ExifToolsGUI_Utils, ExifToolsGUI_Thumbnails, UnitLangResources;
 
 {$R *.dfm}
 
@@ -110,7 +110,7 @@ begin
   if (InstalledContext) then
     EdCommand.Text := InstalledVerb
   else
-    EdCommand.Text := '(Not installed)';
+    EdCommand.Text := StrNotInstalled;
 
   BtnAdd2Context.Enabled := IsElevated and not InstalledContext;
   BtnRemoveFromContextMenu.Enabled := IsElevated and InstalledContext;
@@ -193,7 +193,7 @@ begin
   if (GeoSettings.GeoCodingEnable) and
       ((GeoSettings.GeoCodeApiKey = '') or
        (GeoSettings.ThrottleGeoCode < 1000)) then
-    ShowMessage('Check the GeoCode requirements. (Apikey required. Max 1 call per second for a free account)');
+    ShowMessage(StrCheckTheGeoCodeRe);
 end;
 
 procedure TFPreferences.BtnSetupCleanClick(Sender: TObject);
@@ -203,15 +203,15 @@ var
 begin
   SetupOK := ExistsSageSet(EdThumbCleanset.EditText);
   if not SetupOK then
-    SetupOK := (MessageDlgEx(Format('Overwrite Existing setting %s?', [EdThumbCleanset.EditText]), '', TMsgDlgType.mtWarning,
+    SetupOK := (MessageDlgEx(Format(StrOverwriteExistingS, [EdThumbCleanset.EditText]), '', TMsgDlgType.mtWarning,
       [TMsgDlgBtn.mbYes, TMsgDlgBtn.mbNo]) = idYes)
   else
-    MessageDlgEx('Make sure that you only check ''Thumbnails'' in the next dialog.', '', TMsgDlgType.mtInformation, [TMsgDlgBtn.mbOK]);
+    MessageDlgEx(StrMakeSureThatYouO, '', TMsgDlgType.mtInformation, [TMsgDlgBtn.mbOK]);
   if (SetupOK) then
   begin
     Parm := Format('CleanMgr /sageset:%s', [EdThumbCleanset.EditText]);
     if not RunAsAdmin(Handle, GetComSpec, '/c' + Parm, SW_HIDE) then
-      MessageDlgEx(Format('Run ''%s'' as Admin failed.', [Parm]), '', TMsgDlgType.mtError, [mbOK]);
+      MessageDlgEx(Format(StrRunSAsAdminFail, [Parm]), '', TMsgDlgType.mtError, [mbOK]);
   end;
 end;
 
@@ -224,10 +224,10 @@ procedure TFPreferences.BtnAdd2ContextClick(Sender: TObject);
 var
   Verb: string;
 begin
-  Verb := 'Open with ' + Application.Title;
-  Verb := InputBox('Verb to add to Contextmenu', 'Verb', Verb);
+  Verb := StrOpenWith + Application.Title;
+  Verb := InputBox(StrVerbToAddToContext, 'Verb', Verb);
   if (Verb = '') then
-    MessageDlgEx('A Verb is required.', '', TMsgDlgType.mtError, [mbOK])
+    MessageDlgEx(StrAVerbIsRequired, '', TMsgDlgType.mtError, [mbOK])
   else
     Add2Context(Application.Title, Verb);
   SetContextButtons;
@@ -245,15 +245,15 @@ var
 begin
   Parm := Format('CleanMgr /sagerun:%s', [EdThumbCleanset.EditText]);
   if not RunAsAdmin(Handle, GetComSpec, '/c' + Parm, SW_HIDE) then
-    MessageDlgEx(Format('Run ''%s'' as Admin failed.', [Parm]), '', TMsgDlgType.mtError, [mbOK]);
+    MessageDlgEx(Format(StrRunSAsAdminFail, [Parm]), '', TMsgDlgType.mtError, [mbOK]);
 end;
 
 procedure TFPreferences.BtnGenThumbsClick(Sender: TObject);
 var
   xDir: string;
 begin
-  xDir := BrowseFolderDlg('Folder, including subfolders, to generate thumbnails for.' + #10 +
-                          'Generating will be done in the background.', 0,
+  xDir := BrowseFolderDlg(StrFolderIncludingSub + #10 +
+                          StrGeneratingBackgr, 0,
                            FMain.ShellList.Path);
   if (xDir <> '') then
   begin
@@ -268,19 +268,19 @@ var
 begin
   if Sender = BtnStartupFolder then
   begin
-    xDir := BrowseFolderDlg('Select default startup folder', 0);
+    xDir := BrowseFolderDlg(StrSelectDefaultStart, 0);
     if xDir <> '' then
       EdStartupFolder.Text := xDir;
   end;
   if Sender = BtnExportMetaFolder then
   begin
-    xDir := BrowseFolderDlg('Select default export folder', 0);
+    xDir := BrowseFolderDlg(StrSelectDefaultExpor, 0);
     if xDir <> '' then
       EdExportMetaFolder.Text := xDir;
   end;
   if Sender = BtnETOverride then
   begin
-    xDir := BrowseFolderDlg('Select ExifTool folder to use', 0);
+    xDir := BrowseFolderDlg(StrSelectExifToolFold, 0);
     if xDir <> '' then
       EdETOverride.Text := xDir;
   end;

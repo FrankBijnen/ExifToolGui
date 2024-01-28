@@ -61,7 +61,8 @@ var
 
 implementation
 
-uses Main, MainDef, ExifToolsGUI_Utils, Winapi.ShellAPI;
+uses Main, MainDef, ExifToolsGUI_Utils, Winapi.ShellAPI, UnitLangResources;
+
 
 {$R *.dfm}
 
@@ -99,7 +100,7 @@ begin
         if not AnsiWarned then
         begin
           AnsiWarned := true;
-          ShowMessage('This method only works reliable for ANSI data.');
+          ShowMessage(StrThisMethodOnlyAnsi);
         end;
         MemoCmds.WordWrap := true;
         BtnCmd.Enabled := true;
@@ -146,10 +147,10 @@ begin
 
   ShellExecute(0, nil, PWideChar(GetComSpec),
                        PWideChar(Format('/K echo: ' +
-                                        '&& echo Warning. International characters may not be displayed correctly. ' +
-                                        '&& echo Selecting a different font for the cmd window may help. ' +
+                                        '&& echo ' + StrWarningInternation + ' ' +
+                                        '&& echo ' + StrSelectingADiff + ' ' +
                                         '&& echo: ' +
-                                        '&& echo type "%s" to execute the generated CMD file.' +
+                                        '&& echo ' + StrTypeSToExecute +
                                         '&& echo: && dir "%s"', [ACmd, ACmd])),
                        PWideChar(Format('%s', [Fmain.ShellList.Path])), SW_SHOWNORMAL);
 end;

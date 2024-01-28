@@ -39,7 +39,7 @@ var
 
 implementation
 
-uses System.StrUtils, Main, ExifTool, ExifToolsGUI_Utils, ExifToolsGui_LossLess, MainDef;
+uses System.StrUtils, Main, ExifTool, ExifToolsGUI_Utils, ExifToolsGui_LossLess, MainDef, UnitLangResources;
 
 {$R *.dfm}
 
@@ -73,11 +73,11 @@ begin
 
   if (Preview = '') then
   begin
-    ShowMessage('Check 1 preview to import');
+    ShowMessage(StrCheck1PreviewImp);
     exit;
   end;
 
-  DirJPG := BrowseFolderDlg('Select folder containing JPG images', 1, Fmain.ShellList.Path);
+  DirJPG := BrowseFolderDlg(StrSelectFolderCont, 1, Fmain.ShellList.Path);
   if (DirJpg = '') then
     exit;
 
@@ -118,13 +118,13 @@ begin
           end;
         end;
 
-        StatusBar1.SimpleText := Format('Rotating %s Angle: %d Modulo: %d', [GetPreviewTmp, Angle, Modulo]);
+        StatusBar1.SimpleText := Format(StrRotatingSAngle, [GetPreviewTmp, Angle, Modulo]);
         ASize := PerformLossLess(AnImport, Angle, Modulo, GetPreviewTmp);
         ETcmd := '';
         if (ChkRemoveOthers.Checked) then // Remove others?
         begin
           EtCmd := '-a' + CRLF + '-Preview:All=' + CRLF;
-          StatusBar1.SimpleText := Format('Updating preview in: %s', [AFile]);
+          StatusBar1.SimpleText := Format(StrUpdatingPreviewIn, [AFile]);
           ET_OpenExec(ETcmd, FMain.GetSelectedFile(AFile), ETouts, ETerrs);
           result := result and (ETerrs = '');
         end;
@@ -132,7 +132,7 @@ begin
         ETcmd := Preview + '<=' + GetPreviewTmp + CRLF +
                  '-' + IFD + ':ImageWidth=' + IntToStr(ASize.cx) + CRLF +
                  '-' + IFD + ':ImageHeight=' + IntToStr(ASize.cy);
-        StatusBar1.SimpleText := Format('Updating preview in: %s', [AFile]);
+        StatusBar1.SimpleText := Format(StrUpdatingPreviewIn, [AFile]);
         ET_OpenExec(ETcmd, FMain.GetSelectedFile(AFile), ETouts, ETerrs);
         result := result and (ETerrs = '');
       end;
@@ -152,7 +152,7 @@ begin
   CrNormal := SetCursor(CrWait);
   try
     ImportStatus := DoImportPreview(Sender);
-    StatusBar1.SimpleText := 'All Done';
+    StatusBar1.SimpleText := StrAllDone;
   finally
     SetCursor(CrNormal);
   end;
@@ -177,7 +177,7 @@ begin
   Left := FMain.Left + FMain.GUIBorderWidth + FMain.AdvPageFilelist.Left;
   Top := FMain.Top + FMain.GUIBorderHeight;
   StatusBar1.SimpleText := '';
-  LblSample.Caption := Format('Sample: %s', [ExtractFileName(Fmain.GetFirstSelectedFile)]);
+  LblSample.Caption := Format(StrSampleS, [ExtractFileName(Fmain.GetFirstSelectedFile)]);
   FillPreviewInListView(FMain.GetFirstSelectedFile, LvPreviews);
   BtnExecute.Enabled := LvPreviews.Items.Count > 0;
 end;

@@ -45,7 +45,8 @@ var
 
 implementation
 
-uses Main, ExifTool, System.DateUtils;
+uses Main, ExifTool, System.DateUtils, UnitLangResources;
+
 {$R *.dfm}
 
 const
@@ -98,9 +99,9 @@ procedure TFDateTimeShift.CheckBox4Click(Sender: TObject);
 begin
   with CheckBox4 do
     if Checked then
-      Caption := '=Increment'
+      Caption := '=' + StrIncrement
     else
-      Caption := '=Decrement';
+      Caption := '=' + StrDecrement;
   MaskEdit1Change(Sender);
 end;
 
@@ -117,20 +118,22 @@ begin
   try
     Left := FMain.Left + FMain.GUIBorderWidth + FMain.AdvPageFilelist.Left;
     Top := FMain.Top + FMain.GUIBorderHeight;
-
     if FMain.MaDontBackup.Checked then
-      Label1.Caption := 'Backup: OFF'
+      Label1.Caption := StrBackupOFF
     else
-      Label1.Caption := 'Backup: ON';
+      Label1.Caption := StrBackupON;
+    CheckBox4Click(Sender);
+
     Application.OnHint := DisplayHint;
 
     ETcmd := '-s3' + CRLF + '-f' + CRLF + CmdDateOriginal + CRLF + CmdDateCreate + CRLF + CmdDateModify;
-    ET_OpenExec(ETcmd, FMain.GetFirstSelectedFile, ETResult);
-
-    LabeledEdit1.Text := ETResult[0];
-    LabeledEdit2.Text := ETResult[1];
-    LabeledEdit3.Text := ETResult[2];
-
+    ET_OpenExec(ETcmd, FMain.GetFirstSelectedFile, ETResult, false);
+    if (ETResult.Count > 2) then
+    begin
+      LabeledEdit1.Text := ETResult[0];
+      LabeledEdit2.Text := ETResult[1];
+      LabeledEdit3.Text := ETResult[2];
+    end;
     DTstr := LabeledEdit1.Text; // Check DateTimeOriginal
     Y := StrToIntDef(Copy(DTstr, 1, 4), 0);
     M := StrToIntDef(Copy(DTstr, 6, 2), 0);

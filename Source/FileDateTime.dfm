@@ -20,7 +20,8 @@ object FFileDateTime: TFFileDateTime
     Height = 19
     Panels = <>
     SimplePanel = True
-    ExplicitWidth = 562
+    ExplicitTop = 455
+    ExplicitWidth = 568
   end
   object AdvPanel1: TPanel
     Left = 0
@@ -37,6 +38,7 @@ object FFileDateTime: TFFileDateTime
     ParentDoubleBuffered = False
     ParentFont = False
     TabOrder = 1
+    ExplicitHeight = 455
     object AdvPanel2: TPanel
       Left = 16
       Top = 16
@@ -157,7 +159,7 @@ object FFileDateTime: TFFileDateTime
       object RadioButton1: TRadioButton
         Left = 24
         Top = 8
-        Width = 241
+        Width = 340
         Height = 17
         Caption = 'Use Filename from Exif:DocumentName'
         Checked = True
@@ -191,7 +193,7 @@ object FFileDateTime: TFFileDateTime
       object RadioButton2: TRadioButton
         Left = 24
         Top = 8
-        Width = 241
+        Width = 340
         Height = 17
         Caption = 'Remove leading DateTime (incl. SPACE)'
         Checked = True

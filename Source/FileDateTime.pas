@@ -46,7 +46,7 @@ var
 
 implementation
 
-uses Main, ExifTool;
+uses Main, ExifTool, UnitLangResources;
 
 {$R *.dfm}
 
@@ -124,7 +124,7 @@ begin
       end;
     end;
   end;
-  ShowMessage(intToStr(renamed) + ' file(s) renamed.');
+  ShowMessage(intToStr(renamed) + StrFilesRenamed);
   ModalResult := mrOK;
 end;
 
@@ -136,29 +136,29 @@ begin
     begin
       if CheckBox2.Checked then
       begin
-        Items[0] := 'YYYY-MM-DD_HH-MM-SS Filename';
-        Items[1] := 'YYYY-MM-DD_HH-MM Filename';
+        Items[0] := 'YYYY-MM-DD_HH-MM-SS ' + StrFilename;
+        Items[1] := 'YYYY-MM-DD_HH-MM ' + StrFilename;
       end
       else
       begin
-        Items[0] := 'YYYY-MM-DD_HHMMSS Filename';
-        Items[1] := 'YYYY-MM-DD_HHMM Filename';
+        Items[0] := 'YYYY-MM-DD_HHMMSS ' + StrFilename;
+        Items[1] := 'YYYY-MM-DD_HHMM ' + StrFilename;
       end;
-      Items[2] := 'YYYY-MM-DD Filename';
+      Items[2] := 'YYYY-MM-DD ' + StrFilename;
     end
     else
     begin
       if CheckBox2.Checked then
       begin
-        Items[0] := 'YYYYMMDD_HH-MM-SS Filename';
-        Items[1] := 'YYYYMMDD_HH-MM Filename';
+        Items[0] := 'YYYYMMDD_HH-MM-SS ' + StrFilename;
+        Items[1] := 'YYYYMMDD_HH-MM ' + StrFilename;
       end
       else
       begin
-        Items[0] := 'YYYYMMDD_HHMMSS Filename';
-        Items[1] := 'YYYYMMDD_HHMM Filename';
+        Items[0] := 'YYYYMMDD_HHMMSS ' + StrFilename;
+        Items[1] := 'YYYYMMDD_HHMM ' + StrFilename;
       end;
-      Items[2] := 'YYYYMMDD Filename';
+      Items[2] := 'YYYYMMDD ' + StrFilename;
     end;
   end;
 end;
@@ -173,6 +173,7 @@ begin
   Left := FMain.Left + FMain.GUIBorderWidth + FMain.AdvPageFilelist.Left;
   Top := FMain.Top + FMain.GUIBorderHeight;
   RadioGroup3Click(Sender);
+  CheckBox1Click(Sender);
   Application.OnHint := DisplayHint;
 end;
 

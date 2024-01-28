@@ -20,9 +20,11 @@ type
     ETCharset: string;
     ETVerbose: string;
     ETAPIWindowsWideFile: string;
+    ETAPILargeFileSupport: string;
     ETCustomOptions: string;
     procedure SetGpsFormat(UseDecimal: boolean);
     procedure SetApiWindowsWideFile(UseWide: boolean);
+    procedure SetApiLargeFileSupport(UseLarge: boolean);
     procedure SetCustomOptions(Custom: string);
     function GetCustomOptions: string;
     function GetOptions(Charset: boolean = true): string;
@@ -60,7 +62,9 @@ function ExecET(ETcmd, FNames, WorkDir: string; var ETouts: string): boolean; ov
 
 implementation
 
-uses System.SysUtils, System.SyncObjs, Winapi.Windows, Main, MainDef, ExifToolsGUI_Utils, ExifTool_PipeStream;
+uses
+  System.SysUtils, System.SyncObjs, Winapi.Windows, Main, MainDef, ExifToolsGUI_Utils, ExifTool_PipeStream,
+  UnitLangResources;
 
 const
   SizePipeBuffer = 65535;
@@ -92,6 +96,14 @@ begin
     ETAPIWindowsWideFile := '';
 end;
 
+procedure ET_OptionsRec.SetApiLargeFileSupport(UseLarge: boolean);
+begin
+  if UseLarge then
+    ETAPILargeFileSupport  := '-API' + CRLF + 'LargeFileSupport=1' + CRLF
+  else
+    ETAPILargeFileSupport := '';
+end;
+
 procedure ET_OptionsRec.SetCustomOptions(Custom: string);
 begin
   ETCustomOptions := Custom;
@@ -115,6 +127,7 @@ begin
   result := result + ETMinorError + ETFileDate;
   result := result + ETGpsFormat + ETShowNumber;
   result := result + ETAPIWindowsWideFile;
+  result := result + ETAPILargeFileSupport;
   result := result + GetCustomOptions;
   // +further options...
 end;
@@ -231,7 +244,7 @@ begin
       ETEvent.SetEvent;
       result := false;
       ETouts := '';
-      ETErrs := 'Time out waiting for Event' + CRLF;
+      ETErrs := StrTimeOutWaitingFor + CRLF;
       exit;
     end;
     ETEvent.ReSetEvent;

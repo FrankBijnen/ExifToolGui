@@ -59,4 +59,16 @@ Version:        Description             Issue
                 Fix Issue #214          Copy GPS info only when copying metadata?
                 Fix Issue #215          Camera settings display in Filelist (for FujiFilm RAW)
                 Fix Issue #219          Geocode requires an API Key
+6.2.9.0         Fix Issue #216          Windows display scaling ignored by default (x64 build) in v6.2.7
+                Fix Issue #232          Add option to resize window to default size
+                Fix Issue #236          Can not navigate beyond hidden folders on windows
+                Fix Issue #245          Feature Request: Add keyboard shortcuts
+                Fix Issue #247          Add option for single instance and integration in Explorer context menu
+                Fix Issue #251          false error "Selected file has no valid Lat Lon coordinates" (CR3 filetype)
+                Fix Issue #258          Video files show composite GPS coordinates but cannot update City, Country, etc (MP4 filetype)
+                Fix Issue #260          Feature Request: Shortcut for renaming of file names
+                Fix Issue #261          Feature request: add ENTER and ESC functionality in several menu
+                Fiz Issue #266          Enable Camera settings, Location info and About photo in Filelist for all file types
+                Fiz Issue #270          Add option LargeFileSupport
+                Fiz Issue #272          Add commandline parameter to override language. Create resourcestrings for constants
 
