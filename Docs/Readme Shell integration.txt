@@ -10,7 +10,7 @@ Starting with Version 6.2.9 ExifToolGui has more integration in the Windows Shel
   - Enable the button 'Setup Disk cleanup for thumbnails' in 'Preferences/Thumbnnails'.
 
 - It detects if it was started as Admin. If started as an Admin:
-  - It will always show Hidden Folders and FileList.
+  - It will always show Hidden Folders and Files in the FileList.
   - You can register ExifToolGui in the Contextmenu of Windows Explorer.
 
 - In the tab 'Shell Integration' in 'Preferences' you can:
@@ -20,7 +20,7 @@ Starting with Version 6.2.9 ExifToolGui has more integration in the Windows Shel
 
 Notes:
 
-- If you enable 'When minimized move to tray', the tray icon provides these function.
+- If you enable 'When minimized move to tray', the tray icon provides these functions.
 
   - Left click will restore the main window.
   - Right click shows a popup menu with the version and an option to reset the window sizes to default.
