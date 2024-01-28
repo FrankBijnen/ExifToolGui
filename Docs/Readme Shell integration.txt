@@ -25,7 +25,7 @@ Notes:
   - Left click will restore the main window.
   - Right click shows a popup menu with the version and an option to reset the window sizes to default.
 
-  A balloon is shown, reminding you that there is a tray icon placed. Turn this balloon of by clicking on it.
+  A balloon is shown, reminding you that there is a tray icon placed. Turn this balloon off by clicking on it.
   To make the icon permanently visible, use 'Taskbar settings' and look for 'icon settings'. Details vary with every Windows version!
 
 - Enabling 'Single instance' is particularly useful if combined with the contextmenu, or you'll end up with lots of GUI windows.
