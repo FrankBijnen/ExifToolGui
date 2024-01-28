@@ -727,15 +727,22 @@ function TFMain.GetSelectedFiles(MustExpandPath: boolean): string;
 var
   AnItem: TListItem;
   FullPath: string;
+  J: integer;
 begin
+  J := 0;
   result := '';
   FullPath := GetFullPath(MustExpandPath);
   for AnItem in ShellList.Items do
   begin
     if (AnItem.Selected) and
        (ShellList.Folders[AnItem.Index].IsFolder = false) then
-      result := result + FullPath +ShellList.FileName(AnItem.Index) + CRLF;
+    begin
+      result := result + FullPath + ShellList.FileName(AnItem.Index) + CRLF;
+      Inc(J);
+    end;
   end;
+  if (J > 1) then
+    SetCounter(CounterETEvent, J);
 end;
 
 function TFMain.GetSelectedFiles: string;
