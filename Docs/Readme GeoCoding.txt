@@ -26,7 +26,7 @@ Issues found with 'Video files' (No Jpeg (JPG) or Camera-Raw (DNG, CRW, NEF etc)
              
   - In the Filelist panel. When you set it to 'Camera settings', 'Location info' or 'About photo'. 
     Initially these settings where meant for Camera files only. ExifToolGui would read these files directly without calling ExifTool to speed up processing.
-    The drawback is that for other filetypes the data can not obtained. Changed with version 6.2.9:
+    The drawback is that for other filetypes the data can not be obtained. Changed with version 6.2.9:
     - Added code to be able to read FujiFilm (RAF) and Canon CR3 directly.
     - If the filetype is not recognized, it will now show 'File type unsupported'. Previous versions did not warn you.
     - You can enable the option 'Enable 'Camera Settings', 'Location info' and 'About photo' for all file types. (Slower)' in 'Preferences/Other'.
