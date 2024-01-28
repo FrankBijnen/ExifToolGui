@@ -66,7 +66,7 @@ Basic idea behind GUI is, to keep it <u>simple!</u> Thus, only those options are
 <li>Option added to show hidden files and folders. <b>Admins only</b></li>
 <li>Enhanced integration. Add to Context menu in Windows explorer, Single instance App and minimize to Tray</b></li>
 <li>Camera settings, Location info and About photo in Filelist detail support more File types</b></li>
-<li>Preparations completed for <a href="..\Translation\README.md"><b>Translation</b></a></li>
+<li>Preparations completed for translating into multiple languages.</li>
 </ul>
 <a href="changelog.txt"><b>See changelog.txt for a complete list of issues.</b></a>
 
