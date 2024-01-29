@@ -68,7 +68,8 @@ Version:        Description             Issue
                 Fix Issue #258          Video files show composite GPS coordinates but cannot update City, Country, etc (MP4 filetype)
                 Fix Issue #260          Feature Request: Shortcut for renaming of file names
                 Fix Issue #261          Feature request: add ENTER and ESC functionality in several menu
-                Fiz Issue #266          Enable Camera settings, Location info and About photo in Filelist for all file types
-                Fiz Issue #270          Add option LargeFileSupport
-                Fiz Issue #272          Add commandline parameter to override language. Create resourcestrings for constants
+                Fix Issue #266          Enable Camera settings, Location info and About photo in Filelist for all file types
+                Fix Issue #270          Add option LargeFileSupport
+                Fix Issue #272          Add commandline parameter to override language. Create resourcestrings for constants
+6.3.0.0         Fix Issue #282          Remove blank lines from args file. Confuses generated cmd script 	
 
