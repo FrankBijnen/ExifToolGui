@@ -87,7 +87,7 @@ object FLogWin: TFLogWin
       Align = alLeft
       Constraints.MinWidth = 285
       TabOrder = 1
-      ExplicitHeight = 209
+      ExplicitTop = 0
       object TabCommands: TTabSheet
         Caption = 'Executed commands'
         object MemoCmds: TMemo
@@ -118,18 +118,18 @@ object FLogWin: TFLogWin
           Align = alTop
           TabOrder = 1
           object BtnPowerShell: TButton
-            Left = 241
-            Top = 10
-            Width = 75
+            Left = 235
+            Top = 9
+            Width = 85
             Height = 25
             Caption = 'PowerShell'
             TabOrder = 0
             OnClick = BtnPowerShellClick
           end
           object BtnCmd: TButton
-            Left = 160
-            Top = 10
-            Width = 75
+            Left = 145
+            Top = 9
+            Width = 85
             Height = 25
             Caption = 'Cmd prompt'
             TabOrder = 1
@@ -148,6 +148,7 @@ object FLogWin: TFLogWin
               'CmdLine')
             TabOrder = 2
             OnClick = RadShowCmdsClick
+            ExplicitTop = 2
           end
         end
       end

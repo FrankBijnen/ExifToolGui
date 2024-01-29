@@ -376,7 +376,8 @@ end;
 function EndsWithCRLF(const AString: string): string;
 begin
   result := AString;
-  if (RightStr(result, Length(CRLF)) <> CRLF) then
+  if (result <> '') and
+     (RightStr(result, Length(CRLF)) <> CRLF) then
     result := result + CRLF;
 end;
 
