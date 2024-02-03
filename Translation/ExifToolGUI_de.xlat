@@ -2,7 +2,7 @@
 <xlat>
   <meta>
     <version>3</version>
-    <created>2024-02-03T11:43:34.834+01:00</created>
+    <created>2024-02-03T13:10:38.102+01:00</created>
     <tool>amTranslationManager</tool>
     <toolversion>2.0.8628.33873</toolversion>
   </meta>
@@ -12319,7 +12319,7 @@
               <property name="Caption">
                 <value>-Filelist: Enable 'Camera Settings', 'Location info' and 'About photo' for all file types. (Slower)</value>
                 <translations>
-                  <translation language="de" status="proposed">-Dateiliste: Aktivieren Sie "Kameraeinstellungen", "Standortinformationen" und "Über das Foto" für alle Dateitypen. (Langsamer)</translation>
+                  <translation language="de" status="proposed">-Dateiliste: Aktivieren "Kameraeinstellungen", "Standortinformationen" und "Über das Foto" für alle Dateitypen. (Langsamer)</translation>
                 </translations>
               </property>
             </properties>
@@ -12583,7 +12583,7 @@
               <property name="Caption">
                 <value>GeoCoding</value>
                 <translations>
-                  <translation language="de" status="proposed">GeoCoding</translation>
+                  <translation language="de">GeoCoding</translation>
                 </translations>
               </property>
             </properties>
@@ -12623,7 +12623,7 @@
               <property name="Caption">
                 <value>OverPass Api</value>
                 <translations>
-                  <translation language="de" status="proposed">OverPass Api</translation>
+                  <translation language="de">OverPass Api</translation>
                 </translations>
               </property>
             </properties>
@@ -12633,7 +12633,7 @@
               <property name="EditLabel.Caption">
                 <value>URL</value>
                 <translations>
-                  <translation language="de" status="proposed">URL</translation>
+                  <translation language="de">URL</translation>
                 </translations>
               </property>
               <property name="Text" status="skip">
