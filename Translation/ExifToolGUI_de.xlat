@@ -2,7 +2,7 @@
 <xlat>
   <meta>
     <version>3</version>
-    <created>2024-01-27T10:24:07.994+01:00</created>
+    <created>2024-02-03T11:43:34.834+01:00</created>
     <tool>amTranslationManager</tool>
     <toolversion>2.0.8628.33873</toolversion>
   </meta>
@@ -14,7 +14,7 @@
   </options>
   <project sourcefile=".\ExifToolGUI.exe" stringsymbolfile=".\ExifToolGUI.drc" language="en-US" properties="622">
     <targetlanguages>
-      <language language="de" translated="0"/>
+      <language language="de" translated="84"/>
     </targetlanguages>
     <modules>
       <module name="resourcestrings" type="strings" properties="166">
@@ -23,8 +23,6 @@
             <properties>
               <property>
                 <value>Copy as text</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -32,8 +30,6 @@
             <properties>
               <property>
                 <value>Path not found</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -41,8 +37,6 @@
             <properties>
               <property>
                 <value>The path "%s" was not found.</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -5853,8 +5847,6 @@
             <properties>
               <property>
                 <value>This will set "Date modified" of selected files</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -5862,8 +5854,6 @@
             <properties>
               <property>
                 <value>according to Exif:DateTimeOriginal value.</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -5871,8 +5861,6 @@
             <properties>
               <property>
                 <value>This will copy ALL metadata from any source into</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -5880,8 +5868,6 @@
             <properties>
               <property>
                 <value>currently *selected* %s files.</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -5889,8 +5875,6 @@
             <properties>
               <property>
                 <value>Only those selected files will be processed,</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -5898,8 +5882,6 @@
             <properties>
               <property>
                 <value>where source and destination filename is equal.</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -5907,8 +5889,6 @@
             <properties>
               <property>
                 <value>Next: Select source file.</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -5916,8 +5896,6 @@
             <properties>
               <property>
                 <value>This will copy metadata from single source file,</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -5925,8 +5903,6 @@
             <properties>
               <property>
                 <value>into currently selected files.</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -5934,8 +5910,6 @@
             <properties>
               <property>
                 <value>Next: 1.Select source file, 2.Select metadata to copy.</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -5943,8 +5917,6 @@
             <properties>
               <property>
                 <value>This will copy metadata from files in another folder</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -5952,8 +5924,6 @@
             <properties>
               <property>
                 <value>into *all* %s files inside currently *selected* folder.</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -5961,8 +5931,6 @@
             <properties>
               <property>
                 <value>Only those files will be processed, where</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -5970,8 +5938,6 @@
             <properties>
               <property>
                 <value>source and destination filename is equal.</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -5979,8 +5945,6 @@
             <properties>
               <property>
                 <value>Should files in subfolders also be processed?</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -5988,8 +5952,6 @@
             <properties>
               <property>
                 <value>This will import GPS data from XMP sidecar files into</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -5997,8 +5959,6 @@
             <properties>
               <property>
                 <value>Exif GPS region of currently selected files.</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -6006,8 +5966,6 @@
             <properties>
               <property>
                 <value>Only those selected files will be processed,</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -6015,8 +5973,6 @@
             <properties>
               <property>
                 <value>where source and destination filename is equal.</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -6024,8 +5980,6 @@
             <properties>
               <property>
                 <value>Next: Select folder containing XMP files.</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -6033,8 +5987,6 @@
             <properties>
               <property>
                 <value>File type unsupported</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -6042,8 +5994,6 @@
             <properties>
               <property>
                 <value>Generate Thumbnails</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -6051,8 +6001,6 @@
             <properties>
               <property>
                 <value>Generate Thumbnails (Incl Subdirs)</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -6060,8 +6008,6 @@
             <properties>
               <property>
                 <value>Refresh</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -6069,8 +6015,6 @@
             <properties>
               <property>
                 <value>Administrator:</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -6078,8 +6022,6 @@
             <properties>
               <property>
                 <value>All Done</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -6087,8 +6029,6 @@
             <properties>
               <property>
                 <value>Any GPS log file</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -6096,8 +6036,6 @@
             <properties>
               <property>
                 <value>Available data:</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -6105,8 +6043,6 @@
             <properties>
               <property>
                 <value>A Verb is required.</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -6114,8 +6050,6 @@
             <properties>
               <property>
                 <value>Backup: OFF</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -6123,8 +6057,6 @@
             <properties>
               <property>
                 <value>Backup: ON</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -6132,8 +6064,6 @@
             <properties>
               <property>
                 <value>Cannot save GUI settings.</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -6141,8 +6071,6 @@
             <properties>
               <property>
                 <value>Check 1 preview to import</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -6150,8 +6078,6 @@
             <properties>
               <property>
                 <value>Check at least 1 preview to extract</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -6159,8 +6085,6 @@
             <properties>
               <property>
                 <value>Check the GeoCode requirements. (Apikey required. Max 1 call per second for a free account)</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -6168,8 +6092,6 @@
             <properties>
               <property>
                 <value>Choose folder containing XMP sidecar files</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -6177,8 +6099,6 @@
             <properties>
               <property>
                 <value>Click to disable this hint.</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -6186,8 +6106,6 @@
             <properties>
               <property>
                 <value>Continue ? (Re-enable in Preferences)</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -6195,8 +6113,6 @@
             <properties>
               <property>
                 <value>Could not complete clipboard operation.</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -6204,8 +6120,6 @@
             <properties>
               <property>
                 <value>Custom options</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -6213,8 +6127,6 @@
             <properties>
               <property>
                 <value>Decrement</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -6222,8 +6134,6 @@
             <properties>
               <property>
                 <value>%d Files remaining</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -6231,8 +6141,6 @@
             <properties>
               <property>
                 <value>Drop only one file at a time!</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -6240,8 +6148,6 @@
             <properties>
               <property>
                 <value>ERROR: ExifTool could not be started!</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -6249,8 +6155,6 @@
             <properties>
               <property>
                 <value>To resolve this you can:</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -6258,8 +6162,6 @@
             <properties>
               <property>
                 <value>- Install Exiftool in:</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -6267,8 +6169,6 @@
             <properties>
               <property>
                 <value>- Install Exiftool in a directory in the Windows search sequence.</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -6276,8 +6176,6 @@
             <properties>
               <property>
                 <value>For example in a directory specified in the PATH environment variable.</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -6285,8 +6183,6 @@
             <properties>
               <property>
                 <value>For more info see the documentation on the CreateProcess function.</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -6294,8 +6190,6 @@
             <properties>
               <property>
                 <value>- Locate Exiftool.exe and specify the location in Preferences/Other.</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -6303,8 +6197,6 @@
             <properties>
               <property>
                 <value>Metadata operations disabled.</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -6312,8 +6204,6 @@
             <properties>
               <property>
                 <value>Note: This error can also occur if you browse to an invalid folder. A DVD/CD drive without media, or a Zip file, for example.</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -6321,8 +6211,6 @@
             <properties>
               <property>
                 <value>Error positioning Home</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -6330,8 +6218,6 @@
             <properties>
               <property>
                 <value>Error %s %s creating thumbnail for: %s</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -6339,8 +6225,6 @@
             <properties>
               <property>
                 <value>Execute: %d %s Update/ET Direct status: %s</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -6348,8 +6232,6 @@
             <properties>
               <property>
                 <value>ExifTool executed</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -6357,8 +6239,6 @@
             <properties>
               <property>
                 <value>ExifTool not executed!?</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -6366,8 +6246,6 @@
             <properties>
               <property>
                 <value>Extracting preview from: %s</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -6375,8 +6253,6 @@
             <properties>
               <property>
                 <value>Extracting previews</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -6384,8 +6260,6 @@
             <properties>
               <property>
                 <value>Filename</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -6393,8 +6267,6 @@
             <properties>
               <property>
                 <value>Files/Folders: %d</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -6402,8 +6274,6 @@
             <properties>
               <property>
                 <value>File %s exists. Overwrite?</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -6411,8 +6281,6 @@
             <properties>
               <property>
                 <value> file(s) renamed.</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -6420,8 +6288,6 @@
             <properties>
               <property>
                 <value>Artist</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -6429,8 +6295,6 @@
             <properties>
               <property>
                 <value>City</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -6438,8 +6302,6 @@
             <properties>
               <property>
                 <value>Country</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -6447,8 +6309,6 @@
             <properties>
               <property>
                 <value>DateTime</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -6456,8 +6316,6 @@
             <properties>
               <property>
                 <value>Event</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -6465,8 +6323,6 @@
             <properties>
               <property>
                 <value>ExpComp.</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -6474,8 +6330,6 @@
             <properties>
               <property>
                 <value>ExpProgram</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -6483,8 +6337,6 @@
             <properties>
               <property>
                 <value>ExpTime</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -6492,8 +6344,6 @@
             <properties>
               <property>
                 <value>Flash</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -6501,8 +6351,6 @@
             <properties>
               <property>
                 <value>FLength</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -6510,8 +6358,6 @@
             <properties>
               <property>
                 <value>FNumber</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -6519,8 +6365,6 @@
             <properties>
               <property>
                 <value>GPS</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -6528,8 +6372,6 @@
             <properties>
               <property>
                 <value>ISO</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -6537,8 +6379,6 @@
             <properties>
               <property>
                 <value>Location</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -6546,8 +6386,6 @@
             <properties>
               <property>
                 <value>Name</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -6555,8 +6393,6 @@
             <properties>
               <property>
                 <value>Orientation</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -6564,8 +6400,6 @@
             <properties>
               <property>
                 <value>PersonInImage</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -6573,8 +6407,6 @@
             <properties>
               <property>
                 <value>Province</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -6582,8 +6414,6 @@
             <properties>
               <property>
                 <value>Rating</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -6591,8 +6421,6 @@
             <properties>
               <property>
                 <value>Type</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -6600,8 +6428,6 @@
             <properties>
               <property>
                 <value>F-Number</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -6609,8 +6435,6 @@
             <properties>
               <property>
                 <value>Focal length</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -6618,8 +6442,6 @@
             <properties>
               <property>
                 <value>Folder, including subfolders, to generate thumbnails for.</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -6627,8 +6449,6 @@
             <properties>
               <property>
                 <value>Generating will be done in the background.</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -6636,8 +6456,6 @@
             <properties>
               <property>
                 <value>Generating %d thumbnails for: %s</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -6645,8 +6463,6 @@
             <properties>
               <property>
                 <value>Hor.</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -6654,8 +6470,6 @@
             <properties>
               <property>
                 <value>Importing preview into: %s</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -6663,8 +6477,6 @@
             <properties>
               <property>
                 <value>Increment</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -6672,8 +6484,6 @@
             <properties>
               <property>
                 <value>Ini file does not contain Workspace data -nothing changed.</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -6681,8 +6491,6 @@
             <properties>
               <property>
                 <value>ISO</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -6690,8 +6498,6 @@
             <properties>
               <property>
                 <value>Load Workspace definition file</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -6699,8 +6505,6 @@
             <properties>
               <property>
                 <value>Make sure that you only check 'Thumbnails' in the next dialog.</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -6708,8 +6512,6 @@
             <properties>
               <property>
                 <value>Minimized to tray.</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -6717,8 +6519,6 @@
             <properties>
               <property>
                 <value>MISSING!</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -6726,8 +6526,6 @@
             <properties>
               <property>
                 <value>New Workspace loaded.</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -6735,8 +6533,6 @@
             <properties>
               <property>
                 <value>No</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -6744,8 +6540,6 @@
             <properties>
               <property>
                 <value>*NO*</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -6753,8 +6547,6 @@
             <properties>
               <property>
                 <value>No custom tags defined</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -6762,8 +6554,6 @@
             <properties>
               <property>
                 <value>No data</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -6771,8 +6561,6 @@
             <properties>
               <property>
                 <value>No files selected.</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -6780,8 +6568,6 @@
             <properties>
               <property>
                 <value>No (more) matches found.</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -6789,8 +6575,6 @@
             <properties>
               <property>
                 <value>(Not installed)</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -6798,8 +6582,6 @@
             <properties>
               <property>
                 <value>Not OK</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -6807,8 +6589,6 @@
             <properties>
               <property>
                 <value>No valid Lat Lon coordinates selected.</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -6816,8 +6596,6 @@
             <properties>
               <property>
                 <value>Nr of photos</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -6825,8 +6603,6 @@
             <properties>
               <property>
                 <value>OK</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -6834,8 +6610,6 @@
             <properties>
               <property>
                 <value>OK to proceed?</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -6843,8 +6617,6 @@
             <properties>
               <property>
                 <value>Open with </value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -6852,8 +6624,6 @@
             <properties>
               <property>
                 <value>Overwrite Existing setting %s?</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -6861,8 +6631,6 @@
             <properties>
               <property>
                 <value>Overwrite %s failed.</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -6870,8 +6638,6 @@
             <properties>
               <property>
                 <value>Province</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -6879,8 +6645,6 @@
             <properties>
               <property>
                 <value>Remaining Thumbnails to generate: %d</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -6888,8 +6652,6 @@
             <properties>
               <property>
                 <value>Remove directory failed code %u</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -6897,8 +6659,6 @@
             <properties>
               <property>
                 <value>Request failed with:</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -6906,8 +6666,6 @@
             <properties>
               <property>
                 <value>Resetting Orientation, ModifyDate: %s</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -6922,8 +6680,6 @@
             <properties>
               <property>
                 <value>Result: </value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -6931,8 +6687,6 @@
             <properties>
               <property>
                 <value>Rotating preview %s Angle: %d Modulo: %d</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -6940,8 +6694,6 @@
             <properties>
               <property>
                 <value>Rotating %s Angle: %d Modulo: %d</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -6949,8 +6701,6 @@
             <properties>
               <property>
                 <value>Run "%s" as Admin failed.</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -6958,8 +6708,6 @@
             <properties>
               <property>
                 <value>Sample: %s</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -6967,8 +6715,6 @@
             <properties>
               <property>
                 <value>Save Workspace definition file</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -6976,8 +6722,6 @@
             <properties>
               <property>
                 <value>Screen resolution: %d x %d at %d DPI Scaled: %d%%</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -6985,8 +6729,6 @@
             <properties>
               <property>
                 <value>Select any of source files</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -6994,8 +6736,6 @@
             <properties>
               <property>
                 <value>Select default export folder</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -7003,8 +6743,6 @@
             <properties>
               <property>
                 <value>Select default startup folder</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -7012,8 +6750,6 @@
             <properties>
               <property>
                 <value>Selected destination file must be JPG or TIF!</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -7021,8 +6757,6 @@
             <properties>
               <property>
                 <value>Selected file has no valid Lat Lon coordinates.</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -7030,8 +6764,6 @@
             <properties>
               <property>
                 <value>Select ExifTool folder to use</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -7039,8 +6771,6 @@
             <properties>
               <property>
                 <value>Select folder containing JPG images</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -7048,8 +6778,6 @@
             <properties>
               <property>
                 <value>Select GPS log file</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -7057,8 +6785,6 @@
             <properties>
               <property>
                 <value>Selecting a different font for the cmd window may help.</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -7066,8 +6792,6 @@
             <properties>
               <property>
                 <value>Select source file</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -7075,8 +6799,6 @@
             <properties>
               <property>
                 <value>Settings for: </value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -7084,8 +6806,6 @@
             <properties>
               <property>
                 <value>Show Online help?</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -7093,8 +6813,6 @@
             <properties>
               <property>
                 <value>Source and target should be different!</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -7102,8 +6820,6 @@
             <properties>
               <property>
                 <value>Specify Custom options to add to Exiftool args</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -7111,8 +6827,6 @@
             <properties>
               <property>
                 <value>Tag already exists in Custom view.</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -7120,8 +6834,6 @@
             <properties>
               <property>
                 <value>The WebView2Loader.dll could not be loaded.</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -7129,8 +6841,6 @@
             <properties>
               <property>
                 <value>This method only works reliable for ANSI data.</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -7138,8 +6848,6 @@
             <properties>
               <property>
                 <value>This will fill Exif:LensInfo of selected files with relevant</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -7147,8 +6855,6 @@
             <properties>
               <property>
                 <value>values from Makernotes data (where possible).</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -7156,8 +6862,6 @@
             <properties>
               <property>
                 <value>Time out waiting for Event</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -7165,8 +6869,6 @@
             <properties>
               <property>
                 <value>type "%s" to execute the generated CMD file.</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -7174,8 +6876,6 @@
             <properties>
               <property>
                 <value>Unable to start Edge browser.</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -7183,8 +6883,6 @@
             <properties>
               <property>
                 <value>Updating preview in: %s</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -7192,8 +6890,6 @@
             <properties>
               <property>
                 <value>Use another name for Workspace definition file!</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -7201,8 +6897,6 @@
             <properties>
               <property>
                 <value>-and copy here</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -7210,8 +6904,6 @@
             <properties>
               <property>
                 <value>-use as source</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -7219,8 +6911,6 @@
             <properties>
               <property>
                 <value>Use the OSM Map to select</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -7228,8 +6918,6 @@
             <properties>
               <property>
                 <value>Ver.</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -7237,8 +6925,6 @@
             <properties>
               <property>
                 <value>Verb to add to Contextmenu</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -7246,8 +6932,6 @@
             <properties>
               <property>
                 <value>Waiting for active tasks to complete</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -7255,8 +6939,6 @@
             <properties>
               <property>
                 <value>Warning. International characters may not be displayed correctly.</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -7264,8 +6946,6 @@
             <properties>
               <property>
                 <value>Warning. Only %d results returned from %d workspace commands.</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -7273,8 +6953,6 @@
             <properties>
               <property>
                 <value>Workspace definition file saved.</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -7282,8 +6960,6 @@
             <properties>
               <property>
                 <value>Workspace definition file couldn't be saved!?</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -7291,8 +6967,6 @@
             <properties>
               <property>
                 <value>Write to %s failed</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -7300,8 +6974,6 @@
             <properties>
               <property>
                 <value>Yes</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -7309,8 +6981,6 @@
             <properties>
               <property>
                 <value>*YES*</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -7948,8 +7618,6 @@
             <properties>
               <property>
                 <value>Key</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -8734,8 +8402,6 @@
             <properties>
               <property>
                 <value>Value</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -8880,8 +8546,6 @@
             <properties>
               <property name="Caption">
                 <value>Copy metadata options</value>
-                <translations>
-                </translations>
               </property>
               <property name="Font.Name" status="skip">
                 <value>Tahoma</value>
@@ -8895,8 +8559,6 @@
               </property>
               <property name="Hint">
                 <value>Above data might not be desired to be copied.</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -8960,8 +8622,6 @@
             <properties>
               <property name="Caption">
                 <value>Confirm copying should include:</value>
-                <translations>
-                </translations>
               </property>
               <property name="Font.Name" status="skip">
                 <value>Tahoma</value>
@@ -8972,8 +8632,6 @@
             <properties>
               <property name="Caption">
                 <value>Above tags/groups will only be copied where checked!</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -8982,6 +8640,7 @@
               <property name="Caption">
                 <value>Cancel</value>
                 <translations>
+                  <translation language="de" status="proposed">Abbrechen</translation>
                 </translations>
               </property>
             </properties>
@@ -8990,8 +8649,6 @@
             <properties>
               <property name="Caption">
                 <value>Execute</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -9010,8 +8667,6 @@
             <properties>
               <property name="Caption">
                 <value>Import into selected files</value>
-                <translations>
-                </translations>
               </property>
               <property name="Font.Name" status="skip">
                 <value>Tahoma</value>
@@ -9085,8 +8740,6 @@
             <properties>
               <property name="Caption">
                 <value>-import ALL metadata</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -9094,8 +8747,6 @@
             <properties>
               <property name="Caption">
                 <value>Dont overwrite existing data (-wm cg)</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -9104,6 +8755,7 @@
               <property name="Caption">
                 <value>Cancel</value>
                 <translations>
+                  <translation language="de" status="proposed">Abbrechen</translation>
                 </translations>
               </property>
             </properties>
@@ -9112,8 +8764,6 @@
             <properties>
               <property name="Caption">
                 <value>Execute</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -9132,8 +8782,6 @@
             <properties>
               <property name="Caption">
                 <value>Exif DateTime equalize</value>
-                <translations>
-                </translations>
               </property>
               <property name="Font.Name" status="skip">
                 <value>Tahoma</value>
@@ -9151,8 +8799,6 @@
             <properties>
               <property name="EditLabel.Caption">
                 <value>DateTimeOriginal:</value>
-                <translations>
-                </translations>
               </property>
               <property name="Text" status="skip">
                 <value>2012:01:12 18:15:00</value>
@@ -9163,8 +8809,6 @@
             <properties>
               <property name="EditLabel.Caption">
                 <value>CreateDate:</value>
-                <translations>
-                </translations>
               </property>
               <property name="Text" status="skip">
                 <value></value>
@@ -9175,8 +8819,6 @@
             <properties>
               <property name="EditLabel.Caption">
                 <value>ModifyDate:</value>
-                <translations>
-                </translations>
               </property>
               <property name="Text" status="skip">
                 <value></value>
@@ -9187,8 +8829,6 @@
             <properties>
               <property name="Caption">
                 <value>-use as source</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -9196,8 +8836,6 @@
             <properties>
               <property name="Caption">
                 <value>-and copy here</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -9205,8 +8843,6 @@
             <properties>
               <property name="Caption">
                 <value>-and copy here</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -9215,6 +8851,7 @@
               <property name="Caption">
                 <value>Cancel</value>
                 <translations>
+                  <translation language="de" status="proposed">Abbrechen</translation>
                 </translations>
               </property>
             </properties>
@@ -9223,8 +8860,6 @@
             <properties>
               <property name="Caption">
                 <value>Execute</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -9243,8 +8878,6 @@
             <properties>
               <property name="Caption">
                 <value>Exif: DateTime shift</value>
-                <translations>
-                </translations>
               </property>
               <property name="Font.Name" status="skip">
                 <value>Tahoma</value>
@@ -9262,8 +8895,6 @@
             <properties>
               <property name="Caption">
                 <value>-shift</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -9271,8 +8902,6 @@
             <properties>
               <property name="Caption">
                 <value>-shift</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -9280,8 +8909,6 @@
             <properties>
               <property name="Caption">
                 <value>-shift</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -9289,8 +8916,6 @@
             <properties>
               <property name="Caption">
                 <value>=Increment</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -9298,13 +8923,9 @@
             <properties>
               <property name="Caption">
                 <value>-change File: Date modified</value>
-                <translations>
-                </translations>
               </property>
               <property name="Hint">
                 <value>File: Date modified becomes (shifted) DateTimeOriginal value</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -9312,8 +8933,6 @@
             <properties>
               <property name="Caption">
                 <value>Shift amount:</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -9321,8 +8940,6 @@
             <properties>
               <property name="EditLabel.Caption">
                 <value>*DateTime original:</value>
-                <translations>
-                </translations>
               </property>
               <property name="Text" status="skip">
                 <value></value>
@@ -9333,8 +8950,6 @@
             <properties>
               <property name="EditLabel.Caption">
                 <value>CreateDate:</value>
-                <translations>
-                </translations>
               </property>
               <property name="Text" status="skip">
                 <value></value>
@@ -9345,8 +8960,6 @@
             <properties>
               <property name="EditLabel.Caption">
                 <value>ModifyDate:</value>
-                <translations>
-                </translations>
               </property>
               <property name="Text" status="skip">
                 <value></value>
@@ -9357,13 +8970,9 @@
             <properties>
               <property name="EditLabel.Caption">
                 <value>*DateTime result:</value>
-                <translations>
-                </translations>
               </property>
               <property name="Hint">
                 <value>Example of DateTimeOriginal after shifting</value>
-                <translations>
-                </translations>
               </property>
               <property name="Text" status="skip">
                 <value></value>
@@ -9377,8 +8986,6 @@
               </property>
               <property name="Hint">
                 <value>Example: [0000:00:01 02:00:00] =shift for 1 day &amp; 2 hours</value>
-                <translations>
-                </translations>
               </property>
               <property name="Text" status="skip">
                 <value>    :  :     :  :  </value>
@@ -9390,6 +8997,7 @@
               <property name="Caption">
                 <value>Cancel</value>
                 <translations>
+                  <translation language="de" status="proposed">Abbrechen</translation>
                 </translations>
               </property>
             </properties>
@@ -9398,8 +9006,6 @@
             <properties>
               <property name="Caption">
                 <value>Execute</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -9418,8 +9024,6 @@
             <properties>
               <property name="Caption">
                 <value>Edit file columns</value>
-                <translations>
-                </translations>
               </property>
               <property name="Font.Name" status="skip">
                 <value>Tahoma</value>
@@ -9437,8 +9041,6 @@
             <properties>
               <property name="Caption">
                 <value>Delete selected column</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -9446,8 +9048,6 @@
             <properties>
               <property name="Caption">
                 <value>Save changes</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -9455,8 +9055,6 @@
             <properties>
               <property name="Caption">
                 <value>Insert into new column</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -9464,13 +9062,9 @@
             <properties>
               <property name="EditLabel.Caption">
                 <value>Column name:</value>
-                <translations>
-                </translations>
               </property>
               <property name="Hint">
                 <value>Example: Photographer</value>
-                <translations>
-                </translations>
               </property>
               <property name="Text" status="skip">
                 <value></value>
@@ -9481,13 +9075,9 @@
             <properties>
               <property name="EditLabel.Caption">
                 <value>Metadata tag:</value>
-                <translations>
-                </translations>
               </property>
               <property name="Hint">
                 <value>Example: -exif:Artist</value>
-                <translations>
-                </translations>
               </property>
               <property name="Text" status="skip">
                 <value></value>
@@ -9499,6 +9089,7 @@
               <property name="Caption">
                 <value>Cancel</value>
                 <translations>
+                  <translation language="de" status="proposed">Abbrechen</translation>
                 </translations>
               </property>
             </properties>
@@ -9508,6 +9099,7 @@
               <property name="Caption">
                 <value>Save</value>
                 <translations>
+                  <translation language="de" status="proposed">Speichern</translation>
                 </translations>
               </property>
             </properties>
@@ -9520,8 +9112,6 @@
             <properties>
               <property name="Caption">
                 <value>Edit file filters</value>
-                <translations>
-                </translations>
               </property>
               <property name="Font.Name" status="skip">
                 <value>Tahoma</value>
@@ -9539,8 +9129,6 @@
             <properties>
               <property name="Caption">
                 <value>Add filter</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -9548,8 +9136,6 @@
             <properties>
               <property name="Caption">
                 <value>Delete selected</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -9557,8 +9143,6 @@
             <properties>
               <property name="Caption">
                 <value>5</value>
-                <translations>
-                </translations>
               </property>
               <property name="Font.Name" status="skip">
                 <value>Webdings</value>
@@ -9569,8 +9153,6 @@
             <properties>
               <property name="Caption">
                 <value>6</value>
-                <translations>
-                </translations>
               </property>
               <property name="Font.Name" status="skip">
                 <value>Webdings</value>
@@ -9582,6 +9164,7 @@
               <property name="Caption">
                 <value>Cancel</value>
                 <translations>
+                  <translation language="de" status="proposed">Abbrechen</translation>
                 </translations>
               </property>
             </properties>
@@ -9591,6 +9174,7 @@
               <property name="Caption">
                 <value>Save</value>
                 <translations>
+                  <translation language="de" status="proposed">Speichern</translation>
                 </translations>
               </property>
             </properties>
@@ -9603,8 +9187,6 @@
             <properties>
               <property name="Caption">
                 <value>Rename files</value>
-                <translations>
-                </translations>
               </property>
               <property name="Font.Name" status="skip">
                 <value>Tahoma</value>
@@ -9625,8 +9207,6 @@
               </property>
               <property name="Hint">
                 <value>Note: No backup files are created when renaming!</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -9634,8 +9214,6 @@
             <properties>
               <property name="Caption">
                 <value>Rename</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -9643,8 +9221,6 @@
             <properties>
               <property name="Caption">
                 <value>-set separator in Date field</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -9652,8 +9228,6 @@
             <properties>
               <property name="Caption">
                 <value>-set separator in Time field</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -9661,23 +9235,15 @@
             <properties>
               <property name="Caption">
                 <value>Get DateTime from Exif</value>
-                <translations>
-                </translations>
               </property>
               <property name="Items.Strings[0]">
                 <value>DateTimeOriginal</value>
-                <translations>
-                </translations>
               </property>
               <property name="Items.Strings[1]">
                 <value>CreateDate</value>
-                <translations>
-                </translations>
               </property>
               <property name="Items.Strings[2]">
                 <value>ModifyDate</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -9685,8 +9251,6 @@
             <properties>
               <property name="Caption">
                 <value>New Filename starts with</value>
-                <translations>
-                </translations>
               </property>
               <property name="Items.Strings[0]" status="skip">
                 <value>YYYYMMDD_HHMMSS Filename</value>
@@ -9703,18 +9267,12 @@
             <properties>
               <property name="Caption">
                 <value>Change Filename</value>
-                <translations>
-                </translations>
               </property>
               <property name="Items.Strings[0]">
                 <value>keep as is</value>
-                <translations>
-                </translations>
               </property>
               <property name="Items.Strings[1]">
                 <value>set to:</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -9722,16 +9280,12 @@
             <properties>
               <property name="Caption">
                 <value>Save existing Filename to</value>
-                <translations>
-                </translations>
               </property>
               <property name="Items.Strings[0]" status="skip">
                 <value>Exif:DocumentName</value>
               </property>
               <property name="Items.Strings[1]">
                 <value>Don't save</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -9742,8 +9296,6 @@
               </property>
               <property name="Hint">
                 <value>Files will only be renamed where Exif:DocumentName is defined.</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -9751,8 +9303,6 @@
             <properties>
               <property name="Caption">
                 <value>Rename</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -9760,8 +9310,6 @@
             <properties>
               <property name="Caption">
                 <value>Use Filename from Exif:DocumentName</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -9772,8 +9320,6 @@
               </property>
               <property name="Hint">
                 <value>DateTime part must be separated by SPACE!</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -9781,8 +9327,6 @@
             <properties>
               <property name="Caption">
                 <value>Rename</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -9790,8 +9334,6 @@
             <properties>
               <property name="Caption">
                 <value>Remove leading DateTime (incl. SPACE)</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -9800,6 +9342,7 @@
               <property name="Caption">
                 <value>Cancel</value>
                 <translations>
+                  <translation language="de" status="proposed">Abbrechen</translation>
                 </translations>
               </property>
             </properties>
@@ -9812,8 +9355,6 @@
             <properties>
               <property name="Caption">
                 <value>Generic extract previews</value>
-                <translations>
-                </translations>
               </property>
               <property name="Font.Name" status="skip">
                 <value>Tahoma</value>
@@ -9831,8 +9372,6 @@
             <properties>
               <property name="Caption">
                 <value>Auto rotate extracted JPEG's (From Exif:Orientation)</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -9840,8 +9379,6 @@
             <properties>
               <property name="Caption">
                 <value>Overwrite existing JPEG's</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -9849,8 +9386,6 @@
             <properties>
               <property name="Caption">
                 <value>Create subdirectories for selected Previews</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -9858,23 +9393,15 @@
             <properties>
               <property name="Items.Strings[0]">
                 <value>Do not crop</value>
-                <translations>
-                </translations>
               </property>
               <property name="Items.Strings[1]">
                 <value>Crop to multiple of 8</value>
-                <translations>
-                </translations>
               </property>
               <property name="Items.Strings[2]">
                 <value>Crop to multiple of 16</value>
-                <translations>
-                </translations>
               </property>
               <property name="Text">
                 <value>Do not crop</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -9882,13 +9409,9 @@
             <properties>
               <property name="Caption">
                 <value>Select previews to extract:</value>
-                <translations>
-                </translations>
               </property>
               <property name="Hint">
                 <value>Select at least 1 preview to extract. Multi-select enabled.</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -9903,8 +9426,6 @@
             <properties>
               <property name="Caption">
                 <value>Group</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -9912,8 +9433,6 @@
             <properties>
               <property name="Caption">
                 <value>Preview</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -9921,8 +9440,6 @@
             <properties>
               <property name="Caption">
                 <value>Size</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -9931,6 +9448,7 @@
               <property name="Caption">
                 <value>Cancel</value>
                 <translations>
+                  <translation language="de" status="proposed">Abbrechen</translation>
                 </translations>
               </property>
             </properties>
@@ -9939,8 +9457,6 @@
             <properties>
               <property name="Caption">
                 <value>Execute</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -9952,8 +9468,6 @@
             <properties>
               <property name="Caption">
                 <value>Generic import previews</value>
-                <translations>
-                </translations>
               </property>
               <property name="Font.Name" status="skip">
                 <value>Tahoma</value>
@@ -9971,8 +9485,6 @@
             <properties>
               <property name="Caption">
                 <value>Auto rotate imported JPEG's</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -9980,8 +9492,6 @@
             <properties>
               <property name="Caption">
                 <value>Remove unchecked previews</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -9989,23 +9499,15 @@
             <properties>
               <property name="Items.Strings[0]">
                 <value>Do not crop</value>
-                <translations>
-                </translations>
               </property>
               <property name="Items.Strings[1]">
                 <value>Crop to multiple of 8</value>
-                <translations>
-                </translations>
               </property>
               <property name="Items.Strings[2]">
                 <value>Crop to multiple of 16</value>
-                <translations>
-                </translations>
               </property>
               <property name="Text">
                 <value>Do not crop</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -10013,13 +9515,9 @@
             <properties>
               <property name="Caption">
                 <value>Select preview to import:</value>
-                <translations>
-                </translations>
               </property>
               <property name="Hint">
                 <value>Only the first selected will be used</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -10034,8 +9532,6 @@
             <properties>
               <property name="Caption">
                 <value>Group</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -10043,8 +9539,6 @@
             <properties>
               <property name="Caption">
                 <value>Preview</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -10052,8 +9546,6 @@
             <properties>
               <property name="Caption">
                 <value>Size</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -10062,6 +9554,7 @@
               <property name="Caption">
                 <value>Cancel</value>
                 <translations>
+                  <translation language="de" status="proposed">Abbrechen</translation>
                 </translations>
               </property>
             </properties>
@@ -10070,8 +9563,6 @@
             <properties>
               <property name="Caption">
                 <value>Execute</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -10083,8 +9574,6 @@
             <properties>
               <property name="Caption">
                 <value>Search place</value>
-                <translations>
-                </translations>
               </property>
               <property name="Font.Name" status="skip">
                 <value>Tahoma</value>
@@ -10096,6 +9585,7 @@
               <property name="Caption">
                 <value>Cancel</value>
                 <translations>
+                  <translation language="de" status="proposed">Abbrechen</translation>
                 </translations>
               </property>
             </properties>
@@ -10104,8 +9594,6 @@
             <properties>
               <property name="Caption">
                 <value>OK</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -10113,8 +9601,6 @@
             <properties>
               <property name="Caption">
                 <value>Search</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -10129,6 +9615,7 @@
               <property name="Items.Strings[1]">
                 <value>Overpass API</value>
                 <translations>
+                  <translation language="de" status="proposed">OverPass Api</translation>
                 </translations>
               </property>
               <property name="Text" status="skip">
@@ -10140,13 +9627,9 @@
             <properties>
               <property name="Items.Strings[0]">
                 <value>local</value>
-                <translations>
-                </translations>
               </property>
               <property name="Items.Strings[1]">
                 <value>default</value>
-                <translations>
-                </translations>
               </property>
               <property name="Text" status="skip">
                 <value>CmbOverPasslang</value>
@@ -10157,8 +9640,6 @@
             <properties>
               <property name="EditLabel.Caption">
                 <value>Within Bounds</value>
-                <translations>
-                </translations>
               </property>
               <property name="Text" status="skip">
                 <value></value>
@@ -10169,8 +9650,6 @@
             <properties>
               <property name="EditLabel.Caption">
                 <value>Within Country/Region</value>
-                <translations>
-                </translations>
               </property>
               <property name="Text" status="skip">
                 <value></value>
@@ -10181,8 +9660,6 @@
             <properties>
               <property name="EditLabel.Caption">
                 <value>Search for City</value>
-                <translations>
-                </translations>
               </property>
               <property name="Text" status="skip">
                 <value></value>
@@ -10193,8 +9670,6 @@
             <properties>
               <property name="Caption">
                 <value>City search</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -10202,8 +9677,6 @@
             <properties>
               <property name="Caption">
                 <value>Case sensitive (faster)</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -10211,8 +9684,6 @@
             <properties>
               <property name="Caption">
                 <value>Complete word (faster)</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -10220,8 +9691,6 @@
             <properties>
               <property name="Caption">
                 <value>Preferred language:</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -10229,8 +9698,6 @@
             <properties>
               <property name="Caption">
                 <value>GeoCode provider:</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -10242,8 +9709,6 @@
             <properties>
               <property name="Caption">
                 <value>Geotag files</value>
-                <translations>
-                </translations>
               </property>
               <property name="Font.Name" status="skip">
                 <value>Tahoma</value>
@@ -10255,6 +9720,7 @@
               <property name="Caption">
                 <value>Cancel</value>
                 <translations>
+                  <translation language="de" status="proposed">Abbrechen</translation>
                 </translations>
               </property>
             </properties>
@@ -10263,8 +9729,6 @@
             <properties>
               <property name="Caption">
                 <value>OK</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -10272,8 +9736,6 @@
             <properties>
               <property name="Caption">
                 <value>Setup</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -10281,8 +9743,6 @@
             <properties>
               <property name="Caption">
                 <value>Map CountryCode</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -10304,6 +9764,7 @@
               <property name="Items.Strings[1]">
                 <value>Overpass API</value>
                 <translations>
+                  <translation language="de" status="proposed">OverPass Api</translation>
                 </translations>
               </property>
               <property name="Text" status="skip">
@@ -10315,13 +9776,9 @@
             <properties>
               <property name="Items.Strings[0]">
                 <value>local</value>
-                <translations>
-                </translations>
               </property>
               <property name="Items.Strings[1]">
                 <value>default</value>
-                <translations>
-                </translations>
               </property>
               <property name="Text" status="skip">
                 <value>CmbOverPasslang</value>
@@ -10339,8 +9796,6 @@
             <properties>
               <property name="Caption">
                 <value>Preferred language:</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -10348,8 +9803,6 @@
             <properties>
               <property name="Caption">
                 <value>GeoCode provider:</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -10357,8 +9810,6 @@
             <properties>
               <property name="Caption">
                 <value>Map field to Province</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -10366,8 +9817,6 @@
             <properties>
               <property name="Caption">
                 <value>Map Field to City</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -10382,8 +9831,6 @@
             <properties>
               <property name="Caption">
                 <value>Settings for: </value>
-                <translations>
-                </translations>
               </property>
               <property name="Font.Name" status="skip">
                 <value>Tahoma</value>
@@ -10405,8 +9852,6 @@
             <properties>
               <property name="Caption">
                 <value>Import GPS data</value>
-                <translations>
-                </translations>
               </property>
               <property name="Font.Name" status="skip">
                 <value>Tahoma</value>
@@ -10424,13 +9869,9 @@
             <properties>
               <property name="Caption" status="skip">
                 <value>...</value>
-                <translations>
-                </translations>
               </property>
               <property name="Hint">
                 <value>Pick log file</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -10438,13 +9879,9 @@
             <properties>
               <property name="Caption">
                 <value>-use all log files in directory (if more than one exist for set of photos)</value>
-                <translations>
-                </translations>
               </property>
               <property name="Hint">
                 <value>To be used, all log files must have equal filename extension</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -10452,13 +9889,9 @@
             <properties>
               <property name="Caption">
                 <value>-use TimeZone offset (h):</value>
-                <translations>
-                </translations>
               </property>
               <property name="Hint">
                 <value>Not needed if photos were taken in your local (same as PC) TimeZone area</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -10466,8 +9899,6 @@
             <properties>
               <property name="Caption">
                 <value>Update Geo Location (Country, Province, City)</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -10485,8 +9916,6 @@
             <properties>
               <property name="Caption">
                 <value>Note: Geotagging precision depends on camera time accuracy. If neccesary,&amp;#10;apply Exif:DateTime shift before geotagging.</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -10494,13 +9923,9 @@
             <properties>
               <property name="EditLabel.Caption">
                 <value>Log file:</value>
-                <translations>
-                </translations>
               </property>
               <property name="Hint">
                 <value>Path and name of log file -use picker button to select one</value>
-                <translations>
-                </translations>
               </property>
               <property name="Text" status="skip">
                 <value></value>
@@ -10511,8 +9936,6 @@
             <properties>
               <property name="Caption">
                 <value>Reference DateTime value</value>
-                <translations>
-                </translations>
               </property>
               <property name="Items.Strings[0]" status="skip">
                 <value>-Exif:DateTimeOriginal</value>
@@ -10526,8 +9949,6 @@
             <properties>
               <property name="Hint">
                 <value>Set TimeZone offset =difference between logged time (UTC) and camera DateTime</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -10535,8 +9956,6 @@
             <properties>
               <property name="Caption">
                 <value>Setup Geo</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -10545,6 +9964,7 @@
               <property name="Caption">
                 <value>Cancel</value>
                 <translations>
+                  <translation language="de" status="proposed">Abbrechen</translation>
                 </translations>
               </property>
             </properties>
@@ -10553,8 +9973,6 @@
             <properties>
               <property name="Caption">
                 <value>Execute</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -10573,8 +9991,6 @@
             <properties>
               <property name="Caption">
                 <value>Geotag files</value>
-                <translations>
-                </translations>
               </property>
               <property name="Font.Name" status="skip">
                 <value>Tahoma</value>
@@ -10586,6 +10002,7 @@
               <property name="Caption">
                 <value>Cancel</value>
                 <translations>
+                  <translation language="de" status="proposed">Abbrechen</translation>
                 </translations>
               </property>
             </properties>
@@ -10594,8 +10011,6 @@
             <properties>
               <property name="Caption">
                 <value>Execute</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -10603,8 +10018,6 @@
             <properties>
               <property name="Caption">
                 <value>Setup Geo</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -10612,8 +10025,6 @@
             <properties>
               <property name="Caption">
                 <value>Location data</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -10628,8 +10039,6 @@
             <properties>
               <property name="Caption">
                 <value>First remove existing GPS tags from all groups</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -10637,23 +10046,15 @@
             <properties>
               <property name="Items.Strings[0]">
                 <value>Coordinates (Lat, Lon) </value>
-                <translations>
-                </translations>
               </property>
               <property name="Items.Strings[1]">
                 <value>Location (Country, Province, City)</value>
-                <translations>
-                </translations>
               </property>
               <property name="Items.Strings[2]">
                 <value>Coordinates and Location</value>
-                <translations>
-                </translations>
               </property>
               <property name="Text">
                 <value>Location (Country, Province, City)</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -10661,8 +10062,6 @@
             <properties>
               <property name="Caption">
                 <value>Update in selected files:</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -10681,8 +10080,6 @@
             <properties>
               <property name="Caption">
                 <value>ExifTool LOG</value>
-                <translations>
-                </translations>
               </property>
               <property name="Font.Name" status="skip">
                 <value>Tahoma</value>
@@ -10693,13 +10090,9 @@
             <properties>
               <property name="Caption">
                 <value>Show all Commands</value>
-                <translations>
-                </translations>
               </property>
               <property name="Hint">
                 <value>Show also non-critical commands to populate the Metadata and filelist?</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -10707,8 +10100,6 @@
             <properties>
               <property name="Caption">
                 <value>Errors</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -10723,8 +10114,6 @@
             <properties>
               <property name="Caption">
                 <value>Logged ExifTool commands</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -10732,8 +10121,6 @@
             <properties>
               <property name="Caption">
                 <value>Executed commands</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -10748,8 +10135,6 @@
             <properties>
               <property name="Caption">
                 <value>Cmd prompt</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -10757,8 +10142,6 @@
             <properties>
               <property name="Caption">
                 <value>PowerShell</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -10766,18 +10149,12 @@
             <properties>
               <property name="Caption">
                 <value>Show commands as</value>
-                <translations>
-                </translations>
               </property>
               <property name="Items.Strings[0]">
                 <value>Args</value>
-                <translations>
-                </translations>
               </property>
               <property name="Items.Strings[1]">
                 <value>CmdLine</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -10785,8 +10162,6 @@
             <properties>
               <property name="Caption">
                 <value>Output from commands</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -10801,13 +10176,9 @@
             <properties>
               <property name="DefaultExt">
                 <value>*.cmd</value>
-                <translations>
-                </translations>
               </property>
               <property name="Filter">
                 <value>Command Files|*.cmd|All|*.*</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -10815,13 +10186,9 @@
             <properties>
               <property name="DefaultExt">
                 <value>*.ps1</value>
-                <translations>
-                </translations>
               </property>
               <property name="Filter">
                 <value>Powershell files|*.ps1|All|*.*</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -10833,8 +10200,6 @@
             <properties>
               <property name="Caption">
                 <value>JPG: Lossless autorotate</value>
-                <translations>
-                </translations>
               </property>
               <property name="Font.Name" status="skip">
                 <value>Tahoma</value>
@@ -10852,23 +10217,15 @@
             <properties>
               <property name="Items.Strings[0]">
                 <value>Do not crop</value>
-                <translations>
-                </translations>
               </property>
               <property name="Items.Strings[1]">
                 <value>Crop to multiple of 8</value>
-                <translations>
-                </translations>
               </property>
               <property name="Items.Strings[2]">
                 <value>Crop to multiple of 16</value>
-                <translations>
-                </translations>
               </property>
               <property name="Text">
                 <value>Do not crop</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -10876,33 +10233,21 @@
             <properties>
               <property name="Items.Strings[0]">
                 <value>No change</value>
-                <translations>
-                </translations>
               </property>
               <property name="Items.Strings[1]">
                 <value>[ 1 ]=0°</value>
-                <translations>
-                </translations>
               </property>
               <property name="Items.Strings[2]">
                 <value>[ 3 ]=180°</value>
-                <translations>
-                </translations>
               </property>
               <property name="Items.Strings[3]">
                 <value>[ 6 ]=+90°</value>
-                <translations>
-                </translations>
               </property>
               <property name="Items.Strings[4]">
                 <value>[ 8 ]=-90°</value>
-                <translations>
-                </translations>
               </property>
               <property name="Text">
                 <value>Reset Orientation</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -10910,33 +10255,21 @@
             <properties>
               <property name="Items.Strings[0]">
                 <value>No rotate</value>
-                <translations>
-                </translations>
               </property>
               <property name="Items.Strings[1]">
                 <value>Auto rotate</value>
-                <translations>
-                </translations>
               </property>
               <property name="Items.Strings[2]">
                 <value>90 degrees</value>
-                <translations>
-                </translations>
               </property>
               <property name="Items.Strings[3]">
                 <value>180 degrees</value>
-                <translations>
-                </translations>
               </property>
               <property name="Items.Strings[4]">
                 <value>270 degrees</value>
-                <translations>
-                </translations>
               </property>
               <property name="Text">
                 <value>Rotate</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -10944,8 +10277,6 @@
             <properties>
               <property name="Caption">
                 <value>Rotate method</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -10953,8 +10284,6 @@
             <properties>
               <property name="Caption">
                 <value>Set orientation</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -10962,8 +10291,6 @@
             <properties>
               <property name="Caption">
                 <value>Crop image size to multilple of</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -10971,13 +10298,9 @@
             <properties>
               <property name="Caption">
                 <value>Select preview to rotate.</value>
-                <translations>
-                </translations>
               </property>
               <property name="Hint">
                 <value>Only the first selected will be used. Not required.</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -10999,8 +10322,6 @@
             <properties>
               <property name="Caption">
                 <value>Preview</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -11008,8 +10329,6 @@
             <properties>
               <property name="Caption">
                 <value>Size</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -11018,6 +10337,7 @@
               <property name="Caption">
                 <value>Cancel</value>
                 <translations>
+                  <translation language="de" status="proposed">Abbrechen</translation>
                 </translations>
               </property>
             </properties>
@@ -11026,8 +10346,6 @@
             <properties>
               <property name="Caption">
                 <value>Execute</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -11039,8 +10357,6 @@
             <properties>
               <property name="Caption">
                 <value>FMain</value>
-                <translations>
-                </translations>
               </property>
               <property name="Font.Name" status="skip">
                 <value>Tahoma</value>
@@ -11061,13 +10377,9 @@
             <properties>
               <property name="Caption">
                 <value>Reset window sizes to default</value>
-                <translations>
-                </translations>
               </property>
               <property name="Hint">
                 <value>Reset window sizes to default</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -11075,8 +10387,6 @@
             <properties>
               <property name="Caption">
                 <value>Chart</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -11091,8 +10401,6 @@
             <properties>
               <property name="Caption">
                 <value>+subfolders</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -11100,38 +10408,24 @@
             <properties>
               <property name="Caption">
                 <value>Files</value>
-                <translations>
-                </translations>
               </property>
               <property name="Items.Strings[0]">
                 <value>Any</value>
-                <translations>
-                </translations>
               </property>
               <property name="Items.Strings[1]">
                 <value>JPG</value>
-                <translations>
-                </translations>
               </property>
               <property name="Items.Strings[2]">
                 <value>CR2</value>
-                <translations>
-                </translations>
               </property>
               <property name="Items.Strings[3]">
                 <value>NEF</value>
-                <translations>
-                </translations>
               </property>
               <property name="Items.Strings[4]">
                 <value>PEF</value>
-                <translations>
-                </translations>
               </property>
               <property name="Items.Strings[5]">
                 <value>DNG</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -11139,23 +10433,15 @@
             <properties>
               <property name="Caption">
                 <value>Value</value>
-                <translations>
-                </translations>
               </property>
               <property name="Items.Strings[0]">
                 <value>FLength [4-300]</value>
-                <translations>
-                </translations>
               </property>
               <property name="Items.Strings[1]">
                 <value>FNumber [1.2-22]</value>
-                <translations>
-                </translations>
               </property>
               <property name="Items.Strings[2]">
                 <value>ISO [50-6400]</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -11163,8 +10449,6 @@
             <properties>
               <property name="Caption">
                 <value>Refresh</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -11175,8 +10459,6 @@
               </property>
               <property name="Title.Text.Strings[0]">
                 <value>Focal Length</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -11187,8 +10469,6 @@
               </property>
               <property name="YValues.Name">
                 <value>Bar</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -11196,8 +10476,6 @@
             <properties>
               <property name="Caption">
                 <value>Filelist</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -11212,18 +10490,12 @@
             <properties>
               <property name="Hint">
                 <value>Choose how the command(s) must be executed</value>
-                <translations>
-                </translations>
               </property>
               <property name="Items.Strings[0]">
                 <value>StayOpen</value>
-                <translations>
-                </translations>
               </property>
               <property name="Items.Strings[1]">
                 <value>Classic</value>
-                <translations>
-                </translations>
               </property>
               <property name="Text" status="skip">
                 <value>CmbETDirectMode</value>
@@ -11234,8 +10506,6 @@
             <properties>
               <property name="EditLabel.Caption">
                 <value>Command name:</value>
-                <translations>
-                </translations>
               </property>
               <property name="Font.Name" status="skip">
                 <value>Tahoma</value>
@@ -11249,16 +10519,12 @@
             <properties>
               <property name="EditLabel.Caption">
                 <value>Command (press Enter to execute):</value>
-                <translations>
-                </translations>
               </property>
               <property name="Font.Name" status="skip">
                 <value>Courier New</value>
               </property>
               <property name="Hint">
                 <value>Spaces in data require double quotes, double quotes in data requires prefixing it with a \. Examples -Make="abde fghi"  -Make="Abcde\"fghi"</value>
-                <translations>
-                </translations>
               </property>
               <property name="Text" status="skip">
                 <value></value>
@@ -11269,8 +10535,6 @@
             <properties>
               <property name="Caption">
                 <value>Deselect</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -11278,8 +10542,6 @@
             <properties>
               <property name="Caption">
                 <value>ExifTool direct</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -11287,8 +10549,6 @@
             <properties>
               <property name="Caption">
                 <value>^ Default</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -11296,8 +10556,6 @@
             <properties>
               <property name="Caption">
                 <value>Edit predefined</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -11305,8 +10563,6 @@
             <properties>
               <property name="Caption">
                 <value>^ Add new</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -11314,8 +10570,6 @@
             <properties>
               <property name="Caption">
                 <value>^ Delete</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -11323,8 +10577,6 @@
             <properties>
               <property name="Caption">
                 <value>^ Replace</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -11332,8 +10584,6 @@
             <properties>
               <property name="Caption">
                 <value>Show Log window</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -11348,33 +10598,21 @@
             <properties>
               <property name="Items.Strings[0]">
                 <value>Standard filelist</value>
-                <translations>
-                </translations>
               </property>
               <property name="Items.Strings[1]">
                 <value>Camera settings</value>
-                <translations>
-                </translations>
               </property>
               <property name="Items.Strings[2]">
                 <value>Location info</value>
-                <translations>
-                </translations>
               </property>
               <property name="Items.Strings[3]">
                 <value>About photo</value>
-                <translations>
-                </translations>
               </property>
               <property name="Items.Strings[4]">
                 <value>User defined</value>
-                <translations>
-                </translations>
               </property>
               <property name="Text">
                 <value>Standard filelist</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -11389,8 +10627,6 @@
             <properties>
               <property name="Caption">
                 <value>Edit</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -11398,8 +10634,6 @@
             <properties>
               <property name="Caption">
                 <value>Details:</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -11407,8 +10641,6 @@
             <properties>
               <property name="Caption">
                 <value>Edit</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -11416,8 +10648,6 @@
             <properties>
               <property name="Caption">
                 <value>Refresh</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -11435,8 +10665,6 @@
             <properties>
               <property name="Caption">
                 <value>Metadata</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -11465,8 +10693,6 @@
             <properties>
               <property name="Caption">
                 <value>Large</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -11475,6 +10701,7 @@
               <property name="Caption">
                 <value>&amp;Save</value>
                 <translations>
+                  <translation language="de" status="proposed">&amp;Speichern</translation>
                 </translations>
               </property>
             </properties>
@@ -11490,8 +10717,6 @@
             <properties>
               <property name="EditLabel.Caption">
                 <value>Find</value>
-                <translations>
-                </translations>
               </property>
               <property name="Text" status="skip">
                 <value></value>
@@ -11502,8 +10727,6 @@
             <properties>
               <property name="Caption">
                 <value>ALL</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -11511,8 +10734,6 @@
             <properties>
               <property name="Caption">
                 <value>Custom</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -11541,8 +10762,6 @@
             <properties>
               <property name="Caption">
                 <value>Workspace</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -11560,13 +10779,9 @@
               </property>
               <property name="TitleCaptions.Strings[0]">
                 <value>Tag name</value>
-                <translations>
-                </translations>
               </property>
               <property name="TitleCaptions.Strings[1]">
                 <value>Value</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -11574,8 +10789,6 @@
             <properties>
               <property name="Caption">
                 <value>OSM Map</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -11590,13 +10803,9 @@
             <properties>
               <property name="EditLabel.Caption">
                 <value>Bounds:</value>
-                <translations>
-                </translations>
               </property>
               <property name="Hint">
                 <value>Coordinates of the visible area (South,West,North,East)</value>
-                <translations>
-                </translations>
               </property>
               <property name="Text" status="skip">
                 <value></value>
@@ -11607,8 +10816,6 @@
             <properties>
               <property name="Caption">
                 <value>Geotag files</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -11623,13 +10830,9 @@
             <properties>
               <property name="EditLabel.Caption">
                 <value>Find:</value>
-                <translations>
-                </translations>
               </property>
               <property name="Hint">
                 <value>Use Ctrl+Click on the map to set the Lat/Lon values</value>
-                <translations>
-                </translations>
               </property>
               <property name="Text" status="skip">
                 <value></value>
@@ -11643,8 +10846,6 @@
             <properties>
               <property name="Caption">
                 <value>Forward&gt;&gt;</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -11652,8 +10853,6 @@
             <properties>
               <property name="Caption">
                 <value>&lt;&lt; Back</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -11661,13 +10860,9 @@
             <properties>
               <property name="Caption">
                 <value>Get location</value>
-                <translations>
-                </translations>
               </property>
               <property name="Hint">
                 <value>Sets to Lat/Lon values to the center of map</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -11675,8 +10870,6 @@
             <properties>
               <property name="Caption">
                 <value>Home</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -11684,8 +10877,6 @@
             <properties>
               <property name="Caption">
                 <value>Set^</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -11693,8 +10884,6 @@
             <properties>
               <property name="Caption">
                 <value>Show on map</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -11716,8 +10905,6 @@
             <properties>
               <property name="Caption">
                 <value>Browse</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -11735,8 +10922,6 @@
             <properties>
               <property name="Caption">
                 <value>Preview </value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -11807,8 +10992,6 @@
             <properties>
               <property name="StyleName" status="skip">
                 <value>Platform Default</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -11816,8 +10999,6 @@
             <properties>
               <property name="Caption">
                 <value>&amp;Program</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -11825,8 +11006,6 @@
             <properties>
               <property name="Caption">
                 <value>&amp;About...</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -11835,6 +11014,7 @@
               <property name="Caption">
                 <value>&amp;Preferences...</value>
                 <translations>
+                  <translation language="de" status="proposed">&amp;Einstellungen...</translation>
                 </translations>
               </property>
             </properties>
@@ -11843,8 +11023,6 @@
             <properties>
               <property name="Caption">
                 <value>&amp;Workspace manager...</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -11852,8 +11030,6 @@
             <properties>
               <property name="Caption">
                 <value>W&amp;orkspace definition file</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -11861,8 +11037,6 @@
             <properties>
               <property name="Caption">
                 <value>&amp;Load..</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -11871,6 +11045,7 @@
               <property name="Caption">
                 <value>&amp;Save...</value>
                 <translations>
+                  <translation language="de" status="proposed">&amp;Speichern...</translation>
                 </translations>
               </property>
             </properties>
@@ -11879,8 +11054,6 @@
             <properties>
               <property name="Caption">
                 <value>&amp;Style...</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -11895,8 +11068,6 @@
             <properties>
               <property name="Caption">
                 <value>&amp;Exit</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -11904,8 +11075,6 @@
             <properties>
               <property name="Caption">
                 <value>&amp;Options</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -11913,8 +11082,6 @@
             <properties>
               <property name="Caption">
                 <value>&amp;Don't make backup files</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -11922,8 +11089,6 @@
             <properties>
               <property name="Caption">
                 <value>&amp;Preserve Date modified of files</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -11931,8 +11096,6 @@
             <properties>
               <property name="Caption">
                 <value>P&amp;refix tag names with ID number</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -11940,8 +11103,6 @@
             <properties>
               <property name="Caption">
                 <value>&amp;Group tags by instance (-g4)</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -11956,8 +11117,6 @@
             <properties>
               <property name="Caption">
                 <value>&amp;API WindowsWideFile (Requires Exiftool V12.66)</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -11965,8 +11124,6 @@
             <properties>
               <property name="Caption">
                 <value>API &amp;LargeFileSupport</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -11981,8 +11138,6 @@
             <properties>
               <property name="Caption">
                 <value>&amp;Custom options</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -11990,8 +11145,6 @@
             <properties>
               <property name="Caption">
                 <value>&amp;Ignore minor errors in metadata</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -12006,8 +11159,6 @@
             <properties>
               <property name="Caption">
                 <value>&amp;Show Exif:GPS in decimal notation</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -12015,8 +11166,6 @@
             <properties>
               <property name="Caption">
                 <value>S&amp;how sorted tags (not in Workspace)</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -12024,8 +11173,6 @@
             <properties>
               <property name="Caption">
                 <value>Sh&amp;ow Composite tags in view ALL</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -12033,8 +11180,6 @@
             <properties>
               <property name="Caption">
                 <value>Do&amp;n't show duplicated tags</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -12049,8 +11194,6 @@
             <properties>
               <property name="Caption">
                 <value>Sho&amp;w tag values as numbers</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -12058,8 +11201,6 @@
             <properties>
               <property name="Caption">
                 <value>&amp;Export/Import</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -12067,8 +11208,6 @@
             <properties>
               <property name="Caption">
                 <value>&amp;Export metadata into</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -12076,8 +11215,6 @@
             <properties>
               <property name="Caption">
                 <value>&amp;TXT files</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -12085,8 +11222,6 @@
             <properties>
               <property name="Caption">
                 <value>&amp;MIE files</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -12094,8 +11229,6 @@
             <properties>
               <property name="Caption">
                 <value>&amp;XMP files</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -12103,8 +11236,6 @@
             <properties>
               <property name="Caption">
                 <value>&amp;EXIF files</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -12112,8 +11243,6 @@
             <properties>
               <property name="Caption">
                 <value>&amp;HTML files</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -12121,8 +11250,6 @@
             <properties>
               <property name="Caption">
                 <value>&amp;Copy metadata from single file...</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -12130,8 +11257,6 @@
             <properties>
               <property name="Caption">
                 <value>C&amp;opy metadata into JPG or TIF files...</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -12139,8 +11264,6 @@
             <properties>
               <property name="Caption">
                 <value>Co&amp;py metadata into all JPG or TIF files...</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -12148,8 +11271,6 @@
             <properties>
               <property name="Caption">
                 <value>&amp;Import GPS data from</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -12157,8 +11278,6 @@
             <properties>
               <property name="Caption">
                 <value>&amp;Log files...</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -12166,8 +11285,6 @@
             <properties>
               <property name="Caption">
                 <value>&amp;Xmp files...</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -12182,8 +11299,6 @@
             <properties>
               <property name="Caption">
                 <value>&amp;Generic extract previews...</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -12191,8 +11306,6 @@
             <properties>
               <property name="Caption">
                 <value>Ge&amp;neric import preview...</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -12200,8 +11313,6 @@
             <properties>
               <property name="Caption">
                 <value>&amp;Modify</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -12209,8 +11320,6 @@
             <properties>
               <property name="Caption">
                 <value>&amp;Exif: DateTime shift...</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -12218,8 +11327,6 @@
             <properties>
               <property name="Caption">
                 <value>E&amp;xif: DateTime equalize...</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -12227,8 +11334,6 @@
             <properties>
               <property name="Caption">
                 <value>Ex&amp;if: LensInfo from Makernotes...</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -12243,8 +11348,6 @@
             <properties>
               <property name="Caption">
                 <value>&amp;Remove metadata...</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -12259,8 +11362,6 @@
             <properties>
               <property name="Caption">
                 <value>&amp;Update City, Province, Country from GPS coordinates...</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -12268,8 +11369,6 @@
             <properties>
               <property name="Caption">
                 <value>&amp;Various</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -12277,8 +11376,6 @@
             <properties>
               <property name="Caption">
                 <value>&amp;File: Date modified as in Exif...</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -12286,8 +11383,6 @@
             <properties>
               <property name="Caption">
                 <value>F&amp;ile: Name=DateTime+Name...</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -12295,8 +11390,6 @@
             <properties>
               <property name="Caption">
                 <value>&amp;JPG:  Lossless rotate + crop...</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -12304,8 +11397,6 @@
             <properties>
               <property name="Caption">
                 <value>&amp;Help</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -12313,8 +11404,6 @@
             <properties>
               <property name="Caption">
                 <value>&amp;Online Documentation</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -12322,8 +11411,6 @@
             <properties>
               <property name="Caption">
                 <value>About...</value>
-                <translations>
-                </translations>
               </property>
               <property name="Category" status="skip">
                 <value>Program</value>
@@ -12334,8 +11421,6 @@
             <properties>
               <property name="Caption">
                 <value>API LargeFileSupport</value>
-                <translations>
-                </translations>
               </property>
               <property name="Category" status="skip">
                 <value>Options</value>
@@ -12346,8 +11431,6 @@
             <properties>
               <property name="Caption">
                 <value>API WindowsWideFile (Requires Exiftool V12.66)</value>
-                <translations>
-                </translations>
               </property>
               <property name="Category" status="skip">
                 <value>Options</value>
@@ -12358,8 +11441,6 @@
             <properties>
               <property name="Caption">
                 <value>Custom options</value>
-                <translations>
-                </translations>
               </property>
               <property name="Category" status="skip">
                 <value>Options</value>
@@ -12370,8 +11451,6 @@
             <properties>
               <property name="Caption">
                 <value>Don't make backup files</value>
-                <translations>
-                </translations>
               </property>
               <property name="Category" status="skip">
                 <value>Options</value>
@@ -12382,8 +11461,6 @@
             <properties>
               <property name="Caption">
                 <value>Exif: DateTime equalize...</value>
-                <translations>
-                </translations>
               </property>
               <property name="Category" status="skip">
                 <value>Modify</value>
@@ -12394,8 +11471,6 @@
             <properties>
               <property name="Caption">
                 <value>Exif: DateTime shift...</value>
-                <translations>
-                </translations>
               </property>
               <property name="Category" status="skip">
                 <value>Modify</value>
@@ -12406,8 +11481,6 @@
             <properties>
               <property name="Caption">
                 <value>Exif: LensInfo from Makernotes...</value>
-                <translations>
-                </translations>
               </property>
               <property name="Category" status="skip">
                 <value>Modify</value>
@@ -12418,8 +11491,6 @@
             <properties>
               <property name="Caption">
                 <value>Exit</value>
-                <translations>
-                </translations>
               </property>
               <property name="Category" status="skip">
                 <value>Program</value>
@@ -12430,8 +11501,6 @@
             <properties>
               <property name="Caption">
                 <value>EXIF files</value>
-                <translations>
-                </translations>
               </property>
               <property name="Category" status="skip">
                 <value>Export_Metadata</value>
@@ -12442,8 +11511,6 @@
             <properties>
               <property name="Caption">
                 <value>HTML files</value>
-                <translations>
-                </translations>
               </property>
               <property name="Category" status="skip">
                 <value>Export_Metadata</value>
@@ -12454,8 +11521,6 @@
             <properties>
               <property name="Caption">
                 <value>MIE files</value>
-                <translations>
-                </translations>
               </property>
               <property name="Category" status="skip">
                 <value>Export_Metadata</value>
@@ -12466,8 +11531,6 @@
             <properties>
               <property name="Caption">
                 <value>TXT files</value>
-                <translations>
-                </translations>
               </property>
               <property name="Category" status="skip">
                 <value>Export_Metadata</value>
@@ -12478,8 +11541,6 @@
             <properties>
               <property name="Caption">
                 <value>XMP files</value>
-                <translations>
-                </translations>
               </property>
               <property name="Category" status="skip">
                 <value>Export_Metadata</value>
@@ -12490,8 +11551,6 @@
             <properties>
               <property name="Caption">
                 <value>File: Date modified as in Exif...</value>
-                <translations>
-                </translations>
               </property>
               <property name="Category" status="skip">
                 <value>Various</value>
@@ -12502,8 +11561,6 @@
             <properties>
               <property name="Caption">
                 <value>File: Name=DateTime+Name...</value>
-                <translations>
-                </translations>
               </property>
               <property name="Category" status="skip">
                 <value>Various</value>
@@ -12514,8 +11571,6 @@
             <properties>
               <property name="Caption">
                 <value>Generic extract previews...</value>
-                <translations>
-                </translations>
               </property>
               <property name="Category" status="skip">
                 <value>Export_Import</value>
@@ -12526,8 +11581,6 @@
             <properties>
               <property name="Caption">
                 <value>Generic import preview...</value>
-                <translations>
-                </translations>
               </property>
               <property name="Category" status="skip">
                 <value>Export_Import</value>
@@ -12538,8 +11591,6 @@
             <properties>
               <property name="Caption">
                 <value>Group tags by instance (-g4)</value>
-                <translations>
-                </translations>
               </property>
               <property name="Category" status="skip">
                 <value>Options</value>
@@ -12550,8 +11601,6 @@
             <properties>
               <property name="Caption">
                 <value>Style...</value>
-                <translations>
-                </translations>
               </property>
               <property name="Category" status="skip">
                 <value>Program</value>
@@ -12562,8 +11611,6 @@
             <properties>
               <property name="Caption">
                 <value>Ignore minor errors in metadata</value>
-                <translations>
-                </translations>
               </property>
               <property name="Category" status="skip">
                 <value>Options</value>
@@ -12574,8 +11621,6 @@
             <properties>
               <property name="Caption">
                 <value>Import GPS data from</value>
-                <translations>
-                </translations>
               </property>
               <property name="Category" status="skip">
                 <value>Export_Import</value>
@@ -12586,8 +11631,6 @@
             <properties>
               <property name="Caption">
                 <value>Log files...</value>
-                <translations>
-                </translations>
               </property>
               <property name="Category" status="skip">
                 <value>Import_GPS</value>
@@ -12598,8 +11641,6 @@
             <properties>
               <property name="Caption">
                 <value>Copy metadata into JPG or TIF files...</value>
-                <translations>
-                </translations>
               </property>
               <property name="Category" status="skip">
                 <value>Export_Import</value>
@@ -12610,8 +11651,6 @@
             <properties>
               <property name="Caption">
                 <value>Copy metadata from single file...</value>
-                <translations>
-                </translations>
               </property>
               <property name="Category" status="skip">
                 <value>Export_Import</value>
@@ -12622,8 +11661,6 @@
             <properties>
               <property name="Caption">
                 <value>Copy metadata into all JPG or TIF files...</value>
-                <translations>
-                </translations>
               </property>
               <property name="Category" status="skip">
                 <value>Export_Import</value>
@@ -12634,8 +11671,6 @@
             <properties>
               <property name="Caption">
                 <value>Xmp files...</value>
-                <translations>
-                </translations>
               </property>
               <property name="Category" status="skip">
                 <value>Import_GPS</value>
@@ -12646,8 +11681,6 @@
             <properties>
               <property name="Caption">
                 <value>JPG:  Lossless rotate + crop...</value>
-                <translations>
-                </translations>
               </property>
               <property name="Category" status="skip">
                 <value>Various</value>
@@ -12658,8 +11691,6 @@
             <properties>
               <property name="Caption">
                 <value>Don't show duplicated tags</value>
-                <translations>
-                </translations>
               </property>
               <property name="Category" status="skip">
                 <value>Options</value>
@@ -12670,8 +11701,6 @@
             <properties>
               <property name="Caption">
                 <value>Online Documentation</value>
-                <translations>
-                </translations>
               </property>
               <property name="Category" status="skip">
                 <value>Help</value>
@@ -12683,6 +11712,7 @@
               <property name="Caption">
                 <value>Preferences...</value>
                 <translations>
+                  <translation language="de" status="proposed">Einstellungen...</translation>
                 </translations>
               </property>
               <property name="Category" status="skip">
@@ -12694,8 +11724,6 @@
             <properties>
               <property name="Caption">
                 <value>Preserve Date modified of files</value>
-                <translations>
-                </translations>
               </property>
               <property name="Category" status="skip">
                 <value>Options</value>
@@ -12706,8 +11734,6 @@
             <properties>
               <property name="Caption">
                 <value>Workspace manager...</value>
-                <translations>
-                </translations>
               </property>
               <property name="Category" status="skip">
                 <value>Program</value>
@@ -12718,8 +11744,6 @@
             <properties>
               <property name="Caption">
                 <value>Remove metadata...</value>
-                <translations>
-                </translations>
               </property>
               <property name="Category" status="skip">
                 <value>Modify</value>
@@ -12730,8 +11754,6 @@
             <properties>
               <property name="Caption">
                 <value>Show Composite tags in view ALL</value>
-                <translations>
-                </translations>
               </property>
               <property name="Category" status="skip">
                 <value>Options</value>
@@ -12742,8 +11764,6 @@
             <properties>
               <property name="Caption">
                 <value>Show Exif:GPS in decimal notation</value>
-                <translations>
-                </translations>
               </property>
               <property name="Category" status="skip">
                 <value>Options</value>
@@ -12754,8 +11774,6 @@
             <properties>
               <property name="Caption">
                 <value>Prefix tag names with ID number</value>
-                <translations>
-                </translations>
               </property>
               <property name="Category" status="skip">
                 <value>Options</value>
@@ -12766,8 +11784,6 @@
             <properties>
               <property name="Caption">
                 <value>Show tag values as numbers</value>
-                <translations>
-                </translations>
               </property>
               <property name="Category" status="skip">
                 <value>Options</value>
@@ -12778,8 +11794,6 @@
             <properties>
               <property name="Caption">
                 <value>Show sorted tags (not in Workspace)</value>
-                <translations>
-                </translations>
               </property>
               <property name="Category" status="skip">
                 <value>Options</value>
@@ -12790,8 +11804,6 @@
             <properties>
               <property name="Caption">
                 <value>Update City, Province, Country from GPS coordinates...</value>
-                <translations>
-                </translations>
               </property>
               <property name="Category" status="skip">
                 <value>Modify</value>
@@ -12802,8 +11814,6 @@
             <properties>
               <property name="Caption">
                 <value>Load..</value>
-                <translations>
-                </translations>
               </property>
               <property name="Category" status="skip">
                 <value>Program_Workspace</value>
@@ -12815,6 +11825,7 @@
               <property name="Caption">
                 <value>Save...</value>
                 <translations>
+                  <translation language="de" status="proposed">Speichern...</translation>
                 </translations>
               </property>
               <property name="Category" status="skip">
@@ -12840,8 +11851,6 @@
             <properties>
               <property name="Caption">
                 <value>Add tag to Custom view</value>
-                <translations>
-                </translations>
               </property>
               <property name="ImageName" status="skip">
                 <value>QuickPopUp_AddCustom</value>
@@ -12852,8 +11861,6 @@
             <properties>
               <property name="Caption">
                 <value>Add tag to Filelist Details</value>
-                <translations>
-                </translations>
               </property>
               <property name="ImageName" status="skip">
                 <value>QuickPopUp_AddDetailsUser</value>
@@ -12864,8 +11871,6 @@
             <properties>
               <property name="Caption">
                 <value>Add tag to Workspace</value>
-                <translations>
-                </translations>
               </property>
               <property name="ImageName" status="skip">
                 <value>QuickPopUp_AddQuick</value>
@@ -12876,8 +11881,6 @@
             <properties>
               <property name="Caption">
                 <value>Copy Value to Clipboard</value>
-                <translations>
-                </translations>
               </property>
               <property name="ImageName" status="skip">
                 <value>QuickPopUp_CopyTag</value>
@@ -12888,8 +11891,6 @@
             <properties>
               <property name="Caption">
                 <value>Remove tag from Custom view</value>
-                <translations>
-                </translations>
               </property>
               <property name="ImageName" status="skip">
                 <value>QuickPopUp_DelCustom</value>
@@ -12900,8 +11901,6 @@
             <properties>
               <property name="Caption">
                 <value>Remove tag from Workspace</value>
-                <translations>
-                </translations>
               </property>
               <property name="ImageName" status="skip">
                 <value>QuickPopUp_DelQuick</value>
@@ -12912,8 +11911,6 @@
             <properties>
               <property name="Caption">
                 <value>Fill in default values</value>
-                <translations>
-                </translations>
               </property>
               <property name="ImageName" status="skip">
                 <value>QuickPopUp_FillQuick</value>
@@ -12924,8 +11921,6 @@
             <properties>
               <property name="Caption">
                 <value>Mark/Unmark tag</value>
-                <translations>
-                </translations>
               </property>
               <property name="ImageName" status="skip">
                 <value>QuickPopUp_MarkTag</value>
@@ -12936,8 +11931,6 @@
             <properties>
               <property name="Caption">
                 <value>Undo selected editing</value>
-                <translations>
-                </translations>
               </property>
               <property name="ImageName" status="skip">
                 <value>QuickPopUp_UndoEdit</value>
@@ -12948,8 +11941,6 @@
             <properties>
               <property name="Hint">
                 <value>Reset window sizes to default</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -12971,8 +11962,6 @@
             <properties>
               <property name="Caption">
                 <value>Reset window sizes to default</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -13075,6 +12064,7 @@
               <property name="Caption">
                 <value>Preferences</value>
                 <translations>
+                  <translation language="de" status="proposed">Einstellungen</translation>
                 </translations>
               </property>
               <property name="Font.Name" status="skip">
@@ -13087,6 +12077,7 @@
               <property name="Caption">
                 <value>General</value>
                 <translations>
+                  <translation language="de" status="proposed">Generel</translation>
                 </translations>
               </property>
             </properties>
@@ -13095,8 +12086,6 @@
             <properties>
               <property name="Caption" status="skip">
                 <value>...</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -13104,8 +12093,6 @@
             <properties>
               <property name="Caption" status="skip">
                 <value>...</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -13114,6 +12101,7 @@
               <property name="Caption">
                 <value>-in preview, let GUI temporary rotate images</value>
                 <translations>
+                  <translation language="de" status="proposed">-in Vorschau, lass GUI die Bilder rotieren</translation>
                 </translations>
               </property>
             </properties>
@@ -13123,6 +12111,7 @@
               <property name="Caption">
                 <value>-enable internet access for OSM Map (requires restart)</value>
                 <translations>
+                  <translation language="de" status="proposed">-Internetzugang für OSM Map aktivieren (Neustart erforderlich)</translation>
                 </translations>
               </property>
             </properties>
@@ -13132,6 +12121,7 @@
               <property name="Caption">
                 <value>-save Filelist Details state on exit</value>
                 <translations>
+                  <translation language="de" status="proposed">-Status der Dateiliste Details beim Beenden speichern&amp;#13;&amp;#10;</translation>
                 </translations>
               </property>
             </properties>
@@ -13141,6 +12131,7 @@
               <property name="Caption">
                 <value>Metadata language:</value>
                 <translations>
+                  <translation language="de" status="proposed">Sprache der Metadaten:</translation>
                 </translations>
               </property>
             </properties>
@@ -13150,6 +12141,7 @@
               <property name="EditLabel.Caption">
                 <value>-separator character displayed for multi-value tags (keywords, etc)</value>
                 <translations>
+                  <translation language="de" status="proposed">-trennungskarakter für mehrwert Tags (Stichworte usw)</translation>
                 </translations>
               </property>
               <property name="Text" status="skip">
@@ -13162,16 +12154,19 @@
               <property name="Caption">
                 <value>Default export metadata folder</value>
                 <translations>
+                  <translation language="de" status="proposed">Standard-Metadatenordner für den Export</translation>
                 </translations>
               </property>
               <property name="Items.Strings[0]">
                 <value>-working folder</value>
                 <translations>
+                  <translation language="de" status="proposed">-Arbeitsmappe</translation>
                 </translations>
               </property>
               <property name="Items.Strings[1]">
                 <value>-save in:</value>
                 <translations>
+                  <translation language="de" status="proposed">-Speichern in:</translation>
                 </translations>
               </property>
             </properties>
@@ -13181,16 +12176,19 @@
               <property name="Caption">
                 <value>Default startup folder</value>
                 <translations>
+                  <translation language="de" status="proposed">Standard-Startordner</translation>
                 </translations>
               </property>
               <property name="Items.Strings[0]">
                 <value>-start in last visited folder</value>
                 <translations>
+                  <translation language="de" status="proposed">-starte in letzter Ordner</translation>
                 </translations>
               </property>
               <property name="Items.Strings[1]">
                 <value>-start in:</value>
                 <translations>
+                  <translation language="de" status="proposed">-starte in:</translation>
                 </translations>
               </property>
             </properties>
@@ -13200,6 +12198,7 @@
               <property name="Caption">
                 <value>Shell Integration</value>
                 <translations>
+                  <translation language="de" status="proposed">Integration der Shell</translation>
                 </translations>
               </property>
             </properties>
@@ -13209,6 +12208,7 @@
               <property name="Caption">
                 <value>-application Single instance</value>
                 <translations>
+                  <translation language="de" status="proposed">-Applikation Einzelne Instanz</translation>
                 </translations>
               </property>
             </properties>
@@ -13218,6 +12218,7 @@
               <property name="Caption">
                 <value>-application When minimized move to tray</value>
                 <translations>
+                  <translation language="de" status="proposed">-Anwendung Nach dem Minimieren in die Schublade verschieben</translation>
                 </translations>
               </property>
             </properties>
@@ -13227,6 +12228,7 @@
               <property name="Caption">
                 <value>Register ExiftoolGui in Contextmenu (Requires elevation)</value>
                 <translations>
+                  <translation language="de" status="proposed">ExiftoolGui im Kontextmenü registrieren (Erfordert eine Berechtigung)</translation>
                 </translations>
               </property>
             </properties>
@@ -13236,6 +12238,7 @@
               <property name="Caption">
                 <value>Add to contextmenu</value>
                 <translations>
+                  <translation language="de" status="proposed">Zum Kontextmenü hinzufügen</translation>
                 </translations>
               </property>
             </properties>
@@ -13245,6 +12248,7 @@
               <property name="Caption">
                 <value>Remove from contextmenu</value>
                 <translations>
+                  <translation language="de" status="proposed">aus dem Kontextmenü entfernen</translation>
                 </translations>
               </property>
             </properties>
@@ -13254,6 +12258,7 @@
               <property name="EditLabel.Caption">
                 <value>Installed as:</value>
                 <translations>
+                  <translation language="de" status="proposed">Installiert als:</translation>
                 </translations>
               </property>
               <property name="Text" status="skip">
@@ -13266,6 +12271,7 @@
               <property name="Lines.Strings[0]">
                 <value>The Verb will appear in the context menu, when you right-click on a folder in Windows Explorer.</value>
                 <translations>
+                  <translation language="de" status="proposed">Das Verb wird im Kontextmenü angezeigt, wenn Sie im Windows Explorer mit der rechten Maustaste auf einen Ordner klicken.</translation>
                 </translations>
               </property>
               <property name="Lines.Strings[1]" status="skip">
@@ -13274,16 +12280,19 @@
               <property name="Lines.Strings[2]">
                 <value>Starting from Windows 11 the Verb will be under 'Show more options'. Directly acces the menu:</value>
                 <translations>
+                  <translation language="de" status="proposed">Ab Windows 11 wird das Verb unter "Weitere Optionen anzeigen" zu finden sein. Greifen Sie direkt auf das Menü zu:</translation>
                 </translations>
               </property>
               <property name="Lines.Strings[3]">
                 <value>- Use SHIFT/F10, or Shift/right-click</value>
                 <translations>
+                  <translation language="de" status="proposed">- Verwenden Sie SHIFT/F10, oder Shift/Rechtsklick</translation>
                 </translations>
               </property>
               <property name="Lines.Strings[4]">
                 <value>- For permanent direct access search the net for 'Disable Show more options Windows 11'</value>
                 <translations>
+                  <translation language="de" status="proposed">- Für einen permanenten direkten Zugang suchen Sie im Netz nach 'Disable Show more options Windows 11'</translation>
                 </translations>
               </property>
             </properties>
@@ -13293,6 +12302,7 @@
               <property name="Caption">
                 <value>Other</value>
                 <translations>
+                  <translation language="de" status="proposed">Andere</translation>
                 </translations>
               </property>
             </properties>
@@ -13309,6 +12319,7 @@
               <property name="Caption">
                 <value>-Filelist: Enable 'Camera Settings', 'Location info' and 'About photo' for all file types. (Slower)</value>
                 <translations>
+                  <translation language="de" status="proposed">-Dateiliste: Aktivieren Sie "Kameraeinstellungen", "Standortinformationen" und "Über das Foto" für alle Dateitypen. (Langsamer)</translation>
                 </translations>
               </property>
             </properties>
@@ -13318,6 +12329,7 @@
               <property name="Caption">
                 <value>-Workspace: Move focus to next tag/line after value is entered</value>
                 <translations>
+                  <translation language="de" status="proposed">-Arbeitsbereich: Verschieben des Fokus auf das nächste Tag/die nächste Zeile, nachdem ein Wert eingegeben wurde</translation>
                 </translations>
               </property>
             </properties>
@@ -13327,6 +12339,7 @@
               <property name="Caption">
                 <value>-Workspace: Double Click adds/removes tags</value>
                 <translations>
+                  <translation language="de" status="proposed">-Arbeitsbereich: Doppelklick fügt Tags hinzu/entfernt sie</translation>
                 </translations>
               </property>
             </properties>
@@ -13336,6 +12349,7 @@
               <property name="Caption">
                 <value>-Filelist: Show Folders in Filelist</value>
                 <translations>
+                  <translation language="de" status="proposed">-Dateiliste: Ordner in Dateiliste anzeigen</translation>
                 </translations>
               </property>
             </properties>
@@ -13345,6 +12359,7 @@
               <property name="Caption">
                 <value>-Filelist: Show Breadcrumb (Address Bar) in Filelist</value>
                 <translations>
+                  <translation language="de" status="proposed">-Dateiliste: Breadcrumb (Adressleiste) in Dateiliste anzeigen</translation>
                 </translations>
               </property>
             </properties>
@@ -13354,6 +12369,7 @@
               <property name="Caption">
                 <value>-Filelist: Show Hidden Folders and Files in Filelist (Admin required)</value>
                 <translations>
+                  <translation language="de" status="proposed">-Dateiliste: Versteckte Ordner und Dateien in der Dateiliste anzeigen (Admin erforderlich)</translation>
                 </translations>
               </property>
             </properties>
@@ -13370,6 +12386,7 @@
               <property name="Caption">
                 <value>Hint pause timeout in Millisecs</value>
                 <translations>
+                  <translation language="de" status="proposed">Hinweis Pausen-Timeout in Millisekunden</translation>
                 </translations>
               </property>
             </properties>
@@ -13379,16 +12396,19 @@
               <property name="Caption">
                 <value>ExifTool.exe location</value>
                 <translations>
+                  <translation language="de" status="proposed">ExifTool.exe Ordner</translation>
                 </translations>
               </property>
               <property name="Items.Strings[0]">
                 <value>-Default search (See Windows documentation on CreateProcess)</value>
                 <translations>
+                  <translation language="de" status="proposed">Standardsuche (siehe Windows-Dokumentation zu CreateProcess)</translation>
                 </translations>
               </property>
               <property name="Items.Strings[1]">
                 <value>-Specify</value>
                 <translations>
+                  <translation language="de" status="proposed">-Spezifiziere</translation>
                 </translations>
               </property>
             </properties>
@@ -13398,6 +12418,7 @@
               <property name="Caption">
                 <value>Thumbnails</value>
                 <translations>
+                  <translation language="de" status="proposed">Vorschaubilder</translation>
                 </translations>
               </property>
             </properties>
@@ -13407,6 +12428,7 @@
               <property name="Caption">
                 <value>Cleanup thumbnails</value>
                 <translations>
+                  <translation language="de" status="proposed">Bereinigung Vorschaubilder</translation>
                 </translations>
               </property>
             </properties>
@@ -13416,11 +12438,13 @@
               <property name="Caption">
                 <value>Generate Thumbnails now</value>
                 <translations>
+                  <translation language="de" status="proposed">Jetzt Vorschaubilder erzeugen</translation>
                 </translations>
               </property>
               <property name="Hint">
                 <value>Generating thumbnails is also available in the context menu of the filelist when in Thumbnail mode</value>
                 <translations>
+                  <translation language="de" status="proposed">Die Erzeugung von Miniaturbildern ist auch im Kontextmenü der Dateiliste verfügbar, wenn der Miniaturbildmodus aktiviert ist</translation>
                 </translations>
               </property>
             </properties>
@@ -13430,6 +12454,7 @@
               <property name="Caption">
                 <value>Setup Disk cleanup for thumbnails</value>
                 <translations>
+                  <translation language="de" status="proposed">Festplattenbereinigung für Vorschaubilder einrichten</translation>
                 </translations>
               </property>
             </properties>
@@ -13439,6 +12464,7 @@
               <property name="Caption">
                 <value>Generate thumbnails as needed</value>
                 <translations>
+                  <translation language="de" status="proposed">Erzeuge Vorschaubilder nach Bedarf</translation>
                 </translations>
               </property>
             </properties>
@@ -13451,6 +12477,7 @@
               <property name="Hint">
                 <value>Defines an Id used by the Disk Cleanup program. If unsure leave it to the default value  0000</value>
                 <translations>
+                  <translation language="de" status="proposed">Definiert eine Kennung, die vom Festplattenbereinigungsprogramm verwendet wird. Wenn Sie unsicher sind, belassen Sie es beim Standardwert 0000</translation>
                 </translations>
               </property>
               <property name="Text" status="skip">
@@ -13463,6 +12490,7 @@
               <property name="Caption">
                 <value>Cleanup Thumbnails (Admin required)</value>
                 <translations>
+                  <translation language="de" status="proposed">Bereinigung Vorschaubilder (Admin erforderlich)</translation>
                 </translations>
               </property>
             </properties>
@@ -13479,6 +12507,7 @@
               <property name="Caption">
                 <value>Thumbnails size</value>
                 <translations>
+                  <translation language="de" status="proposed">Größe der Vorschaubilder</translation>
                 </translations>
               </property>
               <property name="Items.Strings[0]" status="skip">
@@ -13531,6 +12560,7 @@
               <property name="EditLabel.Caption">
                 <value>Throttle</value>
                 <translations>
+                  <translation language="de" status="proposed">Drossel</translation>
                 </translations>
               </property>
               <property name="Text" status="skip">
@@ -13543,6 +12573,7 @@
               <property name="Caption">
                 <value>(Min. time between calls in Ms)</value>
                 <translations>
+                  <translation language="de" status="proposed">(Min. Zeit zwischen Anrufen in Ms)</translation>
                 </translations>
               </property>
             </properties>
@@ -13552,6 +12583,7 @@
               <property name="Caption">
                 <value>GeoCoding</value>
                 <translations>
+                  <translation language="de" status="proposed">GeoCoding</translation>
                 </translations>
               </property>
             </properties>
@@ -13561,6 +12593,7 @@
               <property name="Caption">
                 <value>Enable Geocode dialog (Get coordinates of location)</value>
                 <translations>
+                  <translation language="de" status="proposed">Geocode-Dialog aktivieren (Koordinaten des Standorts abrufen)</translation>
                 </translations>
               </property>
             </properties>
@@ -13570,6 +12603,7 @@
               <property name="Caption">
                 <value>Enable GeoCoding</value>
                 <translations>
+                  <translation language="de" status="proposed">Geocode-Dialog aktivieren</translation>
                 </translations>
               </property>
             </properties>
@@ -13579,6 +12613,7 @@
               <property name="Caption">
                 <value>Enable reverse Geocode dialog (Get location of coordinates)</value>
                 <translations>
+                  <translation language="de" status="proposed">Umkehrung des Geocode-Dialogs aktivieren (Standort der Koordinaten ermitteln))</translation>
                 </translations>
               </property>
             </properties>
@@ -13588,6 +12623,7 @@
               <property name="Caption">
                 <value>OverPass Api</value>
                 <translations>
+                  <translation language="de" status="proposed">OverPass Api</translation>
                 </translations>
               </property>
             </properties>
@@ -13597,6 +12633,7 @@
               <property name="EditLabel.Caption">
                 <value>URL</value>
                 <translations>
+                  <translation language="de" status="proposed">URL</translation>
                 </translations>
               </property>
               <property name="Text" status="skip">
@@ -13609,6 +12646,7 @@
               <property name="EditLabel.Caption">
                 <value>Throttle</value>
                 <translations>
+                  <translation language="de" status="proposed">Drossel</translation>
                 </translations>
               </property>
               <property name="Text" status="skip">
@@ -13621,6 +12659,7 @@
               <property name="Caption">
                 <value>(Min. time between calls in Ms)</value>
                 <translations>
+                  <translation language="de" status="proposed">(Min. Zeit zwischen Anrufen in Ms)</translation>
                 </translations>
               </property>
             </properties>
@@ -13630,6 +12669,7 @@
               <property name="Caption">
                 <value>Cancel</value>
                 <translations>
+                  <translation language="de" status="proposed">Abbrechen</translation>
                 </translations>
               </property>
             </properties>
@@ -13639,6 +12679,7 @@
               <property name="Caption">
                 <value>Save</value>
                 <translations>
+                  <translation language="de" status="proposed">Speichern</translation>
                 </translations>
               </property>
             </properties>
@@ -13651,8 +12692,6 @@
             <properties>
               <property name="Caption">
                 <value>Workspace manager</value>
-                <translations>
-                </translations>
               </property>
               <property name="Font.Name" status="skip">
                 <value>Tahoma</value>
@@ -13670,8 +12709,6 @@
             <properties>
               <property name="Caption">
                 <value>Delete selected line</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -13679,8 +12716,6 @@
             <properties>
               <property name="Caption">
                 <value>Save changes</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -13688,8 +12723,6 @@
             <properties>
               <property name="Caption">
                 <value>Insert into new line</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -13697,13 +12730,9 @@
             <properties>
               <property name="EditLabel.Caption">
                 <value>Tag name to display:</value>
-                <translations>
-                </translations>
               </property>
               <property name="Hint">
                 <value>Name ending: [± =multi-value tag (Alt+0177)]  [? =Check for tag (Yes/No)]  [* =Fill in value defined in Hint]  [# =Allow numeric editing]</value>
-                <translations>
-                </translations>
               </property>
               <property name="Text" status="skip">
                 <value></value>
@@ -13714,13 +12743,9 @@
             <properties>
               <property name="EditLabel.Caption">
                 <value>Tag definition:</value>
-                <translations>
-                </translations>
               </property>
               <property name="Hint">
                 <value>Example: [-exif:Artist] or [-xmp-dc:Creator] .. For separator, use [-GUI-SEP] and put caption in Tag name.</value>
-                <translations>
-                </translations>
               </property>
               <property name="Text" status="skip">
                 <value></value>
@@ -13731,13 +12756,9 @@
             <properties>
               <property name="EditLabel.Caption">
                 <value>Hint text:</value>
-                <translations>
-                </translations>
               </property>
               <property name="Hint">
                 <value>Used as default (Fill in) tag value in case Tag name ends with *.</value>
-                <translations>
-                </translations>
               </property>
               <property name="Text" status="skip">
                 <value></value>
@@ -13749,6 +12770,7 @@
               <property name="Caption">
                 <value>Cancel</value>
                 <translations>
+                  <translation language="de" status="proposed">Abbrechen</translation>
                 </translations>
               </property>
             </properties>
@@ -13758,6 +12780,7 @@
               <property name="Caption">
                 <value>Save</value>
                 <translations>
+                  <translation language="de" status="proposed">Speichern</translation>
                 </translations>
               </property>
             </properties>
@@ -13770,8 +12793,6 @@
             <properties>
               <property name="Caption">
                 <value>Remove metadata</value>
-                <translations>
-                </translations>
               </property>
               <property name="Font.Name" status="skip">
                 <value>Tahoma</value>
@@ -13918,8 +12939,6 @@
             <properties>
               <property name="Caption">
                 <value>-remove ALL metadata</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -13928,6 +12947,7 @@
               <property name="Caption">
                 <value>Cancel</value>
                 <translations>
+                  <translation language="de" status="proposed">Abbrechen</translation>
                 </translations>
               </property>
             </properties>
@@ -13936,8 +12956,6 @@
             <properties>
               <property name="Caption">
                 <value>Execute</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -13956,8 +12974,6 @@
             <properties>
               <property name="Caption">
                 <value>About</value>
-                <translations>
-                </translations>
               </property>
               <property name="Font.Name" status="skip">
                 <value>Segoe UI</value>
@@ -14012,8 +13028,6 @@
             <properties>
               <property name="Caption">
                 <value>OK</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -14025,8 +13039,6 @@
             <properties>
               <property name="Caption">
                 <value>Generating thumbnails</value>
-                <translations>
-                </translations>
               </property>
               <property name="Font.Name" status="skip">
                 <value>Segoe UI</value>
@@ -14044,8 +13056,6 @@
             <properties>
               <property name="Caption">
                 <value>&amp;Close</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -14057,8 +13067,6 @@
             <properties>
               <property name="Caption">
                 <value>Places found</value>
-                <translations>
-                </translations>
               </property>
               <property name="Font.Name" status="skip">
                 <value>Tahoma</value>
@@ -14069,8 +13077,6 @@
             <properties>
               <property name="Caption">
                 <value>Lat</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -14078,8 +13084,6 @@
             <properties>
               <property name="Caption">
                 <value>Lon</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -14087,8 +13091,6 @@
             <properties>
               <property name="Caption">
                 <value>Place</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -14097,6 +13099,7 @@
               <property name="Caption">
                 <value>Cancel</value>
                 <translations>
+                  <translation language="de" status="proposed">Abbrechen</translation>
                 </translations>
               </property>
             </properties>
@@ -14105,8 +13108,6 @@
             <properties>
               <property name="Caption">
                 <value>OK</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
@@ -14118,8 +13119,6 @@
             <properties>
               <property name="Caption">
                 <value>Available styles</value>
-                <translations>
-                </translations>
               </property>
               <property name="Font.Name" status="skip">
                 <value>Tahoma</value>
@@ -14131,6 +13130,7 @@
               <property name="Caption">
                 <value>Cancel</value>
                 <translations>
+                  <translation language="de" status="proposed">Abbrechen</translation>
                 </translations>
               </property>
             </properties>
@@ -14139,8 +13139,6 @@
             <properties>
               <property name="Caption">
                 <value>OK</value>
-                <translations>
-                </translations>
               </property>
             </properties>
           </item>
