@@ -3,6 +3,14 @@
 
 This is an updated version of the ExifToolGui program created by Bogdan Hrastnik. Many thanks go out to him.
 
+<h4>Translations in progress</h4>
+- Een vertaling in het Nederlands is klaar. [DLL](Translation/ExifToolGui.NLD), [BTM bronbestand](Translation/ExifToolGUI_nl.xlat)<br>
+- Deutsch hat angefangen. [DLL](Translation/ExifToolGui.DEU), [BTM quelldatei](Translation/ExifToolGUI_de.xlat)<br>
+- English was already available as default. [DLL](Translation/ExifToolGui.ENU), [BTM source file](Translation/ExifToolGUI_en.xlat)<br>
+
+When you place the language DLL in the same folder as the EXE, it should be selected automatically. According to your Windows language. 
+To override the default use /Lang=xxx as commandline parm. Where xxx is the languagecode. (NLD, DEU)
+
 <b>Released version: <b>V6.2.9</b> updated January 28, 2024.</b><br>
 
 - Support for 4K monitors, including scaling and resizing, completed. Commandline parameters not needed anymore.<br>

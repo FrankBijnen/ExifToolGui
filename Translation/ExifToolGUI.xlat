@@ -2,7 +2,7 @@
 <xlat>
   <meta>
     <version>3</version>
-    <created>2024-02-03T11:54:38.558+01:00</created>
+    <created>2024-02-03T12:25:50.033+01:00</created>
     <tool>amTranslationManager</tool>
     <toolversion>2.0.8628.33873</toolversion>
   </meta>
@@ -14,13 +14,13 @@
   </options>
   <project sourcefile=".\ExifToolGUI.exe" stringsymbolfile=".\ExifToolGUI.drc" language="en-US" properties="622">
     <targetlanguages>
-      <language language="es" translated="0"/>
       <language language="nl" translated="627"/>
-      <language language="fr" translated="0"/>
-      <language language="it" translated="0"/>
       <language language="pt" translated="0"/>
       <language language="de" translated="81"/>
       <language language="en" translated="0"/>
+      <language language="es" translated="0"/>
+      <language language="fr" translated="0"/>
+      <language language="it" translated="0"/>
     </targetlanguages>
     <modules>
       <module name="resourcestrings" type="strings" properties="166">
@@ -13931,7 +13931,7 @@
                 <value>-Filelist: Enable 'Camera Settings', 'Location info' and 'About photo' for all file types. (Slower)</value>
                 <translations>
                   <translation language="nl">-Bestandslijst: Schakel 'Camera Settings', 'Location info' en 'About photo'voor alle bestandstypes in. (Tragerr)</translation>
-                  <translation language="de" status="proposed">-Dateiliste: Aktivieren Sie "Kameraeinstellungen", "Standortinformationen" und "Über das Foto" für alle Dateitypen. (Langsamer)</translation>
+                  <translation language="de" status="proposed">-Dateiliste: Aktivieren "Kameraeinstellungen", "Standortinformationen" und "Über das Foto" für alle Dateitypen. (Langsamer)</translation>
                 </translations>
               </property>
             </properties>
