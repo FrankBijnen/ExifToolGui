@@ -2,6 +2,7 @@ unit UnitLangOverride;
 
 interface
 
+procedure CheckOverride;
 procedure SetLanguage(const Locale: string);
 
 implementation
@@ -53,7 +54,7 @@ begin
   ResStringCleanupCache;         // That's why we need this.
 end;
 
-initialization
+procedure CheckOverride;
 var
   Locale: string;
 begin

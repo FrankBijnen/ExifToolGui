@@ -1,3 +1,4 @@
+
 program ExifToolGUI;
 
 {.$DEFINE STACKTRACE}
@@ -67,6 +68,8 @@ begin
 {$ENDIF}
 
   Application.Title := 'ExifToolGui';
+
+  CheckOverride;
 
   if ReadSingleInstanceApp and
      not FSharedMem.IsOwner then
