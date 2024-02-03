@@ -5,7 +5,7 @@ This is an updated version of the ExifToolGui program created by Bogdan Hrastnik
 
 <h4>Translations in progress</h4>
 
-``- Een vertaling in het Nederlands is klaar. [DLL](Translation/ExifToolGui.NLD), [BTM bronbestand](Translation/ExifToolGUI_nl.xlat)<br>
+- Een vertaling in het Nederlands is klaar. [DLL](Translation/ExifToolGui.NLD), [BTM bronbestand](Translation/ExifToolGUI_nl.xlat)<br>
 - Deutsch hat angefangen. [DLL](Translation/ExifToolGui.DEU), [BTM quelldatei](Translation/ExifToolGUI_de.xlat)<br>
 - English was already available as default. [DLL](Translation/ExifToolGui.ENU)<br>
 
