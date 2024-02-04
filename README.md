@@ -12,6 +12,9 @@ This is an updated version of the ExifToolGui program created by Bogdan Hrastnik
 When you place the language DLL in the same folder as the EXE, it should be selected automatically. According to your Windows language. 
 To override the default use /Lang=xxx as commandline parm. Where xxx is the languagecode. (NLD, DEU)
 
+Note: <br>
+- If you use the X64 executable, you will have to use the corresponding X64 language Dll's (ExifToolGui_X64.nld for example)<br>
+
 <b>Released version: <b>V6.2.9</b> updated January 28, 2024.</b><br>
 
 - Support for 4K monitors, including scaling and resizing, completed. Commandline parameters not needed anymore.<br>
