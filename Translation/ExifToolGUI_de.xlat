@@ -2,7 +2,7 @@
 <xlat>
   <meta>
     <version>3</version>
-    <created>2024-02-03T15:52:31.283+01:00</created>
+    <created>2024-02-04T20:55:39.773+01:00</created>
     <tool>amTranslationManager</tool>
     <toolversion>2.0.8628.33873</toolversion>
   </meta>
@@ -10728,7 +10728,7 @@
               <property name="Hint">
                 <value>Pick log file</value>
                 <translations>
-                  <translation language="de" status="proposed">Protokolldatei auswählen</translation>
+                  <translation language="de" status="proposed">Logdatei auswählen</translation>
                 </translations>
               </property>
             </properties>
@@ -10744,7 +10744,7 @@
               <property name="Hint">
                 <value>To be used, all log files must have equal filename extension</value>
                 <translations>
-                  <translation language="de" status="proposed">Um verwendet zu werden, müssen alle Protokolldateien die gleiche Dateinamenerweiterung haben</translation>
+                  <translation language="de" status="proposed">Um verwendet zu werden, müssen alle Logdateien die gleiche Dateinamenerweiterung haben</translation>
                 </translations>
               </property>
             </properties>
@@ -10800,13 +10800,13 @@
               <property name="EditLabel.Caption">
                 <value>Log file:</value>
                 <translations>
-                  <translation language="de" status="proposed">Protokolldatei:</translation>
+                  <translation language="de" status="proposed">Logdatei:</translation>
                 </translations>
               </property>
               <property name="Hint">
                 <value>Path and name of log file -use picker button to select one</value>
                 <translations>
-                  <translation language="de" status="proposed">Pfad und Name der Protokolldatei – verwenden Sie die Auswahlschaltfläche, um eine auszuwählen</translation>
+                  <translation language="de" status="proposed">Pfad und Name der Logdatei – verwenden Sie die Auswahlschaltfläche, um eine auszuwählen</translation>
                 </translations>
               </property>
               <property name="Text" status="skip">
@@ -11691,7 +11691,7 @@
               <property name="Caption">
                 <value>Edit predefined</value>
                 <translations>
-                  <translation language="de" status="proposed">Vordefinierte bearbeiten</translation>
+                  <translation language="de" status="proposed">Vordefiniert</translation>
                 </translations>
               </property>
             </properties>
@@ -11731,7 +11731,7 @@
               <property name="Caption">
                 <value>Show Log window</value>
                 <translations>
-                  <translation language="de" status="proposed">Protokollfenster anzeigen</translation>
+                  <translation language="de" status="proposed">Logfenster</translation>
                 </translations>
               </property>
             </properties>
@@ -12029,7 +12029,7 @@
               <property name="Caption">
                 <value>Geotag files</value>
                 <translations>
-                  <translation language="de" status="proposed">Geotag-Dateien</translation>
+                  <translation language="de" status="proposed">Geotag Dateien</translation>
                 </translations>
               </property>
             </properties>
@@ -12078,7 +12078,7 @@
               <property name="Caption">
                 <value>&lt;&lt; Back</value>
                 <translations>
-                  <translation language="de" status="proposed">&lt;&lt; Xurück</translation>
+                  <translation language="de" status="proposed">&lt;&lt; Zurück</translation>
                 </translations>
               </property>
             </properties>
@@ -12088,7 +12088,7 @@
               <property name="Caption">
                 <value>Get location</value>
                 <translations>
-                  <translation language="de" status="proposed">Standort abrufen</translation>
+                  <translation language="de" status="proposed">Standort Info</translation>
                 </translations>
               </property>
               <property name="Hint">
@@ -12124,7 +12124,7 @@
               <property name="Caption">
                 <value>Show on map</value>
                 <translations>
-                  <translation language="de" status="proposed">Auf Karte anzeigen</translation>
+                  <translation language="de" status="proposed">Anzeigen</translation>
                 </translations>
               </property>
             </properties>
@@ -12148,7 +12148,7 @@
               <property name="Caption">
                 <value>Browse</value>
                 <translations>
-                  <translation language="de" status="proposed">Blättern</translation>
+                  <translation language="de" status="proposed">Verzeichnis</translation>
                 </translations>
               </property>
             </properties>
@@ -12456,7 +12456,7 @@
               <property name="Caption">
                 <value>&amp;Show Exif:GPS in decimal notation</value>
                 <translations>
-                  <translation language="de" status="proposed">&amp;Show Exif:GPS in Dezimalschreibweise</translation>
+                  <translation language="de" status="proposed">&amp;Anzeigen Exif:GPS in Dezimalschreibweise</translation>
                 </translations>
               </property>
             </properties>
@@ -12486,7 +12486,7 @@
               <property name="Caption">
                 <value>Do&amp;n't show duplicated tags</value>
                 <translations>
-                  <translation language="de" status="proposed">Do&amp;n't show duplizierte Tags anzeigen</translation>
+                  <translation language="de" status="proposed">Kei&amp;ne duplizierten tags anzeigen</translation>
                 </translations>
               </property>
             </properties>
@@ -13090,7 +13090,7 @@
               <property name="Caption">
                 <value>Log files...</value>
                 <translations>
-                  <translation language="de" status="proposed">Protokolldateien...</translation>
+                  <translation language="de" status="proposed">Logdateien...</translation>
                 </translations>
               </property>
               <property name="Category" status="skip">
@@ -13864,7 +13864,7 @@
               <property name="Caption">
                 <value>-Filelist: Enable 'Camera Settings', 'Location info' and 'About photo' for all file types. (Slower)</value>
                 <translations>
-                  <translation language="de" status="proposed">-Dateiliste: Aktivieren "Kameraeinstellungen", "Standortinformationen" und "Über das Foto" für alle Dateitypen. (Langsamer)</translation>
+                  <translation language="de" status="proposed">-Dateiliste: Aktivieren "Kamera", "Standort und "Über das Foto" für alle Dateitypen. (Langsamer)</translation>
                 </translations>
               </property>
             </properties>
@@ -13874,7 +13874,7 @@
               <property name="Caption">
                 <value>-Workspace: Move focus to next tag/line after value is entered</value>
                 <translations>
-                  <translation language="de" status="proposed">-Arbeitsbereich: Verschieben des Fokus auf das nächste Tag/die nächste Zeile, nachdem ein Wert eingegeben wurde</translation>
+                  <translation language="de" status="proposed">-Arbeitsbereich: Verschieben des Fokus auf die nächste Zeile, nach eingeben Wert</translation>
                 </translations>
               </property>
             </properties>
@@ -14158,7 +14158,7 @@
               <property name="Caption">
                 <value>Enable reverse Geocode dialog (Get location of coordinates)</value>
                 <translations>
-                  <translation language="de" status="proposed">Umkehrung des Geocode-Dialogs aktivieren (Standort der Koordinaten ermitteln))</translation>
+                  <translation language="de" status="proposed">Umgekehrte Geocode-Dialogs aktivieren (Standort der Koordinaten)</translation>
                 </translations>
               </property>
             </properties>

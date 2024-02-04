@@ -46,7 +46,7 @@ object FQuickManager: TFQuickManager
     object Button1: TButton
       Left = 16
       Top = 456
-      Width = 105
+      Width = 155
       Height = 25
       Caption = 'Delete selected line'
       TabOrder = 1
@@ -55,7 +55,7 @@ object FQuickManager: TFQuickManager
     object LabeledEdit1: TLabeledEdit
       Left = 16
       Top = 421
-      Width = 153
+      Width = 155
       Height = 21
       Hint = 
         'Name ending: ['#177' =multi-value tag (Alt+0177)]  [? =Check for tag ' +
