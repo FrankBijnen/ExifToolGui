@@ -1,4 +1,3 @@
-
 program ExifToolGUI;
 
 {.$DEFINE STACKTRACE}
