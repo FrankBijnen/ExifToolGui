@@ -252,9 +252,9 @@ object FMain: TFMain
           OnClick = SpeedBtnExifClick
         end
         object EditFindMeta: TLabeledEdit
-          Left = 124
+          Left = 129
           Top = 29
-          Width = 160
+          Width = 155
           Height = 21
           Color = clWhite
           EditLabel.Width = 20
@@ -295,9 +295,9 @@ object FMain: TFMain
           OnClick = SpeedBtnLargeClick
         end
         object SpeedBtnQuickSave: TSpeedButton
-          Left = 266
+          Left = 256
           Top = 6
-          Width = 42
+          Width = 52
           Height = 22
           Anchors = [akTop, akRight]
           Caption = '&Save'
@@ -325,7 +325,7 @@ object FMain: TFMain
         object EditQuick: TEdit
           Left = 48
           Top = 6
-          Width = 212
+          Width = 200
           Height = 22
           Anchors = [akLeft, akTop, akRight]
           Font.Charset = DEFAULT_CHARSET
@@ -393,31 +393,31 @@ object FMain: TFMain
         ParentFont = False
         TabOrder = 0
         object SpeedBtn_ShowOnMap: TSpeedButton
-          Left = 2
+          Left = 1
           Top = 2
-          Width = 79
+          Width = 80
           Height = 22
           Caption = 'Show on map'
           OnClick = SpeedBtn_ShowOnMapClick
         end
         object SpeedBtn_MapHome: TSpeedButton
-          Left = 271
+          Left = 268
           Top = 2
-          Width = 40
+          Width = 44
           Height = 22
           Caption = 'Home'
           OnClick = SpeedBtn_MapHomeClick
         end
         object SpeedBtn_MapSetHome: TSpeedButton
-          Left = 271
-          Top = 28
-          Width = 40
+          Left = 268
+          Top = 30
+          Width = 44
           Height = 21
           Caption = 'Set^'
           OnClick = SpeedBtn_MapSetHomeClick
         end
         object Spb_GoBack: TSpeedButton
-          Left = 105
+          Left = 112
           Top = 2
           Width = 61
           Height = 22
@@ -433,9 +433,9 @@ object FMain: TFMain
           OnClick = Spb_ForwardClick
         end
         object SpeedBtn_GetLoc: TSpeedButton
-          Left = 2
+          Left = 1
           Top = 28
-          Width = 79
+          Width = 80
           Height = 22
           Hint = 'Sets to Lat/Lon values to the center of map'
           Caption = 'Get location'
@@ -444,9 +444,9 @@ object FMain: TFMain
           OnClick = SpeedBtn_GetLocClick
         end
         object EditMapFind: TLabeledEdit
-          Left = 112
+          Left = 120
           Top = 30
-          Width = 153
+          Width = 145
           Height = 21
           Hint = 'Use Ctrl+Click on the map to set the Lat/Lon values'
           EditLabel.Width = 24
@@ -487,15 +487,16 @@ object FMain: TFMain
           Align = alLeft
           Caption = 'Geotag files'
           OnClick = SpeedBtn_GeotagClick
+          ExplicitTop = 6
         end
         object EditMapBounds: TLabeledEdit
           AlignWithMargins = True
-          Left = 121
+          Left = 126
           Top = 6
           Width = 188
           Height = 23
           Hint = 'Coordinates of the visible area (South,West,North,East)'
-          Margins.Left = 45
+          Margins.Left = 50
           Margins.Top = 6
           TabStop = False
           Align = alLeft
@@ -509,7 +510,7 @@ object FMain: TFMain
           ShowHint = True
           TabOrder = 0
           Text = ''
-          ExplicitHeight = 21
+          ExplicitLeft = 121
         end
       end
       object EdgeBrowser1: TEdgeBrowser
@@ -560,7 +561,7 @@ object FMain: TFMain
         object SpeedBtnDetails: TSpeedButton
           Left = 2
           Top = 29
-          Width = 55
+          Width = 75
           Height = 22
           AllowAllUp = True
           GroupIndex = 1
@@ -571,29 +572,29 @@ object FMain: TFMain
         object SpeedBtnFListRefresh: TSpeedButton
           Left = 2
           Top = 2
-          Width = 55
+          Width = 75
           Height = 21
           Caption = 'Refresh'
           OnClick = BtnFListRefreshClick
         end
         object SpeedBtnFilterEdit: TSpeedButton
-          Left = 231
+          Left = 250
           Top = 2
-          Width = 42
+          Width = 60
           Height = 21
           Caption = 'Edit'
           OnClick = BtnFilterEditClick
         end
         object SpeedBtnColumnEdit: TSpeedButton
-          Left = 231
+          Left = 250
           Top = 29
-          Width = 42
+          Width = 60
           Height = 22
           Caption = 'Edit'
           OnClick = BtnColumnEditClick
         end
         object CBoxDetails: TComboBox
-          Left = 61
+          Left = 80
           Top = 29
           Width = 164
           Height = 21
@@ -610,7 +611,7 @@ object FMain: TFMain
             'User defined')
         end
         object CBoxFileFilter: TComboBox
-          Left = 61
+          Left = 80
           Top = 2
           Width = 164
           Height = 21

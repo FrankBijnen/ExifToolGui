@@ -2,7 +2,7 @@
 <xlat>
   <meta>
     <version>3</version>
-    <created>2024-02-03T15:54:18.879+01:00</created>
+    <created>2024-02-04T20:56:13.831+01:00</created>
     <tool>amTranslationManager</tool>
     <toolversion>2.0.8628.33873</toolversion>
   </meta>
@@ -14,11 +14,11 @@
   </options>
   <project sourcefile=".\ExifToolGUI.exe" stringsymbolfile=".\ExifToolGUI.drc" language="en-US" properties="622">
     <targetlanguages>
-      <language language="nl" translated="627"/>
+      <language language="it" translated="0"/>
       <language language="es" translated="0"/>
       <language language="fr" translated="0"/>
-      <language language="it" translated="0"/>
       <language language="pt" translated="0"/>
+      <language language="nl" translated="627"/>
       <language language="de" translated="623"/>
       <language language="en" translated="0"/>
     </targetlanguages>
@@ -11038,7 +11038,7 @@
                 <value>Pick log file</value>
                 <translations>
                   <translation language="nl">Kies Logbestand</translation>
-                  <translation language="de" status="proposed">Protokolldatei auswählen</translation>
+                  <translation language="de" status="proposed">Logdatei auswählen</translation>
                 </translations>
               </property>
             </properties>
@@ -11056,7 +11056,7 @@
                 <value>To be used, all log files must have equal filename extension</value>
                 <translations>
                   <translation language="nl">Om te kunnen gebruiken, moeten alle log bestanden dezelfde extensie hebben</translation>
-                  <translation language="de" status="proposed">Um verwendet zu werden, müssen alle Protokolldateien die gleiche Dateinamenerweiterung haben</translation>
+                  <translation language="de" status="proposed">Um verwendet zu werden, müssen alle Logdateien die gleiche Dateinamenerweiterung haben</translation>
                 </translations>
               </property>
             </properties>
@@ -11117,14 +11117,14 @@
                 <value>Log file:</value>
                 <translations>
                   <translation language="nl">Log:</translation>
-                  <translation language="de" status="proposed">Protokolldatei:</translation>
+                  <translation language="de" status="proposed">Logdatei:</translation>
                 </translations>
               </property>
               <property name="Hint">
                 <value>Path and name of log file -use picker button to select one</value>
                 <translations>
                   <translation language="nl">Pad en naam van logbestabd -gebruik ... knop om te selecteren</translation>
-                  <translation language="de" status="proposed">Pfad und Name der Protokolldatei – verwenden Sie die Auswahlschaltfläche, um eine auszuwählen</translation>
+                  <translation language="de" status="proposed">Pfad und Name der Logdatei – verwenden Sie die Auswahlschaltfläche, um eine auszuwählen</translation>
                 </translations>
               </property>
               <property name="Text" status="skip">
@@ -12097,7 +12097,7 @@
                 <value>Edit predefined</value>
                 <translations>
                   <translation language="nl">Voorgedefinieerd</translation>
-                  <translation language="de" status="proposed">Vordefinierte bearbeiten</translation>
+                  <translation language="de" status="proposed">Vordefiniert</translation>
                 </translations>
               </property>
             </properties>
@@ -12141,7 +12141,7 @@
                 <value>Show Log window</value>
                 <translations>
                   <translation language="nl">Toon Log venster</translation>
-                  <translation language="de" status="proposed">Protokollfenster anzeigen</translation>
+                  <translation language="de" status="proposed">Logfenster</translation>
                 </translations>
               </property>
             </properties>
@@ -12462,7 +12462,7 @@
                 <value>Geotag files</value>
                 <translations>
                   <translation language="nl">Geotag best.</translation>
-                  <translation language="de" status="proposed">Geotag-Dateien</translation>
+                  <translation language="de" status="proposed">Geotag Dateien</translation>
                 </translations>
               </property>
             </properties>
@@ -12515,7 +12515,7 @@
                 <value>&lt;&lt; Back</value>
                 <translations>
                   <translation language="nl">&lt;&lt; Terug</translation>
-                  <translation language="de" status="proposed">&lt;&lt; Xurück</translation>
+                  <translation language="de" status="proposed">&lt;&lt; Zurück</translation>
                 </translations>
               </property>
             </properties>
@@ -12526,7 +12526,7 @@
                 <value>Get location</value>
                 <translations>
                   <translation language="nl">Bepaal locatie</translation>
-                  <translation language="de" status="proposed">Standort abrufen</translation>
+                  <translation language="de" status="proposed">Standort Info</translation>
                 </translations>
               </property>
               <property name="Hint">
@@ -12566,7 +12566,7 @@
                 <value>Show on map</value>
                 <translations>
                   <translation language="nl">Toon op kaart</translation>
-                  <translation language="de" status="proposed">Auf Karte anzeigen</translation>
+                  <translation language="de" status="proposed">Anzeigen</translation>
                 </translations>
               </property>
             </properties>
@@ -12591,7 +12591,7 @@
                 <value>Browse</value>
                 <translations>
                   <translation language="nl">Bladeren</translation>
-                  <translation language="de" status="proposed">Blättern</translation>
+                  <translation language="de" status="proposed">Verzeichnis</translation>
                 </translations>
               </property>
             </properties>
@@ -12922,7 +12922,7 @@
                 <value>&amp;Show Exif:GPS in decimal notation</value>
                 <translations>
                   <translation language="nl">T&amp;oon Exif:GPS in decimale notatie</translation>
-                  <translation language="de" status="proposed">&amp;Show Exif:GPS in Dezimalschreibweise</translation>
+                  <translation language="de" status="proposed">&amp;Anzeigen Exif:GPS in Dezimalschreibweise</translation>
                 </translations>
               </property>
             </properties>
@@ -12955,7 +12955,7 @@
                 <value>Do&amp;n't show duplicated tags</value>
                 <translations>
                   <translation language="nl">Toon &amp;geen dubbele labels</translation>
-                  <translation language="de" status="proposed">Do&amp;n't show duplizierte Tags anzeigen</translation>
+                  <translation language="de" status="proposed">Kei&amp;ne duplizierten tags anzeigen</translation>
                 </translations>
               </property>
             </properties>
@@ -13610,7 +13610,7 @@
                 <value>Log files...</value>
                 <translations>
                   <translation language="nl">Log bestanden...</translation>
-                  <translation language="de" status="proposed">Protokolldateien...</translation>
+                  <translation language="de" status="proposed">Logdateien...</translation>
                 </translations>
               </property>
               <property name="Category" status="skip">
@@ -14446,7 +14446,7 @@
                 <value>-Filelist: Enable 'Camera Settings', 'Location info' and 'About photo' for all file types. (Slower)</value>
                 <translations>
                   <translation language="nl">-Bestandslijst: Schakel 'Camera Settings', 'Location info' en 'About photo'voor alle bestandstypes in. (Tragerr)</translation>
-                  <translation language="de" status="proposed">-Dateiliste: Aktivieren "Kameraeinstellungen", "Standortinformationen" und "Über das Foto" für alle Dateitypen. (Langsamer)</translation>
+                  <translation language="de" status="proposed">-Dateiliste: Aktivieren "Kamera", "Standort und "Über das Foto" für alle Dateitypen. (Langsamer)</translation>
                 </translations>
               </property>
             </properties>
@@ -14457,7 +14457,7 @@
                 <value>-Workspace: Move focus to next tag/line after value is entered</value>
                 <translations>
                   <translation language="nl">-Werkriumte: Verplaats focus naar volgende label/regel na invullen waarde</translation>
-                  <translation language="de" status="proposed">-Arbeitsbereich: Verschieben des Fokus auf das nächste Tag/die nächste Zeile, nachdem ein Wert eingegeben wurde</translation>
+                  <translation language="de" status="proposed">-Arbeitsbereich: Verschieben des Fokus auf die nächste Zeile, nach eingeben Wert</translation>
                 </translations>
               </property>
             </properties>
@@ -14764,7 +14764,7 @@
                 <value>Enable reverse Geocode dialog (Get location of coordinates)</value>
                 <translations>
                   <translation language="nl">Schakel omgekeerde Geocode dialoog in (Bepaal lokatie van coördinaten)</translation>
-                  <translation language="de" status="proposed">Umkehrung des Geocode-Dialogs aktivieren (Standort der Koordinaten ermitteln))</translation>
+                  <translation language="de" status="proposed">Umgekehrte Geocode-Dialogs aktivieren (Standort der Koordinaten)</translation>
                 </translations>
               </property>
             </properties>
