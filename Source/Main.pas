@@ -1494,7 +1494,7 @@ begin
   QuickPopUp_AddQuickAct.Visible := not(SpeedBtnQuick.Down or SpeedBtnCustom.Down or IsSep);
   QuickPopUp_AddCustomAct.Visible := not(SpeedBtnQuick.Down or SpeedBtnCustom.Down or IsSep);
   QuickPopUp_DelCustomAct.Visible := SpeedBtnCustom.Down and not(IsSep);
-  QuickPopUp_AddDetailsUserAct.Visible := not IsSep and (SpeedBtnExif.Down or SpeedBtnXmp.Down or SpeedBtnIptc.Down);
+  QuickPopUp_AddDetailsUserAct.Visible := not IsSep and (SpeedBtnExif.Down or SpeedBtnXmp.Down or SpeedBtnIptc.Down or SpeedBtnALL.Down);
 
   Other := (GUIsettings.Language <> '') or IsSep;
 
@@ -1613,8 +1613,9 @@ end;
 
 procedure TFMain.QuickPopUp_AddDetailsUserClick(Sender: TObject);
 var
-  I, N, X: smallint;
+  I, N, X: integer;
   Tx, Tk: string;
+  PrevSel: integer;
 begin
   I := length(FListColUsr);
   SetLength(FListColUsr, I + 1);
@@ -1649,7 +1650,16 @@ begin
     N := Items.Count - 1;
   end;
   if I = N then
-    ShellList.Refresh;
+  begin
+    PrevSel := ShellList.Selected.Index;
+    try
+      ShellList.Refresh;
+    finally
+      ShellList.ClearSelection;
+      ShellList.Items[PrevSel].Selected := true;
+      ShellListClick(ShellList);
+    end;
+  end;
 end;
 
 procedure TFMain.QuickPopUp_AddQuickClick(Sender: TObject);
