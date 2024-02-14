@@ -38,7 +38,7 @@ object FPreferences: TFPreferences
     Top = 0
     Width = 521
     Height = 373
-    ActivePage = AdvTabOther
+    ActivePage = AdvTabGeneral
     Align = alLeft
     DoubleBuffered = True
     ParentDoubleBuffered = False
