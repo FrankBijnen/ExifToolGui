@@ -815,83 +815,82 @@ end;
 
 procedure TFMain.MetadataListDrawCell(Sender: TObject; ACol, ARow: integer; Rect: TRect; State: TGridDrawState);
 var
-  CellTx, KeyTx, WorkTx: string[127];
+  CellTx, KeyTx, WorkTx: string;
   NewColor, TxtColor: TColor;
-  i, n, X: smallint;
+  I, N, X: integer;
 begin
-  n := length(QuickTags) - 1;
-  if (ARow > 0) then
-    with MetadataList do
-    begin
-      CellTx := Cells[ACol, ARow];
-      KeyTx := Cells[0, ARow];
-      if (KeyTx = '') then
-        with Canvas do
-        begin // =Group line
-          Brush.Style := bsSolid;
-          if ACol = 0 then
-          begin
-            Brush.Color := clWindow; // $F0F0F0;
-            FillRect(Rect);
-          end
-          else
-          begin // ACol=1
-            Brush.Color := clWindow;
-            Font.Style := [fsBold];
-            Font.Color := clWindowText;
-            TextRect(Rect, Rect.Left + 4, Rect.Top + 2, CellTx);
-          end;
-        end
-      else if (ACol = 0) then
-      begin // -remove "if ACol=0 then" to change both columns
-        NewColor := clWindow;
-        if SpeedBtnQuick.Down then
-        begin // =Edited tag
-          if (KeyTx[1] = '*') then
-            NewColor := $BBFFFF;
-          if NewColor <> clWindow then
-            with Canvas do
-            begin
-              Brush.Style := bsSolid;
-              Brush.Color := NewColor;
-              Font.Color := $BB0000;
-              TextRect(Rect, Rect.Left + 4, Rect.Top + 2, CellTx);
-            end;
+  if (ARow = 0) then
+    exit;
+
+  N := length(QuickTags) - 1;
+  with MetadataList do
+  begin
+    CellTx := Cells[ACol, ARow];
+    KeyTx := Cells[0, ARow];
+    if (KeyTx = '') then
+      with Canvas do
+      begin // =Group line
+        Brush.Style := bsSolid;
+        if ACol = 0 then
+        begin
+          Brush.Color := clWindow; // $F0F0F0;
+          FillRect(Rect);
         end
         else
+        begin // ACol=1
+          Brush.Color := clWindow;
+          Font.Style := [fsBold];
+          Font.Color := clWindowText;
+          TextRect(Rect, Rect.Left + 4, Rect.Top + 2, CellTx);
+        end;
+      end
+    else if (ACol = 0) then
+    begin // -remove "if ACol=0 then" to change both columns
+      NewColor := clWindow;
+      if SpeedBtnQuick.Down then
+      begin // =Edited tag
+        if (KeyTx[1] = '*') then
+          NewColor := $BBFFFF;
+        if NewColor <> clWindow then
+          with Canvas do
+          begin
+            Brush.Style := bsSolid;
+            Brush.Color := NewColor;
+            Font.Color := $BB0000;
+            TextRect(Rect, Rect.Left + 4, Rect.Top + 2, CellTx);
+          end;
+      end
+      else
+      begin
+        Delete(KeyTx, 1, pos(' ', KeyTx)); // -in case of Show HexID prefix
+        TxtColor := clWindowText;
+        if pos(KeyTx + ' ', MarkedTags) > 0 then
+          TxtColor := $0000FF; // tag is marked
+        // check if tag is defined in Workspace
+        KeyTx := UpperCase(KeyTx);
+        for I := 0 to N do
         begin
-          if GUIsettings.Language = '' then
-          begin // =Marked tag
-            Delete(KeyTx, 1, pos(' ', KeyTx)); // -in case of Show HexID prefix
-            TxtColor := clWindowText;
-            if pos(KeyTx + ' ', MarkedTags) > 0 then
-              TxtColor := $0000FF; // tag is marked
-            // check if tag is defined in Workspace
-            KeyTx := UpperCase(KeyTx);
-            for i := 0 to n do
-            begin
-              WorkTx := UpperCase(QuickTags[i].Command);
-              X := pos(':', WorkTx);
-              if X > 0 then
-                Delete(WorkTx, 1, X);
-              if KeyTx = WorkTx then
-              begin
-                NewColor := $EEFFDD;
-                break;
-              end;
-            end;
-            if (NewColor <> clWindow) or (TxtColor <> clWindowText) then
-              with Canvas do
-              begin
-                Brush.Style := bsSolid;
-                Brush.Color := NewColor;
-                Font.Color := TxtColor;
-                TextRect(Rect, Rect.Left + 4, Rect.Top + 2, CellTx);
-              end;
+          WorkTx := UpperCase(QuickTags[I].Command);
+          X := pos(':', WorkTx);
+          if X > 0 then
+            Delete(WorkTx, 1, X);
+          if KeyTx = WorkTx then
+          begin
+            NewColor := $EEFFDD;
+            break;
           end;
         end;
+        if (NewColor <> clWindow) or (TxtColor <> clWindowText) then
+          with Canvas do
+          begin
+            Brush.Style := bsSolid;
+            Brush.Color := NewColor;
+            Font.Color := TxtColor;
+            TextRect(Rect, Rect.Left + 4, Rect.Top + 2, CellTx);
+          end;
       end;
     end;
+  end;
 end;
 
 procedure TFMain.MetadataListExit(Sender: TObject);
@@ -1482,24 +1481,20 @@ end;
 
 procedure TFMain.QuickPopUpMenuPopup(Sender: TObject);
 var
-  i: smallint;
-  IsSep, Other: boolean;
-  tx: string;
+  I: integer;
+  IsSep: boolean;
+  Tx: string;
 begin
-  i := MetadataList.Row;
-  tx := MetadataList.Keys[i];
-  QuickPopUp_UndoEditAct.Visible := (pos('*', tx) = 1);
-  IsSep := (length(tx) = 0);
+  I := MetadataList.Row;
+  Tx := MetadataList.Keys[I];
+  QuickPopUp_UndoEditAct.Visible := (pos('*', Tx) = 1);
+  IsSep := (Length(Tx) = 0);
 
   QuickPopUp_AddQuickAct.Visible := not(SpeedBtnQuick.Down or SpeedBtnCustom.Down or IsSep);
   QuickPopUp_AddCustomAct.Visible := not(SpeedBtnQuick.Down or SpeedBtnCustom.Down or IsSep);
   QuickPopUp_DelCustomAct.Visible := SpeedBtnCustom.Down and not(IsSep);
-  QuickPopUp_AddDetailsUserAct.Visible := not IsSep and (SpeedBtnExif.Down or SpeedBtnXmp.Down or SpeedBtnIptc.Down or SpeedBtnALL.Down);
-
-  Other := (GUIsettings.Language <> '') or IsSep;
-
-  QuickPopUp_MarkTagAct.Visible := not(SpeedBtnQuick.Down or SpeedBtnCustom.Down or Other);
-
+  QuickPopUp_AddDetailsUserAct.Visible := not IsSep and (SpeedBtnExif.Down or SpeedBtnXmp.Down or SpeedBtnIptc.Down);
+  QuickPopUp_MarkTagAct.Visible := not(SpeedBtnQuick.Down or SpeedBtnCustom.Down or IsSep);
   QuickPopUp_DelQuickAct.Visible := not(IsSep) and SpeedBtnQuick.Down;
   QuickPopUp_FillQuickAct.Visible := QuickPopUp_DelQuickAct.Visible;
   QuickPopUp_CopyTagAct.Visible := not IsSep;
@@ -3187,7 +3182,7 @@ end;
 procedure TFMain.ShowMetadata;
 var
   E, N: integer;
-  ETcmd, Item, Tx: string;
+  ETcmd, Item, Value, Tx: string;
   ETResult: TStringList;
   NoChars:  TSysCharSet;
 begin
@@ -3312,21 +3307,28 @@ begin
       begin
         while E < ETResult.Count do
         begin
-          ETResult[E] := StringReplace(ETResult[E], ': ', '=', []);
+          Value := ETResult[E];
+          Item := Trim(NextField(Value, ': ')); // When Exiftool language is active the items are appended with spaces!
+          ETResult[E] := Item + '=' + Value;
           inc(E);
         end;
       end;
 
       with MetadataList do
       begin
-        E := Row;
-        Row := 1;
-        Strings.Clear;
-        Strings.AddStrings(ETResult);
-        if RowCount > E then
-          Row := E
-        else
-          Row := RowCount - 1;
+        Strings.BeginUpdate;
+        try
+          E := Row;
+          Row := 1;
+          Strings.Clear;
+          Strings.AddStrings(ETResult);
+          if RowCount > E then
+            Row := E
+          else
+            Row := RowCount - 1;
+        finally
+          Strings.EndUpdate;
+        end;
       end;
     end;
   finally
