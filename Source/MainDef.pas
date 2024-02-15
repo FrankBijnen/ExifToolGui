@@ -29,6 +29,7 @@ type
     ETdirMode: smallint;
     InitialDir: string;
     ETOverrideDir: string;
+    ETCustomConfig: string;
     ETTimeOut: integer;
   // Colors of the Bar charts. Not configurable in UI
     CLFNumber: integer;
@@ -43,6 +44,7 @@ type
     SingleInstanceApp: boolean;
     ShowBalloon: boolean;
     function CanShowHidden: boolean;
+    function GetCustomConfig: string;
   end;
 
   FListColUsrRec = record
@@ -160,6 +162,13 @@ end;
 function GUIsettingsRec.CanShowHidden: boolean;
 begin
   result := (ShowHidden and IsAdminUser) or IsElevated;
+end;
+
+function GUIsettingsRec.GetCustomConfig: string;
+begin
+  result := '';
+  if (ETCustomConfig <> '') then
+    result := Format('-config "%s"', [ETCustomConfig]);
 end;
 
 function SetQuickTag(const AIndex: integer; const ACaption, ACommand: string; const AHelp: string = ''): integer;
@@ -379,6 +388,7 @@ begin
         if DefStartupUse and ValidDir(DefStartupDir) then
           GUIsettings.InitialDir := DefStartupDir;
         GUIsettings.ETOverrideDir := ReadString(Ini_Settings, 'ETOverrideDir', '');
+        GUIsettings.ETCustomConfig := ReadString(Ini_Settings, 'ETCustomConfig', '');
         // Note: Not configurable by user, only in INI
         GUIsettings.ETTimeOut := ReadInteger(Ini_Settings, 'ETTimeOut', 5000);
         DefExportUse := ReadBool(Ini_Settings, 'DefExportUse', false);
@@ -695,6 +705,8 @@ begin
           WriteBool(Ini_Settings, 'DefStartupUse', DefStartupUse);
           WriteString(Ini_Settings, 'DefStartupDir', DefStartupDir);
           WriteString(Ini_Settings, 'ETOverrideDir', ETOverrideDir);
+          WriteString(Ini_Settings, 'ETCustomConfig', ETCustomConfig);
+
           WriteInteger(Ini_Settings, 'ETTimeOut', ETTimeOut);
           WriteBool(Ini_Settings, 'DefExportUse', DefExportUse);
           WriteString(Ini_Settings, 'DefExportDir', DefExportDir);

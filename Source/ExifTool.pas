@@ -165,7 +165,7 @@ begin
     exit;
   ET_OpenExit; // -changing WorkDir OnTheFly requires Exit first
 
-  ETcmd := GUIsettings.ETOverrideDir + 'exiftool -stay_open True -@ -';
+  ETcmd := GUIsettings.ETOverrideDir + 'exiftool ' + GUIsettings.GetCustomConfig + ' -stay_open True -@ -';
   FillChar(ETprocessInfo, SizeOf(TProcessInformation), #0);
   FillChar(SecurityAttr, SizeOf(TSecurityAttributes), #0);
   SecurityAttr.nLength := SizeOf(SecurityAttr);
@@ -398,7 +398,7 @@ begin
 
     TempFile := GetExifToolTmp;
     WriteArgsFile(FinalCmd, TempFile);
-    Call_ET := GUIsettings.ETOverrideDir + 'exiftool -@ "' + TempFile + '"';
+    Call_ET := GUIsettings.ETOverrideDir + 'exiftool ' + GUIsettings.GetCustomConfig + ' -@ "' + TempFile + '"';
 
     result := CreateProcess(nil, PChar(Call_ET), nil, nil, true,
                             CREATE_DEFAULT_ERROR_MODE or CREATE_NEW_CONSOLE or NORMAL_PRIORITY_CLASS,
