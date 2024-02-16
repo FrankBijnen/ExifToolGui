@@ -386,13 +386,16 @@ end;
 
 function TCustomBreadcrumbBar.MakeDefaultText: string;
 var
-  i: integer;
+  P, I: integer;
 begin
-  for i := 0 to FCurrentItems.Count - 1 do
-    if i < FCurrentItems.Count - 1 then
-      result := result + FCurrentItems[i] + '\'
+  P := 0;
+  if (FHome <> '') then
+    Inc(P);
+  for I := P to FCurrentItems.Count - 1 do
+    if I < FCurrentItems.Count - 1 then
+      result := result + FCurrentItems[I] + '\'
     else
-      result := result + FCurrentItems[i];
+      result := result + FCurrentItems[I];
 end;
 
 procedure TCustomBreadcrumbBar.GoEditing;
