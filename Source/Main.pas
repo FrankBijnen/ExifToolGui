@@ -19,11 +19,12 @@ uses
   BreadcrumbBar, // BreadcrumbBar
   UnitScaleForm, // Scale form from Commandline parm.
   UnitSingleApp, // Single Instance App.
-  ExifToolsGUI_ShellTree,  // Extension of ShellTreeView
-  ExifToolsGUI_ShellList,  // Extension of ShellListView
-  ExifToolsGUI_Thumbnails, // Thumbnails
-  ExifToolsGUI_ValEdit,    // MetaData
-  ExifToolsGUI_Utils,      // Various
+  ExifToolsGUI_ShellTree,   // Extension of ShellTreeView
+  ExifToolsGUI_ShellList,   // Extension of ShellListView
+  ExifToolsGUI_Thumbnails,  // Thumbnails
+  ExifToolsGUI_ValEdit,     // MetaData
+  ExifToolsGUI_OpenPicture, // OpenPicture dialog
+  ExifToolsGUI_Utils,       // Various
   Vcl.ActnMan, Vcl.ActnCtrls, Vcl.ActnMenus, System.Actions, Vcl.ActnList, Vcl.PlatformDefaultStyleActnCtrls,
   Vcl.ActnPopup, Vcl.BaseImageCollection, Vcl.ImageCollection, Vcl.VirtualImageList,
   System.Win.TaskbarCore, Vcl.Taskbar, Vcl.ToolWin;
@@ -32,6 +33,7 @@ const
   CM_ActivateWindow = WM_USER + 100;
 
 type
+
   TFMain = class(TScaleForm)
     StatusBar: TStatusBar;
     AdvPanelBrowse: TPanel;
@@ -50,6 +52,7 @@ type
     ShellTree: ExifToolsGUI_ShellTree.TShellTreeView; // Need to create our own version!
     ShellList: ExifToolsGUI_ShellList.TShellListView; // Need to create our own version!
     MetadataList: ExifToolsGui_ValEdit.TValueListEditor; // Need to create our own version!
+    OpenPictureDlg: ExifToolsGUI_OpenPicture.TOpenPictureDialog; // Need to create our own version!
     SpeedBtnExif: TSpeedButton;
     SpeedBtnIptc: TSpeedButton;
     SpeedBtnXmp: TSpeedButton;
@@ -79,7 +82,6 @@ type
     SpeedBtnETdirectDel: TSpeedButton;
     SpeedBtnETdirectReplace: TSpeedButton;
     SpeedBtnETdirectAdd: TSpeedButton;
-    OpenPictureDlg: TOpenPictureDialog;
     AdvTabOSMMap: TTabSheet;
     AdvPanel_MapTop: TPanel;
     SpeedBtn_ShowOnMap: TSpeedButton;
@@ -1155,6 +1157,7 @@ begin
     begin
       with OpenPictureDlg do
       begin
+        AutoRotatePreview := GUIsettings.AutoRotatePreview;
         InitialDir := ShellList.Path;
         Filter := 'Image & Metadata files|*.*';
         Options := [ofFileMustExist];
@@ -1212,6 +1215,7 @@ begin
   begin
     with OpenPictureDlg do
     begin
+      AutoRotatePreview := GUIsettings.AutoRotatePreview;
       InitialDir := ShellList.Path;
       Filter := 'Image & Metadata files|*.jpg;*.jpeg;*.cr2;*.dng;*.nef;*.tif;*.tiff;*.mie;*.xmp;*.rw2';
       Options := [ofFileMustExist];
@@ -1232,7 +1236,7 @@ end;
 
 procedure TFMain.MImportRecursiveAllClick(Sender: TObject);
 var
-  i: integer;
+  I: integer;
   DstExt: string[5];
   ETcmd, ETout, ETerr: string;
 begin
@@ -1240,16 +1244,17 @@ begin
   Delete(DstExt, 1, 1);
   if (DstExt = 'jpg') or (DstExt = 'tif') then
   begin
-    i := MessageDlg(ImportRecursive1 + #10 +
+    I := MessageDlg(ImportRecursive1 + #10 +
                     Format(ImportRecursive2, [UpperCase(DstExt)]) + #10 +
                     ImportRecursive3 + #10 +
                     ImportRecursive4 + #10#10 +
                     ImportRecursive5, mtInformation,
                     [mbYes, mbNo, mbCancel], 0);
-    if i <> mrCancel then
+    if I <> mrCancel then
     begin
       with OpenPictureDlg do
       begin
+        AutoRotatePreview := GUIsettings.AutoRotatePreview;
         InitialDir := ShellList.Path;
         Filter := 'Image & Metadata files|*.*';
         Options := [ofFileMustExist];
@@ -1259,10 +1264,10 @@ begin
       if OpenPictureDlg.Execute then
       begin
         ETcmd := '-TagsFromFile' + CRLF + ExtractFilePath(OpenPictureDlg.FileName); // incl. slash
-        if i = mrYes then
+        if I = mrYes then
           ETcmd := ETcmd + '%d\';
         ETcmd := ETcmd + '%f' + ExtractFileExt(OpenPictureDlg.FileName);
-        if i = mrYes then
+        if I = mrYes then
           ETcmd := ETcmd + CRLF + '-r';
         ETcmd := ETcmd + CRLF + '-All:All' + CRLF;
         if FCopyMetadata.ShowModal = mrOK then
@@ -1287,7 +1292,7 @@ begin
               ETcmd := ETcmd + '--Xmp-exif' + CRLF;
           end;
           ETcmd := ETcmd + '-ext' + CRLF + DstExt;
-          SetCounter(CounterETEvent, GetNrOfFiles(ShellList.Path, '*.' + DstExt, (i = mrYes)));
+          SetCounter(CounterETEvent, GetNrOfFiles(ShellList.Path, '*.' + DstExt, (I = mrYes)));
           if (ET_OpenExec(ETcmd, '.', ETout, ETerr)) then
           begin
             RefreshSelected(Sender);
