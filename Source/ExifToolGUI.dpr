@@ -30,6 +30,7 @@ uses
   ExifToolsGUI_MultiContextMenu in 'ExifToolsGUI_MultiContextMenu.pas',
   ExifToolsGUI_Thumbnails in 'ExifToolsGUI_Thumbnails.pas',
   ExifToolsGui_LossLess in 'ExifToolsGui_LossLess.pas',
+  ExifToolsGUI_OpenPicture in 'ExifToolsGUI_OpenPicture.pas',
   ExifInfo in 'ExifInfo.pas',
   ExifTool in 'ExifTool.pas',
   ExifTool_PipeStream in 'ExifTool_PipeStream.pas',
