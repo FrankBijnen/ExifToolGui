@@ -581,13 +581,23 @@ begin
   else
     ImgRatio := H / W;
 
-  // Assume Preview Width is limiting
-  NewW := MaxW;
-  NewH := Round(MaxW * ImgRatio);
-  if (NewH > MaxH) then
-  begin  // No. Preview Height is limiting
-    NewH := MaxH;
-    NewW := Round(MaxH / ImgRatio);
+  if (MaxW = 0) and
+     (MaxH = 0) then
+  begin
+    // Use sizes from image
+    NewW := W;
+    NewH := H;
+  end
+  else
+  begin
+    // Assume Preview Width is limiting
+    NewW := MaxW;
+    NewH := Round(MaxW * ImgRatio);
+    if (NewH > MaxH) then
+    begin  // No. Preview Height is limiting
+      NewH := MaxH;
+      NewW := Round(MaxH / ImgRatio);
+    end;
   end;
 
   // Scaling occurs before Rotating (performs better).

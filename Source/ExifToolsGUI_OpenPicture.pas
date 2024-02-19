@@ -18,12 +18,13 @@ type
 
 implementation
 
-uses Vcl.Graphics, ExifInfo, ExifToolsGUI_Utils;
+uses System.SysUtils, Vcl.Graphics, Vcl.Buttons, ExifInfo, ExifToolsGUI_Utils;
 
 procedure TOpenPictureDialog.DoSelectionChange;
 var
   ABitMap: TBitMap;
   Rotate: integer;
+  FPreviewButton: TSpeedButton;
 begin
 
   inherited DoSelectionChange;
@@ -47,14 +48,22 @@ begin
       end;
     end;
 
-    // Load bitmap
-    ABitMap := GetBitmapFromWic(WicPreview(FileName, Rotate, ImageCtrl.Width, ImageCtrl.Height));
-    try
-      ImageCtrl.Picture.Bitmap := ABitMap;
-    finally
-      ABitMap.Free;
-    end;
+    // Load bitmap from WIC
+    ABitMap := GetBitmapFromWic(WicPreview(FileName, Rotate, 0, 0));
+    if Assigned(ABitmap) then
+    begin
+      try
+        ImageCtrl.Picture.Bitmap := ABitMap;
 
+        // PreviewButton is private!
+        FPreviewButton := TSpeedButton(FindComponent('PreviewButton'));
+        if Assigned(FPreviewButton) then
+          FPreviewButton.Enabled := true;
+
+      finally
+        ABitMap.Free;
+      end;
+    end;
   end;
 
 end;
