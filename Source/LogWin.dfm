@@ -87,7 +87,7 @@ object FLogWin: TFLogWin
       Align = alLeft
       Constraints.MinWidth = 285
       TabOrder = 1
-      ExplicitTop = 0
+      ExplicitHeight = 209
       object TabCommands: TTabSheet
         Caption = 'Executed commands'
         object MemoCmds: TMemo
@@ -148,7 +148,6 @@ object FLogWin: TFLogWin
               'CmdLine')
             TabOrder = 2
             OnClick = RadShowCmdsClick
-            ExplicitTop = 2
           end
         end
       end
@@ -223,9 +222,9 @@ object FLogWin: TFLogWin
     end
   end
   object ChkShowAll: TCheckBox
-    Left = 155
+    Left = 200
     Top = 1
-    Width = 131
+    Width = 364
     Height = 17
     Hint = 
       'Show also non-critical commands to populate the Metadata and fil' +

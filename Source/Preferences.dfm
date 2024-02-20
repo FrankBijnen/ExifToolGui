@@ -4,7 +4,7 @@ object FPreferences: TFPreferences
   BorderStyle = bsDialog
   Caption = 'Preferences'
   ClientHeight = 373
-  ClientWidth = 640
+  ClientWidth = 695
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -14,7 +14,7 @@ object FPreferences: TFPreferences
   OnShow = FormShow
   TextHeight = 13
   object BtnCancel: TButton
-    Left = 527
+    Left = 618
     Top = 294
     Width = 67
     Height = 25
@@ -23,7 +23,7 @@ object FPreferences: TFPreferences
     TabOrder = 1
   end
   object BtnSave: TButton
-    Left = 527
+    Left = 618
     Top = 340
     Width = 67
     Height = 25
@@ -36,27 +36,26 @@ object FPreferences: TFPreferences
   object AdvPageControl1: TPageControl
     Left = 0
     Top = 0
-    Width = 521
+    Width = 606
     Height = 373
     ActivePage = AdvTabGeneral
     Align = alLeft
     DoubleBuffered = True
     ParentDoubleBuffered = False
     TabOrder = 0
-    ExplicitHeight = 372
     object AdvTabGeneral: TTabSheet
       Caption = 'General'
       object Label1: TLabel
         Left = 16
         Top = 16
-        Width = 97
+        Width = 125
         Height = 13
         Caption = 'Metadata language:'
       end
       object ComboBox1: TComboBox
-        Left = 119
+        Left = 148
         Top = 13
-        Width = 282
+        Width = 389
         Height = 21
         Style = csDropDownList
         TabOrder = 0
@@ -64,7 +63,7 @@ object FPreferences: TFPreferences
       object CheckBox1: TCheckBox
         Left = 16
         Top = 48
-        Width = 450
+        Width = 521
         Height = 17
         Caption = '-in preview, let GUI temporary rotate images'
         TabOrder = 1
@@ -72,7 +71,7 @@ object FPreferences: TFPreferences
       object RgStartupFolder: TRadioGroup
         Left = 16
         Top = 102
-        Width = 385
+        Width = 521
         Height = 73
         Caption = 'Default startup folder'
         ItemIndex = 0
@@ -83,14 +82,14 @@ object FPreferences: TFPreferences
         OnClick = RadioGroupClick
       end
       object EdStartupFolder: TEdit
-        Left = 87
+        Left = 154
         Top = 145
-        Width = 264
+        Width = 333
         Height = 21
         TabOrder = 3
       end
       object BtnStartupFolder: TButton
-        Left = 357
+        Left = 500
         Top = 145
         Width = 28
         Height = 22
@@ -101,7 +100,7 @@ object FPreferences: TFPreferences
       object RgExportMetaFolder: TRadioGroup
         Left = 16
         Top = 193
-        Width = 385
+        Width = 521
         Height = 73
         Caption = 'Default export metadata folder'
         ItemIndex = 0
@@ -112,14 +111,14 @@ object FPreferences: TFPreferences
         OnClick = RadioGroupClick
       end
       object EdExportMetaFolder: TEdit
-        Left = 87
+        Left = 154
         Top = 236
-        Width = 264
+        Width = 333
         Height = 21
         TabOrder = 6
       end
       object BtnExportMetaFolder: TButton
-        Left = 357
+        Left = 500
         Top = 236
         Width = 28
         Height = 22
@@ -145,7 +144,7 @@ object FPreferences: TFPreferences
       object CheckBox2: TCheckBox
         Left = 16
         Top = 71
-        Width = 450
+        Width = 521
         Height = 17
         Caption = '-enable internet access for OSM Map (requires restart)'
         Constraints.MinWidth = 450
@@ -154,7 +153,7 @@ object FPreferences: TFPreferences
       object CheckBox3: TCheckBox
         Left = 16
         Top = 308
-        Width = 450
+        Width = 521
         Height = 17
         Caption = '-save Filelist Details state on exit'
         TabOrder = 10
@@ -166,7 +165,7 @@ object FPreferences: TFPreferences
       object GpxCleanThumbNails: TGroupBox
         Left = 20
         Top = 151
-        Width = 385
+        Width = 547
         Height = 115
         Caption = 'Cleanup Thumbnails (Admin required)'
         TabOrder = 5
@@ -182,7 +181,7 @@ object FPreferences: TFPreferences
       object RadioGroup3: TRadioGroup
         Left = 20
         Top = 3
-        Width = 385
+        Width = 539
         Height = 40
         Caption = 'Thumbnails size'
         Columns = 3
@@ -196,7 +195,7 @@ object FPreferences: TFPreferences
       object ChkThumbAutoGenerate: TCheckBox
         Left = 20
         Top = 62
-        Width = 385
+        Width = 539
         Height = 17
         Caption = 'Generate thumbnails as needed'
         TabOrder = 1
@@ -456,14 +455,14 @@ object FPreferences: TFPreferences
       object GrpGeoCodeGeneral: TGroupBox
         Left = 17
         Top = 13
-        Width = 493
+        Width = 557
         Height = 347
         Caption = 'GeoCoding'
         TabOrder = 0
         object ChkGeoCodeDialog: TCheckBox
           Left = 67
           Top = 49
-          Width = 365
+          Width = 452
           Height = 17
           Caption = 'Enable Geocode dialog (Get coordinates of location)'
           TabOrder = 0
@@ -471,7 +470,7 @@ object FPreferences: TFPreferences
         object ChkReverseGeoCodeDialog: TCheckBox
           Left = 67
           Top = 74
-          Width = 365
+          Width = 452
           Height = 17
           Caption = 'Enable reverse Geocode dialog (Get location of coordinates)'
           TabOrder = 1
@@ -479,7 +478,7 @@ object FPreferences: TFPreferences
         object ChkGeoCodingEnable: TCheckBox
           Left = 67
           Top = 25
-          Width = 365
+          Width = 452
           Height = 17
           Caption = 'Enable GeoCoding'
           TabOrder = 2
@@ -488,21 +487,22 @@ object FPreferences: TFPreferences
       object GrpGeoCode: TGroupBox
         Left = 24
         Top = 117
-        Width = 464
+        Width = 518
         Height = 108
         Caption = 'GeoCode Maps:'
         TabOrder = 1
         object Label3: TLabel
-          Left = 140
-          Top = 75
-          Width = 146
+          Left = 159
+          Top = 73
+          Width = 300
           Height = 13
+          AutoSize = False
           Caption = '(Min. time between calls in Ms)'
         end
         object EdGeoCodeUrl: TLabeledEdit
-          Left = 60
+          Left = 80
           Top = 19
-          Width = 365
+          Width = 430
           Height = 21
           EditLabel.Width = 19
           EditLabel.Height = 21
@@ -512,8 +512,8 @@ object FPreferences: TFPreferences
           Text = ''
         end
         object UpdThrottleGeoCode: TUpDown
-          Left = 109
-          Top = 75
+          Left = 128
+          Top = 73
           Width = 17
           Height = 21
           Associate = EdThrottleGeoCode
@@ -525,8 +525,8 @@ object FPreferences: TFPreferences
           Thousands = False
         end
         object EdThrottleGeoCode: TLabeledEdit
-          Left = 60
-          Top = 75
+          Left = 79
+          Top = 73
           Width = 49
           Height = 21
           EditLabel.Width = 38
@@ -537,9 +537,9 @@ object FPreferences: TFPreferences
           Text = '1000'
         end
         object EdGeoCodeApiKey: TLabeledEdit
-          Left = 60
+          Left = 80
           Top = 46
-          Width = 365
+          Width = 430
           Height = 21
           EditLabel.Width = 36
           EditLabel.Height = 21
@@ -552,19 +552,19 @@ object FPreferences: TFPreferences
       object GrpOverPass: TGroupBox
         Left = 24
         Top = 231
-        Width = 464
+        Width = 518
         Height = 80
         Caption = 'OverPass Api'
         TabOrder = 2
         object Label4: TLabel
-          Left = 140
+          Left = 160
           Top = 54
-          Width = 146
+          Width = 300
           Height = 13
           Caption = '(Min. time between calls in Ms)'
         end
         object EdThrottleOverPass: TLabeledEdit
-          Left = 60
+          Left = 80
           Top = 50
           Width = 49
           Height = 21
@@ -576,7 +576,7 @@ object FPreferences: TFPreferences
           Text = '10'
         end
         object UpdThrottleOverpass: TUpDown
-          Left = 109
+          Left = 129
           Top = 50
           Width = 17
           Height = 21
@@ -588,9 +588,9 @@ object FPreferences: TFPreferences
           Thousands = False
         end
         object EdOverPassUrl: TLabeledEdit
-          Left = 60
+          Left = 80
           Top = 23
-          Width = 365
+          Width = 430
           Height = 21
           EditLabel.Width = 19
           EditLabel.Height = 21
@@ -607,7 +607,7 @@ object FPreferences: TFPreferences
       object CheckBox9: TCheckBox
         Left = 16
         Top = 12
-        Width = 369
+        Width = 500
         Height = 17
         Caption = '-application When minimized move to tray'
         TabOrder = 0
@@ -616,7 +616,7 @@ object FPreferences: TFPreferences
       object GrpContextMenu: TGroupBox
         Left = 16
         Top = 67
-        Width = 480
+        Width = 540
         Height = 220
         Caption = 'Register ExiftoolGui in Contextmenu (Requires elevation)'
         TabOrder = 1
@@ -775,7 +775,7 @@ object FPreferences: TFPreferences
         object EdCommand: TLabeledEdit
           Left = 190
           Top = 43
-          Width = 282
+          Width = 325
           Height = 21
           EditLabel.Width = 59
           EditLabel.Height = 13
@@ -787,7 +787,7 @@ object FPreferences: TFPreferences
         object Memo1: TMemo
           Left = 5
           Top = 105
-          Width = 470
+          Width = 510
           Height = 100
           Lines.Strings = (
             
@@ -809,7 +809,7 @@ object FPreferences: TFPreferences
       object CheckBox10: TCheckBox
         Left = 16
         Top = 35
-        Width = 369
+        Width = 500
         Height = 17
         Caption = '-application Single instance'
         TabOrder = 2
@@ -820,14 +820,15 @@ object FPreferences: TFPreferences
       object Label5: TLabel
         Left = 103
         Top = 243
-        Width = 141
+        Width = 475
         Height = 13
+        AutoSize = False
         Caption = 'Hint pause timeout in Millisecs'
       end
       object RgETOverride: TRadioGroup
         Left = 16
         Top = 62
-        Width = 480
+        Width = 562
         Height = 73
         Caption = 'ExifTool.exe location'
         ItemIndex = 0
@@ -840,20 +841,20 @@ object FPreferences: TFPreferences
       object CheckBox4: TCheckBox
         Left = 16
         Top = 16
-        Width = 485
+        Width = 556
         Height = 17
         Caption = '-Workspace: Move focus to next tag/line after value is entered'
         TabOrder = 0
       end
       object EdETOverride: TEdit
-        Left = 103
+        Left = 157
         Top = 105
         Width = 349
         Height = 21
         TabOrder = 3
       end
       object BtnETOverride: TButton
-        Left = 460
+        Left = 514
         Top = 105
         Width = 28
         Height = 22
@@ -864,7 +865,7 @@ object FPreferences: TFPreferences
       object CheckBox5: TCheckBox
         Left = 16
         Top = 39
-        Width = 485
+        Width = 556
         Height = 17
         Caption = '-Workspace: Double Click adds/removes tags'
         TabOrder = 1
@@ -872,7 +873,7 @@ object FPreferences: TFPreferences
       object CheckBox6: TCheckBox
         Left = 16
         Top = 141
-        Width = 485
+        Width = 565
         Height = 17
         Caption = '-Filelist: Show Folders in Filelist'
         TabOrder = 5
@@ -898,7 +899,7 @@ object FPreferences: TFPreferences
       object CheckBox7: TCheckBox
         Left = 16
         Top = 188
-        Width = 485
+        Width = 565
         Height = 17
         Caption = '-Filelist: Show Breadcrumb (Address Bar) in Filelist'
         TabOrder = 7
@@ -906,7 +907,7 @@ object FPreferences: TFPreferences
       object CheckBox8: TCheckBox
         Left = 16
         Top = 164
-        Width = 485
+        Width = 565
         Height = 17
         Caption = 
           '-Filelist: Show Hidden Folders and Files in Filelist (Admin requ' +
@@ -916,7 +917,7 @@ object FPreferences: TFPreferences
       object CheckBox11: TCheckBox
         Left = 16
         Top = 212
-        Width = 485
+        Width = 565
         Height = 17
         Caption = 
           '-Filelist: Enable '#39'Camera Settings'#39', '#39'Location info'#39' and '#39'About ' +
