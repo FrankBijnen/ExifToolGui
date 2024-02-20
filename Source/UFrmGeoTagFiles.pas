@@ -129,6 +129,11 @@ begin
             ETcmd := ETcmd + 'E';
           ETcmd := ETcmd + CRLF + '-GPS:GpsLongitude=' + Lon;
         end;
+
+        // Get data possibly modified by user. With minus sign for West and South!
+        Lat := ValLocation.Values['Lat'];
+        Lon := ValLocation.Values['Lon'];
+
         AdjustLatLon(Lat, Lon, 5);
         ETCmd := ETcmd + CRLF + Format('-QuickTime:GPSCoordinates=''%s, %s, %s''', [Lat, Lon, '0']);
       end;

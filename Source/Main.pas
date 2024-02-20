@@ -1664,7 +1664,7 @@ end;
 
 procedure TFMain.QuickPopUp_AddQuickClick(Sender: TObject);
 var
-  I, N, X: smallint;
+  I, N, X: integer;
   Tx, Ty, Tz, T1: string;
   CrWait, CrNormal: HCURSOR;
 begin

@@ -777,27 +777,21 @@ var
 begin
   ETcmd := '-s3' + CRLF + '-f' + CRLF + '-n' + CRLF + '-q';
   ETcmd := ETcmd + CRLF + '-Filename';
-  ETcmd := ETcmd + CRLF + '-GpsLatitude' + CRLF + '-GpsLatitudeRef';
-  ETcmd := ETcmd + CRLF + '-GpsLongitude' + CRLF + '-GpsLongitudeRef';
+  ETcmd := ETcmd + CRLF + '-Composite:GpsLatitude';
+  ETcmd := ETcmd + CRLF + '-Composite:GpsLongitude';
   ETcmd := ETcmd + CRLF + '-QuickTime:MajorBrand';
   ET_OpenExec(ETcmd, Images, result, ETerrs, false);
 end;
 
 function AnalyzeGPSCoords(var ETout, Lat, Lon: string; var IsQuickTime: boolean): string;
 var
-  LatRef, LonRef, QuickTimeMajorBrand: string;
+  QuickTimeMajorBrand: string;
 begin
   result := NextField(ETout, CRLF);
 
   Lat := NextField(ETout, CRLF);
-  LatRef := NextField(ETout, CRLF);
-  if (LatRef = 'S') then
-    Insert('-', Lat, 1);
-
   Lon := NextField(ETout, CRLF);
-  LonRef := NextField(ETout, CRLF);
-  if (LonRef = 'W') then
-    Insert('-', Lon, 1);
+
   QuickTimeMajorBrand := NextField(ETout, CRLF);
   IsQuickTime := QuickTimeMajorBrand <> '-';
 end;
