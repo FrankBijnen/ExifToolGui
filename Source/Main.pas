@@ -1691,7 +1691,7 @@ begin
       repeat
         Dec(X);
         Tx := MetadataList.Keys[X];
-      until length(Tx) = 0;
+      until (X = 1) or (length(Tx) = 0);
       Tx := MetadataList.Cells[1, X]; // eg '---- IFD0 ----'
       Delete(Tx, 1, 5);               // -> 'IFD0 ----'
       X := pos(' ', Tx);
@@ -2919,22 +2919,25 @@ begin
               if (GUIsettings.EnableUnsupported) then
               begin
                 ET_OpenExec(LocationFields, GetSelectedFile(ShellList.FileName(Item.Index)), Details, False);
-
-                // Details[0] = DateTimeOriginal
-                // Details[1] = CreateDate
-                if (Details[0] = '-') then
-                  Details.Delete(0)
+                if (Details.Count < 2) then
+                  Details.Add(NotSupported)
                 else
-                  Details.Delete(1);
+                begin
+                  // Details[0] = DateTimeOriginal
+                  // Details[1] = CreateDate
+                  if (Details[0] = '-') then
+                    Details.Delete(0)
+                  else
+                    Details.Delete(1);
 
-                // Now Details[1] = GPS:GPSLatitude
-                // GPS tagged?
-                if (Details[1] = '-') or
-                   (Details[1] = '0') then
-                  Details[1] := StrNo
-                else
-                  Details[1] := StrYes;
-
+                  // Now Details[1] = GPS:GPSLatitude
+                  // GPS tagged?
+                  if (Details[1] = '-') or
+                     (Details[1] = '0') then
+                    Details[1] := StrNo
+                  else
+                    Details[1] := StrYes;
+                end;
               end
               else
                 Details.Add(NotSupported);
@@ -3314,7 +3317,10 @@ begin
         begin
           Value := ETResult[E];
           Item := Trim(NextField(Value, ': ')); // When Exiftool language is active the items are appended with spaces!
-          ETResult[E] := Item + '=' + Value;
+          if (Value = '') then
+            ETResult[E] := '=' + Item
+          else
+            ETResult[E] := Item + '=' + Value;
           inc(E);
         end;
       end;
