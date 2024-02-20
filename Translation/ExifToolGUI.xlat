@@ -2,7 +2,7 @@
 <xlat>
   <meta>
     <version>3</version>
-    <created>2024-02-14T11:14:43.134+01:00</created>
+    <created>2024-02-20T20:23:35.792+01:00</created>
     <tool>amTranslationManager</tool>
     <toolversion>2.0.8628.33873</toolversion>
   </meta>
@@ -14,13 +14,13 @@
   </options>
   <project sourcefile=".\ExifToolGUI.exe" stringsymbolfile=".\ExifToolGUI.drc" language="en-US" properties="622">
     <targetlanguages>
-      <language language="es" translated="565"/>
-      <language language="pt" translated="0"/>
+      <language language="es" translated="576"/>
       <language language="it" translated="0"/>
       <language language="fr" translated="0"/>
       <language language="nl" translated="627"/>
+      <language language="pt" translated="0"/>
       <language language="de" translated="623"/>
-      <language language="en" translated="0"/>
+      <language language="en" translated="1"/>
     </targetlanguages>
     <modules>
       <module name="resourcestrings" type="strings" properties="166">
@@ -6423,7 +6423,7 @@
                 <translations>
                   <translation language="nl">-Exiftool installeren in een directory die Windows doorzoekt.</translation>
                   <translation language="de" status="proposed">- Exiftool in einem Verzeichnis in der Windows-Suchreihenfolge installieren.</translation>
-                  <translation language="es" status="proposed">- Instale Exiftool en un directorio de la secuencia de búsqueda de Windows.</translation>
+                  <translation language="es" status="proposed">- Instalar Exiftool en un directorio de la secuencia de búsqueda de Windows.</translation>
                 </translations>
               </property>
             </properties>
@@ -6495,7 +6495,7 @@
                 <translations>
                   <translation language="nl">Fout bij positioneren Thuis</translation>
                   <translation language="de" status="proposed">Fehlerplatzierung Home</translation>
-                  <translation language="es" status="proposed">Error posicionando Home</translation>
+                  <translation language="es" status="proposed">Error posicionando Inicio</translation>
                 </translations>
               </property>
             </properties>
@@ -7400,7 +7400,7 @@
                 <translations>
                   <translation language="nl">Geselecteerd doelbestand moet JPG of TIF zijn!</translation>
                   <translation language="de" status="proposed">Ausgewählte Zieldatei muss JPG oder TIF sein!</translation>
-                  <translation language="es" status="proposed">Seleccione la carpeta de inicio por defecto</translation>
+                  <translation language="es" status="proposed">El archivo de destino seleccionado debe ser JPG o TIF!</translation>
                 </translations>
               </property>
             </properties>
@@ -7412,7 +7412,7 @@
                 <translations>
                   <translation language="nl">Geselecteerd bestand heeft geen geldige Lat Lon coördinaten.</translation>
                   <translation language="de" status="proposed">Ausgewählte Datei hat keine gültigen Lat-Lon-Koordinaten.</translation>
-                  <translation language="es" status="proposed">El archivo de destino seleccionado debe ser JPG o TIF.</translation>
+                  <translation language="es" status="proposed">El archivo seleccionado no tiene coordenadas Lat Lon válidas.</translation>
                 </translations>
               </property>
             </properties>
@@ -7424,7 +7424,7 @@
                 <translations>
                   <translation language="nl">Selecteer te gebruiken ExifTool Map</translation>
                   <translation language="de" status="proposed">Zu verwendenden ExifTool-Ordner auswählen</translation>
-                  <translation language="es" status="proposed">El archivo seleccionado no tiene coordenadas Lat Lon válidas.</translation>
+                  <translation language="es" status="proposed">Seleccione la carpeta de ExifTool que desea utilizar</translation>
                 </translations>
               </property>
             </properties>
@@ -7436,7 +7436,7 @@
                 <translations>
                   <translation language="nl">Selecteer map met JPG bestanden</translation>
                   <translation language="de" status="proposed">Ordner mit JPG-Bildern auswählen</translation>
-                  <translation language="es" status="proposed">Seleccione la carpeta ExifTool a utilizar</translation>
+                  <translation language="es" status="proposed">Seleccione la carpeta que contiene las imágenes JPG</translation>
                 </translations>
               </property>
             </properties>
@@ -7448,7 +7448,7 @@
                 <translations>
                   <translation language="nl">Selecteer HPS Logbestand</translation>
                   <translation language="de" status="proposed">GPS-Protokolldatei auswählen</translation>
-                  <translation language="es" status="proposed">Seleccione la carpeta que contiene las imágenes JPG</translation>
+                  <translation language="es" status="proposed">Seleccionar archivo de registro GPS</translation>
                 </translations>
               </property>
             </properties>
@@ -7460,7 +7460,7 @@
                 <translations>
                   <translation language="nl">Het selecteren van een ander font voor het Opdrachtprompt venster kan helpen.</translation>
                   <translation language="de" status="proposed">Die Auswahl einer anderen Schriftart für das Cmd-Fenster kann hilfreich sein.</translation>
-                  <translation language="es" status="proposed">Seleccione el archivo de registro GPS</translation>
+                  <translation language="es" status="proposed">Seleccionar una fuente diferente para la ventana cmd puede ayudar.</translation>
                 </translations>
               </property>
             </properties>
@@ -7472,7 +7472,7 @@
                 <translations>
                   <translation language="nl">Selecteer bronbestand</translation>
                   <translation language="de" status="proposed">Quelldatei auswählen</translation>
-                  <translation language="es" status="proposed">Seleccionar una fuente diferente para la ventana cmd puede ayudar.</translation>
+                  <translation language="es" status="proposed">Seleccionar archivo fuente</translation>
                 </translations>
               </property>
             </properties>
@@ -7484,7 +7484,7 @@
                 <translations>
                   <translation language="nl">Instellingen voor: </translation>
                   <translation language="de" status="proposed">Einstellungen für: </translation>
-                  <translation language="es" status="proposed">Seleccionar archivo fuente</translation>
+                  <translation language="es" status="proposed">Ajustes para: </translation>
                 </translations>
               </property>
             </properties>
@@ -7496,7 +7496,7 @@
                 <translations>
                   <translation language="nl">Toon Online hulp?</translation>
                   <translation language="de" status="proposed">Online-Hilfe anzeigen?</translation>
-                  <translation language="es" status="proposed">Ajustes para:</translation>
+                  <translation language="es" status="proposed">¿Mostrar ayuda en línea?</translation>
                 </translations>
               </property>
             </properties>
@@ -9660,7 +9660,7 @@
                 <translations>
                   <translation language="nl">Exif Datum en tijd gelijk</translation>
                   <translation language="de" status="proposed">Exif DateTime abgleichen</translation>
-                  <translation language="es" status="proposed">Exif DateTime igualar</translation>
+                  <translation language="es" status="proposed">Exif ecualizar Fecha y Hora</translation>
                 </translations>
               </property>
               <property name="Font.Name" status="skip">
@@ -9682,6 +9682,7 @@
                 <translations>
                   <translation language="nl">Datum origineel:</translation>
                   <translation language="de" status="proposed">DatumZeitUrsprung:</translation>
+                  <translation language="es" status="proposed">Fecha-hora Original:</translation>
                 </translations>
               </property>
               <property name="Text" status="skip">
@@ -9696,6 +9697,7 @@
                 <translations>
                   <translation language="nl">Creatiedatum:</translation>
                   <translation language="de" status="proposed">Erstelldatum:</translation>
+                  <translation language="es" status="proposed">Fecha Creación:</translation>
                 </translations>
               </property>
               <property name="Text" status="skip">
@@ -9710,6 +9712,7 @@
                 <translations>
                   <translation language="nl">Wijzigingsdatum:</translation>
                   <translation language="de" status="proposed">ÄndernDatum:</translation>
+                  <translation language="es" status="proposed">Fecha de Modificación:</translation>
                 </translations>
               </property>
               <property name="Text" status="skip">
@@ -9795,6 +9798,7 @@
                 <translations>
                   <translation language="nl">Exif: Datum en tijd correctie</translation>
                   <translation language="de" status="proposed">Exif: DateTime Shift</translation>
+                  <translation language="es" status="proposed">Exif: Desplazamiento de Fecha-hora</translation>
                 </translations>
               </property>
               <property name="Font.Name" status="skip">
@@ -9864,7 +9868,7 @@
                 <translations>
                   <translation language="nl">-verander bestand: Wijzigingsdatum</translation>
                   <translation language="de" status="proposed">-change File: Änderungsdatum</translation>
-                  <translation language="es" status="proposed">-change Archivo: Fecha modificada</translation>
+                  <translation language="es" status="proposed">-cambiar Archivo: Fecha modificada</translation>
                 </translations>
               </property>
               <property name="Hint">
@@ -9896,6 +9900,7 @@
                 <translations>
                   <translation language="nl">*Datum origineel:</translation>
                   <translation language="de" status="proposed">*DatumUhrzeit Original:</translation>
+                  <translation language="es" status="proposed">*Fecha-hora original:</translation>
                 </translations>
               </property>
               <property name="Text" status="skip">
@@ -9910,7 +9915,7 @@
                 <translations>
                   <translation language="nl">Creatiedatum:</translation>
                   <translation language="de" status="proposed">Erstelldatum:</translation>
-                  <translation language="es" status="proposed">FechaCreación:</translation>
+                  <translation language="es" status="proposed">Fecha Creación:</translation>
                 </translations>
               </property>
               <property name="Text" status="skip">
@@ -9925,6 +9930,7 @@
                 <translations>
                   <translation language="nl">Wijzigingsdatum:</translation>
                   <translation language="de" status="proposed">ÄndernDatum:</translation>
+                  <translation language="es" status="proposed">Fecha de Modificación:</translation>
                 </translations>
               </property>
               <property name="Text" status="skip">
@@ -9939,7 +9945,7 @@
                 <translations>
                   <translation language="nl">*Datum resultaat:</translation>
                   <translation language="de" status="proposed">*DatumZeit Ergebnis:</translation>
-                  <translation language="es" status="proposed">*DateTime resultado:</translation>
+                  <translation language="es" status="proposed">*Fecha-hora resultado:</translation>
                 </translations>
               </property>
               <property name="Hint">
@@ -10322,7 +10328,7 @@
                 <translations>
                   <translation language="nl">Bepaal Datum&amp;&amp;Tijd uit Exif</translation>
                   <translation language="de" status="proposed">DateTime von Exif abrufen</translation>
-                  <translation language="es" status="proposed">Obtener DateTime de Exif</translation>
+                  <translation language="es" status="proposed">Obtener Fecha-hora de Exif</translation>
                 </translations>
               </property>
               <property name="Items.Strings[0]">
@@ -10330,6 +10336,7 @@
                 <translations>
                   <translation language="nl">Datum en tijd orig,</translation>
                   <translation language="de" status="proposed">DatumZeitUrsprung</translation>
+                  <translation language="es" status="proposed">Fecha-hora Original</translation>
                 </translations>
               </property>
               <property name="Items.Strings[1]">
@@ -10337,7 +10344,7 @@
                 <translations>
                   <translation language="nl">Creatiedatum</translation>
                   <translation language="de" status="proposed">Erstelldatum</translation>
-                  <translation language="es" status="proposed">CrearFecha</translation>
+                  <translation language="es" status="proposed">Fecha de creación</translation>
                 </translations>
               </property>
               <property name="Items.Strings[2]">
@@ -10471,7 +10478,7 @@
                 <translations>
                   <translation language="nl">Datum en tijd moeten gescheiden zijn met een SPATIE!</translation>
                   <translation language="de" status="proposed">DateTime-Teil muss durch SPACE getrennt werden!</translation>
-                  <translation language="es" status="proposed">La parte de fecha y hora debe estar separada por un ESPACIO.</translation>
+                  <translation language="es" status="proposed">La parte de fecha-hora debe estar separada por un ESPACIO!</translation>
                 </translations>
               </property>
             </properties>
@@ -11385,6 +11392,7 @@
                 <translations>
                   <translation language="nl">NB: Geotagging precisie is afhankelijk van accurate cameratijd. Indien noodzakelijk,&amp;#13;&amp;#10;voer eerst Exif:DateTime correctie uit.</translation>
                   <translation language="de" status="proposed">Hinweis: Die Geotagging-Präzision hängt von der Genauigkeit der Kamerazeit ab. Falls erforderlich,&amp;#13;Exif:DateTime-Verschiebung vor Geotagging anwenden.</translation>
+                  <translation language="es" status="proposed">Nota: La precisión del geoetiquetado depende de la precisión horaria de la cámara. Si es necesario,&amp;#10;aplique el desplazamiento Exif:DateTime antes del geoetiquetado.</translation>
                 </translations>
               </property>
             </properties>
@@ -11419,7 +11427,7 @@
                 <translations>
                   <translation language="nl">Referentie Datum en Tijd</translation>
                   <translation language="de" status="proposed">Referenz DatumZeit Wert</translation>
-                  <translation language="es" status="proposed">Valor DateTime de referencia</translation>
+                  <translation language="es" status="proposed">Valor Fecha-hora de referencia</translation>
                 </translations>
               </property>
               <property name="Items.Strings[0]" status="skip">
@@ -11637,6 +11645,7 @@
                 <translations>
                   <translation language="nl">ExifTool LOG</translation>
                   <translation language="de">ExifTool LOG</translation>
+                  <translation language="es" status="proposed">Registros de ExifTool</translation>
                 </translations>
               </property>
               <property name="Font.Name" status="skip">
@@ -11758,7 +11767,7 @@
                 <translations>
                   <translation language="nl">CmdLine</translation>
                   <translation language="de">CmdLine</translation>
-                  <translation language="es" status="proposed">Línea de comandos</translation>
+                  <translation language="es" status="proposed">CmdLine</translation>
                 </translations>
               </property>
             </properties>
@@ -12195,7 +12204,7 @@
                 <translations>
                   <translation language="nl">Ieder</translation>
                   <translation language="de" status="proposed">Jeder</translation>
-                  <translation language="es" status="proposed">Cualquier</translation>
+                  <translation language="es" status="proposed">Todo</translation>
                 </translations>
               </property>
               <property name="Items.Strings[1]">
@@ -12411,7 +12420,7 @@
                 <translations>
                   <translation language="nl">Deselecteer</translation>
                   <translation language="de" status="proposed">Aufheben</translation>
-                  <translation language="es" status="proposed">Deseleccione</translation>
+                  <translation language="es" status="proposed">Deselec.</translation>
                 </translations>
               </property>
             </properties>
@@ -12435,7 +12444,7 @@
                 <translations>
                   <translation language="nl">^ Standaard</translation>
                   <translation language="de" status="proposed">^ Standard</translation>
-                  <translation language="es" status="proposed">^ Predeterminado</translation>
+                  <translation language="es" status="proposed">^ Predetermin</translation>
                 </translations>
               </property>
             </properties>
@@ -12447,7 +12456,7 @@
                 <translations>
                   <translation language="nl">Voorgedefinieerd</translation>
                   <translation language="de" status="proposed">Vordefiniert</translation>
-                  <translation language="es" status="proposed">Editar predefinido</translation>
+                  <translation language="es" status="proposed">Editar pred.</translation>
                 </translations>
               </property>
             </properties>
@@ -12459,7 +12468,7 @@
                 <translations>
                   <translation language="nl">^ Nieuw</translation>
                   <translation language="de" status="proposed">^ Neu</translation>
-                  <translation language="es" status="proposed">^ Añadir nuevo</translation>
+                  <translation language="es" status="proposed">^ Añadir</translation>
                 </translations>
               </property>
             </properties>
@@ -12495,7 +12504,7 @@
                 <translations>
                   <translation language="nl">Toon Log venster</translation>
                   <translation language="de" status="proposed">Logfenster</translation>
-                  <translation language="es" status="proposed">Mostrar ventana de registro</translation>
+                  <translation language="es" status="proposed">Mostrar registros</translation>
                 </translations>
               </property>
             </properties>
@@ -12722,7 +12731,7 @@
                 <translations>
                   <translation language="nl">Maatwerk</translation>
                   <translation language="de" status="proposed">Benutzer</translation>
-                  <translation language="es" status="proposed">Personalizar</translation>
+                  <translation language="es" status="proposed">Usario</translation>
                 </translations>
               </property>
             </properties>
@@ -12839,7 +12848,7 @@
                 <translations>
                   <translation language="nl">Geotag best.</translation>
                   <translation language="de" status="proposed">Geotag Dateien</translation>
-                  <translation language="es" status="proposed">Archivos Geotag</translation>
+                  <translation language="es" status="proposed">Geoetiqueta</translation>
                 </translations>
               </property>
             </properties>
@@ -12908,7 +12917,7 @@
                 <translations>
                   <translation language="nl">Bepaal locatie</translation>
                   <translation language="de" status="proposed">Standort Info</translation>
-                  <translation language="es" status="proposed">Obtener ubicación</translation>
+                  <translation language="es" status="proposed">Ubicación</translation>
                 </translations>
               </property>
               <property name="Hint">
@@ -12951,7 +12960,7 @@
                 <translations>
                   <translation language="nl">Toon op kaart</translation>
                   <translation language="de" status="proposed">Anzeigen</translation>
-                  <translation language="es" status="proposed">Mostrar en el mapa</translation>
+                  <translation language="es" status="proposed">Mostrar</translation>
                 </translations>
               </property>
             </properties>
@@ -12975,9 +12984,10 @@
               <property name="Caption">
                 <value>Browse</value>
                 <translations>
-                  <translation language="nl">Bladeren</translation>
-                  <translation language="de" status="proposed">Verzeichnis</translation>
-                  <translation language="es" status="proposed">Navegar por</translation>
+                  <translation language="nl">Mappen</translation>
+                  <translation language="de">Verzeichnis</translation>
+                  <translation language="es">Carpetas</translation>
+                  <translation language="en" status="proposed">Folders</translation>
                 </translations>
               </property>
             </properties>
@@ -13132,7 +13142,7 @@
                 <translations>
                   <translation language="nl">W&amp;erkruimte definitiebestand</translation>
                   <translation language="de" status="proposed">W&amp;orkspace-Definitionsdatei</translation>
-                  <translation language="es" status="proposed">W&amp;Archivo de definición del espacio de trabajo</translation>
+                  <translation language="es" status="proposed">&amp;Archivo de definición del espacio de trabajo</translation>
                 </translations>
               </property>
             </properties>
@@ -13606,6 +13616,7 @@
                 <translations>
                   <translation language="nl">E&amp;xif: Datum gelijk...</translation>
                   <translation language="de" status="proposed">E&amp;xif: DateTime abgleichen...</translation>
+                  <translation language="es" status="proposed">E&amp;xif ecualizar Fecha y Hora...</translation>
                 </translations>
               </property>
             </properties>
@@ -13813,7 +13824,7 @@
                 <translations>
                   <translation language="nl">Exif: Datum gelijk...</translation>
                   <translation language="de" status="proposed">Exif: DateTime abgleichen...</translation>
-                  <translation language="es" status="proposed">Exif: Igualar fecha y hora...</translation>
+                  <translation language="es" status="proposed">Exif: ecualizar Fecha-hora...</translation>
                 </translations>
               </property>
               <property name="Category" status="skip">
@@ -13828,6 +13839,7 @@
                 <translations>
                   <translation language="nl">Exif: Datum en tijd correctie...</translation>
                   <translation language="de" status="proposed">Exif: DateTimeSchicht...</translation>
+                  <translation language="es" status="proposed">Exif: Desplazamiento de Fecha-hora...</translation>
                 </translations>
               </property>
               <property name="Category" status="skip">
@@ -15147,7 +15159,7 @@
                 <translations>
                   <translation language="nl">Stelt een ID in gebruikt door het Schijfopruimingsprogamma. Bij twijfel gebruik de standaardwaarde 0000</translation>
                   <translation language="de" status="proposed">Definiert eine Kennung, die vom Festplattenbereinigungsprogramm verwendet wird. Wenn Sie unsicher sind, belassen Sie es beim Standardwert 0000</translation>
-                  <translation language="es" status="proposed"></translation>
+                  <translation language="es" status="proposed">Define un Id utilizado por el programa Liberador de espacio en disco. Si no está seguro, déjelo en el valor por defecto 0000</translation>
                 </translations>
               </property>
               <property name="Text" status="skip">
@@ -15162,7 +15174,7 @@
                 <translations>
                   <translation language="nl">Opschonen miniaturen (Beheerder vereist)</translation>
                   <translation language="de" status="proposed">Bereinigung Vorschaubilder (Admin erforderlich)</translation>
-                  <translation language="es" status="proposed">Define un Id utilizado por el programa Liberador de espacio en disco. Si no está seguro, déjelo en el valor por defecto 0000</translation>
+                  <translation language="es" status="proposed">Limpiar miniaturas (requiere administración)</translation>
                 </translations>
               </property>
             </properties>
@@ -15181,7 +15193,7 @@
                 <translations>
                   <translation language="nl">Minitatuur afmeting</translation>
                   <translation language="de" status="proposed">Größe der Vorschaubilder</translation>
-                  <translation language="es" status="proposed">Limpieza de miniaturas (Requiere administrador)</translation>
+                  <translation language="es" status="proposed">Tamaño de las miniaturas</translation>
                 </translations>
               </property>
               <property name="Items.Strings[0]" status="skip">
@@ -15236,7 +15248,7 @@
                 <translations>
                   <translation language="nl">Vertraging</translation>
                   <translation language="de" status="proposed">Drossel</translation>
-                  <translation language="es" status="proposed">Tamaño de las miniaturas</translation>
+                  <translation language="es" status="proposed">Acelerador</translation>
                 </translations>
               </property>
               <property name="Text" status="skip">
@@ -15251,7 +15263,7 @@
                 <translations>
                   <translation language="nl">(Min. tijd tussen verzoeken in Ms)</translation>
                   <translation language="de" status="proposed">(Min. Zeit zwischen Anrufen in Ms)</translation>
-                  <translation language="es" status="proposed">Acelerador</translation>
+                  <translation language="es" status="proposed">(Tiempo mín. entre llamadas en Ms)</translation>
                 </translations>
               </property>
             </properties>
@@ -15263,7 +15275,7 @@
                 <translations>
                   <translation language="nl">GeoCoding</translation>
                   <translation language="de">GeoCoding</translation>
-                  <translation language="es" status="proposed">(Tiempo mín. entre llamadas en Ms)</translation>
+                  <translation language="es" status="proposed">GeoCodificación</translation>
                 </translations>
               </property>
             </properties>
@@ -15275,7 +15287,7 @@
                 <translations>
                   <translation language="nl">Schakel Geocode dialoog in (Bepaal coördinaten van lokatie)</translation>
                   <translation language="de" status="proposed">Geocode-Dialog aktivieren (Koordinaten des Standorts abrufen)</translation>
-                  <translation language="es" status="proposed">GeoCodificación</translation>
+                  <translation language="es" status="proposed">Activar diálogo Geocode (Obtener coordenadas de ubicación)</translation>
                 </translations>
               </property>
             </properties>
@@ -15287,7 +15299,7 @@
                 <translations>
                   <translation language="nl">Schakel GeoCoding in</translation>
                   <translation language="de" status="proposed">Geocode-Dialog aktivieren</translation>
-                  <translation language="es" status="proposed">Activar diálogo Geocode (Obtener coordenadas de ubicación)</translation>
+                  <translation language="es" status="proposed">Activar Geocodificación</translation>
                 </translations>
               </property>
             </properties>
@@ -15299,7 +15311,7 @@
                 <translations>
                   <translation language="nl">Schakel omgekeerde Geocode dialoog in (Bepaal lokatie van coördinaten)</translation>
                   <translation language="de" status="proposed">Umgekehrte Geocode-Dialogs aktivieren (Standort der Koordinaten)</translation>
-                  <translation language="es" status="proposed">Activar Geocodificación</translation>
+                  <translation language="es" status="proposed">Activar diálogo inverso de Geocodificación (Obtener ubicación de coordenadas)</translation>
                 </translations>
               </property>
             </properties>
@@ -15311,7 +15323,7 @@
                 <translations>
                   <translation language="nl">OverPass Api</translation>
                   <translation language="de">OverPass Api</translation>
-                  <translation language="es" status="proposed">Habilitar diálogo inverso Geocode (Obtener ubicación de coordenadas)</translation>
+                  <translation language="es" status="proposed">API OverPass</translation>
                 </translations>
               </property>
             </properties>
@@ -15323,7 +15335,7 @@
                 <translations>
                   <translation language="nl">URL</translation>
                   <translation language="de">URL</translation>
-                  <translation language="es" status="proposed">API OverPass</translation>
+                  <translation language="es" status="proposed">URL</translation>
                 </translations>
               </property>
               <property name="Text" status="skip">

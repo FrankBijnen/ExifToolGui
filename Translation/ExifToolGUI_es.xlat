@@ -2,7 +2,7 @@
 <xlat>
   <meta>
     <version>3</version>
-    <created>2024-02-14T11:13:43.652+01:00</created>
+    <created>2024-02-20T19:47:38.964+01:00</created>
     <tool>amTranslationManager</tool>
     <toolversion>2.0.8628.33873</toolversion>
   </meta>
@@ -12,12 +12,12 @@
     <sorted>True</sorted>
     <omitnewstate>True</omitnewstate>
   </options>
-  <project sourcefile=".\ExifToolGUI.exe" stringsymbolfile=".\ExifToolGUI.drc" language="en-US" properties="623">
+  <project sourcefile=".\ExifToolGUI.exe" stringsymbolfile=".\ExifToolGUI.drc" language="en-US" properties="622">
     <targetlanguages>
-      <language language="es" translated="566"/>
+      <language language="es" translated="577"/>
     </targetlanguages>
     <modules>
-      <module name="resourcestrings" type="strings" properties="167">
+      <module name="resourcestrings" type="strings" properties="166">
         <items>
           <item name="BreadcrumbBar_SCopyText">
             <properties>
@@ -6317,7 +6317,7 @@
               <property>
                 <value>- Install Exiftool in a directory in the Windows search sequence.</value>
                 <translations>
-                  <translation language="es" status="proposed">- Instale Exiftool en un directorio de la secuencia de búsqueda de Windows.</translation>
+                  <translation language="es" status="proposed">- Instalar Exiftool en un directorio de la secuencia de búsqueda de Windows.</translation>
                 </translations>
               </property>
             </properties>
@@ -6377,7 +6377,7 @@
               <property>
                 <value>Error positioning Home</value>
                 <translations>
-                  <translation language="es" status="proposed">Error posicionando Home</translation>
+                  <translation language="es" status="proposed">Error posicionando Inicio</translation>
                 </translations>
               </property>
             </properties>
@@ -6943,7 +6943,7 @@
               </property>
             </properties>
           </item>
-          <item name="UnitLangResources_StrProvince">
+          <item name="UnitLangResources_StrProvince" state="unused">
             <properties>
               <property>
                 <value>Province</value>
@@ -7105,7 +7105,7 @@
               <property>
                 <value>Selected destination file must be JPG or TIF!</value>
                 <translations>
-                  <translation language="es" status="proposed">Seleccione la carpeta de inicio por defecto</translation>
+                  <translation language="es" status="proposed">El archivo de destino seleccionado debe ser JPG o TIF!</translation>
                 </translations>
               </property>
             </properties>
@@ -7115,7 +7115,7 @@
               <property>
                 <value>Selected file has no valid Lat Lon coordinates.</value>
                 <translations>
-                  <translation language="es" status="proposed">El archivo de destino seleccionado debe ser JPG o TIF.</translation>
+                  <translation language="es" status="proposed">El archivo seleccionado no tiene coordenadas Lat Lon válidas.</translation>
                 </translations>
               </property>
             </properties>
@@ -7125,7 +7125,7 @@
               <property>
                 <value>Select ExifTool folder to use</value>
                 <translations>
-                  <translation language="es" status="proposed">El archivo seleccionado no tiene coordenadas Lat Lon válidas.</translation>
+                  <translation language="es" status="proposed">Seleccione la carpeta de ExifTool que desea utilizar</translation>
                 </translations>
               </property>
             </properties>
@@ -7135,7 +7135,7 @@
               <property>
                 <value>Select folder containing JPG images</value>
                 <translations>
-                  <translation language="es" status="proposed">Seleccione la carpeta ExifTool a utilizar</translation>
+                  <translation language="es" status="proposed">Seleccione la carpeta que contiene las imágenes JPG</translation>
                 </translations>
               </property>
             </properties>
@@ -7145,7 +7145,7 @@
               <property>
                 <value>Select GPS log file</value>
                 <translations>
-                  <translation language="es" status="proposed">Seleccione la carpeta que contiene las imágenes JPG</translation>
+                  <translation language="es" status="proposed">Seleccionar archivo de registro GPS</translation>
                 </translations>
               </property>
             </properties>
@@ -7155,7 +7155,7 @@
               <property>
                 <value>Selecting a different font for the cmd window may help.</value>
                 <translations>
-                  <translation language="es" status="proposed">Seleccione el archivo de registro GPS</translation>
+                  <translation language="es" status="proposed">Seleccionar una fuente diferente para la ventana cmd puede ayudar.</translation>
                 </translations>
               </property>
             </properties>
@@ -7165,7 +7165,7 @@
               <property>
                 <value>Select source file</value>
                 <translations>
-                  <translation language="es" status="proposed">Seleccionar una fuente diferente para la ventana cmd puede ayudar.</translation>
+                  <translation language="es" status="proposed">Seleccionar archivo fuente</translation>
                 </translations>
               </property>
             </properties>
@@ -7175,7 +7175,7 @@
               <property>
                 <value>Settings for: </value>
                 <translations>
-                  <translation language="es" status="proposed">Seleccionar archivo fuente</translation>
+                  <translation language="es" status="proposed">Ajustes para: </translation>
                 </translations>
               </property>
             </properties>
@@ -7185,7 +7185,7 @@
               <property>
                 <value>Show Online help?</value>
                 <translations>
-                  <translation language="es" status="proposed">Ajustes para:</translation>
+                  <translation language="es" status="proposed">¿Mostrar ayuda en línea?</translation>
                 </translations>
               </property>
             </properties>
@@ -9269,7 +9269,7 @@
               <property name="Caption">
                 <value>Exif DateTime equalize</value>
                 <translations>
-                  <translation language="es" status="proposed">Exif DateTime igualar</translation>
+                  <translation language="es" status="proposed">Exif ecualizar Fecha y Hora</translation>
                 </translations>
               </property>
               <property name="Font.Name" status="skip">
@@ -9288,6 +9288,9 @@
             <properties>
               <property name="EditLabel.Caption">
                 <value>DateTimeOriginal:</value>
+                <translations>
+                  <translation language="es" status="proposed">Fecha-hora Original:</translation>
+                </translations>
               </property>
               <property name="Text" status="skip">
                 <value>2012:01:12 18:15:00</value>
@@ -9298,6 +9301,9 @@
             <properties>
               <property name="EditLabel.Caption">
                 <value>CreateDate:</value>
+                <translations>
+                  <translation language="es" status="proposed">Fecha Creación:</translation>
+                </translations>
               </property>
               <property name="Text" status="skip">
                 <value></value>
@@ -9308,6 +9314,9 @@
             <properties>
               <property name="EditLabel.Caption">
                 <value>ModifyDate:</value>
+                <translations>
+                  <translation language="es" status="proposed">Fecha de Modificación:</translation>
+                </translations>
               </property>
               <property name="Text" status="skip">
                 <value></value>
@@ -9379,6 +9388,9 @@
             <properties>
               <property name="Caption">
                 <value>Exif: DateTime shift</value>
+                <translations>
+                  <translation language="es" status="proposed">Exif: Desplazamiento de Fecha-hora</translation>
+                </translations>
               </property>
               <property name="Font.Name" status="skip">
                 <value>Tahoma</value>
@@ -9437,7 +9449,7 @@
               <property name="Caption">
                 <value>-change File: Date modified</value>
                 <translations>
-                  <translation language="es" status="proposed">-change Archivo: Fecha modificada</translation>
+                  <translation language="es" status="proposed">-cambiar Archivo: Fecha modificada</translation>
                 </translations>
               </property>
               <property name="Hint">
@@ -9462,6 +9474,9 @@
             <properties>
               <property name="EditLabel.Caption">
                 <value>*DateTime original:</value>
+                <translations>
+                  <translation language="es" status="proposed">*Fecha-hora original:</translation>
+                </translations>
               </property>
               <property name="Text" status="skip">
                 <value></value>
@@ -9473,7 +9488,7 @@
               <property name="EditLabel.Caption">
                 <value>CreateDate:</value>
                 <translations>
-                  <translation language="es" status="proposed">FechaCreación:</translation>
+                  <translation language="es" status="proposed">Fecha Creación:</translation>
                 </translations>
               </property>
               <property name="Text" status="skip">
@@ -9485,6 +9500,9 @@
             <properties>
               <property name="EditLabel.Caption">
                 <value>ModifyDate:</value>
+                <translations>
+                  <translation language="es" status="proposed">Fecha de Modificación:</translation>
+                </translations>
               </property>
               <property name="Text" status="skip">
                 <value></value>
@@ -9496,7 +9514,7 @@
               <property name="EditLabel.Caption">
                 <value>*DateTime result:</value>
                 <translations>
-                  <translation language="es" status="proposed">*DateTime resultado:</translation>
+                  <translation language="es" status="proposed">*Fecha-hora resultado:</translation>
                 </translations>
               </property>
               <property name="Hint">
@@ -9821,16 +9839,19 @@
               <property name="Caption">
                 <value>Get DateTime from Exif</value>
                 <translations>
-                  <translation language="es" status="proposed">Obtener DateTime de Exif</translation>
+                  <translation language="es" status="proposed">Obtener Fecha-hora de Exif</translation>
                 </translations>
               </property>
               <property name="Items.Strings[0]">
                 <value>DateTimeOriginal</value>
+                <translations>
+                  <translation language="es" status="proposed">Fecha-hora Original</translation>
+                </translations>
               </property>
               <property name="Items.Strings[1]">
                 <value>CreateDate</value>
                 <translations>
-                  <translation language="es" status="proposed">CrearFecha</translation>
+                  <translation language="es" status="proposed">Fecha de creación</translation>
                 </translations>
               </property>
               <property name="Items.Strings[2]">
@@ -9942,7 +9963,7 @@
               <property name="Hint">
                 <value>DateTime part must be separated by SPACE!</value>
                 <translations>
-                  <translation language="es" status="proposed">La parte de fecha y hora debe estar separada por un ESPACIO.</translation>
+                  <translation language="es" status="proposed">La parte de fecha-hora debe estar separada por un ESPACIO!</translation>
                 </translations>
               </property>
             </properties>
@@ -10708,6 +10729,9 @@
             <properties>
               <property name="Caption">
                 <value>Note: Geotagging precision depends on camera time accuracy. If neccesary,&amp;#10;apply Exif:DateTime shift before geotagging.</value>
+                <translations>
+                  <translation language="es" status="proposed">Nota: La precisión del geoetiquetado depende de la precisión horaria de la cámara. Si es necesario,&amp;#10;aplique el desplazamiento Exif:DateTime antes del geoetiquetado.</translation>
+                </translations>
               </property>
             </properties>
           </item>
@@ -10735,7 +10759,7 @@
               <property name="Caption">
                 <value>Reference DateTime value</value>
                 <translations>
-                  <translation language="es" status="proposed">Valor DateTime de referencia</translation>
+                  <translation language="es" status="proposed">Valor Fecha-hora de referencia</translation>
                 </translations>
               </property>
               <property name="Items.Strings[0]" status="skip">
@@ -10920,6 +10944,9 @@
             <properties>
               <property name="Caption">
                 <value>ExifTool LOG</value>
+                <translations>
+                  <translation language="es" status="proposed">Registros de ExifTool</translation>
+                </translations>
               </property>
               <property name="Font.Name" status="skip">
                 <value>Tahoma</value>
@@ -11014,7 +11041,7 @@
               <property name="Items.Strings[1]">
                 <value>CmdLine</value>
                 <translations>
-                  <translation language="es" status="proposed">Línea de comandos</translation>
+                  <translation language="es" status="proposed">CmdLine</translation>
                 </translations>
               </property>
             </properties>
@@ -11363,7 +11390,7 @@
               <property name="Items.Strings[0]">
                 <value>Any</value>
                 <translations>
-                  <translation language="es" status="proposed">Cualquier</translation>
+                  <translation language="es" status="proposed">Todo</translation>
                 </translations>
               </property>
               <property name="Items.Strings[1]">
@@ -11523,7 +11550,7 @@
               <property name="Caption">
                 <value>Deselect</value>
                 <translations>
-                  <translation language="es" status="proposed">Deseleccione</translation>
+                  <translation language="es" status="proposed">Deselec.</translation>
                 </translations>
               </property>
             </properties>
@@ -11543,7 +11570,7 @@
               <property name="Caption">
                 <value>^ Default</value>
                 <translations>
-                  <translation language="es" status="proposed">^ Predeterminado</translation>
+                  <translation language="es" status="proposed">^ Predetermin</translation>
                 </translations>
               </property>
             </properties>
@@ -11553,7 +11580,7 @@
               <property name="Caption">
                 <value>Edit predefined</value>
                 <translations>
-                  <translation language="es" status="proposed">Editar predefinido</translation>
+                  <translation language="es" status="proposed">Editar pred.</translation>
                 </translations>
               </property>
             </properties>
@@ -11563,7 +11590,7 @@
               <property name="Caption">
                 <value>^ Add new</value>
                 <translations>
-                  <translation language="es" status="proposed">^ Añadir nuevo</translation>
+                  <translation language="es" status="proposed">^ Añadir</translation>
                 </translations>
               </property>
             </properties>
@@ -11593,7 +11620,7 @@
               <property name="Caption">
                 <value>Show Log window</value>
                 <translations>
-                  <translation language="es" status="proposed">Mostrar ventana de registro</translation>
+                  <translation language="es" status="proposed">Mostrar registros</translation>
                 </translations>
               </property>
             </properties>
@@ -11788,7 +11815,7 @@
               <property name="Caption">
                 <value>Custom</value>
                 <translations>
-                  <translation language="es" status="proposed">Personalizar</translation>
+                  <translation language="es" status="proposed">Usario</translation>
                 </translations>
               </property>
             </properties>
@@ -11891,7 +11918,7 @@
               <property name="Caption">
                 <value>Geotag files</value>
                 <translations>
-                  <translation language="es" status="proposed">Archivos Geotag</translation>
+                  <translation language="es" status="proposed">Geoetiqueta</translation>
                 </translations>
               </property>
             </properties>
@@ -11950,7 +11977,7 @@
               <property name="Caption">
                 <value>Get location</value>
                 <translations>
-                  <translation language="es" status="proposed">Obtener ubicación</translation>
+                  <translation language="es" status="proposed">Ubicación</translation>
                 </translations>
               </property>
               <property name="Hint">
@@ -11983,7 +12010,7 @@
               <property name="Caption">
                 <value>Show on map</value>
                 <translations>
-                  <translation language="es" status="proposed">Mostrar en el mapa</translation>
+                  <translation language="es" status="proposed">Mostrar</translation>
                 </translations>
               </property>
             </properties>
@@ -12007,7 +12034,7 @@
               <property name="Caption">
                 <value>Browse</value>
                 <translations>
-                  <translation language="es" status="proposed">Navegar por</translation>
+                  <translation language="es" status="proposed">Carpetas</translation>
                 </translations>
               </property>
             </properties>
@@ -12147,7 +12174,7 @@
               <property name="Caption">
                 <value>W&amp;orkspace definition file</value>
                 <translations>
-                  <translation language="es" status="proposed">W&amp;Archivo de definición del espacio de trabajo</translation>
+                  <translation language="es" status="proposed">&amp;Archivo de definición del espacio de trabajo</translation>
                 </translations>
               </property>
             </properties>
@@ -12548,6 +12575,9 @@
             <properties>
               <property name="Caption">
                 <value>E&amp;xif: DateTime equalize...</value>
+                <translations>
+                  <translation language="es" status="proposed">E&amp;xif ecualizar Fecha y Hora...</translation>
+                </translations>
               </property>
             </properties>
           </item>
@@ -12722,7 +12752,7 @@
               <property name="Caption">
                 <value>Exif: DateTime equalize...</value>
                 <translations>
-                  <translation language="es" status="proposed">Exif: Igualar fecha y hora...</translation>
+                  <translation language="es" status="proposed">Exif: ecualizar Fecha-hora...</translation>
                 </translations>
               </property>
               <property name="Category" status="skip">
@@ -12734,6 +12764,9 @@
             <properties>
               <property name="Caption">
                 <value>Exif: DateTime shift...</value>
+                <translations>
+                  <translation language="es" status="proposed">Exif: Desplazamiento de Fecha-hora...</translation>
+                </translations>
               </property>
               <property name="Category" status="skip">
                 <value>Modify</value>
@@ -13866,7 +13899,7 @@
               <property name="Hint">
                 <value>Defines an Id used by the Disk Cleanup program. If unsure leave it to the default value  0000</value>
                 <translations>
-                  <translation language="es" status="proposed"></translation>
+                  <translation language="es" status="proposed">Define un Id utilizado por el programa Liberador de espacio en disco. Si no está seguro, déjelo en el valor por defecto 0000</translation>
                 </translations>
               </property>
               <property name="Text" status="skip">
@@ -13879,7 +13912,7 @@
               <property name="Caption">
                 <value>Cleanup Thumbnails (Admin required)</value>
                 <translations>
-                  <translation language="es" status="proposed">Define un Id utilizado por el programa Liberador de espacio en disco. Si no está seguro, déjelo en el valor por defecto 0000</translation>
+                  <translation language="es" status="proposed">Limpiar miniaturas (requiere administración)</translation>
                 </translations>
               </property>
             </properties>
@@ -13896,7 +13929,7 @@
               <property name="Caption">
                 <value>Thumbnails size</value>
                 <translations>
-                  <translation language="es" status="proposed">Limpieza de miniaturas (Requiere administrador)</translation>
+                  <translation language="es" status="proposed">Tamaño de las miniaturas</translation>
                 </translations>
               </property>
               <property name="Items.Strings[0]" status="skip">
@@ -13949,7 +13982,7 @@
               <property name="EditLabel.Caption">
                 <value>Throttle</value>
                 <translations>
-                  <translation language="es" status="proposed">Tamaño de las miniaturas</translation>
+                  <translation language="es" status="proposed">Acelerador</translation>
                 </translations>
               </property>
               <property name="Text" status="skip">
@@ -13962,7 +13995,7 @@
               <property name="Caption">
                 <value>(Min. time between calls in Ms)</value>
                 <translations>
-                  <translation language="es" status="proposed">Acelerador</translation>
+                  <translation language="es" status="proposed">(Tiempo mín. entre llamadas en Ms)</translation>
                 </translations>
               </property>
             </properties>
@@ -13972,7 +14005,7 @@
               <property name="Caption">
                 <value>GeoCoding</value>
                 <translations>
-                  <translation language="es" status="proposed">(Tiempo mín. entre llamadas en Ms)</translation>
+                  <translation language="es" status="proposed">GeoCodificación</translation>
                 </translations>
               </property>
             </properties>
@@ -13982,7 +14015,7 @@
               <property name="Caption">
                 <value>Enable Geocode dialog (Get coordinates of location)</value>
                 <translations>
-                  <translation language="es" status="proposed">GeoCodificación</translation>
+                  <translation language="es" status="proposed">Activar diálogo Geocode (Obtener coordenadas de ubicación)</translation>
                 </translations>
               </property>
             </properties>
@@ -13992,7 +14025,7 @@
               <property name="Caption">
                 <value>Enable GeoCoding</value>
                 <translations>
-                  <translation language="es" status="proposed">Activar diálogo Geocode (Obtener coordenadas de ubicación)</translation>
+                  <translation language="es" status="proposed">Activar Geocodificación</translation>
                 </translations>
               </property>
             </properties>
@@ -14002,7 +14035,7 @@
               <property name="Caption">
                 <value>Enable reverse Geocode dialog (Get location of coordinates)</value>
                 <translations>
-                  <translation language="es" status="proposed">Activar Geocodificación</translation>
+                  <translation language="es" status="proposed">Activar diálogo inverso de Geocodificación (Obtener ubicación de coordenadas)</translation>
                 </translations>
               </property>
             </properties>
@@ -14012,7 +14045,7 @@
               <property name="Caption">
                 <value>OverPass Api</value>
                 <translations>
-                  <translation language="es" status="proposed">Habilitar diálogo inverso Geocode (Obtener ubicación de coordenadas)</translation>
+                  <translation language="es" status="proposed">API OverPass</translation>
                 </translations>
               </property>
             </properties>
@@ -14022,7 +14055,7 @@
               <property name="EditLabel.Caption">
                 <value>URL</value>
                 <translations>
-                  <translation language="es" status="proposed">API OverPass</translation>
+                  <translation language="es" status="proposed">URL</translation>
                 </translations>
               </property>
               <property name="Text" status="skip">
@@ -14590,6 +14623,34 @@
           </item>
         </items>
       </module>
+      <module name="BBABORT" type="invalid" state="unused" properties="0"/>
+      <module name="BBABORT_DISABLED" type="invalid" state="unused" properties="0"/>
+      <module name="BBALL" type="invalid" state="unused" properties="0"/>
+      <module name="BBALL_DISABLED" type="invalid" state="unused" properties="0"/>
+      <module name="BBCANCEL" type="invalid" state="unused" properties="0"/>
+      <module name="BBCANCEL_DISABLED" type="invalid" state="unused" properties="0"/>
+      <module name="BBCLOSE" type="invalid" state="unused" properties="0"/>
+      <module name="BBCLOSE_DISABLED" type="invalid" state="unused" properties="0"/>
+      <module name="BBHELP" type="invalid" state="unused" properties="0"/>
+      <module name="BBHELP_DISABLED" type="invalid" state="unused" properties="0"/>
+      <module name="BBIGNORE" type="invalid" state="unused" properties="0"/>
+      <module name="BBIGNORE_DISABLED" type="invalid" state="unused" properties="0"/>
+      <module name="BBNO" type="invalid" state="unused" properties="0"/>
+      <module name="BBNO_DISABLED" type="invalid" state="unused" properties="0"/>
+      <module name="BBOK" type="invalid" state="unused" properties="0"/>
+      <module name="BBOK_DISABLED" type="invalid" state="unused" properties="0"/>
+      <module name="BBRETRY" type="invalid" state="unused" properties="0"/>
+      <module name="BBRETRY_DISABLED" type="invalid" state="unused" properties="0"/>
+      <module name="BBYES" type="invalid" state="unused" properties="0"/>
+      <module name="BBYES_DISABLED" type="invalid" state="unused" properties="0"/>
+      <module name="DVCLAL" type="invalid" state="unused" properties="0"/>
+      <module name="MSG_ERROR" type="invalid" state="unused" properties="0"/>
+      <module name="MSG_INFO" type="invalid" state="unused" properties="0"/>
+      <module name="MSG_WARNING" type="invalid" state="unused" properties="0"/>
+      <module name="PACKAGEINFO" type="invalid" state="unused" properties="0"/>
+      <module name="PLATFORMTARGETS" type="invalid" state="unused" properties="0"/>
+      <module name="TEELCDFONT" type="invalid" state="unused" properties="0"/>
+      <module name="TEELEDFONT" type="invalid" state="unused" properties="0"/>
     </modules>
   </project>
 </xlat>

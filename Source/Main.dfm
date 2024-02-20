@@ -103,7 +103,6 @@ object FMain: TFMain
       ActivePage = AdvTabBrowse
       Align = alClient
       TabOrder = 0
-      ExplicitHeight = 308
       object AdvTabBrowse: TTabSheet
         Caption = 'Browse'
         object ShellTree: TShellTreeView
@@ -188,63 +187,63 @@ object FMain: TFMain
         ParentFont = False
         TabOrder = 0
         object SpeedBtnExif: TSpeedButton
-          Left = 2
+          Left = 1
           Top = 2
-          Width = 45
+          Width = 50
           Height = 21
           GroupIndex = 1
           Caption = 'Exif'
           OnClick = SpeedBtnExifClick
         end
         object SpeedBtnIptc: TSpeedButton
-          Left = 88
+          Left = 103
           Top = 2
-          Width = 45
+          Width = 50
           Height = 21
           GroupIndex = 1
           Caption = 'Iptc'
           OnClick = SpeedBtnExifClick
         end
         object SpeedBtnXmp: TSpeedButton
-          Left = 45
+          Left = 52
           Top = 2
-          Width = 45
+          Width = 50
           Height = 21
           GroupIndex = 1
           Caption = 'Xmp'
           OnClick = SpeedBtnExifClick
         end
         object SpeedBtnMaker: TSpeedButton
-          Left = 131
+          Left = 155
           Top = 2
-          Width = 45
+          Width = 50
           Height = 21
           GroupIndex = 1
           Caption = 'Maker'
           OnClick = SpeedBtnExifClick
         end
         object SpeedBtnALL: TSpeedButton
-          Left = 175
+          Left = 206
           Top = 2
-          Width = 45
+          Width = 50
           Height = 21
           GroupIndex = 1
           Caption = 'ALL'
           OnClick = SpeedBtnExifClick
         end
         object SpeedBtnCustom: TSpeedButton
-          Left = 219
+          Left = 258
           Top = 2
-          Width = 65
+          Width = 50
           Height = 21
           GroupIndex = 1
           Caption = 'Custom'
           OnClick = SpeedBtnExifClick
         end
         object SpeedBtnQuick: TSpeedButton
-          Left = 2
+          Left = 1
           Top = 29
-          Width = 92
+          Width = 102
           Height = 22
           GroupIndex = 1
           Down = True
@@ -252,9 +251,9 @@ object FMain: TFMain
           OnClick = SpeedBtnExifClick
         end
         object EditFindMeta: TLabeledEdit
-          Left = 129
+          Left = 150
           Top = 29
-          Width = 155
+          Width = 159
           Height = 21
           Color = clWhite
           EditLabel.Width = 20
@@ -395,7 +394,7 @@ object FMain: TFMain
         object SpeedBtn_ShowOnMap: TSpeedButton
           Left = 1
           Top = 2
-          Width = 80
+          Width = 85
           Height = 22
           Caption = 'Show on map'
           OnClick = SpeedBtn_ShowOnMapClick
@@ -417,7 +416,7 @@ object FMain: TFMain
           OnClick = SpeedBtn_MapSetHomeClick
         end
         object Spb_GoBack: TSpeedButton
-          Left = 112
+          Left = 130
           Top = 2
           Width = 61
           Height = 22
@@ -425,7 +424,7 @@ object FMain: TFMain
           OnClick = Spb_GoBackClick
         end
         object Spb_Forward: TSpeedButton
-          Left = 199
+          Left = 197
           Top = 2
           Width = 66
           Height = 22
@@ -435,7 +434,7 @@ object FMain: TFMain
         object SpeedBtn_GetLoc: TSpeedButton
           Left = 1
           Top = 28
-          Width = 80
+          Width = 85
           Height = 22
           Hint = 'Sets to Lat/Lon values to the center of map'
           Caption = 'Get location'
@@ -444,9 +443,9 @@ object FMain: TFMain
           OnClick = SpeedBtn_GetLocClick
         end
         object EditMapFind: TLabeledEdit
-          Left = 120
+          Left = 129
           Top = 30
-          Width = 145
+          Width = 136
           Height = 21
           Hint = 'Use Ctrl+Click on the map to set the Lat/Lon values'
           EditLabel.Width = 24
@@ -478,26 +477,28 @@ object FMain: TFMain
         TabOrder = 1
         object SpeedBtn_Geotag: TSpeedButton
           AlignWithMargins = True
-          Left = 3
+          Left = 1
           Top = 5
-          Width = 70
+          Width = 90
           Height = 22
+          Margins.Left = 1
           Margins.Top = 5
+          Margins.Right = 1
           Margins.Bottom = 5
           Align = alLeft
           Caption = 'Geotag files'
           OnClick = SpeedBtn_GeotagClick
-          ExplicitTop = 6
         end
         object EditMapBounds: TLabeledEdit
           AlignWithMargins = True
-          Left = 126
+          Left = 142
           Top = 6
-          Width = 188
+          Width = 178
           Height = 23
           Hint = 'Coordinates of the visible area (South,West,North,East)'
           Margins.Left = 50
           Margins.Top = 6
+          Margins.Right = 1
           TabStop = False
           Align = alLeft
           EditLabel.Width = 39
@@ -510,7 +511,7 @@ object FMain: TFMain
           ShowHint = True
           TabOrder = 0
           Text = ''
-          ExplicitLeft = 121
+          ExplicitHeight = 21
         end
       end
       object EdgeBrowser1: TEdgeBrowser
@@ -654,9 +655,9 @@ object FMain: TFMain
           OnClick = SpeedBtn_ETdirectClick
         end
         object SpeedBtn_ETedit: TSpeedButton
-          Left = 275
+          Left = 273
           Top = 79
-          Width = 90
+          Width = 86
           Height = 21
           AllowAllUp = True
           GroupIndex = 2
@@ -664,9 +665,9 @@ object FMain: TFMain
           OnClick = SpeedBtn_ETeditClick
         end
         object SpeedBtnShowLog: TSpeedButton
-          Left = 275
+          Left = 235
           Top = 6
-          Width = 90
+          Width = 124
           Height = 22
           Caption = 'Show Log window'
           OnClick = BtnShowLogClick
@@ -674,7 +675,7 @@ object FMain: TFMain
         object SpeedBtnETdirectDel: TSpeedButton
           Left = 2
           Top = 114
-          Width = 63
+          Width = 66
           Height = 25
           Caption = '^ Delete'
           Enabled = False
@@ -683,7 +684,7 @@ object FMain: TFMain
         object SpeedBtnETdirectReplace: TSpeedButton
           Left = 70
           Top = 114
-          Width = 63
+          Width = 66
           Height = 25
           Caption = '^ Replace'
           Enabled = False
@@ -692,7 +693,7 @@ object FMain: TFMain
         object SpeedBtnETdirectAdd: TSpeedButton
           Left = 138
           Top = 114
-          Width = 63
+          Width = 66
           Height = 25
           Caption = '^ Add new'
           Enabled = False
@@ -701,15 +702,15 @@ object FMain: TFMain
         object SpeedBtn_ETdSetDef: TSpeedButton
           Left = 206
           Top = 114
-          Width = 63
+          Width = 66
           Height = 25
           Caption = '^ Default'
           OnClick = SpeedBtn_ETdSetDefClick
         end
         object SpeedBtn_ETclear: TSpeedButton
-          Left = 275
+          Left = 273
           Top = 114
-          Width = 58
+          Width = 66
           Height = 25
           Caption = 'Deselect'
           OnClick = SpeedBtn_ETclearClick
@@ -734,7 +735,7 @@ object FMain: TFMain
         object EditETdirect: TLabeledEdit
           Left = 1
           Top = 50
-          Width = 273
+          Width = 355
           Height = 23
           Hint = 
             'Spaces in data require double quotes, double quotes in data requ' +
@@ -757,7 +758,7 @@ object FMain: TFMain
           Text = ''
           OnChange = EditETdirectChange
           OnKeyDown = EditETdirectKeyDown
-          ExplicitWidth = 269
+          ExplicitWidth = 351
         end
         object CBoxETdirect: TComboBox
           Left = 1
