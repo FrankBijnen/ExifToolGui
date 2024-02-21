@@ -190,7 +190,7 @@ object FMain: TFMain
         object SpeedBtnExif: TSpeedButton
           Left = 1
           Top = 2
-          Width = 50
+          Width = 52
           Height = 21
           GroupIndex = 1
           Caption = 'Exif'
@@ -199,7 +199,7 @@ object FMain: TFMain
         object SpeedBtnIptc: TSpeedButton
           Left = 103
           Top = 2
-          Width = 50
+          Width = 52
           Height = 21
           GroupIndex = 1
           Caption = 'Iptc'
@@ -208,7 +208,7 @@ object FMain: TFMain
         object SpeedBtnXmp: TSpeedButton
           Left = 52
           Top = 2
-          Width = 50
+          Width = 52
           Height = 21
           GroupIndex = 1
           Caption = 'Xmp'
@@ -217,7 +217,7 @@ object FMain: TFMain
         object SpeedBtnMaker: TSpeedButton
           Left = 155
           Top = 2
-          Width = 50
+          Width = 52
           Height = 21
           GroupIndex = 1
           Caption = 'Maker'
@@ -226,7 +226,7 @@ object FMain: TFMain
         object SpeedBtnALL: TSpeedButton
           Left = 206
           Top = 2
-          Width = 50
+          Width = 52
           Height = 21
           GroupIndex = 1
           Caption = 'ALL'
@@ -235,7 +235,7 @@ object FMain: TFMain
         object SpeedBtnCustom: TSpeedButton
           Left = 258
           Top = 2
-          Width = 50
+          Width = 52
           Height = 21
           GroupIndex = 1
           Caption = 'Custom'
@@ -252,15 +252,16 @@ object FMain: TFMain
           OnClick = SpeedBtnExifClick
         end
         object EditFindMeta: TLabeledEdit
-          Left = 150
+          Left = 155
           Top = 29
-          Width = 159
+          Width = 157
           Height = 21
           Color = clWhite
           EditLabel.Width = 20
           EditLabel.Height = 21
           EditLabel.Caption = 'Find'
           LabelPosition = lpLeft
+          LabelSpacing = 1
           TabOrder = 0
           Text = ''
           OnKeyPress = EditFindMetaKeyPress
@@ -511,7 +512,6 @@ object FMain: TFMain
           ShowHint = True
           TabOrder = 0
           Text = ''
-          ExplicitWidth = 178
           ExplicitHeight = 21
         end
       end
