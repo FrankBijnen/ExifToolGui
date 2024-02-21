@@ -38,17 +38,18 @@ object FPreferences: TFPreferences
     Top = 0
     Width = 606
     Height = 373
-    ActivePage = AdvTabGeneral
+    ActivePage = AdvTabOther
     Align = alLeft
     DoubleBuffered = True
     ParentDoubleBuffered = False
     TabOrder = 0
+    ExplicitHeight = 372
     object AdvTabGeneral: TTabSheet
       Caption = 'General'
       object Label1: TLabel
         Left = 16
         Top = 16
-        Width = 125
+        Width = 97
         Height = 13
         Caption = 'Metadata language:'
       end
@@ -170,7 +171,7 @@ object FPreferences: TFPreferences
         Caption = 'Cleanup Thumbnails (Admin required)'
         TabOrder = 5
         object Label2: TLabel
-          Left = 247
+          Left = 290
           Top = 35
           Width = 45
           Height = 13
@@ -203,7 +204,7 @@ object FPreferences: TFPreferences
       object BtnSetupClean: TBitBtn
         Left = 37
         Top = 181
-        Width = 225
+        Width = 250
         Height = 25
         Caption = 'Setup Disk cleanup for thumbnails'
         Glyph.Data = {
@@ -277,7 +278,7 @@ object FPreferences: TFPreferences
         OnClick = BtnSetupCleanClick
       end
       object EdThumbCleanset: TMaskEdit
-        Left = 318
+        Left = 361
         Top = 183
         Width = 51
         Height = 21
@@ -294,7 +295,7 @@ object FPreferences: TFPreferences
       object BtnClean: TBitBtn
         Left = 37
         Top = 224
-        Width = 225
+        Width = 250
         Height = 25
         Caption = 'Cleanup thumbnails'
         Glyph.Data = {
@@ -370,7 +371,7 @@ object FPreferences: TFPreferences
       object BtnGenThumbs: TBitBtn
         Left = 20
         Top = 105
-        Width = 210
+        Width = 250
         Height = 25
         Hint = 
           'Generating thumbnails is also available in the context menu of t' +
@@ -462,7 +463,7 @@ object FPreferences: TFPreferences
         object ChkGeoCodeDialog: TCheckBox
           Left = 67
           Top = 49
-          Width = 452
+          Width = 475
           Height = 17
           Caption = 'Enable Geocode dialog (Get coordinates of location)'
           TabOrder = 0
@@ -470,7 +471,7 @@ object FPreferences: TFPreferences
         object ChkReverseGeoCodeDialog: TCheckBox
           Left = 67
           Top = 74
-          Width = 452
+          Width = 475
           Height = 17
           Caption = 'Enable reverse Geocode dialog (Get location of coordinates)'
           TabOrder = 1
@@ -478,7 +479,7 @@ object FPreferences: TFPreferences
         object ChkGeoCodingEnable: TCheckBox
           Left = 67
           Top = 25
-          Width = 452
+          Width = 475
           Height = 17
           Caption = 'Enable GeoCoding'
           TabOrder = 2
@@ -487,7 +488,7 @@ object FPreferences: TFPreferences
       object GrpGeoCode: TGroupBox
         Left = 24
         Top = 117
-        Width = 518
+        Width = 540
         Height = 108
         Caption = 'GeoCode Maps:'
         TabOrder = 1
@@ -552,14 +553,14 @@ object FPreferences: TFPreferences
       object GrpOverPass: TGroupBox
         Left = 24
         Top = 231
-        Width = 518
+        Width = 540
         Height = 80
         Caption = 'OverPass Api'
         TabOrder = 2
         object Label4: TLabel
           Left = 160
           Top = 54
-          Width = 300
+          Width = 146
           Height = 13
           Caption = '(Min. time between calls in Ms)'
         end

@@ -4,7 +4,7 @@ object FDateTimeEqual: TFDateTimeEqual
   BorderStyle = bsDialog
   Caption = 'Exif DateTime equalize'
   ClientHeight = 147
-  ClientWidth = 466
+  ClientWidth = 503
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -14,8 +14,8 @@ object FDateTimeEqual: TFDateTimeEqual
   OnShow = FormShow
   TextHeight = 13
   object Label1: TLabel
-    Left = 400
-    Top = 79
+    Left = 430
+    Top = 76
     Width = 31
     Height = 13
     Caption = 'Label1'
@@ -23,14 +23,16 @@ object FDateTimeEqual: TFDateTimeEqual
   object StatusBar1: TStatusBar
     Left = 0
     Top = 128
-    Width = 466
+    Width = 503
     Height = 19
     Panels = <>
+    ExplicitTop = 127
+    ExplicitWidth = 462
   end
   object AdvPanel1: TPanel
     Left = 0
     Top = 0
-    Width = 385
+    Width = 424
     Height = 128
     Align = alLeft
     DoubleBuffered = True
@@ -43,7 +45,7 @@ object FDateTimeEqual: TFDateTimeEqual
     ParentFont = False
     TabOrder = 1
     object LabeledEdit1: TLabeledEdit
-      Left = 120
+      Left = 137
       Top = 24
       Width = 129
       Height = 22
@@ -57,7 +59,7 @@ object FDateTimeEqual: TFDateTimeEqual
       Text = '2012:01:12 18:15:00'
     end
     object LabeledEdit2: TLabeledEdit
-      Left = 120
+      Left = 137
       Top = 56
       Width = 129
       Height = 22
@@ -71,7 +73,7 @@ object FDateTimeEqual: TFDateTimeEqual
       Text = ''
     end
     object LabeledEdit3: TLabeledEdit
-      Left = 120
+      Left = 137
       Top = 88
       Width = 129
       Height = 22
@@ -85,9 +87,9 @@ object FDateTimeEqual: TFDateTimeEqual
       Text = ''
     end
     object RadioButton1: TRadioButton
-      Left = 255
+      Left = 272
       Top = 27
-      Width = 106
+      Width = 150
       Height = 17
       Caption = '-use as source'
       Checked = True
@@ -96,18 +98,18 @@ object FDateTimeEqual: TFDateTimeEqual
       OnClick = RadioButton1Click
     end
     object RadioButton2: TRadioButton
-      Left = 255
+      Left = 272
       Top = 59
-      Width = 106
+      Width = 150
       Height = 17
       Caption = '-and copy here'
       TabOrder = 4
       OnClick = RadioButton1Click
     end
     object RadioButton3: TRadioButton
-      Left = 255
+      Left = 272
       Top = 91
-      Width = 106
+      Width = 150
       Height = 17
       Caption = '-and copy here'
       TabOrder = 5
@@ -115,8 +117,8 @@ object FDateTimeEqual: TFDateTimeEqual
     end
   end
   object Button1: TButton
-    Left = 400
-    Top = 16
+    Left = 430
+    Top = 13
     Width = 65
     Height = 25
     Caption = 'Cancel'
@@ -124,8 +126,8 @@ object FDateTimeEqual: TFDateTimeEqual
     TabOrder = 2
   end
   object Button2: TButton
-    Left = 400
-    Top = 98
+    Left = 430
+    Top = 95
     Width = 65
     Height = 25
     Caption = 'Execute'

@@ -4,7 +4,7 @@ object FDateTimeShift: TFDateTimeShift
   BorderStyle = bsDialog
   Caption = 'Exif: DateTime shift'
   ClientHeight = 220
-  ClientWidth = 463
+  ClientWidth = 511
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -14,8 +14,8 @@ object FDateTimeShift: TFDateTimeShift
   OnShow = FormShow
   TextHeight = 13
   object Label1: TLabel
-    Left = 383
-    Top = 159
+    Left = 427
+    Top = 151
     Width = 31
     Height = 13
     Caption = 'Label1'
@@ -23,7 +23,7 @@ object FDateTimeShift: TFDateTimeShift
   object StatusBar1: TStatusBar
     Left = 0
     Top = 201
-    Width = 463
+    Width = 511
     Height = 19
     Panels = <>
     SimplePanel = True
@@ -33,7 +33,7 @@ object FDateTimeShift: TFDateTimeShift
   object AdvPanel1: TPanel
     Left = 0
     Top = 0
-    Width = 369
+    Width = 407
     Height = 201
     Align = alLeft
     DoubleBuffered = True
@@ -45,18 +45,18 @@ object FDateTimeShift: TFDateTimeShift
     ParentDoubleBuffered = False
     ParentFont = False
     TabOrder = 1
-    ExplicitHeight = 200
     object Label2: TLabel
-      Left = 43
-      Top = 125
-      Width = 75
+      Left = 1
+      Top = 119
+      Width = 148
       Height = 14
       Alignment = taRightJustify
+      AutoSize = False
       Caption = 'Shift amount:'
     end
     object LabeledEdit1: TLabeledEdit
-      Left = 120
-      Top = 16
+      Left = 153
+      Top = 10
       Width = 129
       Height = 22
       EditLabel.Width = 105
@@ -68,8 +68,8 @@ object FDateTimeShift: TFDateTimeShift
       Text = ''
     end
     object LabeledEdit2: TLabeledEdit
-      Left = 120
-      Top = 44
+      Left = 153
+      Top = 38
       Width = 129
       Height = 22
       EditLabel.Width = 66
@@ -81,8 +81,8 @@ object FDateTimeShift: TFDateTimeShift
       Text = ''
     end
     object LabeledEdit3: TLabeledEdit
-      Left = 120
-      Top = 72
+      Left = 153
+      Top = 66
       Width = 129
       Height = 22
       EditLabel.Width = 65
@@ -94,9 +94,9 @@ object FDateTimeShift: TFDateTimeShift
       Text = ''
     end
     object CheckBox1: TCheckBox
-      Left = 255
-      Top = 19
-      Width = 58
+      Left = 288
+      Top = 13
+      Width = 110
       Height = 17
       Caption = '-shift'
       Checked = True
@@ -105,9 +105,9 @@ object FDateTimeShift: TFDateTimeShift
       OnClick = CheckBox1Click
     end
     object CheckBox2: TCheckBox
-      Left = 255
-      Top = 47
-      Width = 58
+      Left = 288
+      Top = 41
+      Width = 110
       Height = 17
       Caption = '-shift'
       Checked = True
@@ -116,17 +116,17 @@ object FDateTimeShift: TFDateTimeShift
       OnClick = CheckBox1Click
     end
     object CheckBox3: TCheckBox
-      Left = 255
-      Top = 75
-      Width = 58
+      Left = 288
+      Top = 69
+      Width = 110
       Height = 17
       Caption = '-shift'
       TabOrder = 5
       OnClick = CheckBox1Click
     end
     object MaskEdit1: TMaskEdit
-      Left = 120
-      Top = 122
+      Left = 153
+      Top = 116
       Width = 128
       Height = 22
       Hint = 'Example: [0000:00:01 02:00:00] =shift for 1 day & 2 hours'
@@ -137,9 +137,9 @@ object FDateTimeShift: TFDateTimeShift
       OnChange = MaskEdit1Change
     end
     object CheckBox4: TCheckBox
-      Left = 255
-      Top = 125
-      Width = 97
+      Left = 288
+      Top = 119
+      Width = 110
       Height = 17
       Caption = '=Increment'
       Checked = True
@@ -148,8 +148,8 @@ object FDateTimeShift: TFDateTimeShift
       OnClick = CheckBox4Click
     end
     object LabeledEdit4: TLabeledEdit
-      Left = 120
-      Top = 152
+      Left = 153
+      Top = 146
       Width = 129
       Height = 22
       Hint = 'Example of DateTimeOriginal after shifting'
@@ -162,8 +162,8 @@ object FDateTimeShift: TFDateTimeShift
       Text = ''
     end
     object CheckBox5: TCheckBox
-      Left = 120
-      Top = 180
+      Left = 153
+      Top = 174
       Width = 232
       Height = 17
       Hint = 'File: Date modified becomes (shifted) DateTimeOriginal value'
@@ -172,8 +172,8 @@ object FDateTimeShift: TFDateTimeShift
     end
   end
   object Button1: TButton
-    Left = 383
-    Top = 15
+    Left = 427
+    Top = 7
     Width = 69
     Height = 25
     Caption = 'Cancel'
@@ -181,8 +181,8 @@ object FDateTimeShift: TFDateTimeShift
     TabOrder = 2
   end
   object Button2: TButton
-    Left = 383
-    Top = 178
+    Left = 427
+    Top = 170
     Width = 69
     Height = 25
     Caption = 'Execute'
