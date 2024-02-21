@@ -89,53 +89,53 @@ end;
 procedure TFGeotagFiles.Execute;
 var
   CrWait, CrNormal: HCURSOR;
+  CmdLat, CmdLon: string;
 begin
   CrWait := LoadCursor(0, IDC_WAIT);
   CrNormal := SetCursor(CrWait);
   try
     // Get data possibly modified by user
-    Lat := ValLocation.Values['Lat'];
-    Lon := ValLocation.Values['Lon'];
+    CmdLat := Trim(ValLocation.Values['Lat']);
+    CmdLon := Trim(ValLocation.Values['Lon']);
 
     ETcmd := '';
     case (TGeoTagMode(CmbGeoTagMode.ItemIndex)) of
       TGeoTagMode.gtmCoordinates,
       TGeoTagMode.gtmCoordinatesLocation:
       begin
-        ETcmd := '';
         if (ChkRemoveExisting.Checked) then
           ETcmd := ETcmd + '-a' + CRLF + '-Gps*=' + CRLF + '--GPSversion*';
-        if (Lat <> '') then
+        if (CmdLat <> '') then
         begin
           ETcmd := ETcmd + CRLF + '-GPS:GpsLatitudeRef=';
-          if Lat[1] = '-' then
+          if CmdLat[1] = '-' then
           begin
             ETcmd := ETcmd + 'S';
-            Delete(Lat, 1, 1);
+            Delete(CmdLat, 1, 1);
           end
           else
             ETcmd := ETcmd + 'N';
-          ETcmd := ETcmd + CRLF + '-GPS:GpsLatitude=' + Lat;
+          ETcmd := ETcmd + CRLF + '-GPS:GpsLatitude=' + CmdLat;
         end;
-        if (Lon <> '') then
+        if (CmdLon <> '') then
         begin
           ETcmd := ETcmd + CRLF + '-GPS:GpsLongitudeRef=';
-          if Lon[1] = '-' then
+          if CmdLon[1] = '-' then
           begin
             ETcmd := ETcmd + 'W';
-            Delete(Lon, 1, 1);
+            Delete(CmdLon, 1, 1);
           end
           else
             ETcmd := ETcmd + 'E';
-          ETcmd := ETcmd + CRLF + '-GPS:GpsLongitude=' + Lon;
+          ETcmd := ETcmd + CRLF + '-GPS:GpsLongitude=' + CmdLon;
         end;
 
         // Get data possibly modified by user. With minus sign for West and South!
-        Lat := ValLocation.Values['Lat'];
-        Lon := ValLocation.Values['Lon'];
+        CmdLat := Trim(ValLocation.Values['Lat']);
+        CmdLon := Trim(ValLocation.Values['Lon']);
 
-        AdjustLatLon(Lat, Lon, 5);
-        ETCmd := ETcmd + CRLF + Format('-QuickTime:GPSCoordinates=''%s, %s, %s''', [Lat, Lon, '0']);
+        AdjustLatLon(CmdLat, CmdLon, 5);
+        ETCmd := ETcmd + CRLF + Format('-QuickTime:GPSCoordinates=''%s, %s, %s''', [CmdLat, CmdLon, '0']);
       end;
     end;
 
@@ -151,7 +151,7 @@ begin
     end;
     ET_OpenExec(ETcmd, Fmain.GetSelectedFiles, ETouts, ETerrs);
 
-    StatusBar1.SimpleText := 'All Done';
+    StatusBar1.SimpleText := StrAllDone;
   finally
     SetCursor(CrNormal);
   end;
