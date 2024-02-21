@@ -2,7 +2,7 @@
 <xlat>
   <meta>
     <version>3</version>
-    <created>2024-02-20T19:47:38.964+01:00</created>
+    <created>2024-02-21T15:29:20.110+01:00</created>
     <tool>amTranslationManager</tool>
     <toolversion>2.0.8628.33873</toolversion>
   </meta>
@@ -14623,34 +14623,34 @@
           </item>
         </items>
       </module>
-      <module name="BBABORT" type="invalid" state="unused" properties="0"/>
-      <module name="BBABORT_DISABLED" type="invalid" state="unused" properties="0"/>
-      <module name="BBALL" type="invalid" state="unused" properties="0"/>
-      <module name="BBALL_DISABLED" type="invalid" state="unused" properties="0"/>
-      <module name="BBCANCEL" type="invalid" state="unused" properties="0"/>
-      <module name="BBCANCEL_DISABLED" type="invalid" state="unused" properties="0"/>
-      <module name="BBCLOSE" type="invalid" state="unused" properties="0"/>
-      <module name="BBCLOSE_DISABLED" type="invalid" state="unused" properties="0"/>
-      <module name="BBHELP" type="invalid" state="unused" properties="0"/>
-      <module name="BBHELP_DISABLED" type="invalid" state="unused" properties="0"/>
-      <module name="BBIGNORE" type="invalid" state="unused" properties="0"/>
-      <module name="BBIGNORE_DISABLED" type="invalid" state="unused" properties="0"/>
-      <module name="BBNO" type="invalid" state="unused" properties="0"/>
-      <module name="BBNO_DISABLED" type="invalid" state="unused" properties="0"/>
-      <module name="BBOK" type="invalid" state="unused" properties="0"/>
-      <module name="BBOK_DISABLED" type="invalid" state="unused" properties="0"/>
-      <module name="BBRETRY" type="invalid" state="unused" properties="0"/>
-      <module name="BBRETRY_DISABLED" type="invalid" state="unused" properties="0"/>
-      <module name="BBYES" type="invalid" state="unused" properties="0"/>
-      <module name="BBYES_DISABLED" type="invalid" state="unused" properties="0"/>
-      <module name="DVCLAL" type="invalid" state="unused" properties="0"/>
-      <module name="MSG_ERROR" type="invalid" state="unused" properties="0"/>
-      <module name="MSG_INFO" type="invalid" state="unused" properties="0"/>
-      <module name="MSG_WARNING" type="invalid" state="unused" properties="0"/>
-      <module name="PACKAGEINFO" type="invalid" state="unused" properties="0"/>
-      <module name="PLATFORMTARGETS" type="invalid" state="unused" properties="0"/>
-      <module name="TEELCDFONT" type="invalid" state="unused" properties="0"/>
-      <module name="TEELEDFONT" type="invalid" state="unused" properties="0"/>
+      <module name="BBABORT" type="invalid" state="unused" status="skip" properties="0"/>
+      <module name="BBABORT_DISABLED" type="invalid" state="unused" status="skip" properties="0"/>
+      <module name="BBALL" type="invalid" state="unused" status="skip" properties="0"/>
+      <module name="BBALL_DISABLED" type="invalid" state="unused" status="skip" properties="0"/>
+      <module name="BBCANCEL" type="invalid" state="unused" status="skip" properties="0"/>
+      <module name="BBCANCEL_DISABLED" type="invalid" state="unused" status="skip" properties="0"/>
+      <module name="BBCLOSE" type="invalid" state="unused" status="skip" properties="0"/>
+      <module name="BBCLOSE_DISABLED" type="invalid" state="unused" status="skip" properties="0"/>
+      <module name="BBHELP" type="invalid" state="unused" status="skip" properties="0"/>
+      <module name="BBHELP_DISABLED" type="invalid" state="unused" status="skip" properties="0"/>
+      <module name="BBIGNORE" type="invalid" state="unused" status="skip" properties="0"/>
+      <module name="BBIGNORE_DISABLED" type="invalid" state="unused" status="skip" properties="0"/>
+      <module name="BBNO" type="invalid" state="unused" status="skip" properties="0"/>
+      <module name="BBNO_DISABLED" type="invalid" state="unused" status="skip" properties="0"/>
+      <module name="BBOK" type="invalid" state="unused" status="skip" properties="0"/>
+      <module name="BBOK_DISABLED" type="invalid" state="unused" status="skip" properties="0"/>
+      <module name="BBRETRY" type="invalid" state="unused" status="skip" properties="0"/>
+      <module name="BBRETRY_DISABLED" type="invalid" state="unused" status="skip" properties="0"/>
+      <module name="BBYES" type="invalid" state="unused" status="skip" properties="0"/>
+      <module name="BBYES_DISABLED" type="invalid" state="unused" status="skip" properties="0"/>
+      <module name="DVCLAL" type="invalid" state="unused" status="skip" properties="0"/>
+      <module name="MSG_ERROR" type="invalid" state="unused" status="skip" properties="0"/>
+      <module name="MSG_INFO" type="invalid" state="unused" status="skip" properties="0"/>
+      <module name="MSG_WARNING" type="invalid" state="unused" status="skip" properties="0"/>
+      <module name="PACKAGEINFO" type="invalid" state="unused" status="skip" properties="0"/>
+      <module name="PLATFORMTARGETS" type="invalid" state="unused" status="skip" properties="0"/>
+      <module name="TEELCDFONT" type="invalid" state="unused" status="skip" properties="0"/>
+      <module name="TEELEDFONT" type="invalid" state="unused" status="skip" properties="0"/>
     </modules>
   </project>
 </xlat>
