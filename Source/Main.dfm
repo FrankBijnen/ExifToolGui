@@ -103,6 +103,7 @@ object FMain: TFMain
       ActivePage = AdvTabBrowse
       Align = alClient
       TabOrder = 0
+      ExplicitHeight = 308
       object AdvTabBrowse: TTabSheet
         Caption = 'Browse'
         object ShellTree: TShellTreeView
@@ -493,14 +494,13 @@ object FMain: TFMain
           AlignWithMargins = True
           Left = 142
           Top = 6
-          Width = 178
+          Width = 167
           Height = 23
           Hint = 'Coordinates of the visible area (South,West,North,East)'
           Margins.Left = 50
           Margins.Top = 6
-          Margins.Right = 1
           TabStop = False
-          Align = alLeft
+          Align = alClient
           EditLabel.Width = 39
           EditLabel.Height = 23
           EditLabel.Caption = 'Bounds:'
@@ -511,6 +511,7 @@ object FMain: TFMain
           ShowHint = True
           TabOrder = 0
           Text = ''
+          ExplicitWidth = 178
           ExplicitHeight = 21
         end
       end
@@ -735,7 +736,7 @@ object FMain: TFMain
         object EditETdirect: TLabeledEdit
           Left = 1
           Top = 50
-          Width = 355
+          Width = 351
           Height = 23
           Hint = 
             'Spaces in data require double quotes, double quotes in data requ' +
@@ -758,7 +759,7 @@ object FMain: TFMain
           Text = ''
           OnChange = EditETdirectChange
           OnKeyDown = EditETdirectKeyDown
-          ExplicitWidth = 351
+          ExplicitWidth = 347
         end
         object CBoxETdirect: TComboBox
           Left = 1
