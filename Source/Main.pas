@@ -2390,7 +2390,7 @@ end;
 procedure TFMain.FormClose(Sender: TObject; var Action: TCloseAction);
 begin
   EdgeBrowser1.CloseBrowserProcess; // Close Edge. Else we can not remove the tempdir.
-  EdgeBrowser1.CloseWebView;
+
   SaveGUIini;
 end;
 

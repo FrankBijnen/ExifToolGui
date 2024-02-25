@@ -269,10 +269,11 @@ begin
   MkDir(result);
 end;
 
-function RemovePath(const ADir: string; const AFlags: FILEOP_FLAGS = FOF_NO_UI): boolean;
+function RemovePath(const ADir: string; const AFlags: FILEOP_FLAGS = FOF_NO_UI; Retries: integer = 3): boolean;
 var
   ShOp: TSHFileOpStruct;
   ShResult: integer;
+  CurrentTry: integer;
 begin
   result := false;
   if not(DirectoryExists(ADir)) then
@@ -283,7 +284,18 @@ begin
   ShOp.pFrom := PChar(ADir + #0);
   ShOp.pTo := nil;
   ShOp.fFlags := AFlags;
-  ShResult := SHFileOperation(ShOp);
+  CurrentTry := Retries;
+  repeat
+    ShResult := SHFileOperation(ShOp);
+    if (ShResult = 0) then
+      break;
+
+    dec(CurrentTry);
+    sleep(100);
+    Application.ProcessMessages;
+
+  until (CurrentTry < 1);
+
   if (ShResult <> 0) and (ShOp.fAnyOperationsAborted = false) then
     raise Exception.Create(Format(StrRemDirectoryFail, [ShResult]));
   result := (ShResult = 0);
