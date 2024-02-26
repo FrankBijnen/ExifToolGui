@@ -59,7 +59,7 @@ function WicPreview(AImg: string; Rotate, MaxW, MaxH: cardinal): IWICBitmapSourc
 procedure ResizeBitmapCanvas(Bitmap: TBitmap; W, H: integer; BackColor: TColor);
 
 // Message dialog that allows for caption and doesn't wrap lines at spaces.
-function MessageDlgEx(const AMsg, ACaption: string; ADlgType: TMsgDlgType; AButtons: TMsgDlgButtons; AParent: TForm = nil): integer;
+function MessageDlgEx(const AMsg, ACaption: string; ADlgType: TMsgDlgType; AButtons: TMsgDlgButtons; UseTaskMessage: boolean = false): integer;
 
 // Previews in Raw/Jpeg files
 function GetPreviews(ETResult: TStringList; var Biggest: integer): TPreviewInfoList;
@@ -285,19 +285,20 @@ begin
   ShOp.pTo := nil;
   ShOp.fFlags := AFlags;
   CurrentTry := Retries;
+
   repeat
     ShResult := SHFileOperation(ShOp);
     if (ShResult = 0) then
       break;
 
-    dec(CurrentTry);
-    sleep(100);
+    Dec(CurrentTry);
+    Sleep(100);
     Application.ProcessMessages;
 
   until (CurrentTry < 1);
 
   if (ShResult <> 0) and (ShOp.fAnyOperationsAborted = false) then
-    raise Exception.Create(Format(StrRemDirectoryFail, [ShResult]));
+    MessageDlgEx(Format(StrRemDirectoryFail, [ShResult]), '', TMsgDlgType.mtError, [TMsgDlgBtn.mbClose], true);
   result := (ShResult = 0);
 end;
 
@@ -670,26 +671,29 @@ begin
   end;
 end;
 
-function MessageDlgEx(const AMsg, ACaption: string; ADlgType: TMsgDlgType; AButtons: TMsgDlgButtons; AParent: TForm = nil): integer;
+
+function MessageDlgEx(const AMsg, ACaption: string; ADlgType: TMsgDlgType; AButtons: TMsgDlgButtons; UseTaskMessage: boolean = false): integer;
 var
   MsgFrm: TForm;
+  NCaption: string;
 begin
-  MsgFrm := CreateMessageDialog(AMsg, ADlgType, AButtons);
-  try
-    if (ACaption = '') then
-      MsgFrm.Caption := Application.Title
-    else
-      MsgFrm.Caption := ACaption;
-    MsgFrm.Position := poDefaultSizeOnly;
-    MsgFrm.FormStyle := fsStayOnTop;
-    if (AParent <> nil) then
-    begin
-      MsgFrm.Left := AParent.Left + (AParent.Width - MsgFrm.Width) div 2;
-      MsgFrm.Top := AParent.Top + (AParent.Height - MsgFrm.Height) div 2;
+  if (ACaption = '') then
+    NCaption := Application.Title
+  else
+    NCaption := ACaption;
+  if UseTaskMessage then // This dialog can be used after shutdown. E.G. in finalization
+    result := TaskMessageDlg(NCaption, AMsg, ADlgType, AButtons, 0)
+  else
+  begin
+    MsgFrm := CreateMessageDialog(AMsg, ADlgType, AButtons);
+    try
+      MsgFrm.Caption := NCaption;
+      MsgFrm.Position := poDefaultSizeOnly;
+      MsgFrm.FormStyle := fsStayOnTop;
+      result := MsgFrm.ShowModal;
+    finally
+      MsgFrm.Free;
     end;
-    result := MsgFrm.ShowModal;
-  finally
-    MsgFrm.Free
   end;
 end;
 
@@ -1016,7 +1020,7 @@ finalization
 
 begin
   UTF8Encoding.Free;
-  RemovePath(TempDirectory);
+  RemovePath(TempDirectory, 0);
 end;
 
 end.
