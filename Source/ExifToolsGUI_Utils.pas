@@ -279,14 +279,14 @@ begin
   if not(DirectoryExists(ADir)) then
     exit;
 
-  ShOp.Wnd := Application.Handle;
-  ShOp.wFunc := FO_DELETE;
-  ShOp.pFrom := PChar(ADir + #0);
-  ShOp.pTo := nil;
-  ShOp.fFlags := AFlags;
   CurrentTry := Retries;
-
   repeat
+    FillChar(ShOp, SizeOf(ShOp), 0);
+    ShOp.Wnd := Application.Handle;
+    ShOp.wFunc := FO_DELETE;
+    ShOp.pFrom := PChar(ADir + #0);
+    ShOp.pTo := nil;
+    ShOp.fFlags := AFlags;
     ShResult := SHFileOperation(ShOp);
     if (ShResult = 0) then
       break;
@@ -294,7 +294,6 @@ begin
     Dec(CurrentTry);
     Sleep(100);
     Application.ProcessMessages;
-
   until (CurrentTry < 1);
 
   if (ShResult <> 0) and (ShOp.fAnyOperationsAborted = false) then
@@ -1020,7 +1019,7 @@ finalization
 
 begin
   UTF8Encoding.Free;
-  RemovePath(TempDirectory, 0);
+  RemovePath(TempDirectory);
 end;
 
 end.
