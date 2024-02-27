@@ -143,6 +143,7 @@
         <DCCReference Include="ExifToolsGUI_Thumbnails.pas"/>
         <DCCReference Include="ExifToolsGui_LossLess.pas"/>
         <DCCReference Include="ExifToolsGUI_OpenPicture.pas"/>
+        <DCCReference Include="ExifToolsGui_Versions.pas"/>
         <DCCReference Include="ExifInfo.pas"/>
         <DCCReference Include="ExifTool.pas"/>
         <DCCReference Include="ExifTool_PipeStream.pas"/>
@@ -179,13 +180,16 @@
         <DCCReference Include="Geotag.pas">
             <Form>FGeotag</Form>
         </DCCReference>
+        <DCCReference Include="Geomap.pas"/>
+        <DCCReference Include="DateTimeShift.pas">
+            <Form>FDateTimeShift</Form>
+        </DCCReference>
         <DCCReference Include="DateTimeEqual.pas">
             <Form>FDateTimeEqual</Form>
         </DCCReference>
         <DCCReference Include="RemoveMeta.pas">
             <Form>FRemoveMeta</Form>
         </DCCReference>
-        <DCCReference Include="Geomap.pas"/>
         <DCCReference Include="CopyMetaSingle.pas">
             <Form>FCopyMetaSingle</Form>
         </DCCReference>
@@ -213,8 +217,9 @@
         <DCCReference Include="UFrmGenerate.pas">
             <Form>FrmGenerate</Form>
         </DCCReference>
-        <DCCReference Include="DateTimeShift.pas">
-            <Form>FDateTimeShift</Form>
+        <DCCReference Include="UFrmCheckVersions.pas">
+            <Form>FrmCheckVersions</Form>
+            <FormType>dfm</FormType>
         </DCCReference>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>

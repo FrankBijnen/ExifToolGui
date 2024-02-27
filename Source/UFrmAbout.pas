@@ -31,21 +31,24 @@ var
 
 implementation
 
-uses ExifTool, ExifToolsGUI_Utils, ExifToolsGui_LossLess, ShellAPI, UnitLangResources;
+uses Main, ExifTool, ExifToolsGUI_Utils, ExifToolsGui_LossLess, ShellAPI, UnitLangResources;
 
 {$R *.dfm}
 
 procedure TFrmAbout.FormShow(Sender: TObject);
 var
   Output: string;
-  I, X, Y: smallint;
+  I, X, Y: integer;
 begin
+  Left := FMain.Left + FMain.GUIBorderWidth + FMain.AdvPageFilelist.Left;
+  Top := FMain.Top + FMain.GUIBorderHeight;
+
   // These Labels dont have a styled font, copy it from a styled one.
   LblSource.Font.Assign(LblExifTool.Font);
   LblForum.Font.Assign(LblExifTool.Font);
 
   // Setup captions dynamically.
-  LblVersion.Caption := GetFileVersionNumber(Application.ExeName) +
+  LblVersion.Caption := GetFileVersionNumberPlatForm(Application.ExeName) +
     ' by Bogdan Hrastnik.' + #10 +  // Do not localize
     'Adapted for RAD11 by Frank B'; // Do not localize
   LblSource.Caption := 'https://github.com/FrankBijnen/ExifToolGui'; // Do not localize

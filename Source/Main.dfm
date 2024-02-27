@@ -987,10 +987,6 @@ object FMain: TFMain
           item
             Items = <
               item
-                Action = MaAbout
-                Caption = '&About...'
-              end
-              item
                 Action = MaPreferences
                 Caption = '&Preferences...'
               end
@@ -1209,6 +1205,20 @@ object FMain: TFMain
               item
                 Action = MaOnlineDocumentation
                 Caption = '&Online Documentation'
+              end
+              item
+                Caption = '-'
+              end
+              item
+                Action = MaCheckVersions
+                Caption = '&Check Versions'
+              end
+              item
+                Caption = '-'
+              end
+              item
+                Action = MaAbout
+                Caption = '&About...'
               end>
             Caption = '&Help'
           end>
@@ -1231,7 +1241,7 @@ object FMain: TFMain
     end
     object MaAbout: TAction
       Tag = 99
-      Category = 'Program'
+      Category = 'Help'
       Caption = 'About...'
       OnExecute = MAboutClick
     end
@@ -1478,6 +1488,11 @@ object FMain: TFMain
       Category = 'Options'
       Caption = 'Custom options'
       OnExecute = MCustomOptionsClick
+    end
+    object MaCheckVersions: TAction
+      Category = 'Help'
+      Caption = 'Check Versions'
+      OnExecute = MaCheckVersionsExecute
     end
   end
   object QuickPopUpMenu: TPopupMenu

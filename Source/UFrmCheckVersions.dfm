@@ -1,11 +1,11 @@
-object FrmAbout: TFrmAbout
+object FrmCheckVersions: TFrmCheckVersions
   Left = 0
   Top = 0
   BorderIcons = []
   BorderStyle = bsToolWindow
-  Caption = 'About'
+  Caption = 'Check versions'
   ClientHeight = 264
-  ClientWidth = 414
+  ClientWidth = 680
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -50,90 +50,111 @@ object FrmAbout: TFrmAbout
     Left = 45
     Top = 8
     Width = 360
-    Height = 65
+    Height = 21
     AutoSize = False
-    Caption = 'LblVersion'
+    Caption = 'Installed versions'
     Font.Charset = DEFAULT_CHARSET
     Font.Color = clWindowText
     Font.Height = -16
     Font.Name = 'Segoe UI'
     Font.Style = []
     ParentFont = False
-    WordWrap = True
-  end
-  object LblSource: TLabel
-    Left = 45
-    Top = 95
-    Width = 360
-    Height = 18
-    AutoSize = False
-    Caption = 'LblSource'
-    Font.Charset = DEFAULT_CHARSET
-    Font.Color = clWindowText
-    Font.Height = -12
-    Font.Name = 'Segoe UI'
-    Font.Style = []
-    ParentFont = False
-    StyleElements = [seClient, seBorder]
-    OnClick = LblOpenUrl
-    OnMouseEnter = LblUrlEnter
-    OnMouseLeave = LblUrlLeave
-  end
-  object LblForum: TLabel
-    Left = 45
-    Top = 121
-    Width = 360
-    Height = 18
-    AutoSize = False
-    Caption = 'LblForum'
-    Font.Charset = DEFAULT_CHARSET
-    Font.Color = clWindowText
-    Font.Height = -12
-    Font.Name = 'Segoe UI'
-    Font.Style = []
-    ParentFont = False
-    StyleElements = [seClient, seBorder]
-    OnClick = LblOpenUrl
-    OnMouseEnter = LblUrlEnter
-    OnMouseLeave = LblUrlLeave
-  end
-  object LblExifTool: TLabel
-    Left = 45
-    Top = 148
-    Width = 360
-    Height = 18
-    AutoSize = False
-    Caption = 'LblExifTool'
-  end
-  object LblScreen: TLabel
-    Left = 45
-    Top = 208
-    Width = 360
-    Height = 22
-    AutoSize = False
-    Caption = 'LblScreen'
   end
   object Panel1: TPanel
     Left = 0
     Top = 235
-    Width = 414
+    Width = 680
     Height = 29
     Align = alBottom
     TabOrder = 0
     ExplicitTop = 223
-    ExplicitWidth = 406
-    DesignSize = (
-      414
-      29)
-    object BtnOk: TBitBtn
-      Left = 330
+    ExplicitWidth = 672
+    object BtnClose: TBitBtn
+      Left = 589
       Top = 1
       Width = 75
       Height = 25
-      Anchors = [akRight, akBottom]
       Kind = bkClose
       NumGlyphs = 2
       TabOrder = 0
     end
+    object BtnOpenUrl: TBitBtn
+      Left = 485
+      Top = 1
+      Width = 89
+      Height = 25
+      Caption = '&Open Url'
+      Enabled = False
+      Kind = bkYes
+      NumGlyphs = 2
+      TabOrder = 1
+      OnClick = BtnOpenUrlClick
+    end
+  end
+  object LvVersions: TListView
+    Left = 45
+    Top = 45
+    Width = 619
+    Height = 179
+    Checkboxes = True
+    Columns = <
+      item
+        Caption = 'Method'
+        Width = 75
+      end
+      item
+        Caption = 'Url'
+        Width = 325
+      end
+      item
+        Caption = 'Installed'
+        Width = 75
+      end
+      item
+        Caption = 'Available'
+        Width = 75
+      end>
+    GridLines = True
+    Groups = <
+      item
+        Header = 'ExifToolGui'
+        GroupID = 0
+        State = [lgsNormal]
+        HeaderAlign = taLeftJustify
+        FooterAlign = taLeftJustify
+        TitleImage = -1
+      end
+      item
+        Header = 'ExifTool'
+        GroupID = 1
+        State = [lgsNormal]
+        HeaderAlign = taLeftJustify
+        FooterAlign = taLeftJustify
+        TitleImage = -1
+      end>
+    HideSelection = False
+    Items.ItemData = {
+      05C30100000300000000000000FFFFFFFFFFFFFFFF0300000000000000000000
+      000949006E007300740061006C006C006500720033680074007400700073003A
+      002F002F006700690074006800750062002E0063006F006D002F004600720061
+      006E006B00420069006A006E0065006E002F00450078006900660054006F006F
+      006C004700750069002F00720065006C0065006100730065007300A8715A3201
+      2D00506B5A32012D00C06B5A3200000000FFFFFFFFFFFFFFFF03000000010000
+      0000000000035A006900700015680074007400700073003A002F002F00650078
+      006900660074006F006F006C002E006F00720067002F00184F5A32012D00D060
+      5A32012D00E8615A3200000000FFFFFFFFFFFFFFFF0300000001000000000000
+      000949006E007300740061006C006C006500720038680074007400700073003A
+      002F002F006F006C0069007600650072006200650074007A002E00640065002F
+      00700061006700650073002F0041007200740069006B0065006C002F00450078
+      006900660054006F006F006C002D0066006F0072002D00570069006E0064006F
+      0077007300E8295A32012D00F86B5A32012D0008615A32FFFFFFFFFFFFFFFFFF
+      FFFFFFFFFFFFFFFFFF}
+    GroupView = True
+    ReadOnly = True
+    RowSelect = True
+    TabOrder = 1
+    ViewStyle = vsReport
+    OnDblClick = LvVersionsDblClick
+    OnSelectItem = LvVersionsSelectItem
   end
 end
