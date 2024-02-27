@@ -26,7 +26,8 @@ procedure BreakPoint;
 procedure DebugMsg(const Msg: array of variant);
 
 // Version
-function GetFileVersionNumber(Fname: string): string;
+function GetFileVersionNumber(FName: string): string;
+function GetFileVersionNumberPlatForm(FName: string): string;
 
 // FileSystem
 function ValidDir(ADir: string): boolean;
@@ -131,7 +132,7 @@ begin
 end;
 
 // Version
-function GetFileVersionNumber(Fname: string): string;
+function GetFileVersionNumber(FName: string): string;
 var
   V, VerInfoSize, VerValueSize: cardinal;
   VerInfo: pointer;
@@ -147,7 +148,7 @@ begin
   VerQueryValue(VerInfo, '\', pointer(VerValue), VerValueSize);
   with VerValue^ do
   begin
-    result := IntToStr(dwFileVersionMS shr 16);
+    result := 'V' + IntToStr(dwFileVersionMS shr 16);
     result := result + '.' + IntToStr(dwFileVersionMS and $FFFF);
     result := result + '.' + IntToStr(dwFileVersionLS shr 16);
     result := result + '.' + IntToStr(dwFileVersionLS and $FFFF);
@@ -155,8 +156,11 @@ begin
       result := result + ' Pre.';
   end;
   FreeMem(VerInfo, VerInfoSize);
+end;
 
-  result := Application.Title + ' V' + result +
+function GetFileVersionNumberPlatForm(FName: string): string;
+begin
+  result := Application.Title + ' ' + GetFileVersionNumber(FName) +
 {$IFDEF WIN32}
     ' 32 Bits'
 {$ENDIF}
@@ -165,7 +169,6 @@ begin
 {$ENDIF}
   ;
 end;
-
 
 // Directories
 function ValidDir(ADir: string): boolean;
@@ -669,7 +672,6 @@ begin
     Bmp.Free;
   end;
 end;
-
 
 function MessageDlgEx(const AMsg, ACaption: string; ADlgType: TMsgDlgType; AButtons: TMsgDlgButtons; UseTaskMessage: boolean = false): integer;
 var

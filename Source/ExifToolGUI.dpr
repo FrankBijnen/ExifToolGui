@@ -31,6 +31,7 @@ uses
   ExifToolsGUI_Thumbnails in 'ExifToolsGUI_Thumbnails.pas',
   ExifToolsGui_LossLess in 'ExifToolsGui_LossLess.pas',
   ExifToolsGUI_OpenPicture in 'ExifToolsGUI_OpenPicture.pas',
+  ExifToolsGui_Versions in 'ExifToolsGui_Versions.pas',
   ExifInfo in 'ExifInfo.pas',
   ExifTool in 'ExifTool.pas',
   ExifTool_PipeStream in 'ExifTool_PipeStream.pas',
@@ -45,9 +46,10 @@ uses
   UFrmGenericImport in 'UFrmGenericImport.pas' {FGenericImport},
   CopyMeta in 'CopyMeta.pas' {FCopyMetadata},
   Geotag in 'Geotag.pas' {FGeotag},
+  Geomap in 'Geomap.pas',
+  DateTimeShift in 'DateTimeShift.pas' {FDateTimeShift},
   DateTimeEqual in 'DateTimeEqual.pas' {FDateTimeEqual},
   RemoveMeta in 'RemoveMeta.pas' {FRemoveMeta},
-  Geomap in 'Geomap.pas',
   CopyMetaSingle in 'CopyMetaSingle.pas' {FCopyMetaSingle},
   FileDateTime in 'FileDateTime.pas' {FFileDateTime},
   UFrmPlaces in 'UFrmPlaces.pas' {FrmPlaces},
@@ -57,7 +59,7 @@ uses
   UFrmStyle in 'UFrmStyle.pas' {FrmStyle},
   UFrmAbout in 'UFrmAbout.pas' {FrmAbout},
   UFrmGenerate in 'UFrmGenerate.pas' {FrmGenerate},
-  DateTimeShift in 'DateTimeShift.pas' {FDateTimeShift};
+  UFrmCheckVersions in 'UFrmCheckVersions.pas' {FrmCheckVersions};
 
 {$R *.res}
 
@@ -99,6 +101,7 @@ begin
   Application.CreateForm(TFrmPlaces, FrmPlaces);
   Application.CreateForm(TFrmStyle, FrmStyle);
   Application.CreateForm(TFrmAbout, FrmAbout);
+  Application.CreateForm(TFrmCheckVersions, FrmCheckVersions);
   Application.CreateForm(TFrmGenerate, FrmGenerate);
   Application.CreateForm(TFDateTimeShift, FDateTimeShift);
   Application.CreateForm(TFGeoSearch, FGeoSearch);

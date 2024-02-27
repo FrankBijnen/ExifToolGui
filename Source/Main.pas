@@ -178,6 +178,7 @@ type
     ActLstTaskbar: TActionList;
     TaskBarResetWindow: TAction;
     MaAPILargeFileSupport: TAction;
+    MaCheckVersions: TAction;
     procedure ShellListClick(Sender: TObject);
     procedure ShellListKeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
     procedure SpeedBtnExifClick(Sender: TObject);
@@ -293,6 +294,7 @@ type
     procedure TrayIconMouseUp(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
     procedure TrayIconBalloonClick(Sender: TObject);
     procedure MaAPILargeFileSupportExecute(Sender: TObject);
+    procedure MaCheckVersionsExecute(Sender: TObject);
   private
     { Private declarations }
     ETBarSeriesFocal: TBarSeries;
@@ -358,7 +360,7 @@ implementation
 uses System.StrUtils, System.Math, System.Masks, System.Types, System.UITypes,
   Vcl.ClipBrd, Winapi.ShlObj, Winapi.ShellAPI, Winapi.CommCtrl, Vcl.Shell.ShellConsts, Vcl.Themes, Vcl.Styles,
   ExifTool, ExifInfo, ExifToolsGui_LossLess, ExifTool_PipeStream, ExifToolsGUI_MultiContextMenu,
-  MainDef, LogWin, Preferences, EditFFilter, EditFCol, UFrmStyle, UFrmAbout,
+  MainDef, LogWin, Preferences, EditFFilter, EditFCol, UFrmStyle, UFrmAbout, UFrmCheckVersions,
   QuickMngr, DateTimeShift, DateTimeEqual, CopyMeta, RemoveMeta, Geotag, Geomap, CopyMetaSingle, FileDateTime,
   UFrmGenericExtract, UFrmGenericImport, UFrmLossLessRotate, UFrmGeoTagFiles, UFrmGeoSetup,
   UnitLangResources;
@@ -773,6 +775,11 @@ end;
 procedure TFMain.MAboutClick(Sender: TObject);
 begin
   FrmAbout.ShowModal;
+end;
+
+procedure TFMain.MaCheckVersionsExecute(Sender: TObject);
+begin
+  FrmCheckVersions.ShowModal;
 end;
 
 procedure TFMain.MAPIWindowsWideFileClick(Sender: TObject);
@@ -2404,9 +2411,8 @@ begin
   MinFileListWidth := AdvPageFilelist.Constraints.MinWidth;
   AdvPageFilelist.Constraints.MinWidth := 0;
 
-
   // Tray Icon
-  TrayIcon.Hint := GetFileVersionNumber(Application.ExeName);
+  TrayIcon.Hint := GetFileVersionNumberPlatForm(Application.ExeName);
 
   // Create Bread Crumb
   BreadcrumbBar := TDirBreadcrumbBar.Create(Self);
