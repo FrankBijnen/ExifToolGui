@@ -59,65 +59,73 @@ WizardSmallImageFile=ExifToolGUI.Bmp
 DisableProgramGroupPage=yes
 InfoAfterFile=DownLoadInfo.rtf
 
+[CustomMessages]
+InstallOBetzMsg=Install ExifTool using the Oliver Betz installer.%n(Please uninstall any existing versions first!)
+
 [Components]
-Name: WebView2LoaderDLLWin32; Description: "Install WebView2Loader.DLL (Win32)"; types: full; Check: Win32;
-Name: MapFileWin32; Description: "Install Map file (Win32)"; types: full; Check: Win32;
-Name: LanguagesWin32; Description: "Install Language DLL's (Win32)"; types: full; Check: Win32;
-Name: WebView2LoaderDLLWin64; Description: "Install WebView2Loader.DLL (Win64)"; types: full; Check: Win64;
-Name: MapFileWin64; Description: "Install Map file (Win64)"; types: full; Check: Win64;
-Name: LanguagesWin64; Description: "Install Language DLL's (Win64)"; types: full; Check: Win64;
+Name: ExecutableWin32;                  Description: "Install Executable (Win32)";            types: compact full;  Check: Win32;
+Name: MapFileWin32;                     Description: "Install Map file (Win32)";              types: full;          Check: Win32;
+Name: WebView2LoaderDLLWin32;           Description: "Install WebView2Loader.DLL (Win32)";    types: full;          Check: Win32;
+Name: LanguagesWin32;                   Description: "Install Language DLL's (Win32)";        types: full;          Check: Win32;
+
+Name: ExecutableWin64;                  Description: "Install Executable (Win64)";            types: compact full;  Check: Win64;
+Name: MapFileWin64;                     Description: "Install Map file (Win64)";              types: full;          Check: Win64;
+Name: WebView2LoaderDLLWin64;           Description: "Install WebView2Loader.DLL (Win64)";    types: full;          Check: Win64;
+Name: LanguagesWin64;                   Description: "Install Language DLL's (Win64)";        types: full;          Check: Win64;
 
 [Tasks]
-Name: desktopicon; Description: "Create a &desktop icon"; GroupDescription: "Icons";
-Name: {#DownloadExifToolManual}; Description: "&Manual. Download links will be presented after installing."; GroupDescription: "Download ExifTool"; Flags: exclusive;
-Name: {#DownloadExifToolAuto}; Description: "&Automatic download and install of ExifTool."; GroupDescription: "Download ExifTool"; Flags: exclusive unchecked; 
-Name: {#DownloadExifToolAutoPH}; Description: "By Phil Harvey ({#PHUrl})"; GroupDescription: "Other tasks:"; Flags: exclusive unchecked;
-Name: {#DownloadExifToolAutoOBETZ}; Description: "By Oliver Betz ({#OBetzUrl})"; GroupDescription: "Other tasks:"; Flags: exclusive unchecked;
+Name: desktopicon;                      Description: "Create a &desktop icon";                                      GroupDescription: "Icons";
+Name: {#DownloadExifToolManual};        Description: "&Manual. Download links will be presented after installing."; GroupDescription: "Download ExifTool";  Flags: exclusive;
+Name: {#DownloadExifToolAuto};          Description: "&Automatic download and install of ExifTool.";                GroupDescription: "Download ExifTool";  Flags: exclusive unchecked; 
+Name: {#DownloadExifToolAutoPH};        Description: "By Phil Harvey ({#PHUrl})";                                   GroupDescription: "Other tasks:";       Flags: exclusive unchecked;
+Name: {#DownloadExifToolAutoOBETZ};     Description: "By Oliver Betz ({#OBetzUrl})";                                GroupDescription: "Other tasks:";       Flags: exclusive unchecked;
 
 [Files]
 ; Executable
-Source: "Win64\ExifToolGui_X64.exe";  DestDir: "{app}"; flags: replacesameversion; Check: Win64;
-Source: "Win32\ExifToolGui.exe";      DestDir: "{app}"; flags: replacesameversion; Check: Win32;
+Source: "Win32\ExifToolGui.exe";        DestDir: "{app}"; Components: ExecutableWin32;        flags: replacesameversion;
+Source: "Win64\ExifToolGui_X64.exe";    DestDir: "{app}"; Components: ExecutableWin64;        flags: replacesameversion;
 
 ; Map File
-Source: "Win64\ExifToolGui_X64.map";  DestDir: "{app}"; Components: MapFileWin64; flags: replacesameversion;
-Source: "Win32\ExifToolGui.map";      DestDir: "{app}"; Components: MapFileWin32; flags: replacesameversion;
+Source: "Win64\ExifToolGui_X64.map";    DestDir: "{app}"; Components: MapFileWin64;           flags: replacesameversion;
+Source: "Win32\ExifToolGui.map";        DestDir: "{app}"; Components: MapFileWin32;           flags: replacesameversion;
 
 ; WebView2Loader
-Source: "Win64\WebView2Loader.dll";   DestDir: "{app}"; Components: WebView2LoaderDLLWin64; flags: replacesameversion;
-Source: "Win32\WebView2Loader.dll";   DestDir: "{app}"; Components: WebView2LoaderDLLWin32; flags: replacesameversion;
+Source: "Win64\WebView2Loader.dll";     DestDir: "{app}"; Components: WebView2LoaderDLLWin64; flags: replacesameversion;
+Source: "Win32\WebView2Loader.dll";     DestDir: "{app}"; Components: WebView2LoaderDLLWin32; flags: replacesameversion;
 
 ; Language Files
-Source: "Win64\ExifToolGui_X64.DEU";  DestDir: "{app}"; Components: LanguagesWin64; flags: replacesameversion;
-Source: "Win64\ExifToolGui_X64.ENU";  DestDir: "{app}"; Components: LanguagesWin64; flags: replacesameversion;
-Source: "Win64\ExifToolGui_X64.ESP";  DestDir: "{app}"; Components: LanguagesWin64; flags: replacesameversion;
-Source: "Win64\ExifToolGui_X64.FRA";  DestDir: "{app}"; Components: LanguagesWin64; flags: replacesameversion;
-Source: "Win64\ExifToolGui_X64.ITA";  DestDir: "{app}"; Components: LanguagesWin64; flags: replacesameversion;
-Source: "Win64\ExifToolGui_X64.NLD";  DestDir: "{app}"; Components: LanguagesWin64; flags: replacesameversion;
-Source: "Win64\ExifToolGui_X64.PTB";  DestDir: "{app}"; Components: LanguagesWin64; flags: replacesameversion;
+Source: "Win64\ExifToolGui_X64.DEU";    DestDir: "{app}"; Components: LanguagesWin64;         flags: replacesameversion;
+Source: "Win64\ExifToolGui_X64.ENU";    DestDir: "{app}"; Components: LanguagesWin64;         flags: replacesameversion;
+Source: "Win64\ExifToolGui_X64.ESP";    DestDir: "{app}"; Components: LanguagesWin64;         flags: replacesameversion;
+Source: "Win64\ExifToolGui_X64.FRA";    DestDir: "{app}"; Components: LanguagesWin64;         flags: replacesameversion;
+Source: "Win64\ExifToolGui_X64.ITA";    DestDir: "{app}"; Components: LanguagesWin64;         flags: replacesameversion;
+Source: "Win64\ExifToolGui_X64.NLD";    DestDir: "{app}"; Components: LanguagesWin64;         flags: replacesameversion;
+Source: "Win64\ExifToolGui_X64.PTB";    DestDir: "{app}"; Components: LanguagesWin64;         flags: replacesameversion;
 
-Source: "Win32\ExifToolGui.DEU";      DestDir: "{app}"; Components: LanguagesWin32; flags: replacesameversion;
-Source: "Win32\ExifToolGui.ENU";      DestDir: "{app}"; Components: LanguagesWin32; flags: replacesameversion;
-Source: "Win32\ExifToolGui.ESP";      DestDir: "{app}"; Components: LanguagesWin32; flags: replacesameversion;
-Source: "Win32\ExifToolGui.FRA";      DestDir: "{app}"; Components: LanguagesWin32; flags: replacesameversion;
-Source: "Win32\ExifToolGui.ITA";      DestDir: "{app}"; Components: LanguagesWin32; flags: replacesameversion;
-Source: "Win32\ExifToolGui.NLD";      DestDir: "{app}"; Components: LanguagesWin32; flags: replacesameversion;
-Source: "Win32\ExifToolGui.PTB";      DestDir: "{app}"; Components: LanguagesWin32; flags: replacesameversion;
+Source: "Win32\ExifToolGui.DEU";        DestDir: "{app}"; Components: LanguagesWin32;         flags: replacesameversion;
+Source: "Win32\ExifToolGui.ENU";        DestDir: "{app}"; Components: LanguagesWin32;         flags: replacesameversion;
+Source: "Win32\ExifToolGui.ESP";        DestDir: "{app}"; Components: LanguagesWin32;         flags: replacesameversion;
+Source: "Win32\ExifToolGui.FRA";        DestDir: "{app}"; Components: LanguagesWin32;         flags: replacesameversion;
+Source: "Win32\ExifToolGui.ITA";        DestDir: "{app}"; Components: LanguagesWin32;         flags: replacesameversion;
+Source: "Win32\ExifToolGui.NLD";        DestDir: "{app}"; Components: LanguagesWin32;         flags: replacesameversion;
+Source: "Win32\ExifToolGui.PTB";        DestDir: "{app}"; Components: LanguagesWin32;         flags: replacesameversion;
 
 ; These files will be downloaded
-Source: "{tmp}\exiftool_version.txt"; DestDir: "{app}"; Flags: external skipifsourcedoesntexist replacesameversion;
-Source: "{tmp}\exiftool.exe"; DestDir: "{app}"; Flags: external skipifsourcedoesntexist replacesameversion;
-Source: "{code:OBetzInstaller|{tmp}}"; DestDir: "{app}"; Flags: external skipifsourcedoesntexist replacesameversion;
+Source: "{tmp}\exiftool_version.txt";   DestDir: "{app}";                                     flags: external skipifsourcedoesntexist replacesameversion;
+Source: "{tmp}\exiftool.exe";           DestDir: "{app}";                                     flags: external skipifsourcedoesntexist replacesameversion;
+Source: "{code:OBetzInstaller|{tmp}}";  DestDir: "{app}";                                     flags: external skipifsourcedoesntexist replacesameversion;
 
 [Icons]
-Name: "{group}\{#ExifToolGUI}"; Filename: "{app}\{#ExifToolGUIExeName}"
-Name: "{userdesktop}\{#ExifToolGUI}"; Filename: "{app}\{#ExifToolGUIExeName}"; tasks: desktopicon;
+Name: "{group}\{#ExifToolGUI}";         Filename: "{app}\{#ExifToolGUIExeName}"
+Name: "{userdesktop}\{#ExifToolGUI}";   Filename: "{app}\{#ExifToolGUIExeName}";              tasks: desktopicon;
 
 [run]
-Filename: "{code:OBetzInstaller|{app}}"; Description: "Install ExifTool using the Oliver Betz installer. (Please uninstall any existing versions first)"; Flags: postinstall skipifdoesntexist; StatusMsg: "Installing ExifTool"
+Filename: "{code:OBetzInstaller|{app}}";  Description: {cm:InstallOBetzMsg};                  flags: postinstall skipifdoesntexist; StatusMsg: "Installing ExifTool";
 
 [Code]
+
 var
+
   DownloadPageET: TDownloadWizardPage;
   ETVer: AnsiString;
   ETFile: AnsiString;
