@@ -4,7 +4,8 @@ interface
 
 uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
-  Vcl.Controls, Vcl.Forms, UnitScaleForm, Vcl.Dialogs, Vcl.StdCtrls, Vcl.Buttons, Vcl.ExtCtrls, Vcl.ComCtrls;
+  Vcl.Controls, Vcl.Forms, UnitScaleForm, Vcl.Dialogs, Vcl.StdCtrls, Vcl.Buttons, Vcl.ExtCtrls, Vcl.ComCtrls, System.ImageList,
+  Vcl.ImgList;
 
 type
   TFrmCheckVersions = class(TScaleForm)
@@ -14,6 +15,7 @@ type
     LvVersions: TListView;
     BtnClose: TBitBtn;
     BtnOpenUrl: TBitBtn;
+    ImgVersions: TImageList;
     procedure FormShow(Sender: TObject);
     procedure LvVersionsDblClick(Sender: TObject);
     procedure OpenUrl(Sender: TObject);
@@ -102,7 +104,10 @@ begin
 {$IFNDEF DEBUG}
       AnItem.SubItems[2] := GetLatestVersion(Product);
 {$ENDIF}
-      AnItem.Checked := (Pos(AnItem.SubItems[2], AnItem.SubItems[1]) = 1);
+      if (Pos(AnItem.SubItems[2], AnItem.SubItems[1]) = 1) then
+        AnItem.ImageIndex := 0
+      else
+        AnItem.ImageIndex := -1;
     end;
   finally
     LvVersions.Items.EndUpdate;
