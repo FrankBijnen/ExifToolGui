@@ -15,7 +15,7 @@ function GetLatestVersion(ETGuiProduct: TETGuiProduct): string;
 implementation
 
 uses
-  System.JSON,
+  System.JSON, System.UITypes,
   Winapi.Windows,
   REST.Types, REST.Client, REST.Utils,
   ExifToolsGui_Utils, ExifToolsGui_Data, UnitLangResources;
@@ -43,27 +43,36 @@ begin
   RESTRequest.Client := RESTClient;
   RESTRequest.Response := RESTResponse;
   try
-    if not ExecuteRest(RESTRequest) then
-      exit;
+    try
+      if not ExecuteRest(RESTRequest) then
+        exit;
 
-    case (ETGuiProduct) of
-      TETGuiProduct.etGUI:
+      case (ETGuiProduct) of
+        TETGuiProduct.etGUI:
+          begin
+            JSONObject := RESTResponse.JSONValue as TJSONObject;
+            result := JSONObject.GetValue('tag_name').Value;
+            // Interesting. Future use?
+            //writeln(JSONObject.GetValue('html_url').Value);
+            //writeln(JSONObject.GetValue('created_at').Value);
+          end;
+        else
         begin
-          JSONObject := RESTResponse.JSONValue as TJSONObject;
-          //writeln(JSONObject.GetValue('html_url').Value);
-          result := JSONObject.GetValue('tag_name').Value;
-          //writeln(JSONObject.GetValue('created_at').Value);
+          result := Trim(RESTResponse.Content);
         end;
-      else
-      begin
-        result := Trim(RESTResponse.Content);
-      end;
 
+      end;
+    finally
+      RESTResponse.Free;
+      RESTRequest.Free;
+      RESTClient.Free;
     end;
-  finally
-    RESTResponse.Free;
-    RESTRequest.Free;
-    RESTClient.Free;
+  except
+    on E:Exception do
+    begin
+      MessageDlgEx(E.Message, '', TMsgDlgType.mtError, [TMsgDlgBtn.mbOK]);
+      result := 'NOK';
+    end;
   end;
 end;
 

@@ -76,7 +76,6 @@ end;
 procedure TFrmCheckVersions.GetVersions;
 var
   Indx: integer;
-  Product: TETGuiProduct;
   ETver: string;
   AnItem: TListItem;
   CrWait, CrNormal: HCURSOR;
@@ -91,7 +90,6 @@ begin
     for Indx := 0 to LvVersions.Items.Count -1 do
     begin
       AnItem := LvVersions.Items[Indx];
-      Product := TETGuiProduct(Indx);
       case LvVersions.Items[Indx].GroupID of
         0:  begin
               AnItem.SubItems[1] := GetFileVersionNumber(Application.ExeName);
@@ -102,7 +100,7 @@ begin
       end;
 // Avoid Needles calls when debugging
 {$IFNDEF DEBUG}
-      AnItem.SubItems[2] := GetLatestVersion(Product);
+      AnItem.SubItems[2] := GetLatestVersion(TETGuiProduct(Indx));
 {$ENDIF}
       if (Pos(AnItem.SubItems[2], AnItem.SubItems[1]) = 1) then
         AnItem.ImageIndex := 0
