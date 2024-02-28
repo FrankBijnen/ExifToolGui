@@ -132,6 +132,9 @@
         <DelphiCompile Include="$(MainSource)">
             <MainSource>MainSource</MainSource>
         </DelphiCompile>
+        <RcCompile Include="ExifToolsGui_Data.rc">
+            <Form>ExifToolsGui_Data.res</Form>
+        </RcCompile>
         <DCCReference Include="MainDef.pas"/>
         <DCCReference Include="UnitLangResources.pas"/>
         <DCCReference Include="ExifToolsGUI_Utils.pas"/>
@@ -221,6 +224,7 @@
             <Form>FrmCheckVersions</Form>
             <FormType>dfm</FormType>
         </DCCReference>
+        <DCCReference Include="ExifToolsGui_Data.pas"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>

@@ -4,8 +4,8 @@ object FrmAbout: TFrmAbout
   BorderIcons = []
   BorderStyle = bsToolWindow
   Caption = 'About'
-  ClientHeight = 264
-  ClientWidth = 414
+  ClientHeight = 231
+  ClientWidth = 411
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -16,7 +16,7 @@ object FrmAbout: TFrmAbout
   TextHeight = 15
   object Image1: TImage
     Left = 0
-    Top = 1
+    Top = 5
     Width = 39
     Height = 38
     Picture.Data = {
@@ -48,7 +48,7 @@ object FrmAbout: TFrmAbout
   end
   object LblVersion: TLabel
     Left = 45
-    Top = 8
+    Top = 5
     Width = 360
     Height = 65
     AutoSize = False
@@ -63,7 +63,7 @@ object FrmAbout: TFrmAbout
   end
   object LblSource: TLabel
     Left = 45
-    Top = 95
+    Top = 76
     Width = 360
     Height = 18
     AutoSize = False
@@ -79,13 +79,29 @@ object FrmAbout: TFrmAbout
     OnMouseEnter = LblUrlEnter
     OnMouseLeave = LblUrlLeave
   end
-  object LblForum: TLabel
+  object LblExifTool: TLabel
     Left = 45
-    Top = 121
+    Top = 114
     Width = 360
     Height = 18
     AutoSize = False
-    Caption = 'LblForum'
+    Caption = 'LblExifTool'
+  end
+  object LblScreen: TLabel
+    Left = 45
+    Top = 177
+    Width = 360
+    Height = 22
+    AutoSize = False
+    Caption = 'LblScreen'
+  end
+  object LblExifToolHome: TLabel
+    Left = 45
+    Top = 133
+    Width = 360
+    Height = 18
+    AutoSize = False
+    Caption = 'LblExifToolHome'
     Font.Charset = DEFAULT_CHARSET
     Font.Color = clWindowText
     Font.Height = -12
@@ -97,37 +113,21 @@ object FrmAbout: TFrmAbout
     OnMouseEnter = LblUrlEnter
     OnMouseLeave = LblUrlLeave
   end
-  object LblExifTool: TLabel
-    Left = 45
-    Top = 148
-    Width = 360
-    Height = 18
-    AutoSize = False
-    Caption = 'LblExifTool'
-  end
-  object LblScreen: TLabel
-    Left = 45
-    Top = 208
-    Width = 360
-    Height = 22
-    AutoSize = False
-    Caption = 'LblScreen'
-  end
   object Panel1: TPanel
     Left = 0
-    Top = 235
-    Width = 414
+    Top = 202
+    Width = 411
     Height = 29
     Align = alBottom
     TabOrder = 0
-    ExplicitTop = 223
-    ExplicitWidth = 406
+    ExplicitTop = 211
+    ExplicitWidth = 398
     DesignSize = (
-      414
+      411
       29)
     object BtnOk: TBitBtn
       Left = 330
-      Top = 1
+      Top = 2
       Width = 75
       Height = 25
       Anchors = [akRight, akBottom]

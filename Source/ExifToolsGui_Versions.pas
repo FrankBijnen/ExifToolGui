@@ -18,7 +18,7 @@ uses
   System.JSON,
   Winapi.Windows,
   REST.Types, REST.Client, REST.Utils,
-  ExifToolsGui_Utils, UnitLangResources;
+  ExifToolsGui_Utils, ExifToolsGui_Data, UnitLangResources;
 
 function ExecuteRest(const RESTRequest: TRESTRequest): boolean; overload;
 begin
@@ -67,7 +67,6 @@ begin
   end;
 end;
 
-
 function GetLatestVersion(ETGuiProduct: TETGuiProduct): string;
 var
   URL: string;
@@ -75,11 +74,11 @@ begin
   result := '';
   case (ETGuiProduct) of
     TETGuiProduct.etGUI:
-      URL := format('https://api.github.com/repos/%s/%s/releases/latest', ['FrankBijnen', 'ExifToolGui']);
+      URL := ReadResourceId(ETD_Latest_Gui);
     TETGuiProduct.etPH:
-      URL := 'https://exiftool.org/ver.txt';
+      URL := ReadResourceId(ETD_Latest_PH);
     TETGuiProduct.etOBetz:
-      URL := 'https://oliverbetz.de/cms/files/Artikel/ExifTool-for-Windows/exiftool_latest_version.txt';
+      URL := ReadResourceId(ETD_Latest_OBetz);
   end;
   result := ExecuteRest(ETGuiProduct, URL);
 end;
