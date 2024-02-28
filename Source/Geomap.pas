@@ -126,7 +126,7 @@ uses
   System.Variants, System.JSON,  System.NetEncoding, System.Math, System.StrUtils, System.DateUtils,
   Winapi.Windows, Vcl.Dialogs,
   REST.Types, REST.Client, REST.Utils,
-  UFrmPlaces, UFrmGeoSearch, ExifToolsGUI_Utils, UnitLangResources;
+  UFrmPlaces, UFrmGeoSearch, ExifToolsGUI_Utils, ExifToolsGui_Data, UnitLangResources;
 
 var
   CoordFormatSettings: TFormatSettings; // for StrToFloatDef -see Initialization
@@ -333,6 +333,7 @@ begin
   Html.Add('<Html>');
   Html.Add('<head>');
   Html.Add('<title></title>');
+//TODO Create resources
   Html.Add('<script type="text/javascript"  src="http://openlayers.org/api/OpenLayers.js"></script>');
   Html.Add('<script src="http://www.openstreetmap.org/openlayers/OpenStreetMap.js"></script>');
   Html.Add('<script type="text/javascript">');
@@ -1116,11 +1117,11 @@ procedure ReadGeoCodeSettings(GUIini: TMemIniFile);
 begin
   GeoSettings.GetCoordProvider := TGeoCodeProvider(GUIini.ReadInteger(Geo_Settings, 'GetCoordProvider', 0));
   GeoSettings.GetPlaceProvider := TGeoCodeProvider(GUIini.ReadInteger(Geo_Settings, 'GetPlaceProvider', 1));
-  GeoSettings.GeoCodeUrl := GUIini.ReadString(Geo_Settings, 'GeoCodeUrl', 'https://geocode.maps.co');
+  GeoSettings.GeoCodeUrl := GUIini.ReadString(Geo_Settings, 'GeoCodeUrl', ReadResourceId(ETD_GeoCode));
   GeoSettings.GeoCodeApiKey := GUIini.ReadString(Geo_Settings, 'GeoCodeApiKey', '');
 
   GeoSettings.ThrottleGeoCode := GUIini.ReadInteger(Geo_Settings, 'ThrottleGeoCode', 1000);
-  GeoSettings.OverPassUrl := GUIini.ReadString(Geo_Settings, 'OverPassUrl', 'https://overpass-api.de/api');
+  GeoSettings.OverPassUrl := GUIini.ReadString(Geo_Settings, 'OverPassUrl', ReadResourceId(ETD_OverPass));
   GeoSettings.ThrottleOverPass := GUIini.ReadInteger(Geo_Settings, 'ThrottleOverPass', 10);
   GeoSettings.OverPassCaseSensitive := GUIini.ReadBool(Geo_Settings, 'OverPassCaseSensitive', True);
   GeoSettings.OverPassCompleteWord := GUIini.ReadBool(Geo_Settings, 'OverPassCompleteWord', True);

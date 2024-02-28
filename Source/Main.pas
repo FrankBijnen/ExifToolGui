@@ -359,7 +359,7 @@ implementation
 
 uses System.StrUtils, System.Math, System.Masks, System.Types, System.UITypes,
   Vcl.ClipBrd, Winapi.ShlObj, Winapi.ShellAPI, Winapi.CommCtrl, Vcl.Shell.ShellConsts, Vcl.Themes, Vcl.Styles,
-  ExifTool, ExifInfo, ExifToolsGui_LossLess, ExifTool_PipeStream, ExifToolsGUI_MultiContextMenu,
+  ExifTool, ExifInfo, ExifToolsGui_LossLess, ExifTool_PipeStream, ExifToolsGui_Data, ExifToolsGUI_MultiContextMenu,
   MainDef, LogWin, Preferences, EditFFilter, EditFCol, UFrmStyle, UFrmAbout, UFrmCheckVersions,
   QuickMngr, DateTimeShift, DateTimeEqual, CopyMeta, RemoveMeta, Geotag, Geomap, CopyMetaSingle, FileDateTime,
   UFrmGenericExtract, UFrmGenericImport, UFrmLossLessRotate, UFrmGeoTagFiles, UFrmGeoSetup,
@@ -370,11 +370,6 @@ uses System.StrUtils, System.Math, System.Masks, System.Types, System.UITypes,
 
 const
   GUI_SEP = '-GUI-SEP';
-{$IFDEF DEBUG}
-  ONLINE_DOC_URL = 'https://github.com/FrankBijnen/ExifToolGui/blob/Development/Docs/ExifToolGUI_V6.md';
-{$ELSE}
-  ONLINE_DOC_URL = 'https://github.com/FrankBijnen/ExifToolGui/blob/main/Docs/ExifToolGUI_V6.md';
-{$ENDIF}
 
 const
   CameraFields =
@@ -1488,7 +1483,7 @@ end;
 
 procedure TFMain.OnlineDocumentation1Click(Sender: TObject);
 begin
-  ShellExecute(0, 'Open', PWideChar(ONLINE_DOC_URL), '', '', SW_SHOWNORMAL);
+  ShellExecute(0, 'Open', PWideChar(ReadResourceId(ETD_Online_Doc)), '', '', SW_SHOWNORMAL);
 end;
 
 procedure TFMain.QuickPopUpMenuPopup(Sender: TObject);
@@ -1975,17 +1970,17 @@ begin
       if (MessageDlgEx(StrTheWebView2Loaderd + #10 +
                        StrShowOnlineHelp,
                        '', TMsgDlgType.mtError, [TMsgDlgBtn.mbYes, TMsgDlgBtn.mbNo]) = ID_YES) then
-        Url := '/#m_edge_dll';
+        Url := ReadResourceId(ETD_Edge_Dll);
     end
     else
     begin
       if (MessageDlgEx(StrUnableToStartEdge +#10 +
                        StrShowOnlineHelp,
                        '', TMsgDlgType.mtError, [TMsgDlgBtn.mbYes, TMsgDlgBtn.mbNo]) = ID_YES) then
-        Url := '/#m_edge_runtime';
+        Url := ReadResourceId(ETD_Edge_Runtime);
     end;
     if (Url <> '') then
-      ShellExecute(0, 'Open', PWideChar(ONLINE_DOC_URL + Url), '', '', SW_SHOWNORMAL);
+      ShellExecute(0, 'Open', PWideChar(ReadResourceId(ETD_Online_Doc)  + Url), '', '', SW_SHOWNORMAL);
   end;
 
 end;
@@ -3103,7 +3098,7 @@ begin
         StrERRORExifTool9 + #10 + #10 +
         StrShowOnlineHelp, '',
         TMsgDlgType.mtError, [TMsgDlgBtn.mbYes, TMsgDlgBtn.mbNo]) = ID_YES) then
-      ShellExecute(0, 'Open', PWideChar(ONLINE_DOC_URL + '/#m_reqs_exiftool'), '', '', SW_SHOWNORMAL);
+      ShellExecute(0, 'Open', PWideChar(ReadResourceId(ETD_Online_Doc) + ReadResourceId(ETD_Reqs)), '', '', SW_SHOWNORMAL);
 
 end;
 

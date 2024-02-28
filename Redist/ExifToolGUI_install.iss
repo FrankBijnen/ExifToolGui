@@ -4,6 +4,10 @@
 
 #define ExifToolGUI "ExifToolGUI"
 #define ExifToolGUIPublisher "FrankB"
+; URl's
+#define ExifToolGUIUpdatesURL "https://github.com/FrankBijnen/ExifToolGui/releases"
+#define PHUrl "https://exiftool.org/"
+#define OBetzUrl "https://oliverbetz.de/cms/files/Artikel/ExifTool-for-Windows/"
 ; _32 or _64
 #define ETPlatform "{code:Platform}"
 ; empty or _X64
@@ -27,6 +31,7 @@
 
 [Setup]
 AppPublisher={#ExifToolGUIPublisher}
+AppUpdatesURL={#ExifToolGUIUpdatesURL}
 AppName={#ExifToolGUI}
 AppVersion={#ExifToolGUIVersionPlatform}
 VersionInfoTextVersion={#ExifToolGUIVersionPlatform}
@@ -66,8 +71,8 @@ Name: LanguagesWin64; Description: "Install Language DLL's (Win64)"; types: full
 Name: desktopicon; Description: "Create a &desktop icon"; GroupDescription: "Icons";
 Name: {#DownloadExifToolManual}; Description: "&Manual. Download links will be presented after installing."; GroupDescription: "Download ExifTool"; Flags: exclusive;
 Name: {#DownloadExifToolAuto}; Description: "&Automatic download and install of ExifTool."; GroupDescription: "Download ExifTool"; Flags: exclusive unchecked; 
-Name: {#DownloadExifToolAutoPH}; Description: "By Phil Harvey"; GroupDescription: "Other tasks:"; Flags: exclusive unchecked;
-Name: {#DownloadExifToolAutoOBETZ}; Description: "By Oliver Betz"; GroupDescription: "Other tasks:"; Flags: exclusive unchecked;
+Name: {#DownloadExifToolAutoPH}; Description: "By Phil Harvey ({#PHUrl})"; GroupDescription: "Other tasks:"; Flags: exclusive unchecked;
+Name: {#DownloadExifToolAutoOBETZ}; Description: "By Oliver Betz ({#OBetzUrl})"; GroupDescription: "Other tasks:"; Flags: exclusive unchecked;
 
 [Files]
 ; Executable
@@ -123,12 +128,12 @@ const
   SHCONTCH_RESPONDYESTOALL  = $10;
 
   // Constants for OBetz installer
-  OBETZURL                  = 'https://oliverbetz.de/cms/files/Artikel/ExifTool-for-Windows/';
+  OBETZURL                  = '{#OBetzUrl}';
   OBETZVER                  = 'exiftool_latest_version.txt';
   OBETZINSTALL              = 'ExifTool_install';
 
   // Constants for Phil Harvey's ExifTool
-  PHURL                     = 'https://exiftool.org/';
+  PHURL                     = '{#PHUrl}';
   VER_TXT                   = 'ver.txt';
   ZIP                       = '.zip';
   EXE                       = '.exe';

@@ -8,13 +8,15 @@ program ExifToolGUI;
 // Allows for overriding the default language, without writing to the registry.
 // CommandLine example: /OverrideLanguage=NLD
 
+{$R 'ExifToolsGui_Data.res' 'ExifToolsGui_Data.rc'}
+
 uses
-{$IFDEF STACKTRACE}
+  {$IFDEF STACKTRACE}
   UnitStackTrace,
-{$ENDIF }
-{$IFDEF LANGOVERRIDE}
+  {$ENDIF }
+  {$IFDEF LANGOVERRIDE}
   UnitLangOverride,
-{$ENDIF}
+  {$ENDIF }
   UnitSingleApp,
   UnitDpiAwareness,
   Vcl.Forms,
@@ -32,6 +34,7 @@ uses
   ExifToolsGui_LossLess in 'ExifToolsGui_LossLess.pas',
   ExifToolsGUI_OpenPicture in 'ExifToolsGUI_OpenPicture.pas',
   ExifToolsGui_Versions in 'ExifToolsGui_Versions.pas',
+  ExifToolsGui_Data in 'ExifToolsGui_Data.pas',
   ExifInfo in 'ExifInfo.pas',
   ExifTool in 'ExifTool.pas',
   ExifTool_PipeStream in 'ExifTool_PipeStream.pas',
