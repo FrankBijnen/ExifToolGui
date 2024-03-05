@@ -118,8 +118,8 @@ object FLogWin: TFLogWin
           Align = alTop
           TabOrder = 1
           object BtnPowerShell: TButton
-            Left = 235
-            Top = 9
+            Left = 233
+            Top = 10
             Width = 85
             Height = 25
             Caption = 'PowerShell'
@@ -128,7 +128,7 @@ object FLogWin: TFLogWin
           end
           object BtnCmd: TButton
             Left = 145
-            Top = 9
+            Top = 10
             Width = 85
             Height = 25
             Caption = 'Cmd prompt'

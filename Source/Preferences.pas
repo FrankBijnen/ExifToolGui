@@ -73,6 +73,9 @@ type
     EdCommand: TLabeledEdit;
     Memo1: TMemo;
     CheckBox11: TCheckBox;
+    GrpConfig: TGroupBox;
+    EdETCustomConfig: TEdit;
+    BtnEtCustomConfig: TButton;
     procedure FormShow(Sender: TObject);
     procedure BtnSaveClick(Sender: TObject);
     procedure BtnBrowseFolder(Sender: TObject);
@@ -145,6 +148,7 @@ begin
     ETOverrideDir := '';
     if (RgETOverride.ItemIndex = 1) then
       ETOverrideDir := IncludeTrailingBackslash(EdETOverride.Text);
+    ETCustomConfig := EdETCustomConfig.Text;
   end;
   with LabeledEdit1 do
   begin
@@ -264,25 +268,35 @@ end;
 
 procedure TFPreferences.BtnBrowseFolder(Sender: TObject);
 var
-  xDir: string;
+  XDir: string;
 begin
   if Sender = BtnStartupFolder then
   begin
-    xDir := BrowseFolderDlg(StrSelectDefaultStart, 0);
-    if xDir <> '' then
-      EdStartupFolder.Text := xDir;
+    XDir := BrowseFolderDlg(StrSelectDefaultStart, 0);
+    if XDir <> '' then
+      EdStartupFolder.Text := XDir;
   end;
   if Sender = BtnExportMetaFolder then
   begin
-    xDir := BrowseFolderDlg(StrSelectDefaultExpor, 0);
-    if xDir <> '' then
-      EdExportMetaFolder.Text := xDir;
+    XDir := BrowseFolderDlg(StrSelectDefaultExpor, 0);
+    if XDir <> '' then
+      EdExportMetaFolder.Text := XDir;
   end;
   if Sender = BtnETOverride then
   begin
-    xDir := BrowseFolderDlg(StrSelectExifToolFold, 0);
-    if xDir <> '' then
-      EdETOverride.Text := xDir;
+    XDir := BrowseFolderDlg(StrSelectExifToolFold, 0);
+    if XDir <> '' then
+      EdETOverride.Text := XDir;
+  end;
+  if Sender = BtnEtCustomConfig then
+  begin
+    FMain.OpenFileDlg.Filter := 'Config Files|*_config;*.cfg;*.config|*.*|*.*';
+    if FMain.OpenFileDlg.Execute then
+    begin
+      XDir := FMain.OpenFileDlg.FileName;
+      if XDir <> '' then
+        EdETCustomConfig.Text := XDir;
+    end;
   end;
 end;
 
@@ -357,6 +371,7 @@ begin
           ItemIndex := 0;
         RadioGroupClick(RgETOverride);
       end;
+      EdETCustomConfig.Text := ETCustomConfig;
     end;
     Tx := ET_Options.ETSeparator;
     Delete(Tx, 1, 6);

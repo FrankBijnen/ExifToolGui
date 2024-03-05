@@ -966,6 +966,14 @@ object FMain: TFMain
     ExplicitWidth = 936
   end
   object OpenPictureDlg: TOpenPictureDialog
+    Filter = 
+      'All (*.gif;*.jpg;*.jpeg;*.png;*.bmp;*.ico;*.emf;*.wmf;*.tif;*.ti' +
+      'ff)|*.gif;*.jpg;*.jpeg;*.png;*.bmp;*.ico;*.emf;*.wmf;*.tif;*.tif' +
+      'f|GIF Image (*.gif)|*.gif|JPEG Image File (*.jpg)|*.jpg|JPEG Ima' +
+      'ge File (*.jpeg)|*.jpeg|Portable Network Graphics (*.png)|*.png|' +
+      'Bitmaps (*.bmp)|*.bmp|Icons (*.ico)|*.ico|Enhanced Metafiles (*.' +
+      'emf)|*.emf|Metafiles (*.wmf)|*.wmf|TIFF Images (*.tif)|*.tif|TIF' +
+      'F Images (*.tiff)|*.tiff|*.*|*.*'
     Options = [ofHideReadOnly, ofNoValidate, ofPathMustExist, ofFileMustExist, ofEnableSizing, ofDontAddToRecent]
     Left = 163
     Top = 117

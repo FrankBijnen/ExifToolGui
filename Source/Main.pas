@@ -1219,7 +1219,7 @@ begin
     begin
       AutoRotatePreview := GUIsettings.AutoRotatePreview;
       InitialDir := ShellList.Path;
-      Filter := 'Image & Metadata files|*.jpg;*.jpeg;*.cr2;*.dng;*.nef;*.tif;*.tiff;*.mie;*.xmp;*.rw2';
+      Filter := 'Image & Metadata files|*.jpg;*.jpeg;*.cr2;*.dng;*.nef;*.tif;*.tiff;*.mie;*.xmp;*.rw2|*.*|*.*';
       Options := [ofFileMustExist];
       Title := StrSelectSourceFile;
       FileName := '';
@@ -1366,6 +1366,7 @@ procedure TFMain.MPreferencesClick(Sender: TObject);
 begin
   if FPreferences.ShowModal = mrOK then
   begin
+    ET_OpenExit(true); // Force restart of ExifTool. CustomConfig could have changed
     EnableMenus(ET_StayOpen(ShellList.Path)); // Recheck Exiftool.exe.
     ShellListSetFolders;
     ShellList.Refresh;
