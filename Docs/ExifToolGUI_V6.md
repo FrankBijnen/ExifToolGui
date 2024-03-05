@@ -180,7 +180,7 @@ That's all you need. And when a new ExifTool or GUI version is available, you on
 <li><a href="#m_various">Various</a> menu</li>
 <li><font class="blue">Help</font></li>
 <ul>
-<li><u><font class="blue"> Online Documentation<font></u> Opens this document</li>
+<li><u><font class="blue"> Online Documentation</font></u> Opens this document</li>
 <li><u><font class="blue"> Check versions</font></u> Check for updated versions of GUI and ExifTool </li>
 <li><u><font class="blue"> About</font></u></li>
 </ul>
