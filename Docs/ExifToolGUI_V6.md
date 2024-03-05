@@ -71,14 +71,14 @@ Basic idea behind GUI is, to keep it <u>simple!</u> Thus, only those options are
 <li>English</li>
 <li>Nederlands</li>
 </ul><ul> Languages that need verification. Your help is wanted.
-<li>Deutsch>
+<li>Deutsch></li>
 <li>Italiano</li>
 <li>Français</li>
 <li>Español</li>
 <li>Português</li>
 </ul>
-</ul>
 <li>Starting with V6.3.0 an installer is provided.</li>
+</ul>
 <a href="changelog.txt"><b>See changelog.txt for a complete list of issues.</b></a>
 
 <a name="m_reqs_general">
@@ -108,7 +108,7 @@ If you want Windows to be able to always find ExifTool, then add the directory w
 
 <h3><a name="m_reqs_exiftoolgui">2. ExifToolGUI</h3>
 You can download GUI from <a href="https://github.com/FrankBijnen/ExifToolGui/releases"><b>here</b></a>.
-GUI doesn't need to be "installed". Just download the executable for your platform (ExifToolGui.exe or ExifToolGui_X64.exe) into any directory, create a Desktop shortcut and GUI is ready to use.<br>
+The portable version of ExifToolGui doesn't need to be "installed". Just download the executable for your platform (ExifToolGui.exe or ExifToolGui_X64.exe) into any directory, create a Desktop shortcut and GUI is ready to use.<br>
 <br>
 <u>Notes:</u>
 <ul>
@@ -178,9 +178,12 @@ That's all you need. And when a new ExifTool or GUI version is available, you on
 <li><a href="#m_exp_imp">Export/Import</a> menu</li>
 <li><a href="#m_modify">Modify</a> menu</li>
 <li><a href="#m_various">Various</a> menu</li>
-<li><u>Help/Online Documentation</u> menu</li>
-<li><u>Help/Check versions</u> menu</li>
-<li><u>Help/About</u> menu</li>
+<li>Help></li>
+<ul>
+<li><u>Online Documentation</u> Opens this document</li>
+<li><u>Check versions</u> Check for updated versions of GUI and ExifTool </li>
+<li><u>About</u></li>
+</ul>
 <br>
 <b>Panels:</b><br>
 <li><a href="#p_filelist">Filelist</a> panel</li>
