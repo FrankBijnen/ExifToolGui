@@ -147,6 +147,7 @@
         <DCCReference Include="ExifToolsGui_LossLess.pas"/>
         <DCCReference Include="ExifToolsGUI_OpenPicture.pas"/>
         <DCCReference Include="ExifToolsGui_Versions.pas"/>
+        <DCCReference Include="ExifToolsGui_Data.pas"/>
         <DCCReference Include="ExifInfo.pas"/>
         <DCCReference Include="ExifTool.pas"/>
         <DCCReference Include="ExifTool_PipeStream.pas"/>

@@ -820,8 +820,8 @@ object FPreferences: TFPreferences
       Caption = 'Other'
       object Label5: TLabel
         Left = 103
-        Top = 243
-        Width = 475
+        Top = 284
+        Width = 478
         Height = 13
         AutoSize = False
         Caption = 'Hint pause timeout in Millisecs'
@@ -873,7 +873,7 @@ object FPreferences: TFPreferences
       end
       object CheckBox6: TCheckBox
         Left = 16
-        Top = 141
+        Top = 182
         Width = 565
         Height = 17
         Caption = '-Filelist: Show Folders in Filelist'
@@ -881,7 +881,7 @@ object FPreferences: TFPreferences
       end
       object HintPause: TEdit
         Left = 16
-        Top = 240
+        Top = 281
         Width = 66
         Height = 21
         TabOrder = 8
@@ -889,7 +889,7 @@ object FPreferences: TFPreferences
       end
       object UpDHintPause: TUpDown
         Left = 82
-        Top = 240
+        Top = 281
         Width = 16
         Height = 21
         Associate = HintPause
@@ -899,7 +899,7 @@ object FPreferences: TFPreferences
       end
       object CheckBox7: TCheckBox
         Left = 16
-        Top = 188
+        Top = 229
         Width = 565
         Height = 17
         Caption = '-Filelist: Show Breadcrumb (Address Bar) in Filelist'
@@ -907,7 +907,7 @@ object FPreferences: TFPreferences
       end
       object CheckBox8: TCheckBox
         Left = 16
-        Top = 164
+        Top = 205
         Width = 565
         Height = 17
         Caption = 
@@ -917,13 +917,37 @@ object FPreferences: TFPreferences
       end
       object CheckBox11: TCheckBox
         Left = 16
-        Top = 212
+        Top = 253
         Width = 565
         Height = 17
         Caption = 
           '-Filelist: Enable '#39'Camera Settings'#39', '#39'Location info'#39' and '#39'About ' +
           'photo'#39' for all file types. (Slower)'
         TabOrder = 10
+      end
+      object GrpConfig: TGroupBox
+        Left = 16
+        Top = 136
+        Width = 562
+        Height = 42
+        Caption = 'Exiftool config (-config CFGFILE)'
+        TabOrder = 11
+        object EdETCustomConfig: TEdit
+          Left = 141
+          Top = 15
+          Width = 349
+          Height = 21
+          TabOrder = 0
+        end
+        object BtnEtCustomConfig: TButton
+          Left = 498
+          Top = 15
+          Width = 28
+          Height = 22
+          Caption = '...'
+          TabOrder = 1
+          OnClick = BtnBrowseFolder
+        end
       end
     end
   end
