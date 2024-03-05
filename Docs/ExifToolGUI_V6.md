@@ -67,13 +67,28 @@ Basic idea behind GUI is, to keep it <u>simple!</u> Thus, only those options are
 <li>Enhanced integration. Add to Context menu in Windows explorer, Single instance App and minimize to Tray</b></li>
 <li>Camera settings, Location info and About photo in Filelist detail support more File types</b></li>
 <li>Preparations completed for translating into multiple languages.</li>
+<ul> Languages completed.
+<li>English</li>
+<li>Nederlands</li>
+</ul><ul> Languages that need verification. Your help is wanted.
+<li>Deutsch>
+<li>Italiano</li>
+<li>Français</li>
+<li>Español</li>
+<li>Português</li>
 </ul>
+</ul>
+<li>Starting with V6.3.0 an installer is provided.</li>
 <a href="changelog.txt"><b>See changelog.txt for a complete list of issues.</b></a>
 
 <a name="m_reqs_general">
 <h2>Requirements and preparations</h2>
 ExiftoolGUI should run on Windows 7, 8 32-64bit. However, it is highly recommended to use Windows 10 or 11 when you plan to use the OSM map, or GEOcoding.<br>
 It will not run on Windows XP or earlier!<br>
+
+You can use the installer to install ExifToolGui and all required components. If you do you can skip the requirements. <br>
+
+The portable version is still available, and will be continued to be released. Read the following requirements. 
 
 <a name="m_reqs_exiftool">
 <h3>1. ExifTool</h3>
@@ -164,6 +179,8 @@ That's all you need. And when a new ExifTool or GUI version is available, you on
 <li><a href="#m_modify">Modify</a> menu</li>
 <li><a href="#m_various">Various</a> menu</li>
 <li><u>Help/Online Documentation</u> menu</li>
+<li><u>Help/Check versions</u> menu</li>
+<li><u>Help/About</u> menu</li>
 <br>
 <b>Panels:</b><br>
 <li><a href="#p_filelist">Filelist</a> panel</li>
@@ -287,6 +304,8 @@ double-clicking on one of the tabs Exif, Xmp, Iptc, Maker, All will add that tag
 <br><br>
 <b>Exiftool.exe location</b><br>
 If you need to override the location of exiftool.exe you can do that here.<br><br>
+<b>Exiftool config</b><br>
+Use custom config. You can specify a complete path, or just the name. Refer to -config for more info.
 <b>Filelist: Show Folders in Filelist</b><br>
 The default setting is to only show files in the Filelist panel. If you enable this option, also folders (directories) will be shown, allowing easier navigation.<br><br>
 <b>Filelist: Show Hidden Folders and Files in Filelist (Admin required)</b><br>
