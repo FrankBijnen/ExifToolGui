@@ -24,10 +24,26 @@
 ; Default directory to install
 #define DefaultDirName "{code:DefaultDir}\" + ExifToolGUI 
 ; Additional tasks
+; Enable only 1!
+#define EnableAutoDownload "Yes"
+#define EnableAutoDownloadPH "No"
+#define EnableAutoDownloadOBetz "No"
+;
 #define DownloadExifToolManual "DownloadExifToolManual"
 #define DownloadExifToolAuto "DownloadExifToolAuto"
-#define DownloadExifToolAutoPH DownloadExifToolAuto + "\PH"
-#define DownloadExifToolAutoOBETZ DownloadExifToolAuto + "\OBETZ"
+; Change the tasks options. 
+#if EnableAutoDownload == "Yes"
+#define BackSlash "\"           ; Hierarchy
+#define Exclusive "exclusive"   ; Radio button
+#else
+#define BackSlash ""            ; No Hierarchy
+#define Exclusive ""            ; Checkbox
+#endif
+;
+#define TaskPH "PH"
+#define TaskOBETZ "OBETZ"
+#define DownloadExifToolAutoPH DownloadExifToolAuto + BackSlash + TaskPH
+#define DownloadExifToolAutoOBETZ DownloadExifToolAuto + BackSlash+ TaskOBETZ
 
 [Setup]
 AppPublisher={#ExifToolGUIPublisher}
@@ -59,7 +75,7 @@ WizardSmallImageFile=ExifToolGUI.Bmp
 DisableProgramGroupPage=yes
 InfoAfterFile=DownLoadInfo.rtf
 
-[CustomMessages]
+[CustomMessages]                                         
 InstallOBetzMsg=Install ExifTool using the Oliver Betz installer.%n(Please uninstall any existing versions first!)
 
 [Components]
@@ -74,11 +90,16 @@ Name: WebView2LoaderDLLWin64;           Description: "Install WebView2Loader.DLL
 Name: LanguagesWin64;                   Description: "Install Language DLL's (Win64)";        types: full;          Check: Win64;
 
 [Tasks]
-Name: desktopicon;                      Description: "Create a &desktop icon";                                      GroupDescription: "Icons";
-Name: {#DownloadExifToolManual};        Description: "&Manual. Download links will be presented after installing."; GroupDescription: "Download ExifTool";  Flags: exclusive;
-Name: {#DownloadExifToolAuto};          Description: "&Automatic download and install of ExifTool.";                GroupDescription: "Download ExifTool";  Flags: exclusive unchecked; 
-Name: {#DownloadExifToolAutoPH};        Description: "By Phil Harvey ({#PHUrl})";                                   GroupDescription: "Other tasks:";       Flags: exclusive unchecked;
-Name: {#DownloadExifToolAutoOBETZ};     Description: "By Oliver Betz ({#OBetzUrl})";                                GroupDescription: "Other tasks:";       Flags: exclusive unchecked;
+Name: desktopicon;                      Description: "Create a &desktop icon"; \
+                                          GroupDescription: "Icons"; 
+Name: {#DownloadExifToolManual};        Description: "&Manual. Download links will be presented after installing.";  \
+                                          GroupDescription: "Download ExifTool";              Flags: exclusive;               Check: EnableAutoDownload;
+Name: {#DownloadExifToolAuto};          Description: "&Automatic download and install of ExifTool."; \
+                                          GroupDescription: "Download ExifTool";              Flags: exclusive unchecked;     Check: EnableAutoDownload;
+Name: {#DownloadExifToolAutoPH};        Description: "By Phil Harvey ({#PHUrl})"; \
+                                          GroupDescription: "Download and install ExifTool:"; Flags: {#Exclusive} unchecked;  Check: EnableAutoDownload or EnableAutoDownloadPH;
+Name: {#DownloadExifToolAutoOBETZ};     Description: "By Oliver Betz ({#OBetzUrl})"; \
+                                          GroupDescription: "Download and install ExifTool:"; Flags: {#Exclusive} unchecked;  Check: EnableAutoDownload or EnableAutoDownloadOBetz;
 
 [Files]
 ; Executable
@@ -120,7 +141,8 @@ Name: "{group}\{#ExifToolGUI}";         Filename: "{app}\{#ExifToolGUIExeName}"
 Name: "{userdesktop}\{#ExifToolGUI}";   Filename: "{app}\{#ExifToolGUIExeName}";              tasks: desktopicon;
 
 [run]
-Filename: "{code:OBetzInstaller|{app}}";  Description: {cm:InstallOBetzMsg};                  flags: postinstall skipifdoesntexist; StatusMsg: "Installing ExifTool";
+Filename: "{code:OBetzInstaller|{app}}";  Description: {cm:InstallOBetzMsg};                  flags: postinstall skipifdoesntexist; StatusMsg: "Installing ExifTool"; \
+  Check: OBetzSelected;
 
 [Code]
 
@@ -190,6 +212,33 @@ begin
     result := '_X64';
 end;
 
+function EnableAutoDownload: boolean;
+begin
+  result := (UpperCase(ExpandConstant('{#EnableAutoDownload}')) = 'YES');
+end;
+
+function EnableAutoDownloadPH: boolean;
+begin
+  result := (EnableAutoDownload = false) and 
+            (UpperCase(ExpandConstant('{#EnableAutoDownloadPH}')) = 'YES');
+end;
+
+function EnableAutoDownloadOBetz: boolean;
+begin
+  result := (EnableAutoDownload = false) and 
+            (UpperCase(ExpandConstant('{#EnableAutoDownloadOBetz}')) = 'YES');
+end;
+
+function ObetzSelected: boolean;
+begin
+  result := (WizardIsTaskSelected(ExpandConstant('{#DownloadExifToolAutoOBETZ}')));
+end;
+
+function PHSelected: boolean;
+begin
+  result := (WizardIsTaskSelected(ExpandConstant('{#DownloadExifToolAutoPH}')));
+end;
+
 // 1 param seems to be mandatory
 function DefaultDir(Param: string): string;
 begin
@@ -228,11 +277,13 @@ end;
 
 function ShouldSkipPage(PageID: Integer): Boolean;
 begin
+  // Skip Finishing page, with option to install installer from OBetz, if not selected
   if (PageId = wpFinished) then
-     result := (WizardIsTaskSelected(ExpandConstant('{#DownloadExifToolAutoOBETZ}')) = false);
+     result := (OBetzSelected = false);
 
+  // Skip Info page, showing where to download ExifTool, if auto options are selected
   if (PageID = wpInfoAfter) then
-    result := (WizardIsTaskSelected(ExpandConstant('{#DownloadExifToolManual}')) = false);
+    result := PHSelected or OBetzSelected;
 end;
 
 function OBetzInstaller(const Path: string): string;
@@ -329,9 +380,9 @@ begin
 
   if (CurPageID = wpReady) then
   begin
-    if (WizardIsTaskSelected(ExpandConstant('{#DownloadExifToolAutoOBETZ}'))) then
+    if OBetzSelected then
       result := DownLoadETOBetz
-    else if (WizardIsTaskSelected(ExpandConstant('{#DownloadExifToolAutoPH}'))) then
+    else if PHSelected then
       result := DownLoadETPH;
   end;
 
