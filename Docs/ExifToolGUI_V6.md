@@ -306,9 +306,11 @@ If you check this, double-clicking in the Workspace will remove a tag,
 double-clicking on one of the tabs Exif, Xmp, Iptc, Maker, All will add that tag to the Workspace.
 <br><br>
 <b>Exiftool.exe location</b><br>
-If you need to override the location of exiftool.exe you can do that here.<br><br>
+If you need to override the location of exiftool.exe you can do that here.
+<br><br>
 <b>Exiftool config</b><br>
 Use custom config. You can specify a complete path, or just the name. Refer to -config for more info.
+<br><br>
 <b>Filelist: Show Folders in Filelist</b><br>
 The default setting is to only show files in the Filelist panel. If you enable this option, also folders (directories) will be shown, allowing easier navigation.<br><br>
 <b>Filelist: Show Hidden Folders and Files in Filelist (Admin required)</b><br>
