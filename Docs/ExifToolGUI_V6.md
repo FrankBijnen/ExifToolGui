@@ -467,6 +467,8 @@ next GUI start. Remaining options settings however, are only temporary
 
 <h3>API WindowsWideFile (requires Exiftool v12.66)</h3> -Force the use of wide-character Windows I/O functions when the CharsetFileName option is used.<br>
 
+<h3>API LargeFileSupport</h3> -To process files larger than 2GB. Video's for example.<br>
+
 <h3>Custom options</h3> -You can specify additonal options that exiftool should use. Expert option. Normally used with the Log Window.<br>
 Possible use case is the option <b>-htmldump</b> and use the log window to catch the output. Or <b>-API LargeFileSupport=1</b> to support large files.<br>
 <br>
@@ -905,7 +907,7 @@ Here's how to edit metadata in <font class="blue">Workspace</font>:
 <br>
 If you've changed your mind and don't wish to change particular tag,
 then select that tag, right-click (to show pop-up menu) and choose <font class="blue">Undo selected editing</font> -this is usefull in cases when many tags are allready edited and not saved.<br>
-If you've changed your mind completely (don't wish to apply any changes), then just click on <font class="blue">Workspace</font> button and changes will dissapear.<br>
+If you've changed your mind completely (don't wish to apply any changes), then just click on <font class="blue">Workspace</font> button and changes will disappear.<br>
 <u>Note:</u> Changes are lost in most cases when you click elsewhere outside Metadata view area.<br>
 <br>
 <li>When you're finished with editing metadata values, click on <font class="blue">Save</font> button.</li>
