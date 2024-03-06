@@ -81,3 +81,4 @@ Version:        Description             Issue
                 Fix Issue #323          Allow retries for deleting tempdirectory. Dont throw exception in finalization
                 Fix Issue #327          Add version check. Create installer
                 Fix Issue #329          Keep URL's used in a rc file
+                Fix Issue #341          Improve Overpass defaults
