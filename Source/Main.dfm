@@ -1248,7 +1248,7 @@ object FMain: TFMain
       OnExecute = MExportMetaTXTClick
     end
     object MaAbout: TAction
-      Tag = 99
+      Tag = 50
       Category = 'Help'
       Caption = 'About...'
       OnExecute = MAboutClick
@@ -1498,6 +1498,7 @@ object FMain: TFMain
       OnExecute = MCustomOptionsClick
     end
     object MaCheckVersions: TAction
+      Tag = 50
       Category = 'Help'
       Caption = 'Check Versions'
       OnExecute = MaCheckVersionsExecute
