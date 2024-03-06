@@ -30,7 +30,12 @@ type
     ReverseGeoCodeDialog: boolean;
   end;
 
+  TRegionLevels = array[0..3] of integer;
+  TCityLevels = array[0..4] of integer;
+
   TPlace = class
+    FCityLevels: TCityLevels;
+    FRegionLevels: TRegionLevels;
     FCityList : TStringList;
     FProvinceList : TStringList;
     FCountryCode: string;
@@ -46,13 +51,17 @@ type
     function GetCity: string;
     function GetSearchResult: string;
     function GetHtmlSearchResult: string;
+    function GetRegionLevels: TRegionLevels;
+    function GetCityLevels: TCityLevels;
+    procedure SetCountryCode(Value: string);
   public
     constructor Create;
     destructor Destroy; override;
     procedure Clear;
     procedure AssignFromGeocode(Key, Value: string);
     procedure AssignFromOverPass(Key: integer; Value: string);
-    property CountryCode: string read FCountryCode write FCountryCode;
+    procedure Sort;
+    property CountryCode: string read FCountryCode write SetCountryCode;
     property CountryLocation: string read GetCountryLocation;
     property DefLang: string read FDefLang write FDefLang;
     property PostCode: string read FPostCode write FPostCode;
@@ -63,6 +72,9 @@ type
     property City: string read GetCity;
     property SearchReault: string read GetSearchResult;
     property HtmlSearchReault: string read GetHtmlSearchResult;
+    property RegionLevels: TRegionLevels read FRegionLevels;
+    property CityLevels: TCityLevels read FCityLevels;
+
     class function UnEscape(Value: string): string;
   end;
 
@@ -120,6 +132,47 @@ var
   GeoCityList: TStringList;
   ExecRestEvent: TExecRestEvent;
 
+type
+  TCountryRegionLevels = record
+    Country: string[2];
+    Levels: TRegionLevels;
+  end;
+
+  TCountryCityLevels = record
+    Country: string[2];
+    Levels: TCityLevels;
+  end;
+
+const
+  ConstRegionLevels: array[0..7] of TCountryRegionLevels =
+  (
+    (Country: 'NL'; Levels:(4, 6, 5, 3)),
+    (Country: 'DE'; Levels:(4, 6, 5, 3)),
+    (Country: 'PL'; Levels:(4, 6, 5, 3)),
+    (Country: 'CA'; Levels:(4, 6, 5, 3)),
+    (Country: 'US'; Levels:(4, 6, 5, 3)),
+    (Country: 'EC'; Levels:(4, 6, 5, 3)),
+    (Country: 'ZA'; Levels:(4, 6, 5, 3)),
+    (Country: '';   Levels:(6, 5, 4, 3))
+  );
+
+  ConstCityLevels: array[0..12] of TCountryCityLevels =
+  (
+    (Country: 'NL'; Levels:(10, 8, 9, 7, 0)),
+    (Country: 'DE'; Levels:( 8, 7, 6, 9,10)),
+    (Country: 'BE'; Levels:( 9, 8, 7,10, 0)),
+    (Country: 'FI'; Levels:( 9, 8, 7,10, 0)),
+    (Country: 'PT'; Levels:( 9, 8, 7,10, 0)),
+    (Country: 'SI'; Levels:(10, 8, 7, 9, 0)),
+    (Country: 'SE'; Levels:( 9, 7, 8,10, 0)),
+    (Country: 'EC'; Levels:( 6, 7, 8, 9,10)),
+    (Country: 'ZA'; Levels:( 6, 7, 8, 9,10)),
+    (Country: 'SK'; Levels:( 6, 9, 8, 7,10)),
+    (Country: 'GR'; Levels:( 7, 8, 9,10, 0)),
+    (Country: 'GB'; Levels:(10, 8, 7, 9, 0)),
+    (Country: '';   Levels:( 8, 7, 9,10, 0))
+  );
+
 implementation
 
 uses
@@ -132,6 +185,29 @@ var
   CoordFormatSettings: TFormatSettings; // for StrToFloatDef -see Initialization
   LastQuery: TDateTime;
   CoordCache: TObjectDictionary<string, TPlace>;
+
+// Sort on stringlist with possibly integer in key.
+function SortOnKey(List: TStringList; Index1, Index2: Integer): Integer;
+var
+  L1, l2: integer;
+begin
+  result := 0;
+  if (TryStrToInt(List.KeyNames[Index1], L1)) and
+     (TryStrToInt(List.KeyNames[Index2], L2)) then
+  begin // Compare integers
+    if (L1 < L2) then
+      result := -1
+    else if (L1 > L2) then
+      result := 1;
+  end
+  else
+  begin // Compare strings
+    if (List.KeyNames[Index1] < List.KeyNames[Index2]) then
+      result := -1
+    else if (List.KeyNames[Index1] > List.KeyNames[Index2]) then
+      result := 1;
+  end;
+end;
 
 constructor TPlace.Create;
 begin
@@ -189,6 +265,9 @@ begin
 end;
 
 function TPlace.GetProvince: string;
+var
+  Level: integer;
+  LevelX: string;
 begin
   if (GeoProvinceList.Values[FCountryCode] = 'None') then
     exit('');
@@ -202,14 +281,17 @@ begin
     result := FProvinceList.Values['state'];
 
   // Overpass
-  if (result = '') and (FProvinceList.Values['6'] <> '') then
-    result := FProvinceList.Values['6'];
-  if (result = '') and (FProvinceList.Values['5'] <> '') then
-    result := FProvinceList.Values['5'];
-  if (result = '') and (FProvinceList.Values['4'] <> '') then
-    result := FProvinceList.Values['4'];
-  if (result = '') and (FProvinceList.Values['3'] <> '') then
-    result := FProvinceList.Values['3'];
+  for Level in RegionLevels do
+  begin
+    if (Level = 0) then
+      break;
+    LevelX := IntToStr(Level);
+    if (FProvinceList.Values[LevelX] <> '') then
+    begin
+      result := FProvinceList.Values[LevelX];
+      break;
+    end;
+  end;
 end;
 
 function TPlace.GetPrioCity: string;
@@ -222,6 +304,9 @@ begin
 end;
 
 function TPlace.GetCity: string;
+var
+  Level: integer;
+  LevelX: string;
 begin
   if (GeoCityList.Values[FCountryCode] = 'None') then
     exit('');
@@ -239,17 +324,20 @@ begin
     result := FCityList.Values['city'];
 
   // Overpass
-  if (result = '') and (FCityList.Values['10'] <> '') then
-    result := FCityList.Values['10'];
-  if (result = '') and (FCityList.Values['9'] <> '') then
-    result := FCityList.Values['9'];
-  if (result = '') and (FCityList.Values['8'] <> '') then
-    result := FCityList.Values['8'];
-  if (result = '') and (FCityList.Values['7'] <> '') then
-    result := FCityList.Values['7'];
+  for Level in CityLevels do
+  begin
+    if (Level = 0) then
+      break;
+    LevelX := IntToStr(Level);
+    if (FCityList.Values[LevelX] <> '') then
+    begin
+      result := FCityList.Values[LevelX];
+      break;
+    end;
+  end;
 end;
 
-function Tplace.GetSearchResult: string;
+function TPlace.GetSearchResult: string;
 begin
   result := '';
   if (FNodeId <> '') then
@@ -259,17 +347,24 @@ begin
   result := result + Format('Name: %s, City: %s, Province: %s, Country: %s, %s', [Name, City, Province, FCountryCode, FCountry]);
 end;
 
-function Tplace.GetHtmlSearchResult: string;
+function TPlace.GetHtmlSearchResult: string;
 begin
   result := Format('<a>%s<br>%s %s</a>', [City, Province, FCountryCode]);
   result := StringReplace(result, ' ', '&nbsp', [rfReplaceAll]);
   result := StringReplace(result, '-', '&#8209;', [rfReplaceAll]);
 end;
 
+procedure TPlace.SetCountryCode(Value: string);
+begin
+  FCountryCode := Value;
+  FRegionLevels := GetRegionLevels;
+  FCityLevels := GetCityLevels;
+end;
+
 procedure TPlace.AssignFromGeocode(Key, Value: string);
 begin
   if (Key = 'country_code') then
-    FCountryCode := Value;
+    CountryCode := Value;
   if (Key = 'country') then
     FCountry := Value;
 
@@ -292,17 +387,61 @@ begin
 end;
 
 procedure TPlace.AssignFromOverPass(Key: integer; Value: string);
+var
+  Level: integer;
 begin
   if (Key = 0) then
     FNodeId := Value;
   if (Key = 2) then
     FCountry := Value;
-  if (Key >= 3) and
-     (Key <= 6) then
-    FProvinceList.AddPair(IntToStr(Key), Value);
-  if (Key >= 7) and
-     (Key <= 10) then
-    FCityList.AddPair(IntToStr(Key), Value);
+  for Level in RegionLevels do
+  begin
+    if (Key = Level) then
+      FProvinceList.AddPair(IntToStr(Key), Value);
+  end;
+  for Level in CityLevels do
+  begin
+    if (Key = Level) then
+      FCityList.AddPair(IntToStr(Key), Value);
+  end;
+end;
+
+procedure TPLace.Sort;
+begin
+  FCityList.CustomSort(SortOnKey) ;
+  FProvinceList.CustomSort(SortOnKey) ;
+end;
+
+function TPLace.GetRegionLevels: TRegionLevels;
+var
+  Indx, H: integer;
+begin
+  H := High(ConstRegionLevels);
+  result := ConstRegionLevels[H].Levels;
+  for Indx := 0 to H -1 do
+  begin
+    if (ConstRegionLevels[Indx].Country = FCountryCode) then
+    begin
+      result := ConstRegionLevels[Indx].Levels;
+      break;
+    end;
+  end;
+end;
+
+function TPLace.GetCityLevels: TCityLevels;
+var
+  Indx, H: integer;
+begin
+  H := High(ConstCityLevels);
+  result := ConstCityLevels[H].Levels;
+  for Indx := 0 to H -1 do
+  begin
+    if (ConstCityLevels[Indx].Country = FCountryCode) then
+    begin
+      result := ConstCityLevels[Indx].Levels;
+      break;
+    end;
+  end;
 end;
 
 constructor TOSMHelper.Create(const APathName, AInitialZoom: string);
@@ -669,6 +808,7 @@ begin
 
       result.AssignFromOverPass(JSOnAdmin, JSONTagVal.Value);
     end;
+    result.Sort;
   finally
     RESTResponse.Free;
     RESTRequest.Free;
@@ -720,6 +860,7 @@ begin
           result.AssignFromGeocode(TPlace.UnEscape(JSONPair.JsonString.ToString),
                                    TPlace.UnEscape(JSONPair.JsonValue.ToString)
                                   );
+        result.Sort;
       end;
     finally
       JSONObject.Free;
@@ -944,7 +1085,7 @@ begin
         continue;
       end;
     end;
-
+    PlaceResult.Sort;
     ChooseLocation(Lat, Lon);
 
   finally

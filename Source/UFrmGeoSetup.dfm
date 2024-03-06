@@ -22,6 +22,8 @@ object FGeoSetup: TFGeoSetup
     Height = 19
     Panels = <>
     SimplePanel = True
+    ExplicitTop = 400
+    ExplicitWidth = 585
   end
   object BtnCancel: TButton
     Left = 518
