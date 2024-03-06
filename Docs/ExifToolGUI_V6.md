@@ -181,12 +181,7 @@ That's all you need. And when a new ExifTool or GUI version is available, you on
 <li><a href="#m_exp_imp">Export/Import</a> menu</li>
 <li><a href="#m_modify">Modify</a> menu</li>
 <li><a href="#m_various">Various</a> menu</li>
-<li><font class="blue">Help</font></li>
-<ul>
-<li><u><font class="blue"> Online Documentation</font></u> Opens this document</li>
-<li><u><font class="blue"> Check versions</font></u> Check for updated versions of GUI and ExifTool </li>
-<li><u><font class="blue"> About</font></u></li>
-</ul>
+<li><a href="#m_help">Help</a> menu</li>
 <br>
 <b>Panels:</b><br>
 <li><a href="#p_filelist">Filelist</a> panel</li>
@@ -197,9 +192,6 @@ That's all you need. And when a new ExifTool or GUI version is available, you on
 <a href="#final">Final words</a><br><br>
 
 <h2><a name="m_program">Program menu</a></h2>
-<h3>About</h3>
--Displays ExifTool and GUI versions and links.<br>
-<br>
 <h3>Preferences</h3>
 <img src="ExifToolGUI_V6_files/preferences_general.jpg"><br>
 <br><br>
@@ -704,6 +696,17 @@ In addition you have more control over how the function is performed.<br><br>
 <img src="ExifToolGUI_V6_files/jpeglosslessrotate.jpg"><br><br>
 <a href="Readme Lossless rotate_Import_Export previews.txt">See also Readme Lossless rotate_Import_Export previews.txt</a>
 <br>
+<br>
+
+<h2><a name="m_help">Help menu</a></h2>
+<h3>Online Documentation</h3>
+-Opens this document<br>
+
+<h3>Check versions</h3>
+-Check for updated versions of GUI and ExifTool <br>
+
+<h3>About</h3>
+-Displays ExifTool and GUI versions and links.<br>
 <br>
 
 <h2><a name="p_filelist">Filelist panel</a></h2>
