@@ -96,7 +96,9 @@ begin
 end;
 
 procedure TFGeoSetup.FillSetup;
-var Preferred: string;
+var
+  Preferred: string;
+  Level: integer;
 begin
   if (APlace = nil) then
     exit;
@@ -119,10 +121,12 @@ begin
       begin
         begin
           CmbProvince.Items.Add('Default');
-          CmbProvince.Items.Add('6');
-          CmbProvince.Items.Add('5');
-          CmbProvince.Items.Add('4');
-          CmbProvince.Items.Add('3');
+          for Level in APlace.RegionLevels do
+          begin
+            if Level = 0 then
+              continue;
+            CmbProvince.Items.Add(IntToStr(Level));
+          end;
           CmbProvince.Items.Add('None');
 
           CmbOverPasslang.Enabled := true;
@@ -154,10 +158,12 @@ begin
       begin
         begin
           CmbCity.Items.Add('Default');
-          CmbCity.Items.Add('10');
-          CmbCity.Items.Add('9');
-          CmbCity.Items.Add('8');
-          CmbCity.Items.Add('7');
+          for Level in APlace.CityLevels do
+          begin
+            if Level = 0 then
+              continue;
+            CmbCity.Items.Add(IntToStr(Level));
+          end;
           CmbCity.Items.Add('None');
         end;
       end;
