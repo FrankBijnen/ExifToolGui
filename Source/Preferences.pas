@@ -71,7 +71,7 @@ type
     BtnRemoveFromContextMenu: TBitBtn;
     CheckBox10: TCheckBox;
     EdCommand: TLabeledEdit;
-    Memo1: TMemo;
+    MemoWin11: TMemo;
     CheckBox11: TCheckBox;
     GrpConfig: TGroupBox;
     EdETCustomConfig: TEdit;
@@ -121,22 +121,19 @@ end;
 
 procedure TFPreferences.BtnSaveClick(Sender: TObject);
 var
-  i: integer;
-  tx: string[7];
+  I: integer;
+  Tx: string;
 begin
-  i := ComboBox1.ItemIndex;
-  if i = 0 then
+  GUIsettings.Language := '';
+  ET_Options.ETLangDef := '';
+  I := ComboBox1.ItemIndex;
+  if I > 0 then
   begin
-    GUIsettings.Language := '';
-    ET_Options.ETLangDef := '';
-  end
-  else
-  begin
-    tx := ComboBox1.Items[i];
-    i := pos(' ', tx);
-    SetLength(tx, i - 1);
-    GUIsettings.Language := tx;
-    ET_Options.ETLangDef := tx + CRLF;
+    Tx := ComboBox1.Items[I];
+    I := Pos(' ', Tx);
+    SetLength(Tx, I - 1);
+    GUIsettings.Language := Tx;
+    ET_Options.ETLangDef := Tx + CRLF;
   end;
   with GUIsettings do
   begin
@@ -152,20 +149,20 @@ begin
   end;
   with LabeledEdit1 do
   begin
-    if (Text = '') or (Text = ' ') then
+    if (Trim(Text) = '') then
       Text := '*';
     ET_Options.ETSeparator := '-sep' + CRLF + Text + CRLF;
   end;
 
   case RadioGroup3.ItemIndex of
     0:
-      i := 96;
+      I := 96;
     1:
-      i := 128;
+      I := 128;
     2:
-      i := 160;
+      I := 160;
   end;
-  FMain.ShellList.ThumbNailSize := i;
+  FMain.ShellList.ThumbNailSize := I;
   GUIsettings.ThumbSize := RadioGroup3.ItemIndex;
 
   FMain.ShellList.ThumbAutoGenerate := ChkThumbAutoGenerate.Checked;
@@ -198,6 +195,9 @@ begin
       ((GeoSettings.GeoCodeApiKey = '') or
        (GeoSettings.ThrottleGeoCode < 1000)) then
     ShowMessage(StrCheckTheGeoCodeRe);
+
+  // Make sure changes made by user are saved.
+  SaveGUIini;
 end;
 
 procedure TFPreferences.BtnSetupCleanClick(Sender: TObject);
@@ -306,11 +306,14 @@ var
   Tx: string;
   ETResult: TStringList;
 begin
-  memo1.Visible := CheckWin32Version(10, 0) and (TOSversion.Build >= 22000); //WIN11
+  Left := FMain.Left + FMain.GUIBorderWidth;
+  Top := FMain.Top + FMain.GUIBorderHeight;
+
+  MemoWin11.Visible := CheckWin32Version(10, 0) and
+                       (TOSversion.Build >= 22000); //WIN11
+
   ETResult := TStringList.Create;
   try
-    Left := FMain.Left + 8;
-    Top := FMain.Top + 56;
     ET_OpenExec('-lang', '', ETResult, false);
     with ComboBox1 do
     begin

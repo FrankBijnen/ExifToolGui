@@ -96,6 +96,7 @@ var
   CustomViewTags: string;
   GpsXmpDir: string = '';
   WrkIniDir: string = '';
+  ParmIniPath: string = '';
   DontSaveIni: boolean;
 
 function GetIniFilePath(AllowPrevVer: boolean): string;
@@ -103,7 +104,7 @@ procedure ReadGUILog;
 function ReadSingleInstanceApp: boolean;
 procedure ResetWindowSizes;
 procedure ReadGUIini;
-procedure SaveGUIini;
+function SaveGUIini: boolean;
 function LoadWorkspaceIni(IniFName: string): boolean;
 function SaveWorkspaceIni(IniFName: string): boolean;
 function BrowseFolderDlg(const Title: string; iFlag: integer; const StartFolder: string = ''): string;
@@ -129,14 +130,44 @@ var
   GUIini: TMemIniFile;
   lg_StartFolder: string;
 
-  // This function returns the name of the INI file.
-  // If it doesn't exist, but a previous version exists it returns that name.
+
+// Check for IniPath commandLine param. See initialization.
+const
+  INIPATHSWITCH = 'IniPath';
+
+function GetParmIniPath: string;
+begin
+  result := '';
+  if (FindCmdLineSwitch(INIPATHSWITCH, result, true)) then
+  begin
+    result := Copy(result, Pos('=', result) +1);
+    if (SameText(result, '%P')) or
+       (result = '.') or
+       (result = '') then
+      result := GetAppPath;
+    if (SameText(result, '%T')) then
+      result := GetTempDirectory;
+    if (SameText(result, '%W')) then
+      result := GetCurrentDir;
+    result := IncludeTrailingPathDelimiter(result);
+  end;
+end;
+
+// This function returns the name of the INI file.
+// If it doesn't exist, but a previous version exists it returns that name.
 function GetIniFilePath(AllowPrevVer: boolean): string;
 var
   CurVer, PrevVer, PrevPath: string;
 begin
   // Default is ExifToolGuiV6.ini in Profile %AppData%\ExifToolGui
   CurVer := Application.Title + IniVersion + '.ini';
+
+  if (ParmIniPath <> '') then
+  begin
+    result := ParmIniPath + CurVer;
+    exit;
+  end;
+
   result := GetINIPath(not AllowPrevVer) + CurVer;
   if (FileExists(result)) then
     exit;
@@ -617,19 +648,20 @@ begin
   end;
 end;
 
-procedure SaveGUIini;
+function SaveGUIini: boolean;
 var
   I, N: integer;
   Tx: string;
 begin
+  result := true;
   if (DontSaveIni) then
     exit;
   try
     // Recreate the INI file, by deleting first
     System.SysUtils.DeleteFile(GetIniFilePath(false));
+
     GUIini := TMemIniFile.Create(GetIniFilePath(false), TEncoding.UTF8);
     try
-      GUIini.AutoSave := true;
       with GUIini, FMain do
       begin
         if WindowState <> wsMaximized then
@@ -782,6 +814,7 @@ begin
 
       end;
       WriteGeoCodeSettings(GUIini);
+      GUIini.UpdateFile;
     finally
       GUIini.Free;
     end;
@@ -789,6 +822,7 @@ begin
   except
     on E: Exception do
     begin
+      result := false;
       ShowMessage(StrCannotSaveGUI + #10 + E.Message);
     end;
   end;
@@ -820,8 +854,8 @@ begin
     System.SysUtils.DeleteFile(IniFName);
     GUIini := TMemIniFile.Create(IniFName, TEncoding.UTF8);
     try
-      GUIini.AutoSave := true;
       WriteWorkSpaceTags(GuiIni);
+      GUIini.UpdateFile;
     finally
       GUIini.Free;
     end;
@@ -939,6 +973,8 @@ initialization
 
 begin
   ETdirectCmd := TStringList.Create;
+  ParmIniPath := GetParmIniPath;
+
 end;
 
 finalization

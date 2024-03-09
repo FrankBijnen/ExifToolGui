@@ -2521,6 +2521,13 @@ var
   I: integer;
   PathFromParm: boolean;
 begin
+
+  if (ParmIniPath <> '') then
+  begin
+    if not SaveGUIini then
+      Halt;
+  end;
+
   if TrayIcon.Visible then
     exit;
 

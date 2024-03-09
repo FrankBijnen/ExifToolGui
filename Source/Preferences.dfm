@@ -38,7 +38,7 @@ object FPreferences: TFPreferences
     Top = 0
     Width = 606
     Height = 373
-    ActivePage = AdvTabOther
+    ActivePage = AdvTabGeneral
     Align = alLeft
     DoubleBuffered = True
     ParentDoubleBuffered = False
@@ -785,7 +785,7 @@ object FPreferences: TFPreferences
           TabOrder = 2
           Text = ''
         end
-        object Memo1: TMemo
+        object MemoWin11: TMemo
           Left = 5
           Top = 105
           Width = 510
