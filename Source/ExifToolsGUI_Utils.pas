@@ -9,7 +9,7 @@ interface
 uses Winapi.ShlObj, Winapi.ActiveX, Winapi.Wincodec, Winapi.Windows, Winapi.Messages,
   System.Classes, System.SysUtils, System.Variants, System.StrUtils, System.Math, System.Threading,
   System.Generics.Collections,
-  Vcl.Forms, Vcl.Dialogs, Vcl.ComCtrls, Vcl.Shell.ShellCtrls, Vcl.Graphics,
+  Vcl.Forms, Vcl.Dialogs, Vcl.ComCtrls, Vcl.Shell.ShellCtrls, Vcl.Graphics, Vcl.Themes,
   Geomap;
 
 type
@@ -65,6 +65,11 @@ function MessageDlgEx(const AMsg, ACaption: string; ADlgType: TMsgDlgType; AButt
 // Previews in Raw/Jpeg files
 function GetPreviews(ETResult: TStringList; var Biggest: integer): TPreviewInfoList;
 procedure FillPreviewInListView(SelectedFile: string; LvPreviews: TListView);
+procedure StyledDrawListviewItem(FstyleServices: TCustomStyleServices;
+                                 ListView: TCustomListView;
+                                 Item: TlistItem;
+                                 State: TCustomDrawState);
+
 
 // GeoCoding
 function GetGpsCoordinates(const Images: string): string;
@@ -784,6 +789,24 @@ begin
       LvPreviews.Items[AMaxPos].Checked := true;
   finally
     ETResult.Free;
+  end;
+end;
+
+procedure StyledDrawListviewItem(FstyleServices: TCustomStyleServices;
+                                 ListView: TCustomListView;
+                                 Item: TlistItem;
+                                 State: TCustomDrawState);
+var
+  ThemedDetails: TThemedElementDetails;
+begin
+  if (Item.Selected) then
+  begin
+    ListView.Canvas.Font.Color := FStyleServices.GetStyleFontColor(TStyleFont.sfListItemTextSelected);
+    if ([cdsSelected, cdsFocused, cdsHot] * State <> []) then
+    begin
+      ThemedDetails := FStyleServices.GetElementDetails(tgCellSelected); // Use the same as ValueListEditor
+      FStyleServices.DrawElement(ListView.Canvas.Handle, ThemedDetails, Item.DisplayRect(drBounds));
+    end;
   end;
 end;
 

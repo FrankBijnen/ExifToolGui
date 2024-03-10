@@ -113,6 +113,7 @@ type
     property OnItemsLoaded: TNotifyEvent read FOnItemsLoaded write FOnItemsLoaded;
     property OnOwnerDataFetchEvent: TOwnerDataFetchEvent read FOnOwnerDataFetchEvent write FOnOwnerDataFetchEvent;
     property OnMouseWheel;
+    property OnCustomDrawItem;
   end;
 
 implementation

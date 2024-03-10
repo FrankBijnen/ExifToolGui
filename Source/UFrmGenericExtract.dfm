@@ -79,6 +79,7 @@ object FGenericExtract: TFGenericExtract
           Caption = 'Size'
           Width = 125
         end>
+      ReadOnly = True
       TabOrder = 0
       ViewStyle = vsReport
     end

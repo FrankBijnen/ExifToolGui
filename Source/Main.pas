@@ -295,6 +295,7 @@ type
     procedure TrayIconBalloonClick(Sender: TObject);
     procedure MaAPILargeFileSupportExecute(Sender: TObject);
     procedure MaCheckVersionsExecute(Sender: TObject);
+    procedure ShellListEnter(Sender: TObject);
   private
     { Private declarations }
     ETBarSeriesFocal: TBarSeries;
@@ -323,9 +324,13 @@ type
     procedure RefreshSelected(Sender: TObject);
     procedure ShellTreeBeforeContext(Sender: TObject);
     procedure ShellTreeAfterContext(Sender: TObject);
+    procedure ShellTreeCustomDrawItem(Sender: TCustomTreeView; Node: TTreeNode; State: TCustomDrawState; var DefaultDraw: Boolean);
 
     procedure ShellistThumbError(Sender: TObject; Item: TListItem; E: Exception);
     procedure ShellistThumbGenerate(Sender: TObject; Item: TListItem; Status: TThumbGenStatus; Total, Remaining: integer);
+
+    procedure ShellListCustomDrawItem(Sender: TCustomListView; Item: TListItem; State: TCustomDrawState;
+      var DefaultDraw: Boolean);
     procedure ShellListBeforePopulate(Sender: TObject; var DoDefault: boolean);
     procedure ShellListAfterEnumColumns(Sender: TObject);
     procedure ShellListPathChange(Sender: TObject);
@@ -365,8 +370,9 @@ uses System.StrUtils, System.Math, System.Masks, System.Types, System.UITypes,
   UFrmGenericExtract, UFrmGenericImport, UFrmLossLessRotate, UFrmGeoTagFiles, UFrmGeoSetup,
   UnitLangResources;
 
-
 {$R *.dfm}
+
+var FStyleServices: TCustomStyleServices; 
 
 const
   GUI_SEP = '-GUI-SEP';
@@ -657,9 +663,9 @@ begin
   with ShellList do
   if (Enabled) then
   begin
+    ClearSelection;
     Refresh;
-    ShowMetadata;
-    ShowPreview;
+    ShellListItemsLoaded(ShellList);
     SetFocus;
   end;
 end;
@@ -2452,6 +2458,10 @@ begin
   // Enable Column sorting if Sorted = true. Disables Sorted.
   ShellList.ColumnSorted := ShellList.Sorted;
 
+  ShellList.OnCustomDrawItem := ShellListCustomDrawItem;
+
+  ShellTree.OnCustomDrawItem := ShellTreeCustomDrawItem;
+
   // Metadatalist Ctrl handler
   MetadataList.OnCtrlKeyDown := MetadataListCtrlKeyDown;
 
@@ -2718,6 +2728,12 @@ begin
         FListColUsr[ColIndex - 1].Width := TListColumn(Sender).Width;
     end;
   end;
+end;
+
+procedure TFMain.ShellListCustomDrawItem(Sender: TCustomListView; Item: TListItem; State: TCustomDrawState;
+  var DefaultDraw: Boolean);
+begin
+  StyledDrawListviewItem(FStyleServices, Sender, Item, State);
 end;
 
 procedure TFMain.ShellListBeforePopulate(Sender: TObject; var DoDefault: boolean);
@@ -2991,6 +3007,12 @@ begin // event is executed for each deleted file -so make it fast!
   MetadataList.Strings.Clear;
 end;
 
+//Remove focus rectangle
+procedure TFMain.ShellListEnter(Sender: TObject);
+begin
+  SendMessage(ShellList.Handle, WM_CHANGEUISTATE, UIS_Set + ($10000 * UISF_HIDEFOCUS), 0);
+end;
+
 procedure TFMain.ShellListKeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
 
   procedure DeleteSelected;
@@ -3146,6 +3168,13 @@ begin
     ETBarSeriesFnum.Clear;
   if Assigned(ETBarSeriesIso) then
     ETBarSeriesIso.Clear;
+end;
+
+procedure TFMain.ShellTreeCustomDrawItem(Sender: TCustomTreeView; Node: TTreeNode; State: TCustomDrawState;
+  var DefaultDraw: Boolean);
+begin
+  if (Node.Selected ) then
+    Sender.Canvas.Font.Style := Sender.Canvas.Font.Style + [fsBold];
 end;
 
 procedure TFMain.RefreshSelected(Sender: TObject);
@@ -3606,14 +3635,12 @@ begin
 end;
 
 procedure TFMain.SetGuiStyle;
-var
-  AStyleService: TCustomStyleServices;
 begin
   GUIColorWindow := clBlack;
-  AStyleService := TStyleManager.Style[GUIsettings.GuiStyle];
-  if Assigned(AStyleService) then
-    GUIColorWindow := AStyleService.GetStyleColor(scWindow);
+  FStyleServices := TStyleManager.Style[GUIsettings.GuiStyle];
 
+  if Assigned(FStyleServices) then
+    GUIColorWindow := FStyleServices.GetStyleColor(scWindow);
   BreadcrumbBar.Style := GUIsettings.GuiStyle;
 end;
 

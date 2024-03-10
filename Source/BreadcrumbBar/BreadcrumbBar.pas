@@ -152,7 +152,7 @@ type
     function GetIconSize: integer;
   protected
     function GetButtonColor(const ARectState: TRectState): TColor;
-    function GetPenColor: TColor;
+    function GetPenColor(const ASelected: boolean = false): TColor;
     function GetBackColor(const ASelected: boolean = false): TColor;
     function GetBorderColor: TColor;
     function DpiScale(const APix: integer): integer;
@@ -600,12 +600,22 @@ begin
   end;
 end;
 
-function TCustomBreadcrumbBar.GetPenColor: TColor;
+function TCustomBreadcrumbBar.GetPenColor(const ASelected: boolean = false): TColor;
 begin
   if Assigned(FStyleServices) then
-    result := FStyleServices.GetStyleFontColor(TStyleFont.sfButtonTextNormal)
+  begin
+    if (ASelected) then
+      result := FStyleServices.GetStyleFontColor(TStyleFont.sfListItemTextSelected)
+    else
+      result := FStyleServices.GetStyleFontColor(TStyleFont.sfListItemTextNormal);
+  end
   else
-    result := clBlack;
+  begin
+    if (ASelected) then
+      result := clHighlight
+    else
+      result := clBlack;
+  end;
 end;
 
 function TCustomBreadcrumbBar.GetBackColor(const ASelected: boolean = false): TColor;
@@ -613,9 +623,9 @@ begin
   if Assigned(FStyleServices) then
   begin
     if (ASelected) then
-      result := FStyleServices.GetStyleColor(TStyleColor.scButtonHot)
+      result := FStyleServices.GetSystemColor(clHighlight)
     else
-      result := FStyleServices.GetStyleColor(TStyleColor.scGenericGradientBase);
+      result := FStyleServices.GetStyleColor(TStyleColor.scWindow);
   end
   else
   begin
@@ -711,10 +721,7 @@ begin
 
 // Text breadcrumb
     Canvas.Brush.Style := bsClear;
-    if Assigned(FStyleServices) then
-      Canvas.Font.Color := FStyleServices.GetStyleFontColor(TStyleFont.sfButtonTextNormal)
-    else
-      Canvas.Font.Color := clBlack;
+    Canvas.Font.Color := GetPenColor(FBreadcrumbStates[i] <> rsNormal);
 
     DrawText(Canvas.Handle,
       PChar(S),
@@ -897,6 +904,7 @@ begin
                    ARect.Left, ARect.Top + FVerMargin, ILD_TRANSPARENT);
     ARect.Left := ARect.Left + FIconSize + FHorSpace;
     Canvas.Font.Assign(FBreadCrumbBar.Canvas.Font);
+    Canvas.Font.Color := FBreadCrumbBar.GetPenColor(odSelected in State);
     Canvas.TextRect(ARect, AListObject.Caption, [tfSingleLine, tfVerticalCenter]);
   finally
     AListObject.Free;

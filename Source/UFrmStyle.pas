@@ -6,6 +6,9 @@ uses
   Winapi.Windows, Winapi.Messages, Vcl.StdCtrls, Vcl.Buttons, System.Classes,
   Vcl.Controls, Vcl.ExtCtrls, Vcl.Forms, UnitScaleForm;
 
+const
+  cSystemStyleName = 'Windows';
+
 type
   TFrmStyle = class(TScaleForm)
     Panel1: TPanel;
@@ -47,8 +50,6 @@ uses
   Vcl.Themes,
   Vcl.Styles;
 
-const
-  cSystemStyleName = 'Windows';
 
 procedure TFrmStyle.SetNewStyle(Style: string);
 begin
