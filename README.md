@@ -7,7 +7,7 @@ This is an updated version of the ExifToolGui program created by Bogdan Hrastnik
 
 - Een vertaling in het Nederlands is klaar. [DLL](Translation/ExifToolGui.NLD), [BTM bronbestand](Translation/ExifToolGUI_nl.xlat)<br>
 - Deutsch hat angefangen. [DLL](Translation/ExifToolGui.DEU), [BTM quelldatei](Translation/ExifToolGUI_de.xlat)<br>
-- English was already available as default. [DLL](Translation/ExifToolGui.ENU)<br>
+- English was already available as default. [DLL](Translation/ExifToolGUI.ENU)<br>
 
 When you place the language DLL in the same folder as the EXE, it should be selected automatically. According to your Windows language. 
 To override the default use /Lang=xxx as commandline parm. Where xxx is the languagecode. (NLD, DEU)
