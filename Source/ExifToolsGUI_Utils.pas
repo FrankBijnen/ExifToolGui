@@ -796,16 +796,14 @@ procedure StyledDrawListviewItem(FstyleServices: TCustomStyleServices;
                                  ListView: TCustomListView;
                                  Item: TlistItem;
                                  State: TCustomDrawState);
-var
-  ThemedDetails: TThemedElementDetails;
 begin
   if (Item.Selected) then
   begin
-    ListView.Canvas.Font.Color := FStyleServices.GetStyleFontColor(TStyleFont.sfListItemTextSelected);
+    ListView.Canvas.Font.Color := FStyleServices.GetStyleFontColor(TStyleFont.sfGridItemSelected);
     if ([cdsSelected, cdsFocused, cdsHot] * State <> []) then
     begin
-      ThemedDetails := FStyleServices.GetElementDetails(tgCellSelected); // Use the same as ValueListEditor
-      FStyleServices.DrawElement(ListView.Canvas.Handle, ThemedDetails, Item.DisplayRect(drBounds));
+      ListView.Canvas.Brush.Color := FStyleServices.GetSystemColor(clHighlight);
+      ListView.Canvas.FillRect(Item.DisplayRect(drBounds));
     end;
   end;
 end;
