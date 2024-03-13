@@ -331,14 +331,15 @@ begin
     result := FCityList.Values['GeolocationCity'];
 
   // Geocode
+  // Note: hamlet not added to default. Can be specified.
   if (result = '') and (FCityList.Values['village'] <> '') then
     result := FCityList.Values['village'];
-  if (result = '') and (FCityList.Values['municipality'] <> '') then
-    result := FCityList.Values['municipality'];
   if (result = '') and (FCityList.Values['town'] <> '') then
     result := FCityList.Values['town'];
   if (result = '') and (FCityList.Values['city'] <> '') then
     result := FCityList.Values['city'];
+  if (result = '') and (FCityList.Values['municipality'] <> '') then
+    result := FCityList.Values['municipality'];
 
   // Overpass
   if (result = '') then
@@ -396,9 +397,11 @@ begin
   if (Key = 'postcode') then
     FPostCode := Value;
 
-  if (Key = 'town') then
+  if (Key = 'hamlet') then
     FCityList.AddPair(Key, Value);
   if (Key = 'village') then
+    FCityList.AddPair(Key, Value);
+  if (Key = 'town') then
     FCityList.AddPair(Key, Value);
   if (Key = 'municipality') then
     FCityList.AddPair(Key, Value);
@@ -1053,7 +1056,7 @@ begin
       SearchBounds := Format('(%s);', [Bounds]);
 
     Data := Data +
-            Format('node[%s][place~"^(village|city|town)$"]%s%s',
+            Format('node[%s][place~"^(hamlet|village|town|city|municipality)$"]%s%s',
                      [SearchName, SearchBounds, FormatNL]);
 
   end
@@ -1065,7 +1068,7 @@ begin
                         FormatNL]);
     Data := Data +
             Format('(%s' +
-                   'node[%s][place~"city|town|village|hamlet"](area.searchArea);%s' +
+                   'node[%s][place~"municipality|city|town|village|hamlet"](area.searchArea);%s' +
                    ');%s',
                      [FormatNL, SearchName, FormatNL, FormatNL]);
   end;

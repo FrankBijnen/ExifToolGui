@@ -155,10 +155,11 @@ begin
       TGeoCodeProvider.gpGeoName:
         begin
           CmbCity.Items.Add(PlaceDefault);
+          CmbCity.Items.Add('hamlet');
           CmbCity.Items.Add('village');
-          CmbCity.Items.Add('municipality');
           CmbCity.Items.Add('town');
           CmbCity.Items.Add('city');
+          CmbCity.Items.Add('municipality');
           CmbCity.Items.Add(PlaceNone);
         end;
     TGeoCodeProvider.gpOverPass:
@@ -177,7 +178,6 @@ begin
     TGeoCodeProvider.gpExifTool:
       begin
         CmbCity.Items.Add(PlaceDefault);
-        CmbCity.Items.Add(PlaceNone);
       end;
     end;
     CmbCity.ItemIndex := CmbCity.Items.IndexOf(Preferred);
