@@ -76,6 +76,7 @@ function GetGpsCoordinates(const Images: string): string;
 function AnalyzeGPSCoords(var ETout, Lat, Lon: string; var IsQuickTime: boolean): string;
 procedure FillLocationInImage(const ANImage: string);
 function GetIsQuickTime(const AFile: string): boolean;
+function GetGeoLocation(const Lat, Lon:string): TStringList;
 
 // Context menu
 function ContextInstalled(const AppTitle: string): string;
@@ -859,12 +860,34 @@ begin
     APlace := GetPlaceOfCoords(Lat, Lon, GeoSettings.GetPlaceProvider);
     if not Assigned(APlace) then
       exit;
-    ETCmd := ETCmd + CRLF + '-xmp:LocationShownCountryName=' + APlace.CountryLocation;
+
+// Compatibility with exiftool -geolocation
+    Etcmd := '-xmp:CountryCode=' + APlace.CountryCode;;
+    Etcmd := Etcmd + CRLF + '-xmp:Country=' + APlace.CountryName;
+    Etcmd := Etcmd + CRLF + '-xmp:State=' + APlace.Province;
+    Etcmd := Etcmd + CRLF + '-xmp:City=' + APlace.City;
+//
+    ETCmd := ETCmd + CRLF + '-xmp:LocationShownCountryCode=' + APlace.CountryCode;
+    ETCmd := ETCmd + CRLF + '-xmp:LocationShownCountryName=' + APlace.CountryName;
     ETCmd := ETCmd + CRLF + '-xmp:LocationShownProvinceState=' + APlace.Province;
     ETCmd := ETCmd + CRLF + '-xmp:LocationShownCity=' + APlace.City;
 
     ET_OpenExec(ETcmd, ANImage);
   end;
+end;
+
+function GetGeoLocation(const Lat, Lon:string): TStringList;
+var
+  ETCmd: string;
+begin
+  result := TStringList.Create;
+  ETcmd := '-short' + CRLF + '-f' + CRLF + '-n' + CRLF + '-q';
+  ETcmd := ETCmd + CRLF + '-api' + CRLF + Format('geolocation=%s,%s', [Lat, Lon]);
+  ETcmd := ETcmd + CRLF + '-GeolocationCountryCode';
+  ETcmd := ETcmd + CRLF + '-GeolocationCountry';
+  ETcmd := ETcmd + CRLF + '-GeolocationRegion';
+  ETcmd := ETcmd + CRLF + '-GeolocationCity';
+  ET_OpenExec(ETcmd, '', result, false);
 end;
 
 function GetIsQuickTime(const AFile: string): boolean;

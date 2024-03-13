@@ -76,6 +76,7 @@ type
     GrpConfig: TGroupBox;
     EdETCustomConfig: TEdit;
     BtnEtCustomConfig: TButton;
+    ChkCountryLocation: TCheckBox;
     procedure FormShow(Sender: TObject);
     procedure BtnSaveClick(Sender: TObject);
     procedure BtnBrowseFolder(Sender: TObject);
@@ -190,6 +191,7 @@ begin
   GeoSettings.GeoCodeDialog := ChkGeoCodeDialog.Checked;
   GeoSettings.GeoCodingEnable := ChkGeoCodingEnable.Checked;
   GeoSettings.ReverseGeoCodeDialog := ChkReverseGeoCodeDialog.Checked;
+  GeoSettings.CountryCodeLocation := ChkCountryLocation.Checked;
 
   if (GeoSettings.GeoCodingEnable) and
       ((GeoSettings.GeoCodeApiKey = '') or
@@ -406,6 +408,7 @@ begin
     ChkGeoCodingEnable.Checked := GeoSettings.GeoCodingEnable;
     ChkGeoCodeDialog.Checked := GeoSettings.GeoCodeDialog;
     ChkReverseGeoCodeDialog.Checked := GeoSettings.ReverseGeoCodeDialog;
+    ChkCountryLocation.Checked := GeoSettings.CountryCodeLocation;
 
     AdvPageControl1.ActivePage := AdvTabGeneral;
 

@@ -823,7 +823,6 @@ object FMain: TFMain
         TabOrder = 2
         ViewStyle = vsReport
         OnKeyUp = ShellListKeyUp
-        ExplicitLeft = 2
       end
       object PnlBreadCrumb: TPanel
         Left = 0

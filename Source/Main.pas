@@ -395,6 +395,7 @@ const
     '-ExifIFD:DateTimeOriginal' + CRLF +
     '-CreateDate' + CRLF +
     '-GPSLatitude#' + CRLF +
+    '-XMP-iptcExt:LocationShownCountryCode' + CRLF +
     '-XMP-iptcExt:LocationShownCountryName' + CRLF +
     '-XMP-iptcExt:LocationShownProvinceState' + CRLF +
     '-XMP-iptcExt:LocationShownCity' + CRLF +
@@ -1916,7 +1917,7 @@ procedure TFMain.UpdateLocationfromGPScoordinatesClick(Sender: TObject);
 var
   CrWait, CrNormal: HCURSOR;
   SelectedFiles: TStringList;
-  AFile: string;
+  ETCmd, AFile: string;
   GPSCoordinates: string;
   IsQuickTime: boolean;
 begin
@@ -1945,16 +1946,30 @@ begin
     CrNormal := SetCursor(CrWait);
     SelectedFiles := TStringList.Create;
     try
-      SelectedFiles.Text := GetSelectedFiles(true);   // Need full pathname
-      for AFile in SelectedFiles do
+      if (GeoSettings.GetPlaceProvider = gpExifTool) then
       begin
-        StatusBar.Panels[1].Text := AFile;
-        StatusBar.Update;
-        FillLocationInImage(AFile);
+        ETCmd := '-geolocate<GPSPosition' + CRLF +
+                 '-api' + CRLF + 'geolocation' + CRLF +
+                 '-xmp:LocationShownCountryCode<GeolocationCountryCode' + CRLF +
+                 '-xmp:LocationShownCountryName<GeolocationCountry' + CRLF +
+                 '-xmp:LocationShownProvinceState<GeolocationRegion' + CRLF +
+                 '-xmp:LocationShownCity<GeolocationCity' + CRLF;
+        ET_OpenExec(ETcmd, GetSelectedFiles);
+      end
+      else
+      begin
+        SelectedFiles.Text := GetSelectedFiles(true);   // Need full pathname
+        for AFile in SelectedFiles do
+        begin
+          StatusBar.Panels[1].Text := AFile;
+          StatusBar.Update;
+          FillLocationInImage(AFile);
+        end;
       end;
     finally
       SelectedFiles.Free;
       RefreshSelected(Sender);
+      ShowMetadata;
       SetCursor(CrNormal);
     end;
   end;
@@ -2934,7 +2949,11 @@ begin
                 Details.Add(StrYes)
               else
                 Details.Add(StrNo);
-              Details.Add(Xmp.CountryShown);
+              if (GeoSettings.CountryCodeLocation) and
+                 (Trim(Xmp.CountryCodeShown) <> '') then
+                Details.Add(Xmp.CountryCodeShown)
+              else
+                Details.Add(Xmp.CountryNameShown);
               Details.Add(Xmp.ProvinceShown);
               Details.Add(Xmp.CityShown);
               Details.Add(Xmp.LocationShown);
@@ -2962,6 +2981,14 @@ begin
                     Details[1] := StrNo
                   else
                     Details[1] := StrYes;
+
+                  // Prefer CountryCode
+                  if (GeoSettings.CountryCodeLocation) and
+                     (Trim(Details[2]) <> '-') then
+                    Details.Delete(3)   // We have a Country Code, delete the Country Name
+                  else
+                    Details.Delete(2);
+
                 end;
               end
               else
@@ -3371,13 +3398,13 @@ begin
           Row := 1;
           Strings.Clear;
           Strings.AddStrings(ETResult);
-          if RowCount > E then
-            Row := E
-          else
-            Row := RowCount - 1;
         finally
           Strings.EndUpdate;
         end;
+        if RowCount > E then
+          Row := E
+        else
+          Row := RowCount - 1;
       end;
     end;
   finally

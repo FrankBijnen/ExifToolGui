@@ -7,9 +7,13 @@ uses
   System.Classes, System.SysUtils, System.Generics.Collections, System.IniFiles,
   Vcl.Edge;
 
+const
+  PlaceDefault = 'Default';
+  PlaceNone = 'None';
+
 type
   TExecRestEvent = procedure(Url, Response: string; Succes: boolean) of object;
-  TGeoCodeProvider = (gpGeoName, gpOverPass);
+  TGeoCodeProvider = (gpGeoName, gpOverPass, gpExifTool);
   TGeoTagMode = (gtmCoordinates, gtmLocation, gtmCoordinatesLocation);
 
   GEOsettingsRec = record
@@ -40,7 +44,7 @@ type
     FProvinceList : TStringList;
     FCountryCode: string;
     FDefLang: string;
-    FCountry: string;
+    FCountryName: string;
     FName: string;
     FNodeId: string;
     FPostCode: string;
@@ -60,8 +64,10 @@ type
     procedure Clear;
     procedure AssignFromGeocode(Key, Value: string);
     procedure AssignFromOverPass(Key: integer; Value: string);
+    procedure AssignFromExifTool(Key, Value: string);
     procedure Sort;
     property CountryCode: string read FCountryCode write SetCountryCode;
+    property CountryName: string read FCountryName;
     property CountryLocation: string read GetCountryLocation;
     property DefLang: string read FDefLang write FDefLang;
     property PostCode: string read FPostCode write FPostCode;
@@ -230,7 +236,7 @@ procedure TPlace.Clear;
 begin
   SetLength(FCountryCode, 0);
   SetLength(FDefLang, 0);
-  SetLength(FCountry, 0);
+  SetLength(FCountryName, 0);
   SetLength(FNodeId, 0);
   SetLength(FName, 0);
   SetLength(FPostCode, 0);
@@ -252,7 +258,7 @@ begin
   if (GeoSettings.CountryCodeLocation) then
     result := FCountryCode
   else
-    result := FCountry;
+    result := FCountryName;
 end;
 
 function TPlace.GetPrioProvince: string;
@@ -269,10 +275,14 @@ var
   Level: integer;
   LevelX: string;
 begin
-  if (GeoProvinceList.Values[FCountryCode] = 'None') then
+  if (GeoProvinceList.Values[FCountryCode] = PlaceNone) then
     exit('');
 
   result := GetPrioProvince;
+
+  // ExifTool
+  if (result = '') and (FProvinceList.Values['GeolocationRegion'] <> '') then
+    result := FProvinceList.Values['GeolocationRegion'];
 
   // Geocode
   if (result = '') and (FProvinceList.Values['county'] <> '') then
@@ -311,10 +321,14 @@ var
   Level: integer;
   LevelX: string;
 begin
-  if (GeoCityList.Values[FCountryCode] = 'None') then
+  if (GeoCityList.Values[FCountryCode] = PlaceNone) then
     exit('');
 
   result := GetPrioCity;
+
+  // ExifTool
+  if (result = '') and (FCityList.Values['GeolocationCity'] <> '') then
+    result := FCityList.Values['GeolocationCity'];
 
   // Geocode
   if (result = '') and (FCityList.Values['village'] <> '') then
@@ -350,7 +364,7 @@ begin
     result := result + Format('%s, ', [FNodeId]);
   if (FPostCode <> '') then
     result := result + Format('%s, ', [FPostCode]);
-  result := result + Format('Name: %s, City: %s, Province: %s, Country: %s, %s', [Name, City, Province, FCountryCode, FCountry]);
+  result := result + Format('Name: %s, City: %s, Province: %s, Country: %s, %s', [Name, City, Province, CountryCode, CountryName]);
 end;
 
 function TPlace.GetHtmlSearchResult: string;
@@ -372,7 +386,7 @@ begin
   if (Key = 'country_code') then
     CountryCode := Value;
   if (Key = 'country') then
-    FCountry := Value;
+    FCountryName := Value;
 
   if (Key = 'county') then
     FProvinceList.AddPair(Key, Value);
@@ -399,7 +413,7 @@ begin
   if (Key = 0) then
     FNodeId := Value;
   if (Key = 2) then
-    FCountry := Value;
+    FCountryName := Value;
   for Level in RegionLevels do
   begin
     if (Key = Level) then
@@ -410,6 +424,18 @@ begin
     if (Key = Level) then
       FCityList.AddPair(IntToStr(Key), Value);
   end;
+end;
+
+procedure TPlace.AssignFromExifTool(Key, Value: string);
+begin
+  if (SameText(Key, 'GeolocationCountryCode')) then
+    CountryCode := Value;
+  if (SameText(Key, 'GeolocationCountry')) then
+    FCountryName := Value;
+  if (SameText(Key, 'GeolocationRegion')) then
+    FProvinceList.AddPair(Key, Value);
+  if (SameText(Key, 'GeolocationCity')) then
+    FCityList.AddPair(Key, Value);
 end;
 
 procedure TPLace.Sort;
@@ -878,6 +904,31 @@ begin
   end;
 end;
 
+function GetPlaceOfCoords_ExifTool(const Lat, Lon: string): TPlace;
+var
+  LatE, LonE, AResult, AKey, AValue: string;
+  ETResult: TStrings;
+begin
+  result := TPlace.Create;
+  LatE := Trim(Lat);
+  LonE := Trim(Lon);
+  ETResult := GetGeoLocation(LatE, LonE);
+  try
+    for AResult in ETResult do
+    begin
+      AValue := AResult;
+      AKey := Trim(NextField(AValue, ':'));
+      AValue := Trim(AValue);
+      result.AssignFromExifTool(AKey,
+                                AValue
+                                 );
+    end;
+    result.Sort;
+  finally
+    ETResult.Free;
+  end;
+end;
+
 function GetPlaceOfCoords(const Lat, Lon: string; const Provider: TGeoCodeProvider): TPlace;
 var CoordsKey: string;
     LatP, LonP: string;
@@ -897,14 +948,16 @@ begin
     end;
 
     result := nil;
-    if (GeoSettings.GeoCodingEnable = false) then
-      exit;
-
+  
     case Provider of
       TGeoCodeProvider.gpGeoName:
-        result := GetPlaceOfCoords_GeoCode(Lat, Lon);
+        if (GeoSettings.GeoCodingEnable) then
+          result := GetPlaceOfCoords_GeoCode(Lat, Lon);
       TGeoCodeProvider.gpOverPass:
-        result := GetPlaceOfCoords_OverPass(Lat, Lon);
+        if (GeoSettings.GeoCodingEnable) then
+          result := GetPlaceOfCoords_OverPass(Lat, Lon);
+      TGeoCodeProvider.gpExifTool:
+        result := GetPlaceOfCoords_ExifTool(Lat, Lon);
     end;
     // Also cache if not found
     CoordCache.Add(CoordsKey, result);

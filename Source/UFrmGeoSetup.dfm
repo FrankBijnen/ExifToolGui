@@ -126,14 +126,13 @@ object FGeoSetup: TFGeoSetup
         Font.Height = -11
         Font.Name = 'Tahoma'
         Font.Style = []
-        ItemIndex = 0
         ParentFont = False
         TabOrder = 0
-        Text = 'GeoCode'
         OnClick = CmbGeoProviderClick
         Items.Strings = (
           'GeoCode'
-          'Overpass API')
+          'Overpass API'
+          'ExifTool geolocation')
       end
       object CmbProvince: TComboBox
         Left = 8
@@ -153,21 +152,12 @@ object FGeoSetup: TFGeoSetup
         Text = 'CmbProvince'
         OnChange = CmbCityChange
       end
-      object ChkCountryLocation: TCheckBox
-        Left = 3
-        Top = 95
-        Width = 470
-        Height = 17
-        Caption = 'Map CountryCode'
-        TabOrder = 3
-        OnClick = ChkCountryLocationClick
-      end
       object CmbOverPasslang: TComboBox
         Left = 8
         Top = 68
         Width = 470
         Height = 21
-        TabOrder = 4
+        TabOrder = 3
         Text = 'CmbOverPasslang'
         OnChange = CmbOverPasslangChange
         OnClick = CmbOverPasslangClick
