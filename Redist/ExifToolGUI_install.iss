@@ -417,7 +417,7 @@ end;
 
 procedure SetupRichText;
 begin
-  if PHSelected or OBetzSelected or (CurVer <> CURVER_UNAVAIL) then
+  if PHSelected or OBetzSelected then
     RichEditViewer1.RTFText := // InfoNoDownload.rtf
       '{\rtf1\ansi\ansicpg1252\deff0\nouicompat\deflang1033{\fonttbl{\f0\fnil\fcharset0 Calibri;}}' + #13 + #10 +
       '{\colortbl ;\red0\green0\blue255;}' + #13 + #10 +
@@ -563,7 +563,7 @@ begin
         (CurVer = ETVEROBetz)) or
        ((PHSelected) and
         (CurVer = ETVERPH)) then
-      result := (SuppressibleMsgBox('Your selection is already installed. Continue?',  \
+      result := (SuppressibleMsgBox('Your selected ExifTool version is already installed. Continue?',  \
                                     mbConfirmation, MB_YESNO, IDYES) = IDYES);
   end;
 
