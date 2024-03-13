@@ -281,15 +281,18 @@ begin
     result := FProvinceList.Values['state'];
 
   // Overpass
-  for Level in RegionLevels do
+  if (result = '') then
   begin
-    if (Level = 0) then
-      break;
-    LevelX := IntToStr(Level);
-    if (FProvinceList.Values[LevelX] <> '') then
+    for Level in RegionLevels do
     begin
-      result := FProvinceList.Values[LevelX];
-      break;
+      if (Level = 0) then
+        break;
+      LevelX := IntToStr(Level);
+      if (FProvinceList.Values[LevelX] <> '') then
+      begin
+        result := FProvinceList.Values[LevelX];
+        break;
+      end;
     end;
   end;
 end;
@@ -324,15 +327,18 @@ begin
     result := FCityList.Values['city'];
 
   // Overpass
-  for Level in CityLevels do
+  if (result = '') then
   begin
-    if (Level = 0) then
-      break;
-    LevelX := IntToStr(Level);
-    if (FCityList.Values[LevelX] <> '') then
+    for Level in CityLevels do
     begin
-      result := FCityList.Values[LevelX];
-      break;
+      if (Level = 0) then
+        break;
+      LevelX := IntToStr(Level);
+      if (FCityList.Values[LevelX] <> '') then
+      begin
+        result := FCityList.Values[LevelX];
+        break;
+      end;
     end;
   end;
 end;
