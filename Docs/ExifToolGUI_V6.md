@@ -81,6 +81,7 @@ Basic idea behind GUI is, to keep it <u>simple!</u> Thus, only those options are
 <li>Português</li>
 </ul>
 <li>Starting with V6.3.0 an installer is provided.</li>
+<li>Support for Exiftool features <u>geolocate</u> and <u>-api geolocation</u>.</li>
 </ul>
 <a href="changelog.txt"><b>See changelog.txt for a complete list of issues.</b></a>
 
@@ -89,7 +90,7 @@ Basic idea behind GUI is, to keep it <u>simple!</u> Thus, only those options are
 ExiftoolGUI should run on Windows 7, 8 32-64bit. However, it is highly recommended to use Windows 10 or 11 when you plan to use the OSM map, or GEOcoding.<br>
 It will not run on Windows XP or earlier!<br>
 
-You can use the installer to install ExifToolGui and all required components. If you do you can skip the requirements. <br>
+If you use the installer to install ExifToolGui that should take care of all required components, and you can skip this section.<br>
 
 The portable version is still available, and will be continued to be released. Read the following requirements. 
 
@@ -669,7 +670,8 @@ For every selected file a lookup is done using the selected provider. To reduce 
 In the dialog you can customize how the fields are filled.<br><br>
 <img src="ExifToolGUI_V6_files/updatelocationfromgps.jpg"><br><br>
 Notes:<br>
-- Due to the nature of this function, it uses an external webservice, there are some 'point of failures'.<br>
+- If you use Gecode provider 'Exiftool geolocation' no internet connection is required.<br>
+- The other providers use an external webservice, and thus there are some 'point of failures'.<br>
 <ul>
 <li>You need a reliable internet connection.</li>
 <li>The external webservice could be (temporarily) out of service for various reasons.</li>
