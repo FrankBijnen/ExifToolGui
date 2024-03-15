@@ -5,10 +5,13 @@ This is an updated version of the ExifToolGui program created by Bogdan Hrastnik
 
 <b>Released version: <b>V6.3.0</b> updated March 17, 2024</b><br>
 
-- Created an installer and added a version check.<br>
+- Created an installer.<br>
+- Added version checks for ExifToolGui and ExifTool.<br>
 - Translations available. They still need verification. Help wanted!<br>
 - Fixed an annoying bug that prevented the OSM map from displaying.<br>
+- Added Option to specify a custom Exiftool config.<br>
 - Added Support for new ExifTool features geolocate and -api geolocation.<br>
+- Improved defaults for geocode providers.<br>
 
 [Change log](Docs/changelog.txt)<br>
 [Download Release](https://github.com/FrankBijnen/ExifToolGui/releases/latest)<br>

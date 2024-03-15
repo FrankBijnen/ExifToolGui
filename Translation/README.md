@@ -10,7 +10,7 @@ https://bitbucket.org/anders_melander/better-translation-manager/downloads/amTra
 It should contain:
 - The 32 Bits executable. (Has to do with naming, works best when it's the same name as the .Drc file) <br>
 - ExifToolGui.Drc
-- ExifToolGui_xx.xlat Where xx is the language code you want to translate. If your language is not listed, take any language and rename the file to the language code of your choice.
+- ExifToolGui.xlat 
 
 <li>Open the .xlat file in the Better Translation Manager, and start translating</li>
 - Regularly save. <br>

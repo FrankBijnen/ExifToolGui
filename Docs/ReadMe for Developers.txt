@@ -97,4 +97,19 @@ Changed TFileStream to ThandleStream in ExifInfo.pas. To open the file ourselves
 
 Fixed typo in BreadcrumbBar directory name
 
+Version 6.3.0
+
+Added an installer. To build the installer yourself, you will need to install InnoSetup, and place all required distibutable file in 'redist\win32' 'redist\win64'
+Created an RC file to hold some constants, mostly related to URL's
+Added commandline parm /InitPath
+Layout changed, to accomodate for larger texts in other languages.
+Style fixes. Change the background color of the Shelllist selected line. Also for the BreadCrumbBar. Silver.vsf was changed.
+Fixed OpenPictureDialog. Use WIC if default fails.
+Added option to add custom ExifTool config
+Added geolocate -api geolocation features
+Dont throw error in Finalization. Causes memory leaks etc. Allow for 3 retries deleting temp dir
+
+
+
+
 Frank

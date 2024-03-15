@@ -128,4 +128,16 @@ Changed with version 6.2.9
 - Added a tray icon in the windows taskbar to reset the window size to default. You need to make sure the icon is not hidden in Windows.
 - Optionally show hidden files and folders. You need to be an admin and enable the option in Preferences.
 
+Changed with version 6.3.0
+- A nasty bug was fixed that would prevent the OSM map to display if the GPS coordinates had negative values. (West or South)
+- Created an installer. Recommended if you dont use ExifToolGui as a portable program.
+- Added version checks for ExifTool and ExifToolGui. See Help/Check Versions.
+- The About form was moved to Help/About
+- Translations available, when installed via the installer. The language will be selected according to your WIndows settings. Or use the commandline parm /Lang=xxx (NLD, DEU, FRA, ITA, PTB, ESP ENU) to force a specific language.
+- Style fixes for darkmode styles. The selected file(s), folder are now clearly visible.
+- Added support for ExifTool -geolocate and -api geolocation.
+  For better compatibility with the new ExifTool features the location found is stored differently. For more details see: Readme GeoCoding.txt
+- Added the option to specify a custom ExifTool Config
+
+
 Frank

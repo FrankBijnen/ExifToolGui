@@ -2,7 +2,7 @@
 <xlat>
   <meta>
     <version>3</version>
-    <created>2024-02-22T19:20:53.820+01:00</created>
+    <created>2024-03-15T10:09:54.552+01:00</created>
     <tool>amTranslationManager</tool>
     <toolversion>2.0.8628.33873</toolversion>
   </meta>
@@ -12,19 +12,110 @@
     <sorted>True</sorted>
     <omitnewstate>True</omitnewstate>
   </options>
-  <project sourcefile=".\ExifToolGUI.exe" stringsymbolfile=".\ExifToolGUI.drc" language="en-US" properties="623">
+  <project sourcefile=".\ExifToolGUI.exe" stringsymbolfile=".\ExifToolGUI.drc" language="en-US" properties="634">
     <targetlanguages>
-      <language language="es" translated="576"/>
-      <language language="it" translated="580"/>
-      <language language="pt" translated="550"/>
-      <language language="fr" translated="566"/>
-      <language language="nl" translated="627"/>
-      <language language="de" translated="623"/>
+      <language language="es" translated="594"/>
+      <language language="pt" translated="582"/>
+      <language language="fr" translated="582"/>
+      <language language="nl" translated="642"/>
+      <language language="it" translated="599"/>
       <language language="en" translated="1"/>
+      <language language="de" translated="637"/>
     </targetlanguages>
     <modules>
       <module name="resourcestrings" type="strings" properties="167">
         <items>
+          <item name="1">
+            <properties>
+              <property status="skip">
+                <value>https://exiftool.org/ver.txt</value>
+              </property>
+            </properties>
+          </item>
+          <item name="10">
+            <properties>
+              <property status="skip">
+                <value>https://github.com/FrankBijnen/ExifToolGui</value>
+              </property>
+            </properties>
+          </item>
+          <item name="11">
+            <properties>
+              <property status="skip">
+                <value>https://exiftool.org</value>
+              </property>
+            </properties>
+          </item>
+          <item name="12">
+            <properties>
+              <property status="skip">
+                <value>https://oliverbetz.de/pages/Artikel/ExifTool-for-Windows</value>
+              </property>
+            </properties>
+          </item>
+          <item name="2">
+            <properties>
+              <property status="skip">
+                <value>https://oliverbetz.de/cms/files/Artikel/ExifTool-for-Windows/exiftool_latest_version.txt</value>
+              </property>
+            </properties>
+          </item>
+          <item name="20">
+            <properties>
+              <property status="skip">
+                <value>https://github.com/FrankBijnen/ExifToolGui/blob/main/Docs/ExifToolGUI_V6.md</value>
+              </property>
+            </properties>
+          </item>
+          <item name="21">
+            <properties>
+              <property status="skip">
+                <value>/#m_edge_dll</value>
+              </property>
+            </properties>
+          </item>
+          <item name="22">
+            <properties>
+              <property status="skip">
+                <value>/#m_edge_runtime</value>
+              </property>
+            </properties>
+          </item>
+          <item name="23">
+            <properties>
+              <property status="skip">
+                <value>/#m_reqs_exiftool</value>
+              </property>
+            </properties>
+          </item>
+          <item name="30">
+            <properties>
+              <property status="skip">
+                <value>https://geocode.maps.co</value>
+              </property>
+            </properties>
+          </item>
+          <item name="31">
+            <properties>
+              <property status="skip">
+                <value>https://overpass-api.de/api</value>
+              </property>
+            </properties>
+          </item>
+          <item name="5">
+            <properties>
+              <property status="skip">
+                <value>by Bogdan Hrastnik&amp;#10;Adapted for RAD11 by Frank B</value>
+              </property>
+            </properties>
+          </item>
+          <item name="6">
+            <properties>
+              <property status="skip">
+                <value>ExifTool by Phil Harvey</value>
+              </property>
+            </properties>
+          </item>
           <item name="BreadcrumbBar_SCopyText">
             <properties>
               <property>
@@ -6317,6 +6408,7 @@
                   <translation language="de" status="proposed">Backup: AUS</translation>
                   <translation language="es" status="proposed">Copia de seguridad: OFF</translation>
                   <translation language="fr" status="proposed">Sauv.: OFF</translation>
+                  <translation language="pt">Backup: OFF</translation>
                 </translations>
               </property>
             </properties>
@@ -6330,7 +6422,7 @@
                   <translation language="de" status="proposed">Backup: AUS</translation>
                   <translation language="es" status="proposed">Copia de seguridad: ON</translation>
                   <translation language="fr" status="proposed">Sauv. : ON</translation>
-                  <translation language="pt" status="proposed">Backup (cópia de segurança): ON</translation>
+                  <translation language="pt" status="proposed">Backup: ON</translation>
                 </translations>
               </property>
             </properties>
@@ -6376,6 +6468,20 @@
                   <translation language="fr" status="proposed">Vérifier au moins 1 aperçu pour l'extraction</translation>
                   <translation language="pt" status="proposed">Verifique pelo menos uma visualização para extrair</translation>
                   <translation language="it" status="proposed">Controllare almeno 1 anteprima da estrarre</translation>
+                </translations>
+              </property>
+            </properties>
+          </item>
+          <item name="UnitLangResources_StrCheckPlaceProv" state="">
+            <properties>
+              <property>
+                <value>Warning only GeoCode provider ExifTool will produce results.</value>
+                <translations>
+                  <translation language="fr" status="proposed">Attention, seul le fournisseur de GeoCode ExifTool produira des résultats.</translation>
+                  <translation language="nl">Waarschuwing: alleen de GeoCode-provider ExifTool levert resultaten op.</translation>
+                  <translation language="it" status="proposed">Attenzione, solo il provider GeoCode ExifTool produrrà risultati.</translation>
+                  <translation language="pt" status="proposed">Aviso: somente o provedor de GeoCode ExifTool produzirá resultados.</translation>
+                  <translation language="es" status="proposed">Advertencia sólo GeoCode proveedor ExifTool producirá resultados.</translation>
                 </translations>
               </property>
             </properties>
@@ -7518,7 +7624,7 @@
               </property>
             </properties>
           </item>
-          <item name="UnitLangResources_StrProvince">
+          <item name="UnitLangResources_StrProvince" state="unused">
             <properties>
               <property>
                 <value>Province</value>
@@ -10316,6 +10422,7 @@
                   <translation language="es" status="proposed">Exif: Desplazamiento de Fecha-hora</translation>
                   <translation language="fr" status="proposed">Exif : Décalage de la date</translation>
                   <translation language="it" status="proposed">Exif: Spostamento data-ora</translation>
+                  <translation language="pt" status="proposed">Exif: Mudança de data e hora</translation>
                 </translations>
               </property>
               <property name="Font.Name" status="skip">
@@ -10381,6 +10488,7 @@
                   <translation language="es" status="proposed">=Incremento</translation>
                   <translation language="fr" status="proposed">=Incrément</translation>
                   <translation language="it" status="proposed">=Incremento</translation>
+                  <translation language="pt" status="proposed">=Aumento</translation>
                 </translations>
               </property>
             </properties>
@@ -11868,7 +11976,7 @@
           </item>
         </items>
       </module>
-      <module name="TFGEOSETUP" type="form" properties="13">
+      <module name="TFGEOSETUP" type="form" properties="12">
         <items>
           <item name="FGeoSetup" type="TFGeoSetup">
             <properties>
@@ -11929,20 +12037,6 @@
               </property>
             </properties>
           </item>
-          <item name="FGeoSetup.PctMain.TabSetup.ChkCountryLocation" type="TCheckBox">
-            <properties>
-              <property name="Caption">
-                <value>Map CountryCode</value>
-                <translations>
-                  <translation language="nl">Neem Landcode</translation>
-                  <translation language="de" status="proposed">Landcode</translation>
-                  <translation language="es" status="proposed">Mapa CountryCode</translation>
-                  <translation language="fr" status="proposed">Carte du code pays</translation>
-                  <translation language="it" status="proposed">Mappa Codice Paese</translation>
-                </translations>
-              </property>
-            </properties>
-          </item>
           <item name="FGeoSetup.PctMain.TabSetup.CmbCity" type="TComboBox">
             <properties>
               <property name="Text" status="skip">
@@ -11969,7 +12063,10 @@
                   <translation language="it" status="proposed">API di scavalcamento</translation>
                 </translations>
               </property>
-              <property name="Text" status="skip">
+              <property name="Items.Strings[2]" status="skip">
+                <value>ExifTool geolocation</value>
+              </property>
+              <property name="Text" state="unused" status="skip">
                 <value>GeoCode</value>
               </property>
             </properties>
@@ -12235,6 +12332,8 @@
                   <translation language="de" status="proposed">Hinweis: Die Geotagging-Präzision hängt von der Genauigkeit der Kamerazeit ab. Falls erforderlich,&amp;#13;Exif:DateTime-Verschiebung vor Geotagging anwenden.</translation>
                   <translation language="es" status="proposed">Nota: La precisión del geoetiquetado depende de la precisión horaria de la cámara. Si es necesario,&amp;#10;aplique el desplazamiento Exif:DateTime antes del geoetiquetado.</translation>
                   <translation language="fr" status="proposed">Remarque : la précision de la géolocalisation dépend de la précision de l'heure de la caméra.&amp;#13;&amp;#10;Si nécessaire, appliquer le décalage Exif:DateTime avant la géolocalisation.</translation>
+                  <translation language="it" status="proposed">Nota: la precisione del geotagging dipende dalla precisione dell'ora della fotocamera. Se necessario,&amp;#10;applicare lo spostamento Exif:DateTime prima del geotagging.</translation>
+                  <translation language="pt" status="proposed">Observação: A precisão da marcação geográfica depende da precisão do tempo da câmera. Se necessário,&amp;#10;aplique o deslocamento Exif:DateTime antes de fazer o geotagging.</translation>
                 </translations>
               </property>
             </properties>
@@ -12313,6 +12412,7 @@
                   <translation language="de" status="proposed">Geo einstell.</translation>
                   <translation language="es" status="proposed">Configurar Geo</translation>
                   <translation language="it" status="proposed">Impostazione Geo</translation>
+                  <translation language="pt" status="proposed">Configuração Geo</translation>
                 </translations>
               </property>
             </properties>
@@ -13103,7 +13203,7 @@
           </item>
         </items>
       </module>
-      <module name="TFMAIN" type="form" properties="171">
+      <module name="TFMAIN" type="form" properties="172">
         <items>
           <item name="FMain" type="TFMain">
             <properties>
@@ -13448,6 +13548,9 @@
                   <translation language="nl">Spaties in data vereisen dubbele aanhalingstekens, zet een \ indien dubbele aanhalingstekens in data voorkomen. Voorbeelden: -Make="abde fghi" -Make="Abcde\"fghi"</translation>
                   <translation language="de" status="proposed">Leerzeichen in Daten erfordern doppelte Anführungszeichen, doppelte Anführungszeichen in Daten erfordern das Präfix . Beispiele -Make="abde fghi" -Make=" Abcde"fghi"""</translation>
                   <translation language="fr" status="proposed">Les espaces dans les données nécessitent des guillemets doubles, les guillemets doubles dans les données nécessitent d'être préfixés par un \. Exemples -Make="abde fghi" -Make="Abcde\"fghi"</translation>
+                  <translation language="es" status="proposed">Los espacios en los datos requieren comillas dobles, las comillas dobles en los datos requieren anteponerles un \. Ejemplos -Make="abde fghi" -Make="Abcde\"fghi"</translation>
+                  <translation language="it" status="proposed">Gli spazi nei dati richiedono doppi apici, mentre i doppi apici nei dati devono essere preceduti da una \. Esempi -Make="abde fghi" -Make="Abcde\"fghi"</translation>
+                  <translation language="pt" status="proposed">Espaços nos dados requerem aspas duplas, aspas duplas nos dados requerem prefixação com um \. Exemplos -Make="abde fghi" -Make="Abcde\"fghi"</translation>
                 </translations>
               </property>
               <property name="Text" status="skip">
@@ -14145,13 +14248,13 @@
               <property name="Caption">
                 <value>Browse</value>
                 <translations>
-                  <translation language="es">Carpetas</translation>
-                  <translation language="en" status="proposed">Folders</translation>
                   <translation language="pt" status="proposed">Navegar</translation>
-                  <translation language="nl">Mappen</translation>
-                  <translation language="de">Verzeichnis</translation>
+                  <translation language="en" status="proposed">Folders</translation>
+                  <translation language="es">Carpetas</translation>
                   <translation language="fr" status="proposed">Dossiers</translation>
                   <translation language="it" status="proposed">Sfogliare</translation>
+                  <translation language="de">Verzeichnis</translation>
+                  <translation language="nl">Mappen</translation>
                 </translations>
               </property>
             </properties>
@@ -14184,14 +14287,14 @@
           <item name="FMain.ImageCollectionMetadata.Images[0]" type="TImageCollection">
             <properties>
               <property name="Name" status="skip">
-                <value>QuickPopUp_AddCustom</value>
+                <value>QuickPopUp_FillQuick</value>
               </property>
             </properties>
           </item>
           <item name="FMain.ImageCollectionMetadata.Images[1]" type="TImageCollection">
             <properties>
               <property name="Name" status="skip">
-                <value>QuickPopUp_AddDetailsUser</value>
+                <value>QuickPopUp_UndoEdit</value>
               </property>
             </properties>
           </item>
@@ -14205,28 +14308,28 @@
           <item name="FMain.ImageCollectionMetadata.Images[3]" type="TImageCollection">
             <properties>
               <property name="Name" status="skip">
-                <value>QuickPopUp_CopyTag</value>
+                <value>QuickPopUp_DelQuick</value>
               </property>
             </properties>
           </item>
           <item name="FMain.ImageCollectionMetadata.Images[4]" type="TImageCollection">
             <properties>
               <property name="Name" status="skip">
-                <value>QuickPopUp_DelCustom</value>
+                <value>QuickPopUp_AddCustom</value>
               </property>
             </properties>
           </item>
           <item name="FMain.ImageCollectionMetadata.Images[5]" type="TImageCollection">
             <properties>
               <property name="Name" status="skip">
-                <value>QuickPopUp_DelQuick</value>
+                <value>QuickPopUp_DelCustom</value>
               </property>
             </properties>
           </item>
           <item name="FMain.ImageCollectionMetadata.Images[6]" type="TImageCollection">
             <properties>
               <property name="Name" status="skip">
-                <value>QuickPopUp_FillQuick</value>
+                <value>QuickPopUp_AddDetailsUser</value>
               </property>
             </properties>
           </item>
@@ -14240,7 +14343,7 @@
           <item name="FMain.ImageCollectionMetadata.Images[8]" type="TImageCollection">
             <properties>
               <property name="Name" status="skip">
-                <value>QuickPopUp_UndoEdit</value>
+                <value>QuickPopUp_CopyTag</value>
               </property>
             </properties>
           </item>
@@ -14272,21 +14375,6 @@
           <item name="FMain.MainActionManager.ActionBars[0].Items[0].Items[0]" type="TActionManager">
             <properties>
               <property name="Caption">
-                <value>&amp;About...</value>
-                <translations>
-                  <translation language="nl">&amp;Over...</translation>
-                  <translation language="de" status="proposed">&amp;Über...</translation>
-                  <translation language="es" status="proposed">&amp;Acerca de...</translation>
-                  <translation language="fr" status="proposed">À propos de...</translation>
-                  <translation language="pt" status="proposed">&amp;Sobre...</translation>
-                  <translation language="it" status="proposed">&amp;Chi siamo...</translation>
-                </translations>
-              </property>
-            </properties>
-          </item>
-          <item name="FMain.MainActionManager.ActionBars[0].Items[0].Items[1]" type="TActionManager">
-            <properties>
-              <property name="Caption">
                 <value>&amp;Preferences...</value>
                 <translations>
                   <translation language="nl">&amp;Voorkeuren..</translation>
@@ -14299,7 +14387,7 @@
               </property>
             </properties>
           </item>
-          <item name="FMain.MainActionManager.ActionBars[0].Items[0].Items[2]" type="TActionManager">
+          <item name="FMain.MainActionManager.ActionBars[0].Items[0].Items[1]" type="TActionManager">
             <properties>
               <property name="Caption">
                 <value>&amp;Workspace manager...</value>
@@ -14314,7 +14402,7 @@
               </property>
             </properties>
           </item>
-          <item name="FMain.MainActionManager.ActionBars[0].Items[0].Items[3]" type="TActionManager">
+          <item name="FMain.MainActionManager.ActionBars[0].Items[0].Items[2]" type="TActionManager">
             <properties>
               <property name="Caption">
                 <value>W&amp;orkspace definition file</value>
@@ -14329,7 +14417,7 @@
               </property>
             </properties>
           </item>
-          <item name="FMain.MainActionManager.ActionBars[0].Items[0].Items[3].Items[0]" type="TActionManager">
+          <item name="FMain.MainActionManager.ActionBars[0].Items[0].Items[2].Items[0]" type="TActionManager">
             <properties>
               <property name="Caption">
                 <value>&amp;Load..</value>
@@ -14344,7 +14432,7 @@
               </property>
             </properties>
           </item>
-          <item name="FMain.MainActionManager.ActionBars[0].Items[0].Items[3].Items[1]" type="TActionManager">
+          <item name="FMain.MainActionManager.ActionBars[0].Items[0].Items[2].Items[1]" type="TActionManager">
             <properties>
               <property name="Caption">
                 <value>&amp;Save...</value>
@@ -14359,7 +14447,7 @@
               </property>
             </properties>
           </item>
-          <item name="FMain.MainActionManager.ActionBars[0].Items[0].Items[4]" type="TActionManager">
+          <item name="FMain.MainActionManager.ActionBars[0].Items[0].Items[3]" type="TActionManager">
             <properties>
               <property name="Caption">
                 <value>&amp;Style...</value>
@@ -14368,18 +14456,29 @@
                   <translation language="de" status="proposed">&amp;Stil...</translation>
                   <translation language="es" status="proposed">&amp;Estilo...</translation>
                   <translation language="it" status="proposed">&amp;Stile...</translation>
+                  <translation language="pt" status="proposed">&amp;Estilo...</translation>
                 </translations>
               </property>
             </properties>
           </item>
-          <item name="FMain.MainActionManager.ActionBars[0].Items[0].Items[5]" type="TActionManager">
+          <item name="FMain.MainActionManager.ActionBars[0].Items[0].Items[4]" type="TActionManager">
             <properties>
               <property name="Caption" status="skip">
                 <value>-</value>
               </property>
             </properties>
           </item>
-          <item name="FMain.MainActionManager.ActionBars[0].Items[0].Items[6]" type="TActionManager">
+          <item name="FMain.MainActionManager.ActionBars[0].Items[0].Items[5]" type="TActionManager">
+            <properties>
+              <property name="Caption" status="skip">
+                <value>&amp;Exit</value>
+                <translations>
+                  <translation language="es" status="proposed">&amp;Salir</translation>
+                </translations>
+              </property>
+            </properties>
+          </item>
+          <item name="FMain.MainActionManager.ActionBars[0].Items[0].Items[6]" type="TActionManager" state="unused">
             <properties>
               <property name="Caption">
                 <value>&amp;Exit</value>
@@ -14419,6 +14518,7 @@
                   <translation language="es" status="proposed">&amp;No hacer copia de seguridad</translation>
                   <translation language="fr" status="proposed">&amp;Ne pas faire de fichiers de sauvegarde</translation>
                   <translation language="it" status="proposed">Non creare file di backup</translation>
+                  <translation language="pt" status="proposed">&amp;Não criar arquivos de backup</translation>
                 </translations>
               </property>
             </properties>
@@ -14901,6 +15001,7 @@
                   <translation language="es" status="proposed">E&amp;xif ecualizar Fecha y Hora...</translation>
                   <translation language="fr" status="proposed">E&amp;xif : Ēgalisation de la date...</translation>
                   <translation language="it" status="proposed">E&amp;xif: DateTime equalizzare...</translation>
+                  <translation language="pt" status="proposed">E&amp;xif: DateTime equalize...</translation>
                 </translations>
               </property>
             </properties>
@@ -14959,6 +15060,7 @@
                   <translation language="es" status="proposed">&amp;Actualizar Ciudad, Provincia, País desde coordenadas GPS...</translation>
                   <translation language="fr" status="proposed">&amp;Mettre à jour la ville, la province, le pays à partir des coordonnées GPS...</translation>
                   <translation language="it" status="proposed">Aggiornamento di Città, Provincia, Paese dalle coordinate GPS...</translation>
+                  <translation language="pt" status="proposed">&amp;Atualize a cidade, a província, o país a partir das coordenadas de GPS...</translation>
                 </translations>
               </property>
             </properties>
@@ -15003,6 +15105,7 @@
                   <translation language="es" status="proposed">F&amp;archivo: Nombre=FechaHora+Nombre...</translation>
                   <translation language="fr" status="proposed">Fichier : Nom=DateTime+Nom...</translation>
                   <translation language="it" status="proposed">F&amp;file: Nome=DataOra+Nome...</translation>
+                  <translation language="pt" status="proposed">F&amp;ile: Name=DateTime+Name...</translation>
                 </translations>
               </property>
             </properties>
@@ -15052,6 +15155,50 @@
               </property>
             </properties>
           </item>
+          <item name="FMain.MainActionManager.ActionBars[0].Items[5].Items[1]" type="TActionManager">
+            <properties>
+              <property name="Caption" status="skip">
+                <value>-</value>
+              </property>
+            </properties>
+          </item>
+          <item name="FMain.MainActionManager.ActionBars[0].Items[5].Items[2]" type="TActionManager">
+            <properties>
+              <property name="Caption">
+                <value>&amp;Check Versions</value>
+                <translations>
+                  <translation language="nl" status="proposed">&amp;Controleer Versies</translation>
+                  <translation language="fr" status="proposed">&amp;Vérifier Les Versions</translation>
+                  <translation language="de" status="proposed">&amp;Versionen Prüfen</translation>
+                  <translation language="it" status="proposed">&amp;Controllare Le Versioni</translation>
+                  <translation language="pt" status="proposed">&amp;Verificar versões</translation>
+                  <translation language="es" status="proposed">&amp;Comprobar versiones</translation>
+                </translations>
+              </property>
+            </properties>
+          </item>
+          <item name="FMain.MainActionManager.ActionBars[0].Items[5].Items[3]" type="TActionManager">
+            <properties>
+              <property name="Caption" status="skip">
+                <value>-</value>
+              </property>
+            </properties>
+          </item>
+          <item name="FMain.MainActionManager.ActionBars[0].Items[5].Items[4]" type="TActionManager">
+            <properties>
+              <property name="Caption">
+                <value>&amp;About...</value>
+                <translations>
+                  <translation language="nl" status="proposed">&amp;Over...</translation>
+                  <translation language="fr" status="proposed">&amp;A propos de...</translation>
+                  <translation language="de" status="proposed">&amp;Über...</translation>
+                  <translation language="it" status="proposed">&amp;Informazioni su...</translation>
+                  <translation language="pt" status="proposed">&amp;Sobre...</translation>
+                  <translation language="es" status="proposed">&amp;Acerca de...</translation>
+                </translations>
+              </property>
+            </properties>
+          </item>
           <item name="FMain.MainActionManager.MaAbout" type="TAction">
             <properties>
               <property name="Caption">
@@ -15066,7 +15213,7 @@
                 </translations>
               </property>
               <property name="Category" status="skip">
-                <value>Program</value>
+                <value>Help</value>
               </property>
             </properties>
           </item>
@@ -15099,6 +15246,24 @@
               </property>
               <property name="Category" status="skip">
                 <value>Options</value>
+              </property>
+            </properties>
+          </item>
+          <item name="FMain.MainActionManager.MaCheckVersions" type="TAction">
+            <properties>
+              <property name="Caption">
+                <value>Check Versions</value>
+                <translations>
+                  <translation language="nl" status="proposed">Controleer versies</translation>
+                  <translation language="fr" status="proposed">Vérifier les versions</translation>
+                  <translation language="de" status="proposed">Versionen prüfen</translation>
+                  <translation language="it" status="proposed">Controllare le versioni</translation>
+                  <translation language="pt" status="proposed">Verificar Versões</translation>
+                  <translation language="es" status="proposed">Comprobar Versiones</translation>
+                </translations>
+              </property>
+              <property name="Category" status="skip">
+                <value>Help</value>
               </property>
             </properties>
           </item>
@@ -15166,6 +15331,7 @@
                   <translation language="es" status="proposed">Exif: Desplazamiento de Fecha-hora...</translation>
                   <translation language="fr" status="proposed">Exif : Décalage de la date...</translation>
                   <translation language="it" status="proposed">Exif: Spostamento data e ora...</translation>
+                  <translation language="pt" status="proposed">Exif: Mudança de data e hora...</translation>
                 </translations>
               </property>
               <property name="Category" status="skip">
@@ -15308,6 +15474,8 @@
                   <translation language="de" status="proposed">Datei: Änderungsdatum wie in Exif...</translation>
                   <translation language="es" status="proposed">Archivo: Fecha de modificación como en Exif...</translation>
                   <translation language="fr" status="proposed">Fichier : Date de modification comme dans Exif...</translation>
+                  <translation language="it" status="proposed">File: Data di modifica come in Exif...</translation>
+                  <translation language="pt" status="proposed">Arquivo: Data de modificação como no Exif...</translation>
                 </translations>
               </property>
               <property name="Category" status="skip">
@@ -15486,6 +15654,7 @@
                   <translation language="fr" status="proposed">Copier les métadonnées d'un seul fichier...</translation>
                   <translation language="pt" status="proposed">Copiar metadados de um único arquivo...</translation>
                   <translation language="it" status="proposed">Copia dei metadati da un singolo file...</translation>
+                  <translation language="es" status="proposed">Copiar metadatos de un solo archivo...</translation>
                 </translations>
               </property>
               <property name="Category" status="skip">
@@ -15796,6 +15965,13 @@
               </property>
               <property name="Category" status="skip">
                 <value>Program_Workspace</value>
+              </property>
+            </properties>
+          </item>
+          <item name="FMain.OpenPictureDlg" type="TOpenPictureDialog">
+            <properties>
+              <property name="Filter" status="skip">
+                <value>All (*.gif;*.jpg;*.jpeg;*.png;*.bmp;*.ico;*.emf;*.wmf;*.tif;*.tiff)|*.gif;*.jpg;*.jpeg;*.png;*.bmp;*.ico;*.emf;*.wmf;*.tif;*.tiff|GIF Image (*.gif)|*.gif|JPEG Image File (*.jpg)|*.jpg|JPEG Image File (*.jpeg)|*.jpeg|Portable Network Graphics (*.png)|*.png|Bitmaps (*.bmp)|*.bmp|Icons (*.ico)|*.ico|Enhanced Metafiles (*.emf)|*.emf|Metafiles (*.wmf)|*.wmf|TIFF Images (*.tif)|*.tif|TIFF Images (*.tiff)|*.tiff|*.*|*.*</value>
               </property>
             </properties>
           </item>
@@ -16111,7 +16287,7 @@
           </item>
         </items>
       </module>
-      <module name="TFPREFERENCES" type="form" properties="56">
+      <module name="TFPREFERENCES" type="form" properties="59">
         <items>
           <item name="FPreferences" type="TFPreferences">
             <properties>
@@ -16275,6 +16451,7 @@
                   <translation language="es" status="proposed">-guardar en:</translation>
                   <translation language="fr" status="proposed">-sauvegarde dans :</translation>
                   <translation language="it" status="proposed">-Salva in:</translation>
+                  <translation language="pt" status="proposed">-salvar em:</translation>
                 </translations>
               </property>
             </properties>
@@ -16326,6 +16503,7 @@
                   <translation language="es" status="proposed">Shell Integración</translation>
                   <translation language="fr" status="proposed">Intégration Shell</translation>
                   <translation language="it" status="proposed">Integrazione Shell</translation>
+                  <translation language="pt" status="proposed">Integração do Shell</translation>
                 </translations>
               </property>
             </properties>
@@ -16423,7 +16601,7 @@
               </property>
             </properties>
           </item>
-          <item name="FPreferences.AdvPageControl1.AdvTabIntegration.GrpContextMenu.Memo1" type="TMemo">
+          <item name="FPreferences.AdvPageControl1.AdvTabIntegration.GrpContextMenu.MemoWin11" type="TMemo">
             <properties>
               <property name="Lines.Strings[0]">
                 <value>The Verb will appear in the context menu, when you right-click on a folder in Windows Explorer.</value>
@@ -16583,6 +16761,20 @@
                   <translation language="pt" status="proposed">-Filelist (Lista de arquivos): Mostrar pastas e arquivos ocultos na lista de arquivos (requer administração)</translation>
                   <translation language="it" status="proposed">-Elenco file: Mostra cartelle e file nascosti nell'elenco dei file (è necessario l'amministratore)</translation>
                 </translations>
+              </property>
+            </properties>
+          </item>
+          <item name="FPreferences.AdvPageControl1.AdvTabOther.GrpConfig" type="TGroupBox">
+            <properties>
+              <property name="Caption" status="skip">
+                <value>Exiftool config (-config CFGFILE)</value>
+              </property>
+            </properties>
+          </item>
+          <item name="FPreferences.AdvPageControl1.AdvTabOther.GrpConfig.BtnEtCustomConfig" type="TButton">
+            <properties>
+              <property name="Caption" status="skip">
+                <value>...</value>
               </property>
             </properties>
           </item>
@@ -16880,6 +17072,21 @@
               </property>
             </properties>
           </item>
+          <item name="FPreferences.AdvPageControl1.TabGeoCoding.GrpGeoCodeGeneral.ChkCountryLocation" type="TCheckBox">
+            <properties>
+              <property name="Caption">
+                <value>Show CountryCode in Filelist</value>
+                <translations>
+                  <translation language="nl" status="proposed">Toon landcode in bestandslijst</translation>
+                  <translation language="fr" status="proposed">Afficher le code pays dans la liste des fichiers</translation>
+                  <translation language="de" status="proposed">Ländercode in Dateiliste anzeigen</translation>
+                  <translation language="it" status="proposed">Mostra il codice paese nell'elenco dei file</translation>
+                  <translation language="pt" status="proposed">Mostrar código do país na lista de arquivos</translation>
+                  <translation language="es" status="proposed">Mostrar el código de país en la lista de archivos</translation>
+                </translations>
+              </property>
+            </properties>
+          </item>
           <item name="FPreferences.AdvPageControl1.TabGeoCoding.GrpGeoCodeGeneral.ChkGeoCodeDialog" type="TCheckBox">
             <properties>
               <property name="Caption">
@@ -16895,7 +17102,7 @@
               </property>
             </properties>
           </item>
-          <item name="FPreferences.AdvPageControl1.TabGeoCoding.GrpGeoCodeGeneral.ChkGeoCodingEnable" type="TCheckBox">
+          <item name="FPreferences.AdvPageControl1.TabGeoCoding.GrpGeoCodeGeneral.ChkGeoCodingEnable" type="TCheckBox" state="unused">
             <properties>
               <property name="Caption">
                 <value>Enable GeoCoding</value>
@@ -16925,6 +17132,46 @@
               </property>
             </properties>
           </item>
+          <item name="FPreferences.AdvPageControl1.TabGeoCoding.GrpGeoCodeGeneral.CmbGeoCodingEnable" type="TComboBox" state="">
+            <properties>
+              <property name="Items.Strings[0]">
+                <value>Disable GeoCoding</value>
+                <translations>
+                  <translation language="es" status="proposed">Desactivar GeoCoding</translation>
+                  <translation language="nl" status="proposed">Deactiveer GeoCoding</translation>
+                  <translation language="fr" status="proposed">Désactiver le géocodage</translation>
+                  <translation language="de" status="proposed">GeoCoding deaktivieren</translation>
+                  <translation language="it" status="proposed">Disattivare la geocodifica</translation>
+                  <translation language="pt" status="proposed">Desativar GeoCodificação</translation>
+                </translations>
+              </property>
+              <property name="Items.Strings[1]">
+                <value>Enable All GeoCoding</value>
+                <translations>
+                  <translation language="nl" status="proposed">Activeer alle GeoCoding</translation>
+                  <translation language="fr" status="proposed">Activer tous les géocodages</translation>
+                  <translation language="de" status="proposed">Alle GeoCodierungen einschalten</translation>
+                  <translation language="it" status="proposed">Abilita tutta la geocodifica</translation>
+                  <translation language="pt" status="proposed">Ativar toda a geocodificação</translation>
+                  <translation language="es" status="proposed">Activar toda la geocodificación</translation>
+                </translations>
+              </property>
+              <property name="Items.Strings[2]">
+                <value>Enable Offline GeoCoding (ExifTool)</value>
+                <translations>
+                  <translation language="nl" status="proposed">Activeer offline GeoCoding(ExifTool)</translation>
+                  <translation language="es" status="proposed">Activar la geocodificación sin conexión (ExifTool)</translation>
+                  <translation language="pt" status="proposed">Ativar a geocodificação off-line (ExifTool)</translation>
+                  <translation language="it" status="proposed">Abilita la geocodifica offline (ExifTool)</translation>
+                  <translation language="de" status="proposed">Offline-Geokodierung aktivieren (ExifTool)</translation>
+                  <translation language="fr" status="proposed">Activer le géocodage hors ligne (ExifTool)</translation>
+                </translations>
+              </property>
+              <property name="Text" status="skip">
+                <value>CmbGeoCodingEnable</value>
+              </property>
+            </properties>
+          </item>
           <item name="FPreferences.AdvPageControl1.TabGeoCoding.GrpOverPass" type="TGroupBox">
             <properties>
               <property name="Caption">
@@ -16948,6 +17195,9 @@
                   <translation language="nl">URL</translation>
                   <translation language="de">URL</translation>
                   <translation language="es" status="proposed">URL</translation>
+                  <translation language="fr" status="proposed">URL</translation>
+                  <translation language="it" status="proposed">URL</translation>
+                  <translation language="pt" status="proposed">URL</translation>
                 </translations>
               </property>
               <property name="Text" status="skip">
@@ -17421,7 +17671,7 @@
           </item>
         </items>
       </module>
-      <module name="TFRMABOUT" type="form" properties="2">
+      <module name="TFRMABOUT" type="form" properties="1">
         <items>
           <item name="FrmAbout" type="TFrmAbout">
             <properties>
@@ -17448,7 +17698,17 @@
               </property>
             </properties>
           </item>
-          <item name="FrmAbout.LblForum" type="TLabel">
+          <item name="FrmAbout.LblExifToolHome" type="TLabel">
+            <properties>
+              <property name="Caption" status="skip">
+                <value>LblExifToolHome</value>
+              </property>
+              <property name="Font.Name" status="skip">
+                <value>Segoe UI</value>
+              </property>
+            </properties>
+          </item>
+          <item name="FrmAbout.LblForum" type="TLabel" state="unused">
             <properties>
               <property name="Caption" status="skip">
                 <value>LblForum</value>
@@ -17487,12 +17747,191 @@
           </item>
           <item name="FrmAbout.Panel1.BtnOk" type="TBitBtn">
             <properties>
-              <property name="Caption">
+              <property name="Caption" state="unused">
                 <value>OK</value>
                 <translations>
                   <translation language="nl">OK</translation>
                   <translation language="de" status="proposed">OK</translation>
                 </translations>
+              </property>
+            </properties>
+          </item>
+        </items>
+      </module>
+      <module name="TFRMCHECKVERSIONS" type="form" properties="9">
+        <items>
+          <item name="FrmCheckVersions" type="TFrmCheckVersions">
+            <properties>
+              <property name="Caption">
+                <value>Check versions</value>
+                <translations>
+                  <translation language="nl" status="proposed">Controleer versies</translation>
+                  <translation language="fr" status="proposed">Vérifier les versions</translation>
+                  <translation language="de" status="proposed">Versionen prüfen</translation>
+                  <translation language="it" status="proposed">Controllare le versioni</translation>
+                  <translation language="pt" status="proposed">Verificar versões</translation>
+                  <translation language="es" status="proposed">Comprobar versiones</translation>
+                </translations>
+              </property>
+              <property name="Font.Name" status="skip">
+                <value>Segoe UI</value>
+              </property>
+            </properties>
+          </item>
+          <item name="FrmCheckVersions.ImageCollection.Images[0]" type="TImageCollection">
+            <properties>
+              <property name="Name" status="skip">
+                <value>LvVersionFail</value>
+              </property>
+            </properties>
+          </item>
+          <item name="FrmCheckVersions.ImageCollection.Images[1]" type="TImageCollection">
+            <properties>
+              <property name="Name" status="skip">
+                <value>LvVersionOK</value>
+              </property>
+            </properties>
+          </item>
+          <item name="FrmCheckVersions.LblVersion" type="TLabel">
+            <properties>
+              <property name="Caption">
+                <value>Installed and available versions</value>
+                <translations>
+                  <translation language="nl" status="proposed">Geïnstalleerde en beschikbare versies</translation>
+                  <translation language="de" status="proposed">Installierte und verfügbare Versionen</translation>
+                  <translation language="it" status="proposed">Versioni installate e disponibili</translation>
+                  <translation language="pt" status="proposed">Versões instaladas e disponíveis</translation>
+                  <translation language="es" status="proposed">Versiones instaladas y disponibles</translation>
+                  <translation language="fr" status="proposed">Versions installées et disponibles</translation>
+                </translations>
+              </property>
+              <property name="Font.Name" status="skip">
+                <value>Segoe UI</value>
+              </property>
+            </properties>
+          </item>
+          <item name="FrmCheckVersions.LvVersions.Columns[0]" type="TListView">
+            <properties>
+              <property name="Caption">
+                <value>Method</value>
+                <translations>
+                  <translation language="nl" status="proposed">Methode</translation>
+                  <translation language="fr" status="proposed">Méthode</translation>
+                  <translation language="de" status="proposed">Methode</translation>
+                  <translation language="it" status="proposed">Metodo</translation>
+                  <translation language="pt" status="proposed">Metodo</translation>
+                  <translation language="es" status="proposed">Método</translation>
+                </translations>
+              </property>
+            </properties>
+          </item>
+          <item name="FrmCheckVersions.LvVersions.Columns[1]" type="TListView">
+            <properties>
+              <property name="Caption">
+                <value>Url</value>
+                <translations>
+                  <translation language="nl">Url</translation>
+                  <translation language="fr">Url</translation>
+                  <translation language="de">Url</translation>
+                  <translation language="it">Url</translation>
+                  <translation language="pt">Url</translation>
+                  <translation language="es">Url</translation>
+                </translations>
+              </property>
+            </properties>
+          </item>
+          <item name="FrmCheckVersions.LvVersions.Columns[2]" type="TListView">
+            <properties>
+              <property name="Caption">
+                <value>Installed</value>
+                <translations>
+                  <translation language="nl" status="proposed">Geïnstalleerd</translation>
+                  <translation language="fr" status="proposed">Installé</translation>
+                  <translation language="de" status="proposed">Installiert</translation>
+                  <translation language="it" status="proposed">Installato</translation>
+                  <translation language="pt" status="proposed">Installato</translation>
+                  <translation language="es" status="proposed">Instalado</translation>
+                </translations>
+              </property>
+            </properties>
+          </item>
+          <item name="FrmCheckVersions.LvVersions.Columns[3]" type="TListView">
+            <properties>
+              <property name="Caption">
+                <value>Available</value>
+                <translations>
+                  <translation language="nl" status="proposed">Beschikbaar</translation>
+                  <translation language="fr" status="proposed">Disponible</translation>
+                  <translation language="de" status="proposed">Verfügbar</translation>
+                  <translation language="it" status="proposed">Disponibile</translation>
+                  <translation language="pt" status="proposed">Disponibile</translation>
+                  <translation language="es" status="proposed">Disponible</translation>
+                </translations>
+              </property>
+            </properties>
+          </item>
+          <item name="FrmCheckVersions.LvVersions.Groups[0]" type="TListView">
+            <properties>
+              <property name="Header">
+                <value>ExifToolGui</value>
+                <translations>
+                  <translation language="nl">ExifToolGui</translation>
+                  <translation language="fr">ExifToolGui</translation>
+                  <translation language="de">ExifToolGui</translation>
+                  <translation language="it">ExifToolGui</translation>
+                  <translation language="pt">ExifToolGui</translation>
+                  <translation language="es">ExifToolGui</translation>
+                </translations>
+              </property>
+            </properties>
+          </item>
+          <item name="FrmCheckVersions.LvVersions.Groups[1]" type="TListView">
+            <properties>
+              <property name="Header">
+                <value>ExifTool</value>
+                <translations>
+                  <translation language="nl">ExifTool</translation>
+                  <translation language="fr">ExifTool</translation>
+                  <translation language="de">ExifTool</translation>
+                  <translation language="it">ExifTool</translation>
+                  <translation language="pt">ExifTool</translation>
+                  <translation language="es">ExifTool</translation>
+                </translations>
+              </property>
+            </properties>
+          </item>
+          <item name="FrmCheckVersions.Panel1.BtnOpenUrl" type="TBitBtn">
+            <properties>
+              <property name="Caption">
+                <value>&amp;Open Url</value>
+                <translations>
+                  <translation language="nl">&amp;Open Url</translation>
+                  <translation language="fr" status="proposed">&amp;Ouvrir l'url</translation>
+                  <translation language="de" status="proposed">&amp;Url öffnen</translation>
+                  <translation language="it" status="proposed">&amp;Apri Url</translation>
+                  <translation language="pt" status="proposed">&amp;Apri Url</translation>
+                  <translation language="es" status="proposed">&amp;Abrir Url</translation>
+                </translations>
+              </property>
+            </properties>
+          </item>
+          <item name="FrmCheckVersions.VirtualImageList.Images[0]" type="TVirtualImageList">
+            <properties>
+              <property name="CollectionName" status="skip">
+                <value>LvVersionFail</value>
+              </property>
+              <property name="Name" status="skip">
+                <value>LvVersionFail</value>
+              </property>
+            </properties>
+          </item>
+          <item name="FrmCheckVersions.VirtualImageList.Images[1]" type="TVirtualImageList">
+            <properties>
+              <property name="CollectionName" status="skip">
+                <value>LvVersionOK</value>
+              </property>
+              <property name="Name" status="skip">
+                <value>LvVersionOK</value>
               </property>
             </properties>
           </item>
