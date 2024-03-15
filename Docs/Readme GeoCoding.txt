@@ -1,15 +1,16 @@
+Support for new ExifTool functions geolocate and -api geolocation. (Requires ExifTool 12.78 and GUI version V6.3.0)
+
 Starting from version V6.3.0 a new GeoCode provider for reverse geocoding has been added.
 You can obtain the City, State and Country from GPS Coordinates, by selecting 'ExifTool geolocation' as Geocode provider.
 It uses a feature available in ExifTool V12.78. For more background info: https://exiftool.org/geotag.html#Geolocation
 
-In order to be compatible with the ExifTool function the existing functions have modified.
+In order to be compatible with the new ExifTool function the existing GUI functions have been modified.
 
-Exiftool writes to location found into tags: XMP:photoshop:City, XMP:photoshop:State, XMP:photoshop:Country and -XMP-iptcCore:CountryCode
+Exiftool writes the location found into tags: XMP:photoshop:City, XMP:photoshop:State, XMP:photoshop:Country and -XMP-iptcCore:CountryCode
 In previous versions Gui wrote the info to -XMP-iptcExt:LocationShownCity, -XMP-iptcExt:LocationShownProvinceState and -XMP-iptcExt:LocationShownCountryName
-Depending on the setting only the CountryCode was written into -XMP-iptcExt:LocationShownCountryName or the full countryName.
-Starting with V6.3.0 Gui will write in the photoshop and then iptcExt tags. You can choose in preferences if you want the 
-CountryCode, or the full CountryName displayed. 
-If CountryCode is empty, and CountryName not it will display the CountryName.
+Depending on the setting only the CountryCode was written into -XMP-iptcExt:LocationShownCountryName or the full CountryName.
+Starting with V6.3.0 Gui will write botn into the photoshop and into the iptcExt tags. You can choose in preferences if you want the 
+CountryCode, or the full CountryName displayed in the filelist. (If CountryCode is empty, and CountryName is not empty, it will display the CountryName in the filelist)
 
 Lessons learned from user testing.
 

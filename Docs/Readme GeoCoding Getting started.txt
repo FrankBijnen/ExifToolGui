@@ -1,6 +1,6 @@
 - If you dont want any GeoCoding choose 'Disable GeoCoding'.
 
-- If all you want is to get the location of coordinated and dont want to enable Internet Access for lookup.
+- If all you want is to get the location of coordinates and dont want to enable Internet Access for lookup.
 
   In Preferences/GeoCoding choose 'Enable Offline GeoCoding (ExifTool)'
 
