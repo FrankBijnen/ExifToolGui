@@ -19,7 +19,7 @@ A few users have done some testing with GeoCoding. A few issues found are resolv
 General remarks:
 
 - If you run into problems, it's a good idea to replay the commands with the Log Window open. That information helps solving issues.
-- The 2 providers currently available, Geocode and Overpass, will drop requests when you generate too many per second.
+- The 2 online providers currently available, Geocode and Overpass, will drop requests when you generate too many per second.
   Please use the 'Throttle values' in preferences. They specify a minimum nr of milliseconds between calls. For example 2000 means you can only do 1 call per 2 seconds!
 
 Issues found with 'Video files' (No Jpeg (JPG) or Camera-Raw (DNG, CRW, NEF etc), but Video's like MP4 or Mov)
