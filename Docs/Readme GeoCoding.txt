@@ -7,9 +7,9 @@ It uses a feature available in ExifTool V12.78. For more background info: https:
 In order to be compatible with the new ExifTool function the existing GUI functions have been modified.
 
 Exiftool writes the location found into tags: XMP:photoshop:City, XMP:photoshop:State, XMP:photoshop:Country and -XMP-iptcCore:CountryCode
-In previous versions Gui wrote the info to -XMP-iptcExt:LocationShownCity, -XMP-iptcExt:LocationShownProvinceState and -XMP-iptcExt:LocationShownCountryName
+In previous versions Gui wrote the info only into -XMP-iptcExt:LocationShownCity, -XMP-iptcExt:LocationShownProvinceState and -XMP-iptcExt:LocationShownCountryName
 Depending on the setting only the CountryCode was written into -XMP-iptcExt:LocationShownCountryName or the full CountryName.
-Starting with V6.3.0 Gui will write botn into the photoshop and into the iptcExt tags. You can choose in preferences if you want the 
+Starting with V6.3.0 Gui will write both into the photoshop and into the iptcExt tags. You can choose in preferences if you want the 
 CountryCode, or the full CountryName displayed in the filelist. (If CountryCode is empty, and CountryName is not empty, it will display the CountryName in the filelist)
 
 Lessons learned from user testing.
