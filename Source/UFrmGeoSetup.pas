@@ -238,6 +238,7 @@ end;
 
 procedure TFGeoSetup.BtnOKClick(Sender: TObject);
 begin
+  GeoSettings.CheckProvider;
   ModalResult := MROK;
 end;
 

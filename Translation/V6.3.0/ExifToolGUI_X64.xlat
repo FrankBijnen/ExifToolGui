@@ -2,7 +2,7 @@
 <xlat>
   <meta>
     <version>3</version>
-    <created>2024-03-13T09:57:22.815+01:00</created>
+    <created>2024-03-15T10:11:29.408+01:00</created>
     <tool>amTranslationManager</tool>
     <toolversion>2.0.8628.33873</toolversion>
   </meta>
@@ -12,18 +12,18 @@
     <sorted>True</sorted>
     <omitnewstate>True</omitnewstate>
   </options>
-  <project sourcefile=".\ExifToolGUI.exe" stringsymbolfile=".\ExifToolGUI.drc" language="en-US" properties="631">
+  <project sourcefile=".\ExifToolGUI_X64.exe" stringsymbolfile=".\ExifToolGUI_X64.drc" language="en-US" properties="635">
     <targetlanguages>
       <language language="es" translated="590"/>
+      <language language="it" translated="595"/>
       <language language="fr" translated="578"/>
       <language language="nl" translated="638"/>
-      <language language="it" translated="595"/>
       <language language="pt" translated="578"/>
       <language language="en" translated="1"/>
       <language language="de" translated="634"/>
     </targetlanguages>
     <modules>
-      <module name="resourcestrings" type="strings" properties="166">
+      <module name="resourcestrings" type="strings" properties="170">
         <items>
           <item name="1">
             <properties>
@@ -161,6 +161,13 @@
               </property>
             </properties>
           </item>
+          <item name="Data_Bind_Consts_sComponentEvalError" state="">
+            <properties>
+              <property>
+                <value>EvalError in %0:s: %1:s</value>
+              </property>
+            </properties>
+          </item>
           <item name="Data_Bind_Consts_sDataSourceClosed">
             <properties>
               <property status="hold">
@@ -207,6 +214,20 @@
             <properties>
               <property status="hold">
                 <value>Not implemented</value>
+              </property>
+            </properties>
+          </item>
+          <item name="Data_Bind_Consts_sSameSourceAndControlComponent" state="">
+            <properties>
+              <property>
+                <value>Error in %s: Source component and control component cannot be the same</value>
+              </property>
+            </properties>
+          </item>
+          <item name="Data_Bind_Consts_sStateAttr" state="">
+            <properties>
+              <property>
+                <value>State</value>
               </property>
             </properties>
           </item>
@@ -4631,6 +4652,13 @@
             <properties>
               <property status="hold">
                 <value>One or more tasks were cancelled</value>
+              </property>
+            </properties>
+          </item>
+          <item name="System_RTLConsts_SParameterCountExceeded" state="">
+            <properties>
+              <property>
+                <value>Parameter count exceeded</value>
               </property>
             </properties>
           </item>
@@ -14234,13 +14262,13 @@
               <property name="Caption">
                 <value>Browse</value>
                 <translations>
-                  <translation language="pt" status="proposed">Navegar</translation>
                   <translation language="de">Verzeichnis</translation>
+                  <translation language="nl">Mappen</translation>
+                  <translation language="it" status="proposed">Sfogliare</translation>
+                  <translation language="pt" status="proposed">Navegar</translation>
                   <translation language="en" status="proposed">Folders</translation>
                   <translation language="es">Carpetas</translation>
-                  <translation language="nl">Mappen</translation>
                   <translation language="fr" status="proposed">Dossiers</translation>
-                  <translation language="it" status="proposed">Sfogliare</translation>
                 </translations>
               </property>
             </properties>

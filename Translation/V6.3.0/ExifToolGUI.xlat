@@ -2,7 +2,7 @@
 <xlat>
   <meta>
     <version>3</version>
-    <created>2024-03-13T09:57:22.815+01:00</created>
+    <created>2024-03-15T10:09:54.552+01:00</created>
     <tool>amTranslationManager</tool>
     <toolversion>2.0.8628.33873</toolversion>
   </meta>
@@ -12,18 +12,18 @@
     <sorted>True</sorted>
     <omitnewstate>True</omitnewstate>
   </options>
-  <project sourcefile=".\ExifToolGUI.exe" stringsymbolfile=".\ExifToolGUI.drc" language="en-US" properties="631">
+  <project sourcefile=".\ExifToolGUI.exe" stringsymbolfile=".\ExifToolGUI.drc" language="en-US" properties="634">
     <targetlanguages>
-      <language language="es" translated="590"/>
-      <language language="fr" translated="578"/>
-      <language language="nl" translated="638"/>
-      <language language="it" translated="595"/>
-      <language language="pt" translated="578"/>
+      <language language="es" translated="594"/>
+      <language language="pt" translated="582"/>
+      <language language="fr" translated="582"/>
+      <language language="nl" translated="642"/>
+      <language language="it" translated="599"/>
       <language language="en" translated="1"/>
-      <language language="de" translated="634"/>
+      <language language="de" translated="637"/>
     </targetlanguages>
     <modules>
-      <module name="resourcestrings" type="strings" properties="166">
+      <module name="resourcestrings" type="strings" properties="167">
         <items>
           <item name="1">
             <properties>
@@ -6468,6 +6468,20 @@
                   <translation language="fr" status="proposed">Vérifier au moins 1 aperçu pour l'extraction</translation>
                   <translation language="pt" status="proposed">Verifique pelo menos uma visualização para extrair</translation>
                   <translation language="it" status="proposed">Controllare almeno 1 anteprima da estrarre</translation>
+                </translations>
+              </property>
+            </properties>
+          </item>
+          <item name="UnitLangResources_StrCheckPlaceProv" state="">
+            <properties>
+              <property>
+                <value>Warning only GeoCode provider ExifTool will produce results.</value>
+                <translations>
+                  <translation language="fr" status="proposed">Attention, seul le fournisseur de GeoCode ExifTool produira des résultats.</translation>
+                  <translation language="nl">Waarschuwing: alleen de GeoCode-provider ExifTool levert resultaten op.</translation>
+                  <translation language="it" status="proposed">Attenzione, solo il provider GeoCode ExifTool produrrà risultati.</translation>
+                  <translation language="pt" status="proposed">Aviso: somente o provedor de GeoCode ExifTool produzirá resultados.</translation>
+                  <translation language="es" status="proposed">Advertencia sólo GeoCode proveedor ExifTool producirá resultados.</translation>
                 </translations>
               </property>
             </properties>
@@ -14235,12 +14249,12 @@
                 <value>Browse</value>
                 <translations>
                   <translation language="pt" status="proposed">Navegar</translation>
-                  <translation language="de">Verzeichnis</translation>
                   <translation language="en" status="proposed">Folders</translation>
                   <translation language="es">Carpetas</translation>
-                  <translation language="nl">Mappen</translation>
                   <translation language="fr" status="proposed">Dossiers</translation>
                   <translation language="it" status="proposed">Sfogliare</translation>
+                  <translation language="de">Verzeichnis</translation>
+                  <translation language="nl">Mappen</translation>
                 </translations>
               </property>
             </properties>
@@ -16273,7 +16287,7 @@
           </item>
         </items>
       </module>
-      <module name="TFPREFERENCES" type="form" properties="57">
+      <module name="TFPREFERENCES" type="form" properties="59">
         <items>
           <item name="FPreferences" type="TFPreferences">
             <properties>
@@ -17088,7 +17102,7 @@
               </property>
             </properties>
           </item>
-          <item name="FPreferences.AdvPageControl1.TabGeoCoding.GrpGeoCodeGeneral.ChkGeoCodingEnable" type="TCheckBox">
+          <item name="FPreferences.AdvPageControl1.TabGeoCoding.GrpGeoCodeGeneral.ChkGeoCodingEnable" type="TCheckBox" state="unused">
             <properties>
               <property name="Caption">
                 <value>Enable GeoCoding</value>
@@ -17115,6 +17129,46 @@
                   <translation language="pt" status="proposed">Ativar a caixa de diálogo Geocode reversa (obter coordenadas do local)</translation>
                   <translation language="it" status="proposed">Abilita la finestra di dialogo Geocodifica inversa (Ottieni la posizione delle coordinate)</translation>
                 </translations>
+              </property>
+            </properties>
+          </item>
+          <item name="FPreferences.AdvPageControl1.TabGeoCoding.GrpGeoCodeGeneral.CmbGeoCodingEnable" type="TComboBox" state="">
+            <properties>
+              <property name="Items.Strings[0]">
+                <value>Disable GeoCoding</value>
+                <translations>
+                  <translation language="es" status="proposed">Desactivar GeoCoding</translation>
+                  <translation language="nl" status="proposed">Deactiveer GeoCoding</translation>
+                  <translation language="fr" status="proposed">Désactiver le géocodage</translation>
+                  <translation language="de" status="proposed">GeoCoding deaktivieren</translation>
+                  <translation language="it" status="proposed">Disattivare la geocodifica</translation>
+                  <translation language="pt" status="proposed">Desativar GeoCodificação</translation>
+                </translations>
+              </property>
+              <property name="Items.Strings[1]">
+                <value>Enable All GeoCoding</value>
+                <translations>
+                  <translation language="nl" status="proposed">Activeer alle GeoCoding</translation>
+                  <translation language="fr" status="proposed">Activer tous les géocodages</translation>
+                  <translation language="de" status="proposed">Alle GeoCodierungen einschalten</translation>
+                  <translation language="it" status="proposed">Abilita tutta la geocodifica</translation>
+                  <translation language="pt" status="proposed">Ativar toda a geocodificação</translation>
+                  <translation language="es" status="proposed">Activar toda la geocodificación</translation>
+                </translations>
+              </property>
+              <property name="Items.Strings[2]">
+                <value>Enable Offline GeoCoding (ExifTool)</value>
+                <translations>
+                  <translation language="nl" status="proposed">Activeer offline GeoCoding(ExifTool)</translation>
+                  <translation language="es" status="proposed">Activar la geocodificación sin conexión (ExifTool)</translation>
+                  <translation language="pt" status="proposed">Ativar a geocodificação off-line (ExifTool)</translation>
+                  <translation language="it" status="proposed">Abilita la geocodifica offline (ExifTool)</translation>
+                  <translation language="de" status="proposed">Offline-Geokodierung aktivieren (ExifTool)</translation>
+                  <translation language="fr" status="proposed">Activer le géocodage hors ligne (ExifTool)</translation>
+                </translations>
+              </property>
+              <property name="Text" status="skip">
+                <value>CmbGeoCodingEnable</value>
               </property>
             </properties>
           </item>

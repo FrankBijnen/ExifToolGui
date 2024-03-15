@@ -56,7 +56,6 @@ type
     Label4: TLabel;
     UpdThrottleOverpass: TUpDown;
     EdOverPassUrl: TLabeledEdit;
-    ChkGeoCodingEnable: TCheckBox;
     CheckBox6: TCheckBox;
     Label5: TLabel;
     HintPause: TEdit;
@@ -77,6 +76,7 @@ type
     EdETCustomConfig: TEdit;
     BtnEtCustomConfig: TButton;
     ChkCountryLocation: TCheckBox;
+    CmbGeoCodingEnable: TComboBox;
     procedure FormShow(Sender: TObject);
     procedure BtnSaveClick(Sender: TObject);
     procedure BtnBrowseFolder(Sender: TObject);
@@ -189,14 +189,11 @@ begin
   GeoSettings.OverPassUrl := EdOverPassUrl.Text;
   GeoSettings.ThrottleOverPass := UpdThrottleOverpass.Position;
   GeoSettings.GeoCodeDialog := ChkGeoCodeDialog.Checked;
-  GeoSettings.GeoCodingEnable := ChkGeoCodingEnable.Checked;
+  GeoSettings.GeoCodingEnable := TGeoCodeEnable(CmbGeoCodingEnable.ItemIndex);
   GeoSettings.ReverseGeoCodeDialog := ChkReverseGeoCodeDialog.Checked;
   GeoSettings.CountryCodeLocation := ChkCountryLocation.Checked;
 
-  if (GeoSettings.GeoCodingEnable) and
-      ((GeoSettings.GeoCodeApiKey = '') or
-       (GeoSettings.ThrottleGeoCode < 1000)) then
-    ShowMessage(StrCheckTheGeoCodeRe);
+  GeoSettings.CheckProvider;
 
   // Make sure changes made by user are saved.
   SaveGUIini;
@@ -405,7 +402,7 @@ begin
     UpdThrottleGeoCode.Position := GeoSettings.ThrottleGeoCode;
     EdOverPassUrl.Text := GeoSettings.OverPassUrl;
     UpdThrottleOverpass.Position := GeoSettings.ThrottleOverPass;
-    ChkGeoCodingEnable.Checked := GeoSettings.GeoCodingEnable;
+    CmbGeoCodingEnable.ItemIndex := Ord(GeoSettings.GeoCodingEnable);
     ChkGeoCodeDialog.Checked := GeoSettings.GeoCodeDialog;
     ChkReverseGeoCodeDialog.Checked := GeoSettings.ReverseGeoCodeDialog;
     ChkCountryLocation.Checked := GeoSettings.CountryCodeLocation;

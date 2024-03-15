@@ -13,11 +13,12 @@ const
 
 type
   TExecRestEvent = procedure(Url, Response: string; Succes: boolean) of object;
+  TGeoCodeEnable = (geNone, geAll, geOffline);
   TGeoCodeProvider = (gpGeoName, gpOverPass, gpExifTool);
   TGeoTagMode = (gtmCoordinates, gtmLocation, gtmCoordinatesLocation);
 
   GEOsettingsRec = record
-    GeoCodingEnable: boolean;
+    GeoCodingEnable: TGeoCodeEnable;
     GetCoordProvider: TGeoCodeProvider;
     GetPlaceProvider: TGeoCodeProvider;
     GeoCodeUrl: string;
@@ -32,6 +33,7 @@ type
     GeoTagMode: TGeoTagMode;
     GeoCodeDialog: boolean;
     ReverseGeoCodeDialog: boolean;
+    procedure CheckProvider;
   end;
 
   TRegionLevels = array[0..3] of integer;
@@ -191,6 +193,20 @@ var
   CoordFormatSettings: TFormatSettings; // for StrToFloatDef -see Initialization
   LastQuery: TDateTime;
   CoordCache: TObjectDictionary<string, TPlace>;
+
+procedure GEOsettingsRec.CheckProvider;
+begin
+
+  if (GeoSettings.GeoCodingEnable = TGeoCodeEnable.geAll) and
+      ((GeoSettings.GeoCodeApiKey = '') or
+       (GeoSettings.ThrottleGeoCode < 1000)) then
+    ShowMessage(StrCheckTheGeoCodeRe);
+
+  if (GeoSettings.GeoCodingEnable = TGeoCodeEnable.geOffline) and
+     (GeoSettings.GetPlaceProvider <> TGeoCodeProvider.gpExifTool) then
+    ShowMessage(StrCheckPlaceProv);
+
+end;
 
 // Sort on stringlist with possibly integer in key.
 function SortOnKey(List: TStringList; Index1, Index2: Integer): Integer;
@@ -684,7 +700,8 @@ begin
     OsmHelper.WriteHeader;
     OsmHelper.WritePointsStart;
     OsmHelper.WritePoint(Lat, Lon, Desc, false);
-    OsmHelper.WritePointsEnd((GeoSettings.GeoCodingEnable) and (Desc <> OSMHome));
+    OsmHelper.WritePointsEnd((GeoSettings.GeoCodingEnable <> TGeoCodeEnable.geNone) and
+                             (Desc <> OSMHome));
     OsmHelper.WriteFooter;
   finally
     OsmHelper.Free;
@@ -707,7 +724,7 @@ begin
         if (MessageDlgEx(E.Message + #10 + StrContinueReenabl, '',
                          TMsgDlgType.mtInformation,
                          [TMsgDlgBtn.mbYes, TMsgDlgBtn.mbNo]) = IDNO) then
-          GeoSettings.GeoCodingEnable := false;
+          GeoSettings.GeoCodingEnable := TGeoCodeEnable.geNone;
       end;
     end;
   finally
@@ -951,17 +968,30 @@ begin
     end;
 
     result := nil;
-  
-    case Provider of
-      TGeoCodeProvider.gpGeoName:
-        if (GeoSettings.GeoCodingEnable) then
-          result := GetPlaceOfCoords_GeoCode(Lat, Lon);
-      TGeoCodeProvider.gpOverPass:
-        if (GeoSettings.GeoCodingEnable) then
-          result := GetPlaceOfCoords_OverPass(Lat, Lon);
-      TGeoCodeProvider.gpExifTool:
-        result := GetPlaceOfCoords_ExifTool(Lat, Lon);
+
+    case (GeoSettings.GeoCodingEnable) of
+      TGeoCodeEnable.geNone:
+        exit;
+      TGeoCodeEnable.geAll:
+        begin
+          case Provider of
+            TGeoCodeProvider.gpGeoName:
+              result := GetPlaceOfCoords_GeoCode(Lat, Lon);
+            TGeoCodeProvider.gpOverPass:
+              result := GetPlaceOfCoords_OverPass(Lat, Lon);
+            TGeoCodeProvider.gpExifTool:
+              result := GetPlaceOfCoords_ExifTool(Lat, Lon);
+          end;
+        end;
+      TGeoCodeEnable.geOffline:
+        begin
+          case Provider of
+            TGeoCodeProvider.gpExifTool:
+              result := GetPlaceOfCoords_ExifTool(Lat, Lon);
+          end;
+        end;
     end;
+
     // Also cache if not found
     CoordCache.Add(CoordsKey, result);
   finally
@@ -1215,7 +1245,7 @@ var
   CrWait, CrNormal: HCURSOR;
   Region: string;
 begin
-  if (GeoSettings.GeoCodingEnable = false) then
+  if (GeoSettings.GeoCodingEnable <> TGeoCodeEnable.geAll) then
     exit;
 
   Region := Place;
@@ -1334,7 +1364,7 @@ begin
   GeoSettings.GeoTagMode := TGeoTagMode(GUIini.ReadInteger(Geo_Settings, 'GeoTagMode', 1));
   GeoSettings.GeoCodeDialog := GUIini.ReadBool(Geo_Settings, 'GeoCodeDialog', true);
   GeoSettings.ReverseGeoCodeDialog := GUIini.ReadBool(Geo_Settings, 'ReverseGeoCodeDialog', true);
-  GeoSettings.GeoCodingEnable := GUIini.ReadBool(Geo_Settings, 'GeoCodingEnable', false);
+  GeoSettings.GeoCodingEnable := TGeoCodeEnable(GUIini.ReadInteger(Geo_Settings, 'GeoCodingEnable', 0));
 
   GUIini.ReadSectionValues(Geo_Province, GeoProvinceList);
 
@@ -1359,7 +1389,7 @@ begin
   GUIini.WriteInteger(Geo_Settings, 'GeotagMode', Ord(GeoSettings.GeoTagMode));
   GUIini.WriteBool(Geo_Settings, 'GeoCodeDialog', GeoSettings.GeoCodeDialog);
   GUIini.WriteBool(Geo_Settings, 'ReverseGeoCodeDialog', GeoSettings.ReverseGeoCodeDialog);
-  GUIini.WriteBool(Geo_Settings, 'GeoCodingEnable', GeoSettings.GeoCodingEnable);
+  GUIini.WriteInteger(Geo_Settings, 'GeoCodingEnable', Ord(GeoSettings.GeoCodingEnable));
 
   TmpItems := TStringList.Create;
   try

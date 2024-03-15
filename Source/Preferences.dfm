@@ -476,21 +476,25 @@ object FPreferences: TFPreferences
           Caption = 'Enable reverse Geocode dialog (Get location of coordinates)'
           TabOrder = 1
         end
-        object ChkGeoCodingEnable: TCheckBox
-          Left = 67
-          Top = 24
-          Width = 450
-          Height = 17
-          Caption = 'Enable GeoCoding'
-          TabOrder = 2
-        end
         object ChkCountryLocation: TCheckBox
           Left = 67
           Top = 88
           Width = 450
           Height = 17
           Caption = 'Show CountryCode in Filelist'
+          TabOrder = 2
+        end
+        object CmbGeoCodingEnable: TComboBox
+          Left = 67
+          Top = 18
+          Width = 450
+          Height = 21
           TabOrder = 3
+          Text = 'CmbGeoCodingEnable'
+          Items.Strings = (
+            'Disable GeoCoding'
+            'Enable All GeoCoding'
+            'Enable Offline GeoCoding (ExifTool)')
         end
       end
       object GrpGeoCode: TGroupBox

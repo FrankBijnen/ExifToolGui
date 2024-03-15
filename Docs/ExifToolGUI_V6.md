@@ -257,7 +257,8 @@ In the next dialog keep only 'Thumbnail' checked, and click on OK.</li>
 <br><br>
 <b><u>GeoCoding</u></b> settings tab<br>
 <br>
-Here you can setup the GeoCoding parameters. Typically you only have to check <b>Enable GeoCoding</b><br>
+Here you can setup the GeoCoding parameters.<br>
+Getting started: <a href="Readme GeoCoding Getting started.txt"><b>Readme GeoCoding Getting started.txt"</b></a>
 For an in-depth explanation see <a href="Readme GeoCoding.txt"><b>Readme GeoCoding.txt</b></a>
 <br><br>
 
