@@ -3,38 +3,24 @@
 
 This is an updated version of the ExifToolGui program created by Bogdan Hrastnik. Many thanks go out to him.
 
-<h4>Translations in progress</h4>
+<b>Released version: <b>V6.3.0</b> updated March 16, 2024</b><br>
 
-- Een vertaling in het Nederlands is klaar. [DLL](Translation/ExifToolGui.NLD), [BTM bronbestand](Translation/ExifToolGUI_nl.xlat)<br>
-- Deutsch hat angefangen. [DLL](Translation/ExifToolGui.DEU), [BTM quelldatei](Translation/ExifToolGUI_de.xlat)<br>
-- English was already available as default. [DLL](Translation/ExifToolGUI.ENU)<br>
-
-When you place the language DLL in the same folder as the EXE, it should be selected automatically. According to your Windows language.
-To override the default use /Lang=xxx as commandline parm. Where xxx is the languagecode. (NLD, DEU)
-
-Note: <br>
-- If you use the X64 executable, you will have to use the corresponding X64 language Dll's (ExifToolGui_X64.nld for example)<br>
-
-<b>Released version: <b>V6.2.9</b> updated January 28, 2024.</b><br>
-
-- Support for 4K monitors, including scaling and resizing, completed. Commandline parameters not needed anymore.<br>
-- Fixes for issues found in Geocoding. Especially Video files. [Readme GeoCoding](Docs/Readme%20GeoCoding.txt)<br>
-- Optionally show hidden files & folders.<br>
-- Added keyboard shortcuts.<br>
-- Integration in Windows Explorer. [Readme Shell integration](Docs/Readme%20Shell%20integration.txt)<br>
-- Added support for more filetypes in FileList. (Camera settings, Location info and About photo)<br>
-- Add option LargeFileSupport<br>
-- Preparations for multi-language
-  If you're interested in creating/updating a translation, see: [Translation](Translation/README.md) <br>
+- Created an installer.<br>
+- Added version checks for ExifToolGui and ExifTool.<br>
+- Translations available. They still need verification. Help wanted!<br>
+- Fixed an annoying bug that prevented the OSM map from displaying.<br>
+- Added Option to specify a custom Exiftool config.<br>
+- Added Support for new ExifTool features geolocate and -api geolocation.<br>
+- Improved defaults for geocode providers.<br>
+- Style fixes for dark styles.<br>
 
 [Change log](Docs/changelog.txt)<br>
 [Download Release](https://github.com/FrankBijnen/ExifToolGui/releases/latest)<br>
 
 <h4>Important</h4>
 
-- [Please <b>read</b> the Requirements and preparation](https://github.com/FrankBijnen/ExifToolGui/blob/main/Docs/ExifToolGUI_V6.md/#m_reqs_general)<br>
-- To help Bug hunting also Map files are released. If you place the Map file in the same directory as the Executable
-a stacktrace can be copied to the clipboard if an Exception occurs. Please also provide the stacktrace if you report an Exception.<br>
+- [Please <b>read</b> the Requirements and preparation, or use the supplied installer](https://github.com/FrankBijnen/ExifToolGui/blob/main/Docs/ExifToolGUI_V6.md/#m_reqs_general)<br>
+- Map files are no longer released separately. If you need them use the option provided by the installer.
 
 # Useful links
 
@@ -63,7 +49,7 @@ a stacktrace can be copied to the clipboard if an Exception occurs. Please also 
 
 <h4>Legal, Copyright etc.</h4>
 
-This is a continuation of the project started by Bogdan Hrastnik. He did not mention any License, and or Copyrights. Likewise I will not.
+This is a continuation of the project started by Bogdan Hrastnik. He did not mention any License, and or Copyrights. Likewise I will not. 
 I have used some open source components, you can find their legal info in the corresponding subdirectories.
 
 
