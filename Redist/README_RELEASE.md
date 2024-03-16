@@ -4,9 +4,9 @@
 - ExiftoolGui.exe Executable for Win32
 - ExiftoolGui_X64.exe Executable for Win64
 
-Note: You should handle all needed requirements yourself.
-- Download and install ExifTool.exe 
-- Download and install WebView2Loader.dll. Only needed if you want to use the OSM map 
+Note: You should handle all requirements yourself.
+- Download and install ExifTool.exe.
+- Download and install WebView2Loader.dll. Only needed if you want to use the OSM map.
 - Download and install Language DLL's. See below.
 - Download and install MAP files. Only needed to provide additional info in the event of an exception.
 
@@ -20,8 +20,8 @@ Should you prefer the WIN32 files on a WIN64 windows, then you can add /Win32 as
 It is recommended to choose the 'Setup install mode' 'Install for all users' and choose the 'full installation'.
 In the additional tasks your have the options to create a desktop icon (recommended), and to download and install the latest version of Exiftool.
 If 'by Phil Harvey' is chosen, the Exiftool zip file will be download and the exe unzipped and renamed in the installation folder.
-If 'by Oliver Betz' is chosen, the latest installer will be downloaded an run after the installation of ExifToolGui.
-(It is recommended to choose 'Add to Path', then ExiftoolGui will be able to find ExifTool.exe)
+If 'by Oliver Betz' is chosen, the latest installer will be downloaded and run after the installation of ExifToolGui.
+(It is recommended to choose 'Add to Path', so ExiftoolGui will be able to find ExifTool.exe)
 
 <h4>Release info.</h4>
 
@@ -31,8 +31,8 @@ If 'by Oliver Betz' is chosen, the latest installer will be downloaded an run af
 
 - Translations are available for Dutch, German, French, Italian, Portuguese and Spanish.
   If you have selected the Language DLL's during the install, then the Language will be automatically selected according to your Windows languge. (If available)
-  You can force a languge by adding one of these commandline parameters: /Lang=NLD, /Lang=DEU, Lang=FRA, Lang=Ita, /Lang=PTB, Lang=ESP, Lang=ENU
-  Should you regret your choice, because you feel the translation is really bad, simply uninstall ExiftoolGUI and reinstall without the Language DLL's 
+  You can force a language by adding one of these commandline parameters: /Lang=NLD, /Lang=DEU, Lang=FRA, Lang=Ita, /Lang=PTB, Lang=ESP, Lang=ENU
+  Should you regret your choice, because you feel the translation is really bad, simply uninstall ExiftoolGUI and reinstall without the Language DLL's. 
 
   Many translations were done with help from Deepl, if you feel they need improving add a comment to one of the issues.
 

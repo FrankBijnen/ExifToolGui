@@ -417,7 +417,7 @@ end;
 
 procedure SetupRichText;
 begin
-  if PHSelected or OBetzSelected then
+  if (PHSelected or OBetzSelected) then
     RichEditViewer1.RTFText := // InfoNoDownload.rtf
       '{\rtf1\ansi\ansicpg1252\deff0\nouicompat\deflang1033{\fonttbl{\f0\fnil\fcharset0 Calibri;}}' + #13 + #10 +
       '{\colortbl ;\red0\green0\blue255;}' + #13 + #10 +
@@ -426,25 +426,27 @@ begin
       '}' + #13 + #10
   else
     RichEditViewer1.RTFText := //InfoComplete.rtf
-    '{\rtf1\ansi\ansicpg1252\deff0\nouicompat\deflang1033{\fonttbl{\f0\fnil\fcharset0 Calibri;}}' + #13 + #10 +
-  '{\colortbl ;\red0\green0\blue255;}' + #13 + #10 +
-    '{\*\generator Riched20 10.0.19041}\viewkind4\uc1 ' + #13 + #10 +
-    '\pard\sl240\slmult1\f0\fs22\lang9 You have chosen not to download and install ExifTool automatically. \par' + #13 + #10 +
-    'ExifToolGui will not work without ExifTool. You can download it from here:\par' + #13 + #10 +
-    '\par' + #13 + #10 +
-    '' + #13 + #10 +
-    '\pard\sl276\slmult1 The original version by Phil Harvey: \par' + #13 + #10 +
-    '\tab {{\field{\*\fldinst{HYPERLINK https://exiftool.org/ }}{\fldrslt{https://exiftool.org/\ul0\cf0}}}}\f0\fs22\par' + #13 + #10 +
-    'An installer provider by Oliver Betz:\par' + #13 + #10 +
-    '\tab {{\field{\*\fldinst{HYPERLINK https://oliverbetz.de/pages/Artikel/ExifTool-for-Windows }}{\fldrslt{https://oliverbetz.de/pages/Artikel/ExifTool-for-Windows\ul0\cf0}}}}\f0\fs22\par' + #13 + #10 +
-    '\par' + #13 + #10 +
-    'To enable thumbnails of RAW image files, you will need to install a codec adapted for the RAW files you use. FastPictureViewer provides free codecs for personal use: \tab {{\field{\*\fldinst{HYPERLINK https://www.fastpictureviewer.com/codecs/ }}{\fldrslt{https://www.fastpictureviewer.com/codecs/\ul0\cf0}}}}\f0\fs22\par' + #13 + #10 +
-    '}' + #13 + #10;
+      '{\rtf1\ansi\ansicpg1252\deff0\nouicompat\deflang1033{\fonttbl{\f0\fnil\fcharset0 Calibri;}}' + #13 + #10 +
+      '{\colortbl ;\red0\green0\blue255;}' + #13 + #10 +
+      '{\*\generator Riched20 10.0.19041}\viewkind4\uc1 ' + #13 + #10 +
+      '\pard\sl240\slmult1\f0\fs22\lang9 You can download ExifTool here:\par' + #13 + #10
+      + #13 + #10
+      '\pard{\pntext\f1\''B7\tab}{\*\pn\pnlvlblt\pnf1\pnindent0{\pntxtb\''B7}}\fi-360\li720\sl276\slmult1 The original version by Phil Harvey: \par' + #13 + #10 +
+      + #13 + #10
+      '\pard\sl276\slmult1\tab {{\field{\*\fldinst{HYPERLINK https://exiftool.org/ }}{\fldrslt{https://exiftool.org/\ul0\cf0}}}}\f0\fs22\par' + #13 + #10 +
+      + #13 + #10
+      '\pard{\pntext\f1\''B7\tab}{\*\pn\pnlvlblt\pnf1\pnindent0{\pntxtb\''B7}}\fi-360\li720\sl276\slmult1 An installer provider by Oliver Betz:\par' + #13 + #10 +
+      + #13 + #10
+      '\pard\sl276\slmult1\tab {{\field{\*\fldinst{HYPERLINK https://oliverbetz.de/pages/Artikel/ExifTool-for-Windows }}{\fldrslt{https://oliverbetz.de/pages/Artikel/ExifTool-for-Windows\ul0\cf0}}}}\f0\fs22\par' + #13 + #10 +
+      + #13 + #10 +
+      '\pard\sl276\slmult1\par' + #13 + #10 +
+      'To enable thumbnails of RAW image files, you will need to install a codec adapted for the RAW files you use. FastPictureViewer provides free codecs for personal use: \tab {{\field{\*\fldinst{HYPERLINK https://www.fastpictureviewer.com/codecs/ }}{\fldrslt{https://www.fastpictureviewer.com/codecs/\ul0\cf0}}}}\f0\fs22\par' + #13 + #10 +
+      '}' + #13 + #10;
 end;
 
 function ShouldSkipPage(PageID: Integer): Boolean;
 begin
-  // Now we now what info to show.
+  // Now we know what info to show.
   if (PageId = wpInfoAfter) then
   begin
     SetupRichText;

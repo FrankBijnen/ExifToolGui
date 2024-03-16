@@ -2,7 +2,7 @@ Support for new ExifTool functions geolocate and -api geolocation. (Requires Exi
 
 Starting from version V6.3.0 a new GeoCode provider for reverse geocoding has been added.
 You can obtain the City, State and Country from GPS Coordinates, by selecting 'ExifTool geolocation' as Geocode provider.
-It uses a feature available in ExifTool V12.78. For more background info: https://exiftool.org/geotag.html#Geolocation
+It uses a feature available in ExifTool V12.78. For more background info: https://exiftool.org/geolocation.html
 
 In order to be compatible with the new ExifTool function the existing GUI functions have been modified.
 

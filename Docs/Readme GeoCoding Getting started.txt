@@ -11,6 +11,6 @@
   - Button 'Geotag files' (At the bottom of the OSM map)
     Click on Setup Geo
 
-- If you want to search for cities, and have more control over the data choose 'Enable All Geocoding'
+- If you want to search for cities, and have more control over the data choose 'Enable All Geocoding'.
   Get an ApiKey from https://geocode.maps.co/ and set it up in Preferences.
   All options are now available.

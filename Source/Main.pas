@@ -496,6 +496,7 @@ begin
   if FEditFColumn.ShowModal = mrOK then
     with ShellList do
     begin
+      ClearSelection;
       Refresh;
       SetFocus;
     end;
@@ -562,6 +563,7 @@ end;
 
 procedure TFMain.BtnFListRefreshClick(Sender: TObject);
 begin
+  ShellList.ClearSelection;
   ShellList.Refresh; // -use this (to be sure)
   ShellList.SetFocus;
 end;
@@ -963,7 +965,7 @@ procedure TFMain.MetadataListCtrlKeyDown(Sender: TObject; var Key: Word; Shift: 
     if not CheckIndex(New) then
       exit;
 
-    // Select only then item, and make that visible
+    // Select only the item, and make that visible
     ShellList.ClearSelection;
     ShellList.Items[New].Selected := true;
     ShellList.Items[New].MakeVisible(false);
@@ -1376,6 +1378,7 @@ begin
     ET_OpenExit(true); // Force restart of ExifTool. CustomConfig could have changed
     EnableMenus(ET_StayOpen(ShellList.Path)); // Recheck Exiftool.exe.
     ShellListSetFolders;
+    ShellList.ClearSelection;
     ShellList.Refresh;
     ShowMetadata;
   end;
@@ -2342,6 +2345,7 @@ begin
   if i >= 0 then
   begin
     SpeedBtnFilterEdit.Enabled := (i <> 0);
+    ShellList.ClearSelection;
     ShellList.Refresh;
     ShellList.SetFocus;
   end;
@@ -2352,6 +2356,7 @@ begin
   if Key = VK_Return then
   begin
     CBoxFileFilter.Text := trim(CBoxFileFilter.Text);
+    ShellList.ClearSelection;
     ShellList.Refresh;
     ShellList.SetFocus;
   end;
@@ -2848,6 +2853,7 @@ var
   AShellList: TShellListView;
 begin
   AShellList := TShellListView(Sender);
+  AShellList.ClearSelection;
 
   // Select 1st Item rightaway
   if (AShellList.Items.Count > 0) then
@@ -3221,6 +3227,7 @@ procedure TFMain.Tray_ResetwindowsizeClick(Sender: TObject);
 begin
   RestoreGUI;
   ResetWindowSizes;
+  ShellList.ClearSelection;
   ShellList.Refresh;
   Realign;
 end;
