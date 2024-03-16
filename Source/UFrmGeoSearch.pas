@@ -65,6 +65,7 @@ begin
   ChkComplete.Checked := ChkComplete.Enabled and
                          GeoSettings.OverPassCompleteWord;
   SetupGeoCodeLanguage(CmbLang, GeoSettings.GetCoordProvider, GeoSettings.Lang);
+  ClearCoordCache; // Make sure we dont get cached data.
 end;
 
 procedure TFGeoSearch.BtnOKClick(Sender: TObject);
