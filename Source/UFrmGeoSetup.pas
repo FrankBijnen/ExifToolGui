@@ -136,7 +136,7 @@ begin
           CmbProvince.Items.Add(PlaceNone);
         end;
     end;
-    SetupGeoCodeLanguage(Cmblang, GeoSettings.GetPlaceProvider, GeoSettings.Lang);
+    SetupGeoCodeLanguage(Cmblang, GeoSettings.GetPlaceProvider, GeoSettings.ReverseGeoCodeLang);
 
     CmbProvince.ItemIndex := CmbProvince.Items.IndexOf(Preferred);
     if (CmbProvince.ItemIndex < 0) then
@@ -206,12 +206,12 @@ end;
 
 procedure TFGeoSetup.CmbLangChange(Sender: TObject);
 begin
-  GeoSettings.Lang := GetExifToolLanguage(Cmblang);
+  GeoSettings.ReverseGeoCodeLang := GetExifToolLanguage(Cmblang);
 end;
 
 procedure TFGeoSetup.CmbLangClick(Sender: TObject);
 begin
-  GeoSettings.Lang := GetExifToolLanguage(Cmblang);
+  GeoSettings.ReverseGeoCodeLang := GetExifToolLanguage(Cmblang);
   FillPreview;
 end;
 

@@ -496,8 +496,7 @@ begin
   if FEditFColumn.ShowModal = mrOK then
     with ShellList do
     begin
-      ClearSelection;
-      Refresh;
+      ClearSelectionRefresh;
       SetFocus;
     end;
   ShowMetadata;
@@ -563,8 +562,7 @@ end;
 
 procedure TFMain.BtnFListRefreshClick(Sender: TObject);
 begin
-  ShellList.ClearSelection;
-  ShellList.Refresh; // -use this (to be sure)
+  ShellList.ClearSelectionRefresh;
   ShellList.SetFocus;
 end;
 
@@ -666,8 +664,7 @@ begin
   with ShellList do
   if (Enabled) then
   begin
-    ClearSelection;
-    Refresh;
+    ClearSelectionRefresh;
     ShellListItemsLoaded(ShellList);
     SetFocus;
   end;
@@ -1378,8 +1375,7 @@ begin
     ET_OpenExit(true); // Force restart of ExifTool. CustomConfig could have changed
     EnableMenus(ET_StayOpen(ShellList.Path)); // Recheck Exiftool.exe.
     ShellListSetFolders;
-    ShellList.ClearSelection;
-    ShellList.Refresh;
+    ShellList.ClearSelectionRefresh;
     ShowMetadata;
   end;
 end;
@@ -1666,9 +1662,8 @@ begin
   begin
     PrevSel := ShellList.Selected.Index;
     try
-      ShellList.Refresh;
+      ShellList.ClearSelectionRefresh;
     finally
-      ShellList.ClearSelection;
       ShellList.Items[PrevSel].Selected := true;
       ShellListClick(ShellList);
     end;
@@ -2345,8 +2340,7 @@ begin
   if i >= 0 then
   begin
     SpeedBtnFilterEdit.Enabled := (i <> 0);
-    ShellList.ClearSelection;
-    ShellList.Refresh;
+    ShellList.ClearSelectionRefresh;
     ShellList.SetFocus;
   end;
 end;
@@ -2356,8 +2350,7 @@ begin
   if Key = VK_Return then
   begin
     CBoxFileFilter.Text := trim(CBoxFileFilter.Text);
-    ShellList.ClearSelection;
-    ShellList.Refresh;
+    ShellList.ClearSelectionRefresh;
     ShellList.SetFocus;
   end;
 end;
@@ -2853,7 +2846,6 @@ var
   AShellList: TShellListView;
 begin
   AShellList := TShellListView(Sender);
-  AShellList.ClearSelection;
 
   // Select 1st Item rightaway
   if (AShellList.Items.Count > 0) then
@@ -3069,8 +3061,7 @@ procedure TFMain.ShellListKeyUp(Sender: TObject; var Key: Word; Shift: TShiftSta
         DoContextMenuVerb(ShellList.Folders[ANItem.Index], SCmdVerbDelete);
       end;
 
-      ShellList.Refresh;
-      ShellList.ClearSelection;
+      ShellList.ClearSelectionRefresh;
       if (CurIndex < 0) then
         CurIndex := 0;
       if (CurIndex > ShellList.Items.Count -1) then
@@ -3227,8 +3218,7 @@ procedure TFMain.Tray_ResetwindowsizeClick(Sender: TObject);
 begin
   RestoreGUI;
   ResetWindowSizes;
-  ShellList.ClearSelection;
-  ShellList.Refresh;
+  ShellList.ClearSelectionRefresh;
   Realign;
 end;
 

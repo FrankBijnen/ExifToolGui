@@ -76,7 +76,7 @@ function GetGpsCoordinates(const Images: string): string;
 function AnalyzeGPSCoords(var ETout, Lat, Lon: string; var IsQuickTime: boolean): string;
 procedure FillLocationInImage(const ANImage: string);
 function GetIsQuickTime(const AFile: string): boolean;
-function GetExifToolLanguage(const ACombo: TComboBox; FirstSelection: integer = 0): string;
+function GetExifToolLanguage(const ACombo: TComboBox): string;
 procedure SetupExifToolLanguage(const ACombo: TComboBox; ALang: string);
 procedure SetupGeoCodeLanguage(const ACombo: TComboBox; Aprovider: TGeoCodeProvider; ALang: string);
 
@@ -881,12 +881,12 @@ begin
   end;
 end;
 
-function GetExifToolLanguage(const ACombo: TComboBox; FirstSelection: integer = 0): string;
+function GetExifToolLanguage(const ACombo: TComboBox): string;
 var
   AText: string;
 begin
   result := '';
-  if (ACombo.ItemIndex > FirstSelection) then
+  if (ACombo.ItemIndex > 0) then // First entry is the default, return ''
   begin
     AText := ACombo.Items[ACombo.ItemIndex];
     result := NextField(AText, ' ');
@@ -944,18 +944,18 @@ begin
   case AProvider of
     TGeoCodeProvider.gpOverPass:
       begin
-        ExifToolLanguages(ACombo.Items, ['local', 'default']);
+        ExifToolLanguages(ACombo.Items, [PlaceLocal, PlaceDefault]);
         ACombo.Enabled := true;
       end;
     TGeoCodeProvider.gpExifTool:
       begin
-        ExifToolLanguages(ACombo.Items, ['default']);
+        ExifToolLanguages(ACombo.Items, [PlaceDefault]);
         ACombo.Enabled := true;
       end;
     else
     begin
       ACombo.Items.Clear;
-      ACombo.Items.Add('default');
+      ACombo.Items.Add(PlaceDefault);
       ACombo.Enabled := false;
     end;
   end;
@@ -966,34 +966,50 @@ end;
 function ExifToolGeoLocation(const Lat, Lon, Lang:string): TStringList;
 var
   ETCmd: string;
+  SavedLang: string;
 begin
-  result := TStringList.Create;
-  ETcmd := '-short' + CRLF + '-f' + CRLF + '-n' + CRLF + '-q';
-  ETcmd := ETCmd + CRLF + '-api' + CRLF + Format('geolocation=%s,%s', [Lat, Lon]);
-  if (Lang <> '') and
-     (Lang <> 'default') and
-     (Lang <> 'local') then
-    ETCmd := ETCmd + CRLF + '-lang' + CRLF + lang;
-  ETcmd := ETcmd + CRLF + '-GeolocationCountryCode';
-  ETcmd := ETcmd + CRLF + '-GeolocationCountry';
-  ETcmd := ETcmd + CRLF + '-GeolocationRegion';
-  ETcmd := ETcmd + CRLF + '-GeolocationCity';
-  ET_OpenExec(ETcmd, '', result, false);
+  SavedLang := ET_Options.ETLangDef;
+  if (Lang <> PlaceDefault) and
+     (Lang <> PlaceLocal) then
+    ET_Options.ETLangDef := Lang
+  else
+    ET_Options.ETLangDef := '';
+
+  try
+    result := TStringList.Create;
+    ETcmd := '-short' + CRLF + '-f' + CRLF + '-n' + CRLF + '-q';
+    ETcmd := ETCmd + CRLF + '-api' + CRLF + Format('geolocation=%s,%s', [Lat, Lon]);
+    ETcmd := ETcmd + CRLF + '-GeolocationCountryCode';
+    ETcmd := ETcmd + CRLF + '-GeolocationCountry';
+    ETcmd := ETcmd + CRLF + '-GeolocationRegion';
+    ETcmd := ETcmd + CRLF + '-GeolocationCity';
+    ET_OpenExec(ETcmd, '', result, false);
+  finally
+    ET_Options.ETLangDef := SavedLang;
+  end;
 end;
 
 function ExifToolGeoLocation(const City, Country, Lang: string; var ETErr:string): string;
 var
   ETCmd: string;
+  SavedLang: string;
 begin
-  ETcmd := '-m' + CRLF + '-a';
-  ETcmd := ETCmd + CRLF + '-api' + CRLF + Format('geolocation=ci/%s/i', [City]);
-  if (Country <> '') then
-    ETcmd := ETCmd + Format(',/%s/i',[Country]);
-  if (Lang <> '') and
-     (Lang <> 'default') and
-     (Lang <> 'local') then
-    ETCmd := ETCmd + CRLF + '-lang' + CRLF + lang;
-  ET_OpenExec(ETcmd, '', result, ETerr, false);
+  SavedLang := ET_Options.ETLangDef;
+  if (Lang <> PlaceDefault) and
+     (Lang <> PlaceLocal) then
+    ET_Options.ETLangDef := Lang
+  else
+    ET_Options.ETLangDef := '';
+
+  try
+    ETcmd := '-m' + CRLF + '-a';
+    ETcmd := ETCmd + CRLF + '-api' + CRLF + Format('geolocation=ci/%s/i', [City]);
+    if (Country <> '') then
+      ETcmd := ETCmd + Format(',/%s/i',[Country]);
+    ET_OpenExec(ETcmd, '', result, ETerr, false);
+  finally
+    ET_Options.ETLangDef := SavedLang;
+  end;
 end;
 
 function GetIsQuickTime(const AFile: string): boolean;

@@ -64,7 +64,7 @@ begin
   ChkComplete.Enabled := GeoSettings.GetCoordProvider = TGeoCodeProvider.gpOverPass;
   ChkComplete.Checked := ChkComplete.Enabled and
                          GeoSettings.OverPassCompleteWord;
-  SetupGeoCodeLanguage(CmbLang, GeoSettings.GetCoordProvider, GeoSettings.Lang);
+  SetupGeoCodeLanguage(CmbLang, GeoSettings.GetCoordProvider, GeoSettings.GeoCodeLang);
   ClearCoordCache; // Make sure we dont get cached data.
 end;
 
@@ -92,7 +92,7 @@ end;
 
 procedure TFGeoSearch.CmbLangChange(Sender: TObject);
 begin
-  GeoSettings.Lang := GetExifToolLanguage(CmbLang, 1);
+  GeoSettings.GeoCodeLang := GetExifToolLanguage(CmbLang);
 end;
 
 procedure TFGeoSearch.EdRegionChange(Sender: TObject);
@@ -107,10 +107,11 @@ begin
   StatusBar1.SimpleText := '';
 
   CmbGeoProvider.ItemIndex := Ord(GeoSettings.GetCoordProvider);
-  CmbLang.Text := GeoSettings.Lang;
+  CmbLang.Text := GeoSettings.GeoCodeLang;
   SelectedBounds := EdBounds.Text;
 
   UpdateDesign;
+  BtnOK.SetFocus;
 end;
 
 end.

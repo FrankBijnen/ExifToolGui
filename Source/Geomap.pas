@@ -9,6 +9,7 @@ uses
 
 const
   PlaceDefault = 'Default';
+  PlaceLocal = 'Local';
   PlaceNone = 'None';
 
 type
@@ -27,7 +28,8 @@ type
     OverPassUrl: string;
     CaseSensitive: boolean;
     OverPassCompleteWord: boolean;
-    Lang: string;
+    GeoCodeLang: string;
+    ReverseGeoCodeLang: string;
     ThrottleOverPass: integer;
     CountryCodeLocation: boolean;
     GeoTagMode: TGeoTagMode;
@@ -788,9 +790,8 @@ var
   ElementIndx:  integer;
   ElementType:  string;
 begin
-  if (GeoSettings.Lang <> 'default') and
-     (GeoSettings.Lang <> 'local') then
-    APlace.DefLang := GeoSettings.Lang;
+  if (GeoSettings.ReverseGeoCodeLang <> PlaceLocal) then
+    APlace.DefLang := GeoSettings.ReverseGeoCodeLang;
   for ElementIndx := FromElement to AJSONElements.Count -1 do
   begin
     JSONElement := AJSONElements.Items[ElementIndx];
@@ -804,7 +805,7 @@ begin
     if (JSONTags.GetValue<string>('admin_level') <> '2') then
       continue;
 
-    if (GeoSettings.Lang = 'local') and
+    if (GeoSettings.ReverseGeoCodeLang = PlaceLocal) and
        (JSONTags.FindValue('default_language') <> nil) then
       APlace.DefLang := JSONTags.GetValue<string>('default_language');
     if (JSONTags.FindValue('ISO3166-1:alpha2') <> nil) then
@@ -938,7 +939,7 @@ begin
   result := TPlace.Create;
   LatE := Trim(Lat);
   LonE := Trim(Lon);
-  result.DefLang := GeoSettings.Lang;
+  result.DefLang := GeoSettings.ReverseGeoCodeLang;
 
   ETResult := ExifToolGeoLocation(LatE, LonE, result.DefLang);
   try
@@ -1261,7 +1262,7 @@ begin
 
   ETResult := TStringList.Create;
   try
-    ETResult.Text := ExifToolGeoLocation(City, Country, GeoSettings.Lang, AResult);
+    ETResult.Text := ExifToolGeoLocation(City, Country, GeoSettings.GeoCodeLang, AResult);
     FrmPlaces.Listview1.Items.Clear;
     if (AResult = '') then
     begin
@@ -1434,7 +1435,8 @@ begin
   GeoSettings.CaseSensitive := GUIini.ReadBool(Geo_Settings, 'OverPassCaseSensitive', True);
   GeoSettings.OverPassCompleteWord := GUIini.ReadBool(Geo_Settings, 'OverPassCompleteWord', True);
   GeoSettings.OverPassCompleteWord := GUIini.ReadBool(Geo_Settings, 'OverPassCompleteWord', True);
-  GeoSettings.Lang := GUIini.ReadString(Geo_Settings, 'OverPassLang', 'default');
+  GeoSettings.GeoCodeLang := GUIini.ReadString(Geo_Settings, 'GeoCodeLang', PlaceDefault);
+  GeoSettings.ReverseGeoCodeLang := GUIini.ReadString(Geo_Settings, 'ReverseGeoCodeLang', PlaceDefault);
   GeoSettings.CountryCodeLocation := GUIini.ReadBool(Geo_Settings, 'CountryCodeLocation', True);
   GeoSettings.GeoTagMode := TGeoTagMode(GUIini.ReadInteger(Geo_Settings, 'GeoTagMode', 1));
   GeoSettings.GeoCodeDialog := GUIini.ReadBool(Geo_Settings, 'GeoCodeDialog', true);
@@ -1459,7 +1461,8 @@ begin
   GUIini.WriteInteger(Geo_Settings, 'ThrottleOverPass', GeoSettings.ThrottleOverPass);
   GUIini.WriteBool(Geo_Settings, 'OverPassCaseSensitive', GeoSettings.CaseSensitive);
   GUIini.WriteBool(Geo_Settings, 'OverPassCompleteWord', GeoSettings.OverPassCompleteWord);
-  GUIini.WriteString(Geo_Settings, 'OverPassLang', GeoSettings.Lang);
+  GUIini.WriteString(Geo_Settings, 'GeoCodeLang', GeoSettings.GeoCodeLang);
+  GUIini.WriteString(Geo_Settings, 'ReverseGeoCodeLang', GeoSettings.ReverseGeoCodeLang);
   GUIini.WriteBool(Geo_Settings, 'CountryCodeLocation', GeoSettings.CountryCodeLocation);
   GUIini.WriteInteger(Geo_Settings, 'GeotagMode', Ord(GeoSettings.GeoTagMode));
   GUIini.WriteBool(Geo_Settings, 'GeoCodeDialog', GeoSettings.GeoCodeDialog);
