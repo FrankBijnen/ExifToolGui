@@ -3,7 +3,7 @@
 
 This is an updated version of the ExifToolGui program created by Bogdan Hrastnik. Many thanks go out to him.
 
-<b>Released version: <b>V6.3.0</b> updated March 17, 2024</b><br>
+<b>Released version: <b>V6.3.0</b> updated March 16, 2024</b><br>
 
 - Created an installer.<br>
 - Added version checks for ExifToolGui and ExifTool.<br>
@@ -12,6 +12,7 @@ This is an updated version of the ExifToolGui program created by Bogdan Hrastnik
 - Added Option to specify a custom Exiftool config.<br>
 - Added Support for new ExifTool features geolocate and -api geolocation.<br>
 - Improved defaults for geocode providers.<br>
+- Style fixes for dark styles.<br>
 
 [Change log](Docs/changelog.txt)<br>
 [Download Release](https://github.com/FrankBijnen/ExifToolGui/releases/latest)<br>

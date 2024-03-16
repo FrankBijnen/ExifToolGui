@@ -1507,7 +1507,8 @@ begin
   QuickPopUp_AddQuickAct.Visible := not(SpeedBtnQuick.Down or SpeedBtnCustom.Down or IsSep);
   QuickPopUp_AddCustomAct.Visible := not(SpeedBtnQuick.Down or SpeedBtnCustom.Down or IsSep);
   QuickPopUp_DelCustomAct.Visible := SpeedBtnCustom.Down and not(IsSep);
-  QuickPopUp_AddDetailsUserAct.Visible := not IsSep and (SpeedBtnExif.Down or SpeedBtnXmp.Down or SpeedBtnIptc.Down);
+  QuickPopUp_AddDetailsUserAct.Visible := not IsSep and
+                                         (SpeedBtnExif.Down or SpeedBtnXmp.Down or SpeedBtnIptc.Down or SpeedBtnALL.Down);
   QuickPopUp_MarkTagAct.Visible := not(SpeedBtnQuick.Down or SpeedBtnCustom.Down or IsSep);
   QuickPopUp_DelQuickAct.Visible := not(IsSep) and SpeedBtnQuick.Down;
   QuickPopUp_FillQuickAct.Visible := QuickPopUp_DelQuickAct.Visible;
@@ -1624,7 +1625,7 @@ procedure TFMain.QuickPopUp_AddDetailsUserClick(Sender: TObject);
 var
   I, N, X: integer;
   Tx, Tk: string;
-  PrevSel: integer;
+  PrevSel, PrevRow: integer;
 begin
   I := length(FListColUsr);
   SetLength(FListColUsr, I + 1);
@@ -1661,11 +1662,14 @@ begin
   if I = N then
   begin
     PrevSel := ShellList.Selected.Index;
+    PrevRow := MetadataList.Row;
     try
-      ShellList.ClearSelectionRefresh;
+      ShellList.Refresh;
     finally
+      ShellList.ClearSelection;
       ShellList.Items[PrevSel].Selected := true;
       ShellListClick(ShellList);
+      MetadataList.Row := PrevRow;
     end;
   end;
 end;

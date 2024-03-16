@@ -2,7 +2,7 @@
 <xlat>
   <meta>
     <version>3</version>
-    <created>2024-03-16T07:37:21.386+01:00</created>
+    <created>2024-03-16T19:17:04.389+01:00</created>
     <tool>amTranslationManager</tool>
     <toolversion>2.0.8628.33873</toolversion>
   </meta>
@@ -7241,7 +7241,7 @@
               <property>
                 <value>Generating will be done in the background.</value>
                 <translations>
-                  <translation language="nl">Genereren zal wordern uitgevoerd in de achergrond.</translation>
+                  <translation language="nl" status="proposed">Genereren zal worden uitgevoerd in de achergrond.</translation>
                   <translation language="de" status="proposed">Die Generierung erfolgt im Hintergrund.</translation>
                   <translation language="es" status="proposed">La generación se realizará en segundo plano.</translation>
                   <translation language="fr" status="proposed">La génération se fera en arrière-plan.</translation>
@@ -7256,7 +7256,7 @@
               <property>
                 <value>Generating %d thumbnails for: %s</value>
                 <translations>
-                  <translation language="nl">Genereren %d miniaturen voor: %s</translation>
+                  <translation language="nl" status="proposed">Genereren van %d miniaturen voor map: %s</translation>
                   <translation language="de" status="proposed">Generiere %d Miniaturansichten für: %s</translation>
                   <translation language="es" status="proposed">Generando %d miniaturas para: %s</translation>
                   <translation language="fr" status="proposed">Génération de %d vignettes pour : %s</translation>
@@ -14253,8 +14253,8 @@
                 <value>Browse</value>
                 <translations>
                   <translation language="de">Verzeichnis</translation>
-                  <translation language="es">Carpetas</translation>
                   <translation language="fr" status="proposed">Dossiers</translation>
+                  <translation language="es">Carpetas</translation>
                   <translation language="nl">Mappen</translation>
                   <translation language="pt" status="proposed">Navegar</translation>
                   <translation language="it" status="proposed">Sfogliare</translation>
@@ -15089,7 +15089,7 @@
               <property name="Caption">
                 <value>&amp;File: Date modified as in Exif...</value>
                 <translations>
-                  <translation language="nl">&amp;Bestand: Wijzigingsdatum als in in Exif...</translation>
+                  <translation language="nl" status="proposed">&amp;Bestand: Wijzigingsdatum als in Exif...</translation>
                   <translation language="de" status="proposed">&amp;File: Änderungsdatum wie in Exif...</translation>
                   <translation language="es" status="proposed">&amp;Archivo: Fecha de modificación como en Exif...</translation>
                   <translation language="fr" status="proposed">Fichier : Date de modification selon Exif...</translation>
@@ -15474,12 +15474,12 @@
               <property name="Caption">
                 <value>File: Date modified as in Exif...</value>
                 <translations>
-                  <translation language="nl">Bestand: Wijzigingsdatum als in in Exif...</translation>
+                  <translation language="nl" status="proposed">Bestand: Wijzigingsdatum als in Exif...</translation>
                   <translation language="de" status="proposed">Datei: Änderungsdatum wie in Exif...</translation>
                   <translation language="es" status="proposed">Archivo: Fecha de modificación como en Exif...</translation>
-                  <translation language="fr" status="proposed">Fichier : Date de modification comme dans Exif...</translation>
+                  <translation language="fr" status="proposed">Fichier : Date de modification selon Exif...</translation>
                   <translation language="it" status="proposed">File: Data di modifica come in Exif...</translation>
-                  <translation language="pt" status="proposed">Arquivo: Data de modificação como no Exif...</translation>
+                  <translation language="pt" status="proposed">Arquivo: Data de modificação como em Exif...</translation>
                 </translations>
               </property>
               <property name="Category" status="skip">
