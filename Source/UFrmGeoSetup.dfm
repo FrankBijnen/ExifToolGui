@@ -152,16 +152,16 @@ object FGeoSetup: TFGeoSetup
         Text = 'CmbProvince'
         OnChange = CmbCityChange
       end
-      object CmbOverPasslang: TComboBox
+      object CmbLang: TComboBox
         Left = 8
         Top = 68
         Width = 470
         Height = 21
         TabOrder = 3
-        Text = 'CmbOverPasslang'
-        OnChange = CmbOverPasslangChange
-        OnClick = CmbOverPasslangClick
-        OnKeyUp = CmbOverPasslangKeyUp
+        Text = 'CmbLang'
+        OnChange = CmbLangChange
+        OnClick = CmbLangClick
+        OnKeyUp = CmbLangKeyUp
         Items.Strings = (
           'local'
           'default')

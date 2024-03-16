@@ -1,4 +1,4 @@
-xxxxxxxxxxobject FMain: TFMain
+object FMain: TFMain
   Left = 0
   Top = 0
   Caption = 'FMain'

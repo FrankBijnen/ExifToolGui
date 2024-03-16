@@ -9,7 +9,7 @@ interface
 uses Winapi.ShlObj, Winapi.ActiveX, Winapi.Wincodec, Winapi.Windows, Winapi.Messages,
   System.Classes, System.SysUtils, System.Variants, System.StrUtils, System.Math, System.Threading,
   System.Generics.Collections,
-  Vcl.Forms, Vcl.Dialogs, Vcl.ComCtrls, Vcl.Shell.ShellCtrls, Vcl.Graphics, Vcl.Themes,
+  Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, Vcl.ComCtrls, Vcl.Shell.ShellCtrls, Vcl.Graphics, Vcl.Themes,
   Geomap;
 
 type
@@ -76,7 +76,12 @@ function GetGpsCoordinates(const Images: string): string;
 function AnalyzeGPSCoords(var ETout, Lat, Lon: string; var IsQuickTime: boolean): string;
 procedure FillLocationInImage(const ANImage: string);
 function GetIsQuickTime(const AFile: string): boolean;
-function GetGeoLocation(const Lat, Lon:string): TStringList;
+function GetExifToolLanguage(const ACombo: TComboBox; FirstSelection: integer = 0): string;
+procedure SetupExifToolLanguage(const ACombo: TComboBox; ALang: string);
+procedure SetupGeoCodeLanguage(const ACombo: TComboBox; Aprovider: TGeoCodeProvider; ALang: string);
+
+function ExifToolGeoLocation(const Lat, Lon, Lang:string): TStringList; overload;
+function ExifToolGeoLocation(const City, Country, Lang: string; var ETErr:string): string; overload;
 
 // Context menu
 function ContextInstalled(const AppTitle: string): string;
@@ -876,18 +881,119 @@ begin
   end;
 end;
 
-function GetGeoLocation(const Lat, Lon:string): TStringList;
+function GetExifToolLanguage(const ACombo: TComboBox; FirstSelection: integer = 0): string;
+var
+  AText: string;
+begin
+  result := '';
+  if (ACombo.ItemIndex > FirstSelection) then
+  begin
+    AText := ACombo.Items[ACombo.ItemIndex];
+    result := NextField(AText, ' ');
+  end;
+end;
+
+procedure ExifToolLanguages(const Items: TStrings; Defaults: array of string);
+var
+  Indx: integer;
+  SavedLang: string;
+  ADefault: string;
+begin
+  SavedLang := ET_Options.ETLangDef;
+  ET_Options.ETLangDef := ''; // get list of languages in default lang.
+  try
+    ET_OpenExec('-lang', '', Items, false);
+    if Items.Count > 0 then
+      Items.Delete(0);
+
+    for ADefault in Defaults do
+      Items.Insert(0, Adefault);
+
+    for Indx := 0 to Items.Count - 1 do
+      Items[Indx] := TrimLeft(Items[Indx]);
+  finally
+    ET_Options.ETLangDef := SavedLang;
+  end;
+end;
+
+procedure SetupLanguageCombo(const CmbLang: TComboBox; ALang: string);
+var
+  Indx: integer;
+begin
+  CmbLang.ItemIndex := 0;
+  for Indx := 0 to CmbLang.Items.Count -1 do
+  begin
+    if (Pos(LowerCase(ALang), CmbLang.Items[Indx]) = 1) then
+    begin
+      CmbLang.ItemIndex := Indx;
+      break;
+    end;
+  end;
+  CmbLang.Text := CmbLang.Items[CmbLang.ItemIndex];
+end;
+
+procedure SetupExifToolLanguage(const ACombo: TComboBox; ALang: string);
+begin
+  ExifToolLanguages(ACombo.Items, ['ExifTool standard (short)']);
+
+  SetupLanguageCombo(ACombo, ALang);
+end;
+
+procedure SetupGeoCodeLanguage(const ACombo: TComboBox; AProvider: TGeoCodeProvider; ALang: string);
+begin
+  case AProvider of
+    TGeoCodeProvider.gpOverPass:
+      begin
+        ExifToolLanguages(ACombo.Items, ['local', 'default']);
+        ACombo.Enabled := true;
+      end;
+    TGeoCodeProvider.gpExifTool:
+      begin
+        ExifToolLanguages(ACombo.Items, ['default']);
+        ACombo.Enabled := true;
+      end;
+    else
+    begin
+      ACombo.Items.Clear;
+      ACombo.Items.Add('default');
+      ACombo.Enabled := false;
+    end;
+  end;
+
+  SetupLanguageCombo(ACombo, ALang);
+end;
+
+function ExifToolGeoLocation(const Lat, Lon, Lang:string): TStringList;
 var
   ETCmd: string;
 begin
   result := TStringList.Create;
   ETcmd := '-short' + CRLF + '-f' + CRLF + '-n' + CRLF + '-q';
   ETcmd := ETCmd + CRLF + '-api' + CRLF + Format('geolocation=%s,%s', [Lat, Lon]);
+  if (Lang <> '') and
+     (Lang <> 'default') and
+     (Lang <> 'local') then
+    ETCmd := ETCmd + CRLF + '-lang' + CRLF + lang;
   ETcmd := ETcmd + CRLF + '-GeolocationCountryCode';
   ETcmd := ETcmd + CRLF + '-GeolocationCountry';
   ETcmd := ETcmd + CRLF + '-GeolocationRegion';
   ETcmd := ETcmd + CRLF + '-GeolocationCity';
   ET_OpenExec(ETcmd, '', result, false);
+end;
+
+function ExifToolGeoLocation(const City, Country, Lang: string; var ETErr:string): string;
+var
+  ETCmd: string;
+begin
+  ETcmd := '-m' + CRLF + '-a';
+  ETcmd := ETCmd + CRLF + '-api' + CRLF + Format('geolocation=ci/%s/i', [City]);
+  if (Country <> '') then
+    ETcmd := ETCmd + Format(',/%s/i',[Country]);
+  if (Lang <> '') and
+     (Lang <> 'default') and
+     (Lang <> 'local') then
+    ETCmd := ETCmd + CRLF + '-lang' + CRLF + lang;
+  ET_OpenExec(ETcmd, '', result, ETerr, false);
 end;
 
 function GetIsQuickTime(const AFile: string): boolean;

@@ -30,7 +30,7 @@ object FGeoSearch: TFGeoSearch
     Height = 25
     Caption = 'Cancel'
     ModalResult = 2
-    TabOrder = 0
+    TabOrder = 1
   end
   object BtnOK: TButton
     Left = 518
@@ -39,7 +39,7 @@ object FGeoSearch: TFGeoSearch
     Height = 25
     Caption = 'OK'
     Default = True
-    TabOrder = 1
+    TabOrder = 0
     OnClick = BtnOKClick
   end
   object PctMain: TPageControl
@@ -83,14 +83,14 @@ object FGeoSearch: TFGeoSearch
           TabOrder = 0
           OnClick = ChkCompleteClick
         end
-        object ChkCaseSensitve: TCheckBox
+        object ChkCaseSensitive: TCheckBox
           Left = 16
           Top = 25
           Width = 399
           Height = 17
           Caption = 'Case sensitive (faster)'
           TabOrder = 1
-          OnClick = ChkCaseSensitveClick
+          OnClick = ChkCaseSensitiveClick
         end
       end
       object CmbGeoProvider: TComboBox
@@ -104,15 +104,14 @@ object FGeoSearch: TFGeoSearch
         Font.Height = -11
         Font.Name = 'Tahoma'
         Font.Style = []
-        ItemIndex = 0
         ParentFont = False
         TabOrder = 0
-        Text = 'GeoCode'
         OnChange = CmbGeoProviderChange
         OnClick = CmbGeoProviderChange
         Items.Strings = (
           'GeoCode'
-          'Overpass API')
+          'Overpass API'
+          'ExifTool geolocation')
       end
       object EdSearchCity: TLabeledEdit
         Left = 8
@@ -148,15 +147,15 @@ object FGeoSearch: TFGeoSearch
         TabOrder = 3
         Text = ''
       end
-      object CmbOverPasslang: TComboBox
+      object CmbLang: TComboBox
         Left = 8
         Top = 70
         Width = 470
         Height = 21
         TabOrder = 5
-        Text = 'CmbOverPasslang'
-        OnChange = CmbOverPasslangChange
-        OnClick = CmbOverPasslangChange
+        Text = 'CmbLang'
+        OnChange = CmbLangChange
+        OnClick = CmbLangChange
         Items.Strings = (
           'local'
           'default')

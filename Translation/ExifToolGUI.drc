@@ -164,7 +164,7 @@
 #define UnitLangResources_StrCannotSaveGUI 64472
 #define UnitLangResources_StrNotInstalled 64473
 #define UnitLangResources_StrCheckTheGeoCodeRe 64474
-#define UnitLangResources_StrCheckPlaceProv 64475
+#define UnitLangResources_StrCheckOffLineProv 64475
 #define UnitLangResources_StrOverwriteExistingS 64476
 #define UnitLangResources_StrMakeSureThatYouO 64477
 #define UnitLangResources_StrRunSAsAdminFail 64478
@@ -1383,7 +1383,7 @@ BEGIN
 	UnitLangResources_StrCannotSaveGUI,	L"Cannot save GUI settings."
 	UnitLangResources_StrNotInstalled,	L"(Not installed)"
 	UnitLangResources_StrCheckTheGeoCodeRe,	L"Check the GeoCode requirements. (Apikey required. Max 1 call per second for a free account)"
-	UnitLangResources_StrCheckPlaceProv,	L"Warning only GeoCode provider ExifTool will produce results."
+	UnitLangResources_StrCheckOffLineProv,	L"Warning GeoCode provider changed to ExifTool."
 	UnitLangResources_StrOverwriteExistingS,	L"Overwrite Existing setting %s?"
 	UnitLangResources_StrMakeSureThatYouO,	L"Make sure that you only check 'Thumbnails' in the next dialog."
 	UnitLangResources_StrRunSAsAdminFail,	L"Run \"%s\" as Admin failed."

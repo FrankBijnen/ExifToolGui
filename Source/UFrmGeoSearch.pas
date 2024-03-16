@@ -23,16 +23,16 @@ type
     EdBounds: TLabeledEdit;
     GrpCitySearch: TGroupBox;
     ChkComplete: TCheckBox;
-    CmbOverPasslang: TComboBox;
+    CmbLang: TComboBox;
     Label1: TLabel;
-    ChkCaseSensitve: TCheckBox;
+    ChkCaseSensitive: TCheckBox;
     procedure FormShow(Sender: TObject);
     procedure BtnOKClick(Sender: TObject);
     procedure CmbGeoProviderChange(Sender: TObject);
     procedure EdRegionChange(Sender: TObject);
-    procedure ChkCaseSensitveClick(Sender: TObject);
+    procedure ChkCaseSensitiveClick(Sender: TObject);
     procedure ChkCompleteClick(Sender: TObject);
-    procedure CmbOverPasslangChange(Sender: TObject);
+    procedure CmbLangChange(Sender: TObject);
   private
     { Private declarations }
     procedure UpdateDesign;
@@ -58,23 +58,24 @@ begin
     EdBounds.Text := SelectedBounds
   else
     EdBounds.Text := '';
-  ChkCaseSensitve.Enabled := GeoSettings.GetCoordProvider = TGeoCodeProvider.gpOverPass;
-  ChkCaseSensitve.Checked := ChkCaseSensitve.Enabled and
-                             GeoSettings.OverPassCaseSensitive;
+  ChkCaseSensitive.Enabled := (GeoSettings.GetCoordProvider = TGeoCodeProvider.gpOverPass);
+  ChkCaseSensitive.Checked := ChkCaseSensitive.Enabled and
+                              GeoSettings.CaseSensitive;
   ChkComplete.Enabled := GeoSettings.GetCoordProvider = TGeoCodeProvider.gpOverPass;
   ChkComplete.Checked := ChkComplete.Enabled and
                          GeoSettings.OverPassCompleteWord;
-  CmbOverPasslang.Enabled := ChkComplete.Enabled;
+  SetupGeoCodeLanguage(CmbLang, GeoSettings.GetCoordProvider, GeoSettings.Lang);
 end;
 
 procedure TFGeoSearch.BtnOKClick(Sender: TObject);
 begin
+  GeoSettings.CheckProvider;
   ModalResult := MROK;
 end;
 
-procedure TFGeoSearch.ChkCaseSensitveClick(Sender: TObject);
+procedure TFGeoSearch.ChkCaseSensitiveClick(Sender: TObject);
 begin
-  GeoSettings.OverPassCaseSensitive := ChkCaseSensitve.Checked;
+  GeoSettings.CaseSensitive := ChkCaseSensitive.Checked;
 end;
 
 procedure TFGeoSearch.ChkCompleteClick(Sender: TObject);
@@ -88,9 +89,9 @@ begin
   UpdateDesign;
 end;
 
-procedure TFGeoSearch.CmbOverPasslangChange(Sender: TObject);
+procedure TFGeoSearch.CmbLangChange(Sender: TObject);
 begin
-  GeoSettings.OverPassLang := CmbOverPasslang.Text;
+  GeoSettings.Lang := GetExifToolLanguage(CmbLang, 1);
 end;
 
 procedure TFGeoSearch.EdRegionChange(Sender: TObject);
@@ -105,7 +106,7 @@ begin
   StatusBar1.SimpleText := '';
 
   CmbGeoProvider.ItemIndex := Ord(GeoSettings.GetCoordProvider);
-  CmbOverPasslang.Text := GeoSettings.OverPassLang;
+  CmbLang.Text := GeoSettings.Lang;
   SelectedBounds := EdBounds.Text;
 
   UpdateDesign;

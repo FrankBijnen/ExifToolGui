@@ -2,7 +2,7 @@
 <xlat>
   <meta>
     <version>3</version>
-    <created>2024-03-15T10:09:54.552+01:00</created>
+    <created>2024-03-16T07:37:21.386+01:00</created>
     <tool>amTranslationManager</tool>
     <toolversion>2.0.8628.33873</toolversion>
   </meta>
@@ -14,13 +14,13 @@
   </options>
   <project sourcefile=".\ExifToolGUI.exe" stringsymbolfile=".\ExifToolGUI.drc" language="en-US" properties="634">
     <targetlanguages>
-      <language language="es" translated="594"/>
       <language language="pt" translated="582"/>
+      <language language="en" translated="1"/>
+      <language language="de" translated="638"/>
       <language language="fr" translated="582"/>
+      <language language="es" translated="594"/>
       <language language="nl" translated="642"/>
       <language language="it" translated="599"/>
-      <language language="en" translated="1"/>
-      <language language="de" translated="637"/>
     </targetlanguages>
     <modules>
       <module name="resourcestrings" type="strings" properties="167">
@@ -6472,16 +6472,17 @@
               </property>
             </properties>
           </item>
-          <item name="UnitLangResources_StrCheckPlaceProv" state="">
+          <item name="UnitLangResources_StrCheckOffLineProv">
             <properties>
               <property>
-                <value>Warning only GeoCode provider ExifTool will produce results.</value>
+                <value>Warning GeoCode provider changed to ExifTool.</value>
                 <translations>
-                  <translation language="fr" status="proposed">Attention, seul le fournisseur de GeoCode ExifTool produira des résultats.</translation>
-                  <translation language="nl">Waarschuwing: alleen de GeoCode-provider ExifTool levert resultaten op.</translation>
-                  <translation language="it" status="proposed">Attenzione, solo il provider GeoCode ExifTool produrrà risultati.</translation>
-                  <translation language="pt" status="proposed">Aviso: somente o provedor de GeoCode ExifTool produzirá resultados.</translation>
-                  <translation language="es" status="proposed">Advertencia sólo GeoCode proveedor ExifTool producirá resultados.</translation>
+                  <translation language="nl" status="proposed">Waarschuwing GeoCode provider gewijzigd in ExifTool.</translation>
+                  <translation language="fr" status="proposed">Avertissement Le fournisseur de GeoCode a été remplacé par ExifTool.</translation>
+                  <translation language="de" status="proposed">Warnung GeoCode-Anbieter auf ExifTool geändert.</translation>
+                  <translation language="it" status="proposed">Avviso Il provider GeoCode è stato cambiato in ExifTool.</translation>
+                  <translation language="pt" status="proposed">Aviso: o provedor GeoCode foi alterado para ExifTool.</translation>
+                  <translation language="es" status="proposed">Advertencia El proveedor de GeoCode ha cambiado a ExifTool.</translation>
                 </translations>
               </property>
             </properties>
@@ -11814,12 +11815,15 @@
                   <translation language="it" status="proposed">API di scavalcamento</translation>
                 </translations>
               </property>
-              <property name="Text" status="skip">
+              <property name="Items.Strings[2]" status="skip">
+                <value>ExifTool geolocation</value>
+              </property>
+              <property name="Text" state="unused" status="skip">
                 <value>GeoCode</value>
               </property>
             </properties>
           </item>
-          <item name="FGeoSearch.PctMain.TabSearch.CmbOverPasslang" type="TComboBox">
+          <item name="FGeoSearch.PctMain.TabSearch.CmbLang" type="TComboBox">
             <properties>
               <property name="Items.Strings[0]">
                 <value>local</value>
@@ -11841,7 +11845,7 @@
                 </translations>
               </property>
               <property name="Text" status="skip">
-                <value>CmbOverPasslang</value>
+                <value>CmbLang</value>
               </property>
             </properties>
           </item>
@@ -11914,7 +11918,7 @@
               </property>
             </properties>
           </item>
-          <item name="FGeoSearch.PctMain.TabSearch.GrpCitySearch.ChkCaseSensitve" type="TCheckBox">
+          <item name="FGeoSearch.PctMain.TabSearch.GrpCitySearch.ChkCaseSensitive" type="TCheckBox">
             <properties>
               <property name="Caption">
                 <value>Case sensitive (faster)</value>
@@ -14248,13 +14252,13 @@
               <property name="Caption">
                 <value>Browse</value>
                 <translations>
-                  <translation language="pt" status="proposed">Navegar</translation>
-                  <translation language="en" status="proposed">Folders</translation>
+                  <translation language="de">Verzeichnis</translation>
                   <translation language="es">Carpetas</translation>
                   <translation language="fr" status="proposed">Dossiers</translation>
-                  <translation language="it" status="proposed">Sfogliare</translation>
-                  <translation language="de">Verzeichnis</translation>
                   <translation language="nl">Mappen</translation>
+                  <translation language="pt" status="proposed">Navegar</translation>
+                  <translation language="it" status="proposed">Sfogliare</translation>
+                  <translation language="en" status="proposed">Folders</translation>
                 </translations>
               </property>
             </properties>
@@ -17132,7 +17136,7 @@
               </property>
             </properties>
           </item>
-          <item name="FPreferences.AdvPageControl1.TabGeoCoding.GrpGeoCodeGeneral.CmbGeoCodingEnable" type="TComboBox" state="">
+          <item name="FPreferences.AdvPageControl1.TabGeoCoding.GrpGeoCodeGeneral.CmbGeoCodingEnable" type="TComboBox">
             <properties>
               <property name="Items.Strings[0]">
                 <value>Disable GeoCoding</value>

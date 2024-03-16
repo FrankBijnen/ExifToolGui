@@ -26,7 +26,7 @@ type
     LblCity: TLabel;
     LblCountrySettings: TLabel;
     Label1: TLabel;
-    CmbOverPasslang: TComboBox;
+    CmbLang: TComboBox;
     procedure FormShow(Sender: TObject);
     procedure BtnOKClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
@@ -35,9 +35,9 @@ type
     procedure CmbCityChange(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure BtnCancelClick(Sender: TObject);
-    procedure CmbOverPasslangClick(Sender: TObject);
-    procedure CmbOverPasslangChange(Sender: TObject);
-    procedure CmbOverPasslangKeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
+    procedure CmbLangClick(Sender: TObject);
+    procedure CmbLangChange(Sender: TObject);
+    procedure CmbLangKeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
   private
     { Private declarations }
     var
@@ -108,7 +108,6 @@ begin
   CmbProvince.Items.BeginUpdate;
   try
     Preferred := GeoProvinceList.Values[APlace.CountryCode];
-    CmbOverPasslang.Enabled := false;
     CmbProvince.Items.Clear;
     case GeoSettings.GetPlaceProvider of
       TGeoCodeProvider.gpGeoName:
@@ -117,7 +116,6 @@ begin
           CmbProvince.Items.Add('county');
           CmbProvince.Items.Add('state');
           CmbProvince.Items.Add(PlaceNone);
-
         end;
       TGeoCodeProvider.gpOverPass:
         begin
@@ -130,8 +128,6 @@ begin
               CmbProvince.Items.Add(IntToStr(Level));
             end;
             CmbProvince.Items.Add(PlaceNone);
-
-            CmbOverPasslang.Enabled := true;
           end;
         end;
       TGeoCodeProvider.gpExifTool:
@@ -140,6 +136,8 @@ begin
           CmbProvince.Items.Add(PlaceNone);
         end;
     end;
+    SetupGeoCodeLanguage(Cmblang, GeoSettings.GetPlaceProvider, GeoSettings.Lang);
+
     CmbProvince.ItemIndex := CmbProvince.Items.IndexOf(Preferred);
     if (CmbProvince.ItemIndex < 0) then
       CmbProvince.ItemIndex := 0;
@@ -206,18 +204,18 @@ begin
   FillPreview;
 end;
 
-procedure TFGeoSetup.CmbOverPasslangChange(Sender: TObject);
+procedure TFGeoSetup.CmbLangChange(Sender: TObject);
 begin
-  GeoSettings.OverPassLang := CmbOverPasslang.Text;
+  GeoSettings.Lang := GetExifToolLanguage(Cmblang);
 end;
 
-procedure TFGeoSetup.CmbOverPasslangClick(Sender: TObject);
+procedure TFGeoSetup.CmbLangClick(Sender: TObject);
 begin
-  GeoSettings.OverPassLang := CmbOverPasslang.Text;
+  GeoSettings.Lang := GetExifToolLanguage(Cmblang);
   FillPreview;
 end;
 
-procedure TFGeoSetup.CmbOverPasslangKeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
+procedure TFGeoSetup.CmbLangKeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
 begin
   if Key = 13 then
     FillPreview;
@@ -264,7 +262,6 @@ begin
   SavedProvinceList.Assign(GeoProvinceList);
   SavedCityList.Assign(GeoCityList);
   CmbGeoProvider.ItemIndex := Ord(GeoSettings.GetPlaceProvider);
-  CmbOverPasslang.Text := GeoSettings.OverPassLang;
 
   FillPreview; // Need CountryCode for setup, so do the Preview first
   FillSetup;
