@@ -38,7 +38,7 @@ object FPreferences: TFPreferences
     Top = 0
     Width = 606
     Height = 373
-    ActivePage = AdvTabOther
+    ActivePage = AdvTabGeneral
     Align = alLeft
     DoubleBuffered = True
     ParentDoubleBuffered = False
@@ -462,40 +462,52 @@ object FPreferences: TFPreferences
         TabOrder = 0
         object ChkGeoCodeDialog: TCheckBox
           Left = 67
-          Top = 49
-          Width = 475
+          Top = 45
+          Width = 450
           Height = 17
           Caption = 'Enable Geocode dialog (Get coordinates of location)'
           TabOrder = 0
         end
         object ChkReverseGeoCodeDialog: TCheckBox
           Left = 67
-          Top = 74
-          Width = 475
+          Top = 66
+          Width = 450
           Height = 17
           Caption = 'Enable reverse Geocode dialog (Get location of coordinates)'
           TabOrder = 1
         end
-        object ChkGeoCodingEnable: TCheckBox
+        object ChkCountryLocation: TCheckBox
           Left = 67
-          Top = 25
-          Width = 475
+          Top = 88
+          Width = 450
           Height = 17
-          Caption = 'Enable GeoCoding'
+          Caption = 'Show CountryCode in Filelist'
           TabOrder = 2
+        end
+        object CmbGeoCodingEnable: TComboBox
+          Left = 67
+          Top = 18
+          Width = 450
+          Height = 21
+          TabOrder = 3
+          Text = 'CmbGeoCodingEnable'
+          Items.Strings = (
+            'Disable GeoCoding'
+            'Enable All GeoCoding'
+            'Enable Offline GeoCoding (ExifTool)')
         end
       end
       object GrpGeoCode: TGroupBox
         Left = 24
-        Top = 117
+        Top = 137
         Width = 540
         Height = 108
         Caption = 'GeoCode Maps:'
         TabOrder = 1
         object Label3: TLabel
           Left = 159
-          Top = 73
-          Width = 300
+          Top = 77
+          Width = 350
           Height = 13
           AutoSize = False
           Caption = '(Min. time between calls in Ms)'
@@ -552,7 +564,7 @@ object FPreferences: TFPreferences
       end
       object GrpOverPass: TGroupBox
         Left = 24
-        Top = 231
+        Top = 256
         Width = 540
         Height = 80
         Caption = 'OverPass Api'
@@ -560,8 +572,9 @@ object FPreferences: TFPreferences
         object Label4: TLabel
           Left = 160
           Top = 54
-          Width = 146
+          Width = 350
           Height = 13
+          AutoSize = False
           Caption = '(Min. time between calls in Ms)'
         end
         object EdThrottleOverPass: TLabeledEdit
@@ -785,7 +798,7 @@ object FPreferences: TFPreferences
           TabOrder = 2
           Text = ''
         end
-        object Memo1: TMemo
+        object MemoWin11: TMemo
           Left = 5
           Top = 105
           Width = 510

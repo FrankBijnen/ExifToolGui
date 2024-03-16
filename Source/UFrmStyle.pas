@@ -6,6 +6,9 @@ uses
   Winapi.Windows, Winapi.Messages, Vcl.StdCtrls, Vcl.Buttons, System.Classes,
   Vcl.Controls, Vcl.ExtCtrls, Vcl.Forms, UnitScaleForm;
 
+const
+  cSystemStyleName = 'Windows';
+
 type
   TFrmStyle = class(TScaleForm)
     Panel1: TPanel;
@@ -38,6 +41,8 @@ var
 
 implementation
 
+{$R *.dfm}
+
 uses
   Main,
   MainDef,
@@ -45,7 +50,6 @@ uses
   Vcl.Themes,
   Vcl.Styles;
 
-{$R *.dfm}
 
 procedure TFrmStyle.SetNewStyle(Style: string);
 begin
@@ -53,7 +57,7 @@ begin
   TStyleManager.TrySetStyle(GUIsettings.GuiStyle, false);
   Fmain.SetGuiStyle;
 
-  if (GUIsettings.GuiStyle = 'Windows') then // AV unregistering style hooks
+  if (GUIsettings.GuiStyle = cSystemStyleName) then // AV unregistering style hooks
     exit;
 
   Application.ProcessMessages;

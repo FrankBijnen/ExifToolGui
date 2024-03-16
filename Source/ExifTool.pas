@@ -121,7 +121,7 @@ begin
     result := ETCharset + CRLF;
   result := result + ETVerbose + CRLF; // -for file counter!
   if ETLangDef <> '' then
-    result := result + '-lang' + CRLF + ETLangDef;
+    result := result + '-lang' + CRLF + ETLangDef + CRLF;
   result := result + ETBackupMode;
   result := result + ETSeparator;
   result := result + ETMinorError + ETFileDate;

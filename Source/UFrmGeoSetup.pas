@@ -25,21 +25,19 @@ type
     CmbCity: TComboBox;
     LblCity: TLabel;
     LblCountrySettings: TLabel;
-    ChkCountryLocation: TCheckBox;
     Label1: TLabel;
-    CmbOverPasslang: TComboBox;
+    CmbLang: TComboBox;
     procedure FormShow(Sender: TObject);
     procedure BtnOKClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure CmbProvinceChange(Sender: TObject);
     procedure CmbGeoProviderClick(Sender: TObject);
     procedure CmbCityChange(Sender: TObject);
-    procedure ChkCountryLocationClick(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure BtnCancelClick(Sender: TObject);
-    procedure CmbOverPasslangClick(Sender: TObject);
-    procedure CmbOverPasslangChange(Sender: TObject);
-    procedure CmbOverPasslangKeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
+    procedure CmbLangClick(Sender: TObject);
+    procedure CmbLangChange(Sender: TObject);
+    procedure CmbLangKeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
   private
     { Private declarations }
     var
@@ -71,12 +69,16 @@ begin
   GeoSettings.GetPlaceProvider := TGeoCodeProvider(CmbGeoProvider.ItemIndex);
 
   // Get Place of selected coordinates
+  LblCountrySettings.Caption := StrNoData;
+  LblProvince.Caption := StrNoData;
+  LblCity.Caption := StrNoData;
+
   ClearCoordCache; // Make sure we dont get cached data.
   APlace := GetPlaceOfCoords(Lat, Lon, GeoSettings.GetPlaceProvider);
   if (APlace = nil) then
     exit;
-  LblCountrySettings.Caption := StrSettingsFor + APlace.CountryLocation;
 
+  LblCountrySettings.Caption := StrSettingsFor + APlace.CountryLocation;
   if (APlace.PrioProvince <> '') then
     LblProvince.Caption := APlace.PrioProvince
   else
@@ -110,29 +112,32 @@ begin
     case GeoSettings.GetPlaceProvider of
       TGeoCodeProvider.gpGeoName:
         begin
-          CmbProvince.Items.Add('Default');
+          CmbProvince.Items.Add(PlaceDefault);
           CmbProvince.Items.Add('county');
           CmbProvince.Items.Add('state');
-          CmbProvince.Items.Add('None');
-
-          CmbOverPasslang.Enabled := false;
+          CmbProvince.Items.Add(PlaceNone);
         end;
-    TGeoCodeProvider.gpOverPass:
-      begin
+      TGeoCodeProvider.gpOverPass:
         begin
-          CmbProvince.Items.Add('Default');
-          for Level in APlace.RegionLevels do
           begin
-            if Level = 0 then
-              continue;
-            CmbProvince.Items.Add(IntToStr(Level));
+            CmbProvince.Items.Add(PlaceDefault);
+            for Level in APlace.RegionLevels do
+            begin
+              if Level = 0 then
+                continue;
+              CmbProvince.Items.Add(IntToStr(Level));
+            end;
+            CmbProvince.Items.Add(PlaceNone);
           end;
-          CmbProvince.Items.Add('None');
-
-          CmbOverPasslang.Enabled := true;
         end;
-      end;
+      TGeoCodeProvider.gpExifTool:
+        begin
+          CmbProvince.Items.Add(PlaceDefault);
+          CmbProvince.Items.Add(PlaceNone);
+        end;
     end;
+    SetupGeoCodeLanguage(Cmblang, GeoSettings.GetPlaceProvider, GeoSettings.ReverseGeoCodeLang);
+
     CmbProvince.ItemIndex := CmbProvince.Items.IndexOf(Preferred);
     if (CmbProvince.ItemIndex < 0) then
       CmbProvince.ItemIndex := 0;
@@ -147,25 +152,30 @@ begin
     case GeoSettings.GetPlaceProvider of
       TGeoCodeProvider.gpGeoName:
         begin
-          CmbCity.Items.Add('Default');
+          CmbCity.Items.Add(PlaceDefault);
+          CmbCity.Items.Add('hamlet');
           CmbCity.Items.Add('village');
-          CmbCity.Items.Add('municipality');
           CmbCity.Items.Add('town');
           CmbCity.Items.Add('city');
-          CmbCity.Items.Add('None');
+          CmbCity.Items.Add('municipality');
+          CmbCity.Items.Add(PlaceNone);
         end;
     TGeoCodeProvider.gpOverPass:
       begin
         begin
-          CmbCity.Items.Add('Default');
+          CmbCity.Items.Add(PlaceDefault);
           for Level in APlace.CityLevels do
           begin
             if Level = 0 then
               continue;
             CmbCity.Items.Add(IntToStr(Level));
           end;
-          CmbCity.Items.Add('None');
+          CmbCity.Items.Add(PlaceNone);
         end;
+      end;
+    TGeoCodeProvider.gpExifTool:
+      begin
+        CmbCity.Items.Add(PlaceDefault);
       end;
     end;
     CmbCity.ItemIndex := CmbCity.Items.IndexOf(Preferred);
@@ -174,12 +184,6 @@ begin
   finally
     CmbCity.Items.EndUpdate;
   end;
-end;
-
-procedure TFGeoSetup.ChkCountryLocationClick(Sender: TObject);
-begin
-  GeoSettings.CountryCodeLocation := ChkCountryLocation.Checked;
-  FillPreview;
 end;
 
 procedure TFGeoSetup.CmbCityChange(Sender: TObject);
@@ -192,23 +196,26 @@ procedure TFGeoSetup.CmbGeoProviderClick(Sender: TObject);
 begin
   GeoSettings.GetPlaceProvider := TGeoCodeProvider(CmbGeoProvider.ItemIndex);
   FillSetup;
-  GeoCityList.Values[APlace.CountryCode] := CmbCity.Text;
-  GeoProvinceList.Values[APlace.CountryCode] := CmbProvince.Text;
+  if (APlace <> nil) then
+  begin
+    GeoCityList.Values[APlace.CountryCode] := CmbCity.Text;
+    GeoProvinceList.Values[APlace.CountryCode] := CmbProvince.Text;
+  end;
   FillPreview;
 end;
 
-procedure TFGeoSetup.CmbOverPasslangChange(Sender: TObject);
+procedure TFGeoSetup.CmbLangChange(Sender: TObject);
 begin
-  GeoSettings.OverPassLang := CmbOverPasslang.Text;
+  GeoSettings.ReverseGeoCodeLang := GetExifToolLanguage(Cmblang);
 end;
 
-procedure TFGeoSetup.CmbOverPasslangClick(Sender: TObject);
+procedure TFGeoSetup.CmbLangClick(Sender: TObject);
 begin
-  GeoSettings.OverPassLang := CmbOverPasslang.Text;
+  GeoSettings.ReverseGeoCodeLang := GetExifToolLanguage(Cmblang);
   FillPreview;
 end;
 
-procedure TFGeoSetup.CmbOverPasslangKeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
+procedure TFGeoSetup.CmbLangKeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
 begin
   if Key = 13 then
     FillPreview;
@@ -229,6 +236,7 @@ end;
 
 procedure TFGeoSetup.BtnOKClick(Sender: TObject);
 begin
+  GeoSettings.CheckProvider;
   ModalResult := MROK;
 end;
 
@@ -254,8 +262,6 @@ begin
   SavedProvinceList.Assign(GeoProvinceList);
   SavedCityList.Assign(GeoCityList);
   CmbGeoProvider.ItemIndex := Ord(GeoSettings.GetPlaceProvider);
-  ChkCountryLocation.Checked := GeoSettings.CountryCodeLocation;
-  CmbOverPasslang.Text := GeoSettings.OverPassLang;
 
   FillPreview; // Need CountryCode for setup, so do the Preview first
   FillSetup;

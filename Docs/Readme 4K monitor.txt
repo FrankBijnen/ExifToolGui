@@ -2,7 +2,7 @@ Notes on using 4K (HighDpi) monitors.
 
 History:
 Initially Issue #199 tried to improve 4K support.
-- The defaults where /HighDpi=SystemAware and no scaling.
+- The defaults were /HighDpi=SystemAware and no scaling.
 
 More testing resulted in Issue #216, and changing the defaults to:
 - /HighDPI=PerMonitorAwareV2 (Windows 10, or higher), /HighDpi=PerMonitorAware (Windows 8.1 or higher).
@@ -18,7 +18,7 @@ The problem with 4K monitors is that they typically have a higher DPI than 96, t
 The result could be that items look too small, or not correctly positioned, or even be unreadable.
 
 Previous versions of Delphi used scaling to overcome that.
-The problem with scaling, without using the SetProcessDpiAwareness(Context) API, is that items can be blurry.
+The problem with scaling, without using the SetProcessDpiAwareness(Context) API, is that items can be become blurry.
 Recent Delphi versions support the Windows HighDpi Api. (E.g. Via Manifest or API SetProcessDpiAwareness, SetProcessDpiAwarenessContext)
 
 Solution:

@@ -40,6 +40,7 @@ resourcestring
 
   StrNotInstalled           = '(Not installed)';
   StrCheckTheGeoCodeRe      = 'Check the GeoCode requirements. (Apikey required. Max 1 call per second for a free account)';
+  StrCheckOffLineProv       = 'Warning GeoCode provider changed to ExifTool.';
   StrOverwriteExistingS     = 'Overwrite Existing setting %s?';
   StrMakeSureThatYouO       = 'Make sure that you only check ''Thumbnails'' in the next dialog.';
   StrRunSAsAdminFail        = 'Run "%s" as Admin failed.';

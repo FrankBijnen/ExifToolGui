@@ -83,6 +83,7 @@ type
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
     procedure Invalidate; override;
+    procedure ClearSelectionRefresh;
 
     function Path: string;
     function FilePath(ItemIndex: integer = -1): string;
@@ -113,6 +114,7 @@ type
     property OnItemsLoaded: TNotifyEvent read FOnItemsLoaded write FOnItemsLoaded;
     property OnOwnerDataFetchEvent: TOwnerDataFetchEvent read FOnOwnerDataFetchEvent write FOnOwnerDataFetchEvent;
     property OnMouseWheel;
+    property OnCustomDrawItem;
   end;
 
 implementation
@@ -340,6 +342,12 @@ begin
 
   for Indx := 0 to Items.Count - 1 do
     Folders[Indx].ViewHandle := Handle;
+end;
+
+procedure TShellListView.ClearSelectionRefresh;
+begin
+  ClearSelection;
+  Refresh;
 end;
 
 procedure TShellListView.EnumColumns;

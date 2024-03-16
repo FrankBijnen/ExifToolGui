@@ -23,6 +23,7 @@ type
     procedure BtnOpenUrlClick(Sender: TObject);
     procedure LvVersionsSelectItem(Sender: TObject; Item: TListItem; Selected: Boolean);
     procedure FormCreate(Sender: TObject);
+    procedure LvVersionsCustomDrawItem(Sender: TCustomListView; Item: TListItem; State: TCustomDrawState; var DefaultDraw: Boolean);
   private
     { Private declarations }
     procedure SetupLvVersions;
@@ -36,9 +37,12 @@ var
 
 implementation
 
-uses Main, ExifTool, ExifToolsGUI_Utils, ShellAPI, UnitLangResources, ExifToolsGui_Versions, ExifToolsGui_Data;
+uses Main, MainDef, ExifTool, ExifToolsGUI_Utils, ShellAPI, UnitLangResources, ExifToolsGui_Versions, ExifToolsGui_Data,
+     Vcl.Themes;
 
 {$R *.dfm}
+
+var FStyleServices: TCustomStyleServices;
 
 procedure TFrmCheckVersions.OpenUrl(Sender: TObject);
 begin
@@ -121,9 +125,16 @@ end;
 
 procedure TFrmCheckVersions.FormShow(Sender: TObject);
 begin
+  FStyleServices := TStyleManager.Style[GUIsettings.GuiStyle];
   Left := FMain.Left + FMain.GUIBorderWidth + FMain.AdvPageFilelist.Left;
   Top := FMain.Top + FMain.GUIBorderHeight;
   GetVersions;
+end;
+
+procedure TFrmCheckVersions.LvVersionsCustomDrawItem(Sender: TCustomListView; Item: TListItem; State: TCustomDrawState;
+  var DefaultDraw: Boolean);
+begin
+  StyledDrawListviewItem(FStyleServices, Sender, Item, State);
 end;
 
 procedure TFrmCheckVersions.LvVersionsDblClick(Sender: TObject);

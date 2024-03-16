@@ -30,7 +30,7 @@ object FrmStyle: TFrmStyle
       389
       29)
     object BtnOk: TBitBtn
-      Left = 211
+      Left = 203
       Top = 2
       Width = 75
       Height = 25
@@ -57,10 +57,10 @@ object FrmStyle: TFrmStyle
       NumGlyphs = 2
       TabOrder = 0
       OnClick = BtnOkClick
-      ExplicitLeft = 207
+      ExplicitLeft = 199
     end
     object BtnCancel: TBitBtn
-      Left = 292
+      Left = 284
       Top = 2
       Width = 75
       Height = 25
@@ -89,7 +89,7 @@ object FrmStyle: TFrmStyle
       NumGlyphs = 2
       TabOrder = 1
       OnClick = BtnCancelClick
-      ExplicitLeft = 288
+      ExplicitLeft = 280
     end
   end
   object LstStyles: TListBox

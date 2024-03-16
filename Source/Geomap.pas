@@ -7,27 +7,35 @@ uses
   System.Classes, System.SysUtils, System.Generics.Collections, System.IniFiles,
   Vcl.Edge;
 
+const
+  PlaceDefault = 'Default';
+  PlaceLocal = 'Local';
+  PlaceNone = 'None';
+
 type
   TExecRestEvent = procedure(Url, Response: string; Succes: boolean) of object;
-  TGeoCodeProvider = (gpGeoName, gpOverPass);
+  TGeoCodeEnable = (geNone, geAll, geOffline);
+  TGeoCodeProvider = (gpGeoName, gpOverPass, gpExifTool);
   TGeoTagMode = (gtmCoordinates, gtmLocation, gtmCoordinatesLocation);
 
   GEOsettingsRec = record
-    GeoCodingEnable: boolean;
+    GeoCodingEnable: TGeoCodeEnable;
     GetCoordProvider: TGeoCodeProvider;
     GetPlaceProvider: TGeoCodeProvider;
     GeoCodeUrl: string;
     GeoCodeApiKey: string;
     ThrottleGeoCode: integer;
     OverPassUrl: string;
-    OverPassCaseSensitive: boolean;
+    CaseSensitive: boolean;
     OverPassCompleteWord: boolean;
-    OverPassLang: string;
+    GeoCodeLang: string;
+    ReverseGeoCodeLang: string;
     ThrottleOverPass: integer;
     CountryCodeLocation: boolean;
     GeoTagMode: TGeoTagMode;
     GeoCodeDialog: boolean;
     ReverseGeoCodeDialog: boolean;
+    procedure CheckProvider;
   end;
 
   TRegionLevels = array[0..3] of integer;
@@ -40,7 +48,7 @@ type
     FProvinceList : TStringList;
     FCountryCode: string;
     FDefLang: string;
-    FCountry: string;
+    FCountryName: string;
     FName: string;
     FNodeId: string;
     FPostCode: string;
@@ -60,8 +68,10 @@ type
     procedure Clear;
     procedure AssignFromGeocode(Key, Value: string);
     procedure AssignFromOverPass(Key: integer; Value: string);
+    procedure AssignFromExifTool(Key, Value: string);
     procedure Sort;
     property CountryCode: string read FCountryCode write SetCountryCode;
+    property CountryName: string read FCountryName;
     property CountryLocation: string read GetCountryLocation;
     property DefLang: string read FDefLang write FDefLang;
     property PostCode: string read FPostCode write FPostCode;
@@ -186,6 +196,26 @@ var
   LastQuery: TDateTime;
   CoordCache: TObjectDictionary<string, TPlace>;
 
+procedure GEOsettingsRec.CheckProvider;
+begin
+
+  if (GeoSettings.GeoCodingEnable = TGeoCodeEnable.geAll) and
+      ((GeoSettings.GeoCodeApiKey = '') or
+       (GeoSettings.ThrottleGeoCode < 1000)) then
+    ShowMessage(StrCheckTheGeoCodeRe);
+
+  if (GeoSettings.GeoCodingEnable = TGeoCodeEnable.geOffline) then
+  begin
+    if (GeoSettings.GetPlaceProvider <> TGeoCodeProvider.gpExifTool) or
+       (GeoSettings.GetCoordProvider <> TGeoCodeProvider.gpExifTool) then
+    begin
+      GeoSettings.GetPlaceProvider := TGeoCodeProvider.gpExifTool;
+      GeoSettings.GetCoordProvider := TGeoCodeProvider.gpExifTool;
+      ShowMessage(StrCheckOffLineProv);
+    end;
+  end;
+end;
+
 // Sort on stringlist with possibly integer in key.
 function SortOnKey(List: TStringList; Index1, Index2: Integer): Integer;
 var
@@ -230,7 +260,7 @@ procedure TPlace.Clear;
 begin
   SetLength(FCountryCode, 0);
   SetLength(FDefLang, 0);
-  SetLength(FCountry, 0);
+  SetLength(FCountryName, 0);
   SetLength(FNodeId, 0);
   SetLength(FName, 0);
   SetLength(FPostCode, 0);
@@ -252,7 +282,7 @@ begin
   if (GeoSettings.CountryCodeLocation) then
     result := FCountryCode
   else
-    result := FCountry;
+    result := FCountryName;
 end;
 
 function TPlace.GetPrioProvince: string;
@@ -269,10 +299,14 @@ var
   Level: integer;
   LevelX: string;
 begin
-  if (GeoProvinceList.Values[FCountryCode] = 'None') then
+  if (GeoProvinceList.Values[FCountryCode] = PlaceNone) then
     exit('');
 
   result := GetPrioProvince;
+
+  // ExifTool
+  if (result = '') and (FProvinceList.Values['GeolocationRegion'] <> '') then
+    result := FProvinceList.Values['GeolocationRegion'];
 
   // Geocode
   if (result = '') and (FProvinceList.Values['county'] <> '') then
@@ -281,15 +315,18 @@ begin
     result := FProvinceList.Values['state'];
 
   // Overpass
-  for Level in RegionLevels do
+  if (result = '') then
   begin
-    if (Level = 0) then
-      break;
-    LevelX := IntToStr(Level);
-    if (FProvinceList.Values[LevelX] <> '') then
+    for Level in RegionLevels do
     begin
-      result := FProvinceList.Values[LevelX];
-      break;
+      if (Level = 0) then
+        break;
+      LevelX := IntToStr(Level);
+      if (FProvinceList.Values[LevelX] <> '') then
+      begin
+        result := FProvinceList.Values[LevelX];
+        break;
+      end;
     end;
   end;
 end;
@@ -308,31 +345,39 @@ var
   Level: integer;
   LevelX: string;
 begin
-  if (GeoCityList.Values[FCountryCode] = 'None') then
+  if (GeoCityList.Values[FCountryCode] = PlaceNone) then
     exit('');
 
   result := GetPrioCity;
 
+  // ExifTool
+  if (result = '') and (FCityList.Values['GeolocationCity'] <> '') then
+    result := FCityList.Values['GeolocationCity'];
+
   // Geocode
+  // Note: hamlet not added to default. Can be specified.
   if (result = '') and (FCityList.Values['village'] <> '') then
     result := FCityList.Values['village'];
-  if (result = '') and (FCityList.Values['municipality'] <> '') then
-    result := FCityList.Values['municipality'];
   if (result = '') and (FCityList.Values['town'] <> '') then
     result := FCityList.Values['town'];
   if (result = '') and (FCityList.Values['city'] <> '') then
     result := FCityList.Values['city'];
+  if (result = '') and (FCityList.Values['municipality'] <> '') then
+    result := FCityList.Values['municipality'];
 
   // Overpass
-  for Level in CityLevels do
+  if (result = '') then
   begin
-    if (Level = 0) then
-      break;
-    LevelX := IntToStr(Level);
-    if (FCityList.Values[LevelX] <> '') then
+    for Level in CityLevels do
     begin
-      result := FCityList.Values[LevelX];
-      break;
+      if (Level = 0) then
+        break;
+      LevelX := IntToStr(Level);
+      if (FCityList.Values[LevelX] <> '') then
+      begin
+        result := FCityList.Values[LevelX];
+        break;
+      end;
     end;
   end;
 end;
@@ -344,7 +389,7 @@ begin
     result := result + Format('%s, ', [FNodeId]);
   if (FPostCode <> '') then
     result := result + Format('%s, ', [FPostCode]);
-  result := result + Format('Name: %s, City: %s, Province: %s, Country: %s, %s', [Name, City, Province, FCountryCode, FCountry]);
+  result := result + Format('Name: %s, City: %s, Province: %s, Country: %s, %s', [Name, City, Province, CountryCode, CountryName]);
 end;
 
 function TPlace.GetHtmlSearchResult: string;
@@ -366,7 +411,7 @@ begin
   if (Key = 'country_code') then
     CountryCode := Value;
   if (Key = 'country') then
-    FCountry := Value;
+    FCountryName := Value;
 
   if (Key = 'county') then
     FProvinceList.AddPair(Key, Value);
@@ -376,9 +421,11 @@ begin
   if (Key = 'postcode') then
     FPostCode := Value;
 
-  if (Key = 'town') then
+  if (Key = 'hamlet') then
     FCityList.AddPair(Key, Value);
   if (Key = 'village') then
+    FCityList.AddPair(Key, Value);
+  if (Key = 'town') then
     FCityList.AddPair(Key, Value);
   if (Key = 'municipality') then
     FCityList.AddPair(Key, Value);
@@ -393,7 +440,7 @@ begin
   if (Key = 0) then
     FNodeId := Value;
   if (Key = 2) then
-    FCountry := Value;
+    FCountryName := Value;
   for Level in RegionLevels do
   begin
     if (Key = Level) then
@@ -404,6 +451,18 @@ begin
     if (Key = Level) then
       FCityList.AddPair(IntToStr(Key), Value);
   end;
+end;
+
+procedure TPlace.AssignFromExifTool(Key, Value: string);
+begin
+  if (SameText(Key, 'GeolocationCountryCode')) then
+    CountryCode := Value;
+  if (SameText(Key, 'GeolocationCountry')) then
+    FCountryName := Value;
+  if (SameText(Key, 'GeolocationRegion')) then
+    FProvinceList.AddPair(Key, Value);
+  if (SameText(Key, 'GeolocationCity')) then
+    FCityList.AddPair(Key, Value);
 end;
 
 procedure TPLace.Sort;
@@ -635,7 +694,7 @@ begin
   Html.Add('</body>');
   Html.Add('</html>');
 
-  Html.SaveToFile(FPathName);
+  Html.SaveToFile(FPathName, TEncoding.UTF8);
 end;
 
 // ==============================================================================
@@ -649,7 +708,8 @@ begin
     OsmHelper.WriteHeader;
     OsmHelper.WritePointsStart;
     OsmHelper.WritePoint(Lat, Lon, Desc, false);
-    OsmHelper.WritePointsEnd((GeoSettings.GeoCodingEnable) and (Desc <> OSMHome));
+    OsmHelper.WritePointsEnd((GeoSettings.GeoCodingEnable <> TGeoCodeEnable.geNone) and
+                             (Desc <> OSMHome));
     OsmHelper.WriteFooter;
   finally
     OsmHelper.Free;
@@ -672,7 +732,7 @@ begin
         if (MessageDlgEx(E.Message + #10 + StrContinueReenabl, '',
                          TMsgDlgType.mtInformation,
                          [TMsgDlgBtn.mbYes, TMsgDlgBtn.mbNo]) = IDNO) then
-          GeoSettings.GeoCodingEnable := false;
+          GeoSettings.GeoCodingEnable := TGeoCodeEnable.geNone;
       end;
     end;
   finally
@@ -730,9 +790,8 @@ var
   ElementIndx:  integer;
   ElementType:  string;
 begin
-  if (GeoSettings.OverPassLang <> 'default') and
-     (GeoSettings.OverPassLang <> 'local') then
-    APlace.DefLang := GeoSettings.OverPassLang;
+  if (GeoSettings.ReverseGeoCodeLang <> PlaceLocal) then
+    APlace.DefLang := GeoSettings.ReverseGeoCodeLang;
   for ElementIndx := FromElement to AJSONElements.Count -1 do
   begin
     JSONElement := AJSONElements.Items[ElementIndx];
@@ -746,7 +805,7 @@ begin
     if (JSONTags.GetValue<string>('admin_level') <> '2') then
       continue;
 
-    if (GeoSettings.OverPassLang = 'local') and
+    if (GeoSettings.ReverseGeoCodeLang = PlaceLocal) and
        (JSONTags.FindValue('default_language') <> nil) then
       APlace.DefLang := JSONTags.GetValue<string>('default_language');
     if (JSONTags.FindValue('ISO3166-1:alpha2') <> nil) then
@@ -872,6 +931,33 @@ begin
   end;
 end;
 
+function GetPlaceOfCoords_ExifTool(const Lat, Lon: string): TPlace;
+var
+  LatE, LonE, AResult, AKey, AValue: string;
+  ETResult: TStrings;
+begin
+  result := TPlace.Create;
+  LatE := Trim(Lat);
+  LonE := Trim(Lon);
+  result.DefLang := GeoSettings.ReverseGeoCodeLang;
+
+  ETResult := ExifToolGeoLocation(LatE, LonE, result.DefLang);
+  try
+    for AResult in ETResult do
+    begin
+      AValue := AResult;
+      AKey := Trim(NextField(AValue, ':'));
+      AValue := Trim(AValue);
+      result.AssignFromExifTool(AKey,
+                                AValue
+                               );
+    end;
+    result.Sort;
+  finally
+    ETResult.Free;
+  end;
+end;
+
 function GetPlaceOfCoords(const Lat, Lon: string; const Provider: TGeoCodeProvider): TPlace;
 var CoordsKey: string;
     LatP, LonP: string;
@@ -891,15 +977,30 @@ begin
     end;
 
     result := nil;
-    if (GeoSettings.GeoCodingEnable = false) then
-      exit;
 
-    case Provider of
-      TGeoCodeProvider.gpGeoName:
-        result := GetPlaceOfCoords_GeoCode(Lat, Lon);
-      TGeoCodeProvider.gpOverPass:
-        result := GetPlaceOfCoords_OverPass(Lat, Lon);
+    case (GeoSettings.GeoCodingEnable) of
+      TGeoCodeEnable.geNone:
+        exit;
+      TGeoCodeEnable.geAll:
+        begin
+          case Provider of
+            TGeoCodeProvider.gpGeoName:
+              result := GetPlaceOfCoords_GeoCode(Lat, Lon);
+            TGeoCodeProvider.gpOverPass:
+              result := GetPlaceOfCoords_OverPass(Lat, Lon);
+            TGeoCodeProvider.gpExifTool:
+              result := GetPlaceOfCoords_ExifTool(Lat, Lon);
+          end;
+        end;
+      TGeoCodeEnable.geOffline:
+        begin
+          case Provider of
+            TGeoCodeProvider.gpExifTool:
+              result := GetPlaceOfCoords_ExifTool(Lat, Lon);
+          end;
+        end;
     end;
+
     // Also cache if not found
     CoordCache.Add(CoordsKey, result);
   finally
@@ -966,7 +1067,7 @@ begin
   SearchEnd   := '';
   SearchCase  := '';
 
-  if (GeoSettings.OverPassCaseSensitive = false) then
+  if (GeoSettings.CaseSensitive = false) then
   begin
     SearchOp    := '~';
     SearchCase  := ',i';
@@ -994,7 +1095,7 @@ begin
       SearchBounds := Format('(%s);', [Bounds]);
 
     Data := Data +
-            Format('node[%s][place~"^(village|city|town)$"]%s%s',
+            Format('node[%s][place~"^(hamlet|village|town|city|municipality)$"]%s%s',
                      [SearchName, SearchBounds, FormatNL]);
 
   end
@@ -1006,7 +1107,7 @@ begin
                         FormatNL]);
     Data := Data +
             Format('(%s' +
-                   'node[%s][place~"city|town|village|hamlet"](area.searchArea);%s' +
+                   'node[%s][place~"municipality|city|town|village|hamlet"](area.searchArea);%s' +
                    ');%s',
                      [FormatNL, SearchName, FormatNL, FormatNL]);
   end;
@@ -1148,14 +1249,64 @@ begin
   end;
 end;
 
+procedure GetCoordsOfPlace_ExifTool(const City, Country: string; var Lat, Lon: string);
+var
+  ETResult: TStringList;
+  AResult: string;
+  AValue: string;
+  AKey: string;
+  Display: string;
+begin
+  Lat := '';
+  Lon := '';
+
+  ETResult := TStringList.Create;
+  try
+    ETResult.Text := ExifToolGeoLocation(City, Country, GeoSettings.GeoCodeLang, AResult);
+    FrmPlaces.Listview1.Items.Clear;
+    if (AResult = '') then
+    begin
+      Display := '';
+      for AResult in ETResult do
+      begin
+        AValue := AResult;
+        AKey := Trim(NextField(AValue, ' '));
+        AKey := Trim(NextField(AValue, ':'));
+
+        AValue := Trim(AValue);
+        if (AKey = 'Time Zone') then
+          continue;
+// City should be first, Position last
+        if (AKey = 'City') then
+          Display := AValue
+        else if (AKey = 'Position') then
+        begin
+          ParseLatLon(AValue, Lat, Lon);
+          FrmPlaces.AddPlace2LV(Display, Lat, Lon);
+          Display := '';
+        end
+        else
+          Display := Display + ', ' + AKey + '=' + AValue;
+      end;
+    end
+    else
+    begin
+      FrmPlaces.AddPlace2LV(AResult, '', '');
+    end;
+
+    ChooseLocation(Lat, Lon);
+
+  finally
+    ETResult.Free;
+  end;
+end;
+
+
 procedure GetCoordsOfPlace(const Place, Bounds: string; var Lat, Lon: string);
 var
   CrWait, CrNormal: HCURSOR;
   Region: string;
 begin
-  if (GeoSettings.GeoCodingEnable = false) then
-    exit;
-
   Region := Place;
   FGeoSearch.EdSearchCity.Text := Trim(NextField(Region, ','));
   if (FGeoSearch.EdSearchCity.Text = '') then
@@ -1172,12 +1323,29 @@ begin
   CrWait := LoadCursor(0, IDC_WAIT);
   CrNormal := SetCursor(CrWait);
   try
-    case GeoSettings.GetCoordProvider  of
-      TGeoCodeProvider.gpGeoName:
-        GetCoordsOfPlace_GeoCode(FGeoSearch.EdSearchCity.Text, FGeoSearch.EdRegion.Text, Lat, Lon);
-      TGeoCodeProvider.gpOverPass:
-        GetCoordsOfPlace_OverPass(FGeoSearch.EdSearchCity.Text, FGeoSearch.EdRegion.Text, FGeoSearch.EdBounds.Text, Lat, Lon);
+    case (GeoSettings.GeoCodingEnable) of
+      TGeoCodeEnable.geNone:
+        exit;
+      TGeoCodeEnable.geAll:
+        begin
+          case GeoSettings.GetCoordProvider of
+            TGeoCodeProvider.gpGeoName:
+              GetCoordsOfPlace_GeoCode(FGeoSearch.EdSearchCity.Text, FGeoSearch.EdRegion.Text, Lat, Lon);
+            TGeoCodeProvider.gpOverPass:
+              GetCoordsOfPlace_OverPass(FGeoSearch.EdSearchCity.Text, FGeoSearch.EdRegion.Text, FGeoSearch.EdBounds.Text, Lat, Lon);
+            TGeoCodeProvider.gpExifTool:
+              GetCoordsOfPlace_ExifTool(FGeoSearch.EdSearchCity.Text, FGeoSearch.EdRegion.Text, Lat, Lon);
+          end;
+        end;
+      TGeoCodeEnable.geOffline:
+        begin
+          case GeoSettings.GetCoordProvider of
+            TGeoCodeProvider.gpExifTool:
+              GetCoordsOfPlace_ExifTool(FGeoSearch.EdSearchCity.Text, FGeoSearch.EdRegion.Text, Lat, Lon);
+          end;
+        end;
     end;
+
   finally
     SetCursor(CrNormal);
   end;
@@ -1264,15 +1432,16 @@ begin
   GeoSettings.ThrottleGeoCode := GUIini.ReadInteger(Geo_Settings, 'ThrottleGeoCode', 1000);
   GeoSettings.OverPassUrl := GUIini.ReadString(Geo_Settings, 'OverPassUrl', ReadResourceId(ETD_OverPass));
   GeoSettings.ThrottleOverPass := GUIini.ReadInteger(Geo_Settings, 'ThrottleOverPass', 10);
-  GeoSettings.OverPassCaseSensitive := GUIini.ReadBool(Geo_Settings, 'OverPassCaseSensitive', True);
+  GeoSettings.CaseSensitive := GUIini.ReadBool(Geo_Settings, 'OverPassCaseSensitive', True);
   GeoSettings.OverPassCompleteWord := GUIini.ReadBool(Geo_Settings, 'OverPassCompleteWord', True);
   GeoSettings.OverPassCompleteWord := GUIini.ReadBool(Geo_Settings, 'OverPassCompleteWord', True);
-  GeoSettings.OverPassLang := GUIini.ReadString(Geo_Settings, 'OverPassLang', 'default');
+  GeoSettings.GeoCodeLang := GUIini.ReadString(Geo_Settings, 'GeoCodeLang', PlaceDefault);
+  GeoSettings.ReverseGeoCodeLang := GUIini.ReadString(Geo_Settings, 'ReverseGeoCodeLang', PlaceDefault);
   GeoSettings.CountryCodeLocation := GUIini.ReadBool(Geo_Settings, 'CountryCodeLocation', True);
   GeoSettings.GeoTagMode := TGeoTagMode(GUIini.ReadInteger(Geo_Settings, 'GeoTagMode', 1));
   GeoSettings.GeoCodeDialog := GUIini.ReadBool(Geo_Settings, 'GeoCodeDialog', true);
   GeoSettings.ReverseGeoCodeDialog := GUIini.ReadBool(Geo_Settings, 'ReverseGeoCodeDialog', true);
-  GeoSettings.GeoCodingEnable := GUIini.ReadBool(Geo_Settings, 'GeoCodingEnable', false);
+  GeoSettings.GeoCodingEnable := TGeoCodeEnable(GUIini.ReadInteger(Geo_Settings, 'GeoCodingEnable', 0));
 
   GUIini.ReadSectionValues(Geo_Province, GeoProvinceList);
 
@@ -1290,14 +1459,15 @@ begin
   GUIini.WriteInteger(Geo_Settings, 'ThrottleGeoCode', GeoSettings.ThrottleGeoCode);
   GUIini.WriteInteger(Geo_Settings, 'GetPlaceProvider', Ord(GeoSettings.GetPlaceProvider));
   GUIini.WriteInteger(Geo_Settings, 'ThrottleOverPass', GeoSettings.ThrottleOverPass);
-  GUIini.WriteBool(Geo_Settings, 'OverPassCaseSensitive', GeoSettings.OverPassCaseSensitive);
+  GUIini.WriteBool(Geo_Settings, 'OverPassCaseSensitive', GeoSettings.CaseSensitive);
   GUIini.WriteBool(Geo_Settings, 'OverPassCompleteWord', GeoSettings.OverPassCompleteWord);
-  GUIini.WriteString(Geo_Settings, 'OverPassLang', GeoSettings.OverPassLang);
+  GUIini.WriteString(Geo_Settings, 'GeoCodeLang', GeoSettings.GeoCodeLang);
+  GUIini.WriteString(Geo_Settings, 'ReverseGeoCodeLang', GeoSettings.ReverseGeoCodeLang);
   GUIini.WriteBool(Geo_Settings, 'CountryCodeLocation', GeoSettings.CountryCodeLocation);
   GUIini.WriteInteger(Geo_Settings, 'GeotagMode', Ord(GeoSettings.GeoTagMode));
   GUIini.WriteBool(Geo_Settings, 'GeoCodeDialog', GeoSettings.GeoCodeDialog);
   GUIini.WriteBool(Geo_Settings, 'ReverseGeoCodeDialog', GeoSettings.ReverseGeoCodeDialog);
-  GUIini.WriteBool(Geo_Settings, 'GeoCodingEnable', GeoSettings.GeoCodingEnable);
+  GUIini.WriteInteger(Geo_Settings, 'GeoCodingEnable', Ord(GeoSettings.GeoCodingEnable));
 
   TmpItems := TStringList.Create;
   try

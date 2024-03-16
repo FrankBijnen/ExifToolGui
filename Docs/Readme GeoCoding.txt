@@ -1,3 +1,17 @@
+Support for new ExifTool functions geolocate and -api geolocation. (Requires ExifTool 12.78 and GUI version V6.3.0)
+
+Starting from version V6.3.0 a new GeoCode provider for reverse geocoding has been added.
+You can obtain the City, State and Country from GPS Coordinates or obtain the GPS coordinates from a city, by selecting 'ExifTool geolocation' as Geocode provider.
+It uses features available in ExifTool V12.79. For more background info: https://exiftool.org/geolocation.html
+
+In order to be compatible with the new ExifTool function the existing GUI functions have been modified.
+
+Exiftool writes the location found into tags: XMP:photoshop:City, XMP:photoshop:State, XMP:photoshop:Country and -XMP-iptcCore:CountryCode
+In previous versions Gui wrote the info only into -XMP-iptcExt:LocationShownCity, -XMP-iptcExt:LocationShownProvinceState and -XMP-iptcExt:LocationShownCountryName
+Depending on the setting only the CountryCode was written into -XMP-iptcExt:LocationShownCountryName or the full CountryName.
+Starting with V6.3.0 Gui will write both into the photoshop and into the iptcExt tags. You can choose in preferences if you want the 
+CountryCode, or the full CountryName displayed in the filelist. (If CountryCode is empty, and CountryName is not empty, it will display the CountryName in the filelist)
+
 Lessons learned from user testing.
 
 A few users have done some testing with GeoCoding. A few issues found are resolved in code, other issues are worth documenting.
@@ -5,7 +19,7 @@ A few users have done some testing with GeoCoding. A few issues found are resolv
 General remarks:
 
 - If you run into problems, it's a good idea to replay the commands with the Log Window open. That information helps solving issues.
-- The 2 providers currently available, Geocode and Overpass, will drop requests when you generate too many per second.
+- The 2 online providers currently available, Geocode and Overpass, will drop requests when you generate too many per second.
   Please use the 'Throttle values' in preferences. They specify a minimum nr of milliseconds between calls. For example 2000 means you can only do 1 call per 2 seconds!
 
 Issues found with 'Video files' (No Jpeg (JPG) or Camera-Raw (DNG, CRW, NEF etc), but Video's like MP4 or Mov)

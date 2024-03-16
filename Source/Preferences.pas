@@ -56,7 +56,6 @@ type
     Label4: TLabel;
     UpdThrottleOverpass: TUpDown;
     EdOverPassUrl: TLabeledEdit;
-    ChkGeoCodingEnable: TCheckBox;
     CheckBox6: TCheckBox;
     Label5: TLabel;
     HintPause: TEdit;
@@ -71,11 +70,13 @@ type
     BtnRemoveFromContextMenu: TBitBtn;
     CheckBox10: TCheckBox;
     EdCommand: TLabeledEdit;
-    Memo1: TMemo;
+    MemoWin11: TMemo;
     CheckBox11: TCheckBox;
     GrpConfig: TGroupBox;
     EdETCustomConfig: TEdit;
     BtnEtCustomConfig: TButton;
+    ChkCountryLocation: TCheckBox;
+    CmbGeoCodingEnable: TComboBox;
     procedure FormShow(Sender: TObject);
     procedure BtnSaveClick(Sender: TObject);
     procedure BtnBrowseFolder(Sender: TObject);
@@ -120,24 +121,10 @@ begin
 end;
 
 procedure TFPreferences.BtnSaveClick(Sender: TObject);
-var
-  i: integer;
-  tx: string[7];
 begin
-  i := ComboBox1.ItemIndex;
-  if i = 0 then
-  begin
-    GUIsettings.Language := '';
-    ET_Options.ETLangDef := '';
-  end
-  else
-  begin
-    tx := ComboBox1.Items[i];
-    i := pos(' ', tx);
-    SetLength(tx, i - 1);
-    GUIsettings.Language := tx;
-    ET_Options.ETLangDef := tx + CRLF;
-  end;
+  GUIsettings.Language := GetExifToolLanguage(ComboBox1);
+  ET_Options.ETLangDef := GUIsettings.Language;
+
   with GUIsettings do
   begin
     AutoRotatePreview := CheckBox1.Checked;
@@ -152,20 +139,19 @@ begin
   end;
   with LabeledEdit1 do
   begin
-    if (Text = '') or (Text = ' ') then
+    if (Trim(Text) = '') then
       Text := '*';
     ET_Options.ETSeparator := '-sep' + CRLF + Text + CRLF;
   end;
 
   case RadioGroup3.ItemIndex of
     0:
-      i := 96;
+      FMain.ShellList.ThumbNailSize := 96;
     1:
-      i := 128;
+      FMain.ShellList.ThumbNailSize := 128;
     2:
-      i := 160;
+      FMain.ShellList.ThumbNailSize := 160;
   end;
-  FMain.ShellList.ThumbNailSize := i;
   GUIsettings.ThumbSize := RadioGroup3.ItemIndex;
 
   FMain.ShellList.ThumbAutoGenerate := ChkThumbAutoGenerate.Checked;
@@ -191,13 +177,14 @@ begin
   GeoSettings.OverPassUrl := EdOverPassUrl.Text;
   GeoSettings.ThrottleOverPass := UpdThrottleOverpass.Position;
   GeoSettings.GeoCodeDialog := ChkGeoCodeDialog.Checked;
-  GeoSettings.GeoCodingEnable := ChkGeoCodingEnable.Checked;
+  GeoSettings.GeoCodingEnable := TGeoCodeEnable(CmbGeoCodingEnable.ItemIndex);
   GeoSettings.ReverseGeoCodeDialog := ChkReverseGeoCodeDialog.Checked;
+  GeoSettings.CountryCodeLocation := ChkCountryLocation.Checked;
 
-  if (GeoSettings.GeoCodingEnable) and
-      ((GeoSettings.GeoCodeApiKey = '') or
-       (GeoSettings.ThrottleGeoCode < 1000)) then
-    ShowMessage(StrCheckTheGeoCodeRe);
+  GeoSettings.CheckProvider;
+
+  // Make sure changes made by user are saved.
+  SaveGUIini;
 end;
 
 procedure TFPreferences.BtnSetupCleanClick(Sender: TObject);
@@ -302,117 +289,87 @@ end;
 
 procedure TFPreferences.FormShow(Sender: TObject);
 var
-  I, N: smallint;
   Tx: string;
-  ETResult: TStringList;
 begin
-  memo1.Visible := CheckWin32Version(10, 0) and (TOSversion.Build >= 22000); //WIN11
-  ETResult := TStringList.Create;
-  try
-    Left := FMain.Left + 8;
-    Top := FMain.Top + 56;
-    ET_OpenExec('-lang', '', ETResult, false);
-    with ComboBox1 do
+  Left := FMain.Left + FMain.GUIBorderWidth;
+  Top := FMain.Top + FMain.GUIBorderHeight;
+
+  MemoWin11.Visible := CheckWin32Version(10, 0) and
+                       (TOSversion.Build >= 22000); //WIN11
+
+  // Get ExifTool Languages
+  SetupExifToolLanguage(ComboBox1, GUIsettings.Language);
+
+  with GUIsettings do
+  begin
+    CheckBox1.Checked := AutoRotatePreview;
+    EdStartupFolder.Text := DefStartupDir;
+    EdExportMetaFolder.Text := DefExportDir;
+    with RgStartupFolder do
     begin
-      Items.Clear;
-      Items.Append('ExifTool standard (short)');
-      I := ETResult.Count;
-      if I > 0 then
-      begin
-        ETResult.Delete(0);
-        dec(I);
-      end;
-      if I > 0 then
-        for N := 0 to I - 1 do
-          Items.Append(TrimLeft(ETResult[N]));
-      Tx := GUIsettings.Language;
-      if Tx = '' then
-        ItemIndex := 0
+      if DefStartupUse then
+        ItemIndex := 1
       else
-      begin
-        I := Items.Count;
-        N := 1;
-        while N < I do
-        begin
-          if pos(Tx, Items[N]) = 1 then
-            ItemIndex := N;
-          inc(N);
-        end;
-      end;
+        ItemIndex := 0;
+      RadioGroupClick(RgStartupFolder);
     end;
-    ETResult.Clear;
-    with GUIsettings do
+    with RgExportMetaFolder do
     begin
-      CheckBox1.Checked := AutoRotatePreview;
-      EdStartupFolder.Text := DefStartupDir;
-      EdExportMetaFolder.Text := DefExportDir;
-      with RgStartupFolder do
-      begin
-        if DefStartupUse then
-          ItemIndex := 1
-        else
-          ItemIndex := 0;
-        RadioGroupClick(RgStartupFolder);
-      end;
-      with RgExportMetaFolder do
-      begin
-        if DefExportUse then
-          ItemIndex := 1
-        else
-          ItemIndex := 0;
-        RadioGroupClick(RgExportMetaFolder);
-      end;
-      with RgETOverride do
-      begin
-        EdETOverride.Text := ETOverrideDir;
-        if (Trim(ETOverrideDir) <> '') then
-          ItemIndex := 1
-        else
-          ItemIndex := 0;
-        RadioGroupClick(RgETOverride);
-      end;
-      EdETCustomConfig.Text := ETCustomConfig;
+      if DefExportUse then
+        ItemIndex := 1
+      else
+        ItemIndex := 0;
+      RadioGroupClick(RgExportMetaFolder);
     end;
-    Tx := ET_Options.ETSeparator;
-    Delete(Tx, 1, 6);
-    SetLength(Tx, 1);
-    LabeledEdit1.Text := Tx;
-    RadioGroup3.ItemIndex := GUIsettings.ThumbSize;
-    ChkThumbAutoGenerate.Checked := GUIsettings.ThumbAutoGenerate;
-    EdThumbCleanset.Text := GUIsettings.ThumbCleanSet;
-
-    CheckBox2.Checked := GUIsettings.EnableGMap;
-    CheckBox3.Checked := GUIsettings.UseExitDetails;
-    CheckBox4.Checked := GUIsettings.AutoIncLine;
-    CheckBox5.Checked := GUIsettings.DblClickUpdTags;
-    CheckBox6.Checked := GUIsettings.ShowFolders;
-    CheckBox8.Checked := GUIsettings.ShowHidden;
-    CheckBox11.Checked := GUIsettings.EnableUnsupported;
-    CheckBox8.Enabled := IsAdminUser or IsElevated;
-    CheckBox7.Checked := GUIsettings.ShowBreadCrumb;
-    CheckBox9.Checked := GUIsettings.MinimizeToTray;
-    CheckBox10.Checked := GUIsettings.SingleInstanceApp;
-    UpDHintPause.Position := Application.HintHidePause;
-
-    // GeoCode
-    EdGeoCodeUrl.Text := GeoSettings.GeoCodeUrl;
-    EdGeoCodeApiKey.Text := GeoSettings.GeoCodeApiKey;
-    UpdThrottleGeoCode.Position := GeoSettings.ThrottleGeoCode;
-    EdOverPassUrl.Text := GeoSettings.OverPassUrl;
-    UpdThrottleOverpass.Position := GeoSettings.ThrottleOverPass;
-    ChkGeoCodingEnable.Checked := GeoSettings.GeoCodingEnable;
-    ChkGeoCodeDialog.Checked := GeoSettings.GeoCodeDialog;
-    ChkReverseGeoCodeDialog.Checked := GeoSettings.ReverseGeoCodeDialog;
-
-    AdvPageControl1.ActivePage := AdvTabGeneral;
-
-    GrpContextMenu.Enabled := IsElevated;
-    SetContextButtons;
-
-    BtnSetupClean.Enabled := IsAdminUser;
-  finally
-    ETResult.Free;
+    with RgETOverride do
+    begin
+      EdETOverride.Text := ETOverrideDir;
+      if (Trim(ETOverrideDir) <> '') then
+        ItemIndex := 1
+      else
+        ItemIndex := 0;
+      RadioGroupClick(RgETOverride);
+    end;
+    EdETCustomConfig.Text := ETCustomConfig;
   end;
+  Tx := ET_Options.ETSeparator;
+  Delete(Tx, 1, 6);
+  SetLength(Tx, 1);
+  LabeledEdit1.Text := Tx;
+  RadioGroup3.ItemIndex := GUIsettings.ThumbSize;
+  ChkThumbAutoGenerate.Checked := GUIsettings.ThumbAutoGenerate;
+  EdThumbCleanset.Text := GUIsettings.ThumbCleanSet;
+
+  CheckBox2.Checked := GUIsettings.EnableGMap;
+  CheckBox3.Checked := GUIsettings.UseExitDetails;
+  CheckBox4.Checked := GUIsettings.AutoIncLine;
+  CheckBox5.Checked := GUIsettings.DblClickUpdTags;
+  CheckBox6.Checked := GUIsettings.ShowFolders;
+  CheckBox8.Checked := GUIsettings.ShowHidden;
+  CheckBox11.Checked := GUIsettings.EnableUnsupported;
+  CheckBox8.Enabled := IsAdminUser or IsElevated;
+  CheckBox7.Checked := GUIsettings.ShowBreadCrumb;
+  CheckBox9.Checked := GUIsettings.MinimizeToTray;
+  CheckBox10.Checked := GUIsettings.SingleInstanceApp;
+  UpDHintPause.Position := Application.HintHidePause;
+
+  // GeoCode
+  EdGeoCodeUrl.Text := GeoSettings.GeoCodeUrl;
+  EdGeoCodeApiKey.Text := GeoSettings.GeoCodeApiKey;
+  UpdThrottleGeoCode.Position := GeoSettings.ThrottleGeoCode;
+  EdOverPassUrl.Text := GeoSettings.OverPassUrl;
+  UpdThrottleOverpass.Position := GeoSettings.ThrottleOverPass;
+  CmbGeoCodingEnable.ItemIndex := Ord(GeoSettings.GeoCodingEnable);
+  ChkGeoCodeDialog.Checked := GeoSettings.GeoCodeDialog;
+  ChkReverseGeoCodeDialog.Checked := GeoSettings.ReverseGeoCodeDialog;
+  ChkCountryLocation.Checked := GeoSettings.CountryCodeLocation;
+
+  AdvPageControl1.ActivePage := AdvTabGeneral;
+
+  GrpContextMenu.Enabled := IsElevated;
+  SetContextButtons;
+
+  BtnSetupClean.Enabled := IsAdminUser;
 end;
 
 procedure TFPreferences.RadioGroupClick(Sender: TObject);

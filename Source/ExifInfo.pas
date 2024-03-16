@@ -93,7 +93,7 @@ type
     Date: string[19];
     PhotoType: string;
     Title, Event: string;
-    CountryShown, ProvinceShown, CityShown, LocationShown: string;
+    CountryCodeShown, CountryNameShown, ProvinceShown, CityShown, LocationShown: string;
     PersonInImage: string;
     Keywords: string; // =Subject
     Rating: string[1];
@@ -1146,7 +1146,8 @@ begin
     PhotoType := GetBagData('<dc:type>');
     Title := GetAltData('<dc:title>');
     Event := GetAltData('<Iptc4xmpExt:Event>');
-    CountryShown := GetStructTag('<Iptc4xmpExt:LocationShown>', '<Iptc4xmpExt:CountryName>');
+    CountryCodeShown := GetStructTag('<Iptc4xmpExt:LocationShown>', '<Iptc4xmpExt:CountryCode>');
+    CountryNameShown := GetStructTag('<Iptc4xmpExt:LocationShown>', '<Iptc4xmpExt:CountryName>');
     ProvinceShown := GetStructTag('<Iptc4xmpExt:LocationShown>', '<Iptc4xmpExt:ProvinceState>');
     CityShown := GetStructTag('<Iptc4xmpExt:LocationShown>', '<Iptc4xmpExt:City>');
     LocationShown := GetStructTag('<Iptc4xmpExt:LocationShown>', '<Iptc4xmpExt:Sublocation>');

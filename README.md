@@ -1,4 +1,4 @@
-# ExifToolGui
+﻿# ExifToolGui
 <h4>A GUI for ExifTool</h4>
 
 This is an updated version of the ExifToolGui program created by Bogdan Hrastnik. Many thanks go out to him.
@@ -9,7 +9,7 @@ This is an updated version of the ExifToolGui program created by Bogdan Hrastnik
 - Deutsch hat angefangen. [DLL](Translation/ExifToolGui.DEU), [BTM quelldatei](Translation/ExifToolGUI_de.xlat)<br>
 - English was already available as default. [DLL](Translation/ExifToolGUI.ENU)<br>
 
-When you place the language DLL in the same folder as the EXE, it should be selected automatically. According to your Windows language. 
+When you place the language DLL in the same folder as the EXE, it should be selected automatically. According to your Windows language.
 To override the default use /Lang=xxx as commandline parm. Where xxx is the languagecode. (NLD, DEU)
 
 Note: <br>
@@ -63,7 +63,7 @@ a stacktrace can be copied to the clipboard if an Exception occurs. Please also 
 
 <h4>Legal, Copyright etc.</h4>
 
-This is a continuation of the project started by Bogdan Hrastnik. He did not mention any License, and or Copyrights. Likewise I will not. 
+This is a continuation of the project started by Bogdan Hrastnik. He did not mention any License, and or Copyrights. Likewise I will not.
 I have used some open source components, you can find their legal info in the corresponding subdirectories.
 
 

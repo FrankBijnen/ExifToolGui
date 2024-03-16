@@ -295,6 +295,7 @@ type
     procedure TrayIconBalloonClick(Sender: TObject);
     procedure MaAPILargeFileSupportExecute(Sender: TObject);
     procedure MaCheckVersionsExecute(Sender: TObject);
+    procedure ShellListEnter(Sender: TObject);
   private
     { Private declarations }
     ETBarSeriesFocal: TBarSeries;
@@ -323,9 +324,13 @@ type
     procedure RefreshSelected(Sender: TObject);
     procedure ShellTreeBeforeContext(Sender: TObject);
     procedure ShellTreeAfterContext(Sender: TObject);
+    procedure ShellTreeCustomDrawItem(Sender: TCustomTreeView; Node: TTreeNode; State: TCustomDrawState; var DefaultDraw: Boolean);
 
     procedure ShellistThumbError(Sender: TObject; Item: TListItem; E: Exception);
     procedure ShellistThumbGenerate(Sender: TObject; Item: TListItem; Status: TThumbGenStatus; Total, Remaining: integer);
+
+    procedure ShellListCustomDrawItem(Sender: TCustomListView; Item: TListItem; State: TCustomDrawState;
+      var DefaultDraw: Boolean);
     procedure ShellListBeforePopulate(Sender: TObject; var DoDefault: boolean);
     procedure ShellListAfterEnumColumns(Sender: TObject);
     procedure ShellListPathChange(Sender: TObject);
@@ -365,8 +370,9 @@ uses System.StrUtils, System.Math, System.Masks, System.Types, System.UITypes,
   UFrmGenericExtract, UFrmGenericImport, UFrmLossLessRotate, UFrmGeoTagFiles, UFrmGeoSetup,
   UnitLangResources;
 
-
 {$R *.dfm}
+
+var FStyleServices: TCustomStyleServices; 
 
 const
   GUI_SEP = '-GUI-SEP';
@@ -389,6 +395,7 @@ const
     '-ExifIFD:DateTimeOriginal' + CRLF +
     '-CreateDate' + CRLF +
     '-GPSLatitude#' + CRLF +
+    '-XMP-iptcExt:LocationShownCountryCode' + CRLF +
     '-XMP-iptcExt:LocationShownCountryName' + CRLF +
     '-XMP-iptcExt:LocationShownProvinceState' + CRLF +
     '-XMP-iptcExt:LocationShownCity' + CRLF +
@@ -489,7 +496,7 @@ begin
   if FEditFColumn.ShowModal = mrOK then
     with ShellList do
     begin
-      Refresh;
+      ClearSelectionRefresh;
       SetFocus;
     end;
   ShowMetadata;
@@ -555,7 +562,7 @@ end;
 
 procedure TFMain.BtnFListRefreshClick(Sender: TObject);
 begin
-  ShellList.Refresh; // -use this (to be sure)
+  ShellList.ClearSelectionRefresh;
   ShellList.SetFocus;
 end;
 
@@ -657,9 +664,8 @@ begin
   with ShellList do
   if (Enabled) then
   begin
-    Refresh;
-    ShowMetadata;
-    ShowPreview;
+    ClearSelectionRefresh;
+    ShellListItemsLoaded(ShellList);
     SetFocus;
   end;
 end;
@@ -956,7 +962,7 @@ procedure TFMain.MetadataListCtrlKeyDown(Sender: TObject; var Key: Word; Shift: 
     if not CheckIndex(New) then
       exit;
 
-    // Select only then item, and make that visible
+    // Select only the item, and make that visible
     ShellList.ClearSelection;
     ShellList.Items[New].Selected := true;
     ShellList.Items[New].MakeVisible(false);
@@ -1369,7 +1375,7 @@ begin
     ET_OpenExit(true); // Force restart of ExifTool. CustomConfig could have changed
     EnableMenus(ET_StayOpen(ShellList.Path)); // Recheck Exiftool.exe.
     ShellListSetFolders;
-    ShellList.Refresh;
+    ShellList.ClearSelectionRefresh;
     ShowMetadata;
   end;
 end;
@@ -1501,7 +1507,8 @@ begin
   QuickPopUp_AddQuickAct.Visible := not(SpeedBtnQuick.Down or SpeedBtnCustom.Down or IsSep);
   QuickPopUp_AddCustomAct.Visible := not(SpeedBtnQuick.Down or SpeedBtnCustom.Down or IsSep);
   QuickPopUp_DelCustomAct.Visible := SpeedBtnCustom.Down and not(IsSep);
-  QuickPopUp_AddDetailsUserAct.Visible := not IsSep and (SpeedBtnExif.Down or SpeedBtnXmp.Down or SpeedBtnIptc.Down);
+  QuickPopUp_AddDetailsUserAct.Visible := not IsSep and
+                                         (SpeedBtnExif.Down or SpeedBtnXmp.Down or SpeedBtnIptc.Down or SpeedBtnALL.Down);
   QuickPopUp_MarkTagAct.Visible := not(SpeedBtnQuick.Down or SpeedBtnCustom.Down or IsSep);
   QuickPopUp_DelQuickAct.Visible := not(IsSep) and SpeedBtnQuick.Down;
   QuickPopUp_FillQuickAct.Visible := QuickPopUp_DelQuickAct.Visible;
@@ -1618,7 +1625,7 @@ procedure TFMain.QuickPopUp_AddDetailsUserClick(Sender: TObject);
 var
   I, N, X: integer;
   Tx, Tk: string;
-  PrevSel: integer;
+  PrevSel, PrevRow: integer;
 begin
   I := length(FListColUsr);
   SetLength(FListColUsr, I + 1);
@@ -1655,12 +1662,14 @@ begin
   if I = N then
   begin
     PrevSel := ShellList.Selected.Index;
+    PrevRow := MetadataList.Row;
     try
       ShellList.Refresh;
     finally
       ShellList.ClearSelection;
       ShellList.Items[PrevSel].Selected := true;
       ShellListClick(ShellList);
+      MetadataList.Row := PrevRow;
     end;
   end;
 end;
@@ -1910,7 +1919,7 @@ procedure TFMain.UpdateLocationfromGPScoordinatesClick(Sender: TObject);
 var
   CrWait, CrNormal: HCURSOR;
   SelectedFiles: TStringList;
-  AFile: string;
+  ETCmd, AFile: string;
   GPSCoordinates: string;
   IsQuickTime: boolean;
 begin
@@ -1939,16 +1948,30 @@ begin
     CrNormal := SetCursor(CrWait);
     SelectedFiles := TStringList.Create;
     try
-      SelectedFiles.Text := GetSelectedFiles(true);   // Need full pathname
-      for AFile in SelectedFiles do
+      if (GeoSettings.GetPlaceProvider = gpExifTool) then
       begin
-        StatusBar.Panels[1].Text := AFile;
-        StatusBar.Update;
-        FillLocationInImage(AFile);
+        ETCmd := '-geolocate<GPSPosition' + CRLF +
+                 '-api' + CRLF + 'geolocation' + CRLF +
+                 '-xmp:LocationShownCountryCode<GeolocationCountryCode' + CRLF +
+                 '-xmp:LocationShownCountryName<GeolocationCountry' + CRLF +
+                 '-xmp:LocationShownProvinceState<GeolocationRegion' + CRLF +
+                 '-xmp:LocationShownCity<GeolocationCity' + CRLF;
+        ET_OpenExec(ETcmd, GetSelectedFiles);
+      end
+      else
+      begin
+        SelectedFiles.Text := GetSelectedFiles(true);   // Need full pathname
+        for AFile in SelectedFiles do
+        begin
+          StatusBar.Panels[1].Text := AFile;
+          StatusBar.Update;
+          FillLocationInImage(AFile);
+        end;
       end;
     finally
       SelectedFiles.Free;
       RefreshSelected(Sender);
+      ShowMetadata;
       SetCursor(CrNormal);
     end;
   end;
@@ -2321,7 +2344,7 @@ begin
   if i >= 0 then
   begin
     SpeedBtnFilterEdit.Enabled := (i <> 0);
-    ShellList.Refresh;
+    ShellList.ClearSelectionRefresh;
     ShellList.SetFocus;
   end;
 end;
@@ -2331,7 +2354,7 @@ begin
   if Key = VK_Return then
   begin
     CBoxFileFilter.Text := trim(CBoxFileFilter.Text);
-    ShellList.Refresh;
+    ShellList.ClearSelectionRefresh;
     ShellList.SetFocus;
   end;
 end;
@@ -2452,6 +2475,10 @@ begin
   // Enable Column sorting if Sorted = true. Disables Sorted.
   ShellList.ColumnSorted := ShellList.Sorted;
 
+  ShellList.OnCustomDrawItem := ShellListCustomDrawItem;
+
+  ShellTree.OnCustomDrawItem := ShellTreeCustomDrawItem;
+
   // Metadatalist Ctrl handler
   MetadataList.OnCtrlKeyDown := MetadataListCtrlKeyDown;
 
@@ -2521,6 +2548,13 @@ var
   I: integer;
   PathFromParm: boolean;
 begin
+
+  if (ParmIniPath <> '') then
+  begin
+    if not SaveGUIini then
+      Halt;
+  end;
+
   if TrayIcon.Visible then
     exit;
 
@@ -2711,6 +2745,12 @@ begin
         FListColUsr[ColIndex - 1].Width := TListColumn(Sender).Width;
     end;
   end;
+end;
+
+procedure TFMain.ShellListCustomDrawItem(Sender: TCustomListView; Item: TListItem; State: TCustomDrawState;
+  var DefaultDraw: Boolean);
+begin
+  StyledDrawListviewItem(FStyleServices, Sender, Item, State);
 end;
 
 procedure TFMain.ShellListBeforePopulate(Sender: TObject; var DoDefault: boolean);
@@ -2911,7 +2951,11 @@ begin
                 Details.Add(StrYes)
               else
                 Details.Add(StrNo);
-              Details.Add(Xmp.CountryShown);
+              if (GeoSettings.CountryCodeLocation) and
+                 (Trim(Xmp.CountryCodeShown) <> '') then
+                Details.Add(Xmp.CountryCodeShown)
+              else
+                Details.Add(Xmp.CountryNameShown);
               Details.Add(Xmp.ProvinceShown);
               Details.Add(Xmp.CityShown);
               Details.Add(Xmp.LocationShown);
@@ -2939,6 +2983,14 @@ begin
                     Details[1] := StrNo
                   else
                     Details[1] := StrYes;
+
+                  // Prefer CountryCode
+                  if (GeoSettings.CountryCodeLocation) and
+                     (Trim(Details[2]) <> '-') then
+                    Details.Delete(3)   // We have a Country Code, delete the Country Name
+                  else
+                    Details.Delete(2);
+
                 end;
               end
               else
@@ -2984,6 +3036,12 @@ begin // event is executed for each deleted file -so make it fast!
   MetadataList.Strings.Clear;
 end;
 
+//Remove focus rectangle
+procedure TFMain.ShellListEnter(Sender: TObject);
+begin
+  SendMessage(ShellList.Handle, WM_CHANGEUISTATE, UIS_Set + ($10000 * UISF_HIDEFOCUS), 0);
+end;
+
 procedure TFMain.ShellListKeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
 
   procedure DeleteSelected;
@@ -3007,8 +3065,7 @@ procedure TFMain.ShellListKeyUp(Sender: TObject; var Key: Word; Shift: TShiftSta
         DoContextMenuVerb(ShellList.Folders[ANItem.Index], SCmdVerbDelete);
       end;
 
-      ShellList.Refresh;
-      ShellList.ClearSelection;
+      ShellList.ClearSelectionRefresh;
       if (CurIndex < 0) then
         CurIndex := 0;
       if (CurIndex > ShellList.Items.Count -1) then
@@ -3141,6 +3198,13 @@ begin
     ETBarSeriesIso.Clear;
 end;
 
+procedure TFMain.ShellTreeCustomDrawItem(Sender: TCustomTreeView; Node: TTreeNode; State: TCustomDrawState;
+  var DefaultDraw: Boolean);
+begin
+  if (Node.Selected ) then
+    Sender.Canvas.Font.Style := Sender.Canvas.Font.Style + [fsBold];
+end;
+
 procedure TFMain.RefreshSelected(Sender: TObject);
 var AnItem: TListItem;
 begin
@@ -3158,7 +3222,7 @@ procedure TFMain.Tray_ResetwindowsizeClick(Sender: TObject);
 begin
   RestoreGUI;
   ResetWindowSizes;
-  ShellList.Refresh;
+  ShellList.ClearSelectionRefresh;
   Realign;
 end;
 
@@ -3335,13 +3399,13 @@ begin
           Row := 1;
           Strings.Clear;
           Strings.AddStrings(ETResult);
-          if RowCount > E then
-            Row := E
-          else
-            Row := RowCount - 1;
         finally
           Strings.EndUpdate;
         end;
+        if RowCount > E then
+          Row := E
+        else
+          Row := RowCount - 1;
       end;
     end;
   finally
@@ -3599,14 +3663,12 @@ begin
 end;
 
 procedure TFMain.SetGuiStyle;
-var
-  AStyleService: TCustomStyleServices;
 begin
   GUIColorWindow := clBlack;
-  AStyleService := TStyleManager.Style[GUIsettings.GuiStyle];
-  if Assigned(AStyleService) then
-    GUIColorWindow := AStyleService.GetStyleColor(scWindow);
+  FStyleServices := TStyleManager.Style[GUIsettings.GuiStyle];
 
+  if Assigned(FStyleServices) then
+    GUIColorWindow := FStyleServices.GetStyleColor(scWindow);
   BreadcrumbBar.Style := GUIsettings.GuiStyle;
 end;
 

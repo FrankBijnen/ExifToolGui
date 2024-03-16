@@ -1,5 +1,16 @@
 ExiftoolGui Portable?
 
+Starting with version V6.3.0. a new program parameters is available: '/IniPath=<path>'
+With this parameter you specify the location of the ini file. If it is specified, then immediately after starting GUI, the INI file will be saved. 
+If it fails an error message is displayed and the program halted. To prevent that changes made by the user would not be saved.
+<path> can be:
+- A fully qualified path: eg: "c:\a dir with spaces"
+- %P The directory from where the program was loaded.
+- %W The working directory.
+- %T a Temp directory.
+
+Note: Also specifying /DontSaveIni has no effect!
+
 Bogdan Hrastnik stated in his documentation on https://exiftool.org/gui/ Bullet 2. ExifToolGui.
 
 "GUI doesn't write anything into registry file or elsewhere. After first usage, all settings are written into "ExifToolGUI.ini" file, which is automatically

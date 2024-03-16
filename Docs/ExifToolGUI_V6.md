@@ -81,6 +81,7 @@ Basic idea behind GUI is, to keep it <u>simple!</u> Thus, only those options are
 <li>Português</li>
 </ul>
 <li>Starting with V6.3.0 an installer is provided.</li>
+<li>Support for Exiftool features <u>geolocate</u> and <u>-api geolocation</u>.</li>
 </ul>
 <a href="changelog.txt"><b>See changelog.txt for a complete list of issues.</b></a>
 
@@ -89,7 +90,7 @@ Basic idea behind GUI is, to keep it <u>simple!</u> Thus, only those options are
 ExiftoolGUI should run on Windows 7, 8 32-64bit. However, it is highly recommended to use Windows 10 or 11 when you plan to use the OSM map, or GEOcoding.<br>
 It will not run on Windows XP or earlier!<br>
 
-You can use the installer to install ExifToolGui and all required components. If you do you can skip the requirements. <br>
+If you use the installer to install ExifToolGui that should take care of all required components, and you can skip this section.<br>
 
 The portable version is still available, and will be continued to be released. Read the following requirements. 
 
@@ -181,12 +182,7 @@ That's all you need. And when a new ExifTool or GUI version is available, you on
 <li><a href="#m_exp_imp">Export/Import</a> menu</li>
 <li><a href="#m_modify">Modify</a> menu</li>
 <li><a href="#m_various">Various</a> menu</li>
-<li><font class="blue">Help</font></li>
-<ul>
-<li><u><font class="blue"> Online Documentation</font></u> Opens this document</li>
-<li><u><font class="blue"> Check versions</font></u> Check for updated versions of GUI and ExifTool </li>
-<li><u><font class="blue"> About</font></u></li>
-</ul>
+<li><a href="#m_help">Help</a> menu</li>
 <br>
 <b>Panels:</b><br>
 <li><a href="#p_filelist">Filelist</a> panel</li>
@@ -197,9 +193,6 @@ That's all you need. And when a new ExifTool or GUI version is available, you on
 <a href="#final">Final words</a><br><br>
 
 <h2><a name="m_program">Program menu</a></h2>
-<h3>About</h3>
--Displays ExifTool and GUI versions and links.<br>
-<br>
 <h3>Preferences</h3>
 <img src="ExifToolGUI_V6_files/preferences_general.jpg"><br>
 <br><br>
@@ -264,7 +257,8 @@ In the next dialog keep only 'Thumbnail' checked, and click on OK.</li>
 <br><br>
 <b><u>GeoCoding</u></b> settings tab<br>
 <br>
-Here you can setup the GeoCoding parameters. Typically you only have to check <b>Enable GeoCoding</b><br>
+Here you can setup the GeoCoding parameters.<br>
+Getting started: <a href="Readme GeoCoding Getting started.txt"><b>Readme GeoCoding Getting started.txt</b></a><br>
 For an in-depth explanation see <a href="Readme GeoCoding.txt"><b>Readme GeoCoding.txt</b></a>
 <br><br>
 
@@ -475,6 +469,8 @@ next GUI start. Remaining options settings however, are only temporary
 
 <h3>API WindowsWideFile (requires Exiftool v12.66)</h3> -Force the use of wide-character Windows I/O functions when the CharsetFileName option is used.<br>
 
+<h3>API LargeFileSupport</h3> -To process files larger than 2GB. Video's for example.<br>
+
 <h3>Custom options</h3> -You can specify additonal options that exiftool should use. Expert option. Normally used with the Log Window.<br>
 Possible use case is the option <b>-htmldump</b> and use the log window to catch the output. Or <b>-API LargeFileSupport=1</b> to support large files.<br>
 <br>
@@ -675,7 +671,8 @@ For every selected file a lookup is done using the selected provider. To reduce 
 In the dialog you can customize how the fields are filled.<br><br>
 <img src="ExifToolGUI_V6_files/updatelocationfromgps.jpg"><br><br>
 Notes:<br>
-- Due to the nature of this function, it uses an external webservice, there are some 'point of failures'.<br>
+- If you use Gecode provider 'Exiftool geolocation' no internet connection is required.<br>
+- The other providers use an external webservice, and thus there are some 'point of failures'.<br>
 <ul>
 <li>You need a reliable internet connection.</li>
 <li>The external webservice could be (temporarily) out of service for various reasons.</li>
@@ -704,6 +701,17 @@ In addition you have more control over how the function is performed.<br><br>
 <img src="ExifToolGUI_V6_files/jpeglosslessrotate.jpg"><br><br>
 <a href="Readme Lossless rotate_Import_Export previews.txt">See also Readme Lossless rotate_Import_Export previews.txt</a>
 <br>
+<br>
+
+<h2><a name="m_help">Help menu</a></h2>
+<h3>Online Documentation</h3>
+-Opens this document<br>
+
+<h3>Check versions</h3>
+-Check for updated versions of GUI and ExifTool <br>
+
+<h3>About</h3>
+-Displays ExifTool and GUI versions and links.<br>
 <br>
 
 <h2><a name="p_filelist">Filelist panel</a></h2>
@@ -902,7 +910,7 @@ Here's how to edit metadata in <font class="blue">Workspace</font>:
 <br>
 If you've changed your mind and don't wish to change particular tag,
 then select that tag, right-click (to show pop-up menu) and choose <font class="blue">Undo selected editing</font> -this is usefull in cases when many tags are allready edited and not saved.<br>
-If you've changed your mind completely (don't wish to apply any changes), then just click on <font class="blue">Workspace</font> button and changes will dissapear.<br>
+If you've changed your mind completely (don't wish to apply any changes), then just click on <font class="blue">Workspace</font> button and changes will disappear.<br>
 <u>Note:</u> Changes are lost in most cases when you click elsewhere outside Metadata view area.<br>
 <br>
 <li>When you're finished with editing metadata values, click on <font class="blue">Save</font> button.</li>

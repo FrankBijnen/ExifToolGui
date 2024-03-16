@@ -26,7 +26,8 @@ type
     procedure ExecuteCommandExif(Verb: string; var Handled: boolean);
     property OnBeforeContextMenu: TNotifyEvent read FOnBeforeContextMenu write FOnBeforeContextMenu;
     property OnAfterContextMenu: TNotifyEvent read FOnAfterContextMenu write FOnAfterContextMenu;
-  end;
+    property OnCustomDrawItem;
+ end;
 
 implementation
 

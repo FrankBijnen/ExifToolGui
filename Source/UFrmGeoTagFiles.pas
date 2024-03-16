@@ -77,7 +77,8 @@ begin
     APlace := GetPlaceOfCoords(Lat, Lon, GeoSettings.GetPlaceProvider);
     if not Assigned(APlace) then
       exit;
-    ValLocation.Strings.AddPair('Country', APlace.CountryLocation);
+    ValLocation.Strings.AddPair('CountryCode', APlace.CountryCode);
+    ValLocation.Strings.AddPair('CountryName', APlace.CountryName);
     ValLocation.Strings.AddPair('Province', APlace.Province);
     ValLocation.Strings.AddPair('City', APlace.City);
     ValLocation.Strings.AddPair('Location', '');
@@ -143,7 +144,14 @@ begin
       TGeoTagMode.gtmLocation,
       TGeoTagMode.gtmCoordinatesLocation:
       begin
-        Etcmd := Etcmd + CRLF + '-xmp:LocationShownCountryName=' + ValLocation.Values['Country'];
+// Compatibility with exiftool -geolocation
+        Etcmd := Etcmd + CRLF + '-xmp:CountryCode=' + ValLocation.Values['CountryCode'];
+        Etcmd := Etcmd + CRLF + '-xmp:Country=' + ValLocation.Values['CountryName'];
+        Etcmd := Etcmd + CRLF + '-xmp:State=' + ValLocation.Values['Province'];
+        Etcmd := Etcmd + CRLF + '-xmp:City=' + ValLocation.Values['City'];
+//
+        Etcmd := Etcmd + CRLF + '-xmp:LocationShownCountryCode=' + ValLocation.Values['CountryCode'];
+        Etcmd := Etcmd + CRLF + '-xmp:LocationShownCountryName=' + ValLocation.Values['CountryName'];
         Etcmd := Etcmd + CRLF + '-xmp:LocationShownProvinceState=' + ValLocation.Values['Province'];
         Etcmd := Etcmd + CRLF + '-xmp:LocationShownCity=' + ValLocation.Values['City'];
         Etcmd := Etcmd + CRLF + '-xmp:LocationShownSublocation=' + ValLocation.Values['Location'];
