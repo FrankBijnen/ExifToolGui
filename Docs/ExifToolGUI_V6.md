@@ -11,8 +11,6 @@
 <tbody><tr><td class="A4">
 <h1>ExifToolGUI for Windows v6.xx</h1><hr>
 <br>
-<h2>Warning: This documentation is under construction for V6.3.0. You may see things not yet available in your version.</h2>
-<br>
 <h2>Introduction</h2>
 In the summer of 2023 I decided to revive the ExifToolGui project initally created by <b>Bogdan Hrastnik</b>.
 This revival resulted in <b>Version 6</b><br>
