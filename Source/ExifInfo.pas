@@ -911,6 +911,7 @@ var
   APPmark, APPsize: word;
   APPmarkNext: int64;
   Tx: string[15];
+  XMPType: array[0..2] of AnsiChar; // xap, or xmp
   I: integer;
 begin
   repeat
@@ -940,9 +941,18 @@ begin
         end
         else if Tx = 'http' then
         begin
-          FotoF.Seek(23, TSeekOrigin.soCurrent); // skip '://ns.adobe.com/xap/...'
-          XMPoffset := FotoF.Position; // point to '<?xpacket...'
-          XMPsize := APPsize - 31;
+// Only XMP type 'xap' wanted. xmp has no usable info for us. (Google Pixel 7 Pro for example)
+//http://ns.adobe.com/xap/1.0/#0
+//http://ns.adobe.com/xmp/extension/
+          FotoF.Seek(14, TSeekOrigin.soCurrent); // Skip to xap or xmp
+          FillChar(XMPType, Sizeof(XMPType), chr(0));
+          FotoF.Read(XMPType[0], 3);
+          FotoF.Seek(6, TSeekOrigin.soCurrent);  // 14 + 3 + 6 = 23 as original code.
+          if (XMPType = 'xap') then
+          begin
+            XMPoffset := FotoF.Position;         // Point to '<?xpacket...'
+            XMPsize := APPsize - 31;
+          end;
         end;
       end;
 
