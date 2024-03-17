@@ -1124,38 +1124,38 @@ var
   end;
 
 begin
-  XMPdata := '';
   FotoF.Seek(XMPoffset, TSeekOrigin.soBeginning);
   Setlength(Bytes, XMPsize);
   FotoF.Read(Bytes[0], XMPsize);
   XMPdata := '';
   if (Encoding.GetCharCount(Bytes) > 0) then
-    XMPdata := Encoding.GetString(Bytes);
-  XMPdata := StringReplace(XMPdata, '&amp;', '&', [rfReplaceAll]);
-  XMPdata := StringReplace(XMPdata, '&quot;', '"', [rfReplaceAll]);
-  XMPdata := StringReplace(XMPdata, '&#39;', '''', [rfReplaceAll]);
-  XMPdata := StringReplace(XMPdata, '&lt;', '<', [rfReplaceAll]);
-  XMPdata := StringReplace(XMPdata, '&gt;', '>', [rfReplaceAll]);
-
-  with Foto.XMP do
   begin
-    Supported := true;
-    Creator := GetAltData('<dc:creator>');
-    Rights := GetAltData('<dc:rights>');
-    Date := GetAltData('<dc:date>');
-    PhotoType := GetBagData('<dc:type>');
-    Title := GetAltData('<dc:title>');
-    Event := GetAltData('<Iptc4xmpExt:Event>');
-    CountryCodeShown := GetStructTag('<Iptc4xmpExt:LocationShown>', '<Iptc4xmpExt:CountryCode>');
-    CountryNameShown := GetStructTag('<Iptc4xmpExt:LocationShown>', '<Iptc4xmpExt:CountryName>');
-    ProvinceShown := GetStructTag('<Iptc4xmpExt:LocationShown>', '<Iptc4xmpExt:ProvinceState>');
-    CityShown := GetStructTag('<Iptc4xmpExt:LocationShown>', '<Iptc4xmpExt:City>');
-    LocationShown := GetStructTag('<Iptc4xmpExt:LocationShown>', '<Iptc4xmpExt:Sublocation>');
-    PersonInImage := GetBagData('<Iptc4xmpExt:PersonInImage>');
-    Keywords := GetBagData('<dc:subject>');
-    Rating := GetTagData('<xmp:Rating>');
-    if Rating = '' then
-      Rating := GetTagData('<xap:Rating>'); // stupid DNG uses that
+    XMPdata := Encoding.GetString(Bytes);
+    XMPdata := StringReplace(XMPdata, '&amp;', '&', [rfReplaceAll]);
+    XMPdata := StringReplace(XMPdata, '&quot;', '"', [rfReplaceAll]);
+    XMPdata := StringReplace(XMPdata, '&#39;', '''', [rfReplaceAll]);
+    XMPdata := StringReplace(XMPdata, '&lt;', '<', [rfReplaceAll]);
+    XMPdata := StringReplace(XMPdata, '&gt;', '>', [rfReplaceAll]);
+    with Foto.XMP do
+    begin
+      Supported := true;
+      Creator := GetAltData('<dc:creator>');
+      Rights := GetAltData('<dc:rights>');
+      Date := GetAltData('<dc:date>');
+      PhotoType := GetBagData('<dc:type>');
+      Title := GetAltData('<dc:title>');
+      Event := GetAltData('<Iptc4xmpExt:Event>');
+      CountryCodeShown := GetStructTag('<Iptc4xmpExt:LocationShown>', '<Iptc4xmpExt:CountryCode>');
+      CountryNameShown := GetStructTag('<Iptc4xmpExt:LocationShown>', '<Iptc4xmpExt:CountryName>');
+      ProvinceShown := GetStructTag('<Iptc4xmpExt:LocationShown>', '<Iptc4xmpExt:ProvinceState>');
+      CityShown := GetStructTag('<Iptc4xmpExt:LocationShown>', '<Iptc4xmpExt:City>');
+      LocationShown := GetStructTag('<Iptc4xmpExt:LocationShown>', '<Iptc4xmpExt:Sublocation>');
+      PersonInImage := GetBagData('<Iptc4xmpExt:PersonInImage>');
+      Keywords := GetBagData('<dc:subject>');
+      Rating := GetTagData('<xmp:Rating>');
+      if Rating = '' then
+        Rating := GetTagData('<xap:Rating>'); // stupid DNG uses that
+    end;
   end;
   XMPdata := '';
 end;
