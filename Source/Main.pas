@@ -2923,7 +2923,8 @@ begin
               else
                 Details.Add('');
               Details.Add(ExifIFD.ExposureProgram);
-              if IFD0.Orientation > 0 then
+              if (IFD0.Supported) and
+                 (IFD0.Orientation > 0) then
               begin
                 if (IFD0.Orientation and 1) = 1 then
                   Details.Add(StrHor)
@@ -2944,7 +2945,8 @@ begin
         2:
           begin
             GetMetadata(AFolder.PathName, true, false, true, false);
-            if (Foto.ExifIFD.Supported) then
+            if (Foto.ExifIFD.Supported) and
+               (Foto.XMP.Supported) then
             begin
               Details.Add(ExifIFD.DateTimeOriginal);
               if GPS.Latitude <> '' then
@@ -3000,7 +3002,8 @@ begin
         3:
           begin
             GetMetadata(AFolder.PathName, true, false, false, false);
-            if (Foto.IFD0.Supported) then
+            if (Foto.IFD0.Supported) and
+               (Foto.XMP.Supported) then
             begin
               Details.Add(IFD0.Artist);
               Details.Add(Xmp.Rating);
