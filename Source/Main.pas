@@ -1950,12 +1950,7 @@ begin
     try
       if (GeoSettings.GetPlaceProvider = gpExifTool) then
       begin
-        ETCmd := '-geolocate<GPSPosition' + CRLF +
-                 '-api' + CRLF + 'geolocation' + CRLF +
-                 '-xmp:LocationShownCountryCode<GeolocationCountryCode' + CRLF +
-                 '-xmp:LocationShownCountryName<GeolocationCountry' + CRLF +
-                 '-xmp:LocationShownProvinceState<GeolocationRegion' + CRLF +
-                 '-xmp:LocationShownCity<GeolocationCity' + CRLF;
+        ETCmd := '-XMP-photoshop:XMP-iptcCore:XMP-iptcExt:geolocate<GPSPosition' + CRLF;
         ET_OpenExec(ETcmd, GetSelectedFiles);
       end
       else
