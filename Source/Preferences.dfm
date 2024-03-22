@@ -933,9 +933,7 @@ object FPreferences: TFPreferences
         Top = 253
         Width = 565
         Height = 17
-        Caption = 
-          '-Filelist: Enable '#39'Camera Settings'#39', '#39'Location info'#39' and '#39'About ' +
-          'photo'#39' for all file types. (Slower)'
+        Caption = '-Filelist: Use ExifTool for unsupported file types. (Slower)'
         TabOrder = 10
       end
       object GrpConfig: TGroupBox

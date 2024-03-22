@@ -2,7 +2,7 @@
 <xlat>
   <meta>
     <version>3</version>
-    <created>2024-03-16T19:17:04.389+01:00</created>
+    <created>2024-03-22T16:13:28.261+01:00</created>
     <tool>amTranslationManager</tool>
     <toolversion>2.0.8628.33873</toolversion>
   </meta>
@@ -12,15 +12,15 @@
     <sorted>True</sorted>
     <omitnewstate>True</omitnewstate>
   </options>
-  <project sourcefile=".\ExifToolGUI.exe" stringsymbolfile=".\ExifToolGUI.drc" language="en-US" properties="634">
+  <project sourcefile=".\ExifToolGUI.exe" stringsymbolfile=".\ExifToolGUI.drc" language="en-US" properties="635">
     <targetlanguages>
+      <language language="es" translated="594"/>
+      <language language="fr" translated="583"/>
       <language language="pt" translated="582"/>
       <language language="en" translated="1"/>
       <language language="de" translated="638"/>
-      <language language="fr" translated="582"/>
-      <language language="es" translated="594"/>
-      <language language="nl" translated="642"/>
       <language language="it" translated="599"/>
+      <language language="nl" translated="642"/>
     </targetlanguages>
     <modules>
       <module name="resourcestrings" type="strings" properties="167">
@@ -8998,7 +8998,7 @@
                   <translation language="nl">Sleutel</translation>
                   <translation language="de" status="proposed">Schlüssel</translation>
                   <translation language="es" status="proposed">Clave</translation>
-                  <translation language="fr" status="proposed">*OUI</translation>
+                  <translation language="fr" status="proposed">Clé</translation>
                   <translation language="pt" status="proposed">Chave</translation>
                   <translation language="it" status="proposed">Chiave di lettura</translation>
                 </translations>
@@ -9790,7 +9790,7 @@
                   <translation language="nl">Waarde</translation>
                   <translation language="de" status="proposed">Wert</translation>
                   <translation language="es" status="proposed">Valor</translation>
-                  <translation language="fr" status="proposed">Clé</translation>
+                  <translation language="fr" status="proposed">Valeur</translation>
                   <translation language="pt" status="proposed">Valor</translation>
                   <translation language="it" status="proposed">Valore</translation>
                 </translations>
@@ -11980,7 +11980,7 @@
           </item>
         </items>
       </module>
-      <module name="TFGEOSETUP" type="form" properties="12">
+      <module name="TFGEOSETUP" type="form" properties="13">
         <items>
           <item name="FGeoSetup" type="TFGeoSetup">
             <properties>
@@ -12075,7 +12075,20 @@
               </property>
             </properties>
           </item>
-          <item name="FGeoSetup.PctMain.TabSetup.CmbOverPasslang" type="TComboBox">
+          <item name="FGeoSetup.PctMain.TabSetup.CmbLang" type="TComboBox">
+            <properties>
+              <property name="Items.Strings[0]">
+                <value>local</value>
+              </property>
+              <property name="Items.Strings[1]">
+                <value>default</value>
+              </property>
+              <property name="Text">
+                <value>CmbLang</value>
+              </property>
+            </properties>
+          </item>
+          <item name="FGeoSetup.PctMain.TabSetup.CmbOverPasslang" type="TComboBox" state="unused">
             <properties>
               <property name="Items.Strings[0]">
                 <value>local</value>
@@ -12417,6 +12430,7 @@
                   <translation language="es" status="proposed">Configurar Geo</translation>
                   <translation language="it" status="proposed">Impostazione Geo</translation>
                   <translation language="pt" status="proposed">Configuração Geo</translation>
+                  <translation language="fr" status="proposed">Configurer géo</translation>
                 </translations>
               </property>
             </properties>
@@ -12518,9 +12532,9 @@
                   <translation language="nl">Stel Geo in</translation>
                   <translation language="de" status="proposed">Geo einstell.</translation>
                   <translation language="es" status="proposed">Configurar Geo</translation>
-                  <translation language="fr" status="proposed">Configuration des données géo</translation>
-                  <translation language="pt" status="proposed">Configurar dados geográficos</translation>
-                  <translation language="it" status="proposed">Impostazione dei dati di geo</translation>
+                  <translation language="fr" status="proposed">Configurer géo</translation>
+                  <translation language="pt" status="proposed">Configurar Geo</translation>
+                  <translation language="it" status="proposed">Configurare geo</translation>
                 </translations>
               </property>
             </properties>
@@ -13316,7 +13330,7 @@
                   <translation language="nl">Ieder</translation>
                   <translation language="de" status="proposed">Jeder</translation>
                   <translation language="es" status="proposed">Todo</translation>
-                  <translation language="fr" status="proposed">N'importe lequel</translation>
+                  <translation language="fr" status="proposed">Tous</translation>
                   <translation language="pt" status="proposed">Qualquer</translation>
                   <translation language="it" status="proposed">Qualsiasi</translation>
                 </translations>
@@ -13408,7 +13422,7 @@
                   <translation language="nl">Ververs</translation>
                   <translation language="de" status="proposed">Aktualisieren</translation>
                   <translation language="es" status="proposed">Actualizar</translation>
-                  <translation language="fr" status="proposed">Rafraîchissement</translation>
+                  <translation language="fr" status="proposed">Rafraîchir</translation>
                   <translation language="pt" status="proposed">Atualizar</translation>
                   <translation language="it" status="proposed">Aggiornamento</translation>
                 </translations>
@@ -14252,13 +14266,13 @@
               <property name="Caption">
                 <value>Browse</value>
                 <translations>
-                  <translation language="de">Verzeichnis</translation>
-                  <translation language="fr" status="proposed">Dossiers</translation>
-                  <translation language="es">Carpetas</translation>
-                  <translation language="nl">Mappen</translation>
                   <translation language="pt" status="proposed">Navegar</translation>
                   <translation language="it" status="proposed">Sfogliare</translation>
+                  <translation language="es">Carpetas</translation>
+                  <translation language="nl">Mappen</translation>
                   <translation language="en" status="proposed">Folders</translation>
+                  <translation language="fr" status="proposed">Dossiers</translation>
+                  <translation language="de">Verzeichnis</translation>
                 </translations>
               </property>
             </properties>
@@ -15003,7 +15017,7 @@
                   <translation language="nl">E&amp;xif: Datum gelijk...</translation>
                   <translation language="de" status="proposed">E&amp;xif: DateTime abgleichen...</translation>
                   <translation language="es" status="proposed">E&amp;xif ecualizar Fecha y Hora...</translation>
-                  <translation language="fr" status="proposed">E&amp;xif : Ēgalisation de la date...</translation>
+                  <translation language="fr" status="proposed">E&amp;xif : Égalisation de la date...</translation>
                   <translation language="it" status="proposed">E&amp;xif: DateTime equalizzare...</translation>
                   <translation language="pt" status="proposed">E&amp;xif: DateTime equalize...</translation>
                 </translations>
@@ -15172,7 +15186,7 @@
                 <value>&amp;Check Versions</value>
                 <translations>
                   <translation language="nl" status="proposed">&amp;Controleer Versies</translation>
-                  <translation language="fr" status="proposed">&amp;Vérifier Les Versions</translation>
+                  <translation language="fr" status="proposed">&amp;Vérifier les versions</translation>
                   <translation language="de" status="proposed">&amp;Versionen Prüfen</translation>
                   <translation language="it" status="proposed">&amp;Controllare Le Versioni</translation>
                   <translation language="pt" status="proposed">&amp;Verificar versões</translation>
@@ -16681,14 +16695,14 @@
           <item name="FPreferences.AdvPageControl1.AdvTabOther.CheckBox11" type="TCheckBox">
             <properties>
               <property name="Caption">
-                <value>-Filelist: Enable 'Camera Settings', 'Location info' and 'About photo' for all file types. (Slower)</value>
+                <value>-Filelist: Use ExifTool for unsupported file types. (Slower)</value>
                 <translations>
-                  <translation language="nl">-Bestandslijst: Schakel 'Camera Settings', 'Location info' en 'About photo'voor alle bestandstypes in. (Tragerr)</translation>
-                  <translation language="de" status="proposed">-Dateiliste: Aktivieren "Kamera", "Standort und "Über das Foto" für alle Dateitypen. (Langsamer)</translation>
-                  <translation language="es" status="proposed">-Lista de archivos: Habilitar 'Ajustes de cámara', 'Información de ubicación' y 'Acerca de la foto' para todos los tipos de archivo. (Más lento)</translation>
-                  <translation language="fr" status="proposed">-Liste de fichiers : Activer "Paramètres de l'appareil photo", "Informations sur l'emplacement" et "À propos de la photo" pour tous les types de fichiers. (Plus lent)</translation>
-                  <translation language="pt" status="proposed">-Lista de arquivos: Ative "Configurações da câmera", "Informações de localização" e "Sobre a foto" para todos os tipos de arquivo. (Mais lento)</translation>
-                  <translation language="it" status="proposed">-Elenco file: Abilita "Impostazioni fotocamera", "Informazioni sulla posizione" e "Informazioni sulla foto" per tutti i tipi di file. (Più lento)</translation>
+                  <translation language="es" status="proposed">-Lista de archivos: Usar ExifTool para tipos de archivo no soportados. (Más lento)</translation>
+                  <translation language="fr" status="proposed">-Liste de fichiers : Utiliser ExifTool pour les types de fichiers non pris en charge. (Plus lent)</translation>
+                  <translation language="pt" status="proposed">-Lista de arquivos: Usar o ExifTool para tipos de arquivos não suportados. (Mais lento)</translation>
+                  <translation language="nl" status="proposed">-Bestandslijst: Gebruik ExifTool voor niet ondersteunde bestandstypes. (Trager)</translation>
+                  <translation language="de" status="proposed">-Dateiliste: ExifTool für nicht unterstützte Dateitypen verwenden. (Langsamer)</translation>
+                  <translation language="it" status="proposed">-Elenco file: Usa ExifTool per i tipi di file non supportati. (Più lento)</translation>
                 </translations>
               </property>
             </properties>
@@ -16747,7 +16761,7 @@
                   <translation language="de" status="proposed">-Dateiliste: Breadcrumb (Adressleiste) in Dateiliste anzeigen</translation>
                   <translation language="es" status="proposed">-Lista de archivos: Mostrar la barra de direcciones en la lista de archivos</translation>
                   <translation language="fr" status="proposed">-Liste de fichiers : Afficher le fil d'Ariane (barre d'adresse) dans la liste de fichiers</translation>
-                  <translation language="pt" status="proposed">-Filelist (Lista de arquivos): Mostrar Breadcrumb (barra de endereços) na lista de arquivos</translation>
+                  <translation language="pt" status="proposed">-Lista de arquivos: Mostrar Breadcrumb (barra de endereços) na lista de arquivos</translation>
                   <translation language="it" status="proposed">-Elenco file: Mostra il Breadcrumb (barra degli indirizzi) nell'elenco dei file</translation>
                 </translations>
               </property>
@@ -16761,8 +16775,8 @@
                   <translation language="nl">-Bestandslijst: Toon verborgen bestanden en mappen in Bestandslijst (Beheerder vereist)</translation>
                   <translation language="de" status="proposed">-Dateiliste: Versteckte Ordner und Dateien in der Dateiliste anzeigen (Admin erforderlich)</translation>
                   <translation language="es" status="proposed">-Lista de archivos: Mostrar carpetas y archivos ocultos en la lista de archivos (requiere administración)</translation>
-                  <translation language="fr" status="proposed">Liste de fichiers : afficher le fil d'Ariane (barre d'adresse) dans la liste de fichiers - Liste de fichiers : Afficher les dossiers et fichiers cachés dans la liste de fichiers (Admin requis)</translation>
-                  <translation language="pt" status="proposed">-Filelist (Lista de arquivos): Mostrar pastas e arquivos ocultos na lista de arquivos (requer administração)</translation>
+                  <translation language="fr" status="proposed">- Liste de fichiers : Afficher les dossiers et fichiers cachés dans la liste de fichiers (Admin requis)</translation>
+                  <translation language="pt" status="proposed">-Lista de arquivos: Mostrar pastas e arquivos ocultos na lista de arquivos (requer administração)</translation>
                   <translation language="it" status="proposed">-Elenco file: Mostra cartelle e file nascosti nell'elenco dei file (è necessario l'amministratore)</translation>
                 </translations>
               </property>
@@ -18118,6 +18132,34 @@
           </item>
         </items>
       </module>
+      <module name="BBABORT" type="invalid" state="unused" status="skip" properties="0"/>
+      <module name="BBABORT_DISABLED" type="invalid" state="unused" status="skip" properties="0"/>
+      <module name="BBALL" type="invalid" state="unused" status="skip" properties="0"/>
+      <module name="BBALL_DISABLED" type="invalid" state="unused" status="skip" properties="0"/>
+      <module name="BBCANCEL" type="invalid" state="unused" status="skip" properties="0"/>
+      <module name="BBCANCEL_DISABLED" type="invalid" state="unused" status="skip" properties="0"/>
+      <module name="BBCLOSE" type="invalid" state="unused" status="skip" properties="0"/>
+      <module name="BBCLOSE_DISABLED" type="invalid" state="unused" status="skip" properties="0"/>
+      <module name="BBHELP" type="invalid" state="unused" status="skip" properties="0"/>
+      <module name="BBHELP_DISABLED" type="invalid" state="unused" status="skip" properties="0"/>
+      <module name="BBIGNORE" type="invalid" state="unused" status="skip" properties="0"/>
+      <module name="BBIGNORE_DISABLED" type="invalid" state="unused" status="skip" properties="0"/>
+      <module name="BBNO" type="invalid" state="unused" status="skip" properties="0"/>
+      <module name="BBNO_DISABLED" type="invalid" state="unused" status="skip" properties="0"/>
+      <module name="BBOK" type="invalid" state="unused" status="skip" properties="0"/>
+      <module name="BBOK_DISABLED" type="invalid" state="unused" status="skip" properties="0"/>
+      <module name="BBRETRY" type="invalid" state="unused" status="skip" properties="0"/>
+      <module name="BBRETRY_DISABLED" type="invalid" state="unused" status="skip" properties="0"/>
+      <module name="BBYES" type="invalid" state="unused" status="skip" properties="0"/>
+      <module name="BBYES_DISABLED" type="invalid" state="unused" status="skip" properties="0"/>
+      <module name="DVCLAL" type="invalid" state="unused" status="skip" properties="0"/>
+      <module name="MSG_ERROR" type="invalid" state="unused" status="skip" properties="0"/>
+      <module name="MSG_INFO" type="invalid" state="unused" status="skip" properties="0"/>
+      <module name="MSG_WARNING" type="invalid" state="unused" status="skip" properties="0"/>
+      <module name="PACKAGEINFO" type="invalid" state="unused" status="skip" properties="0"/>
+      <module name="PLATFORMTARGETS" type="invalid" state="unused" status="skip" properties="0"/>
+      <module name="TEELCDFONT" type="invalid" state="unused" status="skip" properties="0"/>
+      <module name="TEELEDFONT" type="invalid" state="unused" status="skip" properties="0"/>
     </modules>
   </project>
 </xlat>

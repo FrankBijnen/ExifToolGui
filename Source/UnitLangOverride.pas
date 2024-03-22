@@ -34,16 +34,15 @@ end;
 
 function LoadNewResourceModule(Locale: string): HINST;
 begin
-  // First search for Basename
-  result := LoadLibraryEx(PChar(ChangeFileExt(Application.Title, '.' + Locale)),
+  // First search for exename
+  result := LoadLibraryEx(PChar(ChangeFileExt(Application.ExeName, '.' + Locale)),
                           0,
                           LOAD_LIBRARY_AS_DATAFILE);
-  // Not found, search for exename
+  // Not found, search for Basename
   if (result = 0) then
-    result := LoadLibraryEx(PChar(ChangeFileExt(Application.ExeName, '.' + Locale)),
+    result := LoadLibraryEx(PChar(ChangeFileExt(Application.Title, '.' + Locale)),
                             0,
                             LOAD_LIBRARY_AS_DATAFILE);
-
   if result <> 0 then
     result := SetResourceHInstance(result);
 end;
