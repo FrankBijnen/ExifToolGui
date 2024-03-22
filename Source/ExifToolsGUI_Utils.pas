@@ -1096,6 +1096,7 @@ begin
                                       PsidAdministrators) then
         exit;
       try
+// PtgGroups is defined as Array[0..0] need $R- or you will get a range check!
         for Indx := 0 to PtgGroups.GroupCount -1 do
           if EqualSid(PsidAdministrators, PtgGroups.Groups[Indx].Sid) then
             exit(true);  // Found. The try finally  blocks ensure freeing resources allocated.
