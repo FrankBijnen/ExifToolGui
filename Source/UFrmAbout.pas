@@ -16,6 +16,9 @@ type
     LblExifTool: TLabel;
     LblScreen: TLabel;
     LblExifToolHome: TLabel;
+    LblLicense: TLabel;
+    LblGNUGPL: TLabel;
+    GrpLicense: TGroupBox;
     procedure FormShow(Sender: TObject);
     procedure LblOpenUrl(Sender: TObject);
     procedure LblUrlEnter(Sender: TObject);
@@ -53,6 +56,8 @@ begin
   LblSource.Caption       := ReadResourceId(ETD_Home_Gui);
   LblExifToolHome.Caption := ReadResourceId(ETD_Home_PH);
   LblExifTool.Caption     := ReadResourceId(ETD_Credits_ET);
+  LblGNUGPL.Caption       := ReadResourceId(ETD_GNUGPL);
+
   if ExecET('-ver', '', '', Output) then
     LblExifTool.Caption := LblExifTool.Caption + ' ' + Output
   else

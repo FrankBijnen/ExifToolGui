@@ -74,6 +74,7 @@ PrivilegesRequiredOverridesAllowed=dialog
 SetupIconFile=ExifToolGUI.ico
 WizardSmallImageFile=ExifToolGUI.Bmp
 DisableProgramGroupPage=yes
+LicenseFile=License.rtf
 ; Will be overriden
 InfoAfterFile=InfoComplete.rtf
 

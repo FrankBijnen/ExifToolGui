@@ -4,8 +4,8 @@ object FrmAbout: TFrmAbout
   BorderIcons = []
   BorderStyle = bsToolWindow
   Caption = 'About'
-  ClientHeight = 231
-  ClientWidth = 411
+  ClientHeight = 272
+  ClientWidth = 413
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -63,7 +63,7 @@ object FrmAbout: TFrmAbout
   end
   object LblSource: TLabel
     Left = 45
-    Top = 76
+    Top = 82
     Width = 360
     Height = 18
     AutoSize = False
@@ -81,7 +81,7 @@ object FrmAbout: TFrmAbout
   end
   object LblExifTool: TLabel
     Left = 45
-    Top = 114
+    Top = 103
     Width = 360
     Height = 18
     AutoSize = False
@@ -89,7 +89,7 @@ object FrmAbout: TFrmAbout
   end
   object LblScreen: TLabel
     Left = 45
-    Top = 177
+    Top = 220
     Width = 360
     Height = 22
     AutoSize = False
@@ -97,7 +97,7 @@ object FrmAbout: TFrmAbout
   end
   object LblExifToolHome: TLabel
     Left = 45
-    Top = 133
+    Top = 125
     Width = 360
     Height = 18
     AutoSize = False
@@ -113,20 +113,61 @@ object FrmAbout: TFrmAbout
     OnMouseEnter = LblUrlEnter
     OnMouseLeave = LblUrlLeave
   end
+  object GrpLicense: TGroupBox
+    Left = 45
+    Top = 151
+    Width = 360
+    Height = 63
+    Caption = 'Licensed under'
+    TabOrder = 1
+    object LblLicense: TLabel
+      Left = 9
+      Top = 19
+      Width = 350
+      Height = 25
+      AutoSize = False
+      Caption = 'GNU General Public License v3.0'
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clWindowText
+      Font.Height = -16
+      Font.Name = 'Segoe UI'
+      Font.Style = []
+      ParentFont = False
+      WordWrap = True
+    end
+    object LblGNUGPL: TLabel
+      Left = 9
+      Top = 44
+      Width = 350
+      Height = 14
+      AutoSize = False
+      Caption = 'LblGNUGPL'
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clWindowText
+      Font.Height = -12
+      Font.Name = 'Segoe UI'
+      Font.Style = []
+      ParentFont = False
+      StyleElements = [seClient, seBorder]
+      OnClick = LblOpenUrl
+      OnMouseEnter = LblUrlEnter
+      OnMouseLeave = LblUrlLeave
+    end
+  end
   object Panel1: TPanel
     Left = 0
-    Top = 202
-    Width = 411
+    Top = 243
+    Width = 413
     Height = 29
     Align = alBottom
     TabOrder = 0
-    ExplicitTop = 211
-    ExplicitWidth = 398
+    ExplicitTop = 231
+    ExplicitWidth = 405
     DesignSize = (
-      411
+      413
       29)
     object BtnOk: TBitBtn
-      Left = 330
+      Left = 308
       Top = 2
       Width = 75
       Height = 25
@@ -134,6 +175,7 @@ object FrmAbout: TFrmAbout
       Kind = bkClose
       NumGlyphs = 2
       TabOrder = 0
+      ExplicitLeft = 300
     end
   end
 end

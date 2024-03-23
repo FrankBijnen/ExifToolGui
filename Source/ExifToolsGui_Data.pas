@@ -13,6 +13,7 @@ const
 
   ETD_Credits_GUI   = 5;
   ETD_Credits_ET    = 6;
+  ETD_GNUGPL        = 7;
 
   ETD_Home_Gui      = 10;
   ETD_Home_PH       = 11;
