@@ -47,10 +47,10 @@ This is an updated version of the ExifToolGui program created by Bogdan Hrastnik
 
 [Showcase](Docs/ShowCase/ShowCase.md)<br>
 
-<h4>Legal, Copyright etc.</h4>
+<h4>GNU General Public License v3.0</h4>
 
-This is a continuation of the project started by Bogdan Hrastnik. He did not mention any License, and or Copyrights. Likewise I will not. 
-I have used some open source components, you can find their legal info in the corresponding subdirectories.
+Updated license statement March 23, 2024 <br>
 
+[License Statement](LICENSE)
 
 Frank
