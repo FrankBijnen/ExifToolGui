@@ -35,6 +35,7 @@ uses
   ExifToolsGUI_OpenPicture in 'ExifToolsGUI_OpenPicture.pas',
   ExifToolsGui_Versions in 'ExifToolsGui_Versions.pas',
   ExifToolsGui_Data in 'ExifToolsGui_Data.pas',
+  ExifToolsGUI_StringList in 'ExifToolsGUI_StringList.pas',
   ExifInfo in 'ExifInfo.pas',
   ExifTool in 'ExifTool.pas',
   ExifTool_PipeStream in 'ExifTool_PipeStream.pas',
@@ -62,8 +63,7 @@ uses
   UFrmStyle in 'UFrmStyle.pas' {FrmStyle},
   UFrmAbout in 'UFrmAbout.pas' {FrmAbout},
   UFrmGenerate in 'UFrmGenerate.pas' {FrmGenerate},
-  UFrmCheckVersions in 'UFrmCheckVersions.pas' {FrmCheckVersions},
-  ExifToolsGUI_StringList in 'ExifToolsGUI_StringList.pas';
+  UFrmCheckVersions in 'UFrmCheckVersions.pas' {FrmCheckVersions};
 
 {$R *.res}
 

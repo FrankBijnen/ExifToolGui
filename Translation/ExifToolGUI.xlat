@@ -2,7 +2,7 @@
 <xlat>
   <meta>
     <version>3</version>
-    <created>2024-03-22T16:13:28.261+01:00</created>
+    <created>2024-03-23T17:10:28.250+01:00</created>
     <tool>amTranslationManager</tool>
     <toolversion>2.0.8628.33873</toolversion>
   </meta>
@@ -12,18 +12,18 @@
     <sorted>True</sorted>
     <omitnewstate>True</omitnewstate>
   </options>
-  <project sourcefile=".\ExifToolGUI.exe" stringsymbolfile=".\ExifToolGUI.drc" language="en-US" properties="635">
+  <project sourcefile=".\ExifToolGUI.exe" stringsymbolfile=".\ExifToolGUI.drc" language="en-US" properties="636">
     <targetlanguages>
-      <language language="es" translated="594"/>
-      <language language="fr" translated="583"/>
-      <language language="pt" translated="582"/>
+      <language language="es" translated="595"/>
+      <language language="fr" translated="584"/>
+      <language language="pt" translated="583"/>
       <language language="en" translated="1"/>
-      <language language="de" translated="638"/>
-      <language language="it" translated="599"/>
-      <language language="nl" translated="642"/>
+      <language language="de" translated="639"/>
+      <language language="it" translated="600"/>
+      <language language="nl" translated="643"/>
     </targetlanguages>
     <modules>
-      <module name="resourcestrings" type="strings" properties="167">
+      <module name="resourcestrings" type="strings" properties="168">
         <items>
           <item name="1">
             <properties>
@@ -113,6 +113,13 @@
             <properties>
               <property status="skip">
                 <value>ExifTool by Phil Harvey</value>
+              </property>
+            </properties>
+          </item>
+          <item name="7" state="">
+            <properties>
+              <property>
+                <value>http://www.gnu.org/copyleft/gpl.html</value>
               </property>
             </properties>
           </item>
@@ -11980,7 +11987,7 @@
           </item>
         </items>
       </module>
-      <module name="TFGEOSETUP" type="form" properties="13">
+      <module name="TFGEOSETUP" type="form" properties="12">
         <items>
           <item name="FGeoSetup" type="TFGeoSetup">
             <properties>
@@ -12083,7 +12090,7 @@
               <property name="Items.Strings[1]">
                 <value>default</value>
               </property>
-              <property name="Text">
+              <property name="Text" status="skip">
                 <value>CmbLang</value>
               </property>
             </properties>
@@ -14267,12 +14274,12 @@
                 <value>Browse</value>
                 <translations>
                   <translation language="pt" status="proposed">Navegar</translation>
-                  <translation language="it" status="proposed">Sfogliare</translation>
                   <translation language="es">Carpetas</translation>
-                  <translation language="nl">Mappen</translation>
                   <translation language="en" status="proposed">Folders</translation>
-                  <translation language="fr" status="proposed">Dossiers</translation>
                   <translation language="de">Verzeichnis</translation>
+                  <translation language="it" status="proposed">Sfogliare</translation>
+                  <translation language="nl">Mappen</translation>
+                  <translation language="fr" status="proposed">Dossiers</translation>
                 </translations>
               </property>
             </properties>
@@ -17689,7 +17696,7 @@
           </item>
         </items>
       </module>
-      <module name="TFRMABOUT" type="form" properties="1">
+      <module name="TFRMABOUT" type="form" properties="2">
         <items>
           <item name="FrmAbout" type="TFrmAbout">
             <properties>
@@ -17703,6 +17710,41 @@
                   <translation language="pt" status="proposed">Sobre</translation>
                   <translation language="it" status="proposed">Informazioni su</translation>
                 </translations>
+              </property>
+              <property name="Font.Name" status="skip">
+                <value>Segoe UI</value>
+              </property>
+            </properties>
+          </item>
+          <item name="FrmAbout.GrpLicense" type="TGroupBox" state="">
+            <properties>
+              <property name="Caption">
+                <value>Licensed under</value>
+                <translations>
+                  <translation language="nl" status="proposed">Gelicentieerd onder</translation>
+                  <translation language="fr" status="proposed">Sous licence</translation>
+                  <translation language="de" status="proposed">Lizenziert unter</translation>
+                  <translation language="it" status="proposed">Con licenza</translation>
+                  <translation language="pt" status="proposed">Licenciado sob</translation>
+                  <translation language="es" status="proposed">Con licencia</translation>
+                </translations>
+              </property>
+            </properties>
+          </item>
+          <item name="FrmAbout.GrpLicense.LblGNUGPL" type="TLabel" state="">
+            <properties>
+              <property name="Caption" status="skip">
+                <value>LblGNUGPL</value>
+              </property>
+              <property name="Font.Name" status="skip">
+                <value>Segoe UI</value>
+              </property>
+            </properties>
+          </item>
+          <item name="FrmAbout.GrpLicense.LblLicense" type="TLabel" state="">
+            <properties>
+              <property name="Caption" status="skip">
+                <value>GNU General Public License v3.0</value>
               </property>
               <property name="Font.Name" status="skip">
                 <value>Segoe UI</value>
