@@ -1,5 +1,4 @@
 unit Main;
-{$WARN SYMBOL_PLATFORM OFF}
 // Note all code formatted with Delphi formatter, Right margin 80->150
 // Note about the Path.
 // - To change: Set ShellTree.Path
@@ -365,6 +364,7 @@ implementation
 uses System.StrUtils, System.Math, System.Masks, System.Types, System.UITypes,
   Vcl.ClipBrd, Winapi.ShlObj, Winapi.ShellAPI, Winapi.CommCtrl, Vcl.Shell.ShellConsts, Vcl.Themes, Vcl.Styles,
   ExifTool, ExifInfo, ExifToolsGui_LossLess, ExifTool_PipeStream, ExifToolsGui_Data, ExifToolsGUI_MultiContextMenu,
+  ExifToolsGUI_StringList,
   MainDef, LogWin, Preferences, EditFFilter, EditFCol, UFrmStyle, UFrmAbout, UFrmCheckVersions,
   QuickMngr, DateTimeShift, DateTimeEqual, CopyMeta, RemoveMeta, Geotag, Geomap, CopyMetaSingle, FileDateTime,
   UFrmGenericExtract, UFrmGenericImport, UFrmLossLessRotate, UFrmGeoTagFiles, UFrmGeoSetup,
@@ -465,19 +465,19 @@ begin
   case AdvRadioGroup2.ItemIndex of
     0:
       begin
-        ETChart.LeftAxis.Maximum := ChartMaxFLength;
+        ETChart.LeftAxis.Maximum := Round(ETBarSeriesFocal.MaxYValue * 1.1);
         ETChart.Title.Text.Text := StrFocalLength;
         ETChart.AddSeries(ETBarSeriesFocal);
       end;
     1:
       begin
-        ETChart.LeftAxis.Maximum := ChartMaxFNumber;
+        ETChart.LeftAxis.Maximum := Round(ETBarSeriesFnum.MaxYValue * 1.1);
         ETChart.Title.Text.Text := StrFNumber;
         ETChart.AddSeries(ETBarSeriesFnum);
       end;
     2:
       begin
-        ETChart.LeftAxis.Maximum := ChartMaxISO;
+        ETChart.LeftAxis.Maximum := Round(ETBarSeriesIso.MaxYValue * 1.1);
         ETChart.Title.Text.Text := StrISO;
         ETChart.AddSeries(ETBarSeriesIso);
       end;
@@ -712,7 +712,7 @@ function TFMain.GetFullPath(MustExpandPath: boolean): string;
 begin
   result := '';
   if (MustExpandPath) then
-    result := IncludeTrailingBackslash(ShellList.Path);
+    result := IncludeTrailingPathDelimiter(ShellList.Path);
 end;
 
 function TFMain.GetSelectedFile(FileName: string; MustExpandPath: boolean): string;
@@ -1918,12 +1918,13 @@ end;
 procedure TFMain.UpdateLocationfromGPScoordinatesClick(Sender: TObject);
 var
   CrWait, CrNormal: HCURSOR;
+  Foto: FotoRec;
   SelectedFiles: TStringList;
   ETCmd, AFile: string;
   GPSCoordinates: string;
   IsQuickTime: boolean;
 begin
-  GetMetadata(GetFirstSelectedFilePath, false, false, true, false);
+  Foto := GetMetadata(GetFirstSelectedFilePath, [TGetOption.gmGPS]);
   if (Foto.GPS.Supported) then
   begin
     FGeoSetup.Lat := Foto.GPS.GeoLat;
@@ -2257,6 +2258,7 @@ end;
 
 procedure TFMain.ShowPreview;
 var
+  Foto: FotoRec;
   Rotate: integer;
   FPath: string;
   ABitMap: TBitmap;
@@ -2273,7 +2275,7 @@ begin
       Rotate := 0;
       if GUIsettings.AutoRotatePreview then
       begin
-        GetMetadata(FPath, false, false, false, false);
+        Foto := GetMetadata(FPath, []);
         case Foto.IFD0.Orientation of
           0, 1:
             Rotate := 0; // no tag or don't rotate
@@ -2859,6 +2861,7 @@ end;
 
 procedure TFMain.ShellListOwnerDataFetch(Sender: TObject; Item: TListItem; Request: TItemRequest; AFolder: TShellFolder);
 var
+  Foto: FotoRec;
   AShellList: TShellListView;
   ETcmd, Tx, ADetail: String;
   Indx: integer;
@@ -2885,143 +2888,141 @@ begin
   if (Details.Count = 0) and
      (Afolder.IsFolder = false) then
   begin
-    with Foto do
-    begin
-      case CBoxDetails.ItemIndex of
-        1:
+    case CBoxDetails.ItemIndex of
+      1:
+        begin
+          Foto := GetMetadata(AFolder.PathName, []);
+          if (Foto.ExifIFD.Supported) then
           begin
-            GetMetadata(AFolder.PathName, false, false, false, false);
-            if (Foto.ExifIFD.Supported) then
+            Tx := Foto.ExifIFD.ExposureTime;
+            Tx.PadLeft(7);
+            Details.Add(Tx);
+            Tx := Foto.ExifIFD.FNumber;
+            Tx.PadLeft(4);
+            Details.Add(Tx);
+            Tx := Foto.ExifIFD.ISO;
+            Tx.PadLeft(5);
+            Details.Add(Tx);
+            Tx := Foto.ExifIFD.ExposureBias;
+            Tx.PadLeft(4);
+            Details.Add(Tx);
+            Tx := Foto.ExifIFD.FocalLength;
+            Tx.PadLeft(6);
+            Details.Add(Tx);
+            if (Foto.ExifIFD.Flash and $FF00) <> 0 then
             begin
-              Tx := ExifIFD.ExposureTime;
-              Tx.PadLeft(7);
-              Details.Add(Tx);
-              Tx := ExifIFD.FNumber;
-              Tx.PadLeft(4);
-              Details.Add(Tx);
-              Tx := ExifIFD.ISO;
-              Tx.PadLeft(5);
-              Details.Add(Tx);
-              Tx := ExifIFD.ExposureBias;
-              Tx.PadLeft(4);
-              Details.Add(Tx);
-              Tx := ExifIFD.FocalLength;
-              Tx.PadLeft(6);
-              Details.Add(Tx);
-              if (ExifIFD.Flash and $FF00) <> 0 then
-              begin
-                if (ExifIFD.Flash and 1) = 1 then
-                  Details.Add(StrYes)
-                else
-                  Details.Add(StrNo);
-              end
-              else
-                Details.Add('');
-              Details.Add(ExifIFD.ExposureProgram);
-              if (IFD0.Supported) and
-                 (IFD0.Orientation > 0) then
-              begin
-                if (IFD0.Orientation and 1) = 1 then
-                  Details.Add(StrHor)
-                else
-                  Details.Add(StrVer);
-              end
-              else
-                Details.Add('');
-            end
-            else
-            begin
-              if (GUIsettings.EnableUnsupported) then
-                ET_OpenExec(CameraFields, GetSelectedFile(ShellList.FileName(Item.Index)), Details, False)
-              else
-                Details.Add(NotSupported);
-            end;
-          end;
-        2:
-          begin
-            GetMetadata(AFolder.PathName, true, false, true, false);
-            if (Foto.ExifIFD.Supported) and
-               (Foto.XMP.Supported) then
-            begin
-              Details.Add(ExifIFD.DateTimeOriginal);
-              if GPS.Latitude <> '' then
+              if (Foto.ExifIFD.Flash and 1) = 1 then
                 Details.Add(StrYes)
               else
                 Details.Add(StrNo);
-              if (GeoSettings.CountryCodeLocation) and
-                 (Trim(Xmp.CountryCodeShown) <> '') then
-                Details.Add(Xmp.CountryCodeShown)
-              else
-                Details.Add(Xmp.CountryNameShown);
-              Details.Add(Xmp.ProvinceShown);
-              Details.Add(Xmp.CityShown);
-              Details.Add(Xmp.LocationShown);
             end
             else
-            begin
-              if (GUIsettings.EnableUnsupported) then
-              begin
-                ET_OpenExec(LocationFields, GetSelectedFile(ShellList.FileName(Item.Index)), Details, False);
-                if (Details.Count < 2) then
-                  Details.Add(NotSupported)
-                else
-                begin
-                  // Details[0] = DateTimeOriginal
-                  // Details[1] = CreateDate
-                  if (Details[0] = '-') then
-                    Details.Delete(0)
-                  else
-                    Details.Delete(1);
-
-                  // Now Details[1] = GPS:GPSLatitude
-                  // GPS tagged?
-                  if (Details[1] = '-') or
-                     (Details[1] = '0') then
-                    Details[1] := StrNo
-                  else
-                    Details[1] := StrYes;
-
-                  // Prefer CountryCode
-                  if (GeoSettings.CountryCodeLocation) and
-                     (Trim(Details[2]) <> '-') then
-                    Details.Delete(3)   // We have a Country Code, delete the Country Name
-                  else
-                    Details.Delete(2);
-
-                end;
-              end
-              else
-                Details.Add(NotSupported);
-            end;
-          end;
-        3:
-          begin
-            GetMetadata(AFolder.PathName, true, false, false, false);
+              Details.Add('');
+            Details.Add(Foto.ExifIFD.ExposureProgram);
             if (Foto.IFD0.Supported) and
-               (Foto.XMP.Supported) then
+               (Foto.IFD0.Orientation > 0) then
             begin
-              Details.Add(IFD0.Artist);
-              Details.Add(Xmp.Rating);
-              Details.Add(Xmp.PhotoType);
-              Details.Add(Xmp.Event);
-              Details.Add(Xmp.PersonInImage);
+              if (Foto.IFD0.Orientation and 1) = 1 then
+                Details.Add(StrHor)
+              else
+                Details.Add(StrVer);
             end
             else
-            begin
-              if (GUIsettings.EnableUnsupported) then
-                ET_OpenExec(AboutFields, GetSelectedFile(ShellList.FileName(Item.Index)), Details, False)
-              else
-                Details.Add(NotSupported);
-            end;
-          end;
-        4:
+              Details.Add('');
+          end
+          else
           begin
-            ETcmd := '-s3' + CRLF + '-f';
-            for Indx := 0 to High(FListColUsr) do
-              ETcmd := ETcmd + CRLF + FListColUsr[Indx].Command;
-            ET_OpenExec(ETcmd, GetSelectedFile(ShellList.FileName(Item.Index)), Details, False);
+            if (GUIsettings.EnableUnsupported) then
+              ET_OpenExec(CameraFields, GetSelectedFile(ShellList.FileName(Item.Index)), Details, False)
+            else
+              Details.Add(NotSupported);
           end;
-      end;
+        end;
+      2:
+        begin
+          Foto := GetMetadata(AFolder.PathName, [TGetOption.gmXMP, TGetOption.gmGPS]);
+          if (Foto.ExifIFD.Supported) and
+             (Foto.GPS.Supported) and
+             (Foto.XMP.Supported) then
+          begin
+            Details.Add(Foto.ExifIFD.DateTimeOriginal);
+            if (Foto.GPS.Latitude <> '') then
+              Details.Add(StrYes)
+            else
+              Details.Add(StrNo);
+            if (GeoSettings.CountryCodeLocation) and
+               (Trim(Foto.Xmp.CountryCodeShown) <> '') then
+              Details.Add(Foto.Xmp.CountryCodeShown)
+            else
+              Details.Add(Foto.Xmp.CountryNameShown);
+            Details.Add(Foto.Xmp.ProvinceShown);
+            Details.Add(Foto.Xmp.CityShown);
+            Details.Add(Foto.Xmp.LocationShown);
+          end
+          else
+          begin
+            if (GUIsettings.EnableUnsupported) then
+            begin
+              ET_OpenExec(LocationFields, GetSelectedFile(ShellList.FileName(Item.Index)), Details, False);
+              if (Details.Count < 2) then
+                Details.Add(NotSupported)
+              else
+              begin
+                // Details[0] = DateTimeOriginal
+                // Details[1] = CreateDate
+                if (Details[0] = '-') then
+                  Details.Delete(0)
+                else
+                  Details.Delete(1);
+
+                // Now Details[1] = GPS:GPSLatitude
+                // GPS tagged?
+                if (Details[1] = '-') or
+                   (Details[1] = '0') then
+                  Details[1] := StrNo
+                else
+                  Details[1] := StrYes;
+
+                // Prefer CountryCode
+                if (GeoSettings.CountryCodeLocation) and
+                   (Trim(Details[2]) <> '-') then
+                  Details.Delete(3)   // We have a Country Code, delete the Country Name
+                else
+                  Details.Delete(2);
+
+              end;
+            end
+            else
+              Details.Add(NotSupported);
+          end;
+        end;
+      3:
+        begin
+          Foto := GetMetadata(AFolder.PathName, [TGetOption.gmXMP]);
+          if (Foto.IFD0.Supported) and
+             (Foto.XMP.Supported) then
+          begin
+            Details.Add(Foto.IFD0.Artist);
+            Details.Add(Foto.Xmp.Rating);
+            Details.Add(Foto.Xmp.PhotoType);
+            Details.Add(Foto.Xmp.Event);
+            Details.Add(Foto.Xmp.PersonInImage);
+          end
+          else
+          begin
+            if (GUIsettings.EnableUnsupported) then
+              ET_OpenExec(AboutFields, GetSelectedFile(ShellList.FileName(Item.Index)), Details, False)
+            else
+              Details.Add(NotSupported);
+          end;
+        end;
+      4:
+        begin
+          ETcmd := '-s3' + CRLF + '-f';
+          for Indx := 0 to High(FListColUsr) do
+            ETcmd := ETcmd + CRLF + FListColUsr[Indx].Command;
+          ET_OpenExec(ETcmd, GetSelectedFile(ShellList.FileName(Item.Index)), Details, False);
+        end;
     end;
   end;
   for ADetail in Details do
@@ -3430,15 +3431,11 @@ end;
 procedure TFMain.SpeedBtnChartRefreshClick(Sender: TObject);
 var
   Ext: string;
-  I: integer;
+  Indx: integer;
+  ETFocal, ETFnum, ETISO: TNrSortedStringList;
+
   CrWait, CrNormal: HCURSOR;
 begin
-  for I := Low(ChartFLength) to High(ChartFLength) do
-    ChartFLength[I] := 0;
-  for I := Low(ChartFNumber) to High(ChartFNumber) do
-    ChartFNumber[I] := 0;
-  for I := Low(ChartISO) to High(ChartISO) do
-    ChartISO[I] := 0;
   Ext := '*.*';
   if AdvRadioGroup1.ItemIndex > 0 then
     Ext := '*.' + AdvRadioGroup1.Items[AdvRadioGroup1.ItemIndex];
@@ -3448,55 +3445,31 @@ begin
 
   CrWait := LoadCursor(0, IDC_WAIT);
   CrNormal := SetCursor(CrWait);
+  ETFocal := TNrSortedStringList.Create;
+  ETFnum := TNrSortedStringList.Create;
+  ETISO := TNrSortedStringList.Create;
   try
-    ChartFindFiles(ShellList.Path, Ext, AdvCheckBox_Subfolders.Checked);
+    ChartFindFiles(ShellList.Path, Ext, AdvCheckBox_Subfolders.Checked,
+                   ETFocal, ETFnum, ETISO);
+
+    ETFocal.Sort;
+    for Indx := 0 to ETFocal.Count -1 do
+      ETBarSeriesFocal.AddBar(ETFocal.GetValue(Indx), ETFocal.KeyNames[Indx], GUIsettings.CLFocal);
+
+    ETFnum.Sort;
+    for Indx := 0 to ETFnum.Count -1 do
+      ETBarSeriesFnum.AddBar(ETFnum.GetValue(Indx), ETFnum.KeyNames[Indx], GUIsettings.CLFNumber);
+
+    ETISO.Sort;
+    for Indx := 0 to ETISO.Count -1 do
+      ETBarSeriesIso.AddBar(ETISO.GetValue(Indx), ETISO.KeyNames[Indx], GUIsettings.CLISO);
+
   finally
+    ETFocal.Free;
+    ETFnum.Free;
+    ETISO.Free;
     SetCursor(CrNormal);
   end;
-
-  ChartMaxFLength := 0;
-  for I := Low(ChartFLength) to High(ChartFLength) do
-  begin
-    if ChartFLength[I] > 0 then
-    begin
-      if ChartFLength[I] > ChartMaxFLength then
-        ChartMaxFLength := ChartFLength[I];
-      Ext := IntToStr(I);
-      if I < 100 then
-        Insert('.', Ext, length(Ext)) // 58->5.8
-      else
-        SetLength(Ext, length(Ext) - 1);
-      ETBarSeriesFocal.AddBar(ChartFLength[I], Ext, GUIsettings.CLFocal);
-    end;
-  end;
-  ChartMaxFLength := Round(ChartMaxFLength * 1.1);
-
-  ChartMaxFNumber := 0;
-  for I := Low(ChartFNumber) to High(ChartFNumber) do
-  begin
-    if ChartFNumber[I] > 0 then
-    begin
-      if ChartFNumber[I] > ChartMaxFNumber then
-        ChartMaxFNumber := ChartFNumber[I];
-      Ext := IntToStr(I);
-      Insert('.', Ext, length(Ext)); // 40->4.0
-      ETBarSeriesFnum.AddBar(ChartFNumber[I], Ext, GUIsettings.CLFNumber);
-    end;
-  end;
-  ChartMaxFNumber := Round(ChartMaxFNumber * 1.1);
-
-  ChartMaxISO := 0;
-  for I := Low(ChartISO) to High(ChartISO) do
-  begin
-    if ChartISO[I] > 0 then
-    begin
-      if ChartISO[I] > ChartMaxISO then
-        ChartMaxISO := ChartISO[I];
-      Ext := IntToStr(I) + '0'; // 80->800
-      ETBarSeriesIso.AddBar(ChartISO[I], Ext, GUIsettings.CLISO);
-    end;
-  end;
-  ChartMaxISO := Round(ChartMaxISO * 1.1);
 
   AdvRadioGroup2Click(Sender);
 end;

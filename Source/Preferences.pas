@@ -1,5 +1,4 @@
 unit Preferences;
-{$WARN SYMBOL_PLATFORM OFF}
 
 interface
 
@@ -134,7 +133,7 @@ begin
     DefExportUse := (RgExportMetaFolder.ItemIndex = 1);
     ETOverrideDir := '';
     if (RgETOverride.ItemIndex = 1) then
-      ETOverrideDir := IncludeTrailingBackslash(EdETOverride.Text);
+      ETOverrideDir := IncludeTrailingPathDelimiter(EdETOverride.Text);
     ETCustomConfig := EdETCustomConfig.Text;
   end;
   with LabeledEdit1 do

@@ -1,5 +1,4 @@
 unit ExifToolsGui_Versions;
-{$WARN SYMBOL_PLATFORM OFF}
 
 interface
 

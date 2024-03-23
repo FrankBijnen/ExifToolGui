@@ -1,11 +1,11 @@
 unit Geomap;
-{$WARN SYMBOL_PLATFORM OFF}
 
 interface
 
 uses
   System.Classes, System.SysUtils, System.Generics.Collections, System.IniFiles,
-  Vcl.Edge;
+  Vcl.Edge,
+  ExifToolsGUI_StringList;
 
 const
   PlaceDefault = 'Default';
@@ -44,8 +44,8 @@ type
   TPlace = class
     FCityLevels: TCityLevels;
     FRegionLevels: TRegionLevels;
-    FCityList : TStringList;
-    FProvinceList : TStringList;
+    FCityList : TNrSortedStringList;
+    FProvinceList : TNrSortedStringList;
     FCountryCode: string;
     FDefLang: string;
     FCountryName: string;
@@ -216,35 +216,12 @@ begin
   end;
 end;
 
-// Sort on stringlist with possibly integer in key.
-function SortOnKey(List: TStringList; Index1, Index2: Integer): Integer;
-var
-  L1, l2: integer;
-begin
-  result := 0;
-  if (TryStrToInt(List.KeyNames[Index1], L1)) and
-     (TryStrToInt(List.KeyNames[Index2], L2)) then
-  begin // Compare integers
-    if (L1 < L2) then
-      result := -1
-    else if (L1 > L2) then
-      result := 1;
-  end
-  else
-  begin // Compare strings
-    if (List.KeyNames[Index1] < List.KeyNames[Index2]) then
-      result := -1
-    else if (List.KeyNames[Index1] > List.KeyNames[Index2]) then
-      result := 1;
-  end;
-end;
-
 constructor TPlace.Create;
 begin
   inherited Create; // Does nothing
-  FCityList := TStringList.Create;
+  FCityList := TNrSortedStringList.Create;
   FCityList.Duplicates := TDuplicates.dupIgnore;
-  FProvinceList := TStringList.Create;
+  FProvinceList := TNrSortedStringList.Create;
   FProvinceList.Duplicates := TDuplicates.dupIgnore;
 end;
 
@@ -467,8 +444,8 @@ end;
 
 procedure TPLace.Sort;
 begin
-  FCityList.CustomSort(SortOnKey) ;
-  FProvinceList.CustomSort(SortOnKey) ;
+  FCityList.Sort;
+  FProvinceList.Sort;
 end;
 
 function TPLace.GetRegionLevels: TRegionLevels;
@@ -506,7 +483,6 @@ end;
 constructor TOSMHelper.Create(const APathName, AInitialZoom: string);
 begin
   inherited Create;
-  OsmFormatSettings := TFormatSettings.Create(GetThreadLocale);
   OsmFormatSettings.DecimalSeparator := '.'; // The decimal separator is a . PERIOD!
   OsmFormatSettings.NegCurrFormat := 11;
   FPathName := APathName;
@@ -767,7 +743,7 @@ begin
     begin
       FileName := AnalyzeGPSCoords(ETOut, Lat, Lon, IsQuickTime);
       if (Lat <> '-') and (Lon <> '-') then
-        OsmHelper.WritePoint(Lat, Lon, IncludeTrailingBackslash(Apath) + Filename, true);
+        OsmHelper.WritePoint(Lat, Lon, IncludeTrailingPathDelimiter(Apath) + Filename, true);
     end;
 
     OsmHelper.WritePointsEnd(true);

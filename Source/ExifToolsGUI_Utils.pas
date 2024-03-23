@@ -1,5 +1,4 @@
 unit ExifToolsGUI_Utils;
-{$WARN SYMBOL_PLATFORM OFF}
 
 {$DEFINE GETELEVATION}
 {$DEFINE GETWINDOWSADMIN}
@@ -842,12 +841,13 @@ end;
 
 procedure FillLocationInImage(const ANImage: string);
 var
+  Foto: FotoRec;
   ETCmd: string;
   APlace: TPlace;
   GPSCoordinates, Lat, Lon: string;
   IsQuickTime: boolean;
 begin
-  GetMetadata(ANImage, false, false, true, false);
+  GetMetadata(ANImage, [TGetOption.gmGPS]);
   if (Foto.GPS.Supported) then
   begin
     Lat := Foto.GPS.GeoLat;
@@ -1167,7 +1167,7 @@ end;
 initialization
 
 begin
-  TempDirectory := IncludeTrailingBackslash(CreateTempPath(TempPrefix));
+  TempDirectory := IncludeTrailingPathDelimiter(CreateTempPath(TempPrefix));
   CoCreateInstance(CLSID_WICImagingFactory, nil, CLSCTX_INPROC_SERVER or CLSCTX_LOCAL_SERVER, IUnknown, GlobalImgFact);
   UTF8Encoding := TEncoding.GetEncoding(CP_UTF8);
 

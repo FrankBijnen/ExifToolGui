@@ -922,6 +922,8 @@ object FMain: TFMain
         LeftAxis.Maximum = 15.000000000000000000
         Align = alClient
         TabOrder = 1
+        ExplicitWidth = 358
+        ExplicitHeight = 370
         DefaultCanvas = 'TGDIPlusCanvas'
         PrintMargins = (
           27
