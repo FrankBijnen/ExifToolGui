@@ -22,6 +22,7 @@ uses System.SysUtils, Vcl.Graphics, Vcl.Buttons, ExifInfo, ExifToolsGUI_Utils;
 
 procedure TOpenPictureDialog.DoSelectionChange;
 var
+  Foto: FotoRec;
   ABitMap: TBitMap;
   Rotate: integer;
   FPreviewButton: TSpeedButton;
@@ -35,7 +36,7 @@ begin
     if FAutoRotatePreview then
     begin
       // Rotate ?
-      GetMetadata(FileName, false, false, false, false);
+      Foto := GetMetadata(FileName, []);
       case Foto.IFD0.Orientation of
         0, 1:
           Rotate := 0; // no tag or don't rotate

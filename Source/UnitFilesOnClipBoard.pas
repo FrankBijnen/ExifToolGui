@@ -5,7 +5,6 @@ unit UnitFilesOnClipBoard;
 // https://www.freepascal.org/~michael/articles/dragdrop2/dragdrop2.pdf
 // Many thanks!
 
-{$WARN SYMBOL_PLATFORM OFF}
 {$WRITEABLECONST ON}
 
 interface
@@ -398,7 +397,7 @@ begin
         continue;
 
       // Dont copy to same directory.
-      TargetFile := IncludeTrailingBackslash(TargetDir) + ExtractFileName(AFile);
+      TargetFile := IncludeTrailingPathDelimiter(TargetDir) + ExtractFileName(AFile);
       if (CompareText(TargetFile, AFile) = 0) then
         raise Exception.Create(StrSourceAndTargetSh);
 

@@ -1,5 +1,4 @@
 unit ExifToolsGUI_Thumbnails;
-{$WARN SYMBOL_PLATFORM OFF}
 
 interface
 
@@ -245,7 +244,10 @@ begin
   SetLength(Tasks, NrOfFiles);
   Indx := 0;
 
-  Rc := FindFirst(IncludeTrailingBackslash(AFilePath) + '*.*', faAnyFile - (faHidden or faSysFile), Fs);
+{$WARN SYMBOL_PLATFORM OFF}
+  Rc := FindFirst(IncludeTrailingPathDelimiter(AFilePath) + '*.*', faAnyFile - (faHidden or faSysFile), Fs);
+{$WARN SYMBOL_PLATFORM ON}
+
   while (Rc = 0) and (result) do
   begin
     result := not boolean(SendMessage(AForm.Handle, CM_ThumbGenWantsToClose, 0, 0));
@@ -254,7 +256,7 @@ begin
 
     if (Fs.Name <> '.') and (Fs.Name <> '..') then
     begin
-      ThisThumb := IncludeTrailingBackslash(AFilePath) + Fs.Name;
+      ThisThumb := IncludeTrailingPathDelimiter(AFilePath) + Fs.Name;
       if ((Fs.Attr and faDirectory) <> 0) then
       begin
         if (Subdirs) then
@@ -356,7 +358,7 @@ begin
       CheckKeys := TRegistry.Create(KEY_READ);
       try
         CheckKeys.RootKey := HKEY_LOCAL_MACHINE;
-        CheckKeys.OpenKeyReadOnly(IncludeTrailingBackslash(VolumeCachesKey) + SubKey);
+        CheckKeys.OpenKeyReadOnly(IncludeTrailingPathDelimiter(VolumeCachesKey) + SubKey);
         CheckKeys.GetValueNames(StateFlagsValues);
         for StateFlagValue in StateFlagsValues do
         begin

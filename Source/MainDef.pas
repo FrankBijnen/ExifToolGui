@@ -1,5 +1,4 @@
 unit MainDef;
-{$WARN SYMBOL_PLATFORM OFF}
 
 interface
 
@@ -108,7 +107,6 @@ function SaveGUIini: boolean;
 function LoadWorkspaceIni(IniFName: string): boolean;
 function SaveWorkspaceIni(IniFName: string): boolean;
 function BrowseFolderDlg(const Title: string; iFlag: integer; const StartFolder: string = ''): string;
-procedure ChartFindFiles(StartDir, FileMask: string; subDir: boolean);
 
 implementation
 
@@ -901,80 +899,11 @@ begin
 end;
 // ------------------------------------------------------------------------------
 
-procedure ChartFindFiles(StartDir, FileMask: string; subDir: boolean);
-var
-  SR: TSearchRec;
-  DirList: TStringList;
-  IsFound, DoSub: boolean;
-  I: integer;
-  W: word;
-begin
-  StartDir := IncludeTrailingBackslash(StartDir);
-  DoSub := subDir;
-  // Build a list of the files in directory StartDir -not the directories!
-  IsFound := FindFirst(StartDir + FileMask, faAnyFile - faDirectory, SR) = 0;
-  while IsFound do
-  begin
-    GetMetadata(StartDir + SR.Name, false, false, false, false);
-    with Foto do
-    begin
-      // focal length:
-      W := pos('.', ExifIFD.FocalLength);
-      if W > 0 then
-        Delete(ExifIFD.FocalLength, W, 1); // 5.8->58
-      W := StrToIntDef(ExifIFD.FocalLength, 0);
-      if W > 0 then
-      begin
-        if (W >= Low(ChartFLength)) and (W <= High(ChartFLength)) then
-          inc(ChartFLength[W]);
-      end;
-      // aperture:
-      W := pos('.', ExifIFD.FNumber);
-      if W > 0 then
-        Delete(ExifIFD.FNumber, W, 1); // 4.0->40
-      W := StrToIntDef(ExifIFD.FNumber, 0);
-      if W > 0 then
-      begin
-        if (W >= Low(ChartFNumber)) and (W <= High(ChartFNumber)) then
-          inc(ChartFNumber[W]);
-      end;
-      // ISO:
-      W := StrToIntDef(ExifIFD.ISO, 0) div 10; // 800->80
-      if W > 0 then
-      begin
-        if (W >= Low(ChartISO)) and (W <= High(ChartISO)) then
-          inc(ChartISO[W]);
-      end;
-    end;
-    IsFound := FindNext(SR) = 0;
-  end;
-
-  System.SysUtils.FindClose(SR);
-  // Build a list of subdirectories
-  if DoSub then
-  begin
-    DirList := TStringList.Create;
-    IsFound := FindFirst(StartDir + '*.*', faAnyFile, SR) = 0;
-    while IsFound do
-    begin
-      if ((SR.Attr and faDirectory) <> 0) and (SR.Name[1] <> '.') then
-        DirList.Add(StartDir + SR.Name);
-      IsFound := FindNext(SR) = 0;
-    end;
-    System.SysUtils.FindClose(SR);
-    // Scan the list of subdirectories
-    for I := 0 to DirList.Count - 1 do
-      ChartFindFiles(DirList[I], FileMask, DoSub);
-    DirList.Free;
-  end;
-end;
-
 initialization
 
 begin
   ETdirectCmd := TStringList.Create;
   ParmIniPath := GetParmIniPath;
-
 end;
 
 finalization

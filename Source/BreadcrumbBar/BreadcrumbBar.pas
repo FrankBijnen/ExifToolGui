@@ -1,5 +1,4 @@
 ﻿unit BreadcrumbBar;
-{$WARN SYMBOL_PLATFORM OFF}
 {.$DEFINE SHELLEXEC}
 
 interface
@@ -1188,10 +1187,13 @@ begin
   if not DirectoryExists(SubPath) then
     Exit;
 
-  SubPath := IncludeTrailingBackslash(SubPath);
+  SubPath := IncludeTrailingPathDelimiter(SubPath);
   DirMask := faDirectory;
   if (FShowHiddenDirs) then
+{$WARN SYMBOL_PLATFORM OFF}
     DirMask := DirMask or faHidden or faSysFile or faReadOnly;
+{$WARN SYMBOL_PLATFORM ON}
+
   if System.SysUtils.FindFirst(SubPath + '*.*', DirMask, SR) = 0 then
     try
       repeat
@@ -1236,7 +1238,7 @@ begin
      (BreadcrumbIndex = 0) then
     NewPath := ''
   else
-    NewPath := IncludeTrailingBackslash(GetDirUpTo(BreadcrumbIndex));
+    NewPath := IncludeTrailingPathDelimiter(GetDirUpTo(BreadcrumbIndex));
   SetDirectory(NewPath + GetBreadcrumbListItem(ListIndex));
   if Assigned(FOnChange) then
     FOnChange(Self);

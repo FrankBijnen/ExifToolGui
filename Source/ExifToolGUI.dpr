@@ -62,7 +62,8 @@ uses
   UFrmStyle in 'UFrmStyle.pas' {FrmStyle},
   UFrmAbout in 'UFrmAbout.pas' {FrmAbout},
   UFrmGenerate in 'UFrmGenerate.pas' {FrmGenerate},
-  UFrmCheckVersions in 'UFrmCheckVersions.pas' {FrmCheckVersions};
+  UFrmCheckVersions in 'UFrmCheckVersions.pas' {FrmCheckVersions},
+  ExifToolsGUI_StringList in 'ExifToolsGUI_StringList.pas';
 
 {$R *.res}
 
@@ -110,6 +111,5 @@ begin
   Application.CreateForm(TFGeoSearch, FGeoSearch);
   Application.CreateForm(TFGeotagFiles, FGeotagFiles);
   Application.CreateForm(TFGeoSetup, FGeoSetup);
-
   Application.Run;
 end.
