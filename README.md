@@ -47,9 +47,9 @@ This is an updated version of the ExifToolGui program created by Bogdan Hrastnik
 
 [Showcase](Docs/ShowCase/ShowCase.md)<br>
 
-<h4>GNU General Public License v3.0</h4>
+# GNU General Public License v3.0
 
-Updated license statement March 23, 2024 <br>
+<h4>Updated license statement March 23, 2024</h4>
 
 [License Statement](LICENSE)
 
