@@ -136,12 +136,7 @@ begin
       ETOverrideDir := IncludeTrailingPathDelimiter(EdETOverride.Text);
     ETCustomConfig := EdETCustomConfig.Text;
   end;
-  with LabeledEdit1 do
-  begin
-    if (Trim(Text) = '') then
-      Text := '*';
-    ET_Options.ETSeparator := '-sep' + CRLF + Text + CRLF;
-  end;
+  ET_Options.SetSeparator(LabeledEdit1.Text);
 
   case RadioGroup3.ItemIndex of
     0:
@@ -287,8 +282,6 @@ begin
 end;
 
 procedure TFPreferences.FormShow(Sender: TObject);
-var
-  Tx: string;
 begin
   Left := FMain.Left + FMain.GUIBorderWidth;
   Top := FMain.Top + FMain.GUIBorderHeight;
@@ -331,10 +324,8 @@ begin
     end;
     EdETCustomConfig.Text := ETCustomConfig;
   end;
-  Tx := ET_Options.ETSeparator;
-  Delete(Tx, 1, 6);
-  SetLength(Tx, 1);
-  LabeledEdit1.Text := Tx;
+  LabeledEdit1.Text := ET_Options.GetSeparator;
+
   RadioGroup3.ItemIndex := GUIsettings.ThumbSize;
   ChkThumbAutoGenerate.Checked := GUIsettings.ThumbAutoGenerate;
   EdThumbCleanset.Text := GUIsettings.ThumbCleanSet;

@@ -5,7 +5,7 @@ unit ExifInfo;
 
 interface
 
-uses System.Classes, Vcl.StdCtrls, ExifToolsGUI_StringList;
+uses System.Classes, System.SysUtils, Vcl.StdCtrls, ExifToolsGUI_StringList;
 
 type
 
@@ -128,6 +128,7 @@ type
 
     FotoF: THandleStream;
     GetOptions: TGetOptions;
+    FotoKeySep: string[3];
     IsMM: boolean;
     WordData: word;
     LongData: longint;
@@ -163,102 +164,26 @@ type
 
   end;
 
-var
-  FotoKeySep: string[3] = '*';
-  ETgps: string[15] = '-c "%d°%.4f" ';
-
-function GetMetadata(FName: string; AGetOptions: TGetOptions): FotoRec;
+function GetMetadata(AName: string; AGetOptions: TGetOptions): FotoRec;
 procedure ChartFindFiles(StartDir, FileMask: string; SubDir: boolean;
                          var ETFocal, ETFnum, ETIso: TNrSortedStringList);
 
 implementation
 
-uses Main, SysUtils, Forms, Dialogs, Windows;
-
-const
-
-  // Jpeg markers defined in Table B.1
-  mkNone  = 0;
-
-  mkSOF0  = $c0; // Baseline DCT + Huffman encoding
-  mkSOF1  = $c1; // Extended Sequential DCT + Huffman encoding
-  mkSOF2  = $c2; // Progressive DCT + Huffman encoding
-  mkSOF3  = $c3; // Lossless (sequential) + Huffman encoding
-
-  mkSOF5  = $c5; // Differential Sequential DCT + Huffman encoding
-  mkSOF6  = $c6; // Differential Progressive DCT + Huffman encoding
-  mkSOF7  = $c7; // Differential Lossless (sequential) + Huffman encoding
-
-  mkJPG   = $c8; // Reserved for Jpeg extensions
-  mkSOF9  = $c9; // Extended Sequential DCT + Arithmetic encoding
-  mkSOF10 = $ca; // Progressive DCT + Arithmetic encoding
-  mkSOF11 = $cb; // Lossless (sequential) + Arithmetic encoding
-
-  mkSOF13 = $cd; // Differential Sequential DCT + Arithmetic encoding
-  mkSOF14 = $ce; // Differential Progressive DCT + Arithmetic encoding
-  mkSOF15 = $cf; // Differential Lossless (sequential) + Arithmetic encoding
-
-  mkDHT   = $c4; // Define Huffman Table
-
-  mkDAC   = $cc; // Define Arithmetic Coding
-
-  mkRST0  = $d0; // Restart markers
-  mkRST1  = $d1;
-  mkRST2  = $d2;
-  mkRST3  = $d3;
-  mkRST4  = $d4;
-  mkRST5  = $d5;
-  mkRST6  = $d6;
-  mkRST7  = $d7;
-
-  mkSOI   = $d8; // Start of Image
-  mkEOI   = $d9; // End of Image
-  mkSOS   = $da; // Start of Scan
-  mkDQT   = $db; // Define Quantization Table
-  mkDNL   = $dc; // Define Number of Lines
-  mkDRI   = $dd; // Define Restart Interval
-  mkDHP   = $de; // Define Hierarchical Progression
-  mkEXP   = $df; // Expand reference components
-
-  // For APPn markers see:
-  // http://www.ozhiker.com/electronics/pjmt/jpeg_info/app_segments.html
-
-  mkAPP0  = $e0; // APPn markers - APP0 = JFIF
-  mkAPP1  = $e1; //                APP1 = EXIF or XMP
-  mkAPP2  = $e2; //                ICC colour profile
-  mkAPP3  = $e3;
-  mkAPP4  = $e4;
-  mkAPP5  = $e5;
-  mkAPP6  = $e6;
-  mkAPP7  = $e7;
-  mkAPP8  = $e8;
-  mkAPP9  = $e9;
-  mkAPP10 = $ea;
-  mkAPP11 = $eb;
-  mkAPP12 = $ec;
-  mkAPP13 = $ed; //                APP13 = IPTC or Adobe IRB
-  mkAPP14 = $ee; //                APP14 = Adobe
-  mkAPP15 = $ef;
-
-  mkJPG0  = $f0; // JPGn markers - reserved for JPEG extensions
-  mkJPG13 = $fd;
-  mkCOM   = $fe; // Comment
+uses
+  System.StrUtils, Winapi.Windows, Vcl.Forms, Vcl.Dialogs,
+  Main, ExifTool,
+  Xml.VerySimple, // XML parsing for XMP
+  SDJPegTypes;    // JPEG APP types
 
 var
   Encoding: TEncoding;
   ExifFormatSettings: TFormatSettings; // for Formatfloat -see Initialization
   GpsFormatSettings: TFormatSettings; // for StrToFloatDef -see Initialization
 
-// TODO Make non global
-//  FotoF: THandleStream;
-//  IsMM, doIPTC, doGPS, doICC, doXMP: boolean;
-//  WordData: word;
-//  LongData: longint;
-//  XMPoffset, XMPsize, IPTCsize, IPTCoffset: int64;
-//  TIFFoffset, ExifIFDoffset, GPSoffset: int64;
-//  ICCoffset, InteropOffset, JPGfromRAWoffset: int64;
-//  ICCSize: word;
-
+{$IFDEF DEBUG}
+  Filename:string;
+{$ENDIF}
 
 procedure XMPrec.Clear;
 begin
@@ -344,7 +269,7 @@ begin
     mkDHP , mkEXP,
 
     mkAPP0 , mkAPP1 , mkAPP2 , mkAPP3 , mkAPP4 , mkAPP5 , mkAPP6 , mkAPP7,
-    mkAPP8 , mkAPP9 , mkAPP10 , mkAPP11 , mkAPP12 , mkAPP13 , mkAPP14 ,
+    mkAPP8 , mkAPP9 , mkAPP10 , mkAPP11 , mkAPP12 , mkAPP13 , mkAPP14,
     mkAPP15,
 
     mkJPG0 , mkJPG13 , mkCOM:
@@ -813,11 +738,11 @@ begin
     case IFDentry.Tag of
       $0001:
         begin
-      InteropIndex := DecodeASCII(IFDentry);
-      if InteropIndex = 'R03' then
-        InteropIndex := 'R03=Adobe'
-      else if InteropIndex = 'R98' then
-        InteropIndex := 'R98=sRGB';
+          InteropIndex := DecodeASCII(IFDentry);
+          if InteropIndex = 'R03' then
+            InteropIndex := 'R03=Adobe'
+          else if InteropIndex = 'R98' then
+            InteropIndex := 'R98=sRGB';
         end;
     end;
   end;
@@ -948,12 +873,6 @@ var
   I: integer;
 begin
   TIFFoffset := FotoF.Position - SizeOf(WordData);
-  ExifIFDoffset := 0;
-  GPSoffset     := 0;
-  IPTCoffset    := 0;
-  ICCoffset     := 0;
-  ICCSize       := 0;
-  InteropOffset := 0;
 
   IsMM := (WordData = $4D4D);
   FotoF.Read(WordData, 2);
@@ -1142,162 +1061,123 @@ begin
 end;
 
 // ==============================================================================
-//TODO: Read using VerySimpleXML?
+const
+  XMPEncoding = 'utf-8';
+  XMPMETA     = 'x:xmpmeta';
+  RDF         = 'rdf:RDF';
+
+function GetRDF(const Xml: TXmlVerySimple): TXmlNode;
+begin
+  result := Xml.ChildNodes.Find(XMPMETA);
+  if (result <> nil) then
+    result := result.ChildNodes.Find(RDF);
+end;
+
 procedure FotoRec.ReadXMP;
-var
-  I, K, N: integer;
-  XMPdata, tmpXMP, Tx: string;
-  Bytes: TBytes;
-  XTx: string;
+var Bytes: TBytes;
+    Xml: TXmlVerySimple;
+    RDF, RDFDesc: TXmlNode;
+    RDFDescNodes: TXmlNodeList;
+    TmpStream: TMemoryStream;
 
-  function GetTagData(TagName: string; MaxLen: integer = 255): string;
+  procedure AddBag(var BagData: string; const ANode: string);
   begin
-    I := Pos(TagName, XMPdata);
-    if I > 0 then
-    begin
-      K := length(TagName);
-      Insert('/', TagName, 2);
-      N := Pos(TagName, XMPdata);
-      XTx := copy(XMPdata, I + K, N - I - K);
-      if length(XTx) > MaxLen then
-      begin
-        XTx[MaxLen] := '…';
-        SetLength(XTx, MaxLen);
-      end;
-      Result := XTx;
-    end
-    else
-      Result := '';
+    if (BagData <> '') then
+      BagData := BagData + FotoKeySep;
+    BagData := BagData + ANode;
   end;
 
-  function GetBagData(BagName: string; MaxLen: integer = 255): string;
+  procedure Add2Xmp(const AKey, AValue: string);
   begin
-    I := Pos(BagName, XMPdata);
-    if I > 0 then
-    begin
-      K := length(BagName);
-      Insert('/', BagName, 2);
-      N := Pos(BagName, XMPdata);
-      tmpXMP := copy(XMPdata, I + K, N - I - K);
-      XTx := '';
-      while Pos('<rdf:li>', tmpXMP) > 0 do
-      begin
-        I := Pos('<rdf:li>', tmpXMP);
-        N := Pos('</rdf:li>', tmpXMP);
-        Tx := copy(tmpXMP, I + 8, N - I - 8);
-        XTx := XTx + Tx + FotoKeySep;
-        Delete(tmpXMP, 1, N);
-      end;
-      I := length(XTx);
-      if I > 1 then
-        SetLength(XTx, I - 1); // delete last separator
-      if length(XTx) > MaxLen then
-      begin
-        XTx[MaxLen] := '…';
-        SetLength(XTx, MaxLen);
-      end;
-      Result := XTx;
-    end
-    else
-      Result := '';
+    if (EndsText('Iptc4xmpExt:CountryCode', AKey)) then
+      XMP.CountryCodeShown := AValue
+    else if (EndsText('Iptc4xmpExt:CountryName', AKey)) then
+      XMP.CountryNameShown := AValue
+    else if (EndsText('Iptc4xmpExt:ProvinceState', AKey)) then
+      XMP.ProvinceShown := AValue
+    else if (EndsText('Iptc4xmpExt:City', AKey)) then
+      XMP.CityShown := AValue
+    else if (EndsText('Iptc4xmpExt:Sublocation', AKey)) then
+      XMP.LocationShown := AValue
+    else if (StartsText('Iptc4xmpExt:PersonInImage.rdf:Bag', AKey)) then
+      AddBag(XMP.PersonInImage, AValue)
+
+    else if (StartsText('dc:creator.rdf:Seq', AKey)) then
+      AddBag(XMP.Creator, AValue)
+    else if (StartsText('dc:rights.rdf:Alt', AKey)) then
+      XMP.Rights := AValue
+    else if (StartsText('dc:date.rdf:Seq', AKey)) then
+      XMP.Date := AValue // Hardly a Bag!
+    else if (StartsText('dc:type.rdf', AKey)) then
+      AddBag(XMP.PhotoType, AValue)
+    else if (StartsText('dc:title.rdf:Alt', AKey)) then
+      AddBag(XMP.Title, AValue)
+    else if (StartsText('dc:subject.rdf:Bag', AKey)) then
+      AddBag(XMP.Keywords, AValue)
+
+    else if (StartsText('Iptc4xmpExt:Event.rdf:Alt', AKey)) then
+      XMP.Event := AValue
+
+    else if (StartsText('xmp:Rating', AKey)) or
+            (StartsText('xap:Rating', AKey)) then
+      XMP.Rating := AValue;
   end;
 
-  function GetAltData(AltName: string; MaxLen: integer = 255): string;
-  begin
-    I := Pos(AltName, XMPdata);
-    Result := '';
-    if I > 0 then
-    begin
-      K := length(AltName);
-      insert('/', AltName, 2);
-      N := Pos(AltName, XMPdata);
-      tmpXMP := copy(XMPdata, I + K, N - I - K);
-      I := Pos('<rdf:li', tmpXMP);
-      if I > 0 then
-      begin
-        Delete(tmpXMP, 1, I);
-        I := Pos('>', tmpXMP);
-        Delete(tmpXMP, 1, I);
-        I := Pos('<', tmpXMP);
-        XTx := copy(tmpXMP, 1, I - 1);
-        if length(XTx) > MaxLen then
-        begin
-          XTx[MaxLen] := '…';
-          SetLength(XTx, MaxLen);
-        end;
-        Result := XTx;
-      end;
-    end;
-  end;
-
-  function GetStructTag(StructName, TagName: string): string;
+  procedure LevelDeeper(const ANode: TXmlNode; AParent: string);
   var
-    z: smallint;
-    TagEnd: string;
+    ANodeList: TXmlNodeList;
+    ASubNode: TXmlNode;
+    SelNode: string;
+    Attribute: TXmlAttribute;
   begin
-    I := Pos(StructName, XMPdata);
-    if I > 0 then
-    begin
-      K := length(StructName);
-      insert('/', StructName, 2);
-      N := Pos(StructName, XMPdata);
-      tmpXMP := copy(XMPdata, I + K, N - K);
-      XTx := '';
-      z := length(TagName);
-      TagEnd := TagName;
-      insert('/', TagEnd, 2);
-      while Pos(TagName, tmpXMP) > 0 do
-      begin
-        I := Pos(TagName, tmpXMP);
-        N := Pos(TagEnd, tmpXMP);
-        Tx := copy(tmpXMP, I + z, N - I - z);
-        XTx := XTx + Tx + FotoKeySep;
-        Delete(tmpXMP, 1, N);
-      end;
-      I := length(XTx);
-      if I > 1 then
-        SetLength(XTx, I - 1); // delete last separator
-      Result := XTx;
-    end
-    else
-      Result := '';
+    SelNode := Trim(AParent);
+    if (ANode.NodeValue <> '') then
+      Add2Xmp(SelNode, ANode.NodeValue);
+
+    // Add . , but not for first
+    if (SelNode <> '') then
+      SelNode := SelNode + '.';
+
+    // Look in Attributes of Node
+    for Attribute in ANode.AttributeList do
+      Add2Xmp(SelNode + Attribute.Name, Attribute.Value);
+
+    // Look in Childnodes
+    ANodeList := ANode.ChildNodes;
+    for ASubNode in ANodeList do
+      LevelDeeper(ASubNode, SelNode + ASubNode.NodeName);
   end;
 
 begin
   FotoF.Seek(XMPoffset, TSeekOrigin.soBeginning);
   Setlength(Bytes, XMPsize);
   FotoF.Read(Bytes[0], XMPsize);
-  XMPdata := '';
-  if (Encoding.GetCharCount(Bytes) > 0) then
-  begin
-    XMPdata := Encoding.GetString(Bytes);
-    XMPdata := StringReplace(XMPdata, '&amp;', '&', [rfReplaceAll]);
-    XMPdata := StringReplace(XMPdata, '&quot;', '"', [rfReplaceAll]);
-    XMPdata := StringReplace(XMPdata, '&#39;', '''', [rfReplaceAll]);
-    XMPdata := StringReplace(XMPdata, '&lt;', '<', [rfReplaceAll]);
-    XMPdata := StringReplace(XMPdata, '&gt;', '>', [rfReplaceAll]);
-    with XMP do
-    begin
-      Supported := true;
-      Creator := GetAltData('<dc:creator>');
-      Rights := GetAltData('<dc:rights>');
-      Date := GetAltData('<dc:date>');
-      PhotoType := GetBagData('<dc:type>');
-      Title := GetAltData('<dc:title>');
-      Event := GetAltData('<Iptc4xmpExt:Event>');
-      CountryCodeShown := GetStructTag('<Iptc4xmpExt:LocationShown>', '<Iptc4xmpExt:CountryCode>');
-      CountryNameShown := GetStructTag('<Iptc4xmpExt:LocationShown>', '<Iptc4xmpExt:CountryName>');
-      ProvinceShown := GetStructTag('<Iptc4xmpExt:LocationShown>', '<Iptc4xmpExt:ProvinceState>');
-      CityShown := GetStructTag('<Iptc4xmpExt:LocationShown>', '<Iptc4xmpExt:City>');
-      LocationShown := GetStructTag('<Iptc4xmpExt:LocationShown>', '<Iptc4xmpExt:Sublocation>');
-      PersonInImage := GetBagData('<Iptc4xmpExt:PersonInImage>');
-      Keywords := GetBagData('<dc:subject>');
-      Rating := GetTagData('<xmp:Rating>');
-      if Rating = '' then
-        Rating := GetTagData('<xap:Rating>'); // stupid DNG uses that
-    end;
+
+  TmpStream := TMemoryStream.Create;
+  TmpStream.WriteData(Bytes, XMPsize);
+  if (TmpStream = nil) then
+    exit;
+
+  Xml:= TXmlVerySimple.Create;
+  try
+    TmpStream.Position := 0;
+    Xml.Encoding := XMPEncoding;
+    Xml.LoadFromStream(TmpStream);
+
+    RDF := GetRDF(Xml);
+    if (RDF = nil) then
+      exit;
+
+    RDFDescNodes := RDF.ChildNodes;
+    Xmp.Supported := (RDFDescNodes.Count > 0);
+
+    // Recurse thru all subnodes, and look in attributes and node names
+    for RDFDesc in RDFDescNodes do
+      LevelDeeper(RDFDesc, '');
+  finally
+    Xml.Free;
+    TmpStream.Free;
   end;
-  XMPdata := '';
 end;
 
 // https://github.com/lclevy/canon_cr3/blob/master/readme.md
@@ -1472,23 +1352,28 @@ begin
 end;
 
 // ======================================== MAIN ==============================================
-function GetMetadata(FName: string; AGetOptions: TGetOptions): FotoRec;
+function GetMetadata(AName: string; AGetOptions: TGetOptions): FotoRec;
 var
   FotoHandle: THandle;
 begin
   result.Clear;  // Clear all variables
-  if (FName = '') then
+  if (AName = '') or
+     not FileExists(AName) then
     exit;
+
+{$IFDEF DEBUG}
+  FileName := AName;
+{$ENDIF}
 
   with result do
   begin
-    GetOptions := AGetOptions;
 
-    if not FileExists(FName) then
-      exit;
+    // Get parameters
+    GetOptions := AGetOptions;
+    FotoKeySep := ET_Options.GetSeparator;
 
     // Open the file ourselves. We dont want an exception
-    FotoHandle := FileOpen(FName, fmOpenRead or fmShareDenyNone);
+    FotoHandle := FileOpen(AName, fmOpenRead or fmShareDenyNone);
     if (FotoHandle = INVALID_HANDLE_VALUE) then
       exit;
 
