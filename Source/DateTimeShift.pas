@@ -158,7 +158,7 @@ end;
 
 procedure TFDateTimeShift.MaskEdit1Change(Sender: TObject);
 var
-  Yd, Md, Dd, hhd, mmd, ssd, i: smallint;
+  Yd, Md, Dd, hhd, mmd, ssd, i: integer;
   NewDT: TDateTime;
 begin
   if DateTimeOK then

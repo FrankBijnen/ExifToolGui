@@ -50,15 +50,15 @@ end;
 
 procedure TFEditFFilter.Button2Click(Sender: TObject);
 var
-  i: smallint;
+  Indx: integer;
 begin
-  i := ListBox1.ItemIndex;
-  if i > 0 then
+  Indx := ListBox1.ItemIndex;
+  if Indx > 0 then
   begin
     ListBox1.DeleteSelected;
-    dec(i);
-    ListBox1.ItemIndex := i;
-    Button2.Enabled := (i > 0);
+    dec(Indx);
+    ListBox1.ItemIndex := Indx;
+    Button2.Enabled := (Indx > 0);
     Button4.Enabled := true;
   end;
 end;
@@ -70,23 +70,23 @@ end;
 
 procedure TFEditFFilter.Button5Click(Sender: TObject);
 var
-  i, x: smallint;
+  I, X: integer;
 begin
   with ListBox1 do
   begin
-    i := ItemIndex;
-    x := Items.Count - 1;
-    if i > 0 then
+    I := ItemIndex;
+    X := Items.Count - 1;
+    if I > 0 then
     begin
       if Sender = Button5 then
       begin
-        if i > 1 then
-          Items.Exchange(i, i - 1); // Up
+        if I > 1 then
+          Items.Exchange(I, I - 1); // Up
       end
       else
       begin
-        if i < x then
-          Items.Exchange(i, i + 1); // Down
+        if I < X then
+          Items.Exchange(I, I + 1); // Down
       end;
     end;
   end;
@@ -99,37 +99,37 @@ end;
 
 procedure TFEditFFilter.FormShow(Sender: TObject);
 var
-  i, n: smallint;
+  I, N: integer;
 begin
   Left := FMain.Left + 8;
   Top := FMain.Top + 56;
   ListBox1.Items.Clear;
-  i := FMain.CBoxFileFilter.Items.Count;
-  for n := 0 to i - 1 do
-    ListBox1.Items.Append(FMain.CBoxFileFilter.Items[n]);
-  i := FMain.CBoxFileFilter.ItemIndex;
+  I := FMain.CBoxFileFilter.Items.Count;
+  for N := 0 to I - 1 do
+    ListBox1.Items.Append(FMain.CBoxFileFilter.Items[N]);
+  I := FMain.CBoxFileFilter.ItemIndex;
   ListBox1.ItemIndex := -1;
   Edit1.Text := '';
-  if i <> 0 then
+  if I <> 0 then
   begin
     Edit1.Text := FMain.CBoxFileFilter.Text;
-    ListBox1.ItemIndex := i;
+    ListBox1.ItemIndex := I;
   end;
-  Button1.Enabled := (i = -1);
-  Button2.Enabled := (i > 0);
+  Button1.Enabled := (I = -1);
+  Button2.Enabled := (I > 0);
   Button4.Enabled := false;
 end;
 
 procedure TFEditFFilter.ListBox1Click(Sender: TObject);
 var
-  i: smallint;
+  Indx: integer;
 begin
-  i := ListBox1.ItemIndex;
+  Indx := ListBox1.ItemIndex;
   Button1.Enabled := false;
-  Button2.Enabled := (i > 0);
+  Button2.Enabled := (Indx > 0);
   Edit1.OnChange := nil;
-  if i > 0 then
-    Edit1.Text := ListBox1.Items[i];
+  if Indx > 0 then
+    Edit1.Text := ListBox1.Items[Indx];
   Edit1.OnChange := Edit1Change;
 end;
 

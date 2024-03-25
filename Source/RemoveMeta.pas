@@ -137,16 +137,16 @@ end;
 
 procedure TFRemoveMeta.CheckBox1Click(Sender: TObject);
 var
-  i: smallint;
+  Indx: integer;
 begin
   if EventOn then
   begin
     EventOn := false;
     with AdvPanel2 do
-      for i := 0 to ControlCount - 1 do
+      for Indx := 0 to ControlCount - 1 do
       begin
-        if Controls[i] is TCheckBox then
-          (Controls[i] as TCheckBox).Checked := CheckBox1.Checked;
+        if Controls[Indx] is TCheckBox then
+          (Controls[Indx] as TCheckBox).Checked := CheckBox1.Checked;
       end;
     EventOn := true;
     SetExecuteButton;
@@ -155,15 +155,13 @@ end;
 
 procedure TFRemoveMeta.CheckForRemoveAll;
 var
-  i: smallint;
+  Indx: integer;
   AllChecked: boolean;
 begin
   AllChecked := true;
-  with AdvPanel2 do
-    for i := 0 to ControlCount - 1 do
-    begin
-      AllChecked := AllChecked and (Controls[i] as TCheckBox).Checked;
-    end;
+  for Indx := 0 to AdvPanel2.ControlCount - 1 do
+    AllChecked := AllChecked and
+                  (AdvPanel2.Controls[Indx] as TCheckBox).Checked;
   EventOn := false;
   CheckBox1.Checked := AllChecked;
   EventOn := true;

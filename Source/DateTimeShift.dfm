@@ -3,8 +3,8 @@ object FDateTimeShift: TFDateTimeShift
   Top = 0
   BorderStyle = bsDialog
   Caption = 'Exif: DateTime shift'
-  ClientHeight = 220
-  ClientWidth = 511
+  ClientHeight = 219
+  ClientWidth = 507
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -22,19 +22,18 @@ object FDateTimeShift: TFDateTimeShift
   end
   object StatusBar1: TStatusBar
     Left = 0
-    Top = 201
-    Width = 511
+    Top = 200
+    Width = 507
     Height = 19
     Panels = <>
     SimplePanel = True
-    ExplicitTop = 200
     ExplicitWidth = 459
   end
   object AdvPanel1: TPanel
     Left = 0
     Top = 0
     Width = 407
-    Height = 201
+    Height = 200
     Align = alLeft
     DoubleBuffered = True
     Font.Charset = DEFAULT_CHARSET
@@ -45,6 +44,7 @@ object FDateTimeShift: TFDateTimeShift
     ParentDoubleBuffered = False
     ParentFont = False
     TabOrder = 1
+    ExplicitHeight = 201
     object Label2: TLabel
       Left = 1
       Top = 119

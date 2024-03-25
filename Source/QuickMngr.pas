@@ -60,116 +60,116 @@ end;
 
 procedure TMyGrid.InsertRow(ARow: Integer);
 var
-  i: smallint;
+  Indx: integer;
 begin
-  i := Row;
+  Indx := Row;
   while ARow < FixedRows do
     Inc(ARow);
   RowCount := RowCount + 1;
   MoveRow(RowCount - 1, ARow);
-  Row := i;
+  Row := Indx;
   Rows[Row].Clear;
 end;
 
 procedure TFQuickManager.Button1Click(Sender: TObject);
 var
-  i, t, n: smallint; // Delete row
+  I, T, N: integer; // Delete row
 begin
   with StringGrid1 do
   begin
-    n := Height div RowHeights[0]; // how many rows fit into grid
-    t := TopRow;
-    i := Row;
+    N := Height div RowHeights[0]; // how many rows fit into grid
+    T := TopRow;
+    I := Row;
     if RowCount > 1 then
       TMyGrid(StringGrid1).DeleteRow(Row); // keep one line
-    if i = RowCount then
-      dec(i);
-    if t > i then
+    if I = RowCount then
+      dec(I);
+    if T > I then
     begin // scroll for one page
-      dec(t, n);
-      if t < 0 then
-        t := 0;
+      dec(T, N);
+      if T < 0 then
+        T := 0;
     end;
-    TopRow := t;
-    Row := i;
+    TopRow := T;
+    Row := I;
     Button1.Enabled := (RowCount > 1);
   end;
 end;
 
 procedure TFQuickManager.Button2Click(Sender: TObject);
 var
-  i: smallint;
-  tx: string; // Save changes
+  I: integer;
+  Tx: string; // Save changes
 begin
-  tx := Trim(LabeledEdit1.Text);
-  LabeledEdit1.Text := tx;
-  if (Length(tx) = 0) or (pos('*', tx) = 1) then
+  Tx := Trim(LabeledEdit1.Text);
+  LabeledEdit1.Text := Tx;
+  if (Length(Tx) = 0) or (pos('*', Tx) = 1) then
     LabeledEdit1.SetFocus
   else
   begin
-    tx := Trim(LabeledEdit2.Text);
-    LabeledEdit2.Text := tx;
-    if (Length(tx) < 4) or (LeftStr(tx, 1) <> '-') or (RightStr(tx, 1) = '=') then
+    Tx := Trim(LabeledEdit2.Text);
+    LabeledEdit2.Text := Tx;
+    if (Length(Tx) < 4) or (LeftStr(Tx, 1) <> '-') or (RightStr(Tx, 1) = '=') then
       LabeledEdit2.SetFocus
     else
       with StringGrid1 do
       begin
-        i := Row;
-        Cells[0, i] := LabeledEdit1.Text;
-        Cells[1, i] := LabeledEdit2.Text;
-        Cells[2, i] := Trim(LabeledEdit3.Text);
+        I := Row;
+        Cells[0, I] := LabeledEdit1.Text;
+        Cells[1, I] := LabeledEdit2.Text;
+        Cells[2, I] := Trim(LabeledEdit3.Text);
       end;
   end;
 end;
 
 procedure TFQuickManager.Button3Click(Sender: TObject);
 var
-  i: smallint;
-  tx: string; // Insert row
+  I: integer;
+  Tx: string; // Insert row
 begin
-  tx := Trim(LabeledEdit1.Text);
-  LabeledEdit1.Text := tx;
-  if (Length(tx) = 0) or (pos('*', tx) = 1) then
+  Tx := Trim(LabeledEdit1.Text);
+  LabeledEdit1.Text := Tx;
+  if (Length(Tx) = 0) or (pos('*', Tx) = 1) then
     LabeledEdit1.SetFocus
   else
   begin
-    tx := Trim(LabeledEdit2.Text);
-    LabeledEdit2.Text := tx;
-    if (Length(tx) < 4) or (pos('-', tx) <> 1) then
+    Tx := Trim(LabeledEdit2.Text);
+    LabeledEdit2.Text := Tx;
+    if (Length(Tx) < 4) or (pos('-', Tx) <> 1) then
       LabeledEdit2.SetFocus
     else
       with StringGrid1 do
       begin
-        i := Row;
+        I := Row;
         OnSelectCell := nil;
-        TMyGrid(StringGrid1).InsertRow(i);
+        TMyGrid(StringGrid1).InsertRow(I);
         OnSelectCell := StringGrid1SelectCell;
-        Cells[0, i] := LabeledEdit1.Text;
-        Cells[1, i] := LabeledEdit2.Text;
-        Cells[2, i] := Trim(LabeledEdit3.Text);
+        Cells[0, I] := LabeledEdit1.Text;
+        Cells[1, I] := LabeledEdit2.Text;
+        Cells[2, I] := Trim(LabeledEdit3.Text);
       end;
   end;
 end;
 
 procedure TFQuickManager.Button5Click(Sender: TObject);
 var
-  i, n: smallint;
-  tx: string;
+  I, N: integer;
+  Tx: string;
 begin
   with StringGrid1 do
   begin
-    i := RowCount;
-    SetLength(QuickTags, i);
-    for n := 0 to i - 1 do
+    I := RowCount;
+    SetLength(QuickTags, I);
+    for N := 0 to I - 1 do
     begin
-      tx := Cells[0, n];
-      QuickTags[n].Caption := tx;
-      QuickTags[n].NoEdit := (RightStr(tx, 1) = '?');
-      tx := Cells[1, n];
-      QuickTags[n].Command := tx;
-      tx := UpperCase(LeftStr(tx, 4));
-      QuickTags[n].NoEdit := QuickTags[n].NoEdit or (tx = '-GUI');
-      QuickTags[n].Help := Cells[2, n];
+      Tx := Cells[0, N];
+      QuickTags[N].Caption := Tx;
+      QuickTags[N].NoEdit := (RightStr(Tx, 1) = '?');
+      Tx := Cells[1, N];
+      QuickTags[N].Command := Tx;
+      Tx := UpperCase(LeftStr(Tx, 4));
+      QuickTags[N].NoEdit := QuickTags[N].NoEdit or (Tx = '-GUI');
+      QuickTags[N].Help := Cells[2, N];
     end;
   end;
   ModalResult := mrOK;
@@ -177,27 +177,27 @@ end;
 
 procedure TFQuickManager.FormShow(Sender: TObject);
 var
-  i, n, x: smallint; // clLite,clDark:TColor;
+  I, N, X: integer;
 begin
   Left := FMain.Left + 8;
   Top := FMain.Top + 56;
   if FMain.SpeedBtnQuick.Down then
-    x := FMain.MetadataList.Row - 1
+    X := FMain.MetadataList.Row - 1
   else
-    x := 0;
-  i := Length(QuickTags);
+    X := 0;
+  I := Length(QuickTags);
   with StringGrid1 do
   begin
     ColWidths[1] := 220;
     ColWidths[2] := 220;
-    RowCount := i;
-    for n := 0 to i - 1 do
+    RowCount := I;
+    for N := 0 to I - 1 do
     begin
-      Cells[0, n] := QuickTags[n].Caption;
-      Cells[1, n] := QuickTags[n].Command;
-      Cells[2, n] := QuickTags[n].Help;
+      Cells[0, N] := QuickTags[N].Caption;
+      Cells[1, N] := QuickTags[N].Command;
+      Cells[2, N] := QuickTags[N].Help;
     end;
-    Row := x;
+    Row := X;
     Button1.Enabled := (RowCount > 1);
   end;
   Application.OnHint := DisplayHint;

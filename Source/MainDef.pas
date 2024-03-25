@@ -2,12 +2,14 @@ unit MainDef;
 
 interface
 
-uses System.Classes, ExifTool, GEOMap, UnitLangResources;
+uses System.Classes, Vcl.Dialogs, ExifTool, GEOMap, UnitLangResources;
 
 const
   SHOWALL = 'Show All Files';
 
 type
+  TIniData = (idWorkSpace, idETDirect, idUserDefined);
+
   GUIsettingsRec = record
     Language: string[7];
     AutoRotatePreview: boolean;
@@ -15,7 +17,7 @@ type
     DefStartupDir: string;
     DefExportUse: boolean;
     DefExportDir: string;
-    ThumbSize: smallint;
+    ThumbSize: integer;
     ThumbAutoGenerate: boolean;
     ThumbCleanSet: string[4];
     UseExitDetails: boolean;
@@ -24,8 +26,8 @@ type
     EnableGMap: boolean;
     DefGMapHome: string[23];
     GuiStyle: string;
-    ETdirDefCmd: smallint;
-    ETdirMode: smallint;
+    ETdirDefCmd: integer;
+    ETdirMode: integer;
     InitialDir: string;
     ETOverrideDir: string;
     ETCustomConfig: string;
@@ -49,14 +51,14 @@ type
   FListColUsrRec = record
     Caption: string;
     Command: string;
-    Width: smallint;
-    AlignR: smallint;
+    Width: integer;
+    AlignR: integer;
   end;
 
   FListColDefRec = record
     Caption: PResStringRec;
-    Width: smallint;
-    AlignR: smallint;
+    Width: integer;
+    AlignR: integer;
   end;
 
   QuickTagRec = record
@@ -67,7 +69,7 @@ type
   end;
 
 var
-  FListStdColWidth: array [0 .. 3] of smallint; // [Filename][Size][Type][Date modified]
+  FListStdColWidth: array [0 .. 3] of integer; // [Filename][Size][Type][Date modified]
 
   // Note: Default widths are in ReadGui
   // Captions will be loaded at runtime from resourcestrings
@@ -104,15 +106,15 @@ function ReadSingleInstanceApp: boolean;
 procedure ResetWindowSizes;
 procedure ReadGUIini;
 function SaveGUIini: boolean;
-function LoadWorkspaceIni(IniFName: string): boolean;
-function SaveWorkspaceIni(IniFName: string): boolean;
+function LoadIniDialog(OpenFileDlg: TOpenDialog; AIniData: TIniData; ShowMsg: boolean = true): boolean;
+function SaveIniDialog(SaveFileDlg: TSaveDialog; AIniData: TIniData; ShowMsg: boolean = true): boolean;
 function BrowseFolderDlg(const Title: string; iFlag: integer; const StartFolder: string = ''): string;
 
 implementation
 
 uses System.SysUtils, System.StrUtils, System.IniFiles,
   Winapi.Windows, Winapi.ShellAPI, Winapi.ShlObj,
-  Vcl.Forms, Vcl.ComCtrls, Vcl.Dialogs,
+  Vcl.Forms, Vcl.StdCtrls, Vcl.ComCtrls,
   Main, LogWin, ExifToolsGUI_Utils, ExifInfo;
 
 const
@@ -123,15 +125,15 @@ const
   IniVersion = 'V6';
   PrevIniVersion = 'V5';
   WorkSpaceTags = 'WorkSpaceTags';
+  ETDirectCmds = 'ETdirectCmd';
+  UserDefTags = 'FListUserDefColumn';
+
+  // Check for IniPath commandLine param. See initialization.
+  INIPATHSWITCH = 'IniPath';
 
 var
   GUIini: TMemIniFile;
   lg_StartFolder: string;
-
-
-// Check for IniPath commandLine param. See initialization.
-const
-  INIPATHSWITCH = 'IniPath';
 
 function GetParmIniPath: string;
 begin
@@ -219,7 +221,7 @@ begin
 
 end;
 
-procedure ReadWorkSpaceTags(GUIini: TMemIniFile);
+function ReadWorkSpaceTags(GUIini: TMemIniFile):integer;
 var
   Indx, WSCnt: integer;
   Name, Cmd, Help : string;
@@ -229,6 +231,7 @@ begin
   try
     GUIini.ReadSectionValues(WorkSpaceTags, TmpItems);
     WSCnt := TmpItems.Count;
+    result := WSCnt;
     SetLength(QuickTags, WSCnt);
 
     if (WSCnt = 0) and
@@ -278,6 +281,88 @@ begin
   end;
 end;
 
+function ReadETdirectCmds(CbETDirect: TComboBox; GUIini: TMemIniFile): integer;
+var
+  Indx, ETcnt: integer;
+begin
+
+  ETdirectCmd.Clear;
+  GUIini.ReadSection(ETDirectCmds, CbETDirect.Items);
+  ETcnt := CbETDirect.Items.Count;
+  result := ETcnt;
+  if ETcnt = 0 then
+  begin
+    CbETDirect.Items.Append('Set Exif:Copyright to [©Year by MyName]');
+    ETdirectCmd.Append('-d %Y "-Exif:Copyright<©$DateTimeOriginal by MyName"');
+  end
+  else
+  begin
+    for Indx := 0 to ETcnt - 1 do
+      ETdirectCmd.Append(GUIini.ReadString(ETDirectCmds, CbETDirect.Items[Indx], '?'));
+  end;
+
+  // Setup default ET Direct command
+  if GUIsettings.ETdirDefCmd > ETdirectCmd.Count then
+    GUIsettings.ETdirDefCmd := -1;
+  CbETDirect.ItemIndex := GUIsettings.ETdirDefCmd;
+  CbETDirect.OnChange(CbETDirect);
+end;
+
+function ReadUserDefTags(GUIini: TMemIniFile): integer;
+var
+  Indx, UDCnt: integer;
+  Tx: string;
+  TmpItems: TStringList;
+begin
+  TmpItems := TStringList.Create;
+  try
+    GUIini.ReadSectionValues(UserDefTags, TmpItems);
+    UDCnt := TmpItems.Count;
+    result := UDCnt;
+    if (UDCnt = 0) and
+       (GUIini.SectionExists(UserDefTags) = false) then
+    begin
+      SetLength(FListColUsr, 3);
+      with FListColUsr[0] do
+      begin
+        Caption := 'DateTime';
+        Command := '-exif:DateTimeOriginal';
+        Width := 120;
+        AlignR := 0;
+      end;
+      with FListColUsr[1] do
+      begin
+        Caption := 'Rating';
+        Command := '-xmp-xmp:Rating';
+        Width := 60;
+        AlignR := 0;
+      end;
+      with FListColUsr[2] do
+      begin
+        Caption := 'Photo title';
+        Command := '-xmp-dc:Title';
+        Width := 160;
+        AlignR := 0;
+      end;
+    end
+    else
+    begin
+      SetLength(FListColUsr, UDCnt);
+      for Indx := 0 to UDCnt - 1 do
+      begin
+        Tx := TmpItems[Indx];
+        FListColUsr[Indx].Caption := NextField(Tx, '=');
+        FListColUsr[Indx].Command := NextField(Tx, ' ');
+        FListColUsr[Indx].Width := StrToIntDef(Tx, 80);
+        FListColUsr[Indx].AlignR := 0;
+      end;
+    end;
+  finally
+    TmpItems.Free;
+  end;
+end;
+
+
 // Writing the workspace tags this way allows duplicate tag names.
 // Not what's intended by MS, but hey....
 procedure WriteWorkSpaceTags(GUIini: TMemIniFile);
@@ -293,6 +378,50 @@ begin
     for Indx := 0 to Length(QuickTags) - 1 do
     begin
       Tx := Format('%s=%s^%s', [QuickTags[Indx].Caption, QuickTags[Indx].Command, QuickTags[Indx].Help]);
+      TmpItems.Add(Tx);
+    end;
+    GUIini.SetStrings(TmpItems);
+  finally
+    TmpItems.Free;
+  end;
+end;
+
+// Writing the ET Direct commands
+procedure WriteEtDirectCmds(CbETDirect: TComboBox; GUIini: TMemIniFile);
+var
+  Indx: integer;
+  Tx: string;
+  TmpItems: TStringList;
+begin
+  TmpItems := TStringList.Create;
+  try
+    GUIini.GetStrings(TmpItems); // Get strings written so far.
+    TmpItems.Add(Format('[%s]', [ETDirectCmds]));
+    for Indx := 0 to ETdirectCmd.Count -1 do
+    begin
+      Tx := Format('%s=%s', [CbETDirect.Items[Indx], ETdirectCmd[Indx]]);
+      TmpItems.Add(Tx);
+    end;
+    GUIini.SetStrings(TmpItems);
+  finally
+    TmpItems.Free;
+  end;
+end;
+
+// Writing the User defined fields
+procedure WriteUserDefTags(GUIini: TMemIniFile);
+var
+  Indx: integer;
+  Tx: string;
+  TmpItems: TStringList;
+begin
+  TmpItems := TStringList.Create;
+  try
+    GUIini.GetStrings(TmpItems); // Get strings written so far.
+    TmpItems.Add(Format('[%s]', [UserDefTags]));
+    for Indx := 0 to Length(FListColUsr) -1 do
+    begin
+      Tx := Format('%s=%s %d', [FListColUsr[Indx].Caption, FListColUsr[Indx].Command, FListColUsr[Indx].Width]);
       TmpItems.Add(Tx);
     end;
     GUIini.SetStrings(TmpItems);
@@ -372,7 +501,7 @@ end;
 
 procedure ReadGUIini;
 var
-  I, N, X: integer;
+  I, N: integer;
   Tx, DefaultDir: string;
   TmpItems: TStringList;
 begin
@@ -495,87 +624,10 @@ begin
       end;
 
       // Custom FList columns
-      ReadSectionValues('FListUserDefColumn', TmpItems);
-      I := TmpItems.Count;
-      if I > 0 then
-      begin
-        SetLength(FListColUsr, I);
-        for N := 0 to I - 1 do
-          with FListColUsr[N] do
-          begin
-            Tx := TmpItems[N];
-            X := pos('=', Tx);
-            Caption := LeftStr(Tx, X - 1);
-            Delete(Tx, 1, X);
-            X := pos(' ', Tx);
-            if X = 0 then
-            begin
-              Command := Tx;
-              Width := 80;
-            end
-            else
-            begin
-              Command := LeftStr(Tx, X - 1);
-              Delete(Tx, 1, X);
-              Width := StrToIntDef(Tx, 80);
-            end;
-            AlignR := 0;
-          end;
-      end
-      else
-      begin
-        SetLength(FListColUsr, 3);
-        with FListColUsr[0] do
-        begin
-          Caption := 'DateTime';
-          Command := '-exif:DateTimeOriginal';
-          Width := 120;
-          AlignR := 0;
-        end;
-        with FListColUsr[1] do
-        begin
-          Caption := 'Rating';
-          Command := '-xmp-xmp:Rating';
-          Width := 60;
-          AlignR := 0;
-        end;
-        with FListColUsr[2] do
-        begin
-          Caption := 'Photo title';
-          Command := '-xmp-dc:Title';
-          Width := 160;
-          AlignR := 0;
-        end;
-      end;
+      ReadUserDefTags(GUIini);
 
       // --- ETdirect commands---
-      ETdirectCmd.Clear;
-      ReadSection('ETdirectCmd', CBoxETdirect.Items);
-      N := CBoxETdirect.Items.Count;
-      if N = 0 then
-        with CBoxETdirect.Items do
-        begin
-          Append('Set Exif:Copyright to [©Year by MyName]');
-          ETdirectCmd.Append('-d %Y "-Exif:Copyright<©$DateTimeOriginal by MyName"');
-          N := 2;
-        end
-      else
-      begin
-        for I := 0 to N - 1 do
-          ETdirectCmd.Append(ReadString('ETdirectCmd', CBoxETdirect.Items[I], '?'));
-      end;
-      I := GUIsettings.ETdirDefCmd;
-      if I < N then
-      begin
-        CBoxETdirect.ItemIndex := I;
-        if I <> -1 then
-        begin
-          EditETdirect.Text := ETdirectCmd[I];
-          SpeedBtnETdirectDel.Enabled := True;
-        end;
-      end
-      else
-        GUIsettings.ETdirDefCmd := -1;
+      ReadEtDirectCmds(CBoxETdirect, GUIini);
 
       // --- WorkSpace tags---
       ReadWorkSpaceTags(GUIini);
@@ -771,10 +823,7 @@ begin
 
         WriteBool(Ini_Options, 'DontBackup', MaDontBackup.Checked);
         WriteBool(Ini_Options, 'PreserveDateMod', MaPreserveDateMod.Checked);
-        Tx := ET_Options.ETSeparator;
-        Delete(Tx, 1, 6);
-        SetLength(Tx, 1);
-        WriteString(Ini_Options, 'KeySeparator', Tx);
+        WriteString(Ini_Options, 'KeySeparator', ET_Options.GetSeparator);
         WriteBool(Ini_Options, 'IgnoreErrors', MaIgnoreErrors.Checked);
         WriteBool(Ini_Options, 'GPSinDecimal', MaShowGPSdecimal.Checked);
         WriteBool(Ini_Options, 'ShowSorted', MaShowSorted.Checked);
@@ -784,18 +833,16 @@ begin
         WriteBool(Ini_Options, 'APILargeFileSupport', MaAPILargeFileSupport.Checked);
         WriteString(Ini_Options, 'CustomOptions', ET_Options.ETCustomOptions);
 
-        I := length(FListColUsr) - 1;
-        for N := 0 to I do
-        begin
-          Tx := FListColUsr[N].Command + ' ' + IntToStr(FListColUsr[N].Width);
-          WriteString('FListUserDefColumn', FListColUsr[N].Caption, Tx);
-        end;
+        // Write User defined fields
+        WriteUserDefTags(GUIini);
 
-        for N := 0 to ETdirectCmd.Count - 1 do
-          WriteString('ETdirectCmd', CBoxETdirect.Items[N], ETdirectCmd[N]);
+        // Write Et Direct commands
+        WriteETDirectCmds(CBoxETdirect, GuiIni);
 
+        // Workspace tags
         WriteWorkSpaceTags(GuiIni);
 
+        // Marked Tags
         N := length(MarkedTags);
         if (N > 0) then
           MarkedTags[N] := '<'
@@ -803,6 +850,7 @@ begin
           MarkedTags := '<';
         WriteString('TagList', 'MarkedTags', MarkedTags);
 
+        // Custom view tags
         N := length(CustomViewTags);
         if (N > 0) then
           CustomViewTags[N] := '<'
@@ -826,39 +874,123 @@ begin
   end;
 end;
 
-function LoadWorkspaceIni(IniFName: string): boolean;
-var
-  TmpItems: TStringList;
+function GetHrIniData(AIniData: TIniData): string;
+begin
+  case (AIniData) of
+    TIniData.idWorkSpace:
+      result := StrWorkspace;
+    TIniData.idETDirect:
+      result := StrETDirect;
+    TIniData.idUserDefined:
+      result := StrUserDef;
+  end;
+end;
+
+function LoadIni(IniFName: string; AIniData: TIniData): boolean;
 begin
   result := false;
   if not FileExists(IniFName) then
     exit;
 
-  TmpItems := TStringList.Create;
   GUIini := TMemIniFile.Create(IniFName, TEncoding.UTF8);
   try
-    ReadWorkSpaceTags(GuiIni);
-    result := true;
+    case AIniData of
+      TIniData.idWorkSpace: result := (ReadWorkSpaceTags(GuiIni) <> 0);
+      TIniData.idETDirect: result := (ReadETdirectCmds(Fmain.CBoxETdirect, GuiIni) <> 0);
+      TIniData.idUserDefined: result := (ReadUserDefTags(GuiIni) <> 0);
+    end;
   finally
     GUIini.Free;
-    TmpItems.Free;
   end;
 end;
 
-function SaveWorkspaceIni(IniFName: string): boolean;
+function LoadIniDialog(OpenFileDlg: TOpenDialog; AIniData: TIniData; ShowMsg: boolean = true): boolean;
+var
+  HrIniData: string;
+begin
+  result := false;
+
+  HrIniData := GetHrIniData(AIniData);
+  with OpenFileDlg do
+  begin
+    InitialDir := WrkIniDir;
+    Filter := 'Ini file|*.ini';
+    Title := Format(StrLoadIniDefine, [HrIniData]);
+    if Execute then
+    begin
+      if LoadIni(FileName, AIniData) then
+      begin
+        if (ShowMsg) then
+          ShowMessage(Format(StrNewIniLoaded, [HrIniData]))
+        else
+          result := true
+      end
+      else
+        ShowMessage(StrIniFileNotChanged);
+      WrkIniDir := ExtractFileDir(FileName);
+    end;
+  end;
+end;
+
+function SaveIni(IniFName: string; AIniData: TIniData): boolean;
 begin
   result := true;
   try
     System.SysUtils.DeleteFile(IniFName);
     GUIini := TMemIniFile.Create(IniFName, TEncoding.UTF8);
     try
-      WriteWorkSpaceTags(GuiIni);
+      case AIniData of
+        TIniData.idWorkSpace: WriteWorkSpaceTags(GuiIni);
+        TIniData.idETDirect: WriteEtDirectCmds(FMain.CBoxETdirect, GuiIni);
+        TIniData.idUserDefined: WriteUserDefTags(GuiIni);
+      end;
       GUIini.UpdateFile;
     finally
       GUIini.Free;
     end;
   except
     result := false;
+  end;
+end;
+
+function SaveIniDialog(SaveFileDlg: TSaveDialog; AIniData: TIniData; ShowMsg: boolean = true): boolean;
+var
+  DoSave, IsOK: boolean;
+  HrIniData: string;
+begin
+  result := false;
+
+  HrIniData := GetHrIniData(AIniData);
+  with SaveFileDlg do
+  begin
+    DefaultExt := 'ini';
+    InitialDir := WrkIniDir;
+    Filter := 'Ini file|*.ini';
+    Title := Format(StrSaveIniDefine, [HrIniData]);
+    repeat
+      IsOK := false;
+      DoSave := Execute;
+      InitialDir := ExtractFileDir(FileName);
+      if DoSave then
+      begin
+        IsOK := (ExtractFileName(FileName) <> ExtractFileName(GetIniFilePath(false)));
+        if not IsOK then
+          ShowMessage(Format(StrUseAnotherNameForIni, [HrIniData]));
+      end;
+    until not DoSave or IsOK;
+    if DoSave then
+    begin
+      if SaveIni(FileName, AIniData) then
+      begin
+        if (ShowMsg) then
+          ShowMessage(Format(StrIniDefinition, [HrIniData]))
+        else
+          result := true;
+      end
+      else
+        ShowMessage(Format(StrIniDefNotSaved, [HrIniData]));
+      WrkIniDir := ExtractFileDir(FileName);
+    end;
   end;
 end;
 

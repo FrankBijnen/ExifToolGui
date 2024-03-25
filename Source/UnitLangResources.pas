@@ -120,13 +120,19 @@ resourcestring
   StrChooseFolderContai     = 'Choose folder containing XMP sidecar files';
   StrSpecifyCustomOptio     = 'Specify Custom options to add to Exiftool args';
   StrCustomOptions          = 'Custom options';
-  StrLoadWorkspaceDefin     = 'Load Workspace definition file';
-  StrNewWorkspaceLoaded     = 'New Workspace loaded.';
-  StrIniFileDoesntCon       = 'Ini file does not contain Workspace data -nothing changed.';
-  StrSaveWorkspaceDefini    = 'Save Workspace definition file';
-  StrUseAnotherNameFor      = 'Use another name for Workspace definition file!';
-  StrWorkspaceDefinition    = 'Workspace definition file saved.';
-  StrWorkspaceDefNotSaved   = 'Workspace definition file couldn''t be saved!?';
+
+  StrWorkspace              = 'Workspace';
+  StrETDirect               = 'ExifTool direct';
+  StrUserDef                = 'User defined';
+
+  StrLoadIniDefine          = 'Load %s definition file';
+  StrNewIniLoaded           = 'New %s loaded.';
+  StrIniFileNotChanged      = 'Ini file does not contain data -nothing changed.';
+  StrSaveIniDefine          = 'Save %s definition file';
+  StrUseAnotherNameForIni   = 'Use another name for %s definition file!';
+  StrIniDefinition          = '%s definition file saved.';
+  StrIniDefNotSaved         = '%s definition file couldn''t be saved!?';
+
   StrTagAlreadyExistsI      = 'Tag already exists in Custom view.';
   StrOK                     = 'OK';
   StrNotOK                  = 'Not OK';
