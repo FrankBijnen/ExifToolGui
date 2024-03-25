@@ -478,7 +478,7 @@ begin
         MaPreserveDateMod.Checked := ReadBool(Ini_Options, 'PreserveDateMod', false);
         if MaPreserveDateMod.Checked then
           ETFileDate := '-P' + CRLF;
-        ETSeparator := '-sep' + CRLF + ReadString(Ini_Options, 'KeySeparator', '*') + CRLF;
+        SetSeparator(ReadString(Ini_Options, 'KeySeparator', '*'));
         MaIgnoreErrors.Checked := ReadBool(Ini_Options, 'IgnoreErrors', false);
         if MaIgnoreErrors.Checked then
           ETMinorError := '-m' + CRLF;

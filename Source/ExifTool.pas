@@ -26,8 +26,11 @@ type
     procedure SetApiWindowsWideFile(UseWide: boolean);
     procedure SetApiLargeFileSupport(UseLarge: boolean);
     procedure SetCustomOptions(Custom: string);
+    procedure SetSeparator(const Sep: string);
+
     function GetCustomOptions: string;
     function GetOptions(Charset: boolean = true): string;
+    function GetSeparator: string;
   end;
 
 const
@@ -130,6 +133,26 @@ begin
   result := result + ETAPILargeFileSupport;
   result := result + GetCustomOptions;
   // +further options...
+end;
+
+function ET_OptionsRec.GetSeparator: string;
+var
+  ETSep: string;
+begin
+  ETSep := ETSeparator;
+  result := NextField(ETSep, #10);
+  result := NextField(ETSep, #13);
+end;
+
+procedure ET_OptionsRec.SetSeparator(const Sep: string);
+var
+  CorrectSep: string;
+begin
+  CorrectSep := Sep;
+  if (Trim(CorrectSep) = '') then
+    CorrectSep := '*';
+
+  ETSeparator := '-sep' + CRLF + CorrectSep + CRLF;
 end;
 
 // Add ExecNum to FinalCmd

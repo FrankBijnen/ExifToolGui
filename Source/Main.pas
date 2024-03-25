@@ -2942,7 +2942,6 @@ begin
         begin
           Foto := GetMetadata(AFolder.PathName, [TGetOption.gmXMP, TGetOption.gmGPS]);
           if (Foto.ExifIFD.Supported) and
-             (Foto.GPS.Supported) and
              (Foto.XMP.Supported) then
           begin
             Details.Add(Foto.ExifIFD.DateTimeOriginal);
