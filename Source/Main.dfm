@@ -922,8 +922,6 @@ object FMain: TFMain
         LeftAxis.Maximum = 15.000000000000000000
         Align = alClient
         TabOrder = 1
-        ExplicitWidth = 358
-        ExplicitHeight = 370
         DefaultCanvas = 'TGDIPlusCanvas'
         PrintMargins = (
           27
@@ -1006,6 +1004,9 @@ object FMain: TFMain
                 Caption = '&Workspace manager...'
               end
               item
+                Caption = '-'
+              end
+              item
                 Items = <
                   item
                     Action = MaWorkspaceLoad
@@ -1017,6 +1018,35 @@ object FMain: TFMain
                   end>
                 Caption = 'W&orkspace definition file'
                 UsageCount = 1
+              end
+              item
+                Items = <
+                  item
+                    Action = MaETDirectLoad
+                    Caption = '&Load..'
+                  end
+                  item
+                    Action = MaEtDirectSave
+                    Caption = '&Save...'
+                  end>
+                Caption = 'E&xifTool direct definition file'
+                UsageCount = 1
+              end
+              item
+                Items = <
+                  item
+                    Action = MaUserDefLoad
+                    Caption = '&Load..'
+                  end
+                  item
+                    Action = MaUserDefSave
+                    Caption = '&Save...'
+                  end>
+                Caption = '&User defined fields definition file'
+                UsageCount = 1
+              end
+              item
+                Caption = '-'
               end
               item
                 Action = MaGUIStyle
@@ -1505,6 +1535,26 @@ object FMain: TFMain
       Category = 'Help'
       Caption = 'Check Versions'
       OnExecute = MaCheckVersionsExecute
+    end
+    object MaETDirectLoad: TAction
+      Category = 'Program_ETDirect'
+      Caption = 'Load..'
+      OnExecute = MaETDirectLoadExecute
+    end
+    object MaEtDirectSave: TAction
+      Category = 'Program_ETDirect'
+      Caption = 'Save...'
+      OnExecute = MaEtDirectSaveExecute
+    end
+    object MaUserDefLoad: TAction
+      Category = 'Program_UserDef'
+      Caption = 'Load..'
+      OnExecute = MaUserDefLoadExecute
+    end
+    object MaUserDefSave: TAction
+      Category = 'Program_UserDef'
+      Caption = 'Save...'
+      OnExecute = MaUserDefSaveExecute
     end
   end
   object QuickPopUpMenu: TPopupMenu

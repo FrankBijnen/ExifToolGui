@@ -3,8 +3,8 @@ object FCopyMetaSingle: TFCopyMetaSingle
   Top = 0
   BorderStyle = bsDialog
   Caption = 'Import into selected files'
-  ClientHeight = 296
-  ClientWidth = 502
+  ClientHeight = 295
+  ClientWidth = 498
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -22,18 +22,16 @@ object FCopyMetaSingle: TFCopyMetaSingle
   end
   object StatusBar1: TStatusBar
     Left = 0
-    Top = 277
-    Width = 502
+    Top = 276
+    Width = 498
     Height = 19
     Panels = <>
-    ExplicitTop = 276
-    ExplicitWidth = 498
   end
   object AdvPanel1: TPanel
     Left = 0
     Top = 0
     Width = 417
-    Height = 277
+    Height = 276
     Align = alLeft
     DoubleBuffered = True
     Font.Charset = DEFAULT_CHARSET
@@ -44,7 +42,6 @@ object FCopyMetaSingle: TFCopyMetaSingle
     ParentDoubleBuffered = False
     ParentFont = False
     TabOrder = 1
-    ExplicitHeight = 276
     object CheckBox1: TCheckBox
       Left = 24
       Top = 16

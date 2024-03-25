@@ -2,7 +2,7 @@
 <xlat>
   <meta>
     <version>3</version>
-    <created>2024-03-23T17:10:28.250+01:00</created>
+    <created>2024-03-25T23:52:44.469+01:00</created>
     <tool>amTranslationManager</tool>
     <toolversion>2.0.8628.33873</toolversion>
   </meta>
@@ -12,18 +12,18 @@
     <sorted>True</sorted>
     <omitnewstate>True</omitnewstate>
   </options>
-  <project sourcefile=".\ExifToolGUI.exe" stringsymbolfile=".\ExifToolGUI.drc" language="en-US" properties="636">
+  <project sourcefile=".\ExifToolGUI.exe" stringsymbolfile=".\ExifToolGUI.drc" language="en-US" properties="627">
     <targetlanguages>
-      <language language="es" translated="595"/>
-      <language language="fr" translated="584"/>
-      <language language="pt" translated="583"/>
+      <language language="es" translated="602"/>
+      <language language="fr" translated="593"/>
+      <language language="it" translated="608"/>
+      <language language="nl" translated="653"/>
+      <language language="pt" translated="591"/>
       <language language="en" translated="1"/>
-      <language language="de" translated="639"/>
-      <language language="it" translated="600"/>
-      <language language="nl" translated="643"/>
+      <language language="de" translated="647"/>
     </targetlanguages>
     <modules>
-      <module name="resourcestrings" type="strings" properties="168">
+      <module name="resourcestrings" type="strings" properties="169">
         <items>
           <item name="1">
             <properties>
@@ -116,9 +116,9 @@
               </property>
             </properties>
           </item>
-          <item name="7" state="">
+          <item name="7">
             <properties>
-              <property>
+              <property status="skip">
                 <value>http://www.gnu.org/copyleft/gpl.html</value>
               </property>
             </properties>
@@ -6484,7 +6484,7 @@
               <property>
                 <value>Warning GeoCode provider changed to ExifTool.</value>
                 <translations>
-                  <translation language="nl" status="proposed">Waarschuwing GeoCode provider gewijzigd in ExifTool.</translation>
+                  <translation language="nl">Waarschuwing GeoCode provider gewijzigd in ExifTool.</translation>
                   <translation language="fr" status="proposed">Avertissement Le fournisseur de GeoCode a été remplacé par ExifTool.</translation>
                   <translation language="de" status="proposed">Warnung GeoCode-Anbieter auf ExifTool geändert.</translation>
                   <translation language="it" status="proposed">Avviso Il provider GeoCode è stato cambiato in ExifTool.</translation>
@@ -6791,6 +6791,13 @@
                   <translation language="pt" status="proposed">Erro %s %s ao criar miniatura para: %s</translation>
                   <translation language="it" status="proposed">Errore %s %s creazione miniatura per: %s</translation>
                 </translations>
+              </property>
+            </properties>
+          </item>
+          <item name="UnitLangResources_StrETDirect">
+            <properties>
+              <property status="skip">
+                <value>ExifTool direct</value>
               </property>
             </properties>
           </item>
@@ -7248,7 +7255,7 @@
               <property>
                 <value>Generating will be done in the background.</value>
                 <translations>
-                  <translation language="nl" status="proposed">Genereren zal worden uitgevoerd in de achergrond.</translation>
+                  <translation language="nl">Genereren zal worden uitgevoerd in de achergrond.</translation>
                   <translation language="de" status="proposed">Die Generierung erfolgt im Hintergrund.</translation>
                   <translation language="es" status="proposed">La generación se realizará en segundo plano.</translation>
                   <translation language="fr" status="proposed">La génération se fera en arrière-plan.</translation>
@@ -7263,7 +7270,7 @@
               <property>
                 <value>Generating %d thumbnails for: %s</value>
                 <translations>
-                  <translation language="nl" status="proposed">Genereren van %d miniaturen voor map: %s</translation>
+                  <translation language="nl">Genereren van %d miniaturen voor map: %s</translation>
                   <translation language="de" status="proposed">Generiere %d Miniaturansichten für: %s</translation>
                   <translation language="es" status="proposed">Generando %d miniaturas para: %s</translation>
                   <translation language="fr" status="proposed">Génération de %d vignettes pour : %s</translation>
@@ -7314,17 +7321,47 @@
               </property>
             </properties>
           </item>
-          <item name="UnitLangResources_StrIniFileDoesntCon">
+          <item name="UnitLangResources_StrIniDefinition">
             <properties>
               <property>
-                <value>Ini file does not contain Workspace data -nothing changed.</value>
+                <value>%s definition file saved.</value>
                 <translations>
-                  <translation language="nl">Ini bestand bevat geen Wekruimte data - niets gewijzigd.</translation>
-                  <translation language="de" status="proposed">Ini-Datei enthält keine Arbeitsbereich-Daten – es hat sich nichts geändert.</translation>
-                  <translation language="es" status="proposed">El archivo Ini no contiene datos del Espacio de Trabajo -nada ha cambiado.</translation>
-                  <translation language="fr" status="proposed">Le fichier Ini ne contient pas les données de l'espace de travail - rien n'a changé.</translation>
-                  <translation language="pt" status="proposed">O arquivo Ini não contém dados do espaço de trabalho - nada foi alterado.</translation>
-                  <translation language="it" status="proposed">Il file Ini non contiene dati dell'area di lavoro - non è cambiato nulla.</translation>
+                  <translation language="nl">%s definitiebestand opgeslagen.</translation>
+                  <translation language="de" status="proposed">%sdefinitionsdatei gespeichert.</translation>
+                  <translation language="es" status="proposed">Archivo de definición del %s guardado.</translation>
+                  <translation language="pt" status="proposed">Arquivo de definição do %s salvo.</translation>
+                  <translation language="it" status="proposed">File di definizione dello %s salvato.</translation>
+                  <translation language="fr" status="proposed">Fichier de définition %s sauvegardé.</translation>
+                </translations>
+              </property>
+            </properties>
+          </item>
+          <item name="UnitLangResources_StrIniDefNotSaved">
+            <properties>
+              <property>
+                <value>%s definition file couldn't be saved!?</value>
+                <translations>
+                  <translation language="nl">%s definitiebestand kan niet opgeslagen worden!?</translation>
+                  <translation language="de" status="proposed">%s-Definitionsdatei konnte nicht gespeichert werden!?</translation>
+                  <translation language="es" status="proposed">No se pudo guardar el archivo de definición del %s</translation>
+                  <translation language="fr" status="proposed">Fichier de définition de %s sauvegardé.</translation>
+                  <translation language="pt" status="proposed">O arquivo de definição do %s não pôde ser salvo!?</translation>
+                  <translation language="it" status="proposed">Non è stato possibile salvare il file di definizione dello %s!?</translation>
+                </translations>
+              </property>
+            </properties>
+          </item>
+          <item name="UnitLangResources_StrIniFileNotChanged">
+            <properties>
+              <property>
+                <value>Ini file does not contain data -nothing changed.</value>
+                <translations>
+                  <translation language="nl">Ini bestand bevat geen data - niets gewijzigd.</translation>
+                  <translation language="de" status="proposed">Ini-Datei enthält keine Daten – es hat sich nichts geändert.</translation>
+                  <translation language="es" status="proposed">El archivo Ini no contiene datos -nada ha cambiado.</translation>
+                  <translation language="fr" status="proposed">Le fichier Ini ne contient pas des données - rien n'a changé.</translation>
+                  <translation language="pt" status="proposed">O arquivo Ini não contém dados - nada foi alterado.</translation>
+                  <translation language="it" status="proposed">Il file Ini non contiene dati - non è cambiato nulla.</translation>
                 </translations>
               </property>
             </properties>
@@ -7340,17 +7377,17 @@
               </property>
             </properties>
           </item>
-          <item name="UnitLangResources_StrLoadWorkspaceDefin">
+          <item name="UnitLangResources_StrLoadIniDefine">
             <properties>
               <property>
-                <value>Load Workspace definition file</value>
+                <value>Load %s definition file</value>
                 <translations>
-                  <translation language="nl">Laad Werkruimte definitie bestand</translation>
-                  <translation language="de" status="proposed">Arbeitsbereich-Definitionsdatei laden</translation>
-                  <translation language="es" status="proposed">Cargar archivo de definición del Espacio de Trabajo</translation>
-                  <translation language="fr" status="proposed">Charger le fichier de définition de l'espace de travail</translation>
-                  <translation language="pt" status="proposed">Carregar arquivo de definição do espaço de trabalho</translation>
-                  <translation language="it" status="proposed">Caricare il file di definizione dell'area di lavoro</translation>
+                  <translation language="nl">Laad %s definitie bestand</translation>
+                  <translation language="de" status="proposed">%s-Definitionsdatei laden</translation>
+                  <translation language="es" status="proposed">Cargar archivo de definición del %s</translation>
+                  <translation language="fr" status="proposed">Charger le fichier de définition de %s</translation>
+                  <translation language="pt" status="proposed">Carregar arquivo de definição do espaço de %s</translation>
+                  <translation language="it" status="proposed">Caricare il file di definizione dell'area di %s</translation>
                 </translations>
               </property>
             </properties>
@@ -7400,17 +7437,17 @@
               </property>
             </properties>
           </item>
-          <item name="UnitLangResources_StrNewWorkspaceLoaded">
+          <item name="UnitLangResources_StrNewIniLoaded">
             <properties>
               <property>
-                <value>New Workspace loaded.</value>
+                <value>New %s loaded.</value>
                 <translations>
-                  <translation language="nl">Nieuwe Werkruimte geladen.</translation>
-                  <translation language="de" status="proposed">Neuer Arbeitsbereich geladen.</translation>
-                  <translation language="es" status="proposed">Nuevo espacio de trabajo cargado.</translation>
-                  <translation language="fr" status="proposed">Nouvel espace de travail chargé.</translation>
-                  <translation language="pt" status="proposed">Novo espaço de trabalho carregado.</translation>
-                  <translation language="it" status="proposed">Nuovo spazio di lavoro caricato.</translation>
+                  <translation language="nl">Nieuwe %s geladen.</translation>
+                  <translation language="de" status="proposed">Neuer %s geladen.</translation>
+                  <translation language="es" status="proposed">Nuevo %s cargado.</translation>
+                  <translation language="fr" status="proposed">Nouvel %s chargé.</translation>
+                  <translation language="pt" status="proposed">Novo %s carregado.</translation>
+                  <translation language="it" status="proposed">Nuovo %s caricato.</translation>
                 </translations>
               </property>
             </properties>
@@ -7437,6 +7474,7 @@
                   <translation language="de" status="proposed">*NEIN*</translation>
                   <translation language="es" status="proposed">*NO</translation>
                   <translation language="pt" status="proposed">*NÃO</translation>
+                  <translation language="fr" status="proposed">*NON*</translation>
                 </translations>
               </property>
             </properties>
@@ -7786,17 +7824,17 @@
               </property>
             </properties>
           </item>
-          <item name="UnitLangResources_StrSaveWorkspaceDefini">
+          <item name="UnitLangResources_StrSaveIniDefine">
             <properties>
               <property>
-                <value>Save Workspace definition file</value>
+                <value>Save %s definition file</value>
                 <translations>
-                  <translation language="nl">Sla Werkruimte definitie bestand op</translation>
-                  <translation language="de" status="proposed">Arbeitsbereich-Definitionsdatei speichern</translation>
-                  <translation language="es" status="proposed">Guardar archivo de definición del espacio de trabajo</translation>
-                  <translation language="fr" status="proposed">Sauvegarder le fichier de définition de l'espace de travail</translation>
-                  <translation language="pt" status="proposed">Salvar arquivo de definição do espaço de trabalho</translation>
-                  <translation language="it" status="proposed">Salva il file di definizione dell'area di lavoro</translation>
+                  <translation language="nl">Sla %s definitie bestand op</translation>
+                  <translation language="de" status="proposed">%s-Definitionsdatei speichern</translation>
+                  <translation language="es" status="proposed">Guardar archivo de definición del %s</translation>
+                  <translation language="fr" status="proposed">Sauvegarder le fichier de définition de %s</translation>
+                  <translation language="pt" status="proposed">Salvar arquivo de definição do %s</translation>
+                  <translation language="it" status="proposed">Salva il file di definizione dell'%s</translation>
                 </translations>
               </property>
             </properties>
@@ -8161,17 +8199,17 @@
               </property>
             </properties>
           </item>
-          <item name="UnitLangResources_StrUseAnotherNameFor">
+          <item name="UnitLangResources_StrUseAnotherNameForIni">
             <properties>
               <property>
-                <value>Use another name for Workspace definition file!</value>
+                <value>Use another name for %s definition file!</value>
                 <translations>
-                  <translation language="nl">Gebruik andere naam voor Werkruimte definitiebestand!</translation>
-                  <translation language="de" status="proposed">Verwenden Sie einen anderen Namen für die Arbeitsbereichsdefinitionsdatei!</translation>
-                  <translation language="es" status="proposed">Utilice otro nombre para el archivo de definición del espacio de trabajo</translation>
-                  <translation language="fr" status="proposed">Utilisez un autre nom pour le fichier de définition de l'espace de travail !</translation>
-                  <translation language="pt" status="proposed">Use outro nome para o arquivo de definição do espaço de trabalho!</translation>
-                  <translation language="it" status="proposed">Utilizzare un altro nome per il file di definizione dell'area di lavoro!</translation>
+                  <translation language="nl">Gebruik een andere naam voor het %s definitiebestand!</translation>
+                  <translation language="de" status="proposed">Verwenden Sie einen anderen Namen für die %s-Definitionsdatei!</translation>
+                  <translation language="es" status="proposed">Utilice otro nombre para el archivo de definición del %s</translation>
+                  <translation language="fr" status="proposed">Utilisez un autre nom pour le fichier de définition de l'%s!</translation>
+                  <translation language="pt" status="proposed">Use outro nome para o arquivo de definição do %s!</translation>
+                  <translation language="it" status="proposed">Utilizzare un altro nome per il file di definizione dell'%s!</translation>
                 </translations>
               </property>
             </properties>
@@ -8187,6 +8225,21 @@
                   <translation language="fr" status="proposed">-et copier ici</translation>
                   <translation language="pt" status="proposed">-e copie aqui</translation>
                   <translation language="it" status="proposed">-e copiare qui</translation>
+                </translations>
+              </property>
+            </properties>
+          </item>
+          <item name="UnitLangResources_StrUserDef">
+            <properties>
+              <property>
+                <value>User defined</value>
+                <translations>
+                  <translation language="nl">Gebruiker</translation>
+                  <translation language="de" status="proposed">Benutzerdefiniert</translation>
+                  <translation language="es" status="proposed">Definido por el usuario</translation>
+                  <translation language="fr" status="proposed">Défini par l'utilisateur</translation>
+                  <translation language="pt" status="proposed">Definido pelo usuário</translation>
+                  <translation language="it" status="proposed">Definito dall'utente</translation>
                 </translations>
               </property>
             </properties>
@@ -8292,32 +8345,17 @@
               </property>
             </properties>
           </item>
-          <item name="UnitLangResources_StrWorkspaceDefinition">
+          <item name="UnitLangResources_StrWorkspace">
             <properties>
               <property>
-                <value>Workspace definition file saved.</value>
+                <value>Workspace</value>
                 <translations>
-                  <translation language="nl">Werkruimte definitiebestand opgeslagen.</translation>
-                  <translation language="de" status="proposed">Arbeitsbereichsdefinitionsdatei gespeichert.</translation>
-                  <translation language="es" status="proposed">Archivo de definición del área de trabajo guardado.</translation>
-                  <translation language="fr" status="proposed">Attention. Seulement %d résultats retournés pour %d commandes de l'espace de travail.</translation>
-                  <translation language="pt" status="proposed">Arquivo de definição do espaço de trabalho salvo.</translation>
-                  <translation language="it" status="proposed">File di definizione dello spazio di lavoro salvato.</translation>
-                </translations>
-              </property>
-            </properties>
-          </item>
-          <item name="UnitLangResources_StrWorkspaceDefNotSaved">
-            <properties>
-              <property>
-                <value>Workspace definition file couldn't be saved!?</value>
-                <translations>
-                  <translation language="nl">Werkruimte definitiebestand kan niet opgeslagen worden!?</translation>
-                  <translation language="de" status="proposed">Arbeitsbereich-Definitionsdatei konnte nicht gespeichert werden!?</translation>
-                  <translation language="es" status="proposed">No se pudo guardar el archivo de definición del área de trabajo.</translation>
-                  <translation language="fr" status="proposed">Fichier de définition de l'espace de travail sauvegardé.</translation>
-                  <translation language="pt" status="proposed">O arquivo de definição do espaço de trabalho não pôde ser salvo!?</translation>
-                  <translation language="it" status="proposed">Non è stato possibile salvare il file di definizione dello spazio di lavoro!?</translation>
+                  <translation language="nl">Werkruimte</translation>
+                  <translation language="de" status="proposed">Arbeitsbereich</translation>
+                  <translation language="es" status="proposed">Archivo de definición del área de trabajo</translation>
+                  <translation language="fr" status="proposed">espace de travail</translation>
+                  <translation language="pt" status="proposed">espaço de trabalho</translation>
+                  <translation language="it" status="proposed">spazio di lavoro</translation>
                 </translations>
               </property>
             </properties>
@@ -10843,7 +10881,7 @@
           </item>
         </items>
       </module>
-      <module name="TFEDITFFILTER" type="form" properties="7">
+      <module name="TFEDITFFILTER" type="form" properties="5">
         <items>
           <item name="FEditFFilter" type="TFEditFFilter">
             <properties>
@@ -10902,7 +10940,7 @@
           </item>
           <item name="FEditFFilter.AdvPanel1.Button5" type="TButton">
             <properties>
-              <property name="Caption">
+              <property name="Caption" status="skip">
                 <value>5</value>
                 <translations>
                   <translation language="nl">5</translation>
@@ -10916,7 +10954,7 @@
           </item>
           <item name="FEditFFilter.AdvPanel1.Button6" type="TButton">
             <properties>
-              <property name="Caption">
+              <property name="Caption" status="skip">
                 <value>6</value>
                 <translations>
                   <translation language="nl">6</translation>
@@ -12086,9 +12124,15 @@
             <properties>
               <property name="Items.Strings[0]">
                 <value>local</value>
+                <translations>
+                  <translation language="nl">lokaal</translation>
+                </translations>
               </property>
               <property name="Items.Strings[1]">
                 <value>default</value>
+                <translations>
+                  <translation language="nl">standaard</translation>
+                </translations>
               </property>
               <property name="Text" status="skip">
                 <value>CmbLang</value>
@@ -12882,7 +12926,7 @@
           </item>
         </items>
       </module>
-      <module name="TFLOSSLESSROTATE" type="form" properties="26">
+      <module name="TFLOSSLESSROTATE" type="form" properties="22">
         <items>
           <item name="FLossLessRotate" type="TFLossLessRotate">
             <properties>
@@ -12970,28 +13014,28 @@
                   <translation language="it" status="proposed">Nessuna modifica</translation>
                 </translations>
               </property>
-              <property name="Items.Strings[1]">
+              <property name="Items.Strings[1]" status="skip">
                 <value>[ 1 ]=0°</value>
                 <translations>
                   <translation language="nl">[ 1 ]=0°</translation>
                   <translation language="de">[ 1 ]=0°</translation>
                 </translations>
               </property>
-              <property name="Items.Strings[2]">
+              <property name="Items.Strings[2]" status="skip">
                 <value>[ 3 ]=180°</value>
                 <translations>
                   <translation language="nl">[ 3 ]=180°</translation>
                   <translation language="de">[ 3 ]=180°</translation>
                 </translations>
               </property>
-              <property name="Items.Strings[3]">
+              <property name="Items.Strings[3]" status="skip">
                 <value>[ 6 ]=+90°</value>
                 <translations>
                   <translation language="nl">[ 6 ]=+90°</translation>
                   <translation language="de">[ 6 ]=+90°</translation>
                 </translations>
               </property>
-              <property name="Items.Strings[4]">
+              <property name="Items.Strings[4]" status="skip">
                 <value>[ 8 ]=-90°</value>
                 <translations>
                   <translation language="nl">[ 8 ]=-90°</translation>
@@ -13228,7 +13272,7 @@
           </item>
         </items>
       </module>
-      <module name="TFMAIN" type="form" properties="172">
+      <module name="TFMAIN" type="form" properties="170">
         <items>
           <item name="FMain" type="TFMain">
             <properties>
@@ -13342,35 +13386,35 @@
                   <translation language="it" status="proposed">Qualsiasi</translation>
                 </translations>
               </property>
-              <property name="Items.Strings[1]">
+              <property name="Items.Strings[1]" status="skip">
                 <value>JPG</value>
                 <translations>
                   <translation language="nl">JPG</translation>
                   <translation language="de">JPG</translation>
                 </translations>
               </property>
-              <property name="Items.Strings[2]">
+              <property name="Items.Strings[2]" status="skip">
                 <value>CR2</value>
                 <translations>
                   <translation language="nl">CR2</translation>
                   <translation language="de">CR2</translation>
                 </translations>
               </property>
-              <property name="Items.Strings[3]">
+              <property name="Items.Strings[3]" status="skip">
                 <value>NEF</value>
                 <translations>
                   <translation language="nl">NEF</translation>
                   <translation language="de">NEF</translation>
                 </translations>
               </property>
-              <property name="Items.Strings[4]">
+              <property name="Items.Strings[4]" status="skip">
                 <value>PEF</value>
                 <translations>
                   <translation language="nl">PEF</translation>
                   <translation language="de">PEF</translation>
                 </translations>
               </property>
-              <property name="Items.Strings[5]">
+              <property name="Items.Strings[5]" status="skip">
                 <value>DNG</value>
                 <translations>
                   <translation language="nl">DNG</translation>
@@ -13412,7 +13456,7 @@
                   <translation language="it" status="proposed">Numero FN [1,2-22]</translation>
                 </translations>
               </property>
-              <property name="Items.Strings[2]">
+              <property name="Items.Strings[2]" status="skip">
                 <value>ISO [50-6400]</value>
                 <translations>
                   <translation language="nl">ISO [50-6400]</translation>
@@ -13506,7 +13550,7 @@
                   <translation language="it" status="proposed">Scegliere la modalità di esecuzione del/i comando/i</translation>
                 </translations>
               </property>
-              <property name="Items.Strings[0]">
+              <property name="Items.Strings[0]" status="skip">
                 <value>StayOpen</value>
                 <translations>
                   <translation language="nl">StayOpen</translation>
@@ -14227,7 +14271,7 @@
           </item>
           <item name="FMain.AdvPageMetadata.AdvTabOSMMap.AdvPanel_MapTop.SpeedBtn_MapSetHome" type="TSpeedButton">
             <properties>
-              <property name="Caption">
+              <property name="Caption" status="skip">
                 <value>Set^</value>
                 <translations>
                   <translation language="nl">Zet^</translation>
@@ -14273,13 +14317,13 @@
               <property name="Caption">
                 <value>Browse</value>
                 <translations>
-                  <translation language="pt" status="proposed">Navegar</translation>
-                  <translation language="es">Carpetas</translation>
+                  <translation language="fr" status="proposed">Dossiers</translation>
                   <translation language="en" status="proposed">Folders</translation>
                   <translation language="de">Verzeichnis</translation>
                   <translation language="it" status="proposed">Sfogliare</translation>
+                  <translation language="es">Carpetas</translation>
+                  <translation language="pt" status="proposed">Navegar</translation>
                   <translation language="nl">Mappen</translation>
-                  <translation language="fr" status="proposed">Dossiers</translation>
                 </translations>
               </property>
             </properties>
@@ -14429,20 +14473,27 @@
           </item>
           <item name="FMain.MainActionManager.ActionBars[0].Items[0].Items[2]" type="TActionManager">
             <properties>
+              <property name="Caption" status="skip">
+                <value>-</value>
+              </property>
+            </properties>
+          </item>
+          <item name="FMain.MainActionManager.ActionBars[0].Items[0].Items[3]" type="TActionManager">
+            <properties>
               <property name="Caption">
                 <value>W&amp;orkspace definition file</value>
                 <translations>
                   <translation language="nl">W&amp;erkruimte definitiebestand</translation>
-                  <translation language="de" status="proposed">W&amp;orkspace-Definitionsdatei</translation>
-                  <translation language="es" status="proposed">&amp;Archivo de definición del espacio de trabajo</translation>
-                  <translation language="fr" status="proposed">&amp;Fichier de définition de l'espace de travail</translation>
-                  <translation language="pt" status="proposed">&amp;Arquivo de definição do espaço de trabalho</translation>
-                  <translation language="it" status="proposed">W&amp;File di definizione dello spazio di lavoro</translation>
+                  <translation language="de">Arbeitsbereichs-Definitionsdatei</translation>
+                  <translation language="es">&amp;Archivo de definición del espacio de trabajo</translation>
+                  <translation language="fr">&amp;Fichier de définition de l'espace de travail</translation>
+                  <translation language="pt">&amp;Arquivo de definição do espaço de trabalho</translation>
+                  <translation language="it" status="proposed">&amp;File di definizione dello spazio di lavoro</translation>
                 </translations>
               </property>
             </properties>
           </item>
-          <item name="FMain.MainActionManager.ActionBars[0].Items[0].Items[2].Items[0]" type="TActionManager">
+          <item name="FMain.MainActionManager.ActionBars[0].Items[0].Items[3].Items[0]" type="TActionManager">
             <properties>
               <property name="Caption">
                 <value>&amp;Load..</value>
@@ -14457,7 +14508,7 @@
               </property>
             </properties>
           </item>
-          <item name="FMain.MainActionManager.ActionBars[0].Items[0].Items[2].Items[1]" type="TActionManager">
+          <item name="FMain.MainActionManager.ActionBars[0].Items[0].Items[3].Items[1]" type="TActionManager">
             <properties>
               <property name="Caption">
                 <value>&amp;Save...</value>
@@ -14472,48 +14523,135 @@
               </property>
             </properties>
           </item>
-          <item name="FMain.MainActionManager.ActionBars[0].Items[0].Items[3]" type="TActionManager">
+          <item name="FMain.MainActionManager.ActionBars[0].Items[0].Items[4]" type="TActionManager">
             <properties>
               <property name="Caption">
-                <value>&amp;Style...</value>
+                <value>E&amp;xifTool direct definition file</value>
                 <translations>
-                  <translation language="nl">&amp;Stijl...</translation>
-                  <translation language="de" status="proposed">&amp;Stil...</translation>
-                  <translation language="es" status="proposed">&amp;Estilo...</translation>
-                  <translation language="it" status="proposed">&amp;Stile...</translation>
-                  <translation language="pt" status="proposed">&amp;Estilo...</translation>
+                  <translation language="nl">E&amp;xifTool direct definitiebestand</translation>
+                  <translation language="de">E&amp;xifTool direct-Definitionsdatei</translation>
+                  <translation language="es">&amp;Archivo de definición de ExifTool direct</translation>
+                  <translation language="fr">&amp;Fichier de définition de E&amp;xifTool direct</translation>
+                  <translation language="pt">&amp;Arquivo de definição do E&amp;xifTool direct</translation>
+                  <translation language="it" status="proposed">File di definizione dello E&amp;xifTool direct</translation>
                 </translations>
               </property>
             </properties>
           </item>
-          <item name="FMain.MainActionManager.ActionBars[0].Items[0].Items[4]" type="TActionManager">
+          <item name="FMain.MainActionManager.ActionBars[0].Items[0].Items[4].Items[0]" type="TActionManager">
+            <properties>
+              <property name="Caption">
+                <value>&amp;Load..</value>
+                <translations>
+                  <translation language="nl">&amp;Laad..</translation>
+                  <translation language="de" status="proposed">&amp;Laden..</translation>
+                  <translation language="es" status="proposed">&amp;Cargar..</translation>
+                  <translation language="fr" status="proposed">&amp;Charge..</translation>
+                  <translation language="pt" status="proposed">&amp;Load...</translation>
+                  <translation language="it" status="proposed">&amp;Carica...</translation>
+                </translations>
+              </property>
+            </properties>
+          </item>
+          <item name="FMain.MainActionManager.ActionBars[0].Items[0].Items[4].Items[1]" type="TActionManager">
+            <properties>
+              <property name="Caption">
+                <value>&amp;Save...</value>
+                <translations>
+                  <translation language="nl">&amp;Sla op...</translation>
+                  <translation language="de" status="proposed">&amp;Speichern...</translation>
+                  <translation language="es" status="proposed">&amp;Guardar...</translation>
+                  <translation language="fr" status="proposed">&amp;Enregistrer...</translation>
+                  <translation language="pt" status="proposed">&amp;Salvar...</translation>
+                  <translation language="it" status="proposed">&amp;Salva...</translation>
+                </translations>
+              </property>
+            </properties>
+          </item>
+          <item name="FMain.MainActionManager.ActionBars[0].Items[0].Items[5]" type="TActionManager">
+            <properties>
+              <property name="Caption">
+                <value>&amp;User defined fields definition file</value>
+                <translations>
+                  <translation language="de" status="proposed">&amp;Benutzerdefinierte Felder Definitionsdatei</translation>
+                  <translation language="es" status="proposed">&amp;Archivo de definición de campos definidos por el usuario</translation>
+                  <translation language="pt" status="proposed">&amp;Arquivo de definição de campos definidos pelo usuário</translation>
+                  <translation language="nl" status="proposed">&amp;Gebruiker gedefinieerde velden definitiebestand</translation>
+                  <translation language="fr" status="proposed">&amp;Fichier de définition des champs définis par l'utilisateur</translation>
+                  <translation language="it" status="proposed">File di definizione dei &amp;campi definiti dall'utente</translation>
+                </translations>
+              </property>
+            </properties>
+          </item>
+          <item name="FMain.MainActionManager.ActionBars[0].Items[0].Items[5].Items[0]" type="TActionManager">
+            <properties>
+              <property name="Caption">
+                <value>&amp;Load..</value>
+                <translations>
+                  <translation language="nl">&amp;Laad..</translation>
+                  <translation language="de" status="proposed">&amp;Laden..</translation>
+                  <translation language="es" status="proposed">&amp;Cargar..</translation>
+                  <translation language="fr" status="proposed">&amp;Charge..</translation>
+                  <translation language="pt" status="proposed">&amp;Load...</translation>
+                  <translation language="it" status="proposed">&amp;Carica...</translation>
+                </translations>
+              </property>
+            </properties>
+          </item>
+          <item name="FMain.MainActionManager.ActionBars[0].Items[0].Items[5].Items[1]" type="TActionManager">
+            <properties>
+              <property name="Caption">
+                <value>&amp;Save...</value>
+                <translations>
+                  <translation language="nl">&amp;Sla op...</translation>
+                  <translation language="de" status="proposed">&amp;Speichern...</translation>
+                  <translation language="es" status="proposed">&amp;Guardar...</translation>
+                  <translation language="fr" status="proposed">&amp;Enregistrer...</translation>
+                  <translation language="pt" status="proposed">&amp;Salvar...</translation>
+                  <translation language="it" status="proposed">&amp;Salva...</translation>
+                </translations>
+              </property>
+            </properties>
+          </item>
+          <item name="FMain.MainActionManager.ActionBars[0].Items[0].Items[6]" type="TActionManager">
             <properties>
               <property name="Caption" status="skip">
                 <value>-</value>
               </property>
             </properties>
           </item>
-          <item name="FMain.MainActionManager.ActionBars[0].Items[0].Items[5]" type="TActionManager">
+          <item name="FMain.MainActionManager.ActionBars[0].Items[0].Items[7]" type="TActionManager">
             <properties>
-              <property name="Caption" status="skip">
-                <value>&amp;Exit</value>
+              <property name="Caption">
+                <value>&amp;Style...</value>
                 <translations>
-                  <translation language="es" status="proposed">&amp;Salir</translation>
+                  <translation language="nl">&amp;Stijl...</translation>
+                  <translation language="de">&amp;Stil...</translation>
+                  <translation language="es">&amp;Estilo...</translation>
+                  <translation language="it">&amp;Stile...</translation>
+                  <translation language="pt">&amp;Estilo...</translation>
                 </translations>
               </property>
             </properties>
           </item>
-          <item name="FMain.MainActionManager.ActionBars[0].Items[0].Items[6]" type="TActionManager" state="unused">
+          <item name="FMain.MainActionManager.ActionBars[0].Items[0].Items[8]" type="TActionManager">
+            <properties>
+              <property name="Caption" status="skip">
+                <value>-</value>
+              </property>
+            </properties>
+          </item>
+          <item name="FMain.MainActionManager.ActionBars[0].Items[0].Items[9]" type="TActionManager">
             <properties>
               <property name="Caption">
                 <value>&amp;Exit</value>
                 <translations>
                   <translation language="nl">&amp;Verlaten</translation>
-                  <translation language="de" status="proposed">&amp;Beenden</translation>
-                  <translation language="es" status="proposed">&amp;Salir</translation>
-                  <translation language="fr" status="proposed">&amp;Quitter</translation>
-                  <translation language="pt" status="proposed">&amp;Sair</translation>
-                  <translation language="it" status="proposed">&amp;Esci</translation>
+                  <translation language="de">&amp;Beenden</translation>
+                  <translation language="es">&amp;Salir</translation>
+                  <translation language="fr">&amp;Quitter</translation>
+                  <translation language="pt">&amp;Sair</translation>
+                  <translation language="it">&amp;Esci</translation>
                 </translations>
               </property>
             </properties>
@@ -15110,7 +15248,7 @@
               <property name="Caption">
                 <value>&amp;File: Date modified as in Exif...</value>
                 <translations>
-                  <translation language="nl" status="proposed">&amp;Bestand: Wijzigingsdatum als in Exif...</translation>
+                  <translation language="nl">&amp;Bestand: Wijzigingsdatum als in Exif...</translation>
                   <translation language="de" status="proposed">&amp;File: Änderungsdatum wie in Exif...</translation>
                   <translation language="es" status="proposed">&amp;Archivo: Fecha de modificación como en Exif...</translation>
                   <translation language="fr" status="proposed">Fichier : Date de modification selon Exif...</translation>
@@ -15192,7 +15330,7 @@
               <property name="Caption">
                 <value>&amp;Check Versions</value>
                 <translations>
-                  <translation language="nl" status="proposed">&amp;Controleer Versies</translation>
+                  <translation language="nl">&amp;Controleer Versies</translation>
                   <translation language="fr" status="proposed">&amp;Vérifier les versions</translation>
                   <translation language="de" status="proposed">&amp;Versionen Prüfen</translation>
                   <translation language="it" status="proposed">&amp;Controllare Le Versioni</translation>
@@ -15214,7 +15352,7 @@
               <property name="Caption">
                 <value>&amp;About...</value>
                 <translations>
-                  <translation language="nl" status="proposed">&amp;Over...</translation>
+                  <translation language="nl">&amp;Over...</translation>
                   <translation language="fr" status="proposed">&amp;A propos de...</translation>
                   <translation language="de" status="proposed">&amp;Über...</translation>
                   <translation language="it" status="proposed">&amp;Informazioni su...</translation>
@@ -15244,7 +15382,7 @@
           </item>
           <item name="FMain.MainActionManager.MaAPILargeFileSupport" type="TAction">
             <properties>
-              <property name="Caption">
+              <property name="Caption" status="skip">
                 <value>API LargeFileSupport</value>
                 <translations>
                   <translation language="nl">API LargeFileSupport</translation>
@@ -15279,7 +15417,7 @@
               <property name="Caption">
                 <value>Check Versions</value>
                 <translations>
-                  <translation language="nl" status="proposed">Controleer versies</translation>
+                  <translation language="nl">Controleer versies</translation>
                   <translation language="fr" status="proposed">Vérifier les versions</translation>
                   <translation language="de" status="proposed">Versionen prüfen</translation>
                   <translation language="it" status="proposed">Controllare le versioni</translation>
@@ -15325,6 +15463,26 @@
               </property>
               <property name="Category" status="skip">
                 <value>Options</value>
+              </property>
+            </properties>
+          </item>
+          <item name="FMain.MainActionManager.MaETDirectLoad" type="TAction">
+            <properties>
+              <property name="Caption" status="skip">
+                <value>Load..</value>
+              </property>
+              <property name="Category" status="skip">
+                <value>Program_ETDirect</value>
+              </property>
+            </properties>
+          </item>
+          <item name="FMain.MainActionManager.MaEtDirectSave" type="TAction">
+            <properties>
+              <property name="Caption" status="skip">
+                <value>Save...</value>
+              </property>
+              <property name="Category" status="skip">
+                <value>Program_ETDirect</value>
               </property>
             </properties>
           </item>
@@ -15495,7 +15653,7 @@
               <property name="Caption">
                 <value>File: Date modified as in Exif...</value>
                 <translations>
-                  <translation language="nl" status="proposed">Bestand: Wijzigingsdatum als in Exif...</translation>
+                  <translation language="nl">Bestand: Wijzigingsdatum als in Exif...</translation>
                   <translation language="de" status="proposed">Datei: Änderungsdatum wie in Exif...</translation>
                   <translation language="es" status="proposed">Archivo: Fecha de modificación como en Exif...</translation>
                   <translation language="fr" status="proposed">Fichier : Date de modification selon Exif...</translation>
@@ -15957,6 +16115,26 @@
               </property>
             </properties>
           </item>
+          <item name="FMain.MainActionManager.MaUserDefLoad" type="TAction">
+            <properties>
+              <property name="Caption" status="skip">
+                <value>Load..</value>
+              </property>
+              <property name="Category" status="skip">
+                <value>Program_UserDef</value>
+              </property>
+            </properties>
+          </item>
+          <item name="FMain.MainActionManager.MaUserDefSave" type="TAction">
+            <properties>
+              <property name="Caption" status="skip">
+                <value>Save...</value>
+              </property>
+              <property name="Category" status="skip">
+                <value>Program_UserDef</value>
+              </property>
+            </properties>
+          </item>
           <item name="FMain.MainActionManager.MaWorkspaceLoad" type="TAction">
             <properties>
               <property name="Caption">
@@ -16312,7 +16490,7 @@
           </item>
         </items>
       </module>
-      <module name="TFPREFERENCES" type="form" properties="59">
+      <module name="TFPREFERENCES" type="form" properties="58">
         <items>
           <item name="FPreferences" type="TFPreferences">
             <properties>
@@ -16334,7 +16512,7 @@
           </item>
           <item name="FPreferences.AdvPageControl1.AdvTabGeneral" type="TTabSheet">
             <properties>
-              <property name="Caption">
+              <property name="Caption" status="skip">
                 <value>General</value>
                 <translations>
                   <translation language="nl">Algemeen</translation>
@@ -16707,7 +16885,7 @@
                   <translation language="es" status="proposed">-Lista de archivos: Usar ExifTool para tipos de archivo no soportados. (Más lento)</translation>
                   <translation language="fr" status="proposed">-Liste de fichiers : Utiliser ExifTool pour les types de fichiers non pris en charge. (Plus lent)</translation>
                   <translation language="pt" status="proposed">-Lista de arquivos: Usar o ExifTool para tipos de arquivos não suportados. (Mais lento)</translation>
-                  <translation language="nl" status="proposed">-Bestandslijst: Gebruik ExifTool voor niet ondersteunde bestandstypes. (Trager)</translation>
+                  <translation language="nl">-Bestandslijst: Gebruik ExifTool voor niet ondersteunde bestandstypes. (Trager)</translation>
                   <translation language="de" status="proposed">-Dateiliste: ExifTool für nicht unterstützte Dateitypen verwenden. (Langsamer)</translation>
                   <translation language="it" status="proposed">-Elenco file: Usa ExifTool per i tipi di file non supportati. (Più lento)</translation>
                 </translations>
@@ -17102,7 +17280,7 @@
               <property name="Caption">
                 <value>Show CountryCode in Filelist</value>
                 <translations>
-                  <translation language="nl" status="proposed">Toon landcode in bestandslijst</translation>
+                  <translation language="nl">Toon landcode in bestandslijst</translation>
                   <translation language="fr" status="proposed">Afficher le code pays dans la liste des fichiers</translation>
                   <translation language="de" status="proposed">Ländercode in Dateiliste anzeigen</translation>
                   <translation language="it" status="proposed">Mostra il codice paese nell'elenco dei file</translation>
@@ -17163,7 +17341,7 @@
                 <value>Disable GeoCoding</value>
                 <translations>
                   <translation language="es" status="proposed">Desactivar GeoCoding</translation>
-                  <translation language="nl" status="proposed">Deactiveer GeoCoding</translation>
+                  <translation language="nl">Deactiveer GeoCoding</translation>
                   <translation language="fr" status="proposed">Désactiver le géocodage</translation>
                   <translation language="de" status="proposed">GeoCoding deaktivieren</translation>
                   <translation language="it" status="proposed">Disattivare la geocodifica</translation>
@@ -17173,7 +17351,7 @@
               <property name="Items.Strings[1]">
                 <value>Enable All GeoCoding</value>
                 <translations>
-                  <translation language="nl" status="proposed">Activeer alle GeoCoding</translation>
+                  <translation language="nl">Activeer alle GeoCoding</translation>
                   <translation language="fr" status="proposed">Activer tous les géocodages</translation>
                   <translation language="de" status="proposed">Alle GeoCodierungen einschalten</translation>
                   <translation language="it" status="proposed">Abilita tutta la geocodifica</translation>
@@ -17184,7 +17362,7 @@
               <property name="Items.Strings[2]">
                 <value>Enable Offline GeoCoding (ExifTool)</value>
                 <translations>
-                  <translation language="nl" status="proposed">Activeer offline GeoCoding(ExifTool)</translation>
+                  <translation language="nl">Activeer offline GeoCoding(ExifTool)</translation>
                   <translation language="es" status="proposed">Activar la geocodificación sin conexión (ExifTool)</translation>
                   <translation language="pt" status="proposed">Ativar a geocodificação off-line (ExifTool)</translation>
                   <translation language="it" status="proposed">Abilita la geocodifica offline (ExifTool)</translation>
@@ -17716,12 +17894,12 @@
               </property>
             </properties>
           </item>
-          <item name="FrmAbout.GrpLicense" type="TGroupBox" state="">
+          <item name="FrmAbout.GrpLicense" type="TGroupBox">
             <properties>
               <property name="Caption">
                 <value>Licensed under</value>
                 <translations>
-                  <translation language="nl" status="proposed">Gelicentieerd onder</translation>
+                  <translation language="nl">Gelicentieerd onder</translation>
                   <translation language="fr" status="proposed">Sous licence</translation>
                   <translation language="de" status="proposed">Lizenziert unter</translation>
                   <translation language="it" status="proposed">Con licenza</translation>
@@ -17731,7 +17909,7 @@
               </property>
             </properties>
           </item>
-          <item name="FrmAbout.GrpLicense.LblGNUGPL" type="TLabel" state="">
+          <item name="FrmAbout.GrpLicense.LblGNUGPL" type="TLabel">
             <properties>
               <property name="Caption" status="skip">
                 <value>LblGNUGPL</value>
@@ -17741,7 +17919,7 @@
               </property>
             </properties>
           </item>
-          <item name="FrmAbout.GrpLicense.LblLicense" type="TLabel" state="">
+          <item name="FrmAbout.GrpLicense.LblLicense" type="TLabel">
             <properties>
               <property name="Caption" status="skip">
                 <value>GNU General Public License v3.0</value>
@@ -17825,7 +18003,7 @@
               <property name="Caption">
                 <value>Check versions</value>
                 <translations>
-                  <translation language="nl" status="proposed">Controleer versies</translation>
+                  <translation language="nl">Controleer versies</translation>
                   <translation language="fr" status="proposed">Vérifier les versions</translation>
                   <translation language="de" status="proposed">Versionen prüfen</translation>
                   <translation language="it" status="proposed">Controllare le versioni</translation>
@@ -17857,7 +18035,7 @@
               <property name="Caption">
                 <value>Installed and available versions</value>
                 <translations>
-                  <translation language="nl" status="proposed">Geïnstalleerde en beschikbare versies</translation>
+                  <translation language="nl">Geïnstalleerde en beschikbare versies</translation>
                   <translation language="de" status="proposed">Installierte und verfügbare Versionen</translation>
                   <translation language="it" status="proposed">Versioni installate e disponibili</translation>
                   <translation language="pt" status="proposed">Versões instaladas e disponíveis</translation>
@@ -17875,7 +18053,7 @@
               <property name="Caption">
                 <value>Method</value>
                 <translations>
-                  <translation language="nl" status="proposed">Methode</translation>
+                  <translation language="nl">Methode</translation>
                   <translation language="fr" status="proposed">Méthode</translation>
                   <translation language="de" status="proposed">Methode</translation>
                   <translation language="it" status="proposed">Metodo</translation>
@@ -17905,7 +18083,7 @@
               <property name="Caption">
                 <value>Installed</value>
                 <translations>
-                  <translation language="nl" status="proposed">Geïnstalleerd</translation>
+                  <translation language="nl">Geïnstalleerd</translation>
                   <translation language="fr" status="proposed">Installé</translation>
                   <translation language="de" status="proposed">Installiert</translation>
                   <translation language="it" status="proposed">Installato</translation>
@@ -17920,7 +18098,7 @@
               <property name="Caption">
                 <value>Available</value>
                 <translations>
-                  <translation language="nl" status="proposed">Beschikbaar</translation>
+                  <translation language="nl">Beschikbaar</translation>
                   <translation language="fr" status="proposed">Disponible</translation>
                   <translation language="de" status="proposed">Verfügbar</translation>
                   <translation language="it" status="proposed">Disponibile</translation>
@@ -18126,7 +18304,7 @@
           </item>
         </items>
       </module>
-      <module name="TFRMSTYLE" type="form" properties="3">
+      <module name="TFRMSTYLE" type="form" properties="2">
         <items>
           <item name="FrmStyle" type="TFrmStyle">
             <properties>
@@ -18163,7 +18341,7 @@
           </item>
           <item name="FrmStyle.Panel1.BtnOk" type="TBitBtn">
             <properties>
-              <property name="Caption">
+              <property name="Caption" status="skip">
                 <value>OK</value>
                 <translations>
                   <translation language="nl">OK</translation>
@@ -18174,34 +18352,34 @@
           </item>
         </items>
       </module>
-      <module name="BBABORT" type="invalid" state="unused" status="skip" properties="0"/>
-      <module name="BBABORT_DISABLED" type="invalid" state="unused" status="skip" properties="0"/>
-      <module name="BBALL" type="invalid" state="unused" status="skip" properties="0"/>
-      <module name="BBALL_DISABLED" type="invalid" state="unused" status="skip" properties="0"/>
-      <module name="BBCANCEL" type="invalid" state="unused" status="skip" properties="0"/>
-      <module name="BBCANCEL_DISABLED" type="invalid" state="unused" status="skip" properties="0"/>
-      <module name="BBCLOSE" type="invalid" state="unused" status="skip" properties="0"/>
-      <module name="BBCLOSE_DISABLED" type="invalid" state="unused" status="skip" properties="0"/>
-      <module name="BBHELP" type="invalid" state="unused" status="skip" properties="0"/>
-      <module name="BBHELP_DISABLED" type="invalid" state="unused" status="skip" properties="0"/>
-      <module name="BBIGNORE" type="invalid" state="unused" status="skip" properties="0"/>
-      <module name="BBIGNORE_DISABLED" type="invalid" state="unused" status="skip" properties="0"/>
-      <module name="BBNO" type="invalid" state="unused" status="skip" properties="0"/>
-      <module name="BBNO_DISABLED" type="invalid" state="unused" status="skip" properties="0"/>
-      <module name="BBOK" type="invalid" state="unused" status="skip" properties="0"/>
-      <module name="BBOK_DISABLED" type="invalid" state="unused" status="skip" properties="0"/>
-      <module name="BBRETRY" type="invalid" state="unused" status="skip" properties="0"/>
-      <module name="BBRETRY_DISABLED" type="invalid" state="unused" status="skip" properties="0"/>
-      <module name="BBYES" type="invalid" state="unused" status="skip" properties="0"/>
-      <module name="BBYES_DISABLED" type="invalid" state="unused" status="skip" properties="0"/>
-      <module name="DVCLAL" type="invalid" state="unused" status="skip" properties="0"/>
-      <module name="MSG_ERROR" type="invalid" state="unused" status="skip" properties="0"/>
-      <module name="MSG_INFO" type="invalid" state="unused" status="skip" properties="0"/>
-      <module name="MSG_WARNING" type="invalid" state="unused" status="skip" properties="0"/>
-      <module name="PACKAGEINFO" type="invalid" state="unused" status="skip" properties="0"/>
-      <module name="PLATFORMTARGETS" type="invalid" state="unused" status="skip" properties="0"/>
-      <module name="TEELCDFONT" type="invalid" state="unused" status="skip" properties="0"/>
-      <module name="TEELEDFONT" type="invalid" state="unused" status="skip" properties="0"/>
+      <module name="BBABORT" type="invalid" state="unused" properties="0"/>
+      <module name="BBABORT_DISABLED" type="invalid" state="unused" properties="0"/>
+      <module name="BBALL" type="invalid" state="unused" properties="0"/>
+      <module name="BBALL_DISABLED" type="invalid" state="unused" properties="0"/>
+      <module name="BBCANCEL" type="invalid" state="unused" properties="0"/>
+      <module name="BBCANCEL_DISABLED" type="invalid" state="unused" properties="0"/>
+      <module name="BBCLOSE" type="invalid" state="unused" properties="0"/>
+      <module name="BBCLOSE_DISABLED" type="invalid" state="unused" properties="0"/>
+      <module name="BBHELP" type="invalid" state="unused" properties="0"/>
+      <module name="BBHELP_DISABLED" type="invalid" state="unused" properties="0"/>
+      <module name="BBIGNORE" type="invalid" state="unused" properties="0"/>
+      <module name="BBIGNORE_DISABLED" type="invalid" state="unused" properties="0"/>
+      <module name="BBNO" type="invalid" state="unused" properties="0"/>
+      <module name="BBNO_DISABLED" type="invalid" state="unused" properties="0"/>
+      <module name="BBOK" type="invalid" state="unused" properties="0"/>
+      <module name="BBOK_DISABLED" type="invalid" state="unused" properties="0"/>
+      <module name="BBRETRY" type="invalid" state="unused" properties="0"/>
+      <module name="BBRETRY_DISABLED" type="invalid" state="unused" properties="0"/>
+      <module name="BBYES" type="invalid" state="unused" properties="0"/>
+      <module name="BBYES_DISABLED" type="invalid" state="unused" properties="0"/>
+      <module name="DVCLAL" type="invalid" state="unused" properties="0"/>
+      <module name="MSG_ERROR" type="invalid" state="unused" properties="0"/>
+      <module name="MSG_INFO" type="invalid" state="unused" properties="0"/>
+      <module name="MSG_WARNING" type="invalid" state="unused" properties="0"/>
+      <module name="PACKAGEINFO" type="invalid" state="unused" properties="0"/>
+      <module name="PLATFORMTARGETS" type="invalid" state="unused" properties="0"/>
+      <module name="TEELCDFONT" type="invalid" state="unused" properties="0"/>
+      <module name="TEELEDFONT" type="invalid" state="unused" properties="0"/>
     </modules>
   </project>
 </xlat>

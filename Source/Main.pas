@@ -178,6 +178,10 @@ type
     TaskBarResetWindow: TAction;
     MaAPILargeFileSupport: TAction;
     MaCheckVersions: TAction;
+    MaETDirectLoad: TAction;
+    MaEtDirectSave: TAction;
+    MaUserDefSave: TAction;
+    MaUserDefLoad: TAction;
     procedure ShellListClick(Sender: TObject);
     procedure ShellListKeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
     procedure SpeedBtnExifClick(Sender: TObject);
@@ -295,6 +299,10 @@ type
     procedure MaAPILargeFileSupportExecute(Sender: TObject);
     procedure MaCheckVersionsExecute(Sender: TObject);
     procedure ShellListEnter(Sender: TObject);
+    procedure MaETDirectLoadExecute(Sender: TObject);
+    procedure MaEtDirectSaveExecute(Sender: TObject);
+    procedure MaUserDefLoadExecute(Sender: TObject);
+    procedure MaUserDefSaveExecute(Sender: TObject);
   private
     { Private declarations }
     ETBarSeriesFocal: TBarSeries;
@@ -514,12 +522,12 @@ end;
 
 procedure TFMain.BtnETdirectDelClick(Sender: TObject);
 var
-  i: smallint;
+  Indx: integer;
 begin
-  i := CBoxETdirect.ItemIndex;
+  Indx := CBoxETdirect.ItemIndex;
   CBoxETdirect.ItemIndex := -1;
-  ETdirectCmd.Delete(i);
-  CBoxETdirect.Items.Delete(i);
+  ETdirectCmd.Delete(Indx);
+  CBoxETdirect.Items.Delete(Indx);
   EditETcmdName.Text := '';
   EditETcmdName.Modified := false;
   EditETdirect.Modified := true;
@@ -528,31 +536,31 @@ end;
 
 procedure TFMain.BtnETdirectReplaceClick(Sender: TObject);
 var
-  i: smallint;
+  Indx: integer;
 begin
-  i := CBoxETdirect.ItemIndex;
+  Indx := CBoxETdirect.ItemIndex;
   CBoxETdirect.ItemIndex := -1;
   EditETdirect.Text := trim(EditETdirect.Text);
-  ETdirectCmd[i] := EditETdirect.Text;
+  ETdirectCmd[Indx] := EditETdirect.Text;
   EditETcmdName.Text := trim(EditETcmdName.Text);
-  CBoxETdirect.Items[i] := EditETcmdName.Text;
-  CBoxETdirect.ItemIndex := i;
+  CBoxETdirect.Items[Indx] := EditETcmdName.Text;
+  CBoxETdirect.ItemIndex := Indx;
   CBoxETdirectChange(Sender);
 end;
 
 procedure TFMain.BtnFilterEditClick(Sender: TObject);
 var
-  i, n, X: smallint;
+  I, N, X: integer;
 begin
   if FEditFFilter.ShowModal = mrOK then
     with CBoxFileFilter do
     begin
       X := ItemIndex;
       OnChange := nil;
-      i := FEditFFilter.ListBox1.Items.Count - 1;
+      I := FEditFFilter.ListBox1.Items.Count - 1;
       Items.Clear;
-      for n := 0 to i do
-        Items.Append(FEditFFilter.ListBox1.Items[n]);
+      for N := 0 to I do
+        Items.Append(FEditFFilter.ListBox1.Items[N]);
       OnChange := CBoxFileFilterChange;
       ItemIndex := 0;
       if X <> 0 then
@@ -783,10 +791,32 @@ begin
   FrmCheckVersions.ShowModal;
 end;
 
+procedure TFMain.MaETDirectLoadExecute(Sender: TObject);
+begin
+  if (LoadIniDialog(OpenFileDlg, TIniData.idETDirect, SpeedBtn_ETdirect.Down = false)) then
+    SpeedBtn_ETdirect.Down := true;
+end;
+
+procedure TFMain.MaEtDirectSaveExecute(Sender: TObject);
+begin
+  SaveIniDialog(SaveFileDlg, TIniData.idETDirect, true);
+end;
+
 procedure TFMain.MAPIWindowsWideFileClick(Sender: TObject);
 begin
   with ET_Options do
     SetApiWindowsWideFile(MaAPIWindowsWideFile.Checked);
+end;
+
+procedure TFMain.MaUserDefLoadExecute(Sender: TObject);
+begin
+  if (LoadIniDialog(OpenFileDlg, TIniData.idUserDefined, CBoxDetails.ItemIndex <> 4)) then
+    CBoxDetails.OnChange(CBoxDetails);
+end;
+
+procedure TFMain.MaUserDefSaveExecute(Sender: TObject);
+begin
+  SaveIniDialog(SaveFileDlg, TIniData.idUserDefined, true);
 end;
 
 procedure TFMain.MaAPILargeFileSupportExecute(Sender: TObject);
@@ -1081,32 +1111,32 @@ end;
 
 procedure TFMain.MExportMetaTXTClick(Sender: TObject);
 var
-  i: smallint;
-  ETcmd, xDir, ETout, ETerr: string;
+  Indx: integer;
+  ETcmd, XDir, ETout, ETerr: string;
 begin
-  xDir := '';
+  XDir := '';
   if GUIsettings.DefExportUse then
   begin
-    xDir := GUIsettings.DefExportDir;
-    i := length(xDir);
-    if i > 0 then
-      if xDir[i] <> '\' then
-        xDir := xDir + '\';
+    XDir := GUIsettings.DefExportDir;
+    Indx := length(XDir);
+    if Indx > 0 then
+      if XDir[Indx] <> '\' then
+        XDir := XDir + '\';
   end;
 
   if Sender = MaExportMetaTXT then
-    ETcmd := '-w' + CRLF + xDir + '%f.txt' + CRLF + '-g0' + CRLF + '-a' + CRLF + '-All:All';
+    ETcmd := '-w' + CRLF + XDir + '%f.txt' + CRLF + '-g0' + CRLF + '-a' + CRLF + '-All:All';
   if Sender = MaExportMetaMIE then
-    ETcmd := '-o' + CRLF + xDir + '%f.mie' + CRLF + '-All:All';
+    ETcmd := '-o' + CRLF + XDir + '%f.mie' + CRLF + '-All:All';
   if Sender = MaExportMetaXMP then
-    ETcmd := '-o' + CRLF + xDir + '%f.xmp' + CRLF + '-Xmp:All';
+    ETcmd := '-o' + CRLF + XDir + '%f.xmp' + CRLF + '-Xmp:All';
   if Sender = MaExportMetaEXIF then
     ETcmd := '-TagsFromFile' + CRLF + '@' + CRLF + '-All:All' + CRLF + '-o' + CRLF + '%f.exif';
   if Sender = MaExportMetaHTML then
-    ETcmd := '-w' + CRLF + xDir + '%f.html' + CRLF + '-htmldump';
+    ETcmd := '-w' + CRLF + XDir + '%f.html' + CRLF + '-htmldump';
 
   ET_OpenExec(ETcmd, GetSelectedFiles, ETout, ETerr);
-  if xDir = '' then
+  if XDir = '' then
     BtnFListRefreshClick(Sender);
 end;
 
@@ -1143,7 +1173,7 @@ procedure TFMain.MImportMetaSelectedClick(Sender: TObject);
 var
   DstExt: string[7];
   ETcmd, ETout, ETerr: string;
-  j: smallint;
+  J: integer;
 begin
   // if Sender=MImportMetaIntoJPG then DstExt:='JPG' else DstExt:='TIF';
   DstExt := UpperCase(ExtractFileExt(ShellList.SelectedFolder.PathName));
@@ -1151,8 +1181,8 @@ begin
 
   if (DstExt = 'JPG') or (DstExt = 'TIF') then
   begin
-    j := ShellList.SelCount;
-    if j > 1 then // message appears only if multi files selected
+    J := ShellList.SelCount;
+    if J > 1 then // message appears only if multi files selected
       if MessageDlg(ImportMetaSel1 + #10 +
                     Format(ImportMetaSel2, [DstExt]) + #10 +
                     ImportMetaSel3 + #10 +
@@ -1160,8 +1190,8 @@ begin
                     ImportMetaSel5 + #10 +
                     StrOKToProceed,
                     mtInformation, [mbOk, mbCancel], 0) <> mrOK then
-        j := 0;
-    if j <> 0 then
+        J := 0;
+    if J <> 0 then
     begin
       with OpenPictureDlg do
       begin
@@ -1175,7 +1205,7 @@ begin
       if OpenPictureDlg.Execute then
       begin
         ETcmd := OpenPictureDlg.FileName; // single file selected
-        if j > 1 then
+        if J > 1 then
           ETcmd := ExtractFileDir(ETcmd) + '\%f' + ExtractFileExt(ETcmd);
         // multiple files
         ETcmd := '-TagsFromFile' + CRLF + ETcmd + CRLF + '-All:All' + CRLF;
@@ -1391,7 +1421,7 @@ end;
 
 procedure TFMain.MQuickManagerClick(Sender: TObject);
 var
-  Indx: smallint;
+  Indx: integer;
 begin
   if FQuickManager.ShowModal = mrOK then
   begin
@@ -1434,58 +1464,13 @@ end;
 
 procedure TFMain.MWorkspaceLoadClick(Sender: TObject);
 begin
-  with OpenFileDlg do
-  begin
-    // DefaultExt:='ini';
-    InitialDir := WrkIniDir;
-    Filter := 'Ini file|*.ini';
-    Title := StrLoadWorkspaceDefin;
-    if Execute then
-    begin
-      if LoadWorkspaceIni(FileName) then
-      begin
-        if SpeedBtnQuick.Down then
-          ShowMetadata
-        else
-          ShowMessage(StrNewWorkspaceLoaded);
-      end
-      else
-        ShowMessage(StrIniFileDoesntCon);
-      WrkIniDir := ExtractFileDir(FileName);
-    end;
-  end;
+  if (LoadIniDialog(OpenFileDlg, TIniData.idWorkSpace, SpeedBtnQuick.Down = false)) then
+    ShowMetadata;
 end;
 
 procedure TFMain.MWorkspaceSaveClick(Sender: TObject);
-var
-  DoSave, IsOK: boolean;
 begin
-  with SaveFileDlg do
-  begin
-    DefaultExt := 'ini';
-    InitialDir := WrkIniDir;
-    Filter := 'Ini file|*.ini';
-    Title := StrSaveWorkspaceDefini;
-    repeat
-      IsOK := false;
-      DoSave := Execute;
-      InitialDir := ExtractFileDir(FileName);
-      if DoSave then
-      begin
-        IsOK := (ExtractFileName(FileName) <> ExtractFileName(GetIniFilePath(false)));
-        if not IsOK then
-          ShowMessage(StrUseAnotherNameFor);
-      end;
-    until not DoSave or IsOK;
-    if DoSave then
-    begin
-      if SaveWorkspaceIni(FileName) then
-        ShowMessage(StrWorkspaceDefinition)
-      else
-        ShowMessage(StrWorkspaceDefNotSaved);
-      WrkIniDir := ExtractFileDir(FileName);
-    end;
-  end;
+  SaveIniDialog(SaveFileDlg, TIniData.idWorkSpace, true);
 end;
 
 procedure TFMain.OnlineDocumentation1Click(Sender: TObject);
@@ -1584,41 +1569,41 @@ end;
 
 procedure TFMain.QuickPopUp_AddCustomClick(Sender: TObject);
 var
-  i: smallint;
-  tx, ts: string;
+  Indx: integer;
+  Tx, Ts: string;
   IsVRD: boolean;
 begin
-  i := MetadataList.Row;
-  tx := MetadataList.Keys[i];
-  if LeftStr(tx, 2) = '0x' then
-    Delete(tx, 1, 7)
-  else if LeftStr(tx, 2) = '- ' then
-    Delete(tx, 1, 2);
-  tx := TrimRight(tx);
+  Indx := MetadataList.Row;
+  Tx := MetadataList.Keys[Indx];
+  if LeftStr(Tx, 2) = '0x' then
+    Delete(Tx, 1, 7)
+  else if LeftStr(Tx, 2) = '- ' then
+    Delete(Tx, 1, 2);
+  Tx := TrimRight(Tx);
   if SpeedBtnExif.Down then
-    ts := '-Exif:'
+    Ts := '-Exif:'
   else if SpeedBtnXmp.Down then
-    ts := '-Xmp:'
+    Ts := '-Xmp:'
   else if SpeedBtnIptc.Down then
-    ts := '-Iptc:'
+    Ts := '-Iptc:'
   else if SpeedBtnMaker.Down then
   begin
     repeat
-      dec(i);
-      IsVRD := (pos('CanonVRD', MetadataList.Cells[1, i]) > 0);
-    until IsVRD or (i = 0);
+      dec(Indx);
+      IsVRD := (pos('CanonVRD', MetadataList.Cells[1, Indx]) > 0);
+    until IsVRD or (Indx = 0);
     if IsVRD then
-      ts := '-CanonVRD:'
+      Ts := '-CanonVRD:'
     else
-      ts := '-Makernotes:';
+      Ts := '-Makernotes:';
   end
   else
-    ts := '-';
-  tx := ts + TranslateTagName(ts, tx);
-  if pos(tx, CustomViewTags) > 0 then
+    Ts := '-';
+  Tx := Ts + TranslateTagName(Ts, Tx);
+  if pos(Tx, CustomViewTags) > 0 then
     ShowMessage(StrTagAlreadyExistsI)
   else
-    CustomViewTags := CustomViewTags + tx + ' ';
+    CustomViewTags := CustomViewTags + Tx + ' ';
 end;
 
 procedure TFMain.QuickPopUp_AddDetailsUserClick(Sender: TObject);
@@ -1733,7 +1718,7 @@ end;
 
 procedure TFMain.QuickPopUp_DelCustomClick(Sender: TObject);
 var
-  I, J: smallint;
+  I, J: Integer;
   Tx, T1: string;
 begin
   I := MetadataList.Row;
@@ -1771,38 +1756,38 @@ end;
 
 procedure TFMain.QuickPopUp_DelQuickClick(Sender: TObject);
 var
-  i, n: smallint;
+  I, N: integer;
 begin
-  n := MetadataList.Row - 1;
-  i := length(QuickTags) - 1;
-  while n < i do
+  N := MetadataList.Row - 1;
+  I := length(QuickTags) - 1;
+  while N < I do
   begin
-    QuickTags[n].Caption := QuickTags[n + 1].Caption;
-    QuickTags[n].Command := QuickTags[n + 1].Command;
-    QuickTags[n].Help := QuickTags[n + 1].Help;
-    QuickTags[n].NoEdit := QuickTags[n + 1].NoEdit;
-    inc(n);
+    QuickTags[N].Caption := QuickTags[N + 1].Caption;
+    QuickTags[N].Command := QuickTags[N + 1].Command;
+    QuickTags[N].Help := QuickTags[N + 1].Help;
+    QuickTags[N].NoEdit := QuickTags[N + 1].NoEdit;
+    inc(N);
   end;
-  SetLength(QuickTags, i);
+  SetLength(QuickTags, I);
   ShowMetadata;
 end;
 
 procedure TFMain.QuickPopUp_FillQuickClick(Sender: TObject);
 var
-  i, n: smallint;
-  tx: string;
+  I, N: integer;
+  Tx: string;
 begin
-  n := length(QuickTags);
+  N := length(QuickTags);
   with MetadataList do
   begin
-    for i := 0 to n - 1 do
+    for I := 0 to N - 1 do
     begin
-      tx := QuickTags[i].Caption;
-      if RightStr(tx, 1) = '*' then
+      Tx := QuickTags[I].Caption;
+      if RightStr(Tx, 1) = '*' then
       begin
-        Insert('*', tx, 1);
-        Keys[i + 1] := tx;
-        Cells[1, i + 1] := QuickTags[i].Help;
+        Insert('*', Tx, 1);
+        Keys[I + 1] := Tx;
+        Cells[1, I + 1] := QuickTags[I].Help;
       end;
     end;
     SpeedBtnQuickSave.Enabled := true;
@@ -1811,7 +1796,7 @@ end;
 
 procedure TFMain.QuickPopUp_MarkTagClick(Sender: TObject);
 var
-  I, J: smallint;
+  I, J: integer;
   Tx: string;
 begin
   with MetadataList do
@@ -1837,7 +1822,7 @@ end;
 
 procedure TFMain.QuickPopUp_UndoEditClick(Sender: TObject);
 var
-  I, N, X: smallint;
+  I, N, X: integer;
   Tx, ETouts, ETerrs: string;
 begin
   I := MetadataList.Row;
@@ -2089,7 +2074,7 @@ end;
 procedure TFMain.EditETdirectKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
 var
   IsRecursive, ETResult: boolean;
-  I: smallint;
+  I: integer;
   ETtx, ETout, ETerr: string;
   ETprm: string;
   SelectedFiles: string;
@@ -2202,24 +2187,24 @@ end;
 
 procedure TFMain.EditQuickKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
 var
-  i: smallint;
-  tx: string;
+  Indx: integer;
+  Tx: string;
 begin
-  i := MetadataList.Row;
-  if (Key = VK_Return) and not(QuickTags[i - 1].NoEdit) then
+  Indx := MetadataList.Row;
+  if (Key = VK_Return) and not(QuickTags[Indx - 1].NoEdit) then
     with MetadataList do
     begin
       if Sender = EditQuick then
-        tx := trim(EditQuick.Text) // delete leading and trailing
+        Tx := trim(EditQuick.Text) // delete leading and trailing
       else
-        tx := trim(MemoQuick.Text);
-      Cells[1, i] := tx;
-      tx := Keys[i];
-      if tx[1] <> '*' then
-        Keys[i] := '*' + tx; // mark tag value changed
+        Tx := trim(MemoQuick.Text);
+      Cells[1, Indx] := Tx;
+      Tx := Keys[Indx];
+      if Tx[1] <> '*' then
+        Keys[Indx] := '*' + Tx; // mark tag value changed
       if GUIsettings.AutoIncLine and // select next row
-        (i < RowCount - 1) then
-        Row := i + 1;
+        (Indx < RowCount - 1) then
+        Row := Indx + 1;
       Refresh;
       SetFocus;
       SpeedBtnQuickSave.Enabled := true;
@@ -2230,26 +2215,26 @@ begin
     begin
       if Sender = EditQuick then
       begin
-        if QuickTags[i - 1].NoEdit then
+        if QuickTags[Indx - 1].NoEdit then
           EditQuick.Text := ''
         else
         begin
-          if RightStr(Keys[i], 1) = #177 then
+          if RightStr(Keys[Indx], 1) = #177 then
             EditQuick.Text := '+'
           else
-            EditQuick.Text := Cells[1, i];
+            EditQuick.Text := Cells[1, Indx];
         end;
       end
       else
       begin
-        if QuickTags[i - 1].NoEdit then
+        if QuickTags[Indx - 1].NoEdit then
           MemoQuick.Text := ''
         else
         begin
-          if RightStr(Keys[i], 1) = #177 then
+          if RightStr(Keys[Indx], 1) = #177 then
             MemoQuick.Text := '+'
           else
-            MemoQuick.Text := Cells[1, i];
+            MemoQuick.Text := Cells[1, Indx];
         end;
       end;
       SetFocus;
@@ -2315,12 +2300,12 @@ end;
 
 procedure TFMain.CBoxETdirectChange(Sender: TObject);
 var
-  i: smallint;
+  Indx: integer;
 begin
-  i := CBoxETdirect.ItemIndex;
-  if i >= 0 then
+  Indx := CBoxETdirect.ItemIndex;
+  if Indx >= 0 then
   begin
-    EditETdirect.Text := ETdirectCmd[i];
+    EditETdirect.Text := ETdirectCmd[Indx];
     EditETdirect.Modified := false;
     EditETcmdName.Text := CBoxETdirect.Text;
     EditETcmdName.Modified := false;
@@ -2330,17 +2315,18 @@ begin
     SpeedBtnETdirectDel.Enabled := false;
   SpeedBtnETdirectReplace.Enabled := false;
   SpeedBtnETdirectAdd.Enabled := false;
-  EditETdirect.SetFocus;
+  if (EditETdirect.Showing) then
+    EditETdirect.SetFocus;
 end;
 
 procedure TFMain.CBoxFileFilterChange(Sender: TObject);
 var
-  i: smallint;
+  Indx: integer;
 begin
-  i := CBoxFileFilter.ItemIndex;
-  if i >= 0 then
+  INdx := CBoxFileFilter.ItemIndex;
+  if (Indx >= 0) then
   begin
-    SpeedBtnFilterEdit.Enabled := (i <> 0);
+    SpeedBtnFilterEdit.Enabled := (Indx <> 0);
     ShellList.ClearSelectionRefresh;
     ShellList.SetFocus;
   end;
@@ -2757,7 +2743,7 @@ end;
 
 procedure TFMain.ShellListAfterEnumColumns(Sender: TObject);
 
-  procedure AdjustColumns(ColumnDefs: array of smallint);
+  procedure AdjustColumns(ColumnDefs: array of integer);
   var
     i, j: integer;
   begin
@@ -2766,7 +2752,7 @@ procedure TFMain.ShellListAfterEnumColumns(Sender: TObject);
       ShellList.Columns[i].Width := ColumnDefs[i];
   end;
 
-  procedure AddColumn(const ACaption: string; AWidth: integer; const AAlignment: smallint = 0);
+  procedure AddColumn(const ACaption: string; AWidth: integer; const AAlignment: integer = 0);
   begin
     with TShellListView(Sender).Columns.Add do
     begin

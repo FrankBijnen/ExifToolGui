@@ -54,14 +54,14 @@ var
 
 procedure TFCopyMetaSingle.CheckForImportAll;
 var
-  i: smallint;
+  Indx: integer;
   AllChecked: boolean;
 begin
   AllChecked := true;
   with AdvPanel2 do
-    for i := 0 to ControlCount - 1 do
+    for Indx := 0 to ControlCount - 1 do
     begin
-      AllChecked := AllChecked and (Controls[i] as TCheckBox).Checked;
+      AllChecked := AllChecked and (Controls[Indx] as TCheckBox).Checked;
     end;
   EventOn := false;
   CheckBox1.Checked := AllChecked;
@@ -121,16 +121,16 @@ end;
 
 procedure TFCopyMetaSingle.CheckBox1Click(Sender: TObject);
 var
-  i: smallint;
+  Indx: integer;
 begin
   if EventOn then
   begin
     EventOn := false;
     with AdvPanel2 do
-      for i := 0 to ControlCount - 1 do
+      for Indx := 0 to ControlCount - 1 do
       begin
-        if Controls[i] is TCheckBox then
-          (Controls[i] as TCheckBox).Checked := CheckBox1.Checked;
+        if Controls[Indx] is TCheckBox then
+          (Controls[Indx] as TCheckBox).Checked := CheckBox1.Checked;
       end;
     EventOn := true;
     SetExecuteButton;

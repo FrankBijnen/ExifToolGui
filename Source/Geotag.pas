@@ -79,22 +79,22 @@ end;
 
 procedure TFGeotag.TrackBar1Change(Sender: TObject);
 var
-  i: smallint;
-  tx: string[7];
+  I: integer;
+  Tx: string[7];
 begin
-  i := TrackBar1.Position;
-  if i >= 0 then
-    tx := '+'
+  I := TrackBar1.Position;
+  if I >= 0 then
+    Tx := '+'
   else
   begin
-    tx := '-';
-    i := i * -1;
+    Tx := '-';
+    I := I * -1;
   end;
-  if i < 10 then
-    tx := tx + '0' + IntToStr(i)
+  if I < 10 then
+    Tx := Tx + '0' + IntToStr(I)
   else
-    tx := tx + IntToStr(i);
-  Edit1.Text := tx;
+    Tx := Tx + IntToStr(I);
+  Edit1.Text := Tx;
 end;
 
 procedure TFGeotag.BtnSetupGeoCodeClick(Sender: TObject);
