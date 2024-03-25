@@ -847,7 +847,7 @@ var
   GPSCoordinates, Lat, Lon: string;
   IsQuickTime: boolean;
 begin
-  GetMetadata(ANImage, [TGetOption.gmGPS]);
+  Foto := GetMetadata(ANImage, [TGetOption.gmGPS]);
   if (Foto.GPS.Supported) then
   begin
     Lat := Foto.GPS.GeoLat;
