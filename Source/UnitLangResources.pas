@@ -124,6 +124,8 @@ resourcestring
   StrWorkspace              = 'Workspace';
   StrETDirect               = 'ExifTool direct';
   StrUserDef                = 'User defined';
+  StrCustomView             = 'Custom view';
+  StrMarked                 = 'Marked tags';
 
   StrLoadIniDefine          = 'Load %s definition file';
   StrNewIniLoaded           = 'New %s loaded.';

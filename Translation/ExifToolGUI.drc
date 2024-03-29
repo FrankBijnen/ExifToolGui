@@ -8,90 +8,92 @@
   resources were bound to the produced executable.
 */
 
-#define sdJpegTypes_sCommentCannotBeSet 64304
-#define sdJpegTypes_sDNLMarkerExpected 64305
-#define sdJpegTypes_sCannotUseTileMode 64306
-#define sdJpegTypes_sRangeErrorInTileLoading 64307
-#define UnitLangResources_StrFLCity 64320
-#define UnitLangResources_StrFLLocation 64321
-#define UnitLangResources_StrFLArtist 64322
-#define UnitLangResources_StrFLRating 64323
-#define UnitLangResources_StrFLType 64324
-#define UnitLangResources_StrFLEvent 64325
-#define UnitLangResources_StrFLPersonInImage 64326
-#define sdJpegTypes_sInternalError 64327
-#define sdJpegTypes_sUnsupportedEncoding 64328
-#define sdJpegTypes_sMarkerExpected 64329
-#define sdJpegTypes_sInvalidTableClass 64330
-#define sdJpegTypes_sInputStreamChopped 64331
-#define sdJpegTypes_sUnexpectedMarkerInEncodedStream 64332
-#define sdJpegTypes_sInvalidFrameRef 64333
-#define sdJpegTypes_sNoDCTCoefficentsAvailable 64334
-#define sdJpegTypes_sOperationOnlyFor8x8 64335
-#define UnitLangResources_StrErrorSSCreating 64336
-#define UnitLangResources_StrRemainingThumbnails 64337
-#define UnitLangResources_StrDFilesRemaining 64338
-#define UnitLangResources_StrFLName 64339
-#define UnitLangResources_StrFLExpTime 64340
-#define UnitLangResources_StrFLFNumber 64341
-#define UnitLangResources_StrFLISO 64342
-#define UnitLangResources_StrFLExpComp 64343
-#define UnitLangResources_StrFLFLength 64344
-#define UnitLangResources_StrFLFlash 64345
-#define UnitLangResources_StrFLExpProgram 64346
-#define UnitLangResources_StrFLOrientation 64347
-#define UnitLangResources_StrFLDateTime 64348
-#define UnitLangResources_StrFLGPS 64349
-#define UnitLangResources_StrFLCountry 64350
-#define UnitLangResources_StrFLProvince 64351
-#define UnitLangResources_StrERRORExifTool1 64352
-#define UnitLangResources_StrERRORExifTool2 64353
-#define UnitLangResources_StrERRORExifTool3 64354
-#define UnitLangResources_StrERRORExifTool4 64355
-#define UnitLangResources_StrERRORExifTool5 64356
-#define UnitLangResources_StrERRORExifTool6 64357
-#define UnitLangResources_StrERRORExifTool7 64358
-#define UnitLangResources_StrERRORExifTool8 64359
-#define UnitLangResources_StrERRORExifTool9 64360
-#define UnitLangResources_StrAdministrator 64361
-#define UnitLangResources_StrWarningOnlyDRes 64362
-#define UnitLangResources_StrNOAst 64363
-#define UnitLangResources_StrYESAst 64364
-#define UnitLangResources_StrExifToolExecuted 64365
-#define UnitLangResources_StrNoData 64366
-#define UnitLangResources_StrNoFilesSelected 64367
-#define UnitLangResources_StrRestRequestSUpd 64368
-#define UnitLangResources_StrSelectedFileHasNo 64369
-#define UnitLangResources_StrFiles 64370
-#define UnitLangResources_StrTheWebView2Loaderd 64371
-#define UnitLangResources_StrShowOnlineHelp 64372
-#define UnitLangResources_StrUnableToStartEdge 64373
-#define UnitLangResources_StrExifToolNotExecute 64374
-#define UnitLangResources_StrNoMoreMatchesFo 64375
-#define UnitLangResources_StrMinimizedToTray 64376
-#define UnitLangResources_StrClickToDisableThi 64377
-#define UnitLangResources_StrDropOnlyOneFileA 64378
-#define UnitLangResources_StrErrorPositioningHo 64379
-#define UnitLangResources_StrYes 64380
-#define UnitLangResources_StrNo 64381
-#define UnitLangResources_StrHor 64382
-#define UnitLangResources_StrVer 64383
+#define sdJpegTypes_sNoDCTCoefficentsAvailable 64304
+#define sdJpegTypes_sOperationOnlyFor8x8 64305
+#define sdJpegTypes_sCommentCannotBeSet 64306
+#define sdJpegTypes_sDNLMarkerExpected 64307
+#define sdJpegTypes_sCannotUseTileMode 64308
+#define sdJpegTypes_sRangeErrorInTileLoading 64309
+#define UnitLangResources_StrFLCountry 64320
+#define UnitLangResources_StrFLProvince 64321
+#define UnitLangResources_StrFLCity 64322
+#define UnitLangResources_StrFLLocation 64323
+#define UnitLangResources_StrFLArtist 64324
+#define UnitLangResources_StrFLRating 64325
+#define UnitLangResources_StrFLType 64326
+#define UnitLangResources_StrFLEvent 64327
+#define UnitLangResources_StrFLPersonInImage 64328
+#define sdJpegTypes_sInternalError 64329
+#define sdJpegTypes_sUnsupportedEncoding 64330
+#define sdJpegTypes_sMarkerExpected 64331
+#define sdJpegTypes_sInvalidTableClass 64332
+#define sdJpegTypes_sInputStreamChopped 64333
+#define sdJpegTypes_sUnexpectedMarkerInEncodedStream 64334
+#define sdJpegTypes_sInvalidFrameRef 64335
+#define UnitLangResources_StrNoData 64336
+#define UnitLangResources_StrNoFilesSelected 64337
+#define UnitLangResources_StrErrorSSCreating 64338
+#define UnitLangResources_StrRemainingThumbnails 64339
+#define UnitLangResources_StrDFilesRemaining 64340
+#define UnitLangResources_StrFLName 64341
+#define UnitLangResources_StrFLExpTime 64342
+#define UnitLangResources_StrFLFNumber 64343
+#define UnitLangResources_StrFLISO 64344
+#define UnitLangResources_StrFLExpComp 64345
+#define UnitLangResources_StrFLFLength 64346
+#define UnitLangResources_StrFLFlash 64347
+#define UnitLangResources_StrFLExpProgram 64348
+#define UnitLangResources_StrFLOrientation 64349
+#define UnitLangResources_StrFLDateTime 64350
+#define UnitLangResources_StrFLGPS 64351
+#define UnitLangResources_StrHor 64352
+#define UnitLangResources_StrVer 64353
+#define UnitLangResources_StrERRORExifTool1 64354
+#define UnitLangResources_StrERRORExifTool2 64355
+#define UnitLangResources_StrERRORExifTool3 64356
+#define UnitLangResources_StrERRORExifTool4 64357
+#define UnitLangResources_StrERRORExifTool5 64358
+#define UnitLangResources_StrERRORExifTool6 64359
+#define UnitLangResources_StrERRORExifTool7 64360
+#define UnitLangResources_StrERRORExifTool8 64361
+#define UnitLangResources_StrERRORExifTool9 64362
+#define UnitLangResources_StrAdministrator 64363
+#define UnitLangResources_StrWarningOnlyDRes 64364
+#define UnitLangResources_StrNOAst 64365
+#define UnitLangResources_StrYESAst 64366
+#define UnitLangResources_StrExifToolExecuted 64367
+#define UnitLangResources_StrNotOK 64368
+#define UnitLangResources_StrExecuteDSUpdat 64369
+#define UnitLangResources_StrRestRequestSUpd 64370
+#define UnitLangResources_StrSelectedFileHasNo 64371
+#define UnitLangResources_StrFiles 64372
+#define UnitLangResources_StrTheWebView2Loaderd 64373
+#define UnitLangResources_StrShowOnlineHelp 64374
+#define UnitLangResources_StrUnableToStartEdge 64375
+#define UnitLangResources_StrExifToolNotExecute 64376
+#define UnitLangResources_StrNoMoreMatchesFo 64377
+#define UnitLangResources_StrMinimizedToTray 64378
+#define UnitLangResources_StrClickToDisableThi 64379
+#define UnitLangResources_StrDropOnlyOneFileA 64380
+#define UnitLangResources_StrErrorPositioningHo 64381
+#define UnitLangResources_StrYes 64382
+#define UnitLangResources_StrNo 64383
 #define UnitLangResources_StrSpecifyCustomOptio 64384
 #define UnitLangResources_StrCustomOptions 64385
 #define UnitLangResources_StrWorkspace 64386
 #define UnitLangResources_StrETDirect 64387
 #define UnitLangResources_StrUserDef 64388
-#define UnitLangResources_StrLoadIniDefine 64389
-#define UnitLangResources_StrNewIniLoaded 64390
-#define UnitLangResources_StrIniFileNotChanged 64391
-#define UnitLangResources_StrSaveIniDefine 64392
-#define UnitLangResources_StrUseAnotherNameForIni 64393
-#define UnitLangResources_StrIniDefinition 64394
-#define UnitLangResources_StrIniDefNotSaved 64395
-#define UnitLangResources_StrTagAlreadyExistsI 64396
-#define UnitLangResources_StrOK 64397
-#define UnitLangResources_StrNotOK 64398
-#define UnitLangResources_StrExecuteDSUpdat 64399
+#define UnitLangResources_StrCustomView 64389
+#define UnitLangResources_StrMarked 64390
+#define UnitLangResources_StrLoadIniDefine 64391
+#define UnitLangResources_StrNewIniLoaded 64392
+#define UnitLangResources_StrIniFileNotChanged 64393
+#define UnitLangResources_StrSaveIniDefine 64394
+#define UnitLangResources_StrUseAnotherNameForIni 64395
+#define UnitLangResources_StrIniDefinition 64396
+#define UnitLangResources_StrIniDefNotSaved 64397
+#define UnitLangResources_StrTagAlreadyExistsI 64398
+#define UnitLangResources_StrOK 64399
 #define UnitLangResources_ImportMetaSingle1 64400
 #define UnitLangResources_ImportMetaSingle2 64401
 #define UnitLangResources_ImportMetaSingle3 64402
@@ -1230,10 +1232,14 @@
 #define System_SysConst_SInvalidUnknownFilename 65535
 STRINGTABLE
 BEGIN
+	sdJpegTypes_sNoDCTCoefficentsAvailable,	L"No DCT coefficients available (compress first)"
+	sdJpegTypes_sOperationOnlyFor8x8,	L"Operation can only be performed with LoadScale = jsFull"
 	sdJpegTypes_sCommentCannotBeSet,	L"Comment cannot be set before assigning bitmap"
 	sdJpegTypes_sDNLMarkerExpected,	L"DNL marker expected"
 	sdJpegTypes_sCannotUseTileMode,	L"Cannot use tilemode with progressive jpeg"
 	sdJpegTypes_sRangeErrorInTileLoading,	L"Range error in tiled loading: make sure to select tilemode"
+	UnitLangResources_StrFLCountry,	L"Country"
+	UnitLangResources_StrFLProvince,	L"Province"
 	UnitLangResources_StrFLCity,	L"City"
 	UnitLangResources_StrFLLocation,	L"Location"
 	UnitLangResources_StrFLArtist,	L"Artist"
@@ -1248,8 +1254,8 @@ BEGIN
 	sdJpegTypes_sInputStreamChopped,	L"Input stream prematurely chopped"
 	sdJpegTypes_sUnexpectedMarkerInEncodedStream,	L"Unexpected marker in encoded stream"
 	sdJpegTypes_sInvalidFrameRef,	L"Invalid frame reference in scan component"
-	sdJpegTypes_sNoDCTCoefficentsAvailable,	L"No DCT coefficients available (compress first)"
-	sdJpegTypes_sOperationOnlyFor8x8,	L"Operation can only be performed with LoadScale = jsFull"
+	UnitLangResources_StrNoData,	L"No data"
+	UnitLangResources_StrNoFilesSelected,	L"No files selected."
 	UnitLangResources_StrErrorSSCreating,	L"Error %s %s creating thumbnail for: %s"
 	UnitLangResources_StrRemainingThumbnails,	L"Remaining Thumbnails to generate: %d"
 	UnitLangResources_StrDFilesRemaining,	L"%d Files remaining"
@@ -1264,8 +1270,8 @@ BEGIN
 	UnitLangResources_StrFLOrientation,	L"Orientation"
 	UnitLangResources_StrFLDateTime,	L"DateTime"
 	UnitLangResources_StrFLGPS,	L"GPS"
-	UnitLangResources_StrFLCountry,	L"Country"
-	UnitLangResources_StrFLProvince,	L"Province"
+	UnitLangResources_StrHor,	L"Hor."
+	UnitLangResources_StrVer,	L"Ver."
 	UnitLangResources_StrERRORExifTool1,	L"ERROR: ExifTool could not be started!"
 	UnitLangResources_StrERRORExifTool2,	L"To resolve this you can:"
 	UnitLangResources_StrERRORExifTool3,	L"- Install Exiftool in:"
@@ -1280,8 +1286,8 @@ BEGIN
 	UnitLangResources_StrNOAst,	L"*NO*"
 	UnitLangResources_StrYESAst,	L"*YES*"
 	UnitLangResources_StrExifToolExecuted,	L"ExifTool executed"
-	UnitLangResources_StrNoData,	L"No data"
-	UnitLangResources_StrNoFilesSelected,	L"No files selected."
+	UnitLangResources_StrNotOK,	L"Not OK"
+	UnitLangResources_StrExecuteDSUpdat,	L"Execute: %d %s Update/ET Direct status: %s"
 	UnitLangResources_StrRestRequestSUpd,	L"Rest request: %s Update/ET Direct status: %s"
 	UnitLangResources_StrSelectedFileHasNo,	L"Selected file has no valid Lat Lon coordinates."
 	UnitLangResources_StrFiles,	L"Files/Folders: %d"
@@ -1296,13 +1302,13 @@ BEGIN
 	UnitLangResources_StrErrorPositioningHo,	L"Error positioning Home"
 	UnitLangResources_StrYes,	L"Yes"
 	UnitLangResources_StrNo,	L"No"
-	UnitLangResources_StrHor,	L"Hor."
-	UnitLangResources_StrVer,	L"Ver."
 	UnitLangResources_StrSpecifyCustomOptio,	L"Specify Custom options to add to Exiftool args"
 	UnitLangResources_StrCustomOptions,	L"Custom options"
 	UnitLangResources_StrWorkspace,	L"Workspace"
 	UnitLangResources_StrETDirect,	L"ExifTool direct"
 	UnitLangResources_StrUserDef,	L"User defined"
+	UnitLangResources_StrCustomView,	L"Custom view"
+	UnitLangResources_StrMarked,	L"Marked tags"
 	UnitLangResources_StrLoadIniDefine,	L"Load %s definition file"
 	UnitLangResources_StrNewIniLoaded,	L"New %s loaded."
 	UnitLangResources_StrIniFileNotChanged,	L"Ini file does not contain data -nothing changed."
@@ -1312,8 +1318,6 @@ BEGIN
 	UnitLangResources_StrIniDefNotSaved,	L"%s definition file couldn't be saved!?"
 	UnitLangResources_StrTagAlreadyExistsI,	L"Tag already exists in Custom view."
 	UnitLangResources_StrOK,	L"OK"
-	UnitLangResources_StrNotOK,	L"Not OK"
-	UnitLangResources_StrExecuteDSUpdat,	L"Execute: %d %s Update/ET Direct status: %s"
 	UnitLangResources_ImportMetaSingle1,	L"This will copy metadata from single source file,"
 	UnitLangResources_ImportMetaSingle2,	L"into currently selected files."
 	UnitLangResources_ImportMetaSingle3,	L"Next: 1.Select source file, 2.Select metadata to copy."

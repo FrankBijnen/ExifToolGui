@@ -2,7 +2,7 @@
 <xlat>
   <meta>
     <version>3</version>
-    <created>2024-03-25T23:52:44.469+01:00</created>
+    <created>2024-03-29T11:31:08.417+01:00</created>
     <tool>amTranslationManager</tool>
     <toolversion>2.0.8628.33873</toolversion>
   </meta>
@@ -12,18 +12,18 @@
     <sorted>True</sorted>
     <omitnewstate>True</omitnewstate>
   </options>
-  <project sourcefile=".\ExifToolGUI.exe" stringsymbolfile=".\ExifToolGUI.drc" language="en-US" properties="627">
+  <project sourcefile=".\ExifToolGUI.exe" stringsymbolfile=".\ExifToolGUI.drc" language="en-US" properties="639">
     <targetlanguages>
-      <language language="es" translated="602"/>
-      <language language="fr" translated="593"/>
-      <language language="it" translated="608"/>
-      <language language="nl" translated="653"/>
-      <language language="pt" translated="591"/>
-      <language language="en" translated="1"/>
-      <language language="de" translated="647"/>
+      <language language="fr" translated="605"/>
+      <language language="es" translated="614"/>
+      <language language="pt" translated="603"/>
+      <language language="it" translated="620"/>
+      <language language="nl" translated="665"/>
+      <language language="en" translated="0"/>
+      <language language="de" translated="659"/>
     </targetlanguages>
     <modules>
-      <module name="resourcestrings" type="strings" properties="169">
+      <module name="resourcestrings" type="strings" properties="171">
         <items>
           <item name="1">
             <properties>
@@ -6584,6 +6584,21 @@
               </property>
             </properties>
           </item>
+          <item name="UnitLangResources_StrCustomView">
+            <properties>
+              <property>
+                <value>Custom view</value>
+                <translations>
+                  <translation language="nl" status="proposed">Maatwerk</translation>
+                  <translation language="fr" status="proposed">Affichage utilisateur</translation>
+                  <translation language="de" status="proposed">Benutzerdefiniert</translation>
+                  <translation language="it" status="proposed">&amp;Vista utente</translation>
+                  <translation language="pt" status="proposed">&amp;Visão personalizada</translation>
+                  <translation language="es" status="proposed">Vista usario</translation>
+                </translations>
+              </property>
+            </properties>
+          </item>
           <item name="UnitLangResources_StrDecrement">
             <properties>
               <property>
@@ -7407,6 +7422,21 @@
               </property>
             </properties>
           </item>
+          <item name="UnitLangResources_StrMarked">
+            <properties>
+              <property>
+                <value>Marked tags</value>
+                <translations>
+                  <translation language="nl" status="proposed">Gemarkeerde labels</translation>
+                  <translation language="fr" status="proposed">Étiquettes marquées</translation>
+                  <translation language="de" status="proposed">Markierte Tags</translation>
+                  <translation language="es" status="proposed">Etiquetas marcadas</translation>
+                  <translation language="it" status="proposed">Tag marcati</translation>
+                  <translation language="pt" status="proposed">Tags marcadas </translation>
+                </translations>
+              </property>
+            </properties>
+          </item>
           <item name="UnitLangResources_StrMinimizedToTray">
             <properties>
               <property>
@@ -7486,8 +7516,8 @@
                 <translations>
                   <translation language="nl">Geen maatwerk gedefinieerd</translation>
                   <translation language="de" status="proposed">Keine benutzerdefinierten Tags definiert</translation>
-                  <translation language="es" status="proposed">No se han definido etiquetas personalizadas</translation>
-                  <translation language="fr" status="proposed">Pas de balises personnalisées définies</translation>
+                  <translation language="es" status="proposed">No se han definido etiquetas de vista usario</translation>
+                  <translation language="fr" status="proposed">Pas de etiquettes personnalisées définies</translation>
                   <translation language="pt" status="proposed">Não há tags personalizadas definidas</translation>
                   <translation language="it" status="proposed">Nessun tag personalizzato definito</translation>
                 </translations>
@@ -8071,8 +8101,8 @@
                 <translations>
                   <translation language="nl">Label bestaat al in Maatwerk.</translation>
                   <translation language="de" status="proposed">Tag existiert bereits in der benutzerdefinierten Ansicht.</translation>
-                  <translation language="es" status="proposed">La etiqueta ya existe en la vista personalizada.</translation>
-                  <translation language="fr" status="proposed">La balise existe déjà dans la vue Utilisateur.</translation>
+                  <translation language="es" status="proposed">La etiqueta ya existe en la vista usario.</translation>
+                  <translation language="fr" status="proposed">L'etiquette existe déjà dans la vue Utilisateur.</translation>
                   <translation language="pt" status="proposed">A tag já existe na exibição personalizada.</translation>
                   <translation language="it" status="proposed">Il tag esiste già nella vista personalizzata.</translation>
                 </translations>
@@ -10828,7 +10858,7 @@
                   <translation language="nl">Metadata label:</translation>
                   <translation language="de" status="proposed">Metadaten-Tag:</translation>
                   <translation language="es" status="proposed">Etiqueta de metadatos:</translation>
-                  <translation language="fr" status="proposed">Balise de métadonnées :</translation>
+                  <translation language="fr" status="proposed">Etiquette de métadonnées :</translation>
                   <translation language="pt" status="proposed">Etiqueta de metadados:</translation>
                   <translation language="it" status="proposed">Tag dei metadati:</translation>
                 </translations>
@@ -13272,7 +13302,7 @@
           </item>
         </items>
       </module>
-      <module name="TFMAIN" type="form" properties="170">
+      <module name="TFMAIN" type="form" properties="180">
         <items>
           <item name="FMain" type="TFMain">
             <properties>
@@ -14315,10 +14345,9 @@
           <item name="FMain.AdvPanelBrowse.AdvPageBrowse.AdvTabBrowse" type="TTabSheet">
             <properties>
               <property name="Caption">
-                <value>Browse</value>
+                <value>Folders</value>
                 <translations>
                   <translation language="fr" status="proposed">Dossiers</translation>
-                  <translation language="en" status="proposed">Folders</translation>
                   <translation language="de">Verzeichnis</translation>
                   <translation language="it" status="proposed">Sfogliare</translation>
                   <translation language="es">Carpetas</translation>
@@ -14471,6 +14500,28 @@
               </property>
             </properties>
           </item>
+          <item name="FMain.MainActionManager.ActionBars[0].Items[0].Items[10]" type="TActionManager">
+            <properties>
+              <property name="Caption" status="skip">
+                <value>-</value>
+              </property>
+            </properties>
+          </item>
+          <item name="FMain.MainActionManager.ActionBars[0].Items[0].Items[11]" type="TActionManager">
+            <properties>
+              <property name="Caption">
+                <value>&amp;Exit</value>
+                <translations>
+                  <translation language="nl">&amp;Verlaten</translation>
+                  <translation language="de">&amp;Beenden</translation>
+                  <translation language="es">&amp;Salir</translation>
+                  <translation language="fr">&amp;Quitter</translation>
+                  <translation language="pt">&amp;Sair</translation>
+                  <translation language="it">&amp;Esci</translation>
+                </translations>
+              </property>
+            </properties>
+          </item>
           <item name="FMain.MainActionManager.ActionBars[0].Items[0].Items[2]" type="TActionManager">
             <properties>
               <property name="Caption" status="skip">
@@ -14502,7 +14553,7 @@
                   <translation language="de" status="proposed">&amp;Laden..</translation>
                   <translation language="es" status="proposed">&amp;Cargar..</translation>
                   <translation language="fr" status="proposed">&amp;Charge..</translation>
-                  <translation language="pt" status="proposed">&amp;Load...</translation>
+                  <translation language="pt" status="proposed">&amp;Carga..</translation>
                   <translation language="it" status="proposed">&amp;Carica...</translation>
                 </translations>
               </property>
@@ -14547,7 +14598,7 @@
                   <translation language="de" status="proposed">&amp;Laden..</translation>
                   <translation language="es" status="proposed">&amp;Cargar..</translation>
                   <translation language="fr" status="proposed">&amp;Charge..</translation>
-                  <translation language="pt" status="proposed">&amp;Load...</translation>
+                  <translation language="pt" status="proposed">&amp;Carga..</translation>
                   <translation language="it" status="proposed">&amp;Carica...</translation>
                 </translations>
               </property>
@@ -14592,7 +14643,7 @@
                   <translation language="de" status="proposed">&amp;Laden..</translation>
                   <translation language="es" status="proposed">&amp;Cargar..</translation>
                   <translation language="fr" status="proposed">&amp;Charge..</translation>
-                  <translation language="pt" status="proposed">&amp;Load...</translation>
+                  <translation language="pt" status="proposed">&amp;Carga..</translation>
                   <translation language="it" status="proposed">&amp;Carica...</translation>
                 </translations>
               </property>
@@ -14615,21 +14666,90 @@
           </item>
           <item name="FMain.MainActionManager.ActionBars[0].Items[0].Items[6]" type="TActionManager">
             <properties>
-              <property name="Caption" status="skip">
-                <value>-</value>
+              <property name="Caption">
+                <value>&amp;Custom view definition file</value>
+                <translations>
+                  <translation language="fr" status="proposed">&amp;Fichier de définition de la vue utilisateur</translation>
+                  <translation language="de" status="proposed">&amp;Benutzeransicht-Definitionsdatei</translation>
+                  <translation language="it" status="proposed">&amp;File di definizione della vista personalizzata</translation>
+                  <translation language="pt" status="proposed">&amp;Arquivos de definição de visualização personalizada</translation>
+                  <translation language="es" status="proposed">&amp;Archivo de definición de la vista usario</translation>
+                  <translation language="nl" status="proposed">&amp;Maatwerk definitiebestand</translation>
+                </translations>
+              </property>
+            </properties>
+          </item>
+          <item name="FMain.MainActionManager.ActionBars[0].Items[0].Items[6].Items[0]" type="TActionManager">
+            <properties>
+              <property name="Caption">
+                <value>&amp;Load..</value>
+                <translations>
+                  <translation language="nl">&amp;Laad..</translation>
+                  <translation language="de" status="proposed">&amp;Laden..</translation>
+                  <translation language="es" status="proposed">&amp;Cargar..</translation>
+                  <translation language="fr" status="proposed">&amp;Charge..</translation>
+                  <translation language="pt" status="proposed">&amp;Carga..</translation>
+                  <translation language="it" status="proposed">&amp;Carica...</translation>
+                </translations>
+              </property>
+            </properties>
+          </item>
+          <item name="FMain.MainActionManager.ActionBars[0].Items[0].Items[6].Items[1]" type="TActionManager">
+            <properties>
+              <property name="Caption">
+                <value>&amp;Save...</value>
+                <translations>
+                  <translation language="nl">&amp;Sla op...</translation>
+                  <translation language="de" status="proposed">&amp;Speichern...</translation>
+                  <translation language="es" status="proposed">&amp;Guardar...</translation>
+                  <translation language="fr" status="proposed">&amp;Enregistrer...</translation>
+                  <translation language="pt" status="proposed">&amp;Salvar...</translation>
+                  <translation language="it" status="proposed">&amp;Salva...</translation>
+                </translations>
               </property>
             </properties>
           </item>
           <item name="FMain.MainActionManager.ActionBars[0].Items[0].Items[7]" type="TActionManager">
             <properties>
               <property name="Caption">
-                <value>&amp;Style...</value>
+                <value>&amp;Marked tags definition file</value>
                 <translations>
-                  <translation language="nl">&amp;Stijl...</translation>
-                  <translation language="de">&amp;Stil...</translation>
-                  <translation language="es">&amp;Estilo...</translation>
-                  <translation language="it">&amp;Stile...</translation>
-                  <translation language="pt">&amp;Estilo...</translation>
+                  <translation language="es" status="proposed">&amp;Archivo de definición de etiquetas marcadas</translation>
+                  <translation language="nl" status="proposed">&amp;Gemarkeerde labels definitiebestand</translation>
+                  <translation language="fr" status="proposed">&amp;Fichier de définition des etiquettes marquées</translation>
+                  <translation language="de" status="proposed">&amp;Markierte Tags Definitionsdatei</translation>
+                  <translation language="it" status="proposed">File di definizione dei tag &amp;marcati</translation>
+                  <translation language="pt" status="proposed">&amp;Arquivo de definição de tags marcadas</translation>
+                </translations>
+              </property>
+            </properties>
+          </item>
+          <item name="FMain.MainActionManager.ActionBars[0].Items[0].Items[7].Items[0]" type="TActionManager">
+            <properties>
+              <property name="Caption">
+                <value>&amp;Load..</value>
+                <translations>
+                  <translation language="nl">&amp;Laad..</translation>
+                  <translation language="de" status="proposed">&amp;Laden..</translation>
+                  <translation language="es" status="proposed">&amp;Cargar..</translation>
+                  <translation language="fr" status="proposed">&amp;Charge..</translation>
+                  <translation language="pt" status="proposed">&amp;Carga..</translation>
+                  <translation language="it" status="proposed">&amp;Carica...</translation>
+                </translations>
+              </property>
+            </properties>
+          </item>
+          <item name="FMain.MainActionManager.ActionBars[0].Items[0].Items[7].Items[1]" type="TActionManager">
+            <properties>
+              <property name="Caption">
+                <value>&amp;Save...</value>
+                <translations>
+                  <translation language="nl">&amp;Sla op...</translation>
+                  <translation language="de" status="proposed">&amp;Speichern...</translation>
+                  <translation language="es" status="proposed">&amp;Guardar...</translation>
+                  <translation language="fr" status="proposed">&amp;Enregistrer...</translation>
+                  <translation language="pt" status="proposed">&amp;Salvar...</translation>
+                  <translation language="it" status="proposed">&amp;Salva...</translation>
                 </translations>
               </property>
             </properties>
@@ -14644,14 +14764,13 @@
           <item name="FMain.MainActionManager.ActionBars[0].Items[0].Items[9]" type="TActionManager">
             <properties>
               <property name="Caption">
-                <value>&amp;Exit</value>
+                <value>&amp;Style...</value>
                 <translations>
-                  <translation language="nl">&amp;Verlaten</translation>
-                  <translation language="de">&amp;Beenden</translation>
-                  <translation language="es">&amp;Salir</translation>
-                  <translation language="fr">&amp;Quitter</translation>
-                  <translation language="pt">&amp;Sair</translation>
-                  <translation language="it">&amp;Esci</translation>
+                  <translation language="nl"> &amp;Stijl...</translation>
+                  <translation language="de"> &amp;Stil...</translation>
+                  <translation language="es"> &amp;Estilo...</translation>
+                  <translation language="it"> &amp;Stile...</translation>
+                  <translation language="pt"> &amp;Estilo...</translation>
                 </translations>
               </property>
             </properties>
@@ -14709,7 +14828,7 @@
                   <translation language="nl">&amp;Zet het ID voor labelnamen</translation>
                   <translation language="de" status="proposed">P&amp;refix Tag-Namen mit ID-Nummer</translation>
                   <translation language="es" status="proposed">P&amp;refijar nombres de etiquetas con número ID</translation>
-                  <translation language="fr" status="proposed">P&amp;refixer les noms des balises avec le numéro d'identification</translation>
+                  <translation language="fr" status="proposed">P&amp;refixer les noms des etiquettes avec le numéro d'identification</translation>
                   <translation language="pt" status="proposed">P&amp;refixar nomes de tags com número de ID</translation>
                   <translation language="it" status="proposed">P&amp;rifiuta i nomi dei tag con il numero ID</translation>
                 </translations>
@@ -14848,7 +14967,7 @@
                   <translation language="nl">Toon &amp;Composiete labels in ALLE</translation>
                   <translation language="de" status="proposed">Zusammengesetzte Tags in der Ansicht ALL anzeigen</translation>
                   <translation language="es" status="proposed">Mostrar etiquetas compuestas en la vista TODO</translation>
-                  <translation language="fr" status="proposed">Afficher les balises composées dans la vue ALL</translation>
+                  <translation language="fr" status="proposed">&amp;Afficher les etiquettes composées dans la vue ALL</translation>
                   <translation language="pt" status="proposed">Mostrar tags compostas na visualização ALL</translation>
                   <translation language="it" status="proposed">Mostra i tag composti nella vista TUTTO</translation>
                 </translations>
@@ -14863,7 +14982,7 @@
                   <translation language="nl">Toon &amp;geen dubbele labels</translation>
                   <translation language="de" status="proposed">Kei&amp;ne duplizierten tags anzeigen</translation>
                   <translation language="es" status="proposed">No mostrar etiquetas duplicadas</translation>
-                  <translation language="fr" status="proposed">Ne pas afficher les balises dupliquées</translation>
+                  <translation language="fr" status="proposed">Ne pas afficher les etiquettes dupliquées</translation>
                   <translation language="pt" status="proposed">Não mostrar tags duplicadas</translation>
                   <translation language="it" status="proposed">Non mostrare i tag duplicati</translation>
                 </translations>
@@ -14885,7 +15004,7 @@
                   <translation language="nl">&amp;Toon label waarden als getallen</translation>
                   <translation language="de" status="proposed">Tag-Werte als Zahlen anzeigen</translation>
                   <translation language="es" status="proposed">Mostrar valores de etiquetas como números</translation>
-                  <translation language="fr" status="proposed">Afficher les valeurs des balises sous forme de nombres</translation>
+                  <translation language="fr" status="proposed">&amp;Afficher les valeurs des etiquettes sous forme de nombres</translation>
                   <translation language="pt" status="proposed">Mostrar valores de tags como números</translation>
                   <translation language="it" status="proposed">Mostra i valori dei tag come numeri</translation>
                 </translations>
@@ -15448,6 +15567,42 @@
               </property>
             </properties>
           </item>
+          <item name="FMain.MainActionManager.MaCustomViewLoad" type="TAction">
+            <properties>
+              <property name="Caption">
+                <value>Load..</value>
+                <translations>
+                  <translation language="nl">Laad..</translation>
+                  <translation language="de" status="proposed">Laden..</translation>
+                  <translation language="es" status="proposed">Cargar..</translation>
+                  <translation language="fr" status="proposed">Charger...</translation>
+                  <translation language="pt" status="proposed">Carregar...</translation>
+                  <translation language="it" status="proposed">Carica...</translation>
+                </translations>
+              </property>
+              <property name="Category" status="skip">
+                <value>Program_CustomView</value>
+              </property>
+            </properties>
+          </item>
+          <item name="FMain.MainActionManager.MaCustomViewSave" type="TAction">
+            <properties>
+              <property name="Caption">
+                <value>Save...</value>
+                <translations>
+                  <translation language="nl">Sla op...</translation>
+                  <translation language="de" status="proposed">Speichern...</translation>
+                  <translation language="es" status="proposed">Guardar...</translation>
+                  <translation language="fr" status="proposed">Enregistrer...</translation>
+                  <translation language="pt" status="proposed">Salvar...</translation>
+                  <translation language="it" status="proposed">Salva...</translation>
+                </translations>
+              </property>
+              <property name="Category" status="skip">
+                <value>Program_CustomView</value>
+              </property>
+            </properties>
+          </item>
           <item name="FMain.MainActionManager.MaDontBackup" type="TAction">
             <properties>
               <property name="Caption">
@@ -15899,6 +16054,42 @@
               </property>
             </properties>
           </item>
+          <item name="FMain.MainActionManager.MaMarkedLoad" type="TAction">
+            <properties>
+              <property name="Caption">
+                <value>Load..</value>
+                <translations>
+                  <translation language="nl">Laad..</translation>
+                  <translation language="de" status="proposed">Laden..</translation>
+                  <translation language="es" status="proposed">Cargar..</translation>
+                  <translation language="fr" status="proposed">Charger...</translation>
+                  <translation language="pt" status="proposed">Carregar...</translation>
+                  <translation language="it" status="proposed">Carica...</translation>
+                </translations>
+              </property>
+              <property name="Category" status="skip">
+                <value>Program_Marked</value>
+              </property>
+            </properties>
+          </item>
+          <item name="FMain.MainActionManager.MaMarkedSave" type="TAction">
+            <properties>
+              <property name="Caption">
+                <value>Save...</value>
+                <translations>
+                  <translation language="nl">Sla op...</translation>
+                  <translation language="de" status="proposed">Speichern...</translation>
+                  <translation language="es" status="proposed">Guardar...</translation>
+                  <translation language="fr" status="proposed">Enregistrer...</translation>
+                  <translation language="pt" status="proposed">Salvar...</translation>
+                  <translation language="it" status="proposed">Salva...</translation>
+                </translations>
+              </property>
+              <property name="Category" status="skip">
+                <value>Program_Marked</value>
+              </property>
+            </properties>
+          </item>
           <item name="FMain.MainActionManager.MaNotDuplicated" type="TAction">
             <properties>
               <property name="Caption">
@@ -16015,7 +16206,7 @@
                   <translation language="nl">Toon Composiete labels in ALLE</translation>
                   <translation language="de" status="proposed">Zusammengesetzte Tags in der Ansicht ALL anzeigen</translation>
                   <translation language="es" status="proposed">Mostrar etiquetas compuestas en la vista TODAS</translation>
-                  <translation language="fr" status="proposed">Afficher les balises composites dans la vue ALL</translation>
+                  <translation language="fr" status="proposed">Afficher les etiquettes composites dans la vue ALL</translation>
                   <translation language="pt" status="proposed">Mostrar tags compostas na visualização ALL</translation>
                   <translation language="it" status="proposed">Mostra tag compositi nella vista TUTTI</translation>
                 </translations>
@@ -16051,7 +16242,7 @@
                   <translation language="nl">Zet het ID voor labelnamen</translation>
                   <translation language="de" status="proposed">Tag-Namen mit ID-Nummer voranstellen</translation>
                   <translation language="es" status="proposed">Prefijar los nombres de las etiquetas con el número ID</translation>
-                  <translation language="fr" status="proposed">Préfixer les noms des balises par un numéro d'identification</translation>
+                  <translation language="fr" status="proposed">Préfixer les noms des etiquettes par un numéro d'identification</translation>
                   <translation language="pt" status="proposed">Prefixar nomes de tags com número de ID</translation>
                   <translation language="it" status="proposed">Prefisso dei nomi dei tag con il numero ID</translation>
                 </translations>
@@ -16199,8 +16390,8 @@
                 <translations>
                   <translation language="nl">Voeg label toe aan Maatwerk</translation>
                   <translation language="de" status="proposed">Tag zur benutzerdefinierten Ansicht hinzufügen</translation>
-                  <translation language="es" status="proposed">Añadir etiqueta a la vista personalizada</translation>
-                  <translation language="fr" status="proposed">Ajouter une balise à l'affichage Utilisateur</translation>
+                  <translation language="es" status="proposed">Añadir etiqueta a la vista usario</translation>
+                  <translation language="fr" status="proposed">Ajouter une etiquette à l'affichage Utilisateur</translation>
                   <translation language="pt" status="proposed">Adicionar tag à visualização personalizada</translation>
                   <translation language="it" status="proposed">Aggiungi tag alla vista personalizzata</translation>
                 </translations>
@@ -16236,7 +16427,7 @@
                   <translation language="nl">Voegl label toe aan Werkruimte</translation>
                   <translation language="de" status="proposed">Tag zum Arbeitsbereich hinzufügen</translation>
                   <translation language="es" status="proposed">Añadir etiqueta al espacio de trabajo</translation>
-                  <translation language="fr" status="proposed">Ajouter une balise à l'espace de travail</translation>
+                  <translation language="fr" status="proposed">Ajouter une etiquette à l'espace de travail</translation>
                   <translation language="pt" status="proposed">Adicionar tag ao espaço de trabalho</translation>
                   <translation language="it" status="proposed">Aggiungi il tag all'area di lavoro</translation>
                 </translations>
@@ -16271,8 +16462,8 @@
                 <translations>
                   <translation language="nl">Verwijder label van Maatwerk</translation>
                   <translation language="de" status="proposed">Tag aus benutzerdefinierter Ansicht entfernen</translation>
-                  <translation language="es" status="proposed">Eliminar etiqueta de la vista personalizada</translation>
-                  <translation language="fr" status="proposed">Supprimer la balise de l'affichage Utilisateur</translation>
+                  <translation language="es" status="proposed">Eliminar etiqueta de la vista usario</translation>
+                  <translation language="fr" status="proposed">Supprimer la etiquette de l'affichage Utilisateur</translation>
                   <translation language="pt" status="proposed">Remover tag da visualização personalizada</translation>
                   <translation language="it" status="proposed">Rimuovere il tag dalla vista personalizzata</translation>
                 </translations>
@@ -16290,7 +16481,7 @@
                   <translation language="nl">Verwijder label van Werkruimte</translation>
                   <translation language="de" status="proposed">Tag aus Arbeitsbereich entfernen</translation>
                   <translation language="es" status="proposed">Eliminar etiqueta del área de trabajo</translation>
-                  <translation language="fr" status="proposed">Supprimer une balise de l'espace de travail</translation>
+                  <translation language="fr" status="proposed">Supprimer une etiquette de l'espace de travail</translation>
                   <translation language="pt" status="proposed">Remover tag do espaço de trabalho</translation>
                   <translation language="it" status="proposed">Rimuovere il tag dall'area di lavoro</translation>
                 </translations>
@@ -16326,7 +16517,7 @@
                   <translation language="nl">Markeer/Demarkeer label</translation>
                   <translation language="de" status="proposed">Tag markieren/Markierung aufheben</translation>
                   <translation language="es" status="proposed">Marcar/desmarcar etiqueta</translation>
-                  <translation language="fr" status="proposed">Marquer/Démarquer une balise</translation>
+                  <translation language="fr" status="proposed">Marquer/Démarquer une etiquette</translation>
                   <translation language="pt" status="proposed">Marcar/desmarcar tag</translation>
                   <translation language="it" status="proposed">Contrassegnare/designare il tag</translation>
                 </translations>
@@ -16612,7 +16803,7 @@
                   <translation language="nl">-scheidingsteken character om te tonen voor multi-value tags (keywords, etc)</translation>
                   <translation language="de" status="proposed">-trennungskarakter für mehrwert Tags (Stichworte usw)</translation>
                   <translation language="es" status="proposed">-carácter separador mostrado para etiquetas multivalor (palabras clave, etc)</translation>
-                  <translation language="fr" status="proposed">-Caractère de séparation affiché pour les balises à valeurs multiples (mots-clés, etc.)</translation>
+                  <translation language="fr" status="proposed">-Caractère de séparation affiché pour les etiquettes à valeurs multiples (mots-clés, etc.)</translation>
                   <translation language="pt" status="proposed">-caráter separador exibido para tags de vários valores (palavras-chave, etc.)</translation>
                   <translation language="it" status="proposed">-carattere di separazione visualizzato per i tag a più valori (parole chiave, ecc.)</translation>
                 </translations>
@@ -16900,7 +17091,7 @@
                   <translation language="nl">-Werkriumte: Verplaats focus naar volgende label/regel na invullen waarde</translation>
                   <translation language="de" status="proposed">-Arbeitsbereich: Verschieben des Fokus auf die nächste Zeile, nach eingeben Wert</translation>
                   <translation language="es" status="proposed">-Espacio de trabajo: Mover el foco a la siguiente etiqueta/línea después de introducir el valor.</translation>
-                  <translation language="fr" status="proposed">-Espace de travail : Déplacer le focus sur la balise/ligne suivante après la saisie d'une valeur.</translation>
+                  <translation language="fr" status="proposed">-Espace de travail : Déplacer le focus sur la etiquette/ligne suivante après la saisie d'une valeur.</translation>
                   <translation language="pt" status="proposed">-Espaço de trabalho: Mover o foco para a próxima tag/linha depois que o valor for inserido</translation>
                   <translation language="it" status="proposed">-Spazio di lavoro: Sposta l'attenzione sul tag/riga successivo dopo l'inserimento del valore.</translation>
                 </translations>
@@ -16915,7 +17106,7 @@
                   <translation language="nl">-Werkruimte: DubbelClick voegt labels toe, verwijdert deze</translation>
                   <translation language="de" status="proposed">-Arbeitsbereich: Doppelklick fügt Tags hinzu/entfernt sie</translation>
                   <translation language="es" status="proposed">-Espacio de trabajo: Doble clic para añadir/eliminar etiquetas</translation>
-                  <translation language="fr" status="proposed">-Espace de travail : Espace de travail : Double clic pour ajouter/supprimer des balises</translation>
+                  <translation language="fr" status="proposed">-Espace de travail : Espace de travail : Double clic pour ajouter/supprimer des etiquettes</translation>
                   <translation language="pt" status="proposed">-Espaço de trabalho: Clique duplo para adicionar/remover tags</translation>
                   <translation language="it" status="proposed">-Area di lavoro: Doppio clic per aggiungere/rimuovere tag</translation>
                 </translations>
@@ -17564,7 +17755,7 @@
                   <translation language="nl">Naam eindigt op: [± =multi-waarde label (Alt+0177)]  [? =Controlee op waarde (Ja/Nee)]  [* =Vul met waarde in Hint]  [# =Numeriek wijzigen]</translation>
                   <translation language="de" status="proposed">Namensendung: [± =mehrwertige Markierung (Alt+0177)] [? =Prüfung auf Markierung (Ja/Nein)] [* =Wert ausfüllen, der im Hinweis definiert ist] [# =Nummernbearbeitung zulassen]</translation>
                   <translation language="es" status="proposed">Terminación del nombre: [± =etiqueta multivalor (Alt+0177)] [? =Comprobar etiqueta (Sí/No)] [* =Rellenar valor definido en Sugerencia] [# =Permitir edición numérica].</translation>
-                  <translation language="fr" status="proposed">Fin de nom : [± =balise à valeurs multiples (Alt+0177)] [ ? =Vérifier la présence de la balise (Oui/Non)] [* =Remplir la valeur définie dans l'Indice] [# =Autoriser l'édition numérique].</translation>
+                  <translation language="fr" status="proposed">Fin de nom : [± =etiquette à valeurs multiples (Alt+0177)] [ ? =Vérifier la présence de la etiquette (Oui/Non)] [* =Remplir la valeur définie dans l'Indice] [# =Autoriser l'édition numérique]</translation>
                   <translation language="pt" status="proposed">Final do nome: [± = tag de vários valores (Alt+0177)] [? =Verificação de tag (Sim/Não)] [* =Preencher com o valor definido na dica] [# =Permitir edição numérica]</translation>
                   <translation language="it" status="proposed">Terminazione del nome: [± = tag a più valori (Alt+0177)] [? =Controllo tag (Sì/No)] [* =Compilare il valore definito in Suggerimento] [# =Ammettere modifica numerica].</translation>
                 </translations>
@@ -17582,7 +17773,7 @@
                   <translation language="nl">Label definitie:</translation>
                   <translation language="de">Tag definition:</translation>
                   <translation language="es" status="proposed">Definición de la etiqueta:</translation>
-                  <translation language="fr" status="proposed">Définition de la balise :</translation>
+                  <translation language="fr" status="proposed">Définition de la etiquette:</translation>
                   <translation language="pt" status="proposed">Definição da tag:</translation>
                   <translation language="it" status="proposed">Definizione del tag:</translation>
                 </translations>
@@ -17593,7 +17784,7 @@
                   <translation language="nl">VB: [-exif:Artist] of [-xmp-dc:Creator] .. Voor scheiding gebruik [-GUI-SEP] en vul tekst in Labelnaam.</translation>
                   <translation language="de" status="proposed">Beispiel: [-exif:Artist] oder [-xmp-dc:Creator] ... Als Trennzeichen verwenden Sie [-GUI-SEP] und fügen die Beschriftung in den Tag-Namen ein.</translation>
                   <translation language="es" status="proposed">Ejemplo: [-exif:Artista] o [-xmp-dc:Creador] ... Para separador, utilice [-GUI-SEP] y ponga leyenda en Nombre de etiqueta.</translation>
-                  <translation language="fr" status="proposed">Exemple : [Pour un séparateur, utiliser [-GUI-SEP] et mettre la légende dans le nom de la balise.</translation>
+                  <translation language="fr" status="proposed">Exemple : [Pour un séparateur, utiliser [-GUI-SEP] et mettre la légende dans le nom de la etiquette.</translation>
                   <translation language="pt" status="proposed">Exemplo: [-exif:Artist] ou [-xmp-dc:Creator] ... Para separador, use [-GUI-SEP] e coloque a legenda no nome da tag.</translation>
                   <translation language="it" status="proposed">Esempio: [-exif:Artista] o [-xmp-dc:Creatore] ... Per il separatore, usare [-GUI-SEP] e mettere la didascalia nel nome del tag.</translation>
                 </translations>
@@ -17622,7 +17813,7 @@
                   <translation language="nl">Wordt gebruikt als standaardwaarde invulwaarde indien Labelnaam eindigt op *.</translation>
                   <translation language="de" status="proposed">Wird als Standardwert (zum Ausfüllen) verwendet, wenn der Tag-Name mit * endet.</translation>
                   <translation language="es" status="proposed">Se utiliza como valor de etiqueta por defecto (Fill in) en caso de que el nombre de la Etiqueta termine en *.</translation>
-                  <translation language="fr" status="proposed">Utilisé comme valeur de balise par défaut (Remplir) dans le cas où le nom de la balise se termine par *.</translation>
+                  <translation language="fr" status="proposed">Utilisé comme valeur de etiquette par défaut (Remplir) dans le cas où le nom de l'etiquette se termine par *.</translation>
                   <translation language="pt" status="proposed">Usado como valor padrão (Preenchimento) da tag caso o nome da tag termine com *.</translation>
                   <translation language="it" status="proposed">Utilizzato come valore predefinito (riempimento) del tag nel caso in cui il nome del tag finisca con *.</translation>
                 </translations>

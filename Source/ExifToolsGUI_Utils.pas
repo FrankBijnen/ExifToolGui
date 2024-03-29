@@ -47,6 +47,7 @@ procedure Swap(var A, B: Cardinal);
 // String
 function NextField(var AString: string; const ADelimiter: string): string;
 function QuotedFileName(FileName: string): string;
+function ReplaceLastChar(const AString: string; AFrom, ATo: Char): string;
 function EndsWithCRLF(const AString: string): string;
 function ArgsFromDirectCmd(const CmdIn: string): string;
 function DirectCmdFromArgs(const ArgsIn: string): string;
@@ -396,6 +397,19 @@ begin
   Result := FileName;
   if (Pos(' ', Result) > 0) then
     Result := '"' + Result + '"';
+end;
+
+function ReplaceLastChar(const AString: string; AFrom, ATo: Char): string;
+var
+  Len: integer;
+begin
+  result := AString;
+  Len := Length(result);
+  if (Len = 0) then
+    result := ATo
+  else
+    if (result[Len] = Afrom) then
+      result[Len] := ATo;
 end;
 
 function EndsWithCRLF(const AString: string): string;
