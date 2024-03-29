@@ -8,7 +8,7 @@ const
   SHOWALL = 'Show All Files';
 
 type
-  TIniData = (idWorkSpace, idETDirect, idUserDefined);
+  TIniData = (idWorkSpace, idETDirect, idUserDefined, idCustomView, idMarked);
 
   GUIsettingsRec = record
     Language: string[7];
@@ -93,8 +93,8 @@ var
   GUIsettings: GUIsettingsRec;
   ETdirectCmd: TStringList;
   QuickTags: array of QuickTagRec;
-  MarkedTags: string;
-  CustomViewTags: string;
+  MarkedTagList: string;
+  CustomViewTagList: string;
   GpsXmpDir: string = '';
   WrkIniDir: string = '';
   ParmIniPath: string = '';
@@ -127,6 +127,9 @@ const
   WorkSpaceTags = 'WorkSpaceTags';
   ETDirectCmds = 'ETdirectCmd';
   UserDefTags = 'FListUserDefColumn';
+  TagList = 'TagList';
+  CustomView = 'CustomView';
+  MarkedTags = 'MarkedTags';
 
   // Check for IniPath commandLine param. See initialization.
   INIPATHSWITCH = 'IniPath';
@@ -362,6 +365,17 @@ begin
   end;
 end;
 
+function ReadCustomViewTags(GUIini: TMemIniFile): integer;
+begin
+  CustomViewTagList := ReplaceLastChar(GUIini.ReadString(TagList, CustomView, '<'), '<', ' ');
+  result := Length(CustomViewTagList);
+end;
+
+function ReadMarkedTags(GUIini: TMemIniFile): integer;
+begin
+  MarkedTagList := ReplaceLastChar(GUIini.ReadString(TagList, MarkedTags, '<'), '<', ' ');
+  result := Length(MarkedTagList);
+end;
 
 // Writing the workspace tags this way allows duplicate tag names.
 // Not what's intended by MS, but hey....
@@ -428,6 +442,43 @@ begin
   finally
     TmpItems.Free;
   end;
+end;
+
+procedure WriteTagList(GUIini: TMemIniFile; const AKey, AValue: string);
+var
+  SectionIndx: integer;
+  Section, Value: string;
+  TmpItems: TStringList;
+begin
+  TmpItems := TStringList.Create;
+  try
+    GUIini.GetStrings(TmpItems); // Get strings written so far.
+
+    Value := Format('%s=%s', [AKey, ReplaceLastChar(AValue, ' ', '<')]);
+    Section := Format('[%s]', [TagList]);
+
+    SectionIndx := TmpItems.IndexOf(Section);
+    if (SectionIndx > -1) then
+      TmpItems.Insert(SectionIndx +1, Value)
+    else
+    begin
+      TmpItems.Add(Section);
+      TmpItems.Add(Value);
+    end;
+    GUIini.SetStrings(TmpItems);
+  finally
+    TmpItems.Free;
+  end;
+end;
+
+procedure WriteCustomViewTags(GUIini: TMemIniFile);
+begin
+  WriteTagList(GUIini, CustomView, CustomViewTagList);
+end;
+
+procedure WriteMarkedTags(GUIini: TMemIniFile);
+begin
+  WriteTagList(GUIini, MarkedTags, MarkedTagList);
 end;
 
 procedure ReadMainWindowSizes(const AIniFile: TMemIniFile);
@@ -501,7 +552,7 @@ end;
 
 procedure ReadGUIini;
 var
-  I, N: integer;
+  Indx: integer;
   Tx, DefaultDir: string;
   TmpItems: TStringList;
 begin
@@ -532,15 +583,15 @@ begin
         Tx := ReadString(Ini_Settings, 'FileFilters', '*.JPG|*.CR2|*.JPG;*.CR2|*.JPG;*.DNG|*.JPG;*.PEF');
         CBoxFileFilter.Items.Text := SHOWALL;
         repeat
-          I := pos('|', Tx);
-          if I > 0 then
+          Indx := pos('|', Tx);
+          if Indx > 0 then
           begin
-            CBoxFileFilter.Items.Append(LeftStr(Tx, I - 1));
-            Delete(Tx, 1, I);
+            CBoxFileFilter.Items.Append(LeftStr(Tx, Indx - 1));
+            Delete(Tx, 1, Indx);
           end
           else
             CBoxFileFilter.Items.Append(Tx);
-        until I = 0;
+        until Indx = 0;
         DefStartupUse := ReadBool(Ini_Settings, 'DefStartupUse', false);
         DefStartupDir := ReadString(Ini_Settings, 'DefStartupDir', 'c:\');
         if DefStartupUse and ValidDir(DefStartupDir) then
@@ -554,15 +605,15 @@ begin
         ThumbSize := ReadInteger(Ini_Settings, 'ThumbsSize', 0);
         case ThumbSize of
           0:
-            I := 96;
+            Indx := 96;
           1:
-            I := 128;
+            Indx := 128;
           2:
-            I := 160;
+            Indx := 160;
         else
-          I := 96;
+          Indx := 96;
         end;
-        FMain.ShellList.ThumbNailSize := I;
+        FMain.ShellList.ThumbNailSize := Indx;
         ThumbAutoGenerate := ReadBool(Ini_Settings, 'ThumbAutoGenerate', True);
         FMain.ShellList.ThumbAutoGenerate := ThumbAutoGenerate;
         ThumbCleanSet := ReadString(Ini_Settings, 'ThumbCleanSet', '0000');
@@ -632,21 +683,11 @@ begin
       // --- WorkSpace tags---
       ReadWorkSpaceTags(GUIini);
 
-      // --- Marked tags---
-      MarkedTags := ReadString('TagList', 'MarkedTags', '<');
-      N := length(MarkedTags);
-      if MarkedTags[N] = '<' then
-        MarkedTags[N] := ' '
-      else
-        MarkedTags := ' ';
-
       // --- CustomView tags---
-      CustomViewTags := ReadString('TagList', 'CustomView', '<');
-      N := Length(CustomViewTags);
-      if CustomViewTags[N] = '<' then
-        CustomViewTags[N] := ' '
-      else
-        CustomViewTags := ' ';
+      ReadCustomViewTags(GUIini);
+
+      // --- Marked tags---
+      ReadMarkedTags(GUIini);
 
       ReadGeoCodeSettings(GUIini);
     end;
@@ -840,23 +881,13 @@ begin
         WriteETDirectCmds(CBoxETdirect, GuiIni);
 
         // Workspace tags
-        WriteWorkSpaceTags(GuiIni);
-
-        // Marked Tags
-        N := length(MarkedTags);
-        if (N > 0) then
-          MarkedTags[N] := '<'
-        else
-          MarkedTags := '<';
-        WriteString('TagList', 'MarkedTags', MarkedTags);
+        WriteWorkSpaceTags(GUIini);
 
         // Custom view tags
-        N := length(CustomViewTags);
-        if (N > 0) then
-          CustomViewTags[N] := '<'
-        else
-          CustomViewTags := '<';
-        WriteString('TagList', 'CustomView', CustomViewTags);
+        WriteCustomViewTags(GUIini);
+
+        // Marked Tags
+        WriteMarkedTags(GUIini);
 
       end;
       WriteGeoCodeSettings(GUIini);
@@ -883,6 +914,10 @@ begin
       result := StrETDirect;
     TIniData.idUserDefined:
       result := StrUserDef;
+    TIniData.idCustomView:
+      result := StrCustomView;
+    TIniData.idMarked:
+      result := StrMarked;
   end;
 end;
 
@@ -898,6 +933,8 @@ begin
       TIniData.idWorkSpace: result := (ReadWorkSpaceTags(GuiIni) <> 0);
       TIniData.idETDirect: result := (ReadETdirectCmds(Fmain.CBoxETdirect, GuiIni) <> 0);
       TIniData.idUserDefined: result := (ReadUserDefTags(GuiIni) <> 0);
+      TIniData.idCustomView: result := (ReadCustomViewTags(GuiIni) <> 0);
+      TIniData.idMarked: result := (ReadMarkedTags(GuiIni) <> 0);
     end;
   finally
     GUIini.Free;
@@ -943,6 +980,8 @@ begin
         TIniData.idWorkSpace: WriteWorkSpaceTags(GuiIni);
         TIniData.idETDirect: WriteEtDirectCmds(FMain.CBoxETdirect, GuiIni);
         TIniData.idUserDefined: WriteUserDefTags(GuiIni);
+        TIniData.idCustomView: WriteCustomViewTags(GuiIni);
+        TIniData.idMarked: WriteMarkedTags(GuiIni);
       end;
       GUIini.UpdateFile;
     finally

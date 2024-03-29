@@ -182,6 +182,10 @@ type
     MaEtDirectSave: TAction;
     MaUserDefSave: TAction;
     MaUserDefLoad: TAction;
+    MaCustomViewSave: TAction;
+    MaCustomViewLoad: TAction;
+    MaMarkedSave: TAction;
+    MaMarkedLoad: TAction;
     procedure ShellListClick(Sender: TObject);
     procedure ShellListKeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
     procedure SpeedBtnExifClick(Sender: TObject);
@@ -303,6 +307,10 @@ type
     procedure MaEtDirectSaveExecute(Sender: TObject);
     procedure MaUserDefLoadExecute(Sender: TObject);
     procedure MaUserDefSaveExecute(Sender: TObject);
+    procedure MaCustomViewLoadExecute(Sender: TObject);
+    procedure MaCustomViewSaveExecute(Sender: TObject);
+    procedure MaMarkedLoadExecute(Sender: TObject);
+    procedure MaMarkedSaveExecute(Sender: TObject);
   private
     { Private declarations }
     ETBarSeriesFocal: TBarSeries;
@@ -819,6 +827,28 @@ begin
   SaveIniDialog(SaveFileDlg, TIniData.idUserDefined, true);
 end;
 
+procedure TFMain.MaCustomViewLoadExecute(Sender: TObject);
+begin
+  if (LoadIniDialog(OpenFileDlg, TIniData.idCustomView, SpeedBtnCustom.Down = false)) then
+    ShowMetadata;
+end;
+
+procedure TFMain.MaCustomViewSaveExecute(Sender: TObject);
+begin
+  SaveIniDialog(SaveFileDlg, TIniData.idCustomView, true);
+end;
+
+procedure TFMain.MaMarkedLoadExecute(Sender: TObject);
+begin
+  if (LoadIniDialog(OpenFileDlg, TIniData.idMarked, False)) then
+    ShowMetadata;
+end;
+
+procedure TFMain.MaMarkedSaveExecute(Sender: TObject);
+begin
+  SaveIniDialog(SaveFileDlg, TIniData.idMarked, true);
+end;
+
 procedure TFMain.MaAPILargeFileSupportExecute(Sender: TObject);
 begin
   with ET_Options do
@@ -904,7 +934,7 @@ begin
       begin
         Delete(KeyTx, 1, pos(' ', KeyTx)); // -in case of Show HexID prefix
         TxtColor := clWindowText;
-        if pos(KeyTx + ' ', MarkedTags) > 0 then
+        if pos(KeyTx + ' ', MarkedTagList) > 0 then
           TxtColor := $0000FF; // tag is marked
         // check if tag is defined in Workspace
         KeyTx := UpperCase(KeyTx);
@@ -1600,10 +1630,10 @@ begin
   else
     Ts := '-';
   Tx := Ts + TranslateTagName(Ts, Tx);
-  if pos(Tx, CustomViewTags) > 0 then
+  if pos(Tx, CustomViewTagList) > 0 then
     ShowMessage(StrTagAlreadyExistsI)
   else
-    CustomViewTags := CustomViewTags + Tx + ' ';
+    CustomViewTagList := CustomViewTagList + Tx + ' ';
 end;
 
 procedure TFMain.QuickPopUp_AddDetailsUserClick(Sender: TObject);
@@ -1741,15 +1771,15 @@ begin
 
   if Length(Tx) > 0 then
   begin // should be always true!
-    I := pos(Tx, CustomViewTags);
+    I := pos(Tx, CustomViewTagList);
     J := I;
     repeat
       dec(I);
-    until CustomViewTags[I] = '-';
+    until CustomViewTagList[I] = '-';
     repeat
       inc(J);
-    until CustomViewTags[J] = ' ';
-    Delete(CustomViewTags, I, J - I + 1);
+    until CustomViewTagList[J] = ' ';
+    Delete(CustomViewTagList, I, J - I + 1);
   end;
   ShowMetadata;
 end;
@@ -1806,17 +1836,17 @@ begin
     Delete(Tx, 1, I); // if Show HexID exist
   if Length(Tx) > 0 then
   begin
-    I := pos(Tx, MarkedTags);
+    I := pos(Tx, MarkedTagList);
     if I > 0 then
     begin // tag allready marked: unmark it
       J := I;
       repeat
         inc(J);
-      until MarkedTags[J] = ' ';
-      Delete(MarkedTags, I, J - I + 1);
+      until MarkedTagList[J] = ' ';
+      Delete(MarkedTagList, I, J - I + 1);
     end
     else
-      MarkedTags := MarkedTags + Tx + ' '; // mark tag
+      MarkedTagList := MarkedTagList + Tx + ' '; // mark tag
   end;
 end;
 
@@ -3339,7 +3369,7 @@ begin
 
       if SpeedBtnCustom.Down then
       begin
-        if (Trim(CustomViewTags) = '') then
+        if (Trim(CustomViewTagList) = '') then
         begin
           // Show only message, no data.
           ETcmd := ETcmd + '-f' + CRLF +  '-Echo' + CRLF + StrNoCustomTags;
@@ -3347,7 +3377,7 @@ begin
         end
         else
         begin
-          ETcmd := ETcmd + '-f' + CRLF + CustomViewTags;
+          ETcmd := ETcmd + '-f' + CRLF + CustomViewTagList;
           E := Length(ETcmd);
           SetLength(ETcmd, E - 1); // remove last space char
           ETcmd := StringReplace(ETcmd, ' ', CRLF, [rfReplaceAll]);

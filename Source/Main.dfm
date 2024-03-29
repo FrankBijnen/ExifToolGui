@@ -103,9 +103,8 @@ object FMain: TFMain
       ActivePage = AdvTabBrowse
       Align = alClient
       TabOrder = 0
-      ExplicitHeight = 308
       object AdvTabBrowse: TTabSheet
-        Caption = 'Browse'
+        Caption = 'Folders'
         object ShellTree: TShellTreeView
           Left = 0
           Top = 0
@@ -1046,6 +1045,32 @@ object FMain: TFMain
                 UsageCount = 1
               end
               item
+                Items = <
+                  item
+                    Action = MaCustomViewLoad
+                    Caption = '&Load..'
+                  end
+                  item
+                    Action = MaCustomViewSave
+                    Caption = '&Save...'
+                  end>
+                Caption = 'Custom view definition file'
+                UsageCount = 1
+              end
+              item
+                Items = <
+                  item
+                    Action = MaMarkedLoad
+                    Caption = '&Load..'
+                  end
+                  item
+                    Action = MaMarkedSave
+                    Caption = '&Save...'
+                  end>
+                Caption = 'Marked tags definition file'
+                UsageCount = 1
+              end
+              item
                 Caption = '-'
               end
               item
@@ -1555,6 +1580,26 @@ object FMain: TFMain
       Category = 'Program_UserDef'
       Caption = 'Save...'
       OnExecute = MaUserDefSaveExecute
+    end
+    object MaCustomViewLoad: TAction
+      Category = 'Program_CustomView'
+      Caption = 'Load..'
+      OnExecute = MaCustomViewLoadExecute
+    end
+    object MaCustomViewSave: TAction
+      Category = 'Program_CustomView'
+      Caption = 'Save...'
+      OnExecute = MaCustomViewSaveExecute
+    end
+    object MaMarkedLoad: TAction
+      Category = 'Program_Marked'
+      Caption = 'Load..'
+      OnExecute = MaMarkedLoadExecute
+    end
+    object MaMarkedSave: TAction
+      Category = 'Program_Marked'
+      Caption = 'Save...'
+      OnExecute = MaMarkedSaveExecute
     end
   end
   object QuickPopUpMenu: TPopupMenu
