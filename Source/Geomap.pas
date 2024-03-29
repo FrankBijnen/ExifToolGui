@@ -94,6 +94,7 @@ procedure ShowImagesOnMap(Browser: TEdgeBrowser; Apath, ETOuts: string);
 procedure MapGetLocation(Browser: TEdgeBrowser);
 function MapGoToPlace(Browser: TEdgeBrowser; Place, Bounds, Desc, InitialZoom: string): string;
 procedure ParseJsonMessage(const Message: string; var Msg, Parm1, Parm2: string);
+function GetCountryList: TStringList;
 function ValidLatLon(const Lat, Lon: string): boolean;
 procedure ParseLatLon(const LatLon: string; var Lat, Lon: string);
 procedure AdjustLatLon(var Lat, Lon: string; No_Decimals: integer);
@@ -195,6 +196,7 @@ var
   CoordFormatSettings: TFormatSettings; // for StrToFloatDef -see Initialization
   LastQuery: TDateTime;
   CoordCache: TObjectDictionary<string, TPlace>;
+  CountryList: TStringList;
 
 procedure GEOsettingsRec.CheckProvider;
 begin
@@ -442,13 +444,13 @@ begin
     FCityList.AddPair(Key, Value);
 end;
 
-procedure TPLace.Sort;
+procedure TPlace.Sort;
 begin
   FCityList.Sort;
   FProvinceList.Sort;
 end;
 
-function TPLace.GetRegionLevels: TRegionLevels;
+function TPlace.GetRegionLevels: TRegionLevels;
 var
   Indx, H: integer;
 begin
@@ -464,7 +466,7 @@ begin
   end;
 end;
 
-function TPLace.GetCityLevels: TCityLevels;
+function TPlace.GetCityLevels: TCityLevels;
 var
   Indx, H: integer;
 begin
@@ -693,7 +695,19 @@ begin
   Browser.Navigate(GetHtmlTmp);
 end;
 
+function KnownCountry(const ACountry:string):boolean;
+begin
+  if not (Assigned(CountryList)) then
+    CountryList := GetCountryList;
+  result := (Length(Acountry) = 2);
+  if result and
+     (CountryList.Count > 0) then
+    result := result and (Countrylist.IndexOf(ACountry) > 0);
+end;
+
 function ExecuteRest(const RESTRequest: TRESTRequest): boolean;
+var
+  ARestParm: TRESTRequestParameter;
 begin
   result := true;
   try
@@ -713,7 +727,13 @@ begin
     end;
   finally
     if Assigned(ExecRestEvent) then
+    begin
+      // The Caller will free the params right after this request.
+      // No need to restore.
+      for ARestParm in RESTRequest.Params do
+        ARestParm.Options := [TRESTRequestParameterOption.poDoNotEncode];
       ExecRestEvent(RESTRequest.GetFullRequestURL(true) + #10, RESTRequest.Response.Content, result);
+    end;
   end;
 end;
 
@@ -759,7 +779,7 @@ end;
 // Only admin_level=2
 // If type <> area, we get the next city. Could be a different country.
 
-procedure FillCountry_OverPass(AJSONElements: TJSONArray; FromElement: integer; APlace: TPLace);
+procedure FillCountry_OverPass(AJSONElements: TJSONArray; FromElement: integer; APlace: TPlace);
 var
   JSONElement:  TJSONValue;
   JSONTags:     TJSONObject;
@@ -989,13 +1009,14 @@ begin
   CoordCache.Clear;
 end;
 
-procedure ChooseLocation(var Lat, Lon: string);
+function ChooseLocation(var Lat, Lon: string): Integer;
 begin
   Lat := '';
   Lon := '';
   with FrmPlaces do
   begin
-    if (ShowModal <> IDOK) then
+    result := ShowModal;
+    if (result <> IDOK) then
       exit;
     if (Listview1.Selected = nil) then
       exit;
@@ -1004,7 +1025,7 @@ begin
   end;
 end;
 
-procedure GetCoordsOfPlace_OverPass(const City, Country, Bounds: string; var Lat, Lon: string);
+function GetCoordsOfPlace_OverPass(const City, CountryRegion, Bounds: string; var Lat, Lon: string): integer;
 var
   RESTClient      : TRESTClient;
   RESTRequest     : TRESTRequest;
@@ -1027,8 +1048,9 @@ var
   JSONTagVal      : TJSONValue;
   PlaceResult     : TPlace;
 begin
+  result := IDOK;
   if (Length(Trim(City)) < 5) and
-     (Country = '') and
+     (CountryRegion = '') and
      (Bounds = '') then
     exit;
 
@@ -1036,7 +1058,11 @@ begin
 
   Lat         := '';
   Lon         := '';
+{$IFDEF DEBUG}
+  FormatNL    := #10;
+{$ELSE}
   FormatNL    := '';
+{$ENDIF}
   SearchBounds:= '';
   SearchOp    := '=';
   SearchStart := '';
@@ -1065,7 +1091,7 @@ begin
   Data := Format('[out:json][timeout:25];%s',
                   [FormatNL]);
 
-  if (Country = '') then
+  if (CountryRegion = '') then
   begin   // Query within selected bounds
     if (Bounds <> '') then
       SearchBounds := Format('(%s);', [Bounds]);
@@ -1077,10 +1103,31 @@ begin
   end
   else
   begin   // Query within country/region case and language insensitive
-    Data := Data +
-            	Format('rel[~"^name"~"^%s", i][boundary=administrative][admin_level~"2|4"];map_to_area->.searchArea;%s',
-                       [StringReplace(Trim(Country), '&', '', [rfReplaceAll]),
-                        FormatNL]);
+    if (KnownCountry(CountryRegion)) then
+      Data := Data +
+                // Search for ISO country code (2 pos)
+                Format('(%s' +
+                       ' rel["ISO3166-1"="%s"][boundary=administrative][admin_level="2"];%s'+
+                       ');%s' +
+                       'map_to_area->.searchArea;%s',
+                        [FormatNL,
+                         StringReplace(Trim(UpperCase(CountryRegion)), '&', '', [rfReplaceAll]),
+                         FormatNL,
+                         FormatNL,
+                         FormatNL,
+                         FormatNL])
+    else
+      Data := Data +
+                // Search for Region
+                Format('(%s' +
+                        ' rel["name"~"%s", i][boundary=administrative][admin_level~"3|4|5"];%s'+
+                        ');%s' +
+                        'map_to_area->.searchArea;%s',
+                        [FormatNL,
+                         StringReplace(Trim(CountryRegion), '&', '', [rfReplaceAll]),
+                         FormatNL,
+                         FormatNL,
+                         FormatNL]);
     Data := Data +
             Format('(%s' +
                    'node[%s][place~"municipality|city|town|village|hamlet"](area.searchArea);%s' +
@@ -1163,7 +1210,7 @@ begin
       end;
     end;
     PlaceResult.Sort;
-    ChooseLocation(Lat, Lon);
+    result := ChooseLocation(Lat, Lon);
 
   finally
     RESTResponse.Free;
@@ -1173,7 +1220,7 @@ begin
   end;
 end;
 
-procedure GetCoordsOfPlace_GeoCode(const City, Country: string; var Lat, Lon: string);
+function GetCoordsOfPlace_GeoCode(const City, Country: string; var Lat, Lon: string):integer;
 var
   RESTClient: TRESTClient;
   RESTRequest: TRESTRequest;
@@ -1181,6 +1228,7 @@ var
   JValue: TJSONValue;
   Places: TJSONArray;
 begin
+  result := IDOK;
   if (Length(Trim(City)) < 5) and
      (Country = '') then
     exit;
@@ -1217,7 +1265,7 @@ begin
     Places := RESTResponse.JSONValue as TJSONArray;
     for JValue in Places do
       FrmPlaces.AddPlace2LV(JValue.GetValue<string>('display_name'), JValue.GetValue<string>('lat'), JValue.GetValue<string>('lon'));
-    ChooseLocation(Lat, Lon);
+    result := ChooseLocation(Lat, Lon);
   finally
     RESTResponse.Free;
     RESTRequest.Free;
@@ -1225,27 +1273,35 @@ begin
   end;
 end;
 
-procedure GetCoordsOfPlace_ExifTool(const City, Country: string; var Lat, Lon: string);
+function GetCoordsOfPlace_ExifTool(const City, CountryRegion: string; var Lat, Lon: string):integer;
 var
   ETResult: TStringList;
-  AResult: string;
+  ETerr: string;
   AValue: string;
   AKey: string;
   Display: string;
 begin
+  result := IDOK;
+
+  if (City = '') and
+     (CountryRegion = '') then
+    exit;
+
   Lat := '';
   Lon := '';
 
   ETResult := TStringList.Create;
   try
-    ETResult.Text := ExifToolGeoLocation(City, Country, GeoSettings.GeoCodeLang, AResult);
+    ETResult.Text := ExifToolGeoLocation(City, CountryRegion, GeoSettings.GeoCodeLang, ETerr);
     FrmPlaces.Listview1.Items.Clear;
-    if (AResult = '') then
+    if (ETerr <> '') then
+      FrmPlaces.AddPlace2LV(ETerr, '', '')
+    else
     begin
       Display := '';
-      for AResult in ETResult do
+      for ETerr in ETResult do
       begin
-        AValue := AResult;
+        AValue := ETerr;
         AKey := Trim(NextField(AValue, ' '));
         AKey := Trim(NextField(AValue, ':'));
 
@@ -1264,67 +1320,73 @@ begin
         else
           Display := Display + ', ' + AKey + '=' + AValue;
       end;
-    end
-    else
-    begin
-      FrmPlaces.AddPlace2LV(AResult, '', '');
     end;
 
-    ChooseLocation(Lat, Lon);
+    result := ChooseLocation(Lat, Lon);
 
   finally
     ETResult.Free;
   end;
 end;
 
-
 procedure GetCoordsOfPlace(const Place, Bounds: string; var Lat, Lon: string);
 var
   CrWait, CrNormal: HCURSOR;
-  Region: string;
+  CountryRegion: string;
+  RetrySearch: boolean;
 begin
-  Region := Place;
-  FGeoSearch.EdSearchCity.Text := Trim(NextField(Region, ','));
+  CountryRegion := Place;
+  FGeoSearch.EdSearchCity.Text := Trim(NextField(CountryRegion, ','));
   if (FGeoSearch.EdSearchCity.Text = '') then
     exit;
-  FGeoSearch.EdRegion.Text := Trim(Region);
+  FGeoSearch.EdCountryRegion.Text := Trim(CountryRegion);
   FGeoSearch.EdBounds.Text := Bounds;
 
-  if (GeoSettings.GeoCodeDialog) then
-  begin
-    if (FGeoSearch.ShowModal <> IDOK) then
-      exit;
-  end;
-
-  CrWait := LoadCursor(0, IDC_WAIT);
-  CrNormal := SetCursor(CrWait);
-  try
-    case (GeoSettings.GeoCodingEnable) of
-      TGeoCodeEnable.geNone:
+  repeat
+    RetrySearch := false;
+    if (GeoSettings.GeoCodeDialog) then
+    begin
+      if (FGeoSearch.ShowModal <> IDOK) then
         exit;
-      TGeoCodeEnable.geAll:
-        begin
-          case GeoSettings.GetCoordProvider of
-            TGeoCodeProvider.gpGeoName:
-              GetCoordsOfPlace_GeoCode(FGeoSearch.EdSearchCity.Text, FGeoSearch.EdRegion.Text, Lat, Lon);
-            TGeoCodeProvider.gpOverPass:
-              GetCoordsOfPlace_OverPass(FGeoSearch.EdSearchCity.Text, FGeoSearch.EdRegion.Text, FGeoSearch.EdBounds.Text, Lat, Lon);
-            TGeoCodeProvider.gpExifTool:
-              GetCoordsOfPlace_ExifTool(FGeoSearch.EdSearchCity.Text, FGeoSearch.EdRegion.Text, Lat, Lon);
-          end;
-        end;
-      TGeoCodeEnable.geOffline:
-        begin
-          case GeoSettings.GetCoordProvider of
-            TGeoCodeProvider.gpExifTool:
-              GetCoordsOfPlace_ExifTool(FGeoSearch.EdSearchCity.Text, FGeoSearch.EdRegion.Text, Lat, Lon);
-          end;
-        end;
     end;
 
-  finally
-    SetCursor(CrNormal);
-  end;
+    CrWait := LoadCursor(0, IDC_WAIT);
+    CrNormal := SetCursor(CrWait);
+    try
+      case (GeoSettings.GeoCodingEnable) of
+        TGeoCodeEnable.geNone:
+          exit;
+        TGeoCodeEnable.geAll:
+          begin
+            case GeoSettings.GetCoordProvider of
+              TGeoCodeProvider.gpGeoName:
+                RetrySearch := (GetCoordsOfPlace_GeoCode(FGeoSearch.EdSearchCity.Text,
+                                                         FGeoSearch.EdCountryRegion.Text,
+                                                         Lat, Lon) = IDRETRY);
+              TGeoCodeProvider.gpOverPass:
+                RetrySearch := (GetCoordsOfPlace_OverPass(FGeoSearch.EdSearchCity.Text,
+                                                          FGeoSearch.EdCountryRegion.Text,
+                                                          FGeoSearch.EdBounds.Text,
+                                                          Lat, Lon) = IDRETRY);
+              TGeoCodeProvider.gpExifTool:
+                RetrySearch := (GetCoordsOfPlace_ExifTool(FGeoSearch.EdSearchCity.Text,
+                                                          FGeoSearch.EdCountryRegion.Text,
+                                                          Lat, Lon) = IDRETRY);
+            end;
+          end;
+        TGeoCodeEnable.geOffline:
+          begin
+            case GeoSettings.GetCoordProvider of
+              TGeoCodeProvider.gpExifTool:
+                GetCoordsOfPlace_ExifTool(FGeoSearch.EdSearchCity.Text, FGeoSearch.EdCountryRegion.Text, Lat, Lon);
+            end;
+          end;
+      end;
+
+    finally
+      SetCursor(CrNormal);
+    end;
+  until (not RetrySearch);
 end;
 
 procedure MapGetLocation(Browser: TEdgeBrowser);
@@ -1361,6 +1423,13 @@ begin
   finally
     JSONValue.Free;
   end;
+end;
+
+function GetCountryList: TStringList;
+begin
+  if not Assigned(CountryList) then
+    CountryList := ExifToolGetCountryList;
+  result := CountryList;
 end;
 
 function ValidLatLon(const Lat, Lon: string): boolean;
@@ -1473,6 +1542,8 @@ begin
   CoordCache.Free;
   GeoCityList.Free;
   GeoProvinceList.Free;
+  if (Assigned(CountryList)) then
+    CountryList.Free;
 end;
 
 end.

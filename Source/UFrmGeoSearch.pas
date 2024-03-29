@@ -19,7 +19,7 @@ type
     CmbGeoProvider: TComboBox;
     Label2: TLabel;
     EdSearchCity: TLabeledEdit;
-    EdRegion: TLabeledEdit;
+    EdCountryRegion: TLabeledEdit;
     EdBounds: TLabeledEdit;
     GrpCitySearch: TGroupBox;
     ChkComplete: TCheckBox;
@@ -29,7 +29,7 @@ type
     procedure FormShow(Sender: TObject);
     procedure BtnOKClick(Sender: TObject);
     procedure CmbGeoProviderChange(Sender: TObject);
-    procedure EdRegionChange(Sender: TObject);
+    procedure EdCountryRegionChange(Sender: TObject);
     procedure ChkCaseSensitiveClick(Sender: TObject);
     procedure ChkCompleteClick(Sender: TObject);
     procedure CmbLangChange(Sender: TObject);
@@ -46,7 +46,7 @@ var
 
 implementation
 
-uses System.StrUtils, Main, ExifTool, ExifToolsGUI_Utils;
+uses System.StrUtils, Main, ExifTool, ExifToolsGUI_Utils, UnitLangResources;
 
 {$R *.dfm}
 
@@ -54,10 +54,16 @@ procedure TFGeoSearch.UpdateDesign;
 begin
   EdBounds.Enabled := GeoSettings.GetCoordProvider = TGeoCodeProvider.gpOverPass;
   if (EdBounds.Enabled) and
-     (EdRegion.Text = '') then
+     (EdCountryRegion.Text = '') then
     EdBounds.Text := SelectedBounds
   else
     EdBounds.Text := '';
+
+  if (GeoSettings.GetCoordProvider = TGeoCodeProvider.gpGeoName) then
+    EdCountryRegion.EditLabel.Caption := StrWithinCountry
+  else
+    EdCountryRegion.EditLabel.Caption := StrWithinCountryRegion;
+
   ChkCaseSensitive.Enabled := (GeoSettings.GetCoordProvider = TGeoCodeProvider.gpOverPass);
   ChkCaseSensitive.Checked := ChkCaseSensitive.Enabled and
                               GeoSettings.CaseSensitive;
@@ -95,7 +101,7 @@ begin
   GeoSettings.GeoCodeLang := GetExifToolLanguage(CmbLang);
 end;
 
-procedure TFGeoSearch.EdRegionChange(Sender: TObject);
+procedure TFGeoSearch.EdCountryRegionChange(Sender: TObject);
 begin
   UpdateDesign;
 end;

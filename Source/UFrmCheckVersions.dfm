@@ -68,21 +68,21 @@ object FrmCheckVersions: TFrmCheckVersions
     Height = 29
     Align = alBottom
     TabOrder = 0
-    ExplicitTop = 187
-    ExplicitWidth = 648
+    ExplicitTop = 212
+    ExplicitWidth = 676
     object BtnClose: TBitBtn
-      Left = 594
-      Top = 2
-      Width = 75
+      Left = 585
+      Top = 0
+      Width = 85
       Height = 25
       Kind = bkClose
       NumGlyphs = 2
       TabOrder = 0
     end
     object BtnOpenUrl: TBitBtn
-      Left = 485
+      Left = 468
       Top = 2
-      Width = 89
+      Width = 100
       Height = 25
       Caption = '&Open Url'
       Enabled = False

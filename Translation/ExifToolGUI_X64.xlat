@@ -2,7 +2,7 @@
 <xlat>
   <meta>
     <version>3</version>
-    <created>2024-03-29T11:31:08.417+01:00</created>
+    <created>2024-03-29T19:17:38.110+01:00</created>
     <tool>amTranslationManager</tool>
     <toolversion>2.0.8628.33873</toolversion>
   </meta>
@@ -12,18 +12,18 @@
     <sorted>True</sorted>
     <omitnewstate>True</omitnewstate>
   </options>
-  <project sourcefile=".\ExifToolGUI.exe" stringsymbolfile=".\ExifToolGUI.drc" language="en-US" properties="639">
+  <project sourcefile=".\ExifToolGUI_X64.exe" stringsymbolfile=".\ExifToolGUI_X64.drc" language="en-US" properties="639">
     <targetlanguages>
-      <language language="fr" translated="605"/>
-      <language language="es" translated="614"/>
-      <language language="pt" translated="603"/>
-      <language language="it" translated="620"/>
-      <language language="nl" translated="665"/>
+      <language language="es" translated="615"/>
+      <language language="it" translated="621"/>
+      <language language="fr" translated="606"/>
+      <language language="pt" translated="604"/>
+      <language language="nl" translated="666"/>
       <language language="en" translated="0"/>
-      <language language="de" translated="659"/>
+      <language language="de" translated="660"/>
     </targetlanguages>
     <modules>
-      <module name="resourcestrings" type="strings" properties="171">
+      <module name="resourcestrings" type="strings" properties="174">
         <items>
           <item name="1">
             <properties>
@@ -8375,6 +8375,36 @@
               </property>
             </properties>
           </item>
+          <item name="UnitLangResources_StrWithinCountry">
+            <properties>
+              <property>
+                <value>Within Country code</value>
+                <translations>
+                  <translation language="nl">Binnen Landkode</translation>
+                  <translation language="de" status="proposed">Innerhalb von Landkode</translation>
+                  <translation language="es" status="proposed">Dentro del código de país</translation>
+                  <translation language="fr" status="proposed">Dans le code pays</translation>
+                  <translation language="pt" status="proposed">Dentro do código do país</translation>
+                  <translation language="it" status="proposed">All'interno del codice del paese</translation>
+                </translations>
+              </property>
+            </properties>
+          </item>
+          <item name="UnitLangResources_StrWithinCountryRegion">
+            <properties>
+              <property>
+                <value>Within Country code or Region</value>
+                <translations>
+                  <translation language="nl">Binnen Landkode of Regio</translation>
+                  <translation language="de" status="proposed">Innerhalb von Landkode oder der Region</translation>
+                  <translation language="es" status="proposed">Dentro del código de país o región</translation>
+                  <translation language="fr" status="proposed">Dans le code pays ou de la région</translation>
+                  <translation language="pt" status="proposed">Dentro do código do país ou da região</translation>
+                  <translation language="it" status="proposed">All'interno del codice del paese o della regione</translation>
+                </translations>
+              </property>
+            </properties>
+          </item>
           <item name="UnitLangResources_StrWorkspace">
             <properties>
               <property>
@@ -9385,6 +9415,14 @@
             <properties>
               <property status="hold">
                 <value>&amp;Retry</value>
+                <translations>
+                  <translation language="nl" status="proposed">&amp;Herhaal</translation>
+                  <translation language="fr" status="proposed">&amp;Répète</translation>
+                  <translation language="de" status="proposed">&amp;Wiederholen</translation>
+                  <translation language="it" status="proposed">&amp;Ripetere</translation>
+                  <translation language="pt" status="proposed">&amp;Repetir</translation>
+                  <translation language="es" status="proposed">&amp;Repetir</translation>
+                </translations>
               </property>
             </properties>
           </item>
@@ -9628,8 +9666,16 @@
           </item>
           <item name="Vcl_Consts_SRetryButton">
             <properties>
-              <property status="hold">
+              <property>
                 <value>&amp;Retry</value>
+                <translations>
+                  <translation language="nl" status="proposed">&amp;Herhaal</translation>
+                  <translation language="fr" status="proposed">&amp;Répète</translation>
+                  <translation language="de" status="proposed">&amp;Wiederholen</translation>
+                  <translation language="it" status="proposed">&amp;Ripetere</translation>
+                  <translation language="pt" status="proposed">&amp;Repetir</translation>
+                  <translation language="es" status="proposed">&amp;Repetir</translation>
+                </translations>
               </property>
             </properties>
           </item>
@@ -11810,7 +11856,7 @@
           </item>
         </items>
       </module>
-      <module name="TFGEOSEARCH" type="form" properties="15">
+      <module name="TFGEOSEARCH" type="form" properties="14">
         <items>
           <item name="FGeoSearch" type="TFGeoSearch">
             <properties>
@@ -11879,16 +11925,8 @@
               <property name="Items.Strings[0]" status="skip">
                 <value>GeoCode</value>
               </property>
-              <property name="Items.Strings[1]">
+              <property name="Items.Strings[1]" status="skip">
                 <value>Overpass API</value>
-                <translations>
-                  <translation language="nl">OverPass Api</translation>
-                  <translation language="de" status="proposed">OverPass Api</translation>
-                  <translation language="es" status="proposed">API de sobrepaso</translation>
-                  <translation language="fr" status="proposed">API de contournement</translation>
-                  <translation language="pt" status="proposed">API de ultrapassagem</translation>
-                  <translation language="it" status="proposed">API di scavalcamento</translation>
-                </translations>
               </property>
               <property name="Items.Strings[2]" status="skip">
                 <value>ExifTool geolocation</value>
@@ -11942,7 +11980,7 @@
               </property>
             </properties>
           </item>
-          <item name="FGeoSearch.PctMain.TabSearch.EdRegion" type="TLabeledEdit">
+          <item name="FGeoSearch.PctMain.TabSearch.EdCountryRegion" type="TLabeledEdit">
             <properties>
               <property name="EditLabel.Caption">
                 <value>Within Country/Region</value>
@@ -12055,7 +12093,7 @@
           </item>
         </items>
       </module>
-      <module name="TFGEOSETUP" type="form" properties="12">
+      <module name="TFGEOSETUP" type="form" properties="11">
         <items>
           <item name="FGeoSetup" type="TFGeoSetup">
             <properties>
@@ -12131,16 +12169,8 @@
               <property name="Items.Strings[0]" status="skip">
                 <value>GeoCode</value>
               </property>
-              <property name="Items.Strings[1]">
+              <property name="Items.Strings[1]" status="skip">
                 <value>Overpass API</value>
-                <translations>
-                  <translation language="nl">OverPass Api</translation>
-                  <translation language="de" status="proposed">OverPass Api</translation>
-                  <translation language="es" status="proposed">API de sobrepaso</translation>
-                  <translation language="fr" status="proposed">API de passage à niveau</translation>
-                  <translation language="pt" status="proposed">API de passagem superior</translation>
-                  <translation language="it" status="proposed">API di scavalcamento</translation>
-                </translations>
               </property>
               <property name="Items.Strings[2]" status="skip">
                 <value>ExifTool geolocation</value>
@@ -14627,7 +14657,7 @@
                   <translation language="de" status="proposed">&amp;Benutzerdefinierte Felder Definitionsdatei</translation>
                   <translation language="es" status="proposed">&amp;Archivo de definición de campos definidos por el usuario</translation>
                   <translation language="pt" status="proposed">&amp;Arquivo de definição de campos definidos pelo usuário</translation>
-                  <translation language="nl" status="proposed">&amp;Gebruiker gedefinieerde velden definitiebestand</translation>
+                  <translation language="nl">&amp;Gebruiker gedefinieerde velden definitiebestand</translation>
                   <translation language="fr" status="proposed">&amp;Fichier de définition des champs définis par l'utilisateur</translation>
                   <translation language="it" status="proposed">File di definizione dei &amp;campi definiti dall'utente</translation>
                 </translations>
@@ -14669,12 +14699,12 @@
               <property name="Caption">
                 <value>&amp;Custom view definition file</value>
                 <translations>
-                  <translation language="fr" status="proposed">&amp;Fichier de définition de la vue utilisateur</translation>
-                  <translation language="de" status="proposed">&amp;Benutzeransicht-Definitionsdatei</translation>
-                  <translation language="it" status="proposed">&amp;File di definizione della vista personalizzata</translation>
-                  <translation language="pt" status="proposed">&amp;Arquivos de definição de visualização personalizada</translation>
-                  <translation language="es" status="proposed">&amp;Archivo de definición de la vista usario</translation>
-                  <translation language="nl" status="proposed">&amp;Maatwerk definitiebestand</translation>
+                  <translation language="fr">&amp;Fichier de définition de la vue utilisateur</translation>
+                  <translation language="de">&amp;Benutzeransicht-Definitionsdatei</translation>
+                  <translation language="it">&amp;File di definizione della vista personalizzata</translation>
+                  <translation language="pt">&amp;Arquivos de definição de visualização personalizada</translation>
+                  <translation language="es">&amp;Archivo de definición de la vista usario</translation>
+                  <translation language="nl">&amp;Maatwerk definitiebestand</translation>
                 </translations>
               </property>
             </properties>
@@ -14714,12 +14744,12 @@
               <property name="Caption">
                 <value>&amp;Marked tags definition file</value>
                 <translations>
-                  <translation language="es" status="proposed">&amp;Archivo de definición de etiquetas marcadas</translation>
-                  <translation language="nl" status="proposed">&amp;Gemarkeerde labels definitiebestand</translation>
-                  <translation language="fr" status="proposed">&amp;Fichier de définition des etiquettes marquées</translation>
-                  <translation language="de" status="proposed">&amp;Markierte Tags Definitionsdatei</translation>
-                  <translation language="it" status="proposed">File di definizione dei tag &amp;marcati</translation>
-                  <translation language="pt" status="proposed">&amp;Arquivo de definição de tags marcadas</translation>
+                  <translation language="es">&amp;Archivo de definición de etiquetas marcadas</translation>
+                  <translation language="nl">&amp;Gemarkeerde labels definitiebestand</translation>
+                  <translation language="fr">&amp;Fichier de définition des etiquettes marquées</translation>
+                  <translation language="de">&amp;Markierte Tags Definitionsdatei</translation>
+                  <translation language="it">File di definizione dei tag &amp;marcati</translation>
+                  <translation language="pt">&amp;Arquivo de definição de tags marcadas</translation>
                 </translations>
               </property>
             </properties>
@@ -16681,7 +16711,7 @@
           </item>
         </items>
       </module>
-      <module name="TFPREFERENCES" type="form" properties="58">
+      <module name="TFPREFERENCES" type="form" properties="57">
         <items>
           <item name="FPreferences" type="TFPreferences">
             <properties>
@@ -17568,16 +17598,8 @@
           </item>
           <item name="FPreferences.AdvPageControl1.TabGeoCoding.GrpOverPass" type="TGroupBox">
             <properties>
-              <property name="Caption">
+              <property name="Caption" status="skip">
                 <value>OverPass Api</value>
-                <translations>
-                  <translation language="nl">OverPass Api</translation>
-                  <translation language="de">OverPass Api</translation>
-                  <translation language="es" status="proposed">API OverPass</translation>
-                  <translation language="fr" status="proposed">Api OverPass</translation>
-                  <translation language="pt" status="proposed">Api OverPass</translation>
-                  <translation language="it" status="proposed">Api OverPass</translation>
-                </translations>
               </property>
             </properties>
           </item>
