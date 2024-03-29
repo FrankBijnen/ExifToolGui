@@ -103,6 +103,7 @@ object FMain: TFMain
       ActivePage = AdvTabBrowse
       Align = alClient
       TabOrder = 0
+      ExplicitHeight = 308
       object AdvTabBrowse: TTabSheet
         Caption = 'Folders'
         object ShellTree: TShellTreeView
@@ -1054,7 +1055,7 @@ object FMain: TFMain
                     Action = MaCustomViewSave
                     Caption = '&Save...'
                   end>
-                Caption = 'Custom view definition file'
+                Caption = '&Custom view definition file'
                 UsageCount = 1
               end
               item
@@ -1067,7 +1068,7 @@ object FMain: TFMain
                     Action = MaMarkedSave
                     Caption = '&Save...'
                   end>
-                Caption = 'Marked tags definition file'
+                Caption = '&Marked tags definition file'
                 UsageCount = 1
               end
               item

@@ -30,9 +30,9 @@ object FrmStyle: TFrmStyle
       389
       29)
     object BtnOk: TBitBtn
-      Left = 203
+      Left = 199
       Top = 2
-      Width = 75
+      Width = 85
       Height = 25
       Anchors = [akRight, akBottom]
       Caption = 'OK'
@@ -57,12 +57,11 @@ object FrmStyle: TFrmStyle
       NumGlyphs = 2
       TabOrder = 0
       OnClick = BtnOkClick
-      ExplicitLeft = 199
     end
     object BtnCancel: TBitBtn
-      Left = 284
+      Left = 290
       Top = 2
-      Width = 75
+      Width = 85
       Height = 25
       Anchors = [akRight, akBottom]
       Cancel = True
@@ -89,7 +88,6 @@ object FrmStyle: TFrmStyle
       NumGlyphs = 2
       TabOrder = 1
       OnClick = BtnCancelClick
-      ExplicitLeft = 280
     end
   end
   object LstStyles: TListBox

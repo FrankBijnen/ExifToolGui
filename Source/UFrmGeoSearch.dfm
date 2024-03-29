@@ -3,8 +3,8 @@ object FGeoSearch: TFGeoSearch
   Top = 0
   BorderStyle = bsDialog
   Caption = 'Search place'
-  ClientHeight = 421
-  ClientWidth = 593
+  ClientHeight = 420
+  ClientWidth = 589
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -15,13 +15,11 @@ object FGeoSearch: TFGeoSearch
   TextHeight = 13
   object StatusBar1: TStatusBar
     Left = 0
-    Top = 402
-    Width = 593
+    Top = 401
+    Width = 589
     Height = 19
     Panels = <>
     SimplePanel = True
-    ExplicitTop = 401
-    ExplicitWidth = 589
   end
   object BtnCancel: TButton
     Left = 518
@@ -73,14 +71,14 @@ object FGeoSearch: TFGeoSearch
         Width = 467
         Height = 104
         Caption = 'City search'
-        TabOrder = 4
+        TabOrder = 5
         object ChkComplete: TCheckBox
           Left = 16
           Top = 62
           Width = 399
           Height = 17
           Caption = 'Complete word (faster)'
-          TabOrder = 0
+          TabOrder = 1
           OnClick = ChkCompleteClick
         end
         object ChkCaseSensitive: TCheckBox
@@ -89,7 +87,7 @@ object FGeoSearch: TFGeoSearch
           Width = 399
           Height = 17
           Caption = 'Case sensitive (faster)'
-          TabOrder = 1
+          TabOrder = 0
           OnClick = ChkCaseSensitiveClick
         end
       end
@@ -115,26 +113,26 @@ object FGeoSearch: TFGeoSearch
       end
       object EdSearchCity: TLabeledEdit
         Left = 8
-        Top = 111
+        Top = 112
         Width = 470
         Height = 21
         EditLabel.Width = 72
         EditLabel.Height = 13
         EditLabel.Caption = 'Search for City'
-        TabOrder = 1
+        TabOrder = 2
         Text = ''
       end
-      object EdRegion: TLabeledEdit
+      object EdCountryRegion: TLabeledEdit
         Left = 8
-        Top = 155
+        Top = 156
         Width = 470
         Height = 21
         EditLabel.Width = 109
         EditLabel.Height = 13
         EditLabel.Caption = 'Within Country/Region'
-        TabOrder = 2
+        TabOrder = 3
         Text = ''
-        OnChange = EdRegionChange
+        OnChange = EdCountryRegionChange
       end
       object EdBounds: TLabeledEdit
         Left = 8
@@ -144,15 +142,15 @@ object FGeoSearch: TFGeoSearch
         EditLabel.Width = 68
         EditLabel.Height = 13
         EditLabel.Caption = 'Within Bounds'
-        TabOrder = 3
+        TabOrder = 4
         Text = ''
       end
       object CmbLang: TComboBox
         Left = 8
-        Top = 70
+        Top = 68
         Width = 470
         Height = 21
-        TabOrder = 5
+        TabOrder = 1
         Text = 'CmbLang'
         OnChange = CmbLangChange
         OnClick = CmbLangChange

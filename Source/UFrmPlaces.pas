@@ -12,6 +12,7 @@ type
     BtnOk: TBitBtn;
     BtnCancel: TBitBtn;
     ListView1: TListView;
+    BtnRetry: TBitBtn;
     procedure FormShow(Sender: TObject);
     procedure ListView1DblClick(Sender: TObject);
   private
@@ -25,6 +26,8 @@ var
   FrmPlaces: TFrmPlaces;
 
 implementation
+
+uses Vcl.Consts;
 
 {$R *.dfm}
 

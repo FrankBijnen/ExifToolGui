@@ -141,6 +141,8 @@ resourcestring
   StrExecuteDSUpdat         = 'Execute: %d %s Update/ET Direct status: %s';
   StrRestRequestSUpd        = 'Rest request: %s Update/ET Direct status: %s';
   StrSelectedFileHasNo      = 'Selected file has no valid Lat Lon coordinates.';
+  StrWithinCountry          = 'Within Country code';
+  StrWithinCountryRegion    = 'Within Country code or Region';
   StrFiles                  = 'Files/Folders: %d';
   StrTheWebView2Loaderd     = 'The WebView2Loader.dll could not be loaded.';
   StrShowOnlineHelp         = 'Show Online help?';

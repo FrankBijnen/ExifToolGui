@@ -167,15 +167,14 @@ object FrmAbout: TFrmAbout
       413
       29)
     object BtnOk: TBitBtn
-      Left = 308
+      Left = 300
       Top = 2
-      Width = 75
+      Width = 85
       Height = 25
       Anchors = [akRight, akBottom]
       Kind = bkClose
       NumGlyphs = 2
       TabOrder = 0
-      ExplicitLeft = 300
     end
   end
 end

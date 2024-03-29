@@ -81,7 +81,8 @@ procedure SetupExifToolLanguage(const ACombo: TComboBox; ALang: string);
 procedure SetupGeoCodeLanguage(const ACombo: TComboBox; Aprovider: TGeoCodeProvider; ALang: string);
 
 function ExifToolGeoLocation(const Lat, Lon, Lang:string): TStringList; overload;
-function ExifToolGeoLocation(const City, Country, Lang: string; var ETErr:string): string; overload;
+function ExifToolGeoLocation(const City, CountryRegion, Lang: string; var ETErr:string): string; overload;
+function ExifToolGetCountryList: TStringList;
 
 // Context menu
 function ContextInstalled(const AppTitle: string): string;
@@ -1003,7 +1004,7 @@ begin
   end;
 end;
 
-function ExifToolGeoLocation(const City, Country, Lang: string; var ETErr:string): string;
+function ExifToolGeoLocation(const City, CountryRegion, Lang: string; var ETErr:string): string;
 var
   ETCmd: string;
   SavedLang: string;
@@ -1018,12 +1019,39 @@ begin
   try
     ETcmd := '-m' + CRLF + '-a';
     ETcmd := ETCmd + CRLF + '-api' + CRLF + Format('geolocation=ci/%s/i', [City]);
-    if (Country <> '') then
-      ETcmd := ETCmd + Format(',/%s/i',[Country]);
+    if (CountryRegion <> '') then
+      ETcmd := ETCmd + Format(',/%s/i',[CountryRegion]);
     ET_OpenExec(ETcmd, '', result, ETerr, false);
   finally
     ET_Options.ETLangDef := SavedLang;
   end;
+end;
+
+function ExifToolGetCountryList: TStringList;
+var
+  ETcmd, ETout, Country: string;
+  Indx: integer;
+begin
+  result := TStringList.Create;
+  result.CaseSensitive := false;
+  ETcmd := '-listgeo' + CRLF + '-api' + CRLF + 'GeoLocFeature=pplc';
+  ET_OpenExec(ETcmd, '', result, false);
+  if (result.Count > 2) then
+  begin
+    result.Delete(0); // Delete some header lines
+    result.Delete(0);
+    for Indx := 0 to result.Count -1 do
+    begin
+      ETout := result[Indx];
+      Country := NextField(ETout, ',');
+      Country := NextField(ETout, ',');
+      Country := NextField(ETout, ',');
+      Country := NextField(ETout, ',');
+      result[Indx] := Country;
+    end;
+    result.Sort;
+  end;
+
 end;
 
 function GetIsQuickTime(const AFile: string): boolean;
