@@ -20,6 +20,8 @@ object FGeoSearch: TFGeoSearch
     Height = 19
     Panels = <>
     SimplePanel = True
+    ExplicitTop = 400
+    ExplicitWidth = 585
   end
   object BtnCancel: TButton
     Left = 518
@@ -65,13 +67,21 @@ object FGeoSearch: TFGeoSearch
         Height = 13
         Caption = 'Preferred language:'
       end
+      object LblCountryRegion: TLabel
+        Left = 8
+        Top = 140
+        Width = 470
+        Height = 13
+        AutoSize = False
+        Caption = 'Country or Region'
+      end
       object GrpCitySearch: TGroupBox
         Left = 8
         Top = 238
         Width = 467
         Height = 104
         Caption = 'City search'
-        TabOrder = 5
+        TabOrder = 4
         object ChkComplete: TCheckBox
           Left = 16
           Top = 62
@@ -122,18 +132,6 @@ object FGeoSearch: TFGeoSearch
         TabOrder = 2
         Text = ''
       end
-      object EdCountryRegion: TLabeledEdit
-        Left = 8
-        Top = 156
-        Width = 470
-        Height = 21
-        EditLabel.Width = 109
-        EditLabel.Height = 13
-        EditLabel.Caption = 'Within Country/Region'
-        TabOrder = 3
-        Text = ''
-        OnChange = EdCountryRegionChange
-      end
       object EdBounds: TLabeledEdit
         Left = 8
         Top = 200
@@ -142,7 +140,7 @@ object FGeoSearch: TFGeoSearch
         EditLabel.Width = 68
         EditLabel.Height = 13
         EditLabel.Caption = 'Within Bounds'
-        TabOrder = 4
+        TabOrder = 3
         Text = ''
       end
       object CmbLang: TComboBox
@@ -157,6 +155,15 @@ object FGeoSearch: TFGeoSearch
         Items.Strings = (
           'local'
           'default')
+      end
+      object CmbCountryRegion: TComboBox
+        Left = 8
+        Top = 156
+        Width = 470
+        Height = 21
+        TabOrder = 5
+        OnChange = CmbCountryRegionChange
+        OnDrawItem = CmbCountryRegionDrawItem
       end
     end
   end

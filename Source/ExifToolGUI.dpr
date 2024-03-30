@@ -36,6 +36,7 @@ uses
   ExifToolsGui_Versions in 'ExifToolsGui_Versions.pas',
   ExifToolsGui_Data in 'ExifToolsGui_Data.pas',
   ExifToolsGUI_StringList in 'ExifToolsGUI_StringList.pas',
+  ExifToolsGui_ComboBox in 'ExifToolsGui_ComboBox.pas',
   ExifInfo in 'ExifInfo.pas',
   ExifTool in 'ExifTool.pas',
   ExifTool_PipeStream in 'ExifTool_PipeStream.pas',

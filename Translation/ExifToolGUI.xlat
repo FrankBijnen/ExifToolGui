@@ -2,7 +2,7 @@
 <xlat>
   <meta>
     <version>3</version>
-    <created>2024-03-29T19:17:38.110+01:00</created>
+    <created>2024-03-30T22:14:17.938+01:00</created>
     <tool>amTranslationManager</tool>
     <toolversion>2.0.8628.33873</toolversion>
   </meta>
@@ -12,15 +12,15 @@
     <sorted>True</sorted>
     <omitnewstate>True</omitnewstate>
   </options>
-  <project sourcefile=".\ExifToolGUI.exe" stringsymbolfile=".\ExifToolGUI.drc" language="en-US" properties="639">
+  <project sourcefile=".\ExifToolGUI.exe" stringsymbolfile=".\ExifToolGUI.drc" language="en-US" properties="638">
     <targetlanguages>
-      <language language="es" translated="615"/>
-      <language language="it" translated="621"/>
-      <language language="fr" translated="606"/>
-      <language language="pt" translated="604"/>
-      <language language="nl" translated="666"/>
+      <language language="pt" translated="602"/>
+      <language language="es" translated="614"/>
+      <language language="fr" translated="605"/>
+      <language language="de" translated="658"/>
+      <language language="it" translated="619"/>
+      <language language="nl" translated="664"/>
       <language language="en" translated="0"/>
-      <language language="de" translated="660"/>
     </targetlanguages>
     <modules>
       <module name="resourcestrings" type="strings" properties="174">
@@ -7700,19 +7700,6 @@
               </property>
             </properties>
           </item>
-          <item name="UnitLangResources_StrProvince" state="unused">
-            <properties>
-              <property>
-                <value>Province</value>
-                <translations>
-                  <translation language="nl">Provincie</translation>
-                  <translation language="de">Province</translation>
-                  <translation language="pt" status="proposed">Província</translation>
-                  <translation language="it" status="proposed">Provincia</translation>
-                </translations>
-              </property>
-            </properties>
-          </item>
           <item name="UnitLangResources_StrRemainingThumbnails">
             <properties>
               <property>
@@ -11856,7 +11843,7 @@
           </item>
         </items>
       </module>
-      <module name="TFGEOSEARCH" type="form" properties="14">
+      <module name="TFGEOSEARCH" type="form" properties="13">
         <items>
           <item name="FGeoSearch" type="TFGeoSearch">
             <properties>
@@ -11980,24 +11967,6 @@
               </property>
             </properties>
           </item>
-          <item name="FGeoSearch.PctMain.TabSearch.EdCountryRegion" type="TLabeledEdit">
-            <properties>
-              <property name="EditLabel.Caption">
-                <value>Within Country/Region</value>
-                <translations>
-                  <translation language="nl">Binnen Land/Regio</translation>
-                  <translation language="de" status="proposed">Innerhalb von Land/Region</translation>
-                  <translation language="es" status="proposed">Dentro del país/región</translation>
-                  <translation language="fr" status="proposed">Dans le pays/la région</translation>
-                  <translation language="pt" status="proposed">No país/região</translation>
-                  <translation language="it" status="proposed">Entro il paese/regione</translation>
-                </translations>
-              </property>
-              <property name="Text" status="skip">
-                <value></value>
-              </property>
-            </properties>
-          </item>
           <item name="FGeoSearch.PctMain.TabSearch.EdSearchCity" type="TLabeledEdit">
             <properties>
               <property name="EditLabel.Caption">
@@ -12088,6 +12057,13 @@
                   <translation language="pt" status="proposed">Provedor de GeoCode:</translation>
                   <translation language="it" status="proposed">Provider di geocodici:</translation>
                 </translations>
+              </property>
+            </properties>
+          </item>
+          <item name="FGeoSearch.PctMain.TabSearch.LblCountryRegion" type="TLabel">
+            <properties>
+              <property name="Caption" status="skip">
+                <value>Country or Region</value>
               </property>
             </properties>
           </item>
@@ -18153,16 +18129,6 @@
             <properties>
               <property name="Caption" status="skip">
                 <value>LblExifToolHome</value>
-              </property>
-              <property name="Font.Name" status="skip">
-                <value>Segoe UI</value>
-              </property>
-            </properties>
-          </item>
-          <item name="FrmAbout.LblForum" type="TLabel" state="unused">
-            <properties>
-              <property name="Caption" status="skip">
-                <value>LblForum</value>
               </property>
               <property name="Font.Name" status="skip">
                 <value>Segoe UI</value>

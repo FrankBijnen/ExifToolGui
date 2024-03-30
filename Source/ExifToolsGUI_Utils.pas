@@ -81,7 +81,7 @@ procedure SetupExifToolLanguage(const ACombo: TComboBox; ALang: string);
 procedure SetupGeoCodeLanguage(const ACombo: TComboBox; Aprovider: TGeoCodeProvider; ALang: string);
 
 function ExifToolGeoLocation(const Lat, Lon, Lang:string): TStringList; overload;
-function ExifToolGeoLocation(const City, CountryRegion, Lang: string; var ETErr:string): string; overload;
+function ExifToolGeoLocation(const City, CountryRegion, Match, Lang: string; var ETErr:string): string; overload;
 function ExifToolGetCountryList: TStringList;
 
 // Context menu
@@ -1004,7 +1004,7 @@ begin
   end;
 end;
 
-function ExifToolGeoLocation(const City, CountryRegion, Lang: string; var ETErr:string): string;
+function ExifToolGeoLocation(const City, CountryRegion, Match, Lang: string; var ETErr:string): string;
 var
   ETCmd: string;
   SavedLang: string;
@@ -1019,8 +1019,10 @@ begin
   try
     ETcmd := '-m' + CRLF + '-a';
     ETcmd := ETCmd + CRLF + '-api' + CRLF + Format('geolocation=ci/%s/i', [City]);
+
     if (CountryRegion <> '') then
-      ETcmd := ETCmd + Format(',/%s/i',[CountryRegion]);
+      ETcmd := ETCmd + Format(',%s/%s/i',[Match, CountryRegion]);
+
     ET_OpenExec(ETcmd, '', result, ETerr, false);
   finally
     ET_Options.ETLangDef := SavedLang;
@@ -1029,29 +1031,34 @@ end;
 
 function ExifToolGetCountryList: TStringList;
 var
-  ETcmd, ETout, Country: string;
+  ETout: TStringList;
+  ETcmd, Country, CountryName: string;
   Indx: integer;
 begin
   result := TStringList.Create;
-  result.CaseSensitive := false;
-  ETcmd := '-listgeo' + CRLF + '-api' + CRLF + 'GeoLocFeature=pplc';
-  ET_OpenExec(ETcmd, '', result, false);
-  if (result.Count > 2) then
-  begin
-    result.Delete(0); // Delete some header lines
-    result.Delete(0);
-    for Indx := 0 to result.Count -1 do
+  result.Sorted := true;
+  ETOut := TStringList.Create;
+  try
+    ETcmd := '-listgeo' + CRLF + '-api' + CRLF + 'GeoLocFeature=pplc';
+    ET_OpenExec(ETcmd, '', ETOut, false);
+    if (ETOut.Count > 2) then
     begin
-      ETout := result[Indx];
-      Country := NextField(ETout, ',');
-      Country := NextField(ETout, ',');
-      Country := NextField(ETout, ',');
-      Country := NextField(ETout, ',');
-      result[Indx] := Country;
+      ETOut.Delete(0); // Delete some header lines
+      ETOut.Delete(0);
+      for Indx := 0 to ETOut.Count -1 do
+      begin
+        CountryName := ETOut[Indx];
+        Country := NextField(CountryName, ',');
+        Country := NextField(CountryName, ',');
+        Country := NextField(CountryName, ',');
+        Country := NextField(CountryName, ',');
+        CountryName := NextField(CountryName, ',');
+        result.AddPair(Country, CountryName);
+      end;
     end;
-    result.Sort;
+  finally
+    ETout.Free;
   end;
-
 end;
 
 function GetIsQuickTime(const AFile: string): boolean;

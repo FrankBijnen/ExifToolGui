@@ -227,6 +227,7 @@
         <DCCReference Include="UFrmCheckVersions.pas">
             <Form>FrmCheckVersions</Form>
         </DCCReference>
+        <DCCReference Include="ExifToolsGui_ComboBox.pas"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>
