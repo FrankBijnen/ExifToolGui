@@ -696,13 +696,17 @@ begin
 end;
 
 function KnownCountry(const ACountry:string):boolean;
+var
+  CountryCode, CountryName: string;
 begin
   if not (Assigned(CountryList)) then
     CountryList := GetCountryList;
-  result := (Length(Acountry) = 2);
+  CountryName := ACountry;
+  CountryCode := NextField(CountryName, '|');
+  result := (Length(CountryCode) = 2);
   if result and
      (CountryList.Count > 0) then
-    result := result and (Countrylist.IndexOf(ACountry) > 0);
+    result := result and (Countrylist.Values[CountryCode] <> '');
 end;
 
 function ExecuteRest(const RESTRequest: TRESTRequest): boolean;
@@ -1276,6 +1280,7 @@ end;
 function GetCoordsOfPlace_ExifTool(const City, CountryRegion: string; var Lat, Lon: string):integer;
 var
   ETResult: TStringList;
+  Match: string; // cc for CountryCode or '' for all
   ETerr: string;
   AValue: string;
   AKey: string;
@@ -1292,7 +1297,11 @@ begin
 
   ETResult := TStringList.Create;
   try
-    ETResult.Text := ExifToolGeoLocation(City, CountryRegion, GeoSettings.GeoCodeLang, ETerr);
+    Match := '';
+    if (KnownCountry(CountryRegion)) then
+      Match := 'cc';
+
+    ETResult.Text := ExifToolGeoLocation(City, CountryRegion, Match, GeoSettings.GeoCodeLang, ETerr);
     FrmPlaces.Listview1.Items.Clear;
     if (ETerr <> '') then
       FrmPlaces.AddPlace2LV(ETerr, '', '')
@@ -1339,7 +1348,7 @@ begin
   FGeoSearch.EdSearchCity.Text := Trim(NextField(CountryRegion, ','));
   if (FGeoSearch.EdSearchCity.Text = '') then
     exit;
-  FGeoSearch.EdCountryRegion.Text := Trim(CountryRegion);
+  FGeoSearch.CountryRegion := Trim(CountryRegion);
   FGeoSearch.EdBounds.Text := Bounds;
 
   repeat
@@ -1361,16 +1370,16 @@ begin
             case GeoSettings.GetCoordProvider of
               TGeoCodeProvider.gpGeoName:
                 RetrySearch := (GetCoordsOfPlace_GeoCode(FGeoSearch.EdSearchCity.Text,
-                                                         FGeoSearch.EdCountryRegion.Text,
+                                                         FGeoSearch.CountryRegion,
                                                          Lat, Lon) = IDRETRY);
               TGeoCodeProvider.gpOverPass:
                 RetrySearch := (GetCoordsOfPlace_OverPass(FGeoSearch.EdSearchCity.Text,
-                                                          FGeoSearch.EdCountryRegion.Text,
+                                                          FGeoSearch.CountryRegion,
                                                           FGeoSearch.EdBounds.Text,
                                                           Lat, Lon) = IDRETRY);
               TGeoCodeProvider.gpExifTool:
                 RetrySearch := (GetCoordsOfPlace_ExifTool(FGeoSearch.EdSearchCity.Text,
-                                                          FGeoSearch.EdCountryRegion.Text,
+                                                          FGeoSearch.CountryRegion,
                                                           Lat, Lon) = IDRETRY);
             end;
           end;
@@ -1378,7 +1387,9 @@ begin
           begin
             case GeoSettings.GetCoordProvider of
               TGeoCodeProvider.gpExifTool:
-                GetCoordsOfPlace_ExifTool(FGeoSearch.EdSearchCity.Text, FGeoSearch.EdCountryRegion.Text, Lat, Lon);
+                RetrySearch := (GetCoordsOfPlace_ExifTool(FGeoSearch.EdSearchCity.Text,
+                                                          FGeoSearch.CountryRegion,
+                                                          Lat, Lon) = IDRETRY);
             end;
           end;
       end;
