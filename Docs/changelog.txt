@@ -84,3 +84,10 @@ Version:        Description             Issue
                 Fix Issue #341          Improve Overpass defaults
                 Fix Issue #347          Style Dark Filelist Highlighted Color
                 Fix Issue #350          Add Exiftool features 'geolocate' and '-api geolocation' to GUI as a new GeoCode provider
+6.3.1.0         Fix Issue #348          Ask Bogdan Hrastnik for license selection. GPL V3
+                Fix Issue #351          Feature Request - ability to export predefined ExifTool direct commands.
+                Fix Issue #356          LocationInfo Filelist (Google Pixel Pro 7)
+                Fix Issue #359          Multiple values in reverse geolocation
+                Fix Issue #361          Exiftool warns 'No such city in Geolocation database' for MP4 files with altitude set.
+                Fix Issue #364          Code review ExifInfo.
+                Fix Issue #374          Improve searching for places
