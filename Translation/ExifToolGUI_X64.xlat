@@ -12,7 +12,7 @@
     <sorted>True</sorted>
     <omitnewstate>True</omitnewstate>
   </options>
-  <project sourcefile=".\ExifToolGUI_X64.exe" stringsymbolfile=".\ExifToolGUI_X64.drc" language="en-US" properties="638">
+  <project sourcefile=".\ExifToolGUI.exe" stringsymbolfile=".\ExifToolGUI.drc" language="en-US" properties="638">
     <targetlanguages>
       <language language="pt" translated="602"/>
       <language language="es" translated="614"/>

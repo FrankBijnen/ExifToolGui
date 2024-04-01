@@ -151,6 +151,7 @@
         <DCCReference Include="ExifToolsGui_Versions.pas"/>
         <DCCReference Include="ExifToolsGui_Data.pas"/>
         <DCCReference Include="ExifToolsGUI_StringList.pas"/>
+        <DCCReference Include="ExifToolsGui_ComboBox.pas"/>
         <DCCReference Include="ExifInfo.pas"/>
         <DCCReference Include="ExifTool.pas"/>
         <DCCReference Include="ExifTool_PipeStream.pas"/>
@@ -227,7 +228,6 @@
         <DCCReference Include="UFrmCheckVersions.pas">
             <Form>FrmCheckVersions</Form>
         </DCCReference>
-        <DCCReference Include="ExifToolsGui_ComboBox.pas"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>

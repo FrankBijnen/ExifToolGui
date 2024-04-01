@@ -9,8 +9,9 @@ uses
 
 const
   PlaceDefault = 'Default';
-  PlaceLocal = 'Local';
-  PlaceNone = 'None';
+  PlaceAll     = '*';
+  PlaceLocal   = 'Local - Local';
+  PlaceNone    = 'None';
 
 type
   TExecRestEvent = procedure(Url, Response: string; Succes: boolean) of object;
@@ -53,6 +54,7 @@ type
     FNodeId: string;
     FPostCode: string;
     function GetCountryLocation: string;
+    function GetPrio(const APrio: string; APrioList: TStringList): string;
     function GetPrioProvince: string;
     function GetProvince: string;
     function GetPrioCity: string;
@@ -76,9 +78,7 @@ type
     property DefLang: string read FDefLang write FDefLang;
     property PostCode: string read FPostCode write FPostCode;
     property Name: string read FName write FName;
-    property PrioProvince: string read GetPrioProvince;
     property Province: string read GetProvince;
-    property PrioCity: string read GetPrioCity;
     property City: string read GetCity;
     property SearchReault: string read GetSearchResult;
     property HtmlSearchReault: string read GetHtmlSearchResult;
@@ -264,13 +264,53 @@ begin
     result := FCountryName;
 end;
 
-function TPlace.GetPrioProvince: string;
-var GeoPrio: string;
+function TPlace.GetPrio(const APrio: string; APrioList: TStringList): string;
+var
+  Prio: string;
+  APrioField, APrioValue: string;
+  Indx: integer;
+
+  procedure Add2Result;
+  begin
+    if (APrioValue <> '') then
+    begin
+      if (result <> '') then
+        result :=  result + ', ';
+      result := result + APrioValue;
+    end;
+  end;
+
 begin
   result := '';
-  GeoPrio := GeoProvinceList.Values[FCountryCode];
-  if (FProvinceList.Values[GeoPrio] <> '') then
-    result := FProvinceList.Values[GeoPrio];
+  Prio := APrio;
+  if (Prio = '') then
+    exit;
+
+  result := APrioList.Values[Prio];
+  if (result <> '') then
+    exit;
+
+  if (Prio = PlaceAll) then
+  begin
+    for Indx := 0 to APrioList.Count -1 do
+    begin
+      APrioValue := Trim(APrioList.ValueFromIndex[Indx]);
+      Add2Result;
+    end;
+    exit;
+  end;
+
+  while (Prio <> '') do
+  begin
+    APrioField := Trim(NextField(Prio, ','));
+    APrioValue := Trim(APrioList.Values[APrioField]);
+    Add2Result;
+  end;
+end;
+
+function TPlace.GetPrioProvince: string;
+begin
+  result := GetPrio(GeoProvinceList.Values[FCountryCode], FProvinceList);
 end;
 
 function TPlace.GetProvince: string;
@@ -311,12 +351,8 @@ begin
 end;
 
 function TPlace.GetPrioCity: string;
-var GeoPrio: string;
 begin
-  result := '';
-  GeoPrio := GeoCityList.Values[FCountryCode];
-  if (FCityList.Values[GeoPrio] <> '') then
-    result := FCityList.Values[GeoPrio];
+  result := GetPrio(GeoCityList.Values[FCountryCode], FCityList);
 end;
 
 function TPlace.GetCity: string;
@@ -1041,6 +1077,8 @@ var
   ElementIndx     : integer;
   SearchBounds    : string;
   SearchName      : string;
+  SearchPlaces    : string;
+  SearchNode      : string;
   SearchOp        : string;
   SearchStart     : string;
   SearchEnd       : string;
@@ -1081,13 +1119,17 @@ begin
   if (GeoSettings.OverPassCompleteWord = false) then
     SearchOp    := '~';
 
-  if (SearchOp <> '=') and
-     (GeoSettings.OverPassCompleteWord = true) then
+  if (SearchOp <> '=') then
   begin
-    SearchStart := '^';
-    SearchEnd   := '$';
+    if (GeoSettings.OverPassCompleteWord = true) then
+    begin
+      SearchStart := '^';
+      SearchEnd   := '$';
+    end;
   end;
-  SearchName := Format('name%s"%s%s%s"%s',
+  SearchPlaces := 'municipality|city|town|village|hamlet';
+  SearchNode := Format('node[%%s][place~"%s"](area.searchArea);%%s', [SearchPlaces]);
+  SearchName := Format('"%%s"%s"%s%s%s"%s',
                   [SearchOp, SearchStart,
                    StringReplace(Trim(City), '&', '', [rfReplaceAll]),
                    SearchEnd, SearchCase]);
@@ -1100,9 +1142,15 @@ begin
     if (Bounds <> '') then
       SearchBounds := Format('(%s);', [Bounds]);
 
+    // Join Name and Name:languagecode
+    Data := Data + Format('(%s', [FormatNL]);
     Data := Data +
-            Format('node[%s][place~"^(hamlet|village|town|city|municipality)$"]%s%s',
-                     [SearchName, SearchBounds, FormatNL]);
+            Format('node[%s][place~"^(%s)$"]%s%s',
+              [Format(SearchName, ['name']), SearchPlaces, SearchBounds, FormatNL]);
+    if (GeoSettings.GeoCodeLang <> '') then // Search for name:xx xx=selected language code
+      Data := Data + Format('node[%s][place~"^(%s)$"]%s%s',
+                       [Format(SearchName, ['name:' + LowerCase(GeoSettings.GeoCodeLang)]), SearchPlaces, SearchBounds, FormatNL]);
+    Data := Data +  Format(');%s', [FormatNL]);
 
   end
   else
@@ -1132,11 +1180,14 @@ begin
                          FormatNL,
                          FormatNL,
                          FormatNL]);
-    Data := Data +
-            Format('(%s' +
-                   'node[%s][place~"municipality|city|town|village|hamlet"](area.searchArea);%s' +
-                   ');%s',
-                     [FormatNL, SearchName, FormatNL, FormatNL]);
+
+    // Join Name and Name:languagecode
+    Data := Data + Format('(%s', [FormatNL]);
+    Data := Data + Format(SearchNode, [Format(SearchName, ['name']), FormatNL]);
+    if (GeoSettings.GeoCodeLang <> '') then // Search for name:xx xx=selected language code
+      Data := Data + Format(SearchNode, [Format(SearchName, ['name:' + LowerCase(GeoSettings.GeoCodeLang)]), FormatNL]);
+    Data := Data +  Format(');%s', [FormatNL]);
+
   end;
   Data := Data +
     Format('foreach%s{%s'+
