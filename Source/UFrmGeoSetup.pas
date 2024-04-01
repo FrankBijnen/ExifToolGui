@@ -10,6 +10,8 @@ uses
   Geomap;
 
 type
+  TPLaceChange = set of (pcProvider, pcLang, pcProvince, pcCity);
+
   TFGeoSetup = class(TScaleForm)
     StatusBar1: TStatusBar;
     BtnCancel: TButton;
@@ -35,9 +37,7 @@ type
     procedure CmbCityChange(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure BtnCancelClick(Sender: TObject);
-    procedure CmbLangClick(Sender: TObject);
     procedure CmbLangChange(Sender: TObject);
-    procedure CmbLangKeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
   private
     { Private declarations }
     var
@@ -46,7 +46,11 @@ type
       SavedCityList: TStringList;
       APlace: TPlace; // No need to free, handled in CoordCache.
     procedure FillPreview;
-    procedure FillSetup;
+    procedure FillSetupProvince(PlaceChange: TPLaceChange = []);
+    procedure FillSetupCity(PlaceChange: TPLaceChange = []);
+    procedure FillSetup(PlaceChange: TPLaceChange = []);
+    procedure GetPlace(PlaceChange: TPLaceChange = []);
+    procedure UpdateDesign(PlaceChange: TPLaceChange = []);
   public
     { Public declarations }
     var
@@ -66,48 +70,42 @@ procedure TFGeoSetup.FillPreview;
 begin
   if (not Showing) then
     exit;
-  GeoSettings.GetPlaceProvider := TGeoCodeProvider(CmbGeoProvider.ItemIndex);
 
-  // Get Place of selected coordinates
   LblCountrySettings.Caption := StrNoData;
   LblProvince.Caption := StrNoData;
   LblCity.Caption := StrNoData;
 
-  ClearCoordCache; // Make sure we dont get cached data.
-  APlace := GetPlaceOfCoords(Lat, Lon, GeoSettings.GetPlaceProvider);
+// Need a Place to show the info
   if (APlace = nil) then
     exit;
 
   LblCountrySettings.Caption := StrSettingsFor + APlace.CountryLocation;
-  if (APlace.PrioProvince <> '') then
-    LblProvince.Caption := APlace.PrioProvince
-  else
-    LblProvince.Caption := StrResult + APlace.Province;
+  LblProvince.Caption := StrResult + APlace.Province;
   LblProvince.Caption := LblProvince.Caption + #10 +
                          StrAvailableData + #10 +
                          APlace.FProvinceList.Text;
 
-  if (APlace.PrioCity <> '') then
-    LblCity.Caption := APlace.PrioCity
-  else
-    LblCity.Caption := StrResult + APlace.City;
+  LblCity.Caption := StrResult + APlace.City;
   LblCity.Caption := LblCity.Caption +  #10 +
                      StrAvailableData + #10+
                      APlace.FCityList.Text;
 
 end;
 
-procedure TFGeoSetup.FillSetup;
+//Setup mapping for Province
+procedure TFGeoSetup.FillSetupProvince(PlaceChange: TPLaceChange = []);
 var
   Preferred: string;
   Level: integer;
 begin
-  if (APlace = nil) then
+  if (pcProvince in PlaceChange) then
     exit;
 
   CmbProvince.Items.BeginUpdate;
   try
-    Preferred := GeoProvinceList.Values[APlace.CountryCode];
+    Preferred := '';
+    if Assigned(APlace) then
+      Preferred := GeoProvinceList.Values[APlace.CountryCode];
     CmbProvince.Items.Clear;
     case GeoSettings.GetPlaceProvider of
       TGeoCodeProvider.gpGeoName:
@@ -115,18 +113,23 @@ begin
           CmbProvince.Items.Add(PlaceDefault);
           CmbProvince.Items.Add('county');
           CmbProvince.Items.Add('state');
+          CmbProvince.Items.Add(PlaceAll);
           CmbProvince.Items.Add(PlaceNone);
         end;
       TGeoCodeProvider.gpOverPass:
         begin
           begin
             CmbProvince.Items.Add(PlaceDefault);
-            for Level in APlace.RegionLevels do
+            if Assigned(APlace) then
             begin
-              if Level = 0 then
-                continue;
-              CmbProvince.Items.Add(IntToStr(Level));
+              for Level in APlace.RegionLevels do
+              begin
+                if Level = 0 then
+                  continue;
+                CmbProvince.Items.Add(IntToStr(Level));
+              end;
             end;
+            CmbProvince.Items.Add(PlaceAll);
             CmbProvince.Items.Add(PlaceNone);
           end;
         end;
@@ -136,18 +139,36 @@ begin
           CmbProvince.Items.Add(PlaceNone);
         end;
     end;
-    SetupGeoCodeLanguage(Cmblang, GeoSettings.GetPlaceProvider, GeoSettings.ReverseGeoCodeLang);
 
     CmbProvince.ItemIndex := CmbProvince.Items.IndexOf(Preferred);
     if (CmbProvince.ItemIndex < 0) then
-      CmbProvince.ItemIndex := 0;
+    begin
+      if (Preferred = '')  or
+         (pcProvider in PlaceChange) then
+        CmbProvince.ItemIndex := 0
+      else
+        CmbProvince.Text := Preferred;
+    end;
+
   finally
     CmbProvince.Items.EndUpdate;
   end;
+end;
+
+// Setup mapping for City
+procedure TFGeoSetup.FillSetupCity(PlaceChange: TPLaceChange = []);
+var
+  Preferred: string;
+  Level: integer;
+begin
+  if (pcCity in PlaceChange) then
+    exit;
 
   CmbCity.Items.BeginUpdate;
   try
-    Preferred := GeoCityList.Values[APlace.CountryCode];
+    Preferred := '';
+    if Assigned(APlace) then
+      Preferred := GeoCityList.Values[APlace.CountryCode];
     CmbCity.Items.Clear;
     case GeoSettings.GetPlaceProvider of
       TGeoCodeProvider.gpGeoName:
@@ -158,73 +179,131 @@ begin
           CmbCity.Items.Add('town');
           CmbCity.Items.Add('city');
           CmbCity.Items.Add('municipality');
+          CmbCity.Items.Add(PlaceAll);
           CmbCity.Items.Add(PlaceNone);
         end;
     TGeoCodeProvider.gpOverPass:
       begin
         begin
           CmbCity.Items.Add(PlaceDefault);
-          for Level in APlace.CityLevels do
+          if Assigned(APlace) then
           begin
-            if Level = 0 then
-              continue;
-            CmbCity.Items.Add(IntToStr(Level));
+            for Level in APlace.CityLevels do
+            begin
+              if Level = 0 then
+                continue;
+              CmbCity.Items.Add(IntToStr(Level));
+            end;
           end;
+          CmbCity.Items.Add(PlaceAll);
           CmbCity.Items.Add(PlaceNone);
         end;
       end;
     TGeoCodeProvider.gpExifTool:
       begin
         CmbCity.Items.Add(PlaceDefault);
+        CmbCity.Items.Add(PlaceNone);
       end;
     end;
+
     CmbCity.ItemIndex := CmbCity.Items.IndexOf(Preferred);
     if (CmbCity.ItemIndex < 0) then
-      CmbCity.ItemIndex := 0;
+    begin
+      if (Preferred = '') or
+         (pcProvider in PlaceChange) then
+        CmbCity.ItemIndex := 0
+      else
+        CmbCity.Text := Preferred;
+    end;
+
   finally
     CmbCity.Items.EndUpdate;
   end;
 end;
 
-procedure TFGeoSetup.CmbCityChange(Sender: TObject);
+procedure TFGeoSetup.FillSetup(PlaceChange: TPLaceChange = []);
 begin
-  GeoCityList.Values[APlace.CountryCode] := CmbCity.Text;
+  // Setup Provider
+  CmbGeoProvider.ItemIndex := Ord(GeoSettings.GetPlaceProvider);
+
+  // Setup Language
+  SetupLanguageCombo(Cmblang, GeoSettings.ReverseGeoCodeLang);
+
+  // Setup mapping for Province
+  FillSetupProvince(PlaceChange);
+
+  // Setup mapping for City
+  FillSetupCity(PlaceChange);
+end;
+
+procedure TFGeoSetup.GetPlace(PlaceChange: TPLaceChange = []);
+begin
+  if (pcProvider in PlaceChange) or
+     (pcLang in PlaceChange) then
+    ClearCoordCache;
+  APlace := GetPlaceOfCoords(Lat, Lon, GeoSettings.GetPlaceProvider);
+end;
+
+procedure TFGeoSetup.UpdateDesign(PlaceChange: TPLaceChange = []);
+begin
+  if (pcProvider in PlaceChange) then
+  begin
+    // Need the Provider and language to get the correct Place info
+    GeoSettings.GetPlaceProvider := TGeoCodeProvider(CmbGeoProvider.ItemIndex);
+
+    // Keep language if possible with new provider. (Eg. Overpass has local, Exiftool has not)
+    SetupGeoCodeLanguage(Cmblang, GeoSettings.GetPlaceProvider, GetExifToolLanguage(Cmblang));
+  end;
+
+  // Get new language
+  if (pcLang in PlaceChange) then
+    GeoSettings.ReverseGeoCodeLang := GetExifToolLanguage(Cmblang);
+
+  // Reload place if provider or language change
+  GetPlace(PlaceChange);
+
+  if Assigned(APlace) then
+  begin
+   if (pcProvider in PlaceChange) then
+    begin
+      // Remove Country defaults.(Province and City)
+      GeoCityList.Values[APlace.CountryCode] := '';
+      GeoProvinceList.Values[APlace.CountryCode] := '';
+    end
+    else
+    begin
+      if (pcProvince in PlaceChange) then
+        GeoProvinceList.Values[APlace.CountryCode] := CmbProvince.Text;
+      if (pcCity in PlaceChange) then
+        GeoCityList.Values[APlace.CountryCode] := CmbCity.Text;;
+    end;
+  end;
+
+  // Settings for Country defaults.(Province and City)
+  FillSetup(PlaceChange);
+
+  // Show preview
   FillPreview;
 end;
 
 procedure TFGeoSetup.CmbGeoProviderClick(Sender: TObject);
 begin
-  GeoSettings.GetPlaceProvider := TGeoCodeProvider(CmbGeoProvider.ItemIndex);
-  FillSetup;
-  if (APlace <> nil) then
-  begin
-    GeoCityList.Values[APlace.CountryCode] := CmbCity.Text;
-    GeoProvinceList.Values[APlace.CountryCode] := CmbProvince.Text;
-  end;
-  FillPreview;
+  UpdateDesign([pcProvider, pcLang]);
 end;
 
 procedure TFGeoSetup.CmbLangChange(Sender: TObject);
 begin
-  GeoSettings.ReverseGeoCodeLang := GetExifToolLanguage(Cmblang);
-end;
-
-procedure TFGeoSetup.CmbLangClick(Sender: TObject);
-begin
-  GeoSettings.ReverseGeoCodeLang := GetExifToolLanguage(Cmblang);
-  FillPreview;
-end;
-
-procedure TFGeoSetup.CmbLangKeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
-begin
-  if Key = 13 then
-    FillPreview;
+  UpdateDesign([pcLang]);
 end;
 
 procedure TFGeoSetup.CmbProvinceChange(Sender: TObject);
 begin
-  GeoProvinceList.Values[APlace.CountryCode] := CmbProvince.Text;
-  FillPreview;
+  UpdateDesign([pcProvince]);
+end;
+
+procedure TFGeoSetup.CmbCityChange(Sender: TObject);
+begin
+  UpdateDesign([pcCity]);
 end;
 
 procedure TFGeoSetup.BtnCancelClick(Sender: TObject);
@@ -261,10 +340,9 @@ begin
   SavedGeoSetting := GeoSettings;
   SavedProvinceList.Assign(GeoProvinceList);
   SavedCityList.Assign(GeoCityList);
-  CmbGeoProvider.ItemIndex := Ord(GeoSettings.GetPlaceProvider);
 
-  FillPreview; // Need CountryCode for setup, so do the Preview first
-  FillSetup;
+  SetupGeoCodeLanguage(Cmblang, GeoSettings.GetPlaceProvider, GeoSettings.ReverseGeoCodeLang);
+  UpdateDesign;
 end;
 
 end.

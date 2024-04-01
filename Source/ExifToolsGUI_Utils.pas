@@ -77,8 +77,9 @@ function AnalyzeGPSCoords(var ETout, Lat, Lon: string; var IsQuickTime: boolean)
 procedure FillLocationInImage(const ANImage: string);
 function GetIsQuickTime(const AFile: string): boolean;
 function GetExifToolLanguage(const ACombo: TComboBox): string;
+procedure SetupLanguageCombo(const CmbLang: TComboBox; ALang: string);
 procedure SetupExifToolLanguage(const ACombo: TComboBox; ALang: string);
-procedure SetupGeoCodeLanguage(const ACombo: TComboBox; Aprovider: TGeoCodeProvider; ALang: string);
+procedure SetupGeoCodeLanguage(const ACombo: TComboBox; AProvider: TGeoCodeProvider; ALang: string);
 
 function ExifToolGeoLocation(const Lat, Lon, Lang:string): TStringList; overload;
 function ExifToolGeoLocation(const City, CountryRegion, Match, Lang: string; var ETErr:string): string; overload;
@@ -908,7 +909,7 @@ begin
   end;
 end;
 
-procedure ExifToolLanguages(const Items: TStrings; Defaults: array of string);
+procedure ExifToolLanguages(const ACombo: TComboBox; Defaults: array of string);
 var
   Indx: integer;
   SavedLang: string;
@@ -917,15 +918,15 @@ begin
   SavedLang := ET_Options.ETLangDef;
   ET_Options.ETLangDef := ''; // get list of languages in default lang.
   try
-    ET_OpenExec('-lang', '', Items, false);
-    if Items.Count > 0 then
-      Items.Delete(0);
+    ET_OpenExec('-lang', '', ACombo.Items, false);
+    if ACombo.Items.Count > 0 then
+      ACombo.Items.Delete(0);
 
     for ADefault in Defaults do
-      Items.Insert(0, Adefault);
+      ACombo.Items.Insert(0, Adefault);
 
-    for Indx := 0 to Items.Count - 1 do
-      Items[Indx] := TrimLeft(Items[Indx]);
+    for Indx := 0 to ACombo.Items.Count - 1 do
+      ACombo.Items[Indx] := TrimLeft(ACombo.Items[Indx]);
   finally
     ET_Options.ETLangDef := SavedLang;
   end;
@@ -936,46 +937,61 @@ var
   Indx: integer;
 begin
   CmbLang.ItemIndex := 0;
-  for Indx := 0 to CmbLang.Items.Count -1 do
+
+  // look up Selected language in dropdown list. DropDown list looks like:
+  // de - German
+  // en - English
+  // etc.
+  if (ALang <> '') then
   begin
-    if (Pos(LowerCase(ALang), CmbLang.Items[Indx]) = 1) then
+    for Indx := 1 to CmbLang.Items.Count -1 do // Skip 'Default'
     begin
-      CmbLang.ItemIndex := Indx;
-      break;
+      if (StartsText(ALang, CmbLang.Items[Indx])) then
+      begin
+        CmbLang.ItemIndex := Indx;
+        break;
+      end;
     end;
   end;
+
   CmbLang.Text := CmbLang.Items[CmbLang.ItemIndex];
 end;
 
 procedure SetupExifToolLanguage(const ACombo: TComboBox; ALang: string);
 begin
-  ExifToolLanguages(ACombo.Items, ['ExifTool standard (short)']);
+  ExifToolLanguages(ACombo, ['ExifTool standard (short)']);
 
   SetupLanguageCombo(ACombo, ALang);
 end;
 
 procedure SetupGeoCodeLanguage(const ACombo: TComboBox; AProvider: TGeoCodeProvider; ALang: string);
 begin
-  case AProvider of
-    TGeoCodeProvider.gpOverPass:
+  ACombo.Items.BeginUpdate;
+  try
+    case AProvider of
+      TGeoCodeProvider.gpOverPass:
+        begin
+          ExifToolLanguages(ACombo, [PlaceLocal, PlaceDefault]);
+          ACombo.Enabled := true;
+        end;
+      TGeoCodeProvider.gpExifTool:
+        begin
+          ExifToolLanguages(ACombo, [PlaceDefault]);
+          ACombo.Enabled := true;
+        end;
+      else
       begin
-        ExifToolLanguages(ACombo.Items, [PlaceLocal, PlaceDefault]);
-        ACombo.Enabled := true;
+        ACombo.Items.Clear;
+        ACombo.Items.Add(PlaceDefault);
+        ACombo.Enabled := false;
       end;
-    TGeoCodeProvider.gpExifTool:
-      begin
-        ExifToolLanguages(ACombo.Items, [PlaceDefault]);
-        ACombo.Enabled := true;
-      end;
-    else
-    begin
-      ACombo.Items.Clear;
-      ACombo.Items.Add(PlaceDefault);
-      ACombo.Enabled := false;
     end;
-  end;
 
-  SetupLanguageCombo(ACombo, ALang);
+    SetupLanguageCombo(ACombo, ALang);
+
+  finally
+    ACombo.Items.EndUpdate;
+  end;
 end;
 
 function ExifToolGeoLocation(const Lat, Lon, Lang:string): TStringList;
