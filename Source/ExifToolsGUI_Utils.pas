@@ -36,6 +36,7 @@ function GetAppPath: string;
 function GetTempDirectory: string;
 function GetExifToolTmp: string;
 function GetHtmlTmp: string;
+function GetTrackTmp: string;
 function GetPreviewTmp: string;
 function GetEdgeUserData: string;
 function GetNrOfFiles(StartDir, FileMask: string; subDir: boolean): integer;
@@ -72,8 +73,9 @@ procedure StyledDrawListviewItem(FstyleServices: TCustomStyleServices;
 
 
 // GeoCoding
+function CreateTrkPoints(const LogPath: string; FirstGpx: boolean; var LastCoord: string): integer;
 function GetGpsCoordinates(const Images: string): string;
-function AnalyzeGPSCoords(var ETout, Lat, Lon: string; var IsQuickTime: boolean): string;
+function AnalyzeGPSCoords(var ETout, Lat, Lon, MIMEType: string; var IsQuickTime: boolean): string;
 procedure FillLocationInImage(const ANImage: string);
 function GetIsQuickTime(const AFile: string): boolean;
 function GetExifToolLanguage(const ACombo: TComboBox): string;
@@ -114,6 +116,9 @@ const
 
 const
   HtmlTempFileName = 'ExifToolGUI.html';
+
+const
+  TrackFileName = 'ExifToolGUI.track';
 
 const
   PreviewTempFileName = 'ExifToolGui_Preview.jpg';
@@ -256,6 +261,11 @@ end;
 function GetHtmlTmp: string;
 begin
   result := GetTempDirectory + HtmlTempFileName;
+end;
+
+function GetTrackTmp: string;
+begin
+  result := GetTempDirectory + TrackFileName;
 end;
 
 function GetPreviewTmp: string;
@@ -829,6 +839,97 @@ begin
   end;
 end;
 
+function CreateTrkPoints(const LogPath: string; FirstGpx: boolean; var LastCoord: string): integer;
+const
+  HasUTC = ' UTC ';
+  HasLog = ' GPS track log file ';
+var
+  SavedVerbose: integer;
+  ALine, Akey, ALon, Alat, ALogName, ETcmd: string;
+  ETout: TStringList;
+  P, Indx, PointNum: integer;
+  F: textFile;
+begin
+  result := 0;
+  PointNum := 0;
+
+  SavedVerbose := ET_Options.GetVerbose;
+  EtOut := TStringList.Create;
+  AssignFile(F, GetTrackTmp);
+  if not FileExists(GetTrackTmp) or
+     FirstGpx then
+    Rewrite(F)
+  else
+    Append(F);
+
+  try
+    ETcmd := '-geotag' + CRLF + LogPath + CRLF;
+    ET_Options.SetVerbose(4);
+    ET_OpenExec(ETcmd, 'NUL', ETout, false);
+{$IFDEF DEBUG}
+    ETout.SaveToFile(ChangeFileExt(GetTrackTmp, '.dbg'));
+{$ENDIF}
+    ALogName := '';
+    for Indx := 0 to ETout.Count -1 do
+    begin
+      ALine := ETout[Indx];
+      P := Pos(HasLog, ALine);
+      if (P > 0) then
+      begin
+        if (ALogName <> '') then // Multiple Log's
+        begin
+          Writeln(F, 'CreateTrack(''' + ALogName + ''');');
+          Writeln(F, 'trackpoints = new Array();');
+          PointNum := 0;
+        end;
+        // Get the filename of the log.
+        // Enclosed by quotes
+        // Need to replace / by \ (E.G. If *.gpx is used)
+        // Need to replace ' by \' for JavaScript
+        ALogName := Copy(LeftStr(ALine, Length(Aline) -1), P + Length(HasLog) +1);
+        ALogName := ExtractFileName(StringReplace(ALogName, '/', '\', [rfReplaceAll]));
+        ALogName := StringReplace(ALogName, '''', '\''', [rfReplaceAll]);
+        continue;
+      end;
+      P := Pos(HasUTC, ALine);
+      if (P < 1) then
+        continue;
+      ALine := Copy(ALine, P  + Length(HasUTC));
+      ALat := '';
+      ALOn := '';
+      while (ALine <> '') and
+            ((ALat = '') or (ALon = '')) do
+      begin
+        AKey := StringReplace(NextField(ALine, ' '), ',', '.', [rfReplaceAll]);
+        if (LeftStr(AKey, 4) = 'lat=') then
+        begin
+          Alat := AKey;
+          AKey := NextField(Alat, '=');
+        end;
+        if (LeftStr(AKey, 4) = 'lon=') then
+        begin
+          ALon := AKey;
+          AKey := NextField(ALon, '=');
+        end;
+      end;
+      if (ValidLatLon(Alat, ALon)) then
+      begin
+        AdjustLatLon(ALat, ALon, Coord_Decimals);
+        Inc(result);
+        Inc(PointNum);
+        Writeln(F, 'AddTrkPoint(', PointNum, ',', ALat, ',', ALon, ');');
+      end;
+    end;
+  finally
+    LastCoord := ALat + ', ' + ALon;
+    if (PointNum > 0) then
+      Writeln(F, 'CreateTrack(''' + ALogName + ''');');
+    CloseFile(F);
+    ET_Options.SetVerbose(SavedVerbose);
+    ETout.Free;
+  end;
+end;
+
 function GetGpsCoordinates(const Images: string): string;
 var
   ETCmd: string;
@@ -838,11 +939,12 @@ begin
   ETcmd := ETcmd + CRLF + '-Filename';
   ETcmd := ETcmd + CRLF + '-Composite:GpsLatitude';
   ETcmd := ETcmd + CRLF + '-Composite:GpsLongitude';
+  ETcmd := ETcmd + CRLF + '-MIMEType';
   ETcmd := ETcmd + CRLF + '-QuickTime:MajorBrand';
   ET_OpenExec(ETcmd, Images, result, ETerrs, false);
 end;
 
-function AnalyzeGPSCoords(var ETout, Lat, Lon: string; var IsQuickTime: boolean): string;
+function AnalyzeGPSCoords(var ETout, Lat, Lon, MIMEType: string; var IsQuickTime: boolean): string;
 var
   QuickTimeMajorBrand: string;
 begin
@@ -850,7 +952,7 @@ begin
 
   Lat := NextField(ETout, CRLF);
   Lon := NextField(ETout, CRLF);
-
+  MIMEType := NextField(ETout, CRLF);
   QuickTimeMajorBrand := NextField(ETout, CRLF);
   IsQuickTime := QuickTimeMajorBrand <> '-';
 end;
@@ -860,7 +962,7 @@ var
   Foto: FotoRec;
   ETCmd: string;
   APlace: TPlace;
-  GPSCoordinates, Lat, Lon: string;
+  GPSCoordinates, Lat, Lon, MIMEType: string;
   IsQuickTime: boolean;
 begin
   Foto := GetMetadata(ANImage, [TGetOption.gmGPS]);
@@ -873,7 +975,7 @@ begin
   else
   begin
     GPSCoordinates := GetGpsCoordinates(ANImage);
-    AnalyzeGPSCoords(GPSCoordinates, Lat, Lon, IsQuickTime);
+    AnalyzeGPSCoords(GPSCoordinates, Lat, Lon, MIMEType, IsQuickTime);
   end;
   if (ValidLatLon(Lat, Lon)) then
   begin

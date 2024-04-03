@@ -1936,7 +1936,7 @@ var
   Foto: FotoRec;
   SelectedFiles: TStringList;
   ETCmd, AFile: string;
-  GPSCoordinates: string;
+  MIMEType, GPSCoordinates: string;
   IsQuickTime: boolean;
 begin
   Foto := GetMetadata(GetFirstSelectedFilePath, [TGetOption.gmGPS]);
@@ -1948,7 +1948,7 @@ begin
   else
   begin
     GPSCoordinates := GetGpsCoordinates(GetFirstSelectedFilePath);
-    AnalyzeGPSCoords(GPSCoordinates, FGeoSetup.Lat, FGeoSetup.Lon, IsQuickTime);
+    AnalyzeGPSCoords(GPSCoordinates, FGeoSetup.Lat, FGeoSetup.Lon, MIMEType, IsQuickTime);
   end;
 
   if not (ValidLatLon(FGeoSetup.Lat, FGeoSetup.Lon)) then
@@ -2949,7 +2949,10 @@ begin
           else
           begin
             if (GUIsettings.EnableUnsupported) then
-              ET_OpenExec(CameraFields, GetSelectedFile(ShellList.FileName(Item.Index)), Details, False)
+              ET_OpenExec(Fast3(ShellList.FileExt(Item.Index)) + CameraFields,
+                          GetSelectedFile(ShellList.FileName(Item.Index)),
+                          Details,
+                          False)
             else
               Details.Add(NotSupported);
           end;
@@ -2978,7 +2981,10 @@ begin
           begin
             if (GUIsettings.EnableUnsupported) then
             begin
-              ET_OpenExec(LocationFields, GetSelectedFile(ShellList.FileName(Item.Index)), Details, False);
+              ET_OpenExec(Fast3(ShellList.FileExt(Item.Index)) + LocationFields,
+                          GetSelectedFile(ShellList.FileName(Item.Index)),
+                          Details,
+                          False);
               if (Details.Count < 2) then
                 Details.Add(NotSupported)
               else
@@ -3026,7 +3032,10 @@ begin
           else
           begin
             if (GUIsettings.EnableUnsupported) then
-              ET_OpenExec(AboutFields, GetSelectedFile(ShellList.FileName(Item.Index)), Details, False)
+              ET_OpenExec(Fast3(ShellList.FileExt(Item.Index)) + AboutFields,
+                          GetSelectedFile(ShellList.FileName(Item.Index)),
+                          Details,
+                          False)
             else
               Details.Add(NotSupported);
           end;
@@ -3036,7 +3045,10 @@ begin
           ETcmd := '-s3' + CRLF + '-f';
           for Indx := 0 to High(FListColUsr) do
             ETcmd := ETcmd + CRLF + FListColUsr[Indx].Command;
-          ET_OpenExec(ETcmd, GetSelectedFile(ShellList.FileName(Item.Index)), Details, False);
+          ET_OpenExec(Fast3(ShellList.FileExt(Item.Index)) + ETcmd,
+                      GetSelectedFile(ShellList.FileName(Item.Index)),
+                      Details,
+                      False);
         end;
     end;
   end;
@@ -3294,7 +3306,7 @@ begin
     if SpeedBtnQuick.Down then
     begin
       N := Length(QuickTags) - 1;
-      ETcmd := '-s3' + CRLF + '-f';
+      ETcmd := Fast3(ShellList.FileExt) + '-s3' + CRLF + '-f';
 
       for E := 0 to N do
       begin
@@ -3340,10 +3352,11 @@ begin
     end
     else
     begin
+      ETcmd := Fast3(ShellList.FileExt);
       if MaGroup_g4.Checked then
-        ETcmd := '-g4' + CRLF
+        ETcmd := ETcmd + '-g4' + CRLF
       else
-        ETcmd := '-g1' + CRLF;
+        ETcmd := ETcmd + '-g1' + CRLF;
       if not MaNotDuplicated.Checked then
         ETcmd := ETcmd + '-a' + CRLF;
       if MaShowSorted.Checked then
@@ -3612,6 +3625,7 @@ end;
 
 procedure TFMain.SpeedBtn_MapHomeClick(Sender: TObject);
 begin
+  DeleteFile(GetTrackTmp);
   MapGotoPlace(EdgeBrowser1, GUIsettings.DefGMapHome, '', OSMHome, InitialZoom_Out);
 end;
 

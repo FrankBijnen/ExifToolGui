@@ -122,6 +122,7 @@ type
 
   TOSMHelper = class(TObject)
   private
+    HasTrack: boolean;
     OsmFormatSettings: TFormatSettings;
     Html: TStringList;
     FInitialZoom: string;
@@ -131,6 +132,7 @@ type
     procedure WritePointsStart;
     procedure WritePoint(const ALat, ALon, AImg: string; Link: boolean);
     procedure WritePointsEnd(const GetPlace: boolean);
+    procedure WriteTrackPoints;
     procedure WriteFooter;
   public
     constructor Create(const APathName, AInitialZoom: string);
@@ -527,6 +529,7 @@ begin
   FInitialZoom := AInitialZoom;
   Html := TStringList.Create;
   PlacesDict := TObjectDictionary<String, TStringList>.Create([doOwnsValues]);
+  HasTrack := FileExists(GetTrackTmp);
 end;
 
 destructor TOSMHelper.Destroy;
@@ -549,13 +552,11 @@ begin
   Html.Add('<script type="text/javascript"  src="http://openlayers.org/api/OpenLayers.js"></script>');
   Html.Add('<script src="http://www.openstreetmap.org/openlayers/OpenStreetMap.js"></script>');
   Html.Add('<script type="text/javascript">');
-  Html.Add('');
   Html.Add('var map;');
   Html.Add('var coords;');
   Html.Add('var points;');
+  Html.Add('var trackpoints;');
   Html.Add('var style;');
-  Html.Add('');
-  Html.Add('var lineFeature;');
   Html.Add('var po;');
   Html.Add('var op;');
   Html.Add('');
@@ -564,6 +565,7 @@ begin
   Html.Add('     map = new OpenLayers.Map ("map_canvas", {');
   Html.Add('           controls:         [new OpenLayers.Control.Navigation(),');
   Html.Add('                              new OpenLayers.Control.PanZoomBar(),');
+  Html.Add('                              new OpenLayers.Control.LayerSwitcher(),');
   Html.Add('                              new OpenLayers.Control.Attribution()');
   Html.Add('                             ],');
   Html.Add('           maxResolution:    156543.0399,');
@@ -589,11 +591,15 @@ begin
   Html.Add('       GetBounds("' + OSMGetBounds + '");');
   Html.Add('     })');
 
+  Html.Add('     coords = new Array();');
+  Html.Add('     points = new Array();');
+  Html.Add('     trackpoints = new Array();');
   Html.Add('');
+  Html.Add('     AddTrackPoints();');
+  Html.Add('     AddPoints();');
   Html.Add('     CreateExtent(' + FInitialZoom + ');');
   Html.Add('     CreatePopups();');
   Html.Add('  }');
-  Html.Add('');
 
   Html.Add('  function GetLocation(Func){');
   Html.Add('     var bounds = map.getExtent();');
@@ -607,14 +613,11 @@ begin
   Html.Add('     var lonlat = bounds.getCenterLonLat();');
   Html.Add('     SendMessage(Func, bounds.toBBOX(' + IntToStr(Place_Decimals) + ', true), lonlat.lat + ", " + lonlat.lon);');
   Html.Add('  }');
+
   Html.Add('  function CreateExtent(ZoomLevel){');
-  Html.Add('');
-  Html.Add('     coords = new Array();');
-  Html.Add('     points = new Array();');
-  Html.Add('');
-  Html.Add('     AddPoints();');
-  Html.Add('');
-  Html.Add('     var line_string = new OpenLayers.Geometry.LineString(coords);');
+  Html.Add('     var temp;');
+  Html.Add('     temp = coords.concat(trackpoints);');
+  Html.Add('     var line_string = new OpenLayers.Geometry.LineString(temp);');
   Html.Add('     var bounds = new OpenLayers.Bounds();');
   Html.Add('     line_string.calculateBounds();');
   Html.Add('     bounds.extend(line_string.bounds);');
@@ -630,7 +633,12 @@ begin
   Html.Add('     lonlat = new OpenLayers.LonLat(PointLon, PointLat).transform(op, po);');
   Html.Add('     coords[Id] = new OpenLayers.Geometry.Point(lonlat.lon, lonlat.lat);');
   Html.Add('     points[Id] = [lonlat, Href];');
-  Html.Add('');
+  Html.Add('  }');
+
+  Html.Add('  function AddTrkPoint(Id, PointLat, PointLon){');
+  Html.Add('     var lonlat;');
+  Html.Add('     lonlat = new OpenLayers.LonLat(PointLon, PointLat).transform(op, po);');
+  Html.Add('     trackpoints[Id] = new OpenLayers.Geometry.Point(lonlat.lon, lonlat.lat);');
   Html.Add('  }');
 
   Html.Add('  function SendMessage(msg, parm1, parm2){');
@@ -642,6 +650,15 @@ begin
   Html.Add('       var popup = new OpenLayers.Popup.FramedCloud("Popup", points[i][0], null, points[i][1], null, true);');
   Html.Add('       map.addPopup(popup);');
   Html.Add('     }');
+  Html.Add('  }');
+
+  Html.Add('  function CreateTrack(linename){');
+  Html.Add('     linelayer = new OpenLayers.Layer.Vector(linename);');
+  Html.Add('     style = {strokeColor: ''#0000ff'', strokeOpacity: 0.6, fillOpacity: 0, strokeWidth: 5};');
+  Html.Add('     var line_string = new OpenLayers.Geometry.LineString(trackpoints);');
+  Html.Add('     var linefeature = new OpenLayers.Feature.Vector(line_string, null, style);');
+  Html.Add('     linelayer.addFeatures([linefeature]);');
+  Html.Add('     map.addLayer(linelayer);');
   Html.Add('  }');
 end;
 
@@ -696,11 +713,30 @@ begin
     inc(PointCnt);
   end;
   Html.Add('  }');
-  Html.Add('');
+end;
+
+procedure TOSMHelper.WriteTrackPoints;
+var
+  F: TStringList;
+begin
+  Html.Add('  function AddTrackPoints(){');
+  if (HasTrack) then
+  begin
+    F := TStringList.Create;
+    try
+      F.LoadFromFile(GetTrackTmp);
+      Html.AddStrings(F);
+    finally
+      F.Free;
+    end;
+  end;
+  Html.Add('  }');
 end;
 
 procedure TOSMHelper.WriteFooter;
 begin
+  WriteTrackPoints;
+
   Html.Add('</script>');
   Html.Add('</head>');
   Html.Add('<body onload="initialize()" >');
@@ -790,20 +826,31 @@ end;
 procedure ShowImagesOnMap(Browser: TEdgeBrowser; Apath, ETOuts: string);
 var
   OsmHelper: TOSMHelper;
-  ETout, Lat, Lon, Filename: string;
-  IsQuickTime: boolean;
+  ETout, Lat, Lon, MIMEType, Filename, LastCoord: string;
+  FirstGpx, IsQuickTime: boolean;
 begin
   OsmHelper := TOSMHelper.Create(GetHtmlTmp, InitialZoom_Out);
   try
     OsmHelper.WriteHeader;
     OsmHelper.WritePointsStart;
     ETout := ETOuts;
+    FirstGpx := true;
 
     while (ETout <> '') do
     begin
-      FileName := AnalyzeGPSCoords(ETOut, Lat, Lon, IsQuickTime);
-      if (Lat <> '-') and (Lon <> '-') then
-        OsmHelper.WritePoint(Lat, Lon, IncludeTrailingPathDelimiter(Apath) + Filename, true);
+      FileName := AnalyzeGPSCoords(ETOut, Lat, Lon, MIMEType, IsQuickTime);
+      if (Pos('image', MIMEType) > 0) or
+         (Pos('video', MIMEType) > 0) then
+      begin
+        if (Lat <> '-') and (Lon <> '-') then
+          OsmHelper.WritePoint(Lat, Lon, IncludeTrailingPathDelimiter(Apath) + Filename, true);
+      end
+      else
+      begin
+        OsmHelper.HasTrack := true;
+        if (CreateTrkPoints(FileName, FirstGpx, LastCoord) > 0) then
+          FirstGpx := false;
+      end;
     end;
 
     OsmHelper.WritePointsEnd(true);
