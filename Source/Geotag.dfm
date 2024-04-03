@@ -3,8 +3,8 @@ object FGeotag: TFGeotag
   Top = 0
   BorderStyle = bsDialog
   Caption = 'Import GPS data'
-  ClientHeight = 300
-  ClientWidth = 658
+  ClientHeight = 360
+  ClientWidth = 669
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -15,25 +15,26 @@ object FGeotag: TFGeotag
   TextHeight = 13
   object Label1: TLabel
     Left = 574
-    Top = 232
+    Top = 285
     Width = 31
     Height = 13
     Caption = 'Label1'
   end
   object StatusBar1: TStatusBar
     Left = 0
-    Top = 281
-    Width = 658
+    Top = 341
+    Width = 669
     Height = 19
     Panels = <>
     SimplePanel = True
-    ExplicitWidth = 566
+    ExplicitTop = 340
+    ExplicitWidth = 665
   end
   object AdvPanel1: TPanel
     Left = 0
     Top = 0
     Width = 549
-    Height = 281
+    Height = 341
     Align = alLeft
     DoubleBuffered = True
     Font.Charset = DEFAULT_CHARSET
@@ -44,9 +45,9 @@ object FGeotag: TFGeotag
     ParentDoubleBuffered = False
     ParentFont = False
     TabOrder = 1
-    ExplicitHeight = 282
+    ExplicitHeight = 340
     object Label2: TLabel
-      Left = 27
+      Left = 25
       Top = 201
       Width = 418
       Height = 28
@@ -55,7 +56,7 @@ object FGeotag: TFGeotag
         'eccesary,'#10'apply Exif:DateTime shift before geotagging.'
     end
     object LabeledEdit1: TLabeledEdit
-      Left = 27
+      Left = 25
       Top = 26
       Width = 455
       Height = 22
@@ -78,7 +79,7 @@ object FGeotag: TFGeotag
       OnClick = Button3Click
     end
     object CheckBox1: TCheckBox
-      Left = 27
+      Left = 25
       Top = 54
       Width = 455
       Height = 17
@@ -101,7 +102,7 @@ object FGeotag: TFGeotag
       TabOrder = 3
     end
     object CheckBox2: TCheckBox
-      Left = 27
+      Left = 25
       Top = 171
       Width = 177
       Height = 17
@@ -143,12 +144,33 @@ object FGeotag: TFGeotag
       OnChange = TrackBar1Change
     end
     object ChkUpdateLocation: TCheckBox
-      Left = 27
-      Top = 244
+      Left = 25
+      Top = 308
       Width = 493
       Height = 17
       Caption = 'Update Geo Location (Country, Province, City)'
       TabOrder = 7
+    end
+    object EdMargin: TLabeledEdit
+      Left = 27
+      Top = 264
+      Width = 51
+      Height = 22
+      EditLabel.Width = 358
+      EditLabel.Height = 14
+      EditLabel.Caption = 'Margin before or beyond Track. (Seconds) (-Api GeoMaxExtSecs)'
+      TabOrder = 8
+      Text = '1.800'
+    end
+    object UdMargin: TUpDown
+      Left = 78
+      Top = 264
+      Width = 17
+      Height = 22
+      Associate = EdMargin
+      Max = 86400
+      Position = 1800
+      TabOrder = 9
     end
   end
   object Button1: TButton
@@ -162,7 +184,7 @@ object FGeotag: TFGeotag
   end
   object Button2: TButton
     Left = 574
-    Top = 251
+    Top = 304
     Width = 80
     Height = 25
     Caption = 'Execute'
@@ -172,11 +194,20 @@ object FGeotag: TFGeotag
   end
   object BtnSetupGeoCode: TButton
     Left = 574
-    Top = 201
+    Top = 254
     Width = 80
     Height = 25
     Caption = 'Setup Geo'
     TabOrder = 4
     OnClick = BtnSetupGeoCodeClick
+  end
+  object BtnOnMap: TButton
+    Left = 574
+    Top = 213
+    Width = 75
+    Height = 25
+    Caption = 'Show on Map'
+    TabOrder = 5
+    OnClick = BtnOnMapClick
   end
 end

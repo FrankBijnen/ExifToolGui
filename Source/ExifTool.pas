@@ -18,16 +18,18 @@ type
     ETGpsFormat: string;
     ETShowNumber: string;
     ETCharset: string;
-    ETVerbose: string;
+    ETVerbose: integer;
     ETAPIWindowsWideFile: string;
     ETAPILargeFileSupport: string;
     ETCustomOptions: string;
     procedure SetGpsFormat(UseDecimal: boolean);
+    procedure SetVerbose(Level: integer);
     procedure SetApiWindowsWideFile(UseWide: boolean);
     procedure SetApiLargeFileSupport(UseLarge: boolean);
     procedure SetCustomOptions(Custom: string);
     procedure SetSeparator(const Sep: string);
 
+    function GetVerbose: integer;
     function GetCustomOptions: string;
     function GetOptions(Charset: boolean = true): string;
     function GetSeparator: string;
@@ -47,8 +49,10 @@ var
     ETGpsFormat: '';                              // See SetGpsFormat
     ETShowNumber: '';                             // or '-n'+CRLF
     ETCharset: '-CHARSET' + CRLF + 'FILENAME=UTF8' + CRLF + '-CHARSET' + CRLF + 'UTF8'; // UTF8 it is. No choice
-    ETVerbose: '-v0';                             // For file counter
+    ETVerbose: 0;                                 // For file counter
     ETCustomOptions: '');                         // or -u + CRLF Unknown Tags
+
+function Fast3(const FileExt: string): string;
 
 function ETWorkDir: string;
 
@@ -91,6 +95,11 @@ begin
     ETGpsFormat := '-c' + CRLF + '%d' + #$B0 + '%.4f' + CRLF;
 end;
 
+procedure ET_OptionsRec.SetVerbose(Level: integer);
+begin
+  ETVerbose := Level;
+end;
+
 procedure ET_OptionsRec.SetApiWindowsWideFile(UseWide: boolean);
 begin
   if UseWide then
@@ -112,6 +121,11 @@ begin
   ETCustomOptions := Custom;
 end;
 
+function ET_OptionsRec.GetVerbose: integer;
+begin
+  result := ETVerbose;
+end;
+
 function ET_OptionsRec.GetCustomOptions: string;
 begin
   result := EndsWithCRLF(ArgsFromDirectCmd(ETCustomOptions));
@@ -122,7 +136,7 @@ begin
   result := '';
   if (Charset) then
     result := ETCharset + CRLF;
-  result := result + ETVerbose + CRLF; // -for file counter!
+  result := result + Format('-v%d', [ETVerbose]) + CRLF; // -for file counter!
   if ETLangDef <> '' then
     result := result + '-lang' + CRLF + ETLangDef + CRLF;
   result := result + ETBackupMode;
@@ -162,12 +176,18 @@ begin
   Inc(ExecNum);
   if (ExecNum > 99) then
     ExecNum := 10;
-
               // '-echo4 CRLF {readyxx} CRLF'    Ensures that something is written to StdErr. TSOPipeStream relies on it.
   FinalCmd := Format('-echo4%s{ready%u}%s', [CRLF, ExecNum, CRLF]) +
               FinalCmd +
               // '-executexx CRLF'               The same for STDout.
               Format('-execute%u%s', [ExecNum, CRLF]);
+end;
+
+function Fast3(const FileExt: string): string;
+begin
+  Fast3 := '';
+  if SameText(FileExt, '.gpx') then
+    Fast3 := '-fast3' + CRLF;
 end;
 
 function ETWorkDir: string;

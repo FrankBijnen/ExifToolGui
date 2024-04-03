@@ -25,15 +25,20 @@ type
     Label2: TLabel;
     ChkUpdateLocation: TCheckBox;
     BtnSetupGeoCode: TButton;
+    EdMargin: TLabeledEdit;
+    UdMargin: TUpDown;
+    BtnOnMap: TButton;
     procedure FormShow(Sender: TObject);
     procedure Button3Click(Sender: TObject);
     procedure TrackBar1Change(Sender: TObject);
     procedure CheckBox2Click(Sender: TObject);
     procedure Button2Click(Sender: TObject);
     procedure BtnSetupGeoCodeClick(Sender: TObject);
+    procedure BtnOnMapClick(Sender: TObject);
   private
     { Private declarations }
     procedure DisplayHint(Sender: TObject);
+    function LogPath: string;
   public
     { Public declarations }
   end;
@@ -46,6 +51,14 @@ implementation
 uses Main, MainDef, ExifTool, ExifToolsGUI_Utils, UFrmGeoSetup, Geomap, UnitLangResources;
 
 {$R *.dfm}
+
+function TFGeotag.LogPath: string;
+begin
+  if CheckBox1.Checked then
+    result := ExtractFilePath(LabeledEdit1.Text) + '*' + ExtractFileExt(LabeledEdit1.Text)
+  else
+    result := LabeledEdit1.Text;
+end;
 
 procedure TFGeotag.FormShow(Sender: TObject);
 begin
@@ -73,6 +86,7 @@ begin
     FileName := '';
   end;
   Button2.Enabled := false;
+  BtnOnMap.Enabled := false;
   LabeledEdit1.Clear;
   Application.OnHint := DisplayHint;
 end;
@@ -97,6 +111,17 @@ begin
   Edit1.Text := Tx;
 end;
 
+procedure TFGeotag.BtnOnMapClick(Sender: TObject);
+var
+  LastCoord: string;
+begin
+  if (CreateTrkPoints(LogPath, true, LastCoord) > 0) then
+  begin
+    Fmain.AdvPageMetadata.ActivePage := FMain.AdvTabOSMMap;
+    MapGotoPlace(FMain.EdgeBrowser1, LastCoord, '', '', InitialZoom_Out);
+  end;
+end;
+
 procedure TFGeotag.BtnSetupGeoCodeClick(Sender: TObject);
 begin
   ParseLatLon(Fmain.EditMapFind.Text, FGeoSetup.Lat, FGeoSetup.Lon);
@@ -110,47 +135,56 @@ end;
 
 procedure TFGeotag.Button2Click(Sender: TObject);
 var
+  SavedVerbose: integer;
   ETcmd, ETout, ETerr: string;
   AFile: string;
   SelectedFiles: TStringList;
-
 begin
-  if CheckBox1.Checked then
-    ETcmd := ExtractFilePath(LabeledEdit1.Text) + '*' + ExtractFileExt(LabeledEdit1.Text)
-  else
-    ETcmd := LabeledEdit1.Text;
-  ETcmd := '-geotag' + CRLF + ETcmd + CRLF;
-  ETcmd := ETcmd + '-geotime<';
-  if CheckBox2.Checked then
-  begin
-    if RadioGroup1.ItemIndex = 0 then
-      ETcmd := ETcmd + '${DateTimeOriginal}'
+  SavedVerbose := ET_Options.GetVerbose;
+  try
+    ETcmd := '-geotag' + CRLF + LogPath + CRLF;
+    ETcmd := ETcmd + '-geotime<';
+    if CheckBox2.Checked then
+    begin
+      if RadioGroup1.ItemIndex = 0 then
+        ETcmd := ETcmd + '${DateTimeOriginal}'
+      else
+        ETcmd := ETcmd + '${CreateDate}';
+      ETcmd := ETcmd + Edit1.Text + ':00';
+    end
     else
-      ETcmd := ETcmd + '${CreateDate}';
-    ETcmd := ETcmd + Edit1.Text + ':00';
-  end
-  else
-  begin
-    if RadioGroup1.ItemIndex = 0 then
-      ETcmd := ETcmd + 'DateTimeOriginal'
-    else
-      ETcmd := ETcmd + 'CreateDate"';
-  end;
-  ET_OpenExec(ETcmd, FMain.GetSelectedFiles, ETout, ETerr);
-
-  if (ChkUpdateLocation.Checked) then
-  begin
-    SelectedFiles := TStringList.Create;
-    try
-      SelectedFiles.Text := FMain.GetSelectedFiles(true); // Need complete path
-      for AFile in SelectedFiles do
-        FillLocationInImage(AFile);
-    finally
-      SelectedFiles.Free;
+    begin
+      if RadioGroup1.ItemIndex = 0 then
+        ETcmd := ETcmd + 'DateTimeOriginal'
+      else
+        ETcmd := ETcmd + 'CreateDate"';
     end;
-  end;
 
-  ModalResult := mrOK;
+    if (ChkUpdateLocation.Checked) and
+       (GeoSettings.GetPlaceProvider = TGeoCodeProvider.gpExifTool) then
+      ETcmd := ETcmd + CRLF + '-XMP-photoshop:XMP-iptcCore:XMP-iptcExt:geolocate=geotag';
+
+    ETcmd := ETcmd + CRLF + '-API' + CRLF + Format('GeoMaxExtSecs=%s', [EdMargin.Text]);
+
+    ET_Options.SetVerbose(2);
+    ET_OpenExec(ETcmd, FMain.GetSelectedFiles, ETout, ETerr);
+
+    if (ChkUpdateLocation.Checked) and
+       (GeoSettings.GetPlaceProvider <> TGeoCodeProvider.gpExifTool) then
+    begin
+      SelectedFiles := TStringList.Create;
+      try
+        SelectedFiles.Text := FMain.GetSelectedFiles(true); // Need complete path
+        for AFile in SelectedFiles do
+          FillLocationInImage(AFile);
+      finally
+        SelectedFiles.Free;
+      end;
+    end;
+  finally
+    ET_Options.SetVerbose(SavedVerbose);
+    ModalResult := mrOK;
+  end;
 end;
 
 procedure TFGeotag.Button3Click(Sender: TObject);
@@ -159,9 +193,9 @@ begin
   begin
     LabeledEdit1.Text := FMain.OpenPictureDlg.FileName;
     GpsXmpDir := ExtractFilePath(FMain.OpenPictureDlg.FileName);
-    if GpsXmpDir[Length(GpsXmpDir)] <> '\' then
-      GpsXmpDir := GpsXmpDir + '\';
+    GpsXmpDir := IncludeTrailingPathDelimiter(GpsXmpDir);
     Button2.Enabled := true;
+    BtnOnMap.Enabled := GUIsettings.EnableGMap;
   end;
 end;
 
