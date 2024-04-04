@@ -879,7 +879,6 @@ begin
         if (ALogName <> '') then // Multiple Log's
         begin
           Writeln(F, 'CreateTrack(''' + ALogName + ''');');
-          Writeln(F, 'trackpoints = new Array();');
           PointNum := 0;
         end;
         // Get the filename of the log.
