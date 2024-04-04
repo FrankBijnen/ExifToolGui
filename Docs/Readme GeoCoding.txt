@@ -1,4 +1,21 @@
-Support for new ExifTool functions geolocate and -api geolocation. (Requires ExifTool 12.78 and GUI version V6.3.0)
+Starting from V6.3.1 and Exiftool 12.81:
+The searching for places has been enhanced. 
+- A drop down list is shown for Languages, if applicable for the geocoding provider.
+- A drop down list is shown for Country Codes, if applicable for the geocoding provider.
+- A Retry button is added to the 'Places found' form, to retry the search. So you dont have to retype all parameters.
+- The query for 'Overpass' has been optimized if you select a country from the dropdown list.
+
+The 'Setup Geo' now allows to have all fields mapped to City and Province. You can use the predefined value *, or combine it your self. EG. Hamlet, Town, City.
+
+The 'Import Gps data from Log files' has been enhanced.
+- If you have set up Exiftool as Geocode provider it wil use the ExifTool feature: 'geolocate=geotag', resulting in faster processing, without external Internet calls.
+- The selected Log files can be shown on the map, before executing the function. Use it to verify using the correct files.
+- The option -API GeoMaxExtSecs has been added, allowing for a greater margin between the timestamps in the log file and the timestamp of the images.
+
+YOu can also show a track on the map, by selecting on or more files in the Filelist and clicking 'Show on Map'.
+
+Starting from V6.3.0 and Exiftool 12.78:
+Support for new ExifTool functions geolocate and -api geolocation.
 
 Starting from version V6.3.0 a new GeoCode provider for reverse geocoding has been added.
 You can obtain the City, State and Country from GPS Coordinates or obtain the GPS coordinates from a city, by selecting 'ExifTool geolocation' as Geocode provider.
