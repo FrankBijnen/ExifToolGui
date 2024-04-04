@@ -2,7 +2,7 @@
 <xlat>
   <meta>
     <version>3</version>
-    <created>2024-03-30T22:14:17.938+01:00</created>
+    <created>2024-04-04T13:57:33.901+02:00</created>
     <tool>amTranslationManager</tool>
     <toolversion>2.0.8628.33873</toolversion>
   </meta>
@@ -12,14 +12,14 @@
     <sorted>True</sorted>
     <omitnewstate>True</omitnewstate>
   </options>
-  <project sourcefile=".\ExifToolGUI.exe" stringsymbolfile=".\ExifToolGUI.drc" language="en-US" properties="638">
+  <project sourcefile=".\ExifToolGUI.exe" stringsymbolfile=".\ExifToolGUI.drc" language="en-US" properties="640">
     <targetlanguages>
-      <language language="pt" translated="602"/>
-      <language language="es" translated="614"/>
-      <language language="fr" translated="605"/>
-      <language language="de" translated="658"/>
-      <language language="it" translated="619"/>
-      <language language="nl" translated="664"/>
+      <language language="pt" translated="604"/>
+      <language language="fr" translated="607"/>
+      <language language="es" translated="616"/>
+      <language language="it" translated="621"/>
+      <language language="de" translated="660"/>
+      <language language="nl" translated="666"/>
       <language language="en" translated="0"/>
     </targetlanguages>
     <modules>
@@ -12133,7 +12133,7 @@
           <item name="FGeoSetup.PctMain.TabSetup.CmbCity" type="TComboBox">
             <properties>
               <property name="Text" status="skip">
-                <value>CmbProvince</value>
+                <value>CmbText</value>
               </property>
             </properties>
           </item>
@@ -12302,7 +12302,7 @@
           </item>
         </items>
       </module>
-      <module name="TFGEOTAG" type="form" properties="15">
+      <module name="TFGEOTAG" type="form" properties="17">
         <items>
           <item name="FGeotag" type="TFGeotag">
             <properties>
@@ -12427,6 +12427,24 @@
               </property>
             </properties>
           </item>
+          <item name="FGeotag.AdvPanel1.EdMargin" type="TLabeledEdit">
+            <properties>
+              <property name="EditLabel.Caption">
+                <value>Margin before or beyond Track. (Seconds) (-Api GeoMaxExtSecs)</value>
+                <translations>
+                  <translation language="nl" status="proposed">Marge voor of voorbij Track. (Seconden) (-Api GeoMaxExtSecs)</translation>
+                  <translation language="fr" status="proposed">Marge avant ou au-delà de Track. (Secondes) (-Api GeoMaxExtSecs)</translation>
+                  <translation language="de" status="proposed">Marge vor oder nach dem Track. (Sekunden) (-Api GeoMaxExtSecs)</translation>
+                  <translation language="it" status="proposed">Margine prima o oltre la traccia. (Secondi) (-Api GeoMaxExtSecs)</translation>
+                  <translation language="pt" status="proposed">Margem antes ou além da trilha. (Segundos) (-Api GeoMaxExtSecs)</translation>
+                  <translation language="es" status="proposed">Margen antes o después de Track. (Segundos) (-Api GeoMaxExtSecs)</translation>
+                </translations>
+              </property>
+              <property name="Text" status="skip">
+                <value>1.800</value>
+              </property>
+            </properties>
+          </item>
           <item name="FGeotag.AdvPanel1.Label2" type="TLabel">
             <properties>
               <property name="Caption">
@@ -12503,6 +12521,21 @@
                   <translation language="fr" status="proposed">Définir le décalage du fuseau horaire = différence entre l'heure enregistrée (UTC) et l'heure de la caméra</translation>
                   <translation language="pt" status="proposed">Defina o deslocamento de TimeZone =diferença entre a hora registrada (UTC) e a DateTime da câmera</translation>
                   <translation language="it" status="proposed">Impostare l'offset del fuso orario =differenza tra l'ora registrata (UTC) e l'ora della fotocamera.</translation>
+                </translations>
+              </property>
+            </properties>
+          </item>
+          <item name="FGeotag.BtnOnMap" type="TButton">
+            <properties>
+              <property name="Caption">
+                <value>Show on Map</value>
+                <translations>
+                  <translation language="nl">Toon op kaart</translation>
+                  <translation language="de" status="proposed">Anzeigen</translation>
+                  <translation language="es" status="proposed">Mostrar</translation>
+                  <translation language="fr" status="proposed">Afficher sur carte</translation>
+                  <translation language="pt" status="proposed">Mostrar no mapa</translation>
+                  <translation language="it" status="proposed">Mostra sulla mappa</translation>
                 </translations>
               </property>
             </properties>

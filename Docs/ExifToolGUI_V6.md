@@ -72,7 +72,7 @@ Basic idea behind GUI is, to keep it <u>simple!</u> Thus, only those options are
 <li>English</li>
 <li>Nederlands</li>
 </ul><ul> Languages that need verification. Your help is wanted.
-<li>Deutsch></li>
+<li>Deutsch</li>
 <li>Italiano</li>
 <li>Français</li>
 <li>Español</li>
@@ -80,6 +80,11 @@ Basic idea behind GUI is, to keep it <u>simple!</u> Thus, only those options are
 </ul>
 <li>Starting with V6.3.0 an installer is provided.</li>
 <li>Support for Exiftool features <u>geolocate</u> and <u>-api geolocation</u>.</li>
+<li>License changed to GPL V3.</li>
+<li>Added options to export and import various definition files. (ExifTool Direct, User defined fields, Custom view etc)</li>
+<li>Added support for Google Pixel Pro 7 in location info</li>
+<li>Feature Request: Display the imported gps file track on the map.</li>
+<li>Improvements searching for places, and reverse geocoding/li>
 </ul>
 <a href="changelog.txt"><b>See changelog.txt for a complete list of issues.</b></a>
 
@@ -312,7 +317,7 @@ The default setting is to only show files in the Filelist panel. If you enable t
 Will also show hidden Folders and Files in the Folder Treeview and the Filelist panels. You need to be Admin to use this, and not everything you see may be readable/writeable.<br><br>
 <b>Filelist: Show Breadcrumb (Address bar) in Filelist</b><br>
 Enable a BreadCrumb bar on top of the filelist. Allows for easier navigating.<br><br>
-<b>Filelist: Enable 'Camera Settings', 'Location info and 'About photo' for all file types. (Slower)</b><br>
+<b>Filelist: Use ExifTool for unsupported file types. (Slower)</b><br>
 If you have set the <b>Details</b> of the filelist panel to any of the above options, GUI will show that info only for known filetypes.<br>
 If a file is not supported, or it does not contain the data, GUI will show 'File type unsupported'.<br>
 Generally speaking this works only for filetypes that have <b>IFD0, ExifIFD or XMP</b> groups. <br>
@@ -403,6 +408,11 @@ However, when saving, name of Workspace definition file can not be
 ExifToolGUIv6.ini -you should use any names that reminds you on content,
  for example: MyWorkspace_XMP.ini.<br>
 <br>
+Starting with V6.3.1 these definitions can also be Loaded and Saved. Its workings are analogous to the Workspace: <br>
+<h3>ExifTool direct definition file: Load/Save</h3>
+<h3>User defined fields definition file: Load/Save</h3>
+<h3>Custom view definition file: Load/Save</h3>
+<h3>Marked tags definition file: Load/Save</h3>
 
 <h3><a name="m_style">Style</a></h3>
 Shows a list of available style/skins. To change the appearance of GUI.<br>
@@ -564,10 +574,12 @@ for that set of photos.<br>
 Note: In this case, it doesn't matter which (of multiple) log file you 
 choose -important is, all log files must have the same extension.<br>
 <br>
-<u>Step 3:</u> Choose <b>Reference DateTime value</b>.<br>
+<u>Step 3:</u> Optional: Show on Map. Use this to visually check the log files.</b>.<br>
+<u>Step 4:</u> Choose <b>Reference DateTime value</b>.<br>
 Here you define which photo DateTime values to compare with those in log file.<br>
 <br>
-<u>Step 4:</u> Choose if <b>TimeZone offset</b> is needed to be taken into account.<br>
+<u>Step 5:</u> Margin before or beyond Track. Use this if time of your images are not within 1800 secs of the track time.<br>
+<u>Step 6:</u> Choose if <b>TimeZone offset</b> is needed to be taken into account.<br>
 This is a funny one... The thing is, log files contain UTC time, while 
 camera is usually set to local time (of where photo is taken). In most 
 cases, we are dealing with two scenarios:<br>
@@ -586,7 +598,7 @@ In both cases above it's assumed, that camera is set to local time of
 where photos are taken. It's also assumed, that when geotagging, your 
 PC/laptop is set to your local (home) TimeZone.<br>
 For further reading/questions see <a href="https://exiftool.org/forum/index.php/topic,3333.0.html">here</a>.<br><br>
-<u>Step 5:</u> Check Update Geo Location, if you wish to update Country, Province and City.<br>
+<u>Step 7:</u> Check Update Geo Location, if you wish to update Country, Province and City.<br>
 Click on <a href="#m_geotag_setup"><b>Setup Geo</b></a> to control how these fields are filled.<br>
 Note: These fields are also shown in the filelist if it's set to 'Location info'.<br>
 <br>

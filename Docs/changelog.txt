@@ -91,3 +91,4 @@ Version:        Description             Issue
                 Fix Issue #361          Exiftool warns 'No such city in Geolocation database' for MP4 files with altitude set.
                 Fix Issue #364          Code review ExifInfo.
                 Fix Issue #374          Improve searching for places
+                Fix Issue #340          Feature Request: Display the imported gps file track on the map.
