@@ -140,4 +140,9 @@ Changed with version 6.3.0
   For better compatibility with the new ExifTool features the location found is stored differently. For more details see: Readme GeoCoding.txt
 - Added the option to specify a custom ExifTool Config
 
+Changed with version 6.3.1
+- ExifToolGui is now officially licensed under GPL V3. Dont worry, it's free.  
+- More settings can now be saved and loaded like the Workspace settings. E.G. Exiftool Direct commands, Custom view and User defined fields. 
+- Geocoding enhancements. Searching for places, and reverse geocoding. See: Readme GeoCoding.txt for details.
+
 Frank
