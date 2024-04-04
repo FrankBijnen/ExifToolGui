@@ -82,9 +82,9 @@ Basic idea behind GUI is, to keep it <u>simple!</u> Thus, only those options are
 <li>Support for Exiftool features <u>geolocate</u> and <u>-api geolocation</u>.</li>
 <li>License changed to GPL V3.</li>
 <li>Added options to export and import various definition files. (ExifTool Direct, User defined fields, Custom view etc)</li>
-<li>Added support for Google Pixel Pro 7 in location info</li>
+<li>Added support for Google Pixel Pro 7 in location info.</li>
 <li>Feature Request: Display the imported gps file track on the map.</li>
-<li>Improvements searching for places, and reverse geocoding/li>
+<li>Improvements searching for places, and reverse geocoding.</li>
 </ul>
 <a href="changelog.txt"><b>See changelog.txt for a complete list of issues.</b></a>
 
@@ -318,10 +318,10 @@ Will also show hidden Folders and Files in the Folder Treeview and the Filelist 
 <b>Filelist: Show Breadcrumb (Address bar) in Filelist</b><br>
 Enable a BreadCrumb bar on top of the filelist. Allows for easier navigating.<br><br>
 <b>Filelist: Use ExifTool for unsupported file types. (Slower)</b><br>
-If you have set the <b>Details</b> of the filelist panel to any of the above options, GUI will show that info only for known filetypes.<br>
+If you have set the <b>Details</b> of the filelist panel to 'Camera settings', 'Location info' or 'About photo', GUI will show that info only for known filetypes.<br>
 If a file is not supported, or it does not contain the data, GUI will show 'File type unsupported'.<br>
 Generally speaking this works only for filetypes that have <b>IFD0, ExifIFD or XMP</b> groups. <br>
-Examples that work: Tiff based raw (PEF, NEF, CRW, CR2, DNG), Jpeg, and recently I added FujiFilm (RAF) and CR3.<br>
+Examples that work: Tiff based raw (PEF, NEF, CRW, CR2, DNG), Jpeg, and recently I added FujiFilm (RAF), CR3 and Google Pixel Pro 7.<br>
 Examples that do not work: PDF, MP4<br> 
 Enabling this option will result in calling Exiftool to get the data. While this works, it will slow-down getting the filedetails considerably. It is thus not enabled by default.<br><br>
 <b>Hint pause timeout in Millisecs</b><br>
@@ -408,11 +408,11 @@ However, when saving, name of Workspace definition file can not be
 ExifToolGUIv6.ini -you should use any names that reminds you on content,
  for example: MyWorkspace_XMP.ini.<br>
 <br>
-Starting with V6.3.1 these definitions can also be Loaded and Saved. Its workings are analogous to the Workspace: <br>
 <h3>ExifTool direct definition file: Load/Save</h3>
 <h3>User defined fields definition file: Load/Save</h3>
 <h3>Custom view definition file: Load/Save</h3>
 <h3>Marked tags definition file: Load/Save</h3>
+Starting with V6.3.1 these definitions can also be Loaded and Saved. Its workings are analogous to the <b>Workspace</b>:<br>
 
 <h3><a name="m_style">Style</a></h3>
 Shows a list of available style/skins. To change the appearance of GUI.<br>
