@@ -553,9 +553,10 @@ begin
   Html.Add('<script src="http://www.openstreetmap.org/openlayers/OpenStreetMap.js"></script>');
   Html.Add('<script type="text/javascript">');
   Html.Add('var map;');
-  Html.Add('var coords;');
-  Html.Add('var points;');
-  Html.Add('var trackpoints;');
+  Html.Add('var allpoints;');     // Needed for CreateExtent
+  Html.Add('var imagepoints;');   // All points for Images
+  Html.Add('var imagecoords;');   // Including href
+  Html.Add('var trackpoints;');   // Trackpoints
   Html.Add('var style;');
   Html.Add('var po;');
   Html.Add('var op;');
@@ -591,12 +592,13 @@ begin
   Html.Add('       GetBounds("' + OSMGetBounds + '");');
   Html.Add('     })');
 
-  Html.Add('     coords = new Array();');
-  Html.Add('     points = new Array();');
+  Html.Add('     allpoints = new Array();');
+  Html.Add('     imagepoints = new Array();');
+  Html.Add('     imagecoords = new Array();');
   Html.Add('     trackpoints = new Array();');
   Html.Add('');
   Html.Add('     AddTrackPoints();');
-  Html.Add('     AddPoints();');
+  Html.Add('     AddImagePoints();');
   Html.Add('     CreateExtent(' + FInitialZoom + ');');
   Html.Add('     CreatePopups();');
   Html.Add('  }');
@@ -615,9 +617,9 @@ begin
   Html.Add('  }');
 
   Html.Add('  function CreateExtent(ZoomLevel){');
-  Html.Add('     var temp;');
-  Html.Add('     temp = coords.concat(trackpoints);');
-  Html.Add('     var line_string = new OpenLayers.Geometry.LineString(temp);');
+  Html.Add('     allpoints = allpoints.concat(imagepoints);');  // allpoints contains all the track points, add the image points
+  Html.Add('     var line_string = new OpenLayers.Geometry.LineString(allpoints);');
+  Html.Add('     allpoints = new Array();'); // Remove from memory
   Html.Add('     var bounds = new OpenLayers.Bounds();');
   Html.Add('     line_string.calculateBounds();');
   Html.Add('     bounds.extend(line_string.bounds);');
@@ -628,11 +630,11 @@ begin
   Html.Add('  }');
 
   // OpenLayers uses LonLat, not LatLon. Confusing maybe,
-  Html.Add('  function AddPoint(Id, PointLat, PointLon, Href){');
+  Html.Add('  function AddImagePoint(Id, PointLat, PointLon, Href){');
   Html.Add('     var lonlat;');
   Html.Add('     lonlat = new OpenLayers.LonLat(PointLon, PointLat).transform(op, po);');
-  Html.Add('     coords[Id] = new OpenLayers.Geometry.Point(lonlat.lon, lonlat.lat);');
-  Html.Add('     points[Id] = [lonlat, Href];');
+  Html.Add('     imagepoints[Id] = new OpenLayers.Geometry.Point(lonlat.lon, lonlat.lat);');
+  Html.Add('     imagecoords[Id] = [lonlat, Href];');
   Html.Add('  }');
 
   Html.Add('  function AddTrkPoint(Id, PointLat, PointLon){');
@@ -646,8 +648,8 @@ begin
   Html.Add('  }');
 
   Html.Add('  function CreatePopups(){');
-  Html.Add('     for (let i = 0; i < points.length; i++) {');
-  Html.Add('       var popup = new OpenLayers.Popup.FramedCloud("Popup", points[i][0], null, points[i][1], null, true);');
+  Html.Add('     for (let i = 0; i < imagecoords.length; i++) {');
+  Html.Add('       var popup = new OpenLayers.Popup.FramedCloud("Popup", imagecoords[i][0], null, imagecoords[i][1], null, true);');
   Html.Add('       map.addPopup(popup);');
   Html.Add('     }');
   Html.Add('  }');
@@ -659,12 +661,15 @@ begin
   Html.Add('     var linefeature = new OpenLayers.Feature.Vector(line_string, null, style);');
   Html.Add('     linelayer.addFeatures([linefeature]);');
   Html.Add('     map.addLayer(linelayer);');
+  // Add trackpoints to allpoints. Needed for CreateExtent
+  Html.Add('     allpoints = allpoints.concat(trackpoints);');
+  Html.Add('     trackpoints = new Array();');
   Html.Add('  }');
 end;
 
 procedure TOSMHelper.WritePointsStart;
 begin
-  Html.Add('  function AddPoints(){');
+  Html.Add('  function AddImagePoints(){');
 end;
 
 procedure TOSMHelper.WritePoint(const ALat, ALon, AImg: string; Link: boolean);
@@ -708,8 +713,8 @@ begin
       if (Assigned(PlaceLoc)) then
         Href := Href + PlaceLoc.HtmlSearchReault;
     end;
-
-    Html.Add(Format('     AddPoint(%d, %s, ''%s'');', [PointCnt, Place.Key, Href]));
+    Href := '<small>' + Href + '</small>';
+    Html.Add(Format('     AddImagePoint(%d, %s, ''%s'');', [PointCnt, Place.Key, Href]));
     inc(PointCnt);
   end;
   Html.Add('  }');
