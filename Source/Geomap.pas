@@ -123,6 +123,7 @@ type
   TOSMHelper = class(TObject)
   private
     HasTrack: boolean;
+    Scaled: boolean;
     OsmFormatSettings: TFormatSettings;
     Html: TStringList;
     FInitialZoom: string;
@@ -410,10 +411,29 @@ begin
 end;
 
 function TPlace.GetHtmlSearchResult: string;
+var
+  AField: string;
 begin
-  result := Format('<a>%s<br>%s %s</a>', [City, Province, FCountryCode]);
-  result := StringReplace(result, ' ', '&nbsp', [rfReplaceAll]);
-  result := StringReplace(result, '-', '&#8209;', [rfReplaceAll]);
+  result := '';
+
+  AField := City;
+  if (AField <> '') then
+    result := result + AField;
+
+  AField := Province;
+  if (AField <> '') then
+  begin
+    if (result <> '') then
+      result := result + '<br>';
+    result := result + AField;
+  end;
+
+  if (result <> '') then
+  begin
+    result := Format('<a>%s %s</a>', [result, FCountryCode]);
+    result := StringReplace(result, ' ', '&nbsp', [rfReplaceAll]);
+    result := StringReplace(result, '-', '&#8209;', [rfReplaceAll]);
+  end;
 end;
 
 procedure TPlace.SetCountryCode(Value: string);
@@ -713,7 +733,8 @@ begin
       if (Assigned(PlaceLoc)) then
         Href := Href + PlaceLoc.HtmlSearchReault;
     end;
-    Href := '<small>' + Href + '</small>';
+    if (Scaled) then
+      Href := '<small>' + Href + '</small>';
     Html.Add(Format('     AddImagePoint(%d, %s, ''%s'');', [PointCnt, Place.Key, Href]));
     inc(PointCnt);
   end;
@@ -760,6 +781,7 @@ var
 begin
   OsmHelper := TOSMHelper.Create(GetHtmlTmp, InitialZoom);
   try
+    OsmHelper.Scaled := (Browser.ScaleValue(100) > 100);
     OsmHelper.WriteHeader;
     OsmHelper.WritePointsStart;
     OsmHelper.WritePoint(Lat, Lon, Desc, false);
@@ -836,6 +858,7 @@ var
 begin
   OsmHelper := TOSMHelper.Create(GetHtmlTmp, InitialZoom_Out);
   try
+    OsmHelper.Scaled := (Browser.ScaleValue(100) > 100);
     OsmHelper.WriteHeader;
     OsmHelper.WritePointsStart;
     ETout := ETOuts;
@@ -858,7 +881,7 @@ begin
       end;
     end;
 
-    OsmHelper.WritePointsEnd(true);
+    OsmHelper.WritePointsEnd(GeoSettings.GeoCodingEnable <> TGeoCodeEnable.geNone);
     OsmHelper.WriteFooter;
   finally
     OsmHelper.Free;

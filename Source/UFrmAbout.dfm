@@ -167,7 +167,7 @@ object FrmAbout: TFrmAbout
       413
       29)
     object BtnOk: TBitBtn
-      Left = 300
+      Left = 292
       Top = 2
       Width = 85
       Height = 25
@@ -175,6 +175,7 @@ object FrmAbout: TFrmAbout
       Kind = bkClose
       NumGlyphs = 2
       TabOrder = 0
+      ExplicitLeft = 284
     end
   end
 end
