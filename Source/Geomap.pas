@@ -81,7 +81,7 @@ type
     property Province: string read GetProvince;
     property City: string read GetCity;
     property SearchReault: string read GetSearchResult;
-    property HtmlSearchReault: string read GetHtmlSearchResult;
+    property HtmlSearchResult: string read GetHtmlSearchResult;
     property RegionLevels: TRegionLevels read FRegionLevels;
     property CityLevels: TCityLevels read FCityLevels;
 
@@ -122,13 +122,13 @@ type
 
   TOSMHelper = class(TObject)
   private
-    HasTrack: boolean;
-    Scaled: boolean;
+    Scaled: integer;
     OsmFormatSettings: TFormatSettings;
     Html: TStringList;
     FInitialZoom: string;
     FPathName: string;
     PlacesDict: TObjectDictionary<String, TStringList>;
+    function GetHyperLink(const HRef: string = ''): string;
     procedure WriteHeader;
     procedure WritePointsStart;
     procedure WritePoint(const ALat, ALon, AImg: string; Link: boolean);
@@ -430,7 +430,7 @@ begin
 
   if (result <> '') then
   begin
-    result := Format('<a>%s %s</a>', [result, FCountryCode]);
+    result := Format('%s %s', [result, FCountryCode]);
     result := StringReplace(result, ' ', '&nbsp', [rfReplaceAll]);
     result := StringReplace(result, '-', '&#8209;', [rfReplaceAll]);
   end;
@@ -549,7 +549,6 @@ begin
   FInitialZoom := AInitialZoom;
   Html := TStringList.Create;
   PlacesDict := TObjectDictionary<String, TStringList>.Create([doOwnsValues]);
-  HasTrack := FileExists(GetTrackTmp);
 end;
 
 destructor TOSMHelper.Destroy;
@@ -559,6 +558,18 @@ begin
   PlacesDict.Free;
 
   inherited Destroy;
+end;
+
+function TOSMHelper.GetHyperLink(const HRef: string = ''): string;
+var
+  FontSize: string;
+begin
+  FontSize := '';
+  if (Scaled <> 100) then
+    FontSize := Format('style="font-size: %sem;"',
+                      [FormatFloat('#0.##', 100 / Scaled, CoordFormatSettings)]);
+
+  result := Format('<a %s %s>', [FontSize, HRef]);
 end;
 
 procedure TOSMHelper.WriteHeader;
@@ -720,10 +731,11 @@ begin
       if (ImgName = '') then
         continue;
       if (boolean(Place.Value.Objects[PlaceCnt]) = true) then
-        Href := Href + '<a href="file://' + StringReplace(ImgName, '\', '/', [rfReplaceAll]) + '">' +
-                        ExtractFileName(ImgName) + '</a><br>'
+        Href := Href + GetHyperLink('href="file://' + StringReplace(ImgName, '\', '/', [rfReplaceAll]) + '"') +
+                       ExtractFileName(ImgName) +
+                       '</a><br>'
       else if (GetPlace = false) then
-        Href := Href + '<a>' + ImgName + '</a><br>';
+        Href := Href + GetHyperLink + ImgName + '</a><br>';
     end;
 
     if (GetPlace) then
@@ -731,10 +743,8 @@ begin
       ParseLatLon(Place.Key, Lat, Lon);
       PlaceLoc := GetPlaceOfCoords(Lat, Lon, GeoSettings.GetPlaceProvider);
       if (Assigned(PlaceLoc)) then
-        Href := Href + PlaceLoc.HtmlSearchReault;
+        Href := Href + GetHyperLink + PlaceLoc.HtmlSearchResult + '</a>';
     end;
-    if (Scaled) then
-      Href := '<small>' + Href + '</small>';
     Html.Add(Format('     AddImagePoint(%d, %s, ''%s'');', [PointCnt, Place.Key, Href]));
     inc(PointCnt);
   end;
@@ -746,7 +756,7 @@ var
   F: TStringList;
 begin
   Html.Add('  function AddTrackPoints(){');
-  if (HasTrack) then
+  if (FileExists(GetTrackTmp)) then
   begin
     F := TStringList.Create;
     try
@@ -781,7 +791,7 @@ var
 begin
   OsmHelper := TOSMHelper.Create(GetHtmlTmp, InitialZoom);
   try
-    OsmHelper.Scaled := (Browser.ScaleValue(100) > 100);
+    OsmHelper.Scaled := Browser.ScaleValue(100);
     OsmHelper.WriteHeader;
     OsmHelper.WritePointsStart;
     OsmHelper.WritePoint(Lat, Lon, Desc, false);
@@ -858,7 +868,7 @@ var
 begin
   OsmHelper := TOSMHelper.Create(GetHtmlTmp, InitialZoom_Out);
   try
-    OsmHelper.Scaled := (Browser.ScaleValue(100) > 100);
+    OsmHelper.Scaled := Browser.ScaleValue(100);
     OsmHelper.WriteHeader;
     OsmHelper.WritePointsStart;
     ETout := ETOuts;
@@ -870,12 +880,12 @@ begin
       if (Pos('image', MIMEType) > 0) or
          (Pos('video', MIMEType) > 0) then
       begin
-        if (Lat <> '-') and (Lon <> '-') then
+        if (Lat <> '-') and
+           (Lon <> '-') then
           OsmHelper.WritePoint(Lat, Lon, IncludeTrailingPathDelimiter(Apath) + Filename, true);
       end
       else
       begin
-        OsmHelper.HasTrack := true;
         if (CreateTrkPoints(FileName, FirstGpx, LastCoord) > 0) then
           FirstGpx := false;
       end;
