@@ -52,8 +52,6 @@ var
     ETVerbose: 0;                                 // For file counter
     ETCustomOptions: '');                         // or -u + CRLF Unknown Tags
 
-function Fast3(const FileExt: string): string;
-
 function ETWorkDir: string;
 
 function ET_StayOpen(WorkDir: string): boolean;
@@ -181,13 +179,6 @@ begin
               FinalCmd +
               // '-executexx CRLF'               The same for STDout.
               Format('-execute%u%s', [ExecNum, CRLF]);
-end;
-
-function Fast3(const FileExt: string): string;
-begin
-  Fast3 := '';
-  if SameText(FileExt, '.gpx') then
-    Fast3 := '-fast3' + CRLF;
 end;
 
 function ETWorkDir: string;
