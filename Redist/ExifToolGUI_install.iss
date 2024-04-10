@@ -122,6 +122,7 @@ Source: "Win64\WebView2Loader.dll";     DestDir: "{app}"; Components: WebView2Lo
 Source: "Win32\WebView2Loader.dll";     DestDir: "{app}"; Components: WebView2LoaderDLLWin32; flags: replacesameversion;
 
 ; Language Files
+Source: "..\Translation\ExifToolGui_X64.CHS"; DestDir: "{app}";   Components: LanguagesWin64; flags: replacesameversion;
 Source: "..\Translation\ExifToolGui_X64.DEU"; DestDir: "{app}";   Components: LanguagesWin64; flags: replacesameversion;
 Source: "..\Translation\ExifToolGui_X64.ENU"; DestDir: "{app}";   Components: LanguagesWin64; flags: replacesameversion;
 Source: "..\Translation\ExifToolGui_X64.ESP"; DestDir: "{app}";   Components: LanguagesWin64; flags: replacesameversion;
@@ -130,6 +131,7 @@ Source: "..\Translation\ExifToolGui_X64.ITA"; DestDir: "{app}";   Components: La
 Source: "..\Translation\ExifToolGui_X64.NLD"; DestDir: "{app}";   Components: LanguagesWin64; flags: replacesameversion;
 Source: "..\Translation\ExifToolGui_X64.PTB"; DestDir: "{app}";   Components: LanguagesWin64; flags: replacesameversion;
 
+Source: "..\Translation\ExifToolGui.CHS";     DestDir: "{app}";   Components: LanguagesWin32; flags: replacesameversion;
 Source: "..\Translation\ExifToolGui.DEU";     DestDir: "{app}";   Components: LanguagesWin32; flags: replacesameversion;
 Source: "..\Translation\ExifToolGui.ENU";     DestDir: "{app}";   Components: LanguagesWin32; flags: replacesameversion;
 Source: "..\Translation\ExifToolGui.ESP";     DestDir: "{app}";   Components: LanguagesWin32; flags: replacesameversion;
