@@ -36,7 +36,8 @@ type
     CLFNumber: integer;
     CLFocal: integer;
     CLISO: integer;
-
+  // Filetype to use fast3 in filelist and metadata for. Not configurable in UI
+    Fast3FileTypes: string;
     ShowFolders: boolean;
     ShowHidden: boolean;
     EnableUnsupported: boolean;
@@ -46,6 +47,7 @@ type
     ShowBalloon: boolean;
     function CanShowHidden: boolean;
     function GetCustomConfig: string;
+    function Fast3(const FileExt: string): string;
   end;
 
   FListColUsrRec = record
@@ -203,6 +205,14 @@ begin
   result := '';
   if (ETCustomConfig <> '') then
     result := Format('-config "%s"', [ETCustomConfig]);
+end;
+
+function GUIsettingsRec.Fast3(const FileExt: string): string;
+begin
+  result := '';
+  if (Fast3FileTypes <> '') and
+     (Containstext(Fast3FileTypes, FileExt)) then
+    result := '-fast3' + CRLF;
 end;
 
 function SetQuickTag(const AIndex: integer; const ACaption, ACommand: string; const AHelp: string = ''): integer;
@@ -634,10 +644,13 @@ begin
         ETdirDefCmd := ReadInteger(Ini_Settings, 'ETdirDefCmd', -1);
         ETdirMode := ReadInteger(Ini_Settings, 'ETdirMode', 0);
         CmbETDirectMode.ItemIndex := GUIsettings.ETdirMode;
+
         // Colors of the Bar charts. Only editable in INI file
         TryStrToInt(ReadString(Ini_Settings, 'CLFnumber', '$C0DCC0'), CLFnumber);
         TryStrToInt(ReadString(Ini_Settings, 'CLFocal', '$FFDAB6'), CLFocal);
         TryStrToInt(ReadString(Ini_Settings, 'CLISO', '$D0D0D0'), CLISO);
+        // Fast3FileTypes. Used for filelist and metadata panel. Only editable in INI file
+        Fast3FileTypes := ReadString(Ini_Settings, 'Fast3FileTypes','*.GPX|*.KML');
 
         ShowFolders := ReadBool(Ini_Settings, 'ShowFolders', false);
         ShowHidden := ReadBool(Ini_Settings, 'ShowHidden', false);
@@ -851,6 +864,7 @@ begin
           WriteString(Ini_Settings, 'CLFnumber', '$' + IntToHex(CLFNumber, 8));
           WriteString(Ini_Settings, 'CLFocal', '$' + IntToHex(CLFocal, 8));
           WriteString(Ini_Settings, 'CLISO', '$' + IntToHex(CLISO, 8));
+          WriteString(Ini_Settings, 'Fast3FileTypes', Fast3FileTypes);
           WriteBool(Ini_Settings, 'ShowFolders', ShowFolders);
           WriteBool(Ini_Settings, 'ShowHidden', ShowHidden);
           WriteBool(Ini_Settings, 'EnableUnsupported', EnableUnsupported);

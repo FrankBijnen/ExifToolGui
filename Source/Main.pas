@@ -2949,7 +2949,7 @@ begin
           else
           begin
             if (GUIsettings.EnableUnsupported) then
-              ET_OpenExec(Fast3(ShellList.FileExt(Item.Index)) + CameraFields,
+              ET_OpenExec(GUIsettings.Fast3(ShellList.FileExt(Item.Index)) + CameraFields,
                           GetSelectedFile(ShellList.FileName(Item.Index)),
                           Details,
                           False)
@@ -2981,7 +2981,7 @@ begin
           begin
             if (GUIsettings.EnableUnsupported) then
             begin
-              ET_OpenExec(Fast3(ShellList.FileExt(Item.Index)) + LocationFields,
+              ET_OpenExec(GUIsettings.Fast3(ShellList.FileExt(Item.Index)) + LocationFields,
                           GetSelectedFile(ShellList.FileName(Item.Index)),
                           Details,
                           False);
@@ -3032,7 +3032,7 @@ begin
           else
           begin
             if (GUIsettings.EnableUnsupported) then
-              ET_OpenExec(Fast3(ShellList.FileExt(Item.Index)) + AboutFields,
+              ET_OpenExec(GUIsettings.Fast3(ShellList.FileExt(Item.Index)) + AboutFields,
                           GetSelectedFile(ShellList.FileName(Item.Index)),
                           Details,
                           False)
@@ -3045,7 +3045,7 @@ begin
           ETcmd := '-s3' + CRLF + '-f';
           for Indx := 0 to High(FListColUsr) do
             ETcmd := ETcmd + CRLF + FListColUsr[Indx].Command;
-          ET_OpenExec(Fast3(ShellList.FileExt(Item.Index)) + ETcmd,
+          ET_OpenExec(GUIsettings.Fast3(ShellList.FileExt(Item.Index)) + ETcmd,
                       GetSelectedFile(ShellList.FileName(Item.Index)),
                       Details,
                       False);
@@ -3306,7 +3306,7 @@ begin
     if SpeedBtnQuick.Down then
     begin
       N := Length(QuickTags) - 1;
-      ETcmd := Fast3(ShellList.FileExt) + '-s3' + CRLF + '-f';
+      ETcmd := GUIsettings.Fast3(ShellList.FileExt) + '-s3' + CRLF + '-f';
 
       for E := 0 to N do
       begin
@@ -3352,7 +3352,7 @@ begin
     end
     else
     begin
-      ETcmd := Fast3(ShellList.FileExt);
+      ETcmd := GUIsettings.Fast3(ShellList.FileExt);
       if MaGroup_g4.Checked then
         ETcmd := ETcmd + '-g4' + CRLF
       else
