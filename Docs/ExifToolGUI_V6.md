@@ -57,7 +57,7 @@ Basic idea behind GUI is, to keep it <u>simple!</u> Thus, only those options are
 <li>Optionally copy the stack trace to the clipboard in case of an exception. Available in the released executables, If you compile from source code the Project-JEDI/JCL is required.</li>
 <li>Better support for international characters. All internal code now uses Unicode (UTF16), to interface with Exiftool UTF8.</li>
 <li>Enhanced Log Window. The last 10 commands are shown, with their respective output and error. Option to replay the command in PowerShell/Cmd prompt.</li>
-<li>The external programs Jhead.exe and Jpegtran.exe are no longer needed. Rotation, and cropping, are handled in Delphi native code. With a modified library called NativeJpg by SimDesign B.V. (I tried contacting SimDesign to verify the Licence requirements, but was unable to.)</li>
+<li>The external programs Jhead.exe and Jpegtran.exe are no longer needed. Rotation, and cropping, are handled in Delphi native code. With a modified library called NativeJpg by SimDesign B.V. (I tried contacting SimDesign to verify the License requirements, but was unable to.)</li>
 <li>Exporting and Importing previews has been revised, and offer greater flexibility.</li>
 <li>GeoCoding has been enhanced. You can now choose from 2 providers (https://overpass-api.de and https://geocode.maps.co) and lookup City, Province and Country from GPS coordinates AKA reverse GeoCoding.</li>
 <li>Option added to show folders in the FileList panel.</li>
@@ -1010,7 +1010,7 @@ Marked tag name is shown in red color in any view (except in <font class="blue">
 
 <b>Show on map</b> button<br>
 If selected images are geo-tagged (contain GPS data), clicking this button will display their geo-position on the map.<br>
-Starting with version V6.3.1 you can also show tracklog on the map, if the selected files(s) contain track logs.<br><br>
+Starting with version V6.3.1 you can also show track logs on the map, if the selected files(s) contain(s) track logs.<br><br>
 <u>Notes:</u>
 <ul>
 <li>You can increase/decrease the font size used in the map by holding the CTRL key and using the mouse wheel.<br> </li>
@@ -1057,7 +1057,7 @@ Tries to get the location (City, Province and Country) from the currently select
 
 <b>Home</b> button<br>
 -Moves the map cursor to your predefined position.<br>
--Clears any track shown on the map.<br>
+-Clears any tracks shown on the map.<br>
 <br>
 
 <b>Set^</b> button<br>
