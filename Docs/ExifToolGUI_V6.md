@@ -77,6 +77,7 @@ Basic idea behind GUI is, to keep it <u>simple!</u> Thus, only those options are
 <li>Français</li>
 <li>Español</li>
 <li>Português</li>
+<li>Simplified Chinese</li>
 </ul>
 <li>Starting with V6.3.0 an installer is provided.</li>
 <li>Support for Exiftool features <u>geolocate</u> and <u>-api geolocation</u>.</li>
@@ -578,7 +579,7 @@ choose -important is, all log files must have the same extension.<br>
 <u>Step 4:</u> Choose <b>Reference DateTime value</b>.<br>
 Here you define which photo DateTime values to compare with those in log file.<br>
 <br>
-<u>Step 5:</u> Margin before or beyond Track. Use this if time of your images are not within 1800 secs of the track time.<br>
+<u>Step 5:</u> Margin before or beyond Track. Change this if the time of your images is not within 1800 secs (default) of the track time.<br>
 <u>Step 6:</u> Choose if <b>TimeZone offset</b> is needed to be taken into account.<br>
 This is a funny one... The thing is, log files contain UTC time, while 
 camera is usually set to local time (of where photo is taken). In most 
@@ -854,16 +855,16 @@ By clicking on <font class="blue">Edit predefined</font> button, panel increases
 <h3>Using args files</h3>
 <b>args</b> file is a text file, usually containing several ExifTool 
 commands, which are all executed by simple call of single args file. 
-Here's a example of args file, containing two commands, written by 
-Notepad:
-<pre>-Exif:Artist="My Name"
--Exif:Copyright="C2012 by My Name"
+Here's a example of args file, containing two commands, written by Notepad:
+<pre>-Exif:Artist=My Name
+-Exif:Copyright=C2024 by My Name
 </pre>
-Let's save this text as "MyData.args". <u>Note:</u> File must be saved in the same folder where exiftool.exe is saved (or specify the full path to the args file).<br>
+Let's save this text as "MyData.args".<br>
+<u>Note:</u> File must be saved in the same folder where exiftool.exe is saved (or specify the full path to the args file).<br>
 To execute above commands in GUI (after desired image files are selected), we need to write the following Command into <font class="blue">ExifTool direct</font> panel:<br>
-<pre>-@ MyData.args
-</pre>
--and press Enter key.<br>
+<pre>-@ MyData.args</pre> <br>
+<pre>-@ "c:\path to MyData\MyData.args"</pre>
+-and press Enter key.<br> (Enclose in " if path/filename contain spaces)
 <br>
 
 ExifTool full source version (can be downloaded on top of ExifTool main 
@@ -1008,7 +1009,13 @@ Marked tag name is shown in red color in any view (except in <font class="blue">
 <br>
 
 <b>Show on map</b> button<br>
-If selected images are geo-tagged (contain GPS data), clicking this button will display their geo-position on the map.<br><br>
+If selected images are geo-tagged (contain GPS data), clicking this button will display their geo-position on the map.<br>
+Starting with version V6.3.1 you can also show tracklog on the map, if the selected files(s) contain track logs.<br><br>
+<u>Notes:</u>
+<ul>
+<li>You can increase/decrease the font size used in the map by holding the CTRL key and using the mouse wheel.<br> </li>
+<li>If you setup both <font class="blue">Province and City</font> to <font class="blue">None</font> in the <font class="blue">Setup Geo</font> parameters only the filenames will be shown.<br> </li>
+</ul>
 <img src="ExifToolGUI_V6_files/osmmapshowonmap.jpg"><br>
 <br>
 
@@ -1049,7 +1056,8 @@ Tries to get the location (City, Province and Country) from the currently select
 <br>
 
 <b>Home</b> button<br>
--moves the map cursor to your predefined position.<br>
+-Moves the map cursor to your predefined position.<br>
+-Clears any track shown on the map.<br>
 <br>
 
 <b>Set^</b> button<br>
@@ -1095,7 +1103,7 @@ P.S.: Don't blame me for my English grammar -it's not my native language.<br>
 </em>
 <br>
 Frank<br>
-Modified on December, 2023<br>
+Modified on April, 2024<br>
 <br>
 
 <u>You may find additional info in the ReadMe files:</u>
@@ -1103,9 +1111,11 @@ Modified on December, 2023<br>
 <li><a href="ReadMe for Developers.txt">ReadMe for Developers</a></li>
 <li><a href="..\Source\Vcl.ShellControls\ReadMe.txt">ReadMe ShellControls</a></li>
 <li><a href="..\Source\NativeJpg\README.txt">ReadMe NativeJpg</a></li>
-<li><a href="..\Source\BeadcrumbBar\README.txt">ReadMe Breaddcrum Bar</a></li>
+<li><a href="..\Source\BreadcrumbBar\README.txt">ReadMe Breadcrumb Bar</a></li>
+<li><a href="..\Source\\Xml.VerySimple\readme">ReadMe XML verySimpler</a></li>
 <li><a href="ReadMe for Users.txt">ReadMe for Users</a></li>
 <li><a href="Readme GeoCoding.txt">Readme GeoCoding</a></li>
+<li><a href="Readme GeoCoding Getting started.txt">Readme GeoCoding Getting started</a></li>
 <li><a href="Readme Long filenames.txt">Readme Long filenames</a></li>
 <li><a href="Readme Lossless rotate_Import_Export previews.txt">Readme Lossless rotate_Import_Export previews</a></li>
 <li><a href="Readme Portable.txt">Readme Portable</a></li>

@@ -27,8 +27,6 @@ var
 
 implementation
 
-uses Vcl.Consts;
-
 {$R *.dfm}
 
 procedure TFrmPlaces.AddPlace2LV(PLace, Lat, Lon: string);

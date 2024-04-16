@@ -12,7 +12,7 @@ The 'Import Gps data from Log files' has been enhanced.
 - The selected Log files can be shown on the map, before executing the function. Use it to verify using the correct files.
 - The option -API GeoMaxExtSecs has been added, allowing for a greater margin between the timestamps in the log file and the timestamp of the images.
 
-YOu can also show a track on the map, by selecting on or more files in the Filelist and clicking 'Show on Map'.
+You can also show a track on the map, by selecting on or more files in the Filelist and clicking 'Show on Map'.
 
 Starting from V6.3.0 and Exiftool 12.78:
 Support for new ExifTool functions geolocate and -api geolocation.
