@@ -144,5 +144,8 @@ Changed with version 6.3.1
 - ExifToolGui is now officially licensed under GPL V3. Dont worry, it's free.  
 - More settings can now be saved and loaded like the Workspace settings. E.G. Exiftool Direct commands, Custom view and User defined fields. 
 - Geocoding enhancements. Searching for places, and reverse geocoding. See: Readme GeoCoding.txt for details.
+- Track logs can now be shown on the map, by selecting a track log in the filelist and clicking on 'Show on Map'.
+- To speed up processing '.GPX' and '.KML' files, they are processed by default with '-fast3'. To disable this behaviour find the line:
+  'Fast3FileTypes=*.GPX|*.KML' in ExifToolGuiV6.ini and change it to 'Fast3FileTypes='. Or change the list of extensions. 
 
 Frank
