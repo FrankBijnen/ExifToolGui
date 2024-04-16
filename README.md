@@ -3,16 +3,16 @@
 
 This is an updated version of the ExifToolGui program created by Bogdan Hrastnik. Many thanks go out to him.
 
-<b>Released version: <b>V6.3.0</b> updated March 16, 2024</b><br>
+<b>Released version: <b>V6.3.1</b> updated April 16, 2024</b><br>
 
-- Created an installer.<br>
-- Added version checks for ExifToolGui and ExifTool.<br>
-- Translations available. They still need verification. Help wanted!<br>
-- Fixed an annoying bug that prevented the OSM map from displaying.<br>
-- Added Option to specify a custom Exiftool config.<br>
-- Added Support for new ExifTool features geolocate and -api geolocation.<br>
-- Improved defaults for geocode providers.<br>
-- Style fixes for dark styles.<br>
+- License changed to GPL V3. With approval from Bogdan Hrastnik.<br>
+- Ability to export and import various definitions. E.G. Exiftool Direct commands, User defined fields, Custom view and Marked tags.<br>
+- Added support for Google Pixel Pro 7 in Filelist, Location Info.<br>
+- Allow multiple values in reverse geolocation.<br>
+- Improve searching for places.<br>
+- Display track logs on the map.<br>
+- Added language Simplified Chinese.<br>
+- Performance improvement for .GPX and .KML files by using -fast3 by default.<br>
 
 [Change log](Docs/changelog.txt)<br>
 [Download Release](https://github.com/FrankBijnen/ExifToolGui/releases/latest)<br>
