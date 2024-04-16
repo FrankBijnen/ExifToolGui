@@ -6,6 +6,9 @@
         <Projects Include="ExifToolGUI.dproj">
             <Dependencies/>
         </Projects>
+        <Projects Include="CheckCity.dproj">
+            <Dependencies/>
+        </Projects>
     </ItemGroup>
     <ProjectExtensions>
         <Borland.Personality>Default.Personality.12</Borland.Personality>
@@ -23,17 +26,32 @@
     <Target Name="ExifToolGUI:Make">
         <MSBuild Projects="ExifToolGUI.dproj" Targets="Make"/>
     </Target>
+    <Target Name="CheckCity">
+        <MSBuild Projects="CheckCity.dproj"/>
+    </Target>
+    <Target Name="CheckCity:Clean">
+        <MSBuild Projects="CheckCity.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="CheckCity:Make">
+        <MSBuild Projects="CheckCity.dproj" Targets="Make"/>
+    </Target>
     <Target Name="Build">
-        <CallTarget Targets="ExifToolGUI"/>
+        <CallTarget Targets="ExifToolGUI;CheckCity"/>
     </Target>
     <Target Name="Clean">
-        <CallTarget Targets="ExifToolGUI:Clean"/>
+        <CallTarget Targets="ExifToolGUI:Clean;CheckCity:Clean"/>
     </Target>
     <Target Name="Make">
-        <CallTarget Targets="ExifToolGUI:Make"/>
+        <CallTarget Targets="ExifToolGUI:Make;CheckCity:Make"/>
     </Target>
     <Import Project="$(BDS)\Bin\CodeGear.Group.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')"/>
     <ItemGroup Condition="'$(BuildGroup)'=='All'">
+        <BuildGroupProject Include="CheckCity.dproj">
+            <ProjectGuid>{8BC41078-8CA7-4E9D-9E04-0FC7BA8E658F}</ProjectGuid>
+            <Configurations>Debug</Configurations>
+            <Platforms>Win32</Platforms>
+            <Enabled>False</Enabled>
+        </BuildGroupProject>
         <BuildGroupProject Include="ExifToolGUI.dproj">
             <ProjectGuid>{0CEAEC4E-2D51-4DE8-AB15-379B3D181FC6}</ProjectGuid>
             <Configurations>Debug;Release</Configurations>

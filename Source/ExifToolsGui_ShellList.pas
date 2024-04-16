@@ -597,6 +597,7 @@ begin
 
   ICM2 := nil;
 
+  DoubleBuffered := true;
   FThumbNailSize := 0;
   FGenerating := 0;
   InitSortSpec(0, THeaderSortState.hssNone);

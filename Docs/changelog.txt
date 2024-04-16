@@ -92,3 +92,4 @@ Version:        Description             Issue
                 Fix Issue #364          Code review ExifInfo.
                 Fix Issue #374          Improve searching for places
                 Fix Issue #340          Feature Request: Display the imported gps file track on the map.
+                Fix Issue #388          Translation into Simplified Chinese

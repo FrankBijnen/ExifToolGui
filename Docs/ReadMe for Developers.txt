@@ -109,4 +109,25 @@ Added option to add custom ExifTool config
 Added geolocate -api geolocation features
 Dont throw error in Finalization. Causes memory leaks etc. Allow for 3 retries deleting temp dir
 
+Version 6.3.1
+
+- Reviewed code ExifInfo.pas.
+  Removed global variables.
+  Changed functions to become members of FotoRec. 
+  Added Xml.VerySimple to parse XMP.
+
+- Added code in Geomap.pas to show a track on the map. If trackpoints are written to 'ExifToolGUI.track' in the temp directory, it will be added.
+  The Exiftool feature '-geotag -v4' is used to parse the Lat, Lon values. 
+  See CreateTrkPoints in ExifToolsGui_Utils.pas.
+  Setup extensions to use with -fast3. (.gpx and .kml) To speed up processing large tracklogs. Not configurable in GUI, only in INI file.
+
+- Improved searching for places.
+  Uses Exiftool to get a list of languages and countries to populate the comboboxes.
+  Speed up Overpas api.
+
+- Added the option to combine multiple values for Cities and Province.
+
+- Simplified Chinese translation added. 
+
+
 Frank
