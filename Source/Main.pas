@@ -187,7 +187,7 @@ type
     MaMarkedSave: TAction;
     MaMarkedLoad: TAction;
     procedure ShellListClick(Sender: TObject);
-    procedure ShellListKeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
+    procedure ShellListKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
     procedure SpeedBtnExifClick(Sender: TObject);
     procedure CBoxDetailsChange(Sender: TObject);
     procedure ShellListAddItem(Sender: TObject; AFolder: TShellFolder; var CanAdd: boolean);
@@ -311,6 +311,7 @@ type
     procedure MaCustomViewSaveExecute(Sender: TObject);
     procedure MaMarkedLoadExecute(Sender: TObject);
     procedure MaMarkedSaveExecute(Sender: TObject);
+    procedure FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
   private
     { Private declarations }
     ETBarSeriesFocal: TBarSeries;
@@ -2500,6 +2501,20 @@ begin
   Geomap.ExecRestEvent := ExecRestEvent_Done;
 end;
 
+procedure TFMain.FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
+begin
+  if (ssCTRL in Shift) then
+  begin
+    case Key of
+      Ord('A'):
+      begin
+        ShellListKeyDown(Sender, Key, Shift);
+        Key := 0;
+      end;
+    end;
+  end;
+end;
+
 procedure TFMain.ShellListMouseWheel(Sender: TObject; Shift: TShiftState; WheelDelta: Integer; MousePos: TPoint; var Handled: Boolean);
 begin
   Handled := false;
@@ -3065,10 +3080,11 @@ end;
 //Remove focus rectangle
 procedure TFMain.ShellListEnter(Sender: TObject);
 begin
-  SendMessage(ShellList.Handle, WM_CHANGEUISTATE, UIS_Set + ($10000 * UISF_HIDEFOCUS), 0);
+// Keep for future use.
+//  SendMessage(ShellList.Handle, WM_CHANGEUISTATE, UIS_Set + ($10000 * UISF_HIDEFOCUS), 0);
 end;
 
-procedure TFMain.ShellListKeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
+procedure TFMain.ShellListKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
 
   procedure DeleteSelected;
   var
