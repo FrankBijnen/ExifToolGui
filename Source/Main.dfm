@@ -12,11 +12,13 @@ object FMain: TFMain
   Font.Height = -11
   Font.Name = 'Tahoma'
   Font.Style = []
+  KeyPreview = True
   Position = poDesigned
   OnAfterMonitorDpiChanged = FormAfterMonitorDpiChanged
   OnCanResize = FormCanResize
   OnClose = FormClose
   OnCreate = FormCreate
+  OnKeyDown = FormKeyDown
   OnShow = FormShow
   TextHeight = 13
   object Splitter1: TSplitter
@@ -164,7 +166,7 @@ object FMain: TFMain
     Top = 25
     Width = 320
     Height = 536
-    ActivePage = AdvTabOSMMap
+    ActivePage = AdvTabMetadata
     Align = alRight
     DoubleBuffered = True
     ParentDoubleBuffered = False
@@ -822,7 +824,7 @@ object FMain: TFMain
         ParentFont = False
         TabOrder = 2
         ViewStyle = vsReport
-        OnKeyUp = ShellListKeyUp
+        OnKeyDown = ShellListKeyDown
       end
       object PnlBreadCrumb: TPanel
         Left = 0

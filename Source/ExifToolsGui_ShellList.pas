@@ -731,7 +731,7 @@ begin
       State := hssNone;
     SetListHeaderSortState(Self, Columns[I], State);
   end;
-  Refresh;
+  ClearSelectionRefresh;
 end;
 
 procedure TShellListView.SetColumnSorted(AValue: boolean);
