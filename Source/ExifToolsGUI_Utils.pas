@@ -71,7 +71,6 @@ procedure StyledDrawListviewItem(FstyleServices: TCustomStyleServices;
                                  Item: TlistItem;
                                  State: TCustomDrawState);
 
-
 // GeoCoding
 function CreateTrkPoints(const LogPath: string; FirstGpx: boolean; var LastCoord: string): integer;
 function GetGpsCoordinates(const Images: string): string;
@@ -828,7 +827,8 @@ procedure StyledDrawListviewItem(FstyleServices: TCustomStyleServices;
                                  Item: TlistItem;
                                  State: TCustomDrawState);
 begin
-  if (Item.Selected) then
+  if Assigned(FStyleServices) and
+     (Item.Selected) then
   begin
     ListView.Canvas.Font.Color := FStyleServices.GetStyleFontColor(TStyleFont.sfGridItemSelected);
     if ([cdsSelected, cdsFocused, cdsHot] * State <> []) then
