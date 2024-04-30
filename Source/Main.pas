@@ -312,6 +312,7 @@ type
     procedure MaMarkedLoadExecute(Sender: TObject);
     procedure MaMarkedSaveExecute(Sender: TObject);
     procedure FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
+    procedure ShellTreeKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
   private
     { Private declarations }
     ETBarSeriesFocal: TBarSeries;
@@ -354,7 +355,6 @@ type
     procedure ShellListOwnerDataFetch(Sender: TObject; Item: TListItem; Request: TItemRequest; AFolder: TShellFolder);
     procedure ShellListColumnResized(Sender: TObject);
     procedure ShellListMouseWheel(Sender: TObject; Shift: TShiftState; WheelDelta: Integer; MousePos: TPoint; var Handled: Boolean);
-
     procedure CounterETEvent(Counter: integer);
   public
     { Public declarations }
@@ -1332,7 +1332,7 @@ begin
       end;
       if OpenPictureDlg.Execute then
       begin
-        ETcmd := '-TagsFromFile' + CRLF + ExtractFilePath(OpenPictureDlg.FileName); // incl. slash
+        ETcmd := '-TagsFromFile' + CRLF + ExtractFileDir(OpenPictureDlg.FileName); // incl. slash
         if I = mrYes then
           ETcmd := ETcmd + '%d\';
         ETcmd := ETcmd + '%f' + ExtractFileExt(OpenPictureDlg.FileName);
@@ -3245,6 +3245,16 @@ procedure TFMain.ShellTreeCustomDrawItem(Sender: TCustomTreeView; Node: TTreeNod
 begin
   if (Node.Selected ) then
     Sender.Canvas.Font.Style := Sender.Canvas.Font.Style + [fsBold];
+end;
+
+procedure TFMain.ShellTreeKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
+begin
+  if (ssCtrl in Shift) and (Key = Ord('C')) then
+    ShellTree.FileNamesToClipboard(false);
+  if (ssCtrl in Shift) and (Key = Ord('X')) then
+    ShellTree.FileNamesToClipboard(true);
+  if (ssCtrl in Shift) and (Key = Ord('V')) then
+    ShellTree.PasteFilesFromClipboard;
 end;
 
 procedure TFMain.RefreshSelected(Sender: TObject);

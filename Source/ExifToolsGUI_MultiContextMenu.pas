@@ -10,7 +10,8 @@ uses System.Classes, System.Win.Comobj, System.Sysutils,
 
 // Do not localize.
 // Localized strings are found in UnitLangResources
-
+const IdCmdFirst            = 1;
+      IdCmdLast             = $7fff;
 const SCmdVerbRefresh       = 'Refresh';
       IDVerbRefresh         = $8000;
 const SCmdVerbGenThumbs     = 'Generate Thumbnails';
@@ -19,9 +20,10 @@ const SCmdVerbGenThumbsSub  = 'Generate Thumbnails (Incl Subdirs)';
       IDVerbGenThumbsSub    = $8002;
 
 type
-  IShellCommandVerbExifTool = interface
+    IShellCommandVerbExifTool = interface
     ['{E45EF43F-909E-40F9-A59E-C3FCAC3C9E4B}']
     procedure ExecuteCommandExif(Verb: string; var Handled: boolean);
+    procedure CommandCompletedExif(Verb: string; Succeeded: boolean);
   end;
 
 procedure DoContextMenuVerb(AFolder: TShellFolder; Verb: PAnsiChar);
@@ -51,6 +53,7 @@ var
   HR: HResult;
   ItemIDListArray: array of PItemIDList;
   Index: integer;
+
 begin
   if (AFolder.ShellFolder = nil) then
     exit;
@@ -74,7 +77,7 @@ begin
   Winapi.Windows.ClientToScreen(Owner.Handle, MousePos);
   Menu := CreatePopupMenu;
   try
-    CM.QueryContextMenu(Menu, 0, 1, $7FFF, CMF_EXPLORE or CMF_CANRENAME);
+    CM.QueryContextMenu(Menu, 0, IdCmdFirst, IdCmdLast, CMF_EXPLORE or CMF_CANRENAME);
     CM.QueryInterface(IID_IContextMenu2, ICM2); // To handle submenus. Note: See WndProc of ShellTree and ShellList
 
     // Add Custom items on top
@@ -94,10 +97,10 @@ begin
 
     if Command then
     begin
-      ICmd := LongInt(Command) - 1;
+      ICmd := LongInt(Command) - IdCmdFirst;
       HR := 0;
       case Word(ICmd) of
-        0..$7fff:           // Standard 'Explorer like'
+        0..IdCmdLast:    // Standard 'Explorer like'
           begin
             HR := CM.GetCommandString(ICmd, GCS_VERBA, nil, ZVerb, SizeOf(ZVerb));
             Verb := string(ZVerb);
@@ -140,6 +143,9 @@ begin
 
       if Assigned(SCV) then
         SCV.CommandCompleted(Verb, HR = S_OK);
+
+      if Assigned(SCVEXIF) then
+        SCVEXIF.CommandCompletedExif(Verb, HR = S_OK);
     end;
   finally
     DestroyMenu(Menu);

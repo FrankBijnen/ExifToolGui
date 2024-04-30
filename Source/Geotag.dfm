@@ -3,8 +3,8 @@ object FGeotag: TFGeotag
   Top = 0
   BorderStyle = bsDialog
   Caption = 'Import GPS data'
-  ClientHeight = 360
-  ClientWidth = 669
+  ClientHeight = 359
+  ClientWidth = 665
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -22,19 +22,19 @@ object FGeotag: TFGeotag
   end
   object StatusBar1: TStatusBar
     Left = 0
-    Top = 341
-    Width = 669
+    Top = 340
+    Width = 665
     Height = 19
     Panels = <>
     SimplePanel = True
-    ExplicitTop = 340
-    ExplicitWidth = 665
+    ExplicitTop = 339
+    ExplicitWidth = 661
   end
   object AdvPanel1: TPanel
     Left = 0
     Top = 0
     Width = 549
-    Height = 341
+    Height = 340
     Align = alLeft
     DoubleBuffered = True
     Font.Charset = DEFAULT_CHARSET
@@ -45,7 +45,7 @@ object FGeotag: TFGeotag
     ParentDoubleBuffered = False
     ParentFont = False
     TabOrder = 1
-    ExplicitHeight = 340
+    ExplicitHeight = 339
     object Label2: TLabel
       Left = 25
       Top = 201
@@ -160,7 +160,7 @@ object FGeotag: TFGeotag
       EditLabel.Height = 14
       EditLabel.Caption = 'Margin before or beyond Track. (Seconds) (-Api GeoMaxExtSecs)'
       TabOrder = 8
-      Text = '1.800'
+      Text = '1800'
     end
     object UdMargin: TUpDown
       Left = 78
@@ -171,6 +171,7 @@ object FGeotag: TFGeotag
       Max = 86400
       Position = 1800
       TabOrder = 9
+      Thousands = False
     end
   end
   object Button1: TButton

@@ -132,6 +132,7 @@ object FMain: TFMain
           RightClickSelect = True
           ShowRoot = False
           TabOrder = 0
+          OnKeyDown = ShellTreeKeyDown
           OnChanging = ShellTreeChanging
           ExplicitHeight = 280
         end
@@ -283,6 +284,7 @@ object FMain: TFMain
         Font.Style = []
         ParentFont = False
         TabOrder = 1
+        ExplicitTop = 401
         DesignSize = (
           312
           106)
@@ -372,6 +374,7 @@ object FMain: TFMain
         OnMouseDown = MetadataListMouseDown
         OnMouseMove = MetadataListMouseMove
         OnSelectCell = MetadataListSelectCell
+        ExplicitHeight = 344
         ColWidths = (
           150
           160)
@@ -477,7 +480,6 @@ object FMain: TFMain
         Font.Style = []
         ParentFont = False
         TabOrder = 1
-        ExplicitTop = 475
         object SpeedBtn_Geotag: TSpeedButton
           AlignWithMargins = True
           Left = 1
@@ -528,7 +530,6 @@ object FMain: TFMain
         OnNavigationStarting = EdgeBrowser1NavigationStarting
         OnWebMessageReceived = EdgeBrowser1WebMessageReceived
         OnZoomFactorChanged = EdgeBrowser1ZoomFactorChanged
-        ExplicitHeight = 418
       end
     end
   end
