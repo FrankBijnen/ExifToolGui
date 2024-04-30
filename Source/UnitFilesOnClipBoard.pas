@@ -10,12 +10,14 @@ unit UnitFilesOnClipBoard;
 interface
 
 uses
-  Winapi.Windows, System.Classes, System.SysUtils, Winapi.ActiveX;
+  Winapi.Windows, System.Classes, System.SysUtils, Winapi.ActiveX,
+  Vcl.Shell.ShellCtrls,
+  ExifToolsGui_ShellTree;
 
 
 procedure SetFileNamesOnClipboard(const FileNames: TStrings; Cut: boolean = false);
 function GetFileNamesFromClipboard(const FileNames: TStrings; var Cut: boolean): boolean;
-procedure PasteFilesFromClipBoard(FileList: TStrings; TargetDir: string; Cut: boolean = false);
+procedure PasteFilesFromClipBoard(const ShellTree: TCustomShellTreeView; FileList: TStrings; TargetDir: string; Cut: boolean = false);
 
 implementation
 
@@ -376,7 +378,7 @@ begin
   end;
 end;
 
-procedure PasteFilesFromClipBoard(FileList: TStrings; TargetDir: string; Cut: boolean = false);
+procedure PasteFilesFromClipBoard(const ShellTree: TCustomShellTreeView; FileList: TStrings; TargetDir: string; Cut: boolean = false);
 var
   AFile: string;
   TargetFile: string;
@@ -392,9 +394,13 @@ begin
   try
     for AFile in FileList do
     begin
-      // No directories alllowed
+      // Let SHFileOperation handle directories
       if (DirectoryExists(AFile, false)) then
+      begin
+        if not PasteDirectory(AFile, TargetDir, Cut) then
+          raise Exception.Create(Format(StrOverwriteSFailed, [AFile]));
         continue;
+      end;
 
       // Dont copy to same directory.
       TargetFile := IncludeTrailingPathDelimiter(TargetDir) + ExtractFileName(AFile);
@@ -437,6 +443,17 @@ begin
         Succes := CopyFile(PWideChar(AFile), PWideChar(TargetFile), false);
       if not Succes then
         raise Exception.Create(Format(StrOverwriteSFailed, [AFile]));
+    end;
+
+    // Refresh Treeview
+    if (Assigned(ShellTree)) and
+       (ShellTree is ExifToolsGui_ShellTree.TShellTreeView) then
+    with ExifToolsGui_ShellTree.TShellTreeView(ShellTree) do
+    begin
+      SetPaths2Refresh;
+      RefreshAfterPaste;
+      if Assigned(Selected) then
+        Refresh(Selected);
     end;
   finally
     SetCursor(CrNormal);

@@ -55,7 +55,7 @@ uses Main, MainDef, ExifTool, ExifToolsGUI_Utils, UFrmGeoSetup, Geomap, UnitLang
 function TFGeotag.LogPath: string;
 begin
   if CheckBox1.Checked then
-    result := ExtractFilePath(LabeledEdit1.Text) + '*' + ExtractFileExt(LabeledEdit1.Text)
+    result := ExtractFileDir(LabeledEdit1.Text) + '*' + ExtractFileExt(LabeledEdit1.Text)
   else
     result := LabeledEdit1.Text;
 end;
@@ -192,7 +192,7 @@ begin
   if FMain.OpenPictureDlg.Execute then
   begin
     LabeledEdit1.Text := FMain.OpenPictureDlg.FileName;
-    GpsXmpDir := ExtractFilePath(FMain.OpenPictureDlg.FileName);
+    GpsXmpDir := ExtractFileDir(FMain.OpenPictureDlg.FileName);
     GpsXmpDir := IncludeTrailingPathDelimiter(GpsXmpDir);
     Button2.Enabled := true;
     BtnOnMap.Enabled := GUIsettings.EnableGMap;

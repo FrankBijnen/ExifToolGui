@@ -54,6 +54,7 @@ type
 function GetThumbCache(APIdl: PItemIDList; var hBmp: HBITMAP; Flags: TSIIGBF; AMaxX: longint; AMaxY: longint): HRESULT; overload;
 function GetThumbCache(APath: string; var hBmp: HBITMAP; Flags: TSIIGBF; AMaxX: longint; AMaxY: longint): HRESULT; overload;
 procedure GenerateThumbs(AFilePath: string; Subdirs: boolean; AMax: longint; FOnReady: TNotifyEvent = nil);
+function GetPidlFromName(const Name: string): PItemIDList;
 
 // Functions for CleanMgr.exe
 procedure ResetPool(var AThreadPool: TThreadPool; const Threads: integer = -1);
@@ -67,13 +68,6 @@ uses Winapi.ShellAPI, System.Win.Registry, System.UITypes, System.Win.ComObj,
 
 var
   FThreadPool: TThreadPool;
-
-function GetPidlFromName(const Name: string): PItemIDList;
-begin
-  Result := ILCreateFromPath(PChar(Name));
-  if not Assigned(Result) then
-    RaiseLastOSError;
-end;
 
   // TThumbTask. Generates Thumbnail in a separate thread.
 
@@ -209,6 +203,13 @@ begin
     S.cy := AMaxY;
     result := FileShellItemImage.GetImage(S, Flags, hBmp);
   end;
+end;
+
+function GetPidlFromName(const Name: string): PItemIDList;
+begin
+  Result := ILCreateFromPath(PChar(Name));
+  if not Assigned(Result) then
+    RaiseLastOSError;
 end;
 
 function GetThumbCache(APath: string; var hBmp: HBITMAP; Flags: TSIIGBF; AMaxX: longint; AMaxY: longint): HRESULT;

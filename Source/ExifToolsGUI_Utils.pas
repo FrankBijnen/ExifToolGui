@@ -41,6 +41,7 @@ function GetPreviewTmp: string;
 function GetEdgeUserData: string;
 function GetNrOfFiles(StartDir, FileMask: string; subDir: boolean): integer;
 function GetComSpec: string;
+function PasteDirectory(ADir, TargetDir: string; Cut: boolean = false): boolean;
 
 // Swap
 procedure Swap(var A, B: Cardinal);
@@ -323,6 +324,29 @@ begin
 
   if (ShResult <> 0) and (ShOp.fAnyOperationsAborted = false) then
     MessageDlgEx(Format(StrRemDirectoryFail, [ShResult]), '', TMsgDlgType.mtError, [TMsgDlgBtn.mbClose], true);
+  result := (ShResult = 0);
+end;
+
+function PasteDirectory(ADir, TargetDir: string; Cut: boolean = false): boolean;
+var
+  ShOp: TSHFileOpStruct;
+  ShResult: integer;
+begin
+  result := false;
+  if not(DirectoryExists(ADir)) then
+    exit;
+
+  FillChar(ShOp, SizeOf(ShOp), 0);
+  ShOp.Wnd := Application.Handle;
+  if (Cut) then
+    ShOp.wFunc := FO_MOVE
+  else
+    ShOp.wFunc := FO_COPY;
+  ShOp.pFrom := PChar(ADir + #0);
+  ShOp.pTo := PChar(TargetDir + #0);
+  ShOp.fFlags := FOF_NO_UI;
+  ShResult := SHFileOperation(ShOp);
+
   result := (ShResult = 0);
 end;
 

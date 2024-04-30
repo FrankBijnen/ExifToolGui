@@ -4,7 +4,7 @@ interface
 
 uses
   System.Classes, System.SysUtils, System.Types, System.Threading,
-  Winapi.Windows, Winapi.Messages, Winapi.ShlObj,
+  Winapi.Windows, Winapi.Messages, Winapi.CommCtrl, Winapi.ShlObj,
   Vcl.Shell.ShellCtrls, Vcl.Shell.ShellConsts, Vcl.ComCtrls, Vcl.Menus, Vcl.Controls,
   ExifToolsGUI_Thumbnails, ExifToolsGUI_MultiContextMenu;
 
@@ -72,6 +72,7 @@ type
     procedure EnumColumns; override;
     procedure GetThumbNails; virtual;
     procedure DoContextPopup(MousePos: TPoint; var Handled: boolean); override;
+    procedure Edit(const Item: TLVItem); override;
     procedure Populate; override;
     function OwnerDataFetch(Item: TListItem; Request: TItemRequest): boolean; override;
     procedure Add2ThumbNails(ABmp: HBITMAP; ANitemIndex: integer; NeedsGenerating: boolean);
@@ -93,6 +94,7 @@ type
     procedure FileNamesToClipboard(Cut: boolean = false);
     procedure PasteFilesFromClipboard;
     procedure ExecuteCommandExif(Verb: string; var Handled: boolean);
+    procedure CommandCompletedExif(Verb: String; Succeeded: Boolean);
     procedure ShellListOnGenerateReady(Sender: TObject);
     function GetIconSpacing: dword;
     procedure SetIconSpacing(Cx, Cy: word); overload;
@@ -108,6 +110,7 @@ type
     property OnThumbError: TThumbErrorEvent read FOnNotifyErrorEvent write FOnNotifyErrorEvent;
     property OnThumbGenerate: TThumbGenerateEvent read FOnNotifyGenerateEvent write FOnNotifyGenerateEvent;
     property Generating: integer read FGenerating;
+    property OnEdited;
     property OnPopulateBeforeEvent: TPopulateBeforeEvent read FOnPopulateBeforeEvent write FOnPopulateBeforeEvent;
     property OnEnumColumnsAfterEvent: TNotifyEvent read FOnEnumColumnsAfterEvent write FOnEnumColumnsAfterEvent;
     property OnPathChange: TNotifyEvent read FOnPathChange write FOnPathChange;
@@ -120,7 +123,7 @@ type
 implementation
 
 uses System.Win.ComObj, System.UITypes,
-     Winapi.CommCtrl, Vcl.Graphics, ExifToolsGUI_Utils,
+     Vcl.Graphics, ExifToolsGUI_Utils,
      UnitFilesOnClipBoard;
 
 // res file contains the ?
@@ -272,7 +275,7 @@ begin
     if not GetFileNamesFromClipboard(FileList, Cut) then
       exit;
 
-    UnitFilesOnClipBoard.PasteFilesFromClipBoard(FileList, RootFolder.PathName, Cut);
+    UnitFilesOnClipBoard.PasteFilesFromClipBoard(ShellTreeView, FileList, RootFolder.PathName, Cut);
   finally
     FileList.Free;
     Refresh;
@@ -281,23 +284,32 @@ end;
 
 procedure TShellListView.ExecuteCommandExif(Verb: string; var Handled: boolean);
 begin
+
   if (Verb = SCmdVerbRefresh) then
   begin
     Refresh;
     Handled := true;
   end;
-  if (Verb = SCmdVerbGenThumbs) then
+
+  if SameText(Verb, SCmdVerbGenThumbs) then
   begin
     GenerateThumbs(RootFolder.PathName, false, ThumbNailSize, ShellListOnGenerateReady);
     Handled := true;
   end;
-  if (Verb = SCmdVerbGenThumbsSub) then
+
+  if SameText(Verb, SCmdVerbGenThumbsSub) then
   begin
     GenerateThumbs(RootFolder.PathName, true, ThumbNailSize, ShellListOnGenerateReady);
     Handled := true;
   end;
-  if (Verb = SCmdVerbRename) then
+
+  if SameText(Verb, SCmdVerbRename) then
     FRefreshAfterContext := false;
+end;
+
+procedure TShellListView.CommandCompletedExif(Verb: String; Succeeded: Boolean);
+begin
+{}
 end;
 
 procedure TShellListView.ShowMultiContextMenu(MousePos: TPoint);
@@ -310,7 +322,12 @@ begin
   finally
     FileList.Free;
     if FRefreshAfterContext then
-      Refresh;
+    begin
+      ClearSelectionRefresh;
+      if (Assigned(ShellTreeView)) and
+         (Assigned(ShellTreeView.Selected)) then
+        ShellTreeView.Refresh(ShellTreeView.Selected);
+    end;
   end;
 end;
 
@@ -485,6 +502,16 @@ begin
 //  inherited;
 end;
 
+procedure TShellListView.Edit(const Item: TLVItem);
+begin
+  inherited Edit(Item);
+
+  if Assigned(ShellTreeView) and
+     Assigned(ShellTreeView.Selected) and
+     Folders[Item.iItem].IsFolder then
+    ShellTreeView.Refresh(ShellTreeView.Selected);
+end;
+
 procedure TShellListView.Populate;
 begin
   // Prevent flicker by skipping populate when not yet needed.
@@ -650,7 +677,7 @@ begin
   try
     if (ItemIndex >= 0) then
     begin
-      dec(FGenerating);
+      Dec(FGenerating);
       for Indx := 0 to FThumbTasks.Count - 1 do
       begin
         if (TThumbTask(FThumbTasks[Indx]).ItemIndex = ItemIndex) then
