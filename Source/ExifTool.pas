@@ -21,15 +21,18 @@ type
     ETVerbose: integer;
     ETAPIWindowsWideFile: string;
     ETAPILargeFileSupport: string;
+    ETGeoDir: string;
     ETCustomOptions: string;
     procedure SetGpsFormat(UseDecimal: boolean);
     procedure SetVerbose(Level: integer);
     procedure SetApiWindowsWideFile(UseWide: boolean);
     procedure SetApiLargeFileSupport(UseLarge: boolean);
+    procedure SetGeoDir(GeoDir: string);
     procedure SetCustomOptions(Custom: string);
     procedure SetSeparator(const Sep: string);
 
     function GetVerbose: integer;
+    function GetGeoDir: string;
     function GetCustomOptions: string;
     function GetOptions(Charset: boolean = true): string;
     function GetSeparator: string;
@@ -50,6 +53,7 @@ var
     ETShowNumber: '';                             // or '-n'+CRLF
     ETCharset: '-CHARSET' + CRLF + 'FILENAME=UTF8' + CRLF + '-CHARSET' + CRLF + 'UTF8'; // UTF8 it is. No choice
     ETVerbose: 0;                                 // For file counter
+    ETGeoDir: '';                                 // Alternate GeoLocation Database
     ETCustomOptions: '');                         // or -u + CRLF Unknown Tags
 
 function ETWorkDir: string;
@@ -114,6 +118,14 @@ begin
     ETAPILargeFileSupport := '';
 end;
 
+procedure ET_OptionsRec.SetGeoDir(GeoDir: string);
+begin
+  if (GeoDir <> '') then
+    ETGeoDir := '-API' + CRLF + 'GeoDir=' + GeoDir + CRLF
+  else
+    ETGeoDir := '';
+end;
+
 procedure ET_OptionsRec.SetCustomOptions(Custom: string);
 begin
   ETCustomOptions := Custom;
@@ -127,6 +139,11 @@ end;
 function ET_OptionsRec.GetCustomOptions: string;
 begin
   result := EndsWithCRLF(ArgsFromDirectCmd(ETCustomOptions));
+end;
+
+function ET_OptionsRec.GetGeoDir: string;
+begin
+  result := ETGeoDir;
 end;
 
 function ET_OptionsRec.GetOptions(Charset: boolean = true): string;
@@ -143,6 +160,7 @@ begin
   result := result + ETGpsFormat + ETShowNumber;
   result := result + ETAPIWindowsWideFile;
   result := result + ETAPILargeFileSupport;
+  result := result + GetGeoDir;
   result := result + GetCustomOptions;
   // +further options...
 end;
@@ -497,6 +515,8 @@ begin
   FETWorkDir := '';
   EtOutPipe := nil;
   EtErrPipe := nil;
+  if (DirectoryExists(GetGeoPath)) then
+    ET_Options.SetGeoDir(GetGeoPath);
 end;
 
 finalization

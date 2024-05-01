@@ -46,6 +46,9 @@
 #define DownloadExifToolAutoOBETZ DownloadExifToolAuto + BackSlash+ TaskOBETZ
 #define ByPhilHarvey "By Phil Harvey (" + PHUrl + ")"
 #define ByOliverBetz "By Oliver Betz (" + OBetzUrl + ")"
+#define DownloadGeoDB "DownloadGeoDB" 
+#define DownloadGeoDBDesc "Download alternate (larger) GeoLocation database."
+#define GeoLocationDir "Geolocation500"
 
 [Setup]
 AppPublisher={#ExifToolGUIPublisher}
@@ -76,7 +79,7 @@ WizardSmallImageFile=ExifToolGUI.Bmp
 DisableProgramGroupPage=yes
 LicenseFile=License.rtf
 ; Will be overriden
-InfoAfterFile=InfoComplete.rtf
+InfoAfterFile=InfoDownload.rtf
 
 [Messages]
 FinishedHeadingLabel=[name] has been installed. Exiftool will be installed using the Oliver Betz installer.
@@ -108,6 +111,9 @@ Name: {#DownloadExifToolAutoPH};        Description: "{#ByPhilHarvey}"; \
 Name: {#DownloadExifToolAutoOBETZ};     Description: "{#ByOliverBetz}"; \
                                           GroupDescription: "Download and install ExifTool:"; Flags: {#Exclusive} unchecked;  Check: EnableAutoDownload or EnableAutoDownloadOBetz;
 
+Name: {#DownloadGeoDB};                 Description: "{#DownloadGeoDBDesc}";  \
+                                          GroupDescription: "Optional downloads"; \
+                                                                                              Flags: unchecked;
 [Files]
 ; Executable
 Source: "Win32\ExifToolGui.exe";        DestDir: "{app}"; Components: ExecutableWin32;        flags: replacesameversion;
@@ -144,6 +150,7 @@ Source: "..\Translation\ExifToolGui.PTB";     DestDir: "{app}";   Components: La
 Source: "{tmp}\exiftool_version.txt";   DestDir: "{app}";                                     flags: external skipifsourcedoesntexist replacesameversion;
 Source: "{tmp}\exiftool.exe";           DestDir: "{app}";                                     flags: external skipifsourcedoesntexist replacesameversion;
 Source: "{code:OBetzInstaller|{tmp}}";  DestDir: "{app}";                                     flags: external skipifsourcedoesntexist replacesameversion;
+Source: "{tmp}\{#GeolocationDir}\*";    DestDir: "{app}\{#GeolocationDir}";                   flags: external skipifsourcedoesntexist replacesameversion recursesubdirs;
 
 [Icons]
 Name: "{group}\{#ExifToolGUI}";         Filename: "{app}\{#ExifToolGUIExeName}"
@@ -162,6 +169,8 @@ var
   ETVerPH: AnsiString;
   ETVerOBetz: AnsiString;
   ETFile: AnsiString;
+  AlternateDBVer: AnsiString;
+  DBFile: AnsiString;
 
   ISCustomPage1: TWizardPage;
   RichEditViewer1: TRichEditViewer;
@@ -175,7 +184,7 @@ const
   CURVER_TXT                = 'curver.txt';
   CURVER_UNAVAIL            = 'Unavail';
   AVAILVER_ERROR            = 'Error';
-
+ 
   // Constants for OBetz installer
   OBETZURL                  = '{#OBetzUrl}';
   OBETZVER                  = 'exiftool_latest_version.txt';
@@ -188,6 +197,7 @@ const
   EXE                       = '.exe';
   ET_K                      = 'exiftool(-k)';
   ET                        = 'exiftool';
+  GEODBVER                  = 'geo.txt';
 
 function GetInstalledVersionInPath(const Path: string): AnsiString;
 var
@@ -343,6 +353,11 @@ begin
   result := (WizardIsTaskSelected(ExpandConstant('{#DownloadExifToolAutoPH}')));
 end;
 
+function AltDbSelected: boolean;
+begin
+  result := (WizardIsTaskSelected(ExpandConstant('{#DownloadGeoDB}')));
+end;
+
 // 1 param seems to be mandatory
 function DefaultDir(Param: string): string;
 begin
@@ -390,6 +405,12 @@ begin
         ETVerOBetz := GetCurrentVersion(OBETZURL + OBETZVER);
       WizardForm.TasksList.ItemCaption[I] := WizardForm.TasksList.ItemCaption[I] + ' Available: ' + ConvertToString(ETVerOBetz);
     end;
+    if (WizardForm.TasksList.ItemCaption[I] = ExpandConstant('{#DownloadGeoDBDesc}')) then
+    begin
+      if (AlternateDBVer = '') then
+        AlternateDBVer := GetCurrentVersion(PHURL + GEODBVER);
+      WizardForm.TasksList.ItemCaption[I] := WizardForm.TasksList.ItemCaption[I] + ' Available: ' + AlternateDBVer;
+    end;
   end;
 end;
 
@@ -414,25 +435,24 @@ begin
   CURver := '';
   ETVerPH := '';
   ETVerOBetz := '';
+  AlternateDBVer := '';
 
   WizardForm.TasksList.OnClickCheck := @TaskOnClick;
 end;
 
 procedure SetupRichText;
+var RTFText: string;
+    GeoDir: string;
 begin
-  if (PHSelected or OBetzSelected) then
-    RichEditViewer1.RTFText := // InfoNoDownload.rtf
-      '{\rtf1\ansi\ansicpg1252\deff0\nouicompat\deflang1033{\fonttbl{\f0\fnil\fcharset0 Calibri;}}' + #13 + #10 +
+  // RTF Header
+  RTFText := 
+      '{\rtf1\ansi\ansicpg1252\deff0\nouicompat\deflang1033{\fonttbl{\f0\fnil\fcharset0 Calibri;}{\f1\fnil\fcharset0 Courier New;}}' + #13 + #10 +
       '{\colortbl ;\red0\green0\blue255;}' + #13 + #10 +
-      '{\*\generator Riched20 10.0.19041}\viewkind4\uc1 ' + #13 + #10 +
-      '\pard\sl276\slmult1\f0\fs22\lang9 If you wish to see thumbnails of raw image files, you will need to install a codec adapted for the RAW files you use. FastPictureViewer provides free codecs for personal use: \tab {{\field{\*\fldinst{HYPERLINK https://www.fastpictureviewer.com/codecs/ }}{\fldrslt{https://www.fastpictureviewer.com/codecs/\ul0\cf0}}}}\f0\fs22\par' + #13 + #10 +
-      '}' + #13 + #10
-  else
-    RichEditViewer1.RTFText := //InfoComplete.rtf
-      '{\rtf1\ansi\ansicpg1252\deff0\nouicompat\deflang1033{\fonttbl{\f0\fnil\fcharset0 Calibri;}}' + #13 + #10 +
-      '{\colortbl ;\red0\green0\blue255;}' + #13 + #10 +
-      '{\*\generator Riched20 10.0.19041}\viewkind4\uc1 ' + #13 + #10 +
-      '\pard\sl240\slmult1\f0\fs22\lang9 You can download ExifTool here:\par' + #13 + #10
+      '{\*\generator Riched20 10.0.19041}\viewkind4\uc1 ' + #13 + #10; 
+
+  if (PHSelected = false) and (OBetzSelected = false) then
+    RTFText := RTFText + //InfoDownload.rtf
+      '\pard\b\sl240\slmult1\f0\fs22\lang9 You can download ExifTool here: \b0\par' + #13 + #10
       + #13 + #10
       '\pard{\pntext\f1\''B7\tab}{\*\pn\pnlvlblt\pnf1\pnindent0{\pntxtb\''B7}}\fi-360\li720\sl276\slmult1 The original version by Phil Harvey: \par' + #13 + #10 +
       + #13 + #10
@@ -441,10 +461,31 @@ begin
       '\pard{\pntext\f1\''B7\tab}{\*\pn\pnlvlblt\pnf1\pnindent0{\pntxtb\''B7}}\fi-360\li720\sl276\slmult1 An installer provider by Oliver Betz:\par' + #13 + #10 +
       + #13 + #10
       '\pard\sl276\slmult1\tab {{\field{\*\fldinst{HYPERLINK https://oliverbetz.de/pages/Artikel/ExifTool-for-Windows }}{\fldrslt{https://oliverbetz.de/pages/Artikel/ExifTool-for-Windows\ul0\cf0}}}}\f0\fs22\par' + #13 + #10 +
-      + #13 + #10 +
-      '\pard\sl276\slmult1\par' + #13 + #10 +
-      'To enable thumbnails of RAW image files, you will need to install a codec adapted for the RAW files you use. FastPictureViewer provides free codecs for personal use: \tab {{\field{\*\fldinst{HYPERLINK https://www.fastpictureviewer.com/codecs/ }}{\fldrslt{https://www.fastpictureviewer.com/codecs/\ul0\cf0}}}}\f0\fs22\par' + #13 + #10 +
-      '}' + #13 + #10;
+      '\par' + #13 + #10;
+  
+  if AltDbSelected then
+  begin
+    // Escape \ in Directory
+    GeoDir := ExpandConstant('{app}\{#GeolocationDir}');
+    StringChangeEx(Geodir, '\', '\\', true);   
+     
+    RTFText := RTFText + // InfoAlternateDB.rtf
+      '\pard\b\sl276\slmult1\f0\fs22\lang9 The GeoLocation DB has been installed in: \b0\par' + #13 + #10 + 
+      '\tab\f1\fs18 ' + GeoDir + '\f0\fs22\par' + #13 + #10 +
+      '\par' + #13 + #10 +
+      'ExifToolGui should select it automatically. If you wish to use it in ExifTool create, or update, a config file with this line: \par' + #13 + #10 +
+      '' + #13 + #10 +
+      '\tab\f1\fs18 $Image::ExifTool::Geolocation::geoDir = ''<DIR>'';\fs22\par' + #13 + #10 +
+      '\par' + #13 + #10 +
+      '\pard\sl276\slmult1\f0 For more info see: {{\field{\*\fldinst{HYPERLINK https://exiftool.org/geolocation.html }}{\fldrslt{https://exiftool.org/geolocation.html\ul0\cf0}}}}\f0\fs22\par' + #13 + #10 +
+      '\par' + #13 + #10;
+  end;
+  
+  RTFText := RTFText + // InfoRawCodec.rtf
+    '\pard\b\sl276\slmult1\f0\fs22\lang9 If you wish to see thumbnails of raw image files \b0, you will need to install a codec adapted for the RAW files you use. ' + 
+    'FastPictureViewer provides free codecs for personal use: \par\tab {{\field{\*\fldinst{HYPERLINK https://www.fastpictureviewer.com/codecs/ }}{\fldrslt{https://www.fastpictureviewer.com/codecs/\ul0\cf0}}}}\f0\fs22\par' + #13 + #10;
+
+  RichEditViewer1.RTFText := RTFText + '}' + #13 + #10;
 end;
 
 function ShouldSkipPage(PageID: Integer): Boolean;
@@ -479,6 +520,15 @@ function ShowInstalledVersion(const Param: string): String;
 begin
   result := ConvertToString(CurVer);
 end;
+
+function AlternateDB(const Path: string): string;
+begin
+  result := Path;
+  if (result <> '') then
+    result := result + '\';
+  result := result + AlternateDBVer;
+end;
+
 
 // Show in Download page
 function ShowDownLoadPage(const Remote, Local:string): boolean;
@@ -549,6 +599,34 @@ begin
   end;
 end;
 
+function DownloadAltDb: boolean;
+begin
+  DBFile := PHURL + AlternateDB('');
+  if (NeverDownload) then
+  begin
+    result := true;
+    exit;
+  end;
+
+  result := ShowDownLoadPage(DBFile, AlternateDB(''));
+
+  if (result) then
+  begin
+
+    // These operations all take place in TMP folder.
+    result := false; // In case actions in TMP folder should fail
+
+    // Unzip Exiftool(-k).exe in app folder and rename to exiftool.exe
+    unzip(AlternateDB(ExpandConstant('{tmp}')), ExpandConstant('{tmp}'));
+
+    // unzip has no result. Check if file exists.
+    if not DirExists(ExpandConstant('{tmp}\{#GeoLocationDir}')) then
+      RaiseException('Unzipping ' + ExpandConstant('{tmp}\{#GeoLocationDir}') + ' failed');
+
+     result := true;
+  end;
+end;
+
 function NextButtonClick(CurPageID: Integer): Boolean;
 begin
   Result := true;
@@ -578,6 +656,8 @@ begin
       result := DownLoadETOBetz
     else if PHSelected then
       result := DownLoadETPH;
+    if AltDbSelected then
+      result := DownloadAltDb;
   end;
 
 end;

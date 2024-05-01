@@ -33,6 +33,7 @@ function ValidDir(ADir: string): boolean;
 function ValidFile(AFolder: TShellFolder): boolean;
 function GetINIPath(AllowCreate: boolean = false): string;
 function GetAppPath: string;
+function GetGeoPath: string;
 function GetTempDirectory: string;
 function GetExifToolTmp: string;
 function GetHtmlTmp: string;
@@ -125,6 +126,9 @@ const
 
 const
   EdgeUserDataDir = 'Edge';
+
+const
+  GeoLocation500 = 'GeoLocation500';
 
 procedure BreakPoint;
 {$IFDEF DEBUG}
@@ -246,6 +250,11 @@ end;
 function GetAppPath: string;
 begin
   result := IncludeTrailingPathDelimiter(ExtractFileDir(Application.ExeName));
+end;
+
+function GetGeoPath: string;
+begin
+  result := GetAppPath + GeoLocation500;
 end;
 
 function GetTempDirectory: string;
