@@ -2222,54 +2222,37 @@ var
   Tx: string;
 begin
   Indx := MetadataList.Row;
-  if (Key = VK_Return) and not(QuickTags[Indx - 1].NoEdit) then
-    with MetadataList do
-    begin
-      if Sender = EditQuick then
-        Tx := trim(EditQuick.Text) // delete leading and trailing
-      else
-        Tx := trim(MemoQuick.Text);
-      Cells[1, Indx] := Tx;
-      Tx := Keys[Indx];
-      if Tx[1] <> '*' then
-        Keys[Indx] := '*' + Tx; // mark tag value changed
-      if GUIsettings.AutoIncLine and // select next row
-        (Indx < RowCount - 1) then
-        Row := Indx + 1;
-      Refresh;
-      SetFocus;
-      SpeedBtnQuickSave.Enabled := true;
-    end;
+
+  if (Key = VK_Return) and
+      not(QuickTags[Indx - 1].NoEdit) then
+  begin
+    Tx := Trim(TCustomEdit(Sender).Text);
+    MetadataList.Cells[1, Indx] := Tx;
+    Tx := MetadataList.Keys[Indx];
+    if TCustomEdit(Sender).Modified and
+       (Tx[1] <> '*') then
+      MetadataList.Keys[Indx] := '*' + Tx; // mark tag value changed
+    if GUIsettings.AutoIncLine and // select next row
+      (Indx < MetadataList.RowCount - 1) then
+      MetadataList.Row := Indx + 1;
+    MetadataList.Refresh;
+    MetadataList.SetFocus;
+    SpeedBtnQuickSave.Enabled := true;
+  end;
 
   if Key = VK_ESCAPE then
-    with MetadataList do
+  begin
+    if QuickTags[Indx - 1].NoEdit then
+      TCustomEdit(Sender).Text := ''
+    else
     begin
-      if Sender = EditQuick then
-      begin
-        if QuickTags[Indx - 1].NoEdit then
-          EditQuick.Text := ''
-        else
-        begin
-          if RightStr(Keys[Indx], 1) = #177 then
-            EditQuick.Text := '+'
-          else
-            EditQuick.Text := Cells[1, Indx];
-        end;
-      end
+      if RightStr(MetadataList.Keys[Indx], 1) = #177 then
+        TCustomEdit(Sender).Text := '+'
       else
-      begin
-        if QuickTags[Indx - 1].NoEdit then
-          MemoQuick.Text := ''
-        else
-        begin
-          if RightStr(Keys[Indx], 1) = #177 then
-            MemoQuick.Text := '+'
-          else
-            MemoQuick.Text := Cells[1, Indx];
-        end;
-      end;
-      SetFocus;
+        TCustomEdit(Sender).Text := MetadataList.Cells[1, Indx];
     end;
+    MetadataList.SetFocus;
+  end;
 end;
 
 procedure TFMain.ShowPreview;
