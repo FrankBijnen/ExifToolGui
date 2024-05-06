@@ -244,7 +244,13 @@ begin
                 TShellFolder(Item2).RelativeID));
           end;
         end;
-
+        // Sort on Filename (Column 0), within SortColumn
+        if (Result = 0) and
+           (SortColumn <> 0) then
+        begin
+          Result := Smallint(TShellFolder(Item1).ParentShellFolder.CompareIDs(0, TShellFolder(Item1).RelativeID,
+            TShellFolder(Item2).RelativeID));
+        end;
         if (SortState = THeaderSortState.hssDescending) then
           Result := Result * -1;
       end);
