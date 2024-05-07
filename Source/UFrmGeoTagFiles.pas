@@ -108,7 +108,8 @@ begin
           ETcmd := ETcmd + '-a' + CRLF + '-Gps*=' + CRLF + '--GPSversion*';
         if (CmdLat <> '') then
         begin
-          ETcmd := ETcmd + CRLF + '-GPS:GpsLatitudeRef=';
+//          ETcmd := ETcmd + CRLF + '-GPS:GpsLatitudeRef=';
+          ETcmd := ETcmd + CRLF + '-GpsLatitudeRef=';
           if CmdLat[1] = '-' then
           begin
             ETcmd := ETcmd + 'S';
@@ -116,11 +117,13 @@ begin
           end
           else
             ETcmd := ETcmd + 'N';
-          ETcmd := ETcmd + CRLF + '-GPS:GpsLatitude=' + CmdLat;
+//          ETcmd := ETcmd + CRLF + '-GPS:GpsLatitude=' + CmdLat;
+          ETcmd := ETcmd + CRLF + '-GpsLatitude=' + CmdLat;
         end;
         if (CmdLon <> '') then
         begin
-          ETcmd := ETcmd + CRLF + '-GPS:GpsLongitudeRef=';
+//          ETcmd := ETcmd + CRLF + '-GPS:GpsLongitudeRef=';
+          ETcmd := ETcmd + CRLF + '-GpsLongitudeRef=';
           if CmdLon[1] = '-' then
           begin
             ETcmd := ETcmd + 'W';
@@ -128,7 +131,8 @@ begin
           end
           else
             ETcmd := ETcmd + 'E';
-          ETcmd := ETcmd + CRLF + '-GPS:GpsLongitude=' + CmdLon;
+//          ETcmd := ETcmd + CRLF + '-GPS:GpsLongitude=' + CmdLon;
+          ETcmd := ETcmd + CRLF + '-GpsLongitude=' + CmdLon;
         end;
 
         // Get data possibly modified by user. With minus sign for West and South!

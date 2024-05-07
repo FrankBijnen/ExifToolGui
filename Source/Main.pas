@@ -1939,6 +1939,7 @@ var
   ETCmd, AFile: string;
   MIMEType, GPSCoordinates: string;
   IsQuickTime: boolean;
+  SavedLang: string;
 begin
   Foto := GetMetadata(GetFirstSelectedFilePath, [TGetOption.gmGPS]);
   if (Foto.GPS.Supported) then
@@ -1967,8 +1968,20 @@ begin
     try
       if (GeoSettings.GetPlaceProvider = gpExifTool) then
       begin
-        ETCmd := '-XMP-photoshop:XMP-iptcCore:XMP-iptcExt:geolocate<GPSPosition' + CRLF;
-        ET_OpenExec(ETcmd, GetSelectedFiles);
+        SavedLang := ET_Options.ETLangDef;
+        if (GeoSettings.ReverseGeoCodeLang <> PlaceDefault) and
+           (GeoSettings.ReverseGeoCodeLang <> PlaceLocal) then
+          ET_Options.ETLangDef := GeoSettings.ReverseGeoCodeLang
+        else
+          ET_Options.ETLangDef := '';
+
+        try
+          ETCmd := '-XMP-photoshop:XMP-iptcCore:XMP-iptcExt:geolocate<GPSPosition' + CRLF;
+          ET_OpenExec(ETcmd, GetSelectedFiles);
+        finally
+          ET_Options.ETLangDef := SavedLang;
+        end;
+
       end
       else
       begin

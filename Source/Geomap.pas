@@ -877,13 +877,21 @@ begin
     while (ETout <> '') do
     begin
       FileName := AnalyzeGPSCoords(ETOut, Lat, Lon, MIMEType, IsQuickTime);
-      if (Pos('image', MIMEType) > 0) or
-         (Pos('video', MIMEType) > 0) then
-      begin
-        if (Lat <> '-') and
-           (Lon <> '-') then
-          OsmHelper.WritePoint(Lat, Lon, IncludeTrailingPathDelimiter(Apath) + Filename, true);
-      end
+//      if (Pos('image', MIMEType) > 0) or
+//         (Pos('video', MIMEType) > 0) then
+//      begin
+//        if (Lat <> '-') and
+//           (Lon <> '-') then
+//          OsmHelper.WritePoint(Lat, Lon, IncludeTrailingPathDelimiter(Apath) + Filename, true);
+//      end
+//      else
+//      begin
+//        if (CreateTrkPoints(FileName, FirstGpx, LastCoord) > 0) then
+//          FirstGpx := false;
+//      end;
+      if ((Pos('image', MIMEType) > 0) or (Pos('video', MIMEType) > 0)) or
+         ((Lat <> '-') and (Lon <> '-')) then
+          OsmHelper.WritePoint(Lat, Lon, IncludeTrailingPathDelimiter(Apath) + Filename, true)
       else
       begin
         if (CreateTrkPoints(FileName, FirstGpx, LastCoord) > 0) then
