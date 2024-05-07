@@ -53,6 +53,7 @@ type
     FName: string;
     FNodeId: string;
     FPostCode: string;
+    function HtmlEscape(const HTML: string): string;
     function GetCountryLocation: string;
     function GetPrio(const APrio: string; APrioList: TStringList): string;
     function GetPrioProvince: string;
@@ -410,17 +411,29 @@ begin
   result := result + Format('Name: %s, City: %s, Province: %s, Country: %s, %s', [Name, City, Province, CountryCode, CountryName]);
 end;
 
+function TPlace.HtmlEscape(const HTML: string): string;
+begin
+  result := HTML;
+  result := StringReplace(result, '&',  '&amp;',   [rfReplaceAll]);
+  result := StringReplace(result, '<',  '&lt;',    [rfReplaceAll]);
+  result := StringReplace(result, '>',  '&gt;',    [rfReplaceAll]);
+  result := StringReplace(result, '"',  '&quot;',  [rfReplaceAll]);
+  result := StringReplace(result, '''', '&#39;',   [rfReplaceAll]);
+  result := StringReplace(result, ' ',  '&nbsp;',  [rfReplaceAll]);
+  result := StringReplace(result, '-',  '&#8209;', [rfReplaceAll]);
+end;
+
 function TPlace.GetHtmlSearchResult: string;
 var
   AField: string;
 begin
   result := '';
 
-  AField := City;
+  AField := HtmlEscape(City);
   if (AField <> '') then
     result := result + AField;
 
-  AField := Province;
+  AField := HtmlEscape(Province);
   if (AField <> '') then
   begin
     if (result <> '') then
@@ -429,11 +442,7 @@ begin
   end;
 
   if (result <> '') then
-  begin
-    result := Format('%s %s', [result, FCountryCode]);
-    result := StringReplace(result, ' ', '&nbsp', [rfReplaceAll]);
-    result := StringReplace(result, '-', '&#8209;', [rfReplaceAll]);
-  end;
+    result := Format('%s %s', [result, HtmlEscape(FCountryCode)]);
 end;
 
 procedure TPlace.SetCountryCode(Value: string);
@@ -877,20 +886,14 @@ begin
     while (ETout <> '') do
     begin
       FileName := AnalyzeGPSCoords(ETOut, Lat, Lon, MIMEType, IsQuickTime);
-//      if (Pos('image', MIMEType) > 0) or
-//         (Pos('video', MIMEType) > 0) then
-//      begin
-//        if (Lat <> '-') and
-//           (Lon <> '-') then
-//          OsmHelper.WritePoint(Lat, Lon, IncludeTrailingPathDelimiter(Apath) + Filename, true);
-//      end
-//      else
-//      begin
-//        if (CreateTrkPoints(FileName, FirstGpx, LastCoord) > 0) then
-//          FirstGpx := false;
-//      end;
-      if ((Pos('image', MIMEType) > 0) or (Pos('video', MIMEType) > 0)) or
-         ((Lat <> '-') and (Lon <> '-')) then
+      if ((Pos('image', MIMEType) > 0) or
+          (Pos('video', MIMEType) > 0) or
+          (Pos('application/rdf+xml', MIMEType) > 0)  // XMP side car
+         )
+         and
+         ((Lat <> '-') and // Need Lat
+          (Lon <> '-')     // and Lon
+         ) then
           OsmHelper.WritePoint(Lat, Lon, IncludeTrailingPathDelimiter(Apath) + Filename, true)
       else
       begin
