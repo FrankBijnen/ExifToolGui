@@ -1088,39 +1088,46 @@ var Bytes: TBytes;
   end;
 
   procedure Add2Xmp(const AKey, AValue: string);
+  var
+    UnEscaped: string;
   begin
+    // ExifTool escapes (needless) ' and " in XML.
+    // VerySimpleXML does not UnEscape those.
+    UnEscaped := StringReplace(AValue, '&#39;', '''', [rfReplaceAll]);
+    UnEscaped := StringReplace(UnEscaped, '&quot;', '''', [rfReplaceAll]);
+
     if (EndsText('Iptc4xmpExt:CountryCode', AKey)) then
-      XMP.CountryCodeShown := AValue
+      XMP.CountryCodeShown := UnEscaped
     else if (EndsText('Iptc4xmpExt:CountryName', AKey)) then
-      XMP.CountryNameShown := AValue
+      XMP.CountryNameShown := UnEscaped
     else if (EndsText('Iptc4xmpExt:ProvinceState', AKey)) then
-      XMP.ProvinceShown := AValue
+      XMP.ProvinceShown := UnEscaped
     else if (EndsText('Iptc4xmpExt:City', AKey)) then
-      XMP.CityShown := AValue
+      XMP.CityShown := UnEscaped
     else if (EndsText('Iptc4xmpExt:Sublocation', AKey)) then
-      XMP.LocationShown := AValue
+      XMP.LocationShown := UnEscaped
     else if (StartsText('Iptc4xmpExt:PersonInImage.rdf:Bag', AKey)) then
-      AddBag(XMP.PersonInImage, AValue)
+      AddBag(XMP.PersonInImage, UnEscaped)
 
     else if (StartsText('dc:creator.rdf:Seq', AKey)) then
-      AddBag(XMP.Creator, AValue)
+      AddBag(XMP.Creator, UnEscaped)
     else if (StartsText('dc:rights.rdf:Alt', AKey)) then
-      XMP.Rights := AValue
+      XMP.Rights := UnEscaped
     else if (StartsText('dc:date.rdf:Seq', AKey)) then
-      XMP.Date := AValue // Hardly a Bag!
+      XMP.Date := UnEscaped // Hardly a Bag!
     else if (StartsText('dc:type.rdf', AKey)) then
-      AddBag(XMP.PhotoType, AValue)
+      AddBag(XMP.PhotoType, UnEscaped)
     else if (StartsText('dc:title.rdf:Alt', AKey)) then
-      AddBag(XMP.Title, AValue)
+      AddBag(XMP.Title, UnEscaped)
     else if (StartsText('dc:subject.rdf:Bag', AKey)) then
-      AddBag(XMP.Keywords, AValue)
+      AddBag(XMP.Keywords, UnEscaped)
 
     else if (StartsText('Iptc4xmpExt:Event.rdf:Alt', AKey)) then
-      XMP.Event := AValue
+      XMP.Event := UnEscaped
 
     else if (StartsText('xmp:Rating', AKey)) or
             (StartsText('xap:Rating', AKey)) then
-      XMP.Rating := AValue;
+      XMP.Rating := UnEscaped;
   end;
 
   procedure LevelDeeper(const ANode: TXmlNode; AParent: string);
