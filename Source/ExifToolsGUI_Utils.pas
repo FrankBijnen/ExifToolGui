@@ -970,7 +970,9 @@ begin
   ETcmd := '-s3' + CRLF + '-f' + CRLF + '-n' + CRLF + '-q';
   ETcmd := ETcmd + CRLF + '-Filename';
   ETcmd := ETcmd + CRLF + '-Composite:GpsLatitude';
+  ETcmd := ETcmd + CRLF + '-GpsLatitude';
   ETcmd := ETcmd + CRLF + '-Composite:GpsLongitude';
+  ETcmd := ETcmd + CRLF + '-GpsLongitude';
   ETcmd := ETcmd + CRLF + '-MIMEType';
   ETcmd := ETcmd + CRLF + '-QuickTime:MajorBrand';
   ET_OpenExec(ETcmd, Images, result, ETerrs, false);
@@ -979,11 +981,23 @@ end;
 function AnalyzeGPSCoords(var ETout, Lat, Lon, MIMEType: string; var IsQuickTime: boolean): string;
 var
   QuickTimeMajorBrand: string;
+  CompLat, CompLon: string;
 begin
   result := NextField(ETout, CRLF);
 
+  // Take Composite Lat & Lon. If not avail get without group.
+  // Needed to get Lat & Lon for .XMP files. They are not avail in composite
+  // Maybe better to read only without group, but kept for compatibility.
+  CompLat := NextField(ETout, CRLF);
   Lat := NextField(ETout, CRLF);
+  if (Lat = '-') then
+    Lat := CompLat;
+
+  CompLon := NextField(ETout, CRLF);
   Lon := NextField(ETout, CRLF);
+  if (Lon = '-') then
+    Lon := CompLon;
+
   MIMEType := NextField(ETout, CRLF);
   QuickTimeMajorBrand := NextField(ETout, CRLF);
   IsQuickTime := QuickTimeMajorBrand <> '-';
