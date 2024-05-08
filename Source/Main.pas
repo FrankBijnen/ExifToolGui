@@ -3063,6 +3063,12 @@ begin
         end;
     end;
   end;
+
+  // Column sorting works better when every column has a detail
+  for Indx := Details.Count to AShellList.Columns.Count -2 do
+    Details.Add('');
+
+  // Now add to Listview
   for ADetail in Details do
     Item.SubItems.Append(ADetail);
 end;
