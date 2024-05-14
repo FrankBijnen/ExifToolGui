@@ -186,6 +186,7 @@ type
     MaCustomViewLoad: TAction;
     MaMarkedSave: TAction;
     MaMarkedLoad: TAction;
+    AdvPanelBrowser: TPanel;
     procedure ShellListClick(Sender: TObject);
     procedure ShellListKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
     procedure SpeedBtnExifClick(Sender: TObject);
@@ -2593,6 +2594,7 @@ begin
 
   MaUpdateLocationfromGPScoordinates.Enabled := false;
   AdvTabOSMMap.Enabled := false;
+  EdgeBrowser1.Visible := false;
   if GUIsettings.EnableGMap then
   begin
     try
@@ -2600,6 +2602,7 @@ begin
       ParseLatLon(GUIsettings.DefGMapHome, Lat, Lon);
       OSMMapInit(EdgeBrowser1, Lat, Lon, OSMHome, InitialZoom_Out);
       AdvTabOSMMap.Enabled := true;
+      EdgeBrowser1.Visible := true;
     except
       on E:Exception do
         MessageDlgEx(E.Message, StrErrorPositioningHo, TMsgDlgType.mtWarning, [TMsgDlgBtn.mbOK]);
