@@ -23,6 +23,7 @@ type
     GeoCodingEnable: TGeoCodeEnable;
     GetCoordProvider: TGeoCodeProvider;
     GetPlaceProvider: TGeoCodeProvider;
+    GeoLocation500Dir: string;
     GeoCodeUrl: string;
     GeoCodeApiKey: string;
     ThrottleGeoCode: integer;
@@ -37,6 +38,7 @@ type
     GeoCodeDialog: boolean;
     ReverseGeoCodeDialog: boolean;
     procedure CheckProvider;
+    procedure SetGeoLocation500(ADir: string);
   end;
 
   TRegionLevels = array[0..3] of integer;
@@ -194,7 +196,7 @@ uses
   System.Variants, System.JSON,  System.NetEncoding, System.Math, System.StrUtils, System.DateUtils,
   Winapi.Windows, Vcl.Dialogs,
   REST.Types, REST.Client, REST.Utils,
-  UFrmPlaces, UFrmGeoSearch, ExifToolsGUI_Utils, ExifToolsGui_Data, UnitLangResources;
+  UFrmPlaces, UFrmGeoSearch, ExifToolsGUI_Utils, ExifToolsGui_Data, ExifTool, UnitLangResources;
 
 var
   CoordFormatSettings: TFormatSettings; // for StrToFloatDef -see Initialization
@@ -220,6 +222,16 @@ begin
       ShowMessage(StrCheckOffLineProv);
     end;
   end;
+end;
+
+procedure GEOsettingsRec.SetGeoLocation500(ADir: string);
+begin
+  GeoLocation500Dir := ADir;
+  if (GeoLocation500Dir = '') and
+     (DirectoryExists(GetGeoPath)) then
+    GeoLocation500Dir := GetGeoPath;
+
+  ET_Options.SetGeoDir(GeoLocation500Dir)
 end;
 
 constructor TPlace.Create;
@@ -1634,6 +1646,9 @@ begin
 
   GeoSettings.ThrottleGeoCode := GUIini.ReadInteger(Geo_Settings, 'ThrottleGeoCode', 1000);
   GeoSettings.OverPassUrl := GUIini.ReadString(Geo_Settings, 'OverPassUrl', ReadResourceId(ETD_OverPass));
+
+  GeoSettings.SetGeoLocation500(GUIini.ReadString(Geo_Settings, 'GeoLocation500Dir', ''));
+
   GeoSettings.ThrottleOverPass := GUIini.ReadInteger(Geo_Settings, 'ThrottleOverPass', 10);
   GeoSettings.CaseSensitive := GUIini.ReadBool(Geo_Settings, 'OverPassCaseSensitive', True);
   GeoSettings.OverPassCompleteWord := GUIini.ReadBool(Geo_Settings, 'OverPassCompleteWord', True);
@@ -1657,6 +1672,8 @@ var
 begin
   GUIini.WriteString(Geo_Settings, 'GeoCodeUrl', GeoSettings.GeoCodeUrl);
   GUIini.WriteString(Geo_Settings, 'OverPassUrl', GeoSettings.OverPassUrl);
+  GUIini.WriteString(Geo_Settings, 'GeoLocation500Dir', GeoSettings.GeoLocation500Dir);
+
   GUIini.WriteString(Geo_Settings, 'GeoCodeApiKey', GeoSettings.GeoCodeApiKey);
   GUIini.WriteInteger(Geo_Settings, 'GetCoordProvider', Ord(GeoSettings.GetCoordProvider));
   GUIini.WriteInteger(Geo_Settings, 'ThrottleGeoCode', GeoSettings.ThrottleGeoCode);

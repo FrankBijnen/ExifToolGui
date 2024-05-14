@@ -52,6 +52,7 @@ resourcestring
   StrSelectDefaultStart     = 'Select default startup folder';
   StrSelectDefaultExpor     = 'Select default export folder';
   StrSelectExifToolFold     = 'Select ExifTool folder to use';
+  StrSelectGeoLocation      = 'Select ExifTool GeoLocation DB to use';
 
   StrScreenResolution       = 'Screen resolution: %d x %d at %d DPI Scaled: %d%%';
   StrMISSING                = 'MISSING!';

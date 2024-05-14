@@ -76,6 +76,9 @@ type
     BtnEtCustomConfig: TButton;
     ChkCountryLocation: TCheckBox;
     CmbGeoCodingEnable: TComboBox;
+    GrpExifTool: TGroupBox;
+    EdGeoLocation500Dir: TEdit;
+    BtnGeoLocation500Dir: TButton;
     procedure FormShow(Sender: TObject);
     procedure BtnSaveClick(Sender: TObject);
     procedure BtnBrowseFolder(Sender: TObject);
@@ -169,6 +172,7 @@ begin
   GeoSettings.GeoCodeApiKey := EdGeoCodeApiKey.Text;
   GeoSettings.ThrottleGeoCode := UpdThrottleGeoCode.Position;
   GeoSettings.OverPassUrl := EdOverPassUrl.Text;
+  GeoSettings.SetGeoLocation500(EdGeoLocation500Dir.Text);
   GeoSettings.ThrottleOverPass := UpdThrottleOverpass.Position;
   GeoSettings.GeoCodeDialog := ChkGeoCodeDialog.Checked;
   GeoSettings.GeoCodingEnable := TGeoCodeEnable(CmbGeoCodingEnable.ItemIndex);
@@ -269,6 +273,12 @@ begin
     if XDir <> '' then
       EdETOverride.Text := XDir;
   end;
+  if Sender = BtnGeoLocation500Dir then
+  begin
+    XDir := BrowseFolderDlg(StrSelectGeoLocation, 0);
+    if XDir <> '' then
+      EdGeoLocation500Dir.Text := XDir;
+  end;
   if Sender = BtnEtCustomConfig then
   begin
     FMain.OpenFileDlg.Filter := 'Config Files|*_config;*.cfg;*.config|*.*|*.*';
@@ -348,6 +358,7 @@ begin
   EdGeoCodeApiKey.Text := GeoSettings.GeoCodeApiKey;
   UpdThrottleGeoCode.Position := GeoSettings.ThrottleGeoCode;
   EdOverPassUrl.Text := GeoSettings.OverPassUrl;
+  EdGeoLocation500Dir.Text := GeoSettings.GeoLocation500Dir;
   UpdThrottleOverpass.Position := GeoSettings.ThrottleOverPass;
   CmbGeoCodingEnable.ItemIndex := Ord(GeoSettings.GeoCodingEnable);
   ChkGeoCodeDialog.Checked := GeoSettings.GeoCodeDialog;

@@ -3,8 +3,8 @@ object FPreferences: TFPreferences
   Top = 0
   BorderStyle = bsDialog
   Caption = 'Preferences'
-  ClientHeight = 373
-  ClientWidth = 695
+  ClientHeight = 416
+  ClientWidth = 694
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -37,7 +37,7 @@ object FPreferences: TFPreferences
     Left = 0
     Top = 0
     Width = 606
-    Height = 373
+    Height = 416
     ActivePage = AdvTabGeneral
     Align = alLeft
     DoubleBuffered = True
@@ -454,10 +454,10 @@ object FPreferences: TFPreferences
       Caption = 'GeoCoding'
       ImageIndex = 3
       object GrpGeoCodeGeneral: TGroupBox
-        Left = 17
+        Left = 19
         Top = 13
-        Width = 557
-        Height = 347
+        Width = 565
+        Height = 372
         Caption = 'GeoCoding'
         TabOrder = 0
         object ChkGeoCodeDialog: TCheckBox
@@ -496,11 +496,35 @@ object FPreferences: TFPreferences
             'Enable All GeoCoding'
             'Enable Offline GeoCoding (ExifTool)')
         end
+        object GrpExifTool: TGroupBox
+          Left = 5
+          Top = 111
+          Width = 545
+          Height = 43
+          Caption = 'Exiftool GeoLocation DB'
+          TabOrder = 4
+          object EdGeoLocation500Dir: TEdit
+            Left = 62
+            Top = 16
+            Width = 447
+            Height = 21
+            TabOrder = 0
+          end
+          object BtnGeoLocation500Dir: TButton
+            Left = 512
+            Top = 16
+            Width = 28
+            Height = 22
+            Caption = '...'
+            TabOrder = 1
+            OnClick = BtnBrowseFolder
+          end
+        end
       end
       object GrpGeoCode: TGroupBox
         Left = 24
-        Top = 137
-        Width = 540
+        Top = 180
+        Width = 545
         Height = 108
         Caption = 'GeoCode Maps:'
         TabOrder = 1
@@ -564,8 +588,8 @@ object FPreferences: TFPreferences
       end
       object GrpOverPass: TGroupBox
         Left = 24
-        Top = 256
-        Width = 540
+        Top = 294
+        Width = 545
         Height = 80
         Caption = 'OverPass Api'
         TabOrder = 2
