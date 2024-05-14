@@ -515,8 +515,6 @@ begin
   FETWorkDir := '';
   EtOutPipe := nil;
   EtErrPipe := nil;
-  if (DirectoryExists(GetGeoPath)) then
-    ET_Options.SetGeoDir(GetGeoPath);
 end;
 
 finalization
