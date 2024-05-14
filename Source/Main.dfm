@@ -382,6 +382,97 @@ object FMain: TFMain
     end
     object AdvTabOSMMap: TTabSheet
       Caption = 'OSM Map'
+      object AdvPanelBrowser: TPanel
+        Left = 0
+        Top = 57
+        Width = 312
+        Height = 419
+        Align = alClient
+        Caption = 'Internet access not enabled in preferences'
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clWindowText
+        Font.Height = -13
+        Font.Name = 'Tahoma'
+        Font.Style = []
+        ParentFont = False
+        TabOrder = 0
+        ExplicitLeft = 59
+        ExplicitTop = 76
+        ExplicitWidth = 185
+        ExplicitHeight = 41
+        object EdgeBrowser1: TEdgeBrowser
+          Left = 1
+          Top = 1
+          Width = 310
+          Height = 417
+          Align = alClient
+          TabOrder = 0
+          UserDataFolder = '%LOCALAPPDATA%\bds.exe.WebView2'
+          OnCreateWebViewCompleted = EdgeBrowser1CreateWebViewCompleted
+          OnNavigationStarting = EdgeBrowser1NavigationStarting
+          OnWebMessageReceived = EdgeBrowser1WebMessageReceived
+          OnZoomFactorChanged = EdgeBrowser1ZoomFactorChanged
+          ExplicitTop = -467
+          ExplicitWidth = 183
+          ExplicitHeight = 508
+        end
+      end
+      object AdvPanel_MapBottom: TPanel
+        Left = 0
+        Top = 476
+        Width = 312
+        Height = 32
+        Align = alBottom
+        BevelOuter = bvNone
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clWindowText
+        Font.Height = -11
+        Font.Name = 'Tahoma'
+        Font.Style = []
+        ParentFont = False
+        TabOrder = 1
+        ExplicitLeft = 1
+        ExplicitTop = 8
+        ExplicitWidth = 183
+        object SpeedBtn_Geotag: TSpeedButton
+          AlignWithMargins = True
+          Left = 1
+          Top = 5
+          Width = 90
+          Height = 22
+          Margins.Left = 1
+          Margins.Top = 5
+          Margins.Right = 1
+          Margins.Bottom = 5
+          Align = alLeft
+          Caption = 'Geotag files'
+          OnClick = SpeedBtn_GeotagClick
+        end
+        object EditMapBounds: TLabeledEdit
+          AlignWithMargins = True
+          Left = 142
+          Top = 6
+          Width = 167
+          Height = 23
+          Hint = 'Coordinates of the visible area (South,West,North,East)'
+          Margins.Left = 50
+          Margins.Top = 6
+          TabStop = False
+          Align = alClient
+          EditLabel.Width = 39
+          EditLabel.Height = 23
+          EditLabel.Caption = 'Bounds:'
+          LabelPosition = lpLeft
+          MaxLength = 200
+          ParentShowHint = False
+          ReadOnly = True
+          ShowHint = True
+          TabOrder = 0
+          Text = ''
+          ExplicitWidth = 38
+          ExplicitHeight = 21
+        end
+      end
       object AdvPanel_MapTop: TPanel
         Left = 0
         Top = 0
@@ -395,7 +486,10 @@ object FMain: TFMain
         Font.Name = 'Tahoma'
         Font.Style = []
         ParentFont = False
-        TabOrder = 0
+        TabOrder = 2
+        ExplicitLeft = 1
+        ExplicitTop = 1
+        ExplicitWidth = 183
         object SpeedBtn_ShowOnMap: TSpeedButton
           Left = 1
           Top = 2
@@ -465,71 +559,6 @@ object FMain: TFMain
           TextHint = '0.1234, 0.1234'
           OnKeyDown = EditMapFindKeyDown
         end
-      end
-      object AdvPanel_MapBottom: TPanel
-        Left = 0
-        Top = 476
-        Width = 312
-        Height = 32
-        Align = alBottom
-        BevelOuter = bvNone
-        Font.Charset = DEFAULT_CHARSET
-        Font.Color = clWindowText
-        Font.Height = -11
-        Font.Name = 'Tahoma'
-        Font.Style = []
-        ParentFont = False
-        TabOrder = 1
-        object SpeedBtn_Geotag: TSpeedButton
-          AlignWithMargins = True
-          Left = 1
-          Top = 5
-          Width = 90
-          Height = 22
-          Margins.Left = 1
-          Margins.Top = 5
-          Margins.Right = 1
-          Margins.Bottom = 5
-          Align = alLeft
-          Caption = 'Geotag files'
-          OnClick = SpeedBtn_GeotagClick
-        end
-        object EditMapBounds: TLabeledEdit
-          AlignWithMargins = True
-          Left = 142
-          Top = 6
-          Width = 167
-          Height = 23
-          Hint = 'Coordinates of the visible area (South,West,North,East)'
-          Margins.Left = 50
-          Margins.Top = 6
-          TabStop = False
-          Align = alClient
-          EditLabel.Width = 39
-          EditLabel.Height = 23
-          EditLabel.Caption = 'Bounds:'
-          LabelPosition = lpLeft
-          MaxLength = 200
-          ParentShowHint = False
-          ReadOnly = True
-          ShowHint = True
-          TabOrder = 0
-          Text = ''
-          ExplicitHeight = 21
-        end
-      end
-      object EdgeBrowser1: TEdgeBrowser
-        Left = 0
-        Top = 57
-        Width = 312
-        Height = 419
-        Align = alClient
-        TabOrder = 2
-        UserDataFolder = '%LOCALAPPDATA%\bds.exe.WebView2'
-        OnCreateWebViewCompleted = EdgeBrowser1CreateWebViewCompleted
-        OnNavigationStarting = EdgeBrowser1NavigationStarting
-        OnWebMessageReceived = EdgeBrowser1WebMessageReceived
-        OnZoomFactorChanged = EdgeBrowser1ZoomFactorChanged
       end
     end
   end
@@ -739,7 +768,7 @@ object FMain: TFMain
         object EditETdirect: TLabeledEdit
           Left = 1
           Top = 50
-          Width = 343
+          Width = 339
           Height = 23
           Hint = 
             'Spaces in data require double quotes, double quotes in data requ' +
@@ -762,7 +791,7 @@ object FMain: TFMain
           Text = ''
           OnChange = EditETdirectChange
           OnKeyDown = EditETdirectKeyDown
-          ExplicitWidth = 339
+          ExplicitWidth = 335
         end
         object CBoxETdirect: TComboBox
           Left = 1
