@@ -1631,11 +1631,11 @@ begin
   end
   else
     Ts := '-';
-  Tx := Ts + TranslateTagName(Ts, Tx);
-  if pos(Tx, CustomViewTagList) > 0 then
+  Tx := Ts + TranslateTagName(Ts, Tx) + ' ';
+  if Pos(Tx, CustomViewTagList) > 0 then
     ShowMessage(StrTagAlreadyExistsI)
   else
-    CustomViewTagList := CustomViewTagList + Tx + ' ';
+    CustomViewTagList := CustomViewTagList + Tx;
 end;
 
 procedure TFMain.QuickPopUp_AddDetailsUserClick(Sender: TObject);
@@ -1644,7 +1644,7 @@ var
   Tx, Tk: string;
   PrevSel, PrevRow: integer;
 begin
-  I := length(FListColUsr);
+  I := Length(FListColUsr);
   SetLength(FListColUsr, I + 1);
   N := MetadataList.Row;
   X := N;
