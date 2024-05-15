@@ -396,10 +396,6 @@ object FMain: TFMain
         Font.Style = []
         ParentFont = False
         TabOrder = 0
-        ExplicitLeft = 59
-        ExplicitTop = 76
-        ExplicitWidth = 185
-        ExplicitHeight = 41
         object EdgeBrowser1: TEdgeBrowser
           Left = 1
           Top = 1
@@ -412,9 +408,6 @@ object FMain: TFMain
           OnNavigationStarting = EdgeBrowser1NavigationStarting
           OnWebMessageReceived = EdgeBrowser1WebMessageReceived
           OnZoomFactorChanged = EdgeBrowser1ZoomFactorChanged
-          ExplicitTop = -467
-          ExplicitWidth = 183
-          ExplicitHeight = 508
         end
       end
       object AdvPanel_MapBottom: TPanel
@@ -431,9 +424,6 @@ object FMain: TFMain
         Font.Style = []
         ParentFont = False
         TabOrder = 1
-        ExplicitLeft = 1
-        ExplicitTop = 8
-        ExplicitWidth = 183
         object SpeedBtn_Geotag: TSpeedButton
           AlignWithMargins = True
           Left = 1
@@ -469,7 +459,6 @@ object FMain: TFMain
           ShowHint = True
           TabOrder = 0
           Text = ''
-          ExplicitWidth = 38
           ExplicitHeight = 21
         end
       end
@@ -487,9 +476,6 @@ object FMain: TFMain
         Font.Style = []
         ParentFont = False
         TabOrder = 2
-        ExplicitLeft = 1
-        ExplicitTop = 1
-        ExplicitWidth = 183
         object SpeedBtn_ShowOnMap: TSpeedButton
           Left = 1
           Top = 2
