@@ -147,10 +147,10 @@ Source: "..\Translation\ExifToolGui.NLD";     DestDir: "{app}";   Components: La
 Source: "..\Translation\ExifToolGui.PTB";     DestDir: "{app}";   Components: LanguagesWin32; flags: replacesameversion;
 
 ; These files will be downloaded
-Source: "{tmp}\exiftool_version.txt";   DestDir: "{app}";                                     flags: external skipifsourcedoesntexist replacesameversion;
+Source: "{tmp}\curver.txt";             DestDir: "{app}";                                     flags: external skipifsourcedoesntexist replacesameversion;
 Source: "{tmp}\exiftool.exe";           DestDir: "{app}";                                     flags: external skipifsourcedoesntexist replacesameversion;
 Source: "{code:OBetzInstaller|{tmp}}";  DestDir: "{app}";                                     flags: external skipifsourcedoesntexist replacesameversion;
-Source: "{tmp}\{#GeolocationDir}\*";    DestDir: "{app}\{#GeolocationDir}";                   flags: external skipifsourcedoesntexist replacesameversion recursesubdirs;
+Source: "{tmp}\{#GeolocationDir}\*";    DestDir: "{code:GeoLocationDir}";                     flags: external skipifsourcedoesntexist replacesameversion recursesubdirs;
 
 [Icons]
 Name: "{group}\{#ExifToolGUI}";         Filename: "{app}\{#ExifToolGUIExeName}"
@@ -165,6 +165,7 @@ Filename: "{code:OBetzInstaller|{app}}";Description: {code:InstallOBetzMsg};    
 var
 
   DownloadPageET: TDownloadWizardPage;
+  GeoLocationDirPage: TInputDirWizardPage;
   CURVer: AnsiString;
   ETVerPH: AnsiString;
   ETVerOBetz: AnsiString;
@@ -438,6 +439,17 @@ begin
   AlternateDBVer := '';
 
   WizardForm.TasksList.OnClickCheck := @TaskOnClick;
+
+//  CopyDirPage := CreateInputDirPage(wpSelectTasks, 'Select directory for GeoLocation', '',  '', False, '');
+//  CopyDirPage.Add('Directory:');
+
+end;
+
+function GeoLocationDir(const Param: string):string;
+begin
+  result := ExpandConstant('{app}\{#GeoLocationDir}');
+  if (GeoLocationDirPage <> nil) then
+    result := GeoLocationDirPage.Values[0];
 end;
 
 procedure SetupRichText;
@@ -466,15 +478,16 @@ begin
   if AltDbSelected then
   begin
     // Escape \ in Directory
-    GeoDir := ExpandConstant('{app}\{#GeolocationDir}');
+    GeoDir := GeoLocationDir('');
     StringChangeEx(Geodir, '\', '\\', true);   
      
     RTFText := RTFText + // InfoAlternateDB.rtf
       '\pard\b\sl276\slmult1\f0\fs22\lang9 The GeoLocation DB has been installed in: \b0\par' + #13 + #10 + 
       '\tab\f1\fs18 ' + GeoDir + '\f0\fs22\par' + #13 + #10 +
       '\par' + #13 + #10 +
-      'ExifToolGui should select it automatically. If you wish to use it in ExifTool create, or update, a config file with this line: \par' + #13 + #10 +
-      '' + #13 + #10 +
+      'If ExifToolGui does not select it automatically, you can select the folder in Preferences.\par' + #13 + #10 +
+      '\par' + #13 + #10 +
+      'If you wish to use it in ExifTool create, or update, a config file with this line: \par' + #13 + #10 + 
       '\tab\f1\fs18 $Image::ExifTool::Geolocation::geoDir = ''<DIR>'';\fs22\par' + #13 + #10 +
       '\par' + #13 + #10 +
       '\pard\sl276\slmult1\f0 For more info see: {{\field{\*\fldinst{HYPERLINK https://exiftool.org/geolocation.html }}{\fldrslt{https://exiftool.org/geolocation.html\ul0\cf0}}}}\f0\fs22\par' + #13 + #10 +
@@ -648,6 +661,16 @@ begin
         (CurVer = ETVERPH)) then
       result := (SuppressibleMsgBox('Your selected ExifTool version is already installed. Continue?',  \
                                     mbConfirmation, MB_YESNO, IDYES) = IDYES);
+
+    if (AltDbSelected) then
+    begin
+      GeoLocationDirPage := CreateInputDirPage(wpSelectTasks, 
+                              'Select directory for GeoLocation', 
+                              'Note: If you dont accept the default value you have to setup the directory in ExifToolGui/Preferences/GeoCoding',
+                              '', False, '');
+      GeoLocationDirPage.Add('Directory:');
+      GeoLocationDirPage.Values[0] := ExpandConstant('{app}\{#GeoLocationDir}');
+    end;
   end;
 
   if (CurPageID = wpReady) then

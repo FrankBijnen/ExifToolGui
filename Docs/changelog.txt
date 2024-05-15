@@ -93,3 +93,12 @@ Version:        Description             Issue
                 Fix Issue #374          Improve searching for places
                 Fix Issue #340          Feature Request: Display the imported gps file track on the map.
                 Fix Issue #388          Translation into Simplified Chinese
+6.3.2.0         Fix Issue #394          Using Ctrl-A to select all files does not seem to work consistently
+                Fix Issue #396          Check for FStyleServices in StyledDrawListviewItem
+                Fix Issue #398          Feature Request - Add shortcuts CTRL-C, CTRL-X and CTRL-V to Treeview. Allow copying directories. Improve refreshing
+                Fix Issue #402          Add option to download and install GeoLocation500
+                Fix Issue #405          Sort by filetype not followed by filename sort
+                Fix Issue #406          Write GPS coordinates to XMP tags and files #406
+                Fix Issue #409          Only mark a tag to save when data actually entered (Check .ismodified)
+                Fix Issue #414          Map is not loading. Show label how to enable it.
+                Fix Issue #417          Custom view - false message 'tag already exists'
