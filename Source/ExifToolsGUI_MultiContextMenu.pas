@@ -20,7 +20,7 @@ const SCmdVerbGenThumbsSub  = 'Generate Thumbnails (Incl Subdirs)';
       IDVerbGenThumbsSub    = $8002;
 
 type
-    IShellCommandVerbExifTool = interface
+  IShellCommandVerbExifTool = interface
     ['{E45EF43F-909E-40F9-A59E-C3FCAC3C9E4B}']
     procedure ExecuteCommandExif(Verb: string; var Handled: boolean);
     procedure CommandCompletedExif(Verb: string; Succeeded: boolean);
