@@ -129,5 +129,9 @@ Version 6.3.1
 
 - Simplified Chinese translation added. 
 
+Version 6.3.2
+
+- Updated the installer and preferences to allow the Alternate GeoLocation DB.
+- Mainly bug fixes. See ChangeLog.txt
 
 Frank

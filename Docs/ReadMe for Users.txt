@@ -148,4 +148,15 @@ Changed with version 6.3.1
 - To speed up processing '.GPX' and '.KML' files, they are processed by default with '-fast3'. To disable this behaviour find the line:
   'Fast3FileTypes=*.GPX|*.KML' in ExifToolGuiV6.ini and change it to 'Fast3FileTypes='. Or change the list of extensions. 
 
+Changed with version 6.3.2
+- The Installer can now be used to download and install an alternate (larger) GeoLocation DB.
+  In Preferences/GeoCoding you can specify this directory.
+- Bugfixes.
+  - Sort files always on Filename, within the chosen sort column. E.G. Within FileType on Filename.
+  - Dont prompt to save a tag value in the Workspace, if no data is entered.
+  - Keyboard shortcuts and refreshing for the Directory and Filelist panel.
+  - Fixed geotaggging XMP sidecar files.
+  - Message 'tag already exists' wrongly appears when adding tag to the Custom View.
+  - Show label on the OSM Map, if internet access is not enabled. 
+
 Frank

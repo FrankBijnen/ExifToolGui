@@ -1,3 +1,16 @@
+Starting from V6.3.2 and Exiftool 12.84:
+You can install a larger GeoCoding DB from https://exiftool.org/geolocation.html. Read 'Alternate databases' for more info.
+To use it you can:
+
+- Add the directory where you installed the DB in your ExifTool config file. 
+  $Image::ExifTool::Geolocation::geoDir = '/PATH/TO/Geolocation500';
+
+- Or specify the directory in preferences/GeoCoding. 'Exiftool GeoLocation DB' 
+  The larger DB will only be used in when calling ExifTool from GUI. GUI then uses '-API GeoDir=</PATH/TO/Geolocation500>'.
+
+- Or probably the easiest is to use the option provided by the installer. That will handle downloading and installing.
+  If you dont accept the proposed directory in the installer, you have to setup the actual directory using any of the methods above.
+ 
 Starting from V6.3.1 and Exiftool 12.81:
 The searching for places has been enhanced. 
 - A drop down list is shown for Languages, if applicable for the geocoding provider.
