@@ -103,6 +103,10 @@ The portable version is still available, and will be continued to be released. R
 You only need to download the "Windows Executable" zip file from <a href="https://exiftool.org/"><b>here</b></a>.
 After unzipping, depending on your Windows Explorer settings, you will see:<font color="CC0000">exiftool(-k)</font> or <font color="CC0000">exiftool(-k).exe</font>
 Rename it to either <font color="CC0000">exiftool</font> or <font color="CC0000">exiftool.exe</font> and put it in the same folder as ExifToolGui.<br><br>
+
+ExifTool (version 12.78 and later) comes standard with a DB used for the <font color="CC0000">GeoLocation</font> feature. An alternate (larger) DB is also provided.<br>
+The installer (V6.3.2) can download and install this larger DB automatically, See <a href="https://exiftool.org/geolocation.html">https://exiftool.org/geolocation.html</a> for more info how to do this manually.<br><br>
+
 <u>Notes:</u>
 <ul>
 <li>Bogdan Hrastnik recommended to copy exiftool into the Windows directory, but I strongly advise not to.
