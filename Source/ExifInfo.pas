@@ -1092,9 +1092,8 @@ var Bytes: TBytes;
     UnEscaped: string;
   begin
     // ExifTool escapes (needless) ' and " in XML.
-    // VerySimpleXML does not UnEscape those.
+    // VerySimpleXML does not UnEscape '&#39;' .
     UnEscaped := StringReplace(AValue, '&#39;', '''', [rfReplaceAll]);
-    UnEscaped := StringReplace(UnEscaped, '&quot;', '''', [rfReplaceAll]);
 
     if (EndsText('Iptc4xmpExt:CountryCode', AKey)) then
       XMP.CountryCodeShown := UnEscaped
