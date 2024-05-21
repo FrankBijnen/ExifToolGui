@@ -841,6 +841,7 @@ object FMain: TFMain
         TabOrder = 2
         ViewStyle = vsReport
         OnKeyDown = ShellListKeyDown
+        OnKeyUp = ShellListKeyUp
       end
       object PnlBreadCrumb: TPanel
         Left = 0

@@ -314,6 +314,7 @@ type
     procedure MaMarkedSaveExecute(Sender: TObject);
     procedure FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
     procedure ShellTreeKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
+    procedure ShellListKeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
   private
     { Private declarations }
     ETBarSeriesFocal: TBarSeries;
@@ -3126,8 +3127,6 @@ procedure TFMain.ShellListKeyDown(Sender: TObject; var Key: Word; Shift: TShiftS
   end;
 
 begin
-  if (Key = VK_UP) or (Key = VK_DOWN) then       // Up-Down arrow
-    ShellListClick(Sender);
   if (Key = Ord('A')) and (ssCTRL in Shift) then // Ctrl+A
     ShellList.SelectAll;
   if (Key = Ord('C')) and (ssCTRL in Shift) then // Ctrl+C
@@ -3136,8 +3135,6 @@ begin
     ShellList.FileNamesToClipboard(True);
   if (Key = Ord('V')) and (ssCTRL in Shift) then // Ctrl+V
     ShellList.PasteFilesFromClipboard;
-  if (Key = VK_PRIOR) or (Key = VK_NEXT) then    // PageUp/Down
-    ShellListClick(Sender);
 
   if (Key = VK_ADD) and (ssCtrl in Shift) then
     ShellList.SetIconSpacing(1, 0);
@@ -3151,6 +3148,14 @@ begin
   if (Key = VK_DELETE) and (ssCtrl in Shift) then
     DeleteSelected;
 {$ENDIF}
+end;
+
+procedure TFMain.ShellListKeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
+begin
+  if (Key = VK_UP) or (Key = VK_DOWN) then       // Up-Down arrow
+    ShellListClick(Sender);
+  if (Key = VK_PRIOR) or (Key = VK_NEXT) then    // PageUp/Down
+    ShellListClick(Sender);
 end;
 
 procedure TFMain.ShellListSetFolders;
