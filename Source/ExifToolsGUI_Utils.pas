@@ -49,7 +49,7 @@ procedure Swap(var A, B: Cardinal);
 
 // String
 function NextField(var AString: string; const ADelimiter: string): string;
-function QuotedFileName(FileName: string): string;
+function QuotedArg(FileName: string): string;
 function ReplaceLastChar(const AString: string; AFrom, ATo: Char): string;
 function EndsWithCRLF(const AString: string): string;
 function ArgsFromDirectCmd(const CmdIn: string): string;
@@ -436,10 +436,12 @@ begin
   end;
 end;
 
-function QuotedFileName(FileName: string): string;
+function QuotedArg(FileName: string): string;
 begin
   Result := FileName;
-  if (Pos(' ', Result) > 0) then
+  if (Pos(' ', Result) > 0) or
+     (Pos('>', Result) > 0) or
+     (Pos('<', Result) > 0) then
     Result := '"' + Result + '"';
 end;
 
@@ -483,7 +485,7 @@ begin
       result[Indx] := #10;                                      // Change a space to a LF, If not present within " "
   end;
   result := StringReplace(result, '"', '', [rfReplaceAll]);     // remove Double quotes
-  result := StringReplace(result, #0, '"', [rfReplaceAll]);     // Put the DOuble quotes in, that belong to the data
+  result := StringReplace(result, #0, '"', [rfReplaceAll]);     // Put the Double quotes in, that belong to the data
   result := StringReplace(result, #10, #13#10, [rfReplaceAll]); // LF => CRLF
 end;
 
@@ -501,7 +503,7 @@ begin
     for Indx := 0 to ArgsInList.Count -1 do
     begin
       Aline := StringReplace(ArgsInList[Indx], '"', '\"', [rfReplaceAll]);
-      result := result + Sep + QuotedFileName(Aline);
+      result := result + Sep + QuotedArg(Aline);
       Sep := ' ';
     end;
   finally
