@@ -3,10 +3,10 @@
 
 This is an updated version of the ExifToolGui program created by Bogdan Hrastnik. Many thanks go out to him.
 
-<b>Released version: <b>V6.3.2</b> updated May 17, 2024</b><br>
+<b>Released version: <b>V6.3.3</b> updated June 7, 2024</b><br>
 
-- Added the option to download and install an alternate (larger) GeoLocation DB.<br>
-- Mainly bug fixes.<br>
+- 2 small bugfixes.<br>
+- Changed compression of installer from lzma2 to zip, to prevent it from being flagged as virus.<br>
 - For the complete info see the changelog.<br>
 
 [Change log](Docs/changelog.txt)<br>
