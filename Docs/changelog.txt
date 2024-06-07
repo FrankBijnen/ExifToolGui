@@ -102,3 +102,6 @@ Version:        Description             Issue
                 Fix Issue #409          Only mark a tag to save when data actually entered (Check .ismodified)
                 Fix Issue #414          Map is not loading. Show label how to enable it.
                 Fix Issue #417          Custom view - false message 'tag already exists'
+6.3.3.0         Fix Issue #427          Preview doesn't show correct photo when using up/down keys to select photo/file
+                Fix Issue #429          Escape some more characters when creating CMD file from log window
+                Fix Issue #433          Getting "Virus detected" when downloading ExifToolGUI installer from Chrome, prevents download

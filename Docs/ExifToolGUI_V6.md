@@ -543,7 +543,7 @@ following tags:<br>
 This option is very similar to above. The difference is:<br>
 <li>No matter how many destination files you select (you must select at 
 least one for menu to be enabled), metadata will always be copied into <b>all</b> JPG or TIF (but not both) files inside current folder. That is, this option behaves as if all JPG or TIF files are selected in <b>Scenario 2</b> above.</li>
-<li>After you choose this menu option, you'll be first asked "<font class="blue">should files in subfolders also be processed?</font>". If we choose <font class="blue">No</font>, then again, this option behaves the same way as if all files are selected in <b>Scenario 2</b> above. However, if we coose <font class="blue">Yes</font>, then metadata will be copied into images in all subfolders as well (only where folder/file names are equal, of course).</li>
+<li>After you choose this menu option, you'll be first asked "<font class="blue">should files in subfolders also be processed?</font>". If we choose <font class="blue">No</font>, then again, this option behaves the same way as if all files are selected in <b>Scenario 2</b> above. However, if we choose <font class="blue">Yes</font>, then metadata will be copied into images in all subfolders as well (only where folder/file names are equal, of course).</li>
 <br>
 Let's see an example, where we wish to update <font class="brown">jpg</font> files with metadata from <font class="brown">raw</font> files:<br>
 <img src="ExifToolGUI_V6_files/copymetadatamulti.jpg"><br>
