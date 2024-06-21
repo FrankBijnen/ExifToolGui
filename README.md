@@ -1,9 +1,9 @@
-9﻿# ExifToolGui
+# ExifToolGui
 <h4>A GUI for ExifTool</h4>
 
 <h4>Warning</h4>
 As of June 21, 2024 MS defender started flagging the V6.3.3 installer as a virus.
-Postponing development until this is settled.<br>
+Postponing development until this is settled.<br><br>
 
 This is an updated version of the ExifToolGui program created by Bogdan Hrastnik. Many thanks go out to him.
 
