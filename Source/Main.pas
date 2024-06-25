@@ -1334,7 +1334,7 @@ begin
       end;
       if OpenPictureDlg.Execute then
       begin
-        ETcmd := '-TagsFromFile' + CRLF + ExtractFileDir(OpenPictureDlg.FileName); // incl. slash
+        ETcmd := '-TagsFromFile' + CRLF + IncludeTrailingPathDelimiter(ExtractFileDir(OpenPictureDlg.FileName)); // incl. slash
         if I = mrYes then
           ETcmd := ETcmd + '%d\';
         ETcmd := ETcmd + '%f' + ExtractFileExt(OpenPictureDlg.FileName);
