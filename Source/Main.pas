@@ -3445,12 +3445,12 @@ begin
         while E < ETResult.Count do
         begin
           Value := ETResult[E];
-          Item := Trim(NextField(Value, ': ')); // When Exiftool language is active the items are appended with spaces!
-          if (Value = '') then
-            ETResult[E] := '=' + Item
+          N := Pos(': ', Value);
+          if (N < 1) then
+            ETResult[E] := '=' + Value // Header
           else
-            ETResult[E] := Item + '=' + Value;
-          inc(E);
+            ETResult[E] := Trim(Copy(Value, 1, N -1)) + '=' + Copy(Value, N +2); // Normal Tag
+          Inc(E);
         end;
       end;
 
