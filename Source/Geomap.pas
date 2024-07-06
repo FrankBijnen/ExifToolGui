@@ -18,6 +18,7 @@ type
   TGeoCodeEnable = (geNone, geAll, geOffline);
   TGeoCodeProvider = (gpGeoName, gpOverPass, gpExifTool);
   TGeoTagMode = (gtmCoordinates, gtmLocation, gtmCoordinatesLocation);
+  TGeoCheckMode = (cmAll, cmPlaceProvider, cmCoordProvider);
 
   GEOsettingsRec = record
     GeoCodingEnable: TGeoCodeEnable;
@@ -37,7 +38,7 @@ type
     GeoTagMode: TGeoTagMode;
     GeoCodeDialog: boolean;
     ReverseGeoCodeDialog: boolean;
-    procedure CheckProvider;
+    procedure CheckProvider(const GeoCheckMode: TGeoCheckMode);
     procedure SetGeoLocation500(ADir: string);
   end;
 
@@ -203,14 +204,12 @@ var
   LastQuery: TDateTime;
   CoordCache: TObjectDictionary<string, TPlace>;
   CountryList: TStringList;
+  IgnoreGeoProvider: boolean;
 
-procedure GEOsettingsRec.CheckProvider;
+procedure GEOsettingsRec.CheckProvider(const GeoCheckMode: TGeoCheckMode);
+var
+  CheckFailed: boolean;
 begin
-
-  if (GeoSettings.GeoCodingEnable = TGeoCodeEnable.geAll) and
-      ((GeoSettings.GeoCodeApiKey = '') or
-       (GeoSettings.ThrottleGeoCode < 1000)) then
-    ShowMessage(StrCheckTheGeoCodeRe);
 
   if (GeoSettings.GeoCodingEnable = TGeoCodeEnable.geOffline) then
   begin
@@ -222,6 +221,26 @@ begin
       ShowMessage(StrCheckOffLineProv);
     end;
   end;
+
+  if (IgnoreGeoProvider) then
+    exit;
+
+  CheckFailed := ((GeoSettings.GeoCodeApiKey = '') or
+                  (GeoSettings.ThrottleGeoCode < 1000));
+  case GeoCheckMode of
+    TGeoCheckMode.cmPlaceProvider:
+        CheckFailed := (GeoSettings.GetPlaceProvider = TGeoCodeProvider.gpGeoName) and CheckFailed;
+    TGeoCheckMode.cmCoordProvider:
+        CheckFailed := (GeoSettings.GetCoordProvider = TGeoCodeProvider.gpGeoName) and CheckFailed;
+    TGeoCheckMode.cmAll:
+        CheckFailed := ((GeoSettings.GetPlaceProvider = TGeoCodeProvider.gpGeoName) or
+                        (GeoSettings.GetCoordProvider = TGeoCodeProvider.gpGeoName)) and CheckFailed;
+  end;
+
+  if (CheckFailed) then
+    IgnoreGeoProvider := (MessageDlgEx(StrCheckTheGeoCodeRe, '',
+                                       TMsgDlgType.mtWarning,
+                                       [TMsgDlgBtn.mbOK, TMsgDlgBtn.mbIgnore]) = IDIGNORE);
 end;
 
 procedure GEOsettingsRec.SetGeoLocation500(ADir: string);
@@ -1704,6 +1723,7 @@ end;
 
 initialization
 begin
+  IgnoreGeoProvider := false;
   CoordFormatSettings.ThousandSeparator := ',';
   CoordFormatSettings.DecimalSeparator := '.';
   GeoCityList := TStringList.Create;

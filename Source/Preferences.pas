@@ -179,7 +179,7 @@ begin
   GeoSettings.ReverseGeoCodeDialog := ChkReverseGeoCodeDialog.Checked;
   GeoSettings.CountryCodeLocation := ChkCountryLocation.Checked;
 
-  GeoSettings.CheckProvider;
+  GeoSettings.CheckProvider(TGeoCheckMode.cmAll);
 
   // Make sure changes made by user are saved.
   SaveGUIini;
