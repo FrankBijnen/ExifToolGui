@@ -82,7 +82,7 @@ end;
 
 procedure TFGeoSearch.BtnOKClick(Sender: TObject);
 begin
-  GeoSettings.CheckProvider;
+  GeoSettings.CheckProvider(TGeoCheckMode.cmCoordProvider);
   ModalResult := MROK;
 end;
 

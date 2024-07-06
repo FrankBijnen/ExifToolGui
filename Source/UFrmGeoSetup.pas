@@ -315,7 +315,7 @@ end;
 
 procedure TFGeoSetup.BtnOKClick(Sender: TObject);
 begin
-  GeoSettings.CheckProvider;
+  GeoSettings.CheckProvider(TGeoCheckMode.cmPlaceProvider);
   ModalResult := MROK;
 end;
 
