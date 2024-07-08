@@ -24,6 +24,7 @@ resourcestring
 
   StrRequestFailedWith      = 'Request failed with:';
   StrContinueReenabl        = 'Continue ? (Re-enable in Preferences)';
+  StrInvalidJson            = 'Invalid JSON received: %s';
 
   StrAnyGPSLogFile          = 'Any GPS log file';
   StrSelectGPSLogFile       = 'Select GPS log file';

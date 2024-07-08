@@ -1008,7 +1008,9 @@ begin
     if not ExecuteRest(RESTRequest) then
       exit;
 
-    JSONObject := RESTResponse.JSONValue as TJSONObject;
+    if not RESTResponse.JSONValue.TryGetValue(JSONObject) then
+      raise Exception.Create(Format(StrInvalidJson, [RESTResponse.Content]));
+
     JSONElements := JSONObject.GetValue<TJSONArray>('elements');
 
     // Find default lang, and Country code
@@ -1073,20 +1075,19 @@ begin
     if not ExecuteRest(RESTRequest) then
       exit;
 
-    JSONObject := TJSonObject.ParseJSONValue(RESTResponse.Content) as TJSONObject;
-    try
-      if (JSONObject.FindValue('address') <> nil) then
-      begin
-        JSONAddress := JSONObject.GetValue<TJSONObject>('address');
-        for JSONPair in JSONAddress do
-          result.AssignFromGeocode(TPlace.UnEscape(JSONPair.JsonString.ToString),
-                                   TPlace.UnEscape(JSONPair.JsonValue.ToString)
-                                  );
-        result.Sort;
-      end;
-    finally
-      JSONObject.Free;
+    if not RESTResponse.JSONValue.TryGetValue(JSONObject) then
+      raise Exception.Create(Format(StrInvalidJson, [RESTResponse.Content]));
+
+    if (JSONObject.FindValue('address') <> nil) then
+    begin
+      JSONAddress := JSONObject.GetValue<TJSONObject>('address');
+      for JSONPair in JSONAddress do
+        result.AssignFromGeocode(TPlace.UnEscape(JSONPair.JsonString.ToString),
+                                 TPlace.UnEscape(JSONPair.JsonValue.ToString)
+                                );
+      result.Sort;
     end;
+
   finally
     RESTResponse.Free;
     RESTRequest.Free;
@@ -1336,11 +1337,13 @@ begin
   try
     RESTRequest.params.Clear;
     RESTRequest.params.AddItem('data', Data, TRESTRequestParameterKind.pkGETorPOST);
+
     if not ExecuteRest(RESTRequest) then
       exit;
 
-    FrmPlaces.Listview1.Items.Clear;
-    JSONObject := RESTResponse.JSONValue as TJSONObject;
+    if not RESTResponse.JSONValue.TryGetValue(JSONObject) then
+      raise Exception.Create(Format(StrInvalidJson, [RESTResponse.Content]));
+
     JSONElements := JSONObject.GetValue<TJSONArray>('elements');
     for ElementIndx := 0 to JSONElements.Count -1 do
     begin
@@ -1442,9 +1445,9 @@ begin
     if not ExecuteRest(RESTRequest) then
       exit;
 
-    FrmPlaces.Listview1.Items.Clear;
+    if not RESTResponse.JSONValue.TryGetValue(Places) then
+      raise Exception.Create(Format(StrInvalidJson, [RESTResponse.Content]));
 
-    Places := RESTResponse.JSONValue as TJSONArray;
     for JValue in Places do
       FrmPlaces.AddPlace2LV(JValue.GetValue<string>('display_name'), JValue.GetValue<string>('lat'), JValue.GetValue<string>('lon'));
     result := ChooseLocation(Lat, Lon);
@@ -1480,7 +1483,6 @@ begin
       Match := 'cc';
 
     ETResult.Text := ExifToolGeoLocation(City, CountryRegion, Match, GeoSettings.GeoCodeLang, ETerr);
-    FrmPlaces.Listview1.Items.Clear;
     if (ETerr <> '') then
       FrmPlaces.AddPlace2LV(ETerr, '', '')
     else
@@ -1539,6 +1541,8 @@ begin
 
     CrWait := LoadCursor(0, IDC_WAIT);
     CrNormal := SetCursor(CrWait);
+
+    FrmPlaces.ListView1.Items.Clear;
     try
       case (GeoSettings.GeoCodingEnable) of
         TGeoCodeEnable.geNone:
