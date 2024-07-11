@@ -1072,12 +1072,14 @@ var
 begin
   TValueListEditor(Sender).MouseToCell(X, Y, ACol, ARow);
   if (ARow >= 1) and
-     (ARow <= TValueListEditor(Sender).RowCount) and
-     (TValueListEditor(Sender).Tag <> ARow) then  // Hint already shown?
+     (ARow <= TValueListEditor(Sender).RowCount) then
+    Hint := TValueListEditor(Sender).Cells[1, ARow]
+  else
+    Hint := '';
+
+  if (TValueListEditor(Sender).Tag <> ARow) then  // Need to activate hint already?
   begin
     TValueListEditor(Sender).Tag := ARow;         // Remember the row that has the hint.
-
-    Hint := TValueListEditor(Sender).Cells[1, ARow];
     Application.ActivateHint(TValueListEditor(Sender).ClientToScreen(Point(X, Y))); // Force hint display
   end;
 end;
