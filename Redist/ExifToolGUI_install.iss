@@ -49,6 +49,8 @@
 #define DownloadGeoDB "DownloadGeoDB" 
 #define DownloadGeoDBDesc "Download alternate (larger) GeoLocation database."
 #define GeoLocationDir "Geolocation500"
+;
+#define AddToPath "AddToPath"
 
 [Setup]
 AppPublisher={#ExifToolGUIPublisher}
@@ -82,6 +84,7 @@ DisableProgramGroupPage=yes
 LicenseFile=License.rtf
 ; Will be overriden
 InfoAfterFile=InfoDownload.rtf
+ChangesEnvironment=true
 
 [Messages]
 FinishedHeadingLabel=[name] has been installed. Exiftool will be installed using the Oliver Betz installer.
@@ -102,6 +105,8 @@ Name: LanguagesWin64;                   Description: "Install Language DLL's (Wi
 [Tasks]
 Name: desktopicon;                      Description: "Create a &desktop icon"; \
                                           GroupDescription: "Icons";
+Name: {#AddToPath};                     Description: "Add ExiftoolGUI to PATH"; \
+                                          GroupDescription: "Environment";
 Name: {#DownloadExifToolManual};        Description: "&Manual. Download links will be presented after installing.";  \
                                           GroupDescription: "Download ExifTool. (Currently installed: {code:ShowInstalledVersion})"; \
                                                                                               Flags: exclusive;               Check: EnableAutoDownload;
@@ -202,7 +207,120 @@ const
   ET                        = 'exiftool';
   GEODBVER                  = 'geo.txt';
   EXIFTOOL_FILES            = '\exiftool_files';
+
+
+const 
+  RootKeyAdmin = HKEY_LOCAL_MACHINE;
+  EnvironmentKeyAdmin = 'SYSTEM\CurrentControlSet\Control\Session Manager\Environment';
+  RootKeyNonAdmin = HKEY_CURRENT_USER;
+  EnvironmentKeyNonAdmin = 'Environment';
+
+procedure SetRegKey(var RootKey: integer; var EnvironmentKey: string);
+begin
+  if (IsAdminInstallMode) then
+  begin
+    RootKey := RootKeyAdmin;
+    EnvironmentKey := EnvironmentKeyAdmin;
+  end
+  else
+  begin
+    RootKey := RootKeyNonAdmin;
+    EnvironmentKey := EnvironmentKeyNonAdmin;
+  end;
+end;
+
+function AddSemiColons(Paths: string; Prefix, Suffix: boolean): string;
+var 
+  L: integer;
+begin
+  result := Paths;
+  L := Length(result);
+  if (L > 0) then
+  begin
+    if (Suffix) and
+       (Copy(result, L, 1) <> ';') then
+      result := result + ';';
+    if (Prefix) and
+       (Copy(result, 1, 1) <> ';') then
+      result := ';' + result;
+  end;    
+end;
   
+function RemoveSemiColons(Paths: string; Prefix, Suffix: boolean): string;
+var 
+  L: integer;
+begin
+  result := Paths;
+  L := Length(result);
+  if (L > 0) then
+  begin
+    if (Suffix) and
+       (Copy(result, L, 1) = ';') then
+      Delete(result, L, 1);
+    if (Prefix) and
+       (Copy(result, 1, 1) = ';') then
+      Delete(result, 1, 1);
+  end;    
+end;  
+
+procedure EnvAddPath(Path: string);
+var
+  RootKey: integer;
+  EnvironmentKey: string;
+  OrigPaths: string;
+  Paths: string;
+  NewPath: string;
+begin
+  SetRegKey(RootKey, EnvironmentKey);
+  
+  { Retrieve current path (use empty string if entry not exists) }
+  if not RegQueryStringValue(RootKey, EnvironmentKey, 'Path', OrigPaths) then
+    OrigPaths := '';
+  Paths := AddSemiColons(OrigPaths, true, true);
+  NewPath := AddSemiColons(Path, true, true);
+  
+  { Skip if string already found in path }
+  if Pos(Uppercase(NewPath), Uppercase(Paths)) > 0 then 
+    exit;
+
+  { App string to the end of the path variable }
+  Paths := AddSemiColons(OrigPaths, false, true) + Path;
+  
+  { Overwrite (or create if missing) path environment variable }
+  if not RegWriteStringValue(RootKey, EnvironmentKey, 'Path', Paths) then
+    Log(Format('Error while adding the [%s] to PATH: [%s]', [Path, Paths]));
+end;
+
+procedure EnvRemovePath(Path: string);
+var
+  Rootkey: integer;
+  EnvironmentKey: string;
+  OrigPaths: string;
+  Paths: string;
+  OldPath: string;
+  P: Integer;
+begin
+  SetRegKey(RootKey, EnvironmentKey);
+  
+  { Skip if registry entry not exists }
+  if not RegQueryStringValue(RootKey, EnvironmentKey, 'Path', OrigPaths) then
+    exit;
+  Paths := AddSemiColons(OrigPaths, true, true);  
+  OldPath := AddSemiColons(Path, true, true);  
+
+  { Skip if string not found in path }
+  P := Pos(Uppercase(OldPath), Uppercase(Paths));
+  if (P = 0) then
+    exit;
+    
+  Delete(Paths, P, Length(OldPath) -1);
+  Paths := RemoveSemiColons(Paths, true, true); // Remove unwanted ;
+  
+  { Overwrite path environment variable }
+  if not RegWriteStringValue(RootKey, EnvironmentKey, 'Path', Paths) then
+    Log(Format('Error while removing the [%s] from PATH: [%s]', [Path, Paths]));
+end;
+
 function GetInstalledVersionInPath(const Path: string): AnsiString;
 var
   Version_file: string;
@@ -345,6 +463,11 @@ function EnableAutoDownloadOBetz: boolean;
 begin
   result := (EnableAutoDownload = false) and
             (UpperCase(ExpandConstant('{#EnableAutoDownloadOBetz}')) = 'YES');
+end;
+
+function AddToPathSelected: boolean;
+begin
+  result := (WizardIsTaskSelected(ExpandConstant('{#AddToPath}')));
 end;
 
 function ObetzSelected: boolean;
@@ -714,5 +837,17 @@ begin
     if AltDbSelected then
       result := DownloadAltDb;
   end;
+end;
 
+procedure CurStepChanged(CurStep: TSetupStep);
+begin
+  if (CurStep = ssPostInstall) and
+     (AddToPathSelected) then 
+    EnvAddPath(ExpandConstant('{app}'));
+end;
+
+procedure CurUninstallStepChanged(CurUninstallStep: TUninstallStep);
+begin
+  if CurUninstallStep = usPostUninstall then
+    EnvRemovePath(ExpandConstant('{app}'));
 end;

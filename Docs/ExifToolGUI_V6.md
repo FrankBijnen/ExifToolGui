@@ -100,8 +100,8 @@ The portable version is still available, and will be continued to be released. R
 
 <a name="m_reqs_exiftool">
 <h3>1. ExifTool</h3>
-Starting with V12.88 the ExifTool the distribution has changed. Please follow the instructions <a href="https://exiftool.org/install.html"><b>here</b></a>
-if you want to install ExifTool manually. Starting with GUI V6.3.4 the installer can perform these steps also.
+Starting with V12.88 the ExifTool distribution has changed. Please follow the instructions on <a href="https://exiftool.org/install.html"><b>https://exiftool.org/install.html</b></a>
+if you want to install ExifTool manually. The GUI installer V6.3.4. can also perform these steps. <br><br>
 
 ExifTool (version 12.78 and later) comes standard with a DB used for the <font color="CC0000">GeoLocation</font> feature. An alternate (larger) DB is also provided.<br>
 The installer (V6.3.2) can download and install this larger DB automatically, See <a href="https://exiftool.org/geolocation.html">https://exiftool.org/geolocation.html</a> for more info how to do this manually.<br><br>

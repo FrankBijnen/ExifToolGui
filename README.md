@@ -7,10 +7,10 @@ Postponing development until this is settled.<br><br>
 
 This is an updated version of the ExifToolGui program created by Bogdan Hrastnik. Many thanks go out to him.
 
-<b>Released version: <b>V6.3.3</b> updated June 7, 2024</b><br>
+<b>Released version: <b>V6.3.4</b> updated July 12, 2024</b><br>
 
-- 2 small bugfixes.<br>
-- Changed compression of installer from lzma2 to zip, to prevent it from being flagged as virus.<br>
+- Some small bugfixes.<br>
+- Changed installer to support the new ExifTool distribution format, introduced with V12.88.<br>
 - For the complete info see the changelog.<br>
 
 [Change log](Docs/changelog.txt)<br>
