@@ -105,3 +105,8 @@ Version:        Description             Issue
 6.3.3.0         Fix Issue #427          Preview doesn't show correct photo when using up/down keys to select photo/file
                 Fix Issue #429          Escape some more characters when creating CMD file from log window
                 Fix Issue #433          Getting "Virus detected" when downloading ExifToolGUI installer from Chrome, prevents download
+6.3.4.0         Fix Issue #439          Show warning 'Check GeoCoding requirements only when GeoCoding provider chosen
+                Fix Issue #440          Metadata can trigger tags incorrectly displayed as headers
+                Fix Issue #443          Add check for valid JSON, before processing
+                Fix Issue #445          Dont show metadata hint if cursor is not on a line
+                Fix Issue #448          Update installer to support downloading and installing ExifTool V12.88 and late

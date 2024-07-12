@@ -159,4 +159,7 @@ Changed with version 6.3.2
   - Message 'tag already exists' wrongly appears when adding tag to the Custom View.
   - Show label on the OSM Map, if internet access is not enabled. 
 
+Changed with version 6.3.4
+- The Installer can now be used to download and install the new ExifTool V12.88 format.
+
 Frank
