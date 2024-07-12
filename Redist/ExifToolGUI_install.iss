@@ -66,14 +66,14 @@ OutputBaseFilename={#ExifToolGuiInstaller}
 UsePreviousTasks=No
 UsePreviousSetupType=No
 UsePreviousLanguage=No
-;Compression changed to zip, in an effort to please Windows Defender
-;Compression=lzma2/normal
-;LZMANumBlockThreads=16
-;LZMAUseSeparateProcess=yes
-Compression=zip/9
+;Change compression to zip? An effort to please Windows Defender.
+Compression=lzma2/normal
+LZMANumBlockThreads=16
+LZMAUseSeparateProcess=yes
+;Compression=zip/9
 SolidCompression=no
 RestartIfNeededByRun=no
-ArchitecturesInstallIn64BitMode=x64
+ArchitecturesInstallIn64BitMode=x64compatible
 PrivilegesRequired=lowest
 PrivilegesRequiredOverridesAllowed=dialog
 SetupIconFile=ExifToolGUI.ico
@@ -150,7 +150,7 @@ Source: "..\Translation\ExifToolGui.PTB";     DestDir: "{app}";   Components: La
 
 ; These files will be downloaded
 Source: "{tmp}\curver.txt";             DestDir: "{app}";                                     flags: external skipifsourcedoesntexist replacesameversion;
-Source: "{tmp}\exiftool.exe";           DestDir: "{app}";                                     flags: external skipifsourcedoesntexist replacesameversion;
+Source: "{code:EtZipFile|{tmp}}\*";     DestDir: "{app}";                                     flags: external skipifsourcedoesntexist replacesameversion recursesubdirs;
 Source: "{code:OBetzInstaller|{tmp}}";  DestDir: "{app}";                                     flags: external skipifsourcedoesntexist replacesameversion;
 Source: "{tmp}\{#GeolocationDir}\*";    DestDir: "{code:GeoLocationDir}";                     flags: external skipifsourcedoesntexist replacesameversion recursesubdirs;
 
@@ -201,7 +201,8 @@ const
   ET_K                      = 'exiftool(-k)';
   ET                        = 'exiftool';
   GEODBVER                  = 'geo.txt';
-
+  EXIFTOOL_FILES            = '\exiftool_files';
+  
 function GetInstalledVersionInPath(const Path: string): AnsiString;
 var
   Version_file: string;
@@ -442,9 +443,6 @@ begin
 
   WizardForm.TasksList.OnClickCheck := @TaskOnClick;
 
-//  CopyDirPage := CreateInputDirPage(wpSelectTasks, 'Select directory for GeoLocation', '',  '', False, '');
-//  CopyDirPage.Add('Directory:');
-
 end;
 
 function GeoLocationDir(const Param: string):string;
@@ -516,12 +514,20 @@ begin
      result := (OBetzSelected = false);
 end;
 
+function ETZipFile(const Path: string): string;
+begin
+  result := Path;
+  if (result <> '') then
+    result := result + '\';
+  result := result + ET + '-' + ETVerPH + ExpandConstant('{#ETPlatform}');
+end;
+
 function OBetzInstaller(const Path: string): string;
 begin
   result := Path;
   if (result <> '') then
     result := result + '\';
-  result := result + OBETZINSTALL + '_' + ETVerOBetz +  ExpandConstant('{#ETPlatform}') + EXE
+  result := result + OBETZINSTALL + '_' + ETVerOBetz +  ExpandConstant('{#ETPlatform}') + EXE;
 end;
 
 function InstallOBetzMsg(const Param: string):string;
@@ -544,9 +550,8 @@ begin
   result := result + AlternateDBVer;
 end;
 
-
 // Show in Download page
-function ShowDownLoadPage(const Remote, Local:string): boolean;
+function ShowDownLoadPage(const Remote, Local, Msg1, Msg2: string): boolean;
 begin
   DownloadPageET := CreateDownloadPage(SetupMessage(msgWizardPreparing), SetupMessage(msgPreparingDesc), @OnDownloadProgress);
   DownloadPageET.Add(Remote, Local, '');
@@ -564,7 +569,11 @@ begin
       Result := False;
     end;
   finally
-    DownloadPageET.Hide;
+    if (Msg1 <> '') or
+       (Msg2 <> '') then
+      DownLoadPageET.SetText(Msg1, Msg2)
+    else    
+      DownloadPageET.Hide;
   end;
 end;
 
@@ -576,42 +585,44 @@ begin
     result := true;
     exit;
   end;
-  result := ShowDownLoadPage(ETFile, OBetzInstaller(''));
+  result := ShowDownLoadPage(ETFile, OBetzInstaller(''), '', '');
 end;
 
 function DownloadETPH: boolean;
+var
+  ETDir: AnsiString;
 begin
-  ETFile := PHURL + ET + '-' + ETVerPH + ZIP;
+  ETFile := PHURL + ETZipFile('') + ZIP;
   if (NeverDownload) then
   begin
     result := true;
     exit;
   end;
 
-  result := ShowDownLoadPage(ETFile, ET + ZIP);
+  result := ShowDownLoadPage(ETFile, ET + ZIP, 'Unzipping', ETFile);
+  try
+    if (result) then
+    begin
+      // These operations all take place in TMP folder.
+      result := false; // In case actions in TMP folder should fail
 
-  if (result) then
-  begin
-    // These operations all take place in TMP folder.
-    result := false; // In case actions in TMP folder should fail
+      // Unzip Exiftool(-k).exe in app folder and rename to exiftool.exe
+      unzip(ExpandConstant('{tmp}\' + ET + ZIP), ExpandConstant('{tmp}'));
 
-    // Delete existing files. Dont check, dont need to be there
-    DeleteFile(ExpandConstant('{tmp}\' + ET_K + EXE));
-    DeleteFile(ExpandConstant('{tmp}\' + ET + EXE));
+      // unzip has no result. Check if file exists.
+      ETDir := ETZipFile(ExpandConstant('{tmp}')) + '\';
+      if not FileExists(ETDir + ET_K + EXE) then
+        RaiseException('Unzipping ' + ETDir + ZIP + ' failed');
 
-    // Unzip Exiftool(-k).exe in app folder and rename to exiftool.exe
-    unzip(ExpandConstant('{tmp}\' + ET + ZIP), ExpandConstant('{tmp}'));
+      // Rename
+      if not RenameFile(ETDir + ET_K + EXE,  ETDir + ET + EXE) then
+        RaiseException('Rename to ' +  ET + EXE + ' failed');
 
-    // unzip has no result. Check if file exists.
-    if not FileExists(ExpandConstant('{tmp}\' + ET_K + EXE)) then
-      RaiseException('Unzipping ' + ET + ZIP + ' failed');
-
-    // Rename
-    if not RenameFile(ExpandConstant('{tmp}\' + ET_K + EXE), ExpandConstant('{tmp}\' + ET + EXE)) then
-      RaiseException('Rename to ' +  ET + EXE + ' failed');
-
-     result := true;
-  end;
+      result := true;
+    end;
+  finally  
+    DownloadPageET.Hide;
+  end;  
 end;
 
 function DownloadAltDb: boolean;
@@ -623,26 +634,31 @@ begin
     exit;
   end;
 
-  result := ShowDownLoadPage(DBFile, AlternateDB(''));
+  result := ShowDownLoadPage(DBFile, AlternateDB(''), 'Unzipping', DBFile);
+  try
+    if (result) then
+    begin
 
-  if (result) then
-  begin
+      // These operations all take place in TMP folder.
+      result := false; // In case actions in TMP folder should fail
 
-    // These operations all take place in TMP folder.
-    result := false; // In case actions in TMP folder should fail
+      // Unzip Exiftool(-k).exe in app folder and rename to exiftool.exe
+      unzip(AlternateDB(ExpandConstant('{tmp}')), ExpandConstant('{tmp}'));
 
-    // Unzip Exiftool(-k).exe in app folder and rename to exiftool.exe
-    unzip(AlternateDB(ExpandConstant('{tmp}')), ExpandConstant('{tmp}'));
+      // unzip has no result. Check if file exists.
+      if not DirExists(ExpandConstant('{tmp}\{#GeoLocationDir}')) then
+        RaiseException('Unzipping ' + ExpandConstant('{tmp}\{#GeoLocationDir}') + ' failed');
 
-    // unzip has no result. Check if file exists.
-    if not DirExists(ExpandConstant('{tmp}\{#GeoLocationDir}')) then
-      RaiseException('Unzipping ' + ExpandConstant('{tmp}\{#GeoLocationDir}') + ' failed');
-
-     result := true;
-  end;
+       result := true;
+    end;
+  finally
+    DownloadPageET.Hide;
+  end;  
 end;
 
 function NextButtonClick(CurPageID: Integer): Boolean;
+var
+  ExifTool_Files_Dir: AnsiString;
 begin
   Result := true;
 
@@ -663,6 +679,20 @@ begin
         (CurVer = ETVERPH)) then
       result := (SuppressibleMsgBox('Your selected ExifTool version is already installed. Continue?',  \
                                     mbConfirmation, MB_YESNO, IDYES) = IDYES);
+
+    if ((PHSelected) and
+        (CurVer <> CURVER_UNAVAIL) and
+        (CurVer <> ETVERPH)) then
+    begin    
+      ExifTool_Files_Dir := ExpandConstant('{app}') + EXIFTOOL_FILES;
+      if (DirExists(ExifTool_Files_Dir)) then
+      begin
+        if (MsgBox('You are upgrading ExifTool to a newer version. Delete existing ExifTool_files found first?' + #10 + #10 +
+                   ExifTool_Files_Dir,
+                   mbConfirmation, MB_YESNO) = IDYES) then
+          DelTree(ExifTool_Files_Dir, true, true, true);
+      end;
+    end;    
 
     if (AltDbSelected) then
     begin
