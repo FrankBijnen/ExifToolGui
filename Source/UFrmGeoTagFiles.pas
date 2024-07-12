@@ -71,20 +71,25 @@ begin
     ValLocation.Strings.Clear;
     ValLocation.Strings.AddPair('Lat', Lat);
     ValLocation.Strings.AddPair('Lon', Lon);
-
-    // Get Place of selected coordinates
-    ClearCoordCache; // Make sure we dont get cached data.
-    APlace := GetPlaceOfCoords(Lat, Lon, GeoSettings.GetPlaceProvider);
-    if not Assigned(APlace) then
-      exit;
-    ValLocation.Strings.AddPair('CountryCode', APlace.CountryCode);
-    ValLocation.Strings.AddPair('CountryName', APlace.CountryName);
-    ValLocation.Strings.AddPair('Province', APlace.Province);
-    ValLocation.Strings.AddPair('City', APlace.City);
+    ValLocation.Strings.AddPair('CountryCode', '');
+    ValLocation.Strings.AddPair('CountryName', '');
+    ValLocation.Strings.AddPair('Province', '');
+    ValLocation.Strings.AddPair('City', '');
     ValLocation.Strings.AddPair('Location', '');
   finally
     ValLocation.Strings.EndUpdate;
   end;
+
+  // Get Place of selected coordinates
+  ClearCoordCache; // Make sure we dont get cached data.
+  APlace := GetPlaceOfCoords(Lat, Lon, GeoSettings.GetPlaceProvider);
+  if not Assigned(APlace) then
+    exit;
+  ValLocation.Values['CountryCode'] := APlace.CountryCode;
+  ValLocation.Values['CountryName'] := APlace.CountryName;
+  ValLocation.Values['Province'] := APlace.Province;
+  ValLocation.Values['City'] := APlace.City;
+  ValLocation.Values['Location'] := '';
 end;
 
 procedure TFGeotagFiles.Execute;
