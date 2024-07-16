@@ -331,7 +331,14 @@ begin
       ClearSelectionRefresh;
       if (Assigned(ShellTreeView)) and
          (Assigned(ShellTreeView.Selected)) then
-        ShellTreeView.Refresh(ShellTreeView.Selected);
+      begin
+        Self.Enabled := false;
+        try
+          ShellTreeView.Refresh(ShellTreeView.Selected);
+        finally
+          Self.Enabled := true;
+        end;
+      end;
     end;
   end;
 end;
