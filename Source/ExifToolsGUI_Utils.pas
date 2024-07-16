@@ -1355,6 +1355,7 @@ begin
     Reg.RootKey := HKEY_LOCAL_MACHINE;
     Reg.OpenKey(ETGContextKey + AppTitle, true);
     Reg.WriteString('', Description);
+    Reg.WriteString('Icon', '"'+ ParamStr(0) + '"');
     Reg.CloseKey;
 
     Reg.OpenKey(ETGContextKey + AppTitle + ETGCommandKey, true);
