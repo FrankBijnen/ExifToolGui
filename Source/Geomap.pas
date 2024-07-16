@@ -1268,15 +1268,15 @@ begin
   if (CountryRegion = '') then
   begin   // Query within selected bounds
     if (Bounds <> '') then
-      SearchBounds := Format('(%s);', [Bounds]);
+      SearchBounds := Format('(%s)', [Bounds]);
 
     // Join Name and Name:languagecode
     Data := Data + Format('(%s', [FormatNL]);
     Data := Data +
-            Format('node[%s][place~"^(%s)$"]%s%s',
+            Format('node[%s][place~"^(%s)$"]%s;%s',
               [Format(SearchName, ['name']), SearchPlaces, SearchBounds, FormatNL]);
     if (GeoSettings.GeoCodeLang <> '') then // Search for name:xx xx=selected language code
-      Data := Data + Format('node[%s][place~"^(%s)$"]%s%s',
+      Data := Data + Format('node[%s][place~"^(%s)$"]%s;%s',
                        [Format(SearchName, ['name:' + LowerCase(GeoSettings.GeoCodeLang)]), SearchPlaces, SearchBounds, FormatNL]);
     Data := Data +  Format(');%s', [FormatNL]);
 
