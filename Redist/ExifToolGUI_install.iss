@@ -92,12 +92,12 @@ FinishedLabel=It is recommended to keep the default settings. In particular 'Add
 ClickFinish=(Un)Check Install Exiftool and click Finish to continue.
 
 [Components]
-Name: ExecutableWin32;                  Description: "Install Executable (Win32)";            types: compact full;  Check: Win32;
+Name: ExecutableWin32;                  Description: "Install Executable (Win32)";            types: full;          Check: Win32;
 Name: MapFileWin32;                     Description: "Install Map file (Win32)";              types: full;          Check: Win32;
 Name: WebView2LoaderDLLWin32;           Description: "Install WebView2Loader.DLL (Win32)";    types: full;          Check: Win32;
 Name: LanguagesWin32;                   Description: "Install Language DLL's (Win32)";        types: full;          Check: Win32;
 
-Name: ExecutableWin64;                  Description: "Install Executable (Win64)";            types: compact full;  Check: Win64;
+Name: ExecutableWin64;                  Description: "Install Executable (Win64)";            types: full;          Check: Win64;
 Name: MapFileWin64;                     Description: "Install Map file (Win64)";              types: full;          Check: Win64;
 Name: WebView2LoaderDLLWin64;           Description: "Install WebView2Loader.DLL (Win64)";    types: full;          Check: Win64;
 Name: LanguagesWin64;                   Description: "Install Language DLL's (Win64)";        types: full;          Check: Win64;
@@ -154,7 +154,6 @@ Source: "..\Translation\ExifToolGui.NLD";     DestDir: "{app}";   Components: La
 Source: "..\Translation\ExifToolGui.PTB";     DestDir: "{app}";   Components: LanguagesWin32; flags: replacesameversion;
 
 ; These files will be downloaded
-Source: "{tmp}\curver.txt";             DestDir: "{app}";                                     flags: external skipifsourcedoesntexist replacesameversion;
 Source: "{code:EtZipFile|{tmp}}\*";     DestDir: "{app}";                                     flags: external skipifsourcedoesntexist replacesameversion recursesubdirs;
 Source: "{code:OBetzInstaller|{tmp}}";  DestDir: "{app}";                                     flags: external skipifsourcedoesntexist replacesameversion;
 Source: "{tmp}\{#GeolocationDir}\*";    DestDir: "{code:GeoLocationDir}";                     flags: external skipifsourcedoesntexist replacesameversion recursesubdirs;
@@ -333,7 +332,7 @@ begin
   TmpDir := ExpandConstant('{tmp}');
   Version_file := AddQuotes(ExpandConstant('{tmp}') + '\' + CURVER_TXT);
   Params := '/c' + AddQuotes(Path + 'exiftool') + ' -ver > ' + Version_file;
-  Rc := ExecAsOriginalUser(GetEnv('COMSPEC'), Params, TmpDir, SW_HIDE, ewWaitUntilTerminated, ErrorCode);
+  Rc := Exec(GetEnv('COMSPEC'), Params, TmpDir, SW_HIDE, ewWaitUntilTerminated, ErrorCode);
   if (not Rc) or 
      (ErrorCode <> 0) then
   begin
