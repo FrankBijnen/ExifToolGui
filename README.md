@@ -22,9 +22,7 @@ This is an updated version of the ExifToolGui program created by Bogdan Hrastnik
 <h4>Obtaining Exiftool</h4>
 
 1) The original version by Phil Harvey. https://exiftool.org/ <br>
-   Download the zip file called: Windows Executable: exiftool-xx.yy.zip. <br>
-   Unzip the exe and rename it to 'exiftool.exe' in a directory that Windows searches. (Without the quotes) <br>
-   Can be the directory where 'ExifToolGui.exe' is located.
+   Starting with Version V12.88 the instructions for downloading and installing have changed: https://exiftool.org/install.html
 
 2) An installer provided by Oliver Betz. https://oliverbetz.de/pages/Artikel/ExifTool-for-Windows
 
