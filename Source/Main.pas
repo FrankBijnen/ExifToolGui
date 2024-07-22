@@ -2495,6 +2495,7 @@ begin
 
   // Metadatalist Ctrl handler
   MetadataList.OnCtrlKeyDown := MetadataListCtrlKeyDown;
+  MetadataList.ProportionalVScroll := true;
 
   CBoxFileFilter.Text := SHOWALL;
   ExifTool.ExecETEvent := ExecETEvent_Done;
@@ -3319,7 +3320,7 @@ end;
 // =========================== Show Metadata ====================================
 procedure TFMain.ShowMetadata;
 var
-  E, N: integer;
+  E, N, SavedRow: integer;
   ETcmd, Item, Value, Tx: string;
   ETResult: TStringList;
   NoChars:  TSysCharSet;
@@ -3339,6 +3340,9 @@ begin
     exit;
   end;
 
+  SavedRow := MetadataList.Row;
+  MetadataList.Row := 1;
+
   ETResult := TStringList.Create;
   try
     if SpeedBtnQuick.Down then
@@ -3357,34 +3361,39 @@ begin
       N := Min(N, ETResult.Count - 1);
       with MetadataList do
       begin
-        Strings.Clear;
-        if (ETResult.Count < Length(QuickTags)) and
-           (ETResult.Count > 0) then
-          Strings.Append(Format('=' + StrWarningOnlyDRes,
-                                [ETResult.Count, Length(QuickTags)]));
-        for E := 0 to N do
-        begin
-          Tx := QuickTags[E].Command;
-          if UpperCase(LeftStr(Tx, Length(GUI_SEP))) = GUI_SEP then
-            Tx := '=' + QuickTags[E].Caption
-          else
+        Strings.BeginUpdate;
+        try
+          Strings.Clear;
+          if (ETResult.Count < Length(QuickTags)) and
+             (ETResult.Count > 0) then
+            Strings.Append(Format('=' + StrWarningOnlyDRes,
+                                  [ETResult.Count, Length(QuickTags)]));
+          for E := 0 to N do
           begin
-            Tx := QuickTags[E].Caption;
-            if (Pos('?', Tx) > 0) then
-            begin
-              Include(NoChars, '-');
-              if (Pos('??', Tx) > 0) then
-                Include(NoChars, '0');
-
-              if CharInSet(ETResult[E][1], NoChars) then
-                Tx := Tx + '='+ StrNOAst
-              else
-                Tx := Tx + '=' + StrYESAst;
-            end
+            Tx := QuickTags[E].Command;
+            if UpperCase(LeftStr(Tx, Length(GUI_SEP))) = GUI_SEP then
+              Tx := '=' + QuickTags[E].Caption
             else
-              Tx := QuickTags[E].Caption + '=' + ETResult[E];
+            begin
+              Tx := QuickTags[E].Caption;
+              if (Pos('?', Tx) > 0) then
+              begin
+                Include(NoChars, '-');
+                if (Pos('??', Tx) > 0) then
+                  Include(NoChars, '0');
+
+                if CharInSet(ETResult[E][1], NoChars) then
+                  Tx := Tx + '='+ StrNOAst
+                else
+                  Tx := Tx + '=' + StrYESAst;
+              end
+              else
+                Tx := QuickTags[E].Caption + '=' + ETResult[E];
+            end;
+            Strings.Append(Tx);
           end;
-          Strings.Append(Tx);
+        finally
+          Strings.EndUpdate;
         end;
       end;
     end
@@ -3460,19 +3469,17 @@ begin
       begin
         Strings.BeginUpdate;
         try
-          E := Row;
-          Row := 1;
           Strings.Clear;
           Strings.AddStrings(ETResult);
         finally
           Strings.EndUpdate;
         end;
-        if RowCount > E then
-          Row := E
-        else
-          Row := RowCount - 1;
       end;
     end;
+    if MetadataList.RowCount > SavedRow then
+      MetadataList.Row := SavedRow
+    else
+      MetadataList.Row := MetadataList.RowCount - 1;
   finally
     ETResult.Free;
   end;
