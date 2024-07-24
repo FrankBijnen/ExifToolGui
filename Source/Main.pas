@@ -1210,14 +1210,13 @@ var
   ETcmd, ETout, ETerr: string;
   J: integer;
 begin
-  // if Sender=MImportMetaIntoJPG then DstExt:='JPG' else DstExt:='TIF';
   DstExt := UpperCase(ExtractFileExt(ShellList.SelectedFolder.PathName));
   Delete(DstExt, 1, 1);
 
   if (DstExt = 'JPG') or (DstExt = 'TIF') then
   begin
     J := ShellList.SelCount;
-    if J > 1 then // message appears only if multi files selected
+    if J > 1 then // message appears only if multiple files selected
       if MessageDlg(ImportMetaSel1 + #10 +
                     Format(ImportMetaSel2, [DstExt]) + #10 +
                     ImportMetaSel3 + #10 +
@@ -1244,27 +1243,11 @@ begin
           ETcmd := ExtractFileDir(ETcmd) + '\%f' + ExtractFileExt(ETcmd);
         // multiple files
         ETcmd := '-TagsFromFile' + CRLF + ETcmd + CRLF + '-All:All' + CRLF;
+
+        FCopyMetadata.SetSample(OpenPictureDlg.FileName);
         if FCopyMetadata.ShowModal = mrOK then
         begin
-          with FCopyMetadata do
-          begin
-            if not CheckBox1.Checked then
-              ETcmd := ETcmd + '--exif:ExifImageWidth' + CRLF + '--exif:ExifImageHeight' + CRLF;
-            if not CheckBox2.Checked then
-              ETcmd := ETcmd + '--exif:Orientation' + CRLF;
-            if not CheckBox3.Checked then
-              ETcmd := ETcmd + '--exif:Xresolution' + CRLF + '--exif:Yresolution' + CRLF + '--exif:ResolutionUnit' + CRLF;
-            if not CheckBox4.Checked then
-              ETcmd := ETcmd + '--exif:ColorSpace' + CRLF + '--exif:InteropIndex' + CRLF;
-            if not CheckBox5.Checked then
-              ETcmd := ETcmd + '--Makernotes' + CRLF;
-            if not CheckBox6.Checked then
-              ETcmd := ETcmd + '--Xmp-photoshop' + CRLF;
-            if not CheckBox7.Checked then
-              ETcmd := ETcmd + '--Xmp-crs' + CRLF;
-            if not CheckBox8.Checked then
-              ETcmd := ETcmd + '--Xmp-exif' + CRLF;
-          end;
+          ETcmd := ETcmd + FCopyMetadata.TagSelection;
           ETcmd := ETcmd + '-ext' + CRLF + DstExt;
           if (ET_OpenExec(ETcmd, GetSelectedFiles, ETout, ETerr)) then
           begin
@@ -1297,7 +1280,7 @@ begin
     end;
     if OpenPictureDlg.Execute then
     begin
-      FCopyMetaSingle.SrcFile := OpenPictureDlg.FileName;
+      FCopyMetaSingle.SetSourceFile(OpenPictureDlg.FileName);
       if FCopyMetaSingle.ShowModal = mrOK then
       begin
         RefreshSelected(Sender);
@@ -1343,27 +1326,11 @@ begin
         if I = mrYes then
           ETcmd := ETcmd + CRLF + '-r';
         ETcmd := ETcmd + CRLF + '-All:All' + CRLF;
+
+        FCopyMetadata.SetSample(OpenPictureDlg.FileName);
         if FCopyMetadata.ShowModal = mrOK then
         begin
-          with FCopyMetadata do
-          begin
-            if not CheckBox1.Checked then
-              ETcmd := ETcmd + '--exif:ExifImageWidth' + CRLF + '--exif:ExifImageHeight' + CRLF;
-            if not CheckBox2.Checked then
-              ETcmd := ETcmd + '--exif:Orientation' + CRLF;
-            if not CheckBox3.Checked then
-              ETcmd := ETcmd + '--exif:Xresolution' + CRLF + '--exif:Yresolution' + CRLF + '--exif:ResolutionUnit' + CRLF;
-            if not CheckBox4.Checked then
-              ETcmd := ETcmd + '--exif:ColorSpace' + CRLF + '--exif:InteropIndex' + CRLF;
-            if not CheckBox5.Checked then
-              ETcmd := ETcmd + '--Makernotes' + CRLF;
-            if not CheckBox6.Checked then
-              ETcmd := ETcmd + '--Xmp-photoshop' + CRLF;
-            if not CheckBox7.Checked then
-              ETcmd := ETcmd + '--Xmp-crs' + CRLF;
-            if not CheckBox8.Checked then
-              ETcmd := ETcmd + '--Xmp-exif' + CRLF;
-          end;
+          ETcmd := ETcmd + FCopyMetadata.TagSelection;
           ETcmd := ETcmd + '-ext' + CRLF + DstExt;
           SetCounter(CounterETEvent, GetNrOfFiles(ShellList.Path, '*.' + DstExt, (I = mrYes)));
           if (ET_OpenExec(ETcmd, '.', ETout, ETerr)) then
@@ -1472,6 +1439,7 @@ end;
 
 procedure TFMain.MRemoveMetaClick(Sender: TObject);
 begin
+  FRemoveMeta.SetSample(GetFirstSelectedFilePath);
   if FRemoveMeta.ShowModal = mrOK then
     ShowMetadata;
 end;
@@ -2475,6 +2443,7 @@ begin
   // Set properties of ShellTree in code.
   ShellTree.OnBeforeContextMenu := ShellTreeBeforeContext;
   ShellTree.OnAfterContextMenu := ShellTreeAfterContext;
+  ShellTree.OnCustomDrawItem := ShellTreeCustomDrawItem;
 
   // Set properties of Shelllist in code.
   ShellList.OnPopulateBeforeEvent := ShellListBeforePopulate;
@@ -2488,10 +2457,7 @@ begin
   ShellList.OnMouseWheel := ShellListMouseWheel;
   // Enable Column sorting if Sorted = true. Disables Sorted.
   ShellList.ColumnSorted := ShellList.Sorted;
-
   ShellList.OnCustomDrawItem := ShellListCustomDrawItem;
-
-  ShellTree.OnCustomDrawItem := ShellTreeCustomDrawItem;
 
   // Metadatalist Ctrl handler
   MetadataList.OnCtrlKeyDown := MetadataListCtrlKeyDown;

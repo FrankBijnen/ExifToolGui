@@ -6,47 +6,50 @@ uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants,
   System.Classes, Vcl.Graphics,
   Vcl.Controls, Vcl.Forms, UnitScaleForm, Vcl.Dialogs, Vcl.ExtCtrls, Vcl.ComCtrls,
-  Vcl.StdCtrls;
+  Vcl.StdCtrls, Vcl.Buttons, System.ImageList, Vcl.ImgList, Vcl.VirtualImageList, Vcl.BaseImageCollection, Vcl.ImageCollection;
 
 type
   TFRemoveMeta = class(TScaleForm)
     StatusBar1: TStatusBar;
     AdvPanel1: TPanel;
-    Button1: TButton;
-    Button2: TButton;
+    BtnCancel: TButton;
+    BtnExecute: TButton;
     Label1: TLabel;
-    CheckBox1: TCheckBox;
-    AdvPanel2: TPanel;
-    CheckBox2: TCheckBox;
-    CheckBox3: TCheckBox;
-    CheckBox4: TCheckBox;
-    CheckBox5: TCheckBox;
-    CheckBox6: TCheckBox;
-    CheckBox7: TCheckBox;
-    CheckBox8: TCheckBox;
-    CheckBox9: TCheckBox;
-    CheckBox10: TCheckBox;
-    CheckBox11: TCheckBox;
-    CheckBox12: TCheckBox;
-    CheckBox13: TCheckBox;
-    CheckBox14: TCheckBox;
-    CheckBox15: TCheckBox;
-    CheckBox16: TCheckBox;
-    CheckBox17: TCheckBox;
-    CheckBox18: TCheckBox;
+    ChkRemoveAll: TCheckBox;
+    LvTagNames: TListView;
+    BtnPreview: TButton;
+    PnlButtons: TPanel;
+    SpbAdd: TSpeedButton;
+    SpbDel: TSpeedButton;
+    SpbEdit: TSpeedButton;
+    SpbReset: TSpeedButton;
+    ImageCollection: TImageCollection;
+    VirtualImageList: TVirtualImageList;
     procedure FormShow(Sender: TObject);
-    procedure CheckBox1Click(Sender: TObject);
-    procedure CheckBox2Click(Sender: TObject);
-    procedure CheckBox3Click(Sender: TObject);
-    procedure CheckBox7Click(Sender: TObject);
-    procedure Button2Click(Sender: TObject);
+
+    procedure BtnExecuteClick(Sender: TObject);
+    procedure ChkRemoveAllClick(Sender: TObject);
+    procedure BtnPreviewClick(Sender: TObject);
+    procedure LvTagNamesCustomDrawItem(Sender: TCustomListView; Item: TListItem; State: TCustomDrawState; var DefaultDraw: Boolean);
+    procedure SpbAddClick(Sender: TObject);
+    procedure SpbDelClick(Sender: TObject);
+    procedure SpbEditClick(Sender: TObject);
+    procedure SpbResetClick(Sender: TObject);
+    procedure FormClose(Sender: TObject; var Action: TCloseAction);
+    procedure LvTagNamesItemChecked(Sender: TObject; Item: TListItem);
+    procedure LvTagNamesEdited(Sender: TObject; Item: TListItem; var S: string);
   private
     { Private declarations }
+    FSample: string;
+    procedure SetupListView;
+    procedure GetSelectedTags;
+    procedure GetTagNames;
+    procedure CheckSelection;
     procedure DisplayHint(Sender: TObject);
-    procedure SetExecuteButton;
-    procedure CheckForRemoveAll;
   public
     { Public declarations }
+    procedure SetSample(ASample: string);
+    function TagSelection(const DoRemove: string = ''): string;
   end;
 
 var
@@ -54,180 +57,163 @@ var
 
 implementation
 
-uses Main, ExifTool, UnitLangResources;
+uses
+  Main, MainDef, ExifToolsGUI_Utils, ExifTool, LogWin, UFrmTagNames, UnitLangResources,
+  Vcl.Themes;
 
 {$R *.dfm}
 
-var
-  // clLite,clDark:TColor;
-  EventOn: boolean;
+var FStyleServices: TCustomStyleServices;
 
-procedure TFRemoveMeta.SetExecuteButton;
+procedure TFRemoveMeta.SetupListView;
 var
-  i: integer;
-  CheckedExist: boolean;
+  ATag, AllTags: string;
+  ANItem: TListItem;
 begin
-  CheckedExist := CheckBox1.Checked;
-  if not CheckedExist then
-  begin
-    with AdvPanel2 do
-      for i := 0 to ControlCount - 1 do
+  LvTagNames.Tag := 1;
+  LvTagNames.Items.BeginUpdate;
+  try
+    LvTagNames.Items.Clear;
+    if (ChkRemoveAll.Checked = false) then
+    begin
+      AllTags := RemoveTagList;
+      while (AllTags <> '') do
       begin
-        if Controls[i] is TCheckBox then
-          CheckedExist := CheckedExist or (Controls[i] as TCheckBox).Checked;
+        ATag := NextField(AllTags, ' ');
+        ANItem := LvTagNames.Items.Add;
+        ANitem.Caption := ATag;
+        ANItem.ImageIndex := TagImageIndex(ANitem.Caption);
+        ANItem.Checked := (Pos(' ' + ATag + ' ', ' ' + SelRemoveTagList) > 0);
       end;
+    end;
+  finally
+    LvTagNames.Items.EndUpdate;
+    LvTagNames.Tag := 0;
   end;
-  Button2.Enabled := CheckedExist;
 end;
 
-procedure TFRemoveMeta.Button2Click(Sender: TObject);
+procedure TFRemoveMeta.SpbAddClick(Sender: TObject);
+begin
+  FrmTagNames.SetSample(FSample);
+  if (FrmTagNames.ShowModal = IDOK) then
+  begin
+    with LvTagNames.Items.Add do
+    begin
+      Caption := FrmTagNames.EdTagName.Text;
+      ImageIndex := TagImageIndex(Caption);
+    end;
+  end;
+end;
+
+procedure TFRemoveMeta.SpbResetClick(Sender: TObject);
+begin
+  RemoveTagList := DefRemoveTags;
+  SelRemoveTagList := '';
+  SetupListView;
+end;
+
+procedure TFRemoveMeta.SpbDelClick(Sender: TObject);
+begin
+  if (LvTagNames.Selected <> nil) then
+    LvTagNames.Selected.Delete;
+end;
+
+procedure TFRemoveMeta.SpbEditClick(Sender: TObject);
+begin
+  if (LvTagNames.Selected <> nil) then
+  begin
+    BtnExecute.Default := false;
+    LvTagNames.Selected.EditCaption;
+  end;
+end;
+
+procedure TFRemoveMeta.GetTagNames;
+var
+  ANItem: TListItem;
+begin
+  RemoveTagList := '';
+  for ANItem in LvTagNames.Items do
+    RemoveTagList := RemoveTagList + ANItem.Caption + ' ';
+end;
+
+procedure TFRemoveMeta.GetSelectedTags;
+var
+  ANItem: TListItem;
+begin
+  SelRemoveTagList := '';
+  for ANItem in LvTagNames.Items do
+  begin
+    if (ANitem.Checked) then
+      SelRemoveTagList := SelRemoveTagList + ANItem.Caption + ' ';
+  end;
+end;
+
+procedure TFRemoveMeta.SetSample(ASample: string);
+begin
+  FSample := ASample;
+end;
+
+function TFRemoveMeta.TagSelection(const DoRemove: string = ''): string;
+var
+  ANItem: TListItem;
+begin
+  if (ChkRemoveAll.Checked) then
+    result := '-All:all' + DoRemove
+  else
+  begin
+    // Save selection. Will be stored in INI
+    GetTagNames;
+    GetSelectedTags;
+
+    result := '';
+    for ANItem in LvTagNames.Items do
+    begin
+      if (ANitem.Checked) then
+        result := result + '-' + ANItem.Caption + DoRemove + CRLF;
+    end;
+  end;
+end;
+
+procedure TFRemoveMeta.BtnExecuteClick(Sender: TObject);
 var
   ETcmd, ETout, ETerr: string;
 begin
-  ETcmd := '';
-  if CheckBox1.Checked then
-    ETcmd := '-All='
-  else
-  begin
-    if CheckBox2.Checked then
-      ETcmd := '-Exif:All='
-    else
-    begin
-      if CheckBox3.Checked then
-        ETcmd := '-Makernotes:All=';
-      if CheckBox4.Checked then
-        ETcmd := ETcmd + CRLF + '-Gps:All=';
-      if CheckBox5.Checked then
-        ETcmd := ETcmd + CRLF + '-IFD1:All=';
-    end;
-    if CheckBox6.Checked then
-      ETcmd := ETcmd + CRLF + '-Xmp:All='
-    else
-    begin
-      if CheckBox7.Checked then
-        ETcmd := ETcmd + CRLF + '-Xmp-exif:All=';
-      if CheckBox8.Checked then
-        ETcmd := ETcmd + CRLF + '-Xmp-Acdsee:All=';
-      if CheckBox9.Checked then
-        ETcmd := ETcmd + CRLF + '-Xmp-Mediapro:All=';
-      if CheckBox10.Checked then
-        ETcmd := ETcmd + CRLF + '-Xmp-Photoshop:All=';
-      if CheckBox11.Checked then
-        ETcmd := ETcmd + CRLF + '-Xmp-crs:All=';
-      if CheckBox12.Checked then
-        ETcmd := ETcmd + CRLF + '-Xmp-Microsoft:All=';
-      if CheckBox17.Checked then
-        ETcmd := ETcmd + CRLF + '-Xmp-pdf:All=';
-      if CheckBox18.Checked then
-        ETcmd := ETcmd + CRLF + '-Xmp-tiff:All=';
-    end;
-    if CheckBox13.Checked then
-      ETcmd := ETcmd + CRLF + '-Iptc:All=';
-    if CheckBox14.Checked then
-      ETcmd := ETcmd + CRLF + '-Photoshop:All=';
-    if CheckBox15.Checked then
-      ETcmd := ETcmd + CRLF + '-Jfif:All=';
-    if CheckBox16.Checked then
-      ETcmd := ETcmd + CRLF + '-ICC_profile:All=';
-  end;
-
+  ETcmd := TagSelection('=');
   ET_OpenExec(ETcmd, FMain.GetSelectedFiles, ETout, ETerr);
   ModalResult := mrOK;
 end;
 
-procedure TFRemoveMeta.CheckBox1Click(Sender: TObject);
+procedure TFRemoveMeta.BtnPreviewClick(Sender: TObject);
 var
-  Indx: integer;
+  ETcmd: string;
 begin
-  if EventOn then
-  begin
-    EventOn := false;
-    with AdvPanel2 do
-      for Indx := 0 to ControlCount - 1 do
-      begin
-        if Controls[Indx] is TCheckBox then
-          (Controls[Indx] as TCheckBox).Checked := CheckBox1.Checked;
-      end;
-    EventOn := true;
-    SetExecuteButton;
-  end;
+  ETcmd := '-G0:1' + CRLF + '-a' + CRLF + '-s1' + CRLF + TagSelection;
+  FLogWin.Show;
+  ET_OpenExec(ETcmd, FSample);
 end;
 
-procedure TFRemoveMeta.CheckForRemoveAll;
-var
-  Indx: integer;
-  AllChecked: boolean;
+procedure TFRemoveMeta.ChkRemoveAllClick(Sender: TObject);
 begin
-  AllChecked := true;
-  for Indx := 0 to AdvPanel2.ControlCount - 1 do
-    AllChecked := AllChecked and
-                  (AdvPanel2.Controls[Indx] as TCheckBox).Checked;
-  EventOn := false;
-  CheckBox1.Checked := AllChecked;
-  EventOn := true;
+  LvTagNames.Enabled := not ChkRemoveAll.Checked;
+  PnlButtons.Enabled := not ChkRemoveAll.Checked;
+  SetupListView;
+  CheckSelection;
 end;
 
-procedure TFRemoveMeta.CheckBox2Click(Sender: TObject);
-var
-  IsChecked: boolean; // Exif,Xmp,Iptc,Photoshop,JFIF,ICC
+procedure TFRemoveMeta.CheckSelection;
 begin
-  if EventOn then
-  begin
-    EventOn := false;
-    IsChecked := (Sender as TCheckBox).Checked;
-    if not IsChecked then
-      CheckBox1.Checked := false; // RemoveAll
-
-    if Sender = CheckBox2 then
-    begin // Exif:All
-      CheckBox3.Checked := IsChecked;
-      CheckBox4.Checked := IsChecked;
-      CheckBox5.Checked := IsChecked;
-    end;
-    if Sender = CheckBox6 then
-    begin // Xmp:All
-      CheckBox7.Checked := IsChecked;
-      CheckBox8.Checked := IsChecked;
-      CheckBox9.Checked := IsChecked;
-      CheckBox10.Checked := IsChecked;
-      CheckBox11.Checked := IsChecked;
-      CheckBox12.Checked := IsChecked;
-      CheckBox17.Checked := IsChecked;
-      CheckBox18.Checked := IsChecked;
-    end;
-    CheckForRemoveAll;
-    EventOn := true;
-    SetExecuteButton;
-  end;
-end;
-
-procedure TFRemoveMeta.CheckBox3Click(Sender: TObject);
-begin
-  if EventOn then
-  begin
-    EventOn := false;
-    CheckBox2.Checked := false;
-    CheckForRemoveAll;
-    EventOn := true;
-    SetExecuteButton;
-  end;
-end;
-
-procedure TFRemoveMeta.CheckBox7Click(Sender: TObject);
-begin
-  if EventOn then
-  begin
-    EventOn := false;
-    CheckBox6.Checked := false;
-    CheckForRemoveAll;
-    EventOn := true;
-    SetExecuteButton;
-  end;
+  BtnExecute.Enabled := TagSelection <> '';
+  BtnPreview.Enabled := BtnExecute.Enabled;
 end;
 
 procedure TFRemoveMeta.DisplayHint(Sender: TObject);
 begin
   StatusBar1.SimpleText := GetShortHint(Application.Hint);
+end;
+
+procedure TFRemoveMeta.FormClose(Sender: TObject; var Action: TCloseAction);
+begin
+  FLogWin.Close;
 end;
 
 procedure TFRemoveMeta.FormShow(Sender: TObject);
@@ -239,10 +225,28 @@ begin
     Label1.Caption := StrBackupOFF
   else
     Label1.Caption := StrBackupON;
+  SetupListView;
   Application.OnHint := DisplayHint;
-  EventOn := true;
-  CheckBox1.Checked := false;
-  CheckBox1Click(Sender); // set all to unchecked
+  ChkRemoveAll.Checked := false;
+  ChkRemoveAllClick(Sender);
+end;
+
+procedure TFRemoveMeta.LvTagNamesCustomDrawItem(Sender: TCustomListView; Item: TListItem; State: TCustomDrawState;
+  var DefaultDraw: Boolean);
+begin
+  StyledDrawListviewItem(FStyleServices, Sender, Item, State);
+end;
+
+procedure TFRemoveMeta.LvTagNamesEdited(Sender: TObject; Item: TListItem; var S: string);
+begin
+  Item.ImageIndex := TagImageIndex(S);
+  BtnExecute.Default := true;
+end;
+
+procedure TFRemoveMeta.LvTagNamesItemChecked(Sender: TObject; Item: TListItem);
+begin
+  if (LvTagNames.Tag = 0) then
+    CheckSelection;
 end;
 
 end.

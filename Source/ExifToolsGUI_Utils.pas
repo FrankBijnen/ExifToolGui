@@ -9,6 +9,7 @@ uses Winapi.ShlObj, Winapi.ActiveX, Winapi.Wincodec, Winapi.Windows, Winapi.Mess
   System.Classes, System.SysUtils, System.Variants, System.StrUtils, System.Math, System.Threading,
   System.Generics.Collections,
   Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, Vcl.ComCtrls, Vcl.Shell.ShellCtrls, Vcl.Graphics, Vcl.Themes,
+  Vcl.Controls,
   Geomap;
 
 type
@@ -19,6 +20,13 @@ type
     SizeInt: integer;
   end;
   TPreviewInfoList = TList<TPreviewInfo>;
+
+  TTagInfo = record
+    GroupName: string;
+    TagName: string;
+    TagValue: string;
+  end;
+  TTagInfoList = TList<TTagInfo>;
 
 // Debug
 procedure BreakPoint;
@@ -72,6 +80,13 @@ procedure StyledDrawListviewItem(FstyleServices: TCustomStyleServices;
                                  ListView: TCustomListView;
                                  Item: TlistItem;
                                  State: TCustomDrawState);
+
+// Tag names
+function GetTags(ETResult: TStringList; CmbTags: TComboBox): TTagInfoList;
+procedure FillGroupsInCombo(SelectedFile: string; CmbTags: TComboBox; const Family: string);
+procedure FillTagsInCombo(SelectedFile: string; CmbTags: TComboBox; const Family, GroupName: string);
+procedure DrawItemTagName(Control: TWinControl; Index: Integer; Rect: TRect; State: TOwnerDrawState);
+function TagImageIndex(const Caption: string): integer;
 
 // GeoCoding
 function CreateTrkPoints(const LogPath: string; FirstGpx: boolean; var LastCoord: string): integer;
@@ -454,7 +469,7 @@ begin
   if (Len = 0) then
     result := ATo
   else
-    if (result[Len] = Afrom) then
+    if (result[Len] = AFrom) then
       result[Len] := ATo;
 end;
 
@@ -872,6 +887,195 @@ begin
       ListView.Canvas.FillRect(Item.DisplayRect(drBounds));
     end;
   end;
+end;
+
+function GetTags(ETResult: TStringList; CmbTags: TComboBox): TTagInfoList;
+var
+  Aline: string;
+  AResult: string;
+  ATagInfo: TTagInfo;
+  First: boolean;
+  ThisWidth: integer;
+begin
+  result := TTagInfoList.Create;
+  CmbTags.Tag := -1;
+  First := true;
+  for Aline in ETResult do
+  begin
+    AResult := ALine;
+    with ATagInfo do
+    begin
+      GroupName   := NextField(AResult, '[');             // Strip Leading [
+      GroupName   := NextField(AResult, ']');             // Group name
+      if (First) then
+      begin
+        TagName := 'All';
+        TagValue := '';
+        result.Add(ATagInfo);
+        First := false;
+      end;
+      TagName    := Trim(NextField(AResult, ':'));
+      TagValue   := Trim(AResult);
+
+      ThisWidth  := CmbTags.Canvas.TextWidth(GroupName + ':' + TagName + '|');
+      if (ThisWidth > CmbTags.Tag) then
+        CmbTags.Tag := ThisWidth;
+
+      result.Add(ATagInfo);
+    end;
+  end;
+end;
+
+procedure FillGroupsInCombo(SelectedFile: string; CmbTags: TComboBox; const Family: string);
+var
+  Indx: integer;
+  ETCmd, AGroupLine: string;
+  ETResult, ETUnSorted: TStringList;
+  ANItem: string;
+begin
+  CmbTags.Items.BeginUpdate;
+  ETResult := TStringList.Create;
+  try
+    CmbTags.Items.Clear;
+    if (SelectedFile <> '') then
+    begin
+      CmbTags.Items.Add('All');
+      ETUnSorted := TStringList.Create;
+      try
+        ETResult.Sorted := true;
+        ETResult.Duplicates := TDuplicates.dupIgnore;
+        ETCmd := '-sort' + CRLF + '-s1' + CRLF + '-G' + Family;
+        ET_OpenExec(ETcmd, SelectedFile, ETUnSorted);
+        for Indx := 0 to ETUnSorted.Count -1 do
+        begin
+          AGroupLine  := ETUnSorted[Indx];
+          ANItem      := NextField(AGroupLine, '[');             // Strip Leading [
+          ANItem      := NextField(AGroupLine, ']');             // Group name
+          ETResult.Add(ANItem);
+        end;
+      finally
+        ETUnSorted.Free;
+      end;
+    end
+    else
+    begin
+      ETCmd := '-listg' + Family;
+      ET_OpenExec(ETcmd, '', ETResult);
+    end;
+
+    for Indx := 1 to ETResult.Count -1 do
+    begin
+      AGroupLine := ETResult[Indx];
+      while (AGroupLine <> '') do
+      begin
+        ANItem := NextField(AGroupLine, ' ');
+        if (Trim(ANItem) <> '') then
+          CmbTags.Items.Add(ANItem);
+      end;
+
+    end;
+  finally
+    ETResult.Free;
+    CmbTags.Items.EndUpdate;
+    CmbTags.Text := CmbTags.Items[0];
+  end;
+end;
+
+procedure FillTagsInCombo(SelectedFile: string; CmbTags: TComboBox; const Family, GroupName: string);
+var
+  Indx: integer;
+  ETCmd, AGroupLine: string;
+  ETResult: TStringList;
+  ANItem: string;
+  ATagInfoList: TTagInfoList;
+  ATagInfo: TTagInfo;
+begin
+  ETResult := TStringList.Create;
+  CmbTags.Items.BeginUpdate;
+  try
+    CmbTags.Items.Clear;
+    if (SelectedFile <> '') then
+    begin
+      ETCmd := '-sort' + CRLF + '-s1' + CRLF + '-a' + CRLF + '-G' + Family + CRLF + '-' + Groupname + ':All';
+      ET_OpenExec(ETcmd, SelectedFile, ETResult);
+      ATagInfoList := GetTags(ETResult, CmbTags);
+      try
+        for ATagInfo in ATagInfoList do
+        begin
+          ANItem := ATagInfo.GroupName + ':' + ATagInfo.TagName;
+          if (ATagInfo.TagValue <> '') then
+            ANItem := ANItem + '|' + ATagInfo.TagValue;
+          CmbTags.Items.Add(ANItem);
+        end;
+      finally
+        ATagInfoList.Free;
+      end;
+    end
+    else
+    begin
+      ETCmd := '-listw' + CRLF + '-' + Groupname + ':All';
+      ET_OpenExec(ETcmd, '', ETResult);
+      for Indx := 1 to ETResult.Count -1 do
+      begin
+        AGroupLine := ETResult[Indx];
+        while (AGroupLine <> '') do
+        begin
+          ANItem := NextField(AGroupLine, ' ');
+          if (Trim(ANItem) <> '') then
+            CmbTags.Items.Add(ANItem);
+        end;
+      end;
+      CmbTags.Tag := CmbTags.Width;
+    end;
+
+  finally
+    ETResult.Free;
+    CmbTags.Items.EndUpdate;
+    CmbTags.Text := CmbTags.Items[0];
+  end;
+end;
+
+procedure DrawItemTagName(Control: TWinControl; Index: Integer; Rect: TRect; State: TOwnerDrawState);
+var
+  TagName, TagValue: string;
+  ACanvas: TCanvas;
+  DrawRect: TRect;
+  LinePos: integer;
+begin
+  // Split item in Code and name
+  TagValue := TComboBox(Control).Items[index];
+  TagName := NextField(TagValue, '|');
+
+  // Compute the position of the dividing line
+  ACanvas := TComboBox(Control).Canvas;
+  ACanvas.FillRect(Rect);
+  LinePos := Control.Tag + Rect.Left;
+  if (LinePos > Rect.Right) then
+    LinePos := Rect.Width div 2;
+
+  // Draw Tag Name
+  DrawRect:= Rect;
+  DrawRect.Right := LinePos;
+  ACanvas.TextRect(DrawRect, TagName, [TTextFormats.tfLeft, TTextFormats.tfSingleLine]);
+
+  if (TagValue <> '') then
+  begin
+    // Draw Line
+    ACanvas.Pen.Color := TStyleManager.Style[GUIsettings.GuiStyle].GetStyleFontColor(TStyleFont.sfListItemTextNormal);
+    ACanvas.MoveTo(LinePos, Rect.Top);
+    ACanvas.LineTo(LinePos, Rect.Bottom);
+
+    // Draw Tag Value
+    DrawRect:= Rect;
+    DrawRect.Left := LinePos + ACanvas.TextWidth('Q');
+    ACanvas.TextRect(DrawRect, TagValue, [TTextFormats.tfLeft, TTextFormats.tfSingleLine]);
+  end;
+
+end;
+
+function TagImageIndex(const Caption: string): integer;
+begin
+  result := integer(Pos('-', Caption) = 1);
 end;
 
 function CreateTrkPoints(const LogPath: string; FirstGpx: boolean; var LastCoord: string): integer;
