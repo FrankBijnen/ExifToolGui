@@ -6,6 +6,46 @@ uses System.Classes, Vcl.Dialogs, ExifTool, GEOMap, UnitLangResources;
 
 const
   SHOWALL = 'Show All Files';
+  DefExcludeCopyTags =
+    'exif:ExifImageWidth ' +
+    'exif:ExifImageHeight ' +
+    'exif:Orientation ' +
+    'exif:Xresolution ' +
+    'exif:Yresolution ' +
+    'exif:ResolutionUnit ' +
+    'exif:ColorSpace ' +
+    'exif:InteropIndex ' +
+    'Makernotes:All ' +
+    'Xmp-photoshop:All ' +
+    'Xmp-crs:All ' +
+    'Xmp-exif:All ';
+
+  DefRemoveTags =
+    'Exif:All ' +
+    'Makernotes:All ' +
+    'Gps:All ' +
+    'Xmp:All ' +
+    'Xmp-exif:All ' +
+    'Xmp-Acdsee:All ' +
+    'Xmp-Mediapro:All ' +
+    'Xmp-Photoshop:All ' +
+    'Xmp-crs:All ' +
+    'Xmp-Microsoft:All ' +
+    'Xmp-pdf:All ' +
+    'Xmp-tiff:All ' +
+    'Iptc:All ' +
+    'Photoshop:All ' +
+    'Jfif:All ' +
+    'ICC_profile:All ';
+
+  DefCopySingleTags =
+    'Exif:all ' +
+    '-Makernotes:All ' +
+    '-Gps:All ' +
+    'Xmp:All ' +
+    'IPTC:All ' +
+    'ICC_Profile:All ' +
+    'Gps:All ';
 
 type
   TIniData = (idWorkSpace, idETDirect, idUserDefined, idCustomView, idMarked);
@@ -101,6 +141,12 @@ var
   WrkIniDir: string = '';
   ParmIniPath: string = '';
   DontSaveIni: boolean;
+  ExcludeCopyTagList: string;
+  RemoveTagList: string;
+  CopySingleTagList: string;
+  SelExcludeCopyTagList: string;
+  SelRemoveTagList: string;
+  SelCopySingleTagList: string;
 
 function GetIniFilePath(AllowPrevVer: boolean): string;
 procedure ReadGUILog;
@@ -132,6 +178,12 @@ const
   TagList = 'TagList';
   CustomView = 'CustomView';
   MarkedTags = 'MarkedTags';
+  ExcludeCopyTags = 'ExcludeCopyTags';
+  SelExcludeCopyTags = 'SelExcludeCopyTags';
+  RemoveTags = 'RemoveTags';
+  SelRemoveTags = 'SelRemoveTags';
+  CopySingleTags = 'CopySingleTags';
+  SelCopySingleTags = 'SelCopySingleTags';
 
   // Check for IniPath commandLine param. See initialization.
   INIPATHSWITCH = 'IniPath';
@@ -387,6 +439,36 @@ begin
   result := Length(MarkedTagList);
 end;
 
+procedure ReadCopyTags(GUIini: TMemIniFile);
+begin
+  ExcludeCopyTagList := ReplaceLastChar(GUIini.ReadString(TagList, ExcludeCopyTags, '<'), '<', ' ');
+
+  if (ExcludeCopyTagList = ' ') then
+    ExcludeCopyTagList := DefExcludeCopyTags;
+
+  SelExcludeCopyTagList := ReplaceLastChar(GUIini.ReadString(TagList, SelExcludeCopyTags, '<'), '<', ' ');
+end;
+
+procedure ReadRemoveTags(GUIini: TMemIniFile);
+begin
+  RemoveTagList := ReplaceLastChar(GUIini.ReadString(TagList, RemoveTags, '<'), '<', ' ');
+
+  if (RemoveTagList = ' ') then
+    RemoveTagList := DefRemoveTags;
+
+  SelRemoveTagList := ReplaceLastChar(GUIini.ReadString(TagList, SelRemoveTags, '<'), '<', ' ');
+end;
+
+procedure ReadCopySingleTags(GUIini: TMemIniFile);
+begin
+  CopySingleTagList := ReplaceLastChar(GUIini.ReadString(TagList, CopySingleTags, '<'), '<', ' ');
+
+  if (CopySingleTagList = ' ') then
+    CopySingleTagList := DefCopySingleTags;
+
+  SelCopySingleTagList := ReplaceLastChar(GUIini.ReadString(TagList, SelCopySingleTags, '<'), '<', ' ');
+end;
+
 // Writing the workspace tags this way allows duplicate tag names.
 // Not what's intended by MS, but hey....
 procedure WriteWorkSpaceTags(GUIini: TMemIniFile);
@@ -489,6 +571,24 @@ end;
 procedure WriteMarkedTags(GUIini: TMemIniFile);
 begin
   WriteTagList(GUIini, MarkedTags, MarkedTagList);
+end;
+
+procedure WriteCopyTags(GUIini: TMemIniFile);
+begin
+  WriteTagList(GUIini, ExcludeCopyTags, ExcludeCopyTagList);
+  WriteTagList(GUIini, SelExcludeCopyTags, SelExcludeCopyTagList);
+end;
+
+procedure WriteRemoveTags(GUIini: TMemIniFile);
+begin
+  WriteTagList(GUIini, RemoveTags, RemoveTagList);
+  WriteTagList(GUIini, SelRemoveTags, SelRemoveTagList);
+end;
+
+procedure WriteCopySingleTags(GUIini: TMemIniFile);
+begin
+  WriteTagList(GUIini, CopySingleTags, CopySingleTagList);
+  WriteTagList(GUIini, SelCopySingleTags, SelCopySingleTagList);
 end;
 
 procedure ReadMainWindowSizes(const AIniFile: TMemIniFile);
@@ -702,6 +802,16 @@ begin
       // --- Marked tags---
       ReadMarkedTags(GUIini);
 
+      // -- ExcludeCopyTags & SelExcludeCopyTags
+      ReadCopyTags(GUIini);
+
+      // -- RemoveTags & SelRemoveTags
+      ReadRemoveTags(GUIini);
+
+      // -- CopySingleTags & SelCopySingleTags
+      ReadCopySingleTags(GUIini);
+
+      // ---GeoCode
       ReadGeoCodeSettings(GUIini);
     end;
   finally
@@ -902,6 +1012,15 @@ begin
 
         // Marked Tags
         WriteMarkedTags(GUIini);
+
+        // -- ExcludeCopyTags & SelExcludeCopyTags
+        WriteCopyTags(GUIini);
+
+        // -- RemoveTags & SelRemoveTags
+        WriteRemoveTags(GUIini);
+
+        // -- CopySingleTags & SelCopySingleTags
+        WriteCopySingleTags(GUIini);
 
       end;
       WriteGeoCodeSettings(GUIini);

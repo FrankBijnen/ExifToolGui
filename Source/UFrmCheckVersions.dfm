@@ -256,7 +256,7 @@ object FrmCheckVersions: TFrmCheckVersions
               5143DF0000000049454E44AE426082}
           end>
       end>
-    Left = 91
+    Left = 90
     Top = 78
   end
   object VirtualImageList: TVirtualImageList

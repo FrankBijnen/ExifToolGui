@@ -189,7 +189,7 @@ object FMain: TFMain
         Font.Name = 'Tahoma'
         Font.Style = []
         ParentFont = False
-        TabOrder = 0
+        TabOrder = 2
         object SpeedBtnExif: TSpeedButton
           Left = 1
           Top = 2
@@ -363,7 +363,7 @@ object FMain: TFMain
         ParentShowHint = False
         PopupMenu = QuickPopUpMenu
         ShowHint = True
-        TabOrder = 2
+        TabOrder = 0
         TitleCaptions.Strings = (
           'Tag name'
           'Value')
@@ -754,7 +754,7 @@ object FMain: TFMain
         object EditETdirect: TLabeledEdit
           Left = 1
           Top = 50
-          Width = 339
+          Width = 327
           Height = 23
           Hint = 
             'Spaces in data require double quotes, double quotes in data requ' +
@@ -777,7 +777,7 @@ object FMain: TFMain
           Text = ''
           OnChange = EditETdirectChange
           OnKeyDown = EditETdirectKeyDown
-          ExplicitWidth = 335
+          ExplicitWidth = 323
         end
         object CBoxETdirect: TComboBox
           Left = 1
@@ -1310,8 +1310,8 @@ object FMain: TFMain
           end>
         ActionBar = ActionMainMenuBar
       end>
-    Left = 163
-    Top = 52
+    Left = 164
+    Top = 50
     StyleName = 'Platform Default'
     object MaExportMetaTXT: TAction
       Tag = 20

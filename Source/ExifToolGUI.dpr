@@ -64,7 +64,8 @@ uses
   UFrmStyle in 'UFrmStyle.pas' {FrmStyle},
   UFrmAbout in 'UFrmAbout.pas' {FrmAbout},
   UFrmGenerate in 'UFrmGenerate.pas' {FrmGenerate},
-  UFrmCheckVersions in 'UFrmCheckVersions.pas' {FrmCheckVersions};
+  UFrmCheckVersions in 'UFrmCheckVersions.pas' {FrmCheckVersions},
+  UFrmTagNames in 'UFrmTagNames.pas' {FrmTagNames};
 
 {$R *.res}
 
@@ -112,5 +113,6 @@ begin
   Application.CreateForm(TFGeoSearch, FGeoSearch);
   Application.CreateForm(TFGeotagFiles, FGeotagFiles);
   Application.CreateForm(TFGeoSetup, FGeoSetup);
+  Application.CreateForm(TFrmTagNames, FrmTagNames);
   Application.Run;
 end.

@@ -3,38 +3,39 @@ object FCopyMetadata: TFCopyMetadata
   Top = 0
   BorderStyle = bsDialog
   Caption = 'Copy metadata options'
-  ClientHeight = 271
-  ClientWidth = 421
+  ClientHeight = 387
+  ClientWidth = 462
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
   Font.Height = -11
   Font.Name = 'Tahoma'
   Font.Style = []
+  OnClose = FormClose
   OnShow = FormShow
   TextHeight = 13
   object Label1: TLabel
-    Left = 344
-    Top = 203
+    Left = 388
+    Top = 317
     Width = 31
     Height = 13
     Caption = 'Label1'
   end
   object StatusBar1: TStatusBar
     Left = 0
-    Top = 252
-    Width = 421
+    Top = 368
+    Width = 462
     Height = 19
     Panels = <>
     SimplePanel = True
-    ExplicitTop = 251
-    ExplicitWidth = 417
+    ExplicitTop = 367
+    ExplicitWidth = 458
   end
   object AdvPanel1: TPanel
     Left = 0
     Top = 0
-    Width = 329
-    Height = 252
+    Width = 380
+    Height = 368
     Hint = 'Above data might not be desired to be copied.'
     Align = alLeft
     DoubleBuffered = True
@@ -45,8 +46,8 @@ object FCopyMetadata: TFCopyMetadata
     Font.Style = []
     ParentDoubleBuffered = False
     ParentFont = False
-    TabOrder = 1
-    ExplicitHeight = 251
+    TabOrder = 0
+    ExplicitHeight = 367
     object Label2: TLabel
       Left = 16
       Top = 16
@@ -62,93 +63,95 @@ object FCopyMetadata: TFCopyMetadata
     end
     object Label3: TLabel
       Left = 16
-      Top = 236
+      Top = 342
       Width = 301
       Height = 14
       Caption = 'Above tags/groups will only be copied where checked!'
     end
-    object CheckBox1: TCheckBox
-      Left = 40
-      Top = 38
-      Width = 177
-      Height = 17
-      Caption = '-Exif image Width && Height'
-      TabOrder = 0
-    end
-    object CheckBox2: TCheckBox
-      Left = 40
-      Top = 61
-      Width = 185
-      Height = 17
-      Caption = '-Exif image Orientation value'
+    object LvTagNames: TListView
+      Left = 16
+      Top = 76
+      Width = 348
+      Height = 260
+      Checkboxes = True
+      Columns = <
+        item
+          Caption = 'Tag name'
+          Width = 320
+        end>
+      GridLines = True
+      HideSelection = False
       TabOrder = 1
+      ViewStyle = vsReport
+      OnCustomDrawItem = LvTagNamesCustomDrawItem
+      OnEdited = LvTagNamesEdited
     end
-    object CheckBox3: TCheckBox
-      Left = 40
-      Top = 86
-      Width = 177
-      Height = 17
-      Caption = '-Exif image Resolution data'
-      TabOrder = 2
-    end
-    object CheckBox4: TCheckBox
-      Left = 40
-      Top = 109
-      Width = 201
-      Height = 17
-      Caption = '-Exif ColorSpace && InteropIndex'
-      TabOrder = 3
-    end
-    object CheckBox5: TCheckBox
-      Left = 40
-      Top = 133
-      Width = 121
-      Height = 17
-      Caption = '-Makernotes data'
-      TabOrder = 4
-    end
-    object CheckBox6: TCheckBox
-      Left = 40
-      Top = 156
-      Width = 153
-      Height = 17
-      Caption = '-Xmp-photoshop group'
-      TabOrder = 5
-    end
-    object CheckBox7: TCheckBox
-      Left = 40
-      Top = 179
-      Width = 105
-      Height = 17
-      Caption = '-Xmp-crs group'
-      TabOrder = 6
-    end
-    object CheckBox8: TCheckBox
-      Left = 40
-      Top = 202
-      Width = 105
-      Height = 17
-      Caption = '-Xmp-Exif group'
-      TabOrder = 7
+    object PnlButtons: TPanel
+      Left = 16
+      Top = 45
+      Width = 348
+      Height = 25
+      TabOrder = 0
+      object SpbAdd: TSpeedButton
+        Left = 2
+        Top = 2
+        Width = 70
+        Height = 22
+        Caption = 'Add'
+        OnClick = SpbAddClick
+      end
+      object SpbDel: TSpeedButton
+        Left = 68
+        Top = 2
+        Width = 70
+        Height = 22
+        Caption = 'Del'
+        OnClick = SpbDelClick
+      end
+      object SpbEdit: TSpeedButton
+        Left = 134
+        Top = 2
+        Width = 70
+        Height = 22
+        Caption = 'Edit'
+        OnClick = SpbEditClick
+      end
+      object SpbReset: TSpeedButton
+        Left = 200
+        Top = 2
+        Width = 70
+        Height = 22
+        Caption = 'Reset'
+        OnClick = SpbResetClick
+      end
     end
   end
-  object Button1: TButton
-    Left = 344
-    Top = 12
+  object BtnCancel: TButton
+    Left = 388
+    Top = 10
     Width = 65
     Height = 25
     Caption = 'Cancel'
     ModalResult = 2
-    TabOrder = 2
+    TabOrder = 1
   end
-  object Button2: TButton
-    Left = 344
-    Top = 225
+  object BtnExecute: TButton
+    Left = 388
+    Top = 339
     Width = 65
     Height = 25
     Caption = 'Execute'
     Default = True
     ModalResult = 1
     TabOrder = 3
+  end
+  object BtnPreview: TButton
+    Left = 388
+    Top = 286
+    Width = 65
+    Height = 25
+    Caption = 'Preview'
+    TabOrder = 2
+    OnClick = BtnPreviewClick
   end
 end

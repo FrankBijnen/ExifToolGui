@@ -3,35 +3,38 @@ object FCopyMetaSingle: TFCopyMetaSingle
   Top = 0
   BorderStyle = bsDialog
   Caption = 'Import into selected files'
-  ClientHeight = 295
-  ClientWidth = 498
+  ClientHeight = 386
+  ClientWidth = 520
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
   Font.Height = -11
   Font.Name = 'Tahoma'
   Font.Style = []
+  OnClose = FormClose
   OnShow = FormShow
   TextHeight = 13
   object Label1: TLabel
-    Left = 433
-    Top = 226
+    Left = 436
+    Top = 317
     Width = 31
     Height = 13
     Caption = 'Label1'
   end
   object StatusBar1: TStatusBar
     Left = 0
-    Top = 276
-    Width = 498
+    Top = 367
+    Width = 520
     Height = 19
     Panels = <>
+    ExplicitTop = 366
+    ExplicitWidth = 516
   end
   object AdvPanel1: TPanel
     Left = 0
     Top = 0
     Width = 417
-    Height = 276
+    Height = 367
     Align = alLeft
     DoubleBuffered = True
     Font.Charset = DEFAULT_CHARSET
@@ -41,120 +44,235 @@ object FCopyMetaSingle: TFCopyMetaSingle
     Font.Style = []
     ParentDoubleBuffered = False
     ParentFont = False
-    TabOrder = 1
-    object CheckBox1: TCheckBox
-      Left = 24
+    TabOrder = 0
+    ExplicitHeight = 366
+    object ChkImportAll: TCheckBox
+      Left = 16
       Top = 16
-      Width = 145
+      Width = 355
       Height = 17
       Caption = '-import ALL metadata'
+      Checked = True
+      State = cbChecked
       TabOrder = 0
-      OnClick = CheckBox1Click
+      OnClick = ChkImportAllClick
     end
-    object AdvPanel2: TPanel
-      Left = 24
-      Top = 39
-      Width = 369
-      Height = 200
-      BevelOuter = bvLowered
-      Font.Charset = DEFAULT_CHARSET
-      Font.Color = clWindowText
-      Font.Height = -12
-      Font.Name = 'Tahoma'
-      Font.Style = []
-      ParentFont = False
-      TabOrder = 1
-      object CheckBox2: TCheckBox
-        Left = 16
-        Top = 8
-        Width = 73
-        Height = 17
-        Caption = '-Exif:All'
-        TabOrder = 0
-        OnClick = CheckBox2Click
-      end
-      object CheckBox3: TCheckBox
-        Left = 32
-        Top = 31
-        Width = 113
-        Height = 17
-        Caption = '-Exif:Makernotes'
-        TabOrder = 1
-        OnClick = CheckBox3Click
-      end
-      object CheckBox4: TCheckBox
-        Left = 168
-        Top = 31
-        Width = 73
-        Height = 17
-        Caption = '-Exif:GPS'
-        TabOrder = 2
-        OnClick = CheckBox3Click
-      end
-      object CheckBox5: TCheckBox
-        Left = 16
-        Top = 72
-        Width = 73
-        Height = 17
-        Caption = '-Xmp:All'
-        TabOrder = 3
-        OnClick = CheckBox2Click
-      end
-      object CheckBox6: TCheckBox
-        Left = 16
-        Top = 104
-        Width = 73
-        Height = 17
-        Caption = '-Iptc:All'
-        TabOrder = 4
-        OnClick = CheckBox2Click
-      end
-      object CheckBox7: TCheckBox
-        Left = 16
-        Top = 138
-        Width = 89
-        Height = 17
-        Caption = '-ICC Profile'
-        TabOrder = 5
-        OnClick = CheckBox2Click
-      end
-      object CheckBox8: TCheckBox
-        Left = 16
-        Top = 170
-        Width = 73
-        Height = 17
-        Caption = '-Gps:All'
-        TabOrder = 6
-        OnClick = CheckBox2Click
-      end
-    end
-    object CheckBox9: TCheckBox
-      Left = 24
-      Top = 250
+    object ChkNoOverWrite: TCheckBox
+      Left = 16
+      Top = 342
       Width = 355
       Height = 17
       Caption = 'Dont overwrite existing data (-wm cg)'
+      TabOrder = 3
+    end
+    object PnlButtons: TPanel
+      Left = 16
+      Top = 45
+      Width = 355
+      Height = 25
+      TabOrder = 1
+      object SpbAdd: TSpeedButton
+        Left = 2
+        Top = 0
+        Width = 70
+        Height = 22
+        Caption = 'Add'
+        OnClick = SpbAddClick
+      end
+      object SpbDel: TSpeedButton
+        Left = 68
+        Top = 0
+        Width = 70
+        Height = 22
+        Caption = 'Del'
+        OnClick = SpbDelClick
+      end
+      object SpbEdit: TSpeedButton
+        Left = 134
+        Top = 0
+        Width = 70
+        Height = 22
+        Caption = 'Edit'
+        OnClick = SpbEditClick
+      end
+      object SpbReset: TSpeedButton
+        Left = 200
+        Top = 0
+        Width = 70
+        Height = 22
+        Caption = 'Reset'
+        OnClick = SpbResetClick
+      end
+    end
+    object LvTagNames: TListView
+      Left = 16
+      Top = 76
+      Width = 355
+      Height = 260
+      Checkboxes = True
+      Columns = <
+        item
+          Caption = 'Tag name'
+          Width = 320
+        end>
+      GridLines = True
+      HideSelection = False
+      SmallImages = VirtualImageList
       TabOrder = 2
+      ViewStyle = vsReport
+      OnCustomDrawItem = LvTagNamesCustomDrawItem
+      OnEdited = LvTagNamesEdited
+      OnItemChecked = LvTagNamesItemChecked
     end
   end
-  object Button1: TButton
-    Left = 433
+  object BtnCancel: TButton
+    Left = 436
     Top = 16
     Width = 64
     Height = 25
     Caption = 'Cancel'
     ModalResult = 2
-    TabOrder = 2
+    TabOrder = 1
   end
-  object Button2: TButton
-    Left = 430
-    Top = 245
+  object BtnExecute: TButton
+    Left = 436
+    Top = 336
     Width = 64
     Height = 25
     Caption = 'Execute'
     Default = True
+    Enabled = False
     ModalResult = 1
     TabOrder = 3
-    OnClick = Button2Click
+    OnClick = BtnExecuteClick
+  end
+  object BtnPreview: TButton
+    Left = 436
+    Top = 286
+    Width = 64
+    Height = 25
+    Caption = 'Preview'
+    Enabled = False
+    TabOrder = 2
+    OnClick = BtnPreviewClick
+  end
+  object ImageCollection: TImageCollection
+    Images = <
+      item
+        Name = 'LvExcludeTag'
+        SourceImages = <
+          item
+            Image.Data = {
+              89504E470D0A1A0A0000000D494844520000004600000046080300000046F012
+              B60000000774494D4507E80718063B3AEF7DDA17000000097048597300000AF0
+              00000AF00142AC34980000000467414D410000B18F0BFC610500000117504C54
+              45FFFFFFF7F7F73131312929292121213939394242424A4A4A5A5A5AEFEFEF08
+              08080800001800001000000000001818181010106300008400008C00007B0000
+              6B0000730000CE0808D61818CE2121CE1818D61010D60808DE0000DE0808E710
+              10EF1818EF3131EF2929EF2121EF1010EF0000CE0000D60000C60000BD0000B5
+              0000AD0000A500009C00009400005A0000290000DE4A4ADE6363DE5252DE5A5A
+              E75252E74242E74A4ADE4242E73939E73131E72929F71010F70808FF0000F700
+              00310000E76B6BE76363E75A5AF72121F71818FF1010FF0808E7737339000021
+              0000DE6B6B4A0000E77B7BCE2929E78484C61010D63939D64242D64A4ADE3939
+              DE3131E72121C60808DE2929E70000420000DE2121520000B3D1938A00000243
+              4944415478DAED94696FDA401086617D40CD654E731628B0AC6D0C8423019AD8
+              40DB1802292D6DD3D2E6FFFF8E8E0DC6548A02B2FA711F468385EC47338BF5FA
+              7C140A8542A150CEE13FB9E639C4F388E311C373318E832B8E115F6A88651112
+              18148B2146842F26C8BB9650043E569D27E212062221F6E811A6C954269549C7
+              E3F14EBC033C3F9F6F5ABBDD6A69ED4E584087C54219526A124214455181D611
+              19FF19DE00D71693325664B80BE3266E9680DD6ED730B0D6151D4D9A909F1286
+              06850996A024A9589470F1D7D1329E94ED276D1A80B1A7F95B3868840EF9F275
+              BBDD7EDBDA8C46DF6D7E00E3A3653C797AAA556A15A05EA9DCEEB9BBBB2BAD05
+              E76C3AF2E7C566B3795C2C16B3D96A369FCF3F00C3A1BB115826D56AF51D5003
+              3ED980E7DE2C2DC583260A9A47B0EC359665FEAAE5A36BB9379BDD9833CD9AC0
+              34175B6AA716134F9D2316D6726EE5D16292A326BA56F30B4F1B99A64EC2ACB3
+              D452CDADBCCD62EAF283A3119724D7F3663175F5E178C45335DFF3B21160A811
+              C6F9C32D8D378BA541CE5253253FB8D072FB8F45D7752DEC4C23765B85AB5EAF
+              3F18F4AFFAC3EB9BD1D87A7CF21E38B154EA75FBEDB7D00D43D7AD328C76D899
+              460827A56C2E97CDE6B3857CA15828148B5092547A5BAEB8B3D41BB849642B07
+              B0A212A5D552354D6B273AD1C0418342F14422994C251229209DC9A481571B44
+              16C4965D21E7ED7BE31342FB9F21DBA2760EC295107DA909315610595664AC08
+              65182B7C4F42193110B10CE21044321708F08160F0D2E6F3FB5D0F8542A15028
+              FF97BF5FECE036BEFCEE640000000049454E44AE426082}
+          end>
+      end
+      item
+        Name = 'LvIncludeTag'
+        SourceImages = <
+          item
+            Image.Data = {
+              89504E470D0A1A0A0000000D494844520000004600000046080300000046F012
+              B60000000774494D4507E8071806352C852A42C8000000097048597300000AF0
+              00000AF00142AC34980000000467414D410000B18F0BFC61050000012F504C54
+              45FFFFFFF7F7F742424218181810101021212129292939393931313152525221
+              0000290000310000180000100000080000080808000000630000D60000C60000
+              BD0000CE0000AD0000B500009C00009400008400007B0000EFEFEF6B6B6BF700
+              00FF0000EF00004A4A4ADE0000F70808FF1010FF0808A50000F710108C0000E7
+              0000F71818EF0808730000EF1010EF21216B0000F72121EF1818420000390000
+              EF29295A5A5A5200004A0000EF3131CE0808D61818CE2121CE1818D61010D608
+              08DE0808E710105A0000DE4A4ADE6363DE5252DE5A5AE75252E74242E74A4ADE
+              4242E73939E73131E72929E76B6BE76363E75A5AE77373DE6B6BE77B7BCE2929
+              E78484C61010D63939D64242D64A4ADE3939DE3131E72121C60808DE2929DE21
+              21D62929DE1010DE1818DE7373636363088D050B0000000174524E530040E6D8
+              66000004BA4944415478DAD5987B53E24814C5318424BCF2EC74088943780CAF
+              DD200B0C22228C8C0A080BE26371D7D99171FCFE9F616F0249982AB74ABAF69F
+              3DB48056F1AB7B2FE9733A8642FF3F1D6C7F889463A95C2E1A8DB65FDBED0FAF
+              AF141985120489E725015E445112449A26A1B485A669DA725D3E3E1E363B9D66
+              2B9194080A6A0BF53C5611525DA552A992CD13D4D396EC2AFA63B55AAFEE41BD
+              FB5EB7140FEF3FE8A853CDEA0EF4E3C72DE872ADC7C27B1773D8E66505300F0F
+              7777CBE5723E9FAF757E7F4C282AD55D8C47593CE9B1080946C6C8696A4BB959
+              93600EA3C210E1D5D2A32C16EB34495339C0A0D5D2A7DC3C9361A4A1EA623694
+              C5E8399D249ACDB18A57738F72337A49F3FB630EA2C2710AAFE71E0530158921
+              6A2A05D578949B09544384816A560B8F329ABC54788EA4A98ED65D2F3CCAC869
+              6A7F0C54D3D1F0534019BF1804D5C037D529B9980D65323E3578960023345DCC
+              9632197F27C5E868ED5326E3BE49E27E301B1DAF7DCA64DA37796A7FDB62A526
+              60461E653CFB6CBFD5D42E9762398AE2588A632836CCB2F08E656868AABB1E79
+              94F1F4BB29895C24C27122C385C31C43C30BD3DEE953E0E1E1AC1DC16F4E533E
+              C5A926C9EF2A09E28588CF111315D336EDBA2CCB43790882488135B44BF8DBC4
+              A30046ABCBA66D1B8669A42B153D9D2E95F4F4302972DBC6041BE51584108488
+              062AF952F1B34F19CFCE710AF20661AC60250FAA56ABD90CD6E3B487A923F477
+              17C3132C8C701756B73B1874F1E09B4F99CECEDD4FBACA82321B294D718B1187
+              90478F8F8F7F3EBABABEFECBD51368EA53A6B3AF5F8F1A470D50ADD1286F5428
+              14F21DD19BCD50BD5F3E4092B856773BDF6C809B60BA2E65767272F2097404FA
+              C515703E16F32D2F4AC12DEF77F228D88DFF42F92DA07C2C2A71CFA0C50E826A
+              DE4D39DAA51471C21BB1D8517BB7849422F231602C674BA28E8A450BF97121B6
+              B4DE2D592D454BF5A3946EA1DE0519A56869FE31434C686717241D81329A1F17
+              928321A33818CFA0E944EAECEA9D94F24F14CBB2F4A4570D1D2FF5BF5C5C5C5E
+              5D5D7EB91C8D27D753E7E3B3DF413B9446ADE65EFD8EAC4CC6B29C95C9A4935E
+              3562B2D23DEDF54E4FCF4EFB67FD41BF3F18C0EA76F39FCF1B412DB52C5690EA
+              F8004E6928552A69BAAEA78DA194DB623841368C4AC5042701D56DBB0E02F331
+              50BE11745456EC441C144BC6926059605BEE12BCABEF30240A9B3F0BCE69DAF1
+              41780707EA63ADDAF8E4CFA5ACB4245A0C47443A12A119C74219C631DF1D53E6
+              18B058866339B0643697A372ED762E02987C23986E19FB96F0B3A71F049CB792
+              8197532E667BD5953118D4E1DE39C50AB2EA34E55D2F05254172D3B0C11CF93B
+              A0805B34C1DD10C5D7D56A2DD84705ECBBEE5ED54875E456B3DD016E5344189C
+              AD05FBA8A010DC32840E29C1C6D094BF1B777C6EBF11DB4AB6B69301284EF24D
+              71928FD9EC694CD2145C7EA692FD35A058284E8C29042E65A97192D9708291CF
+              ECB8540691DC32C0888D2A60DECA807D44F1956AA6F06606EC379B4AD6C10419
+              40D6146F38982003D424C1213D94E3CD7CA6E04120034A24B339FC4027300480
+              EBFF9605872BA21BDF83109594210AB0AA69293DAD1BA62C90FDCF848EC513F1
+              989303707C15444924A284A87098766380651CAB8F9251FE331DBC7B0BFD0317
+              208A7469F706BE0000000049454E44AE426082}
+          end>
+      end>
+    Left = 461
+    Top = 78
+  end
+  object VirtualImageList: TVirtualImageList
+    DisabledOpacity = 127
+    Images = <
+      item
+        CollectionIndex = 1
+        CollectionName = 'LvIncludeTag'
+        Name = 'LvIncludeTag'
+      end
+      item
+        CollectionIndex = 0
+        CollectionName = 'LvExcludeTag'
+        Name = 'LvExcludeTag'
+      end>
+    ImageCollection = ImageCollection
+    Left = 460
+    Top = 142
   end
 end
