@@ -87,6 +87,7 @@ procedure FillGroupsInCombo(SelectedFile: string; CmbTags: TComboBox; const Fami
 procedure FillTagsInCombo(SelectedFile: string; CmbTags: TComboBox; const Family, GroupName: string);
 procedure DrawItemTagName(Control: TWinControl; Index: Integer; Rect: TRect; State: TOwnerDrawState);
 function TagImageIndex(const Caption: string): integer;
+function RemoveInvalidTags(const Tag: string; AllowExclude: boolean = false): string;
 
 // GeoCoding
 function CreateTrkPoints(const LogPath: string; FirstGpx: boolean; var LastCoord: string): integer;
@@ -304,7 +305,7 @@ end;
 
 function TempFilename(const Prefix: string): string;
 var
-  AName, ADir: array [0 .. MAX_PATH] of char;
+  AName, ADir: array [0 .. MAX_PATH] of Char;
 begin
   GetTempPath(MAX_PATH, ADir);
   GetTempFilename(ADir, PChar(Prefix), 0, AName);
@@ -1076,6 +1077,24 @@ end;
 function TagImageIndex(const Caption: string): integer;
 begin
   result := integer(Pos('-', Caption) = 1);
+end;
+
+function RemoveInvalidTags(const Tag: string; AllowExclude: boolean = false): string;
+const
+  InvalidChars: array of Char = [' ', '<', '='];
+var
+  AChar: Char;
+begin
+  result := Tag;
+  if (not AllowExclude) and
+     (Pos('-', Tag) = 1) then
+     Delete(result, 1, 1);
+
+  for AChar in InvalidChars do
+    result := StringReplace(result, AChar, '', [rfReplaceAll]);
+
+  if result <> Tag then
+    MessageDlgEx(Format(StrInvalidCharsRemoved, [Tag]), '', TMsgDlgType.mtError, [TMsgDlgBtn.mbOK]);
 end;
 
 function CreateTrkPoints(const LogPath: string; FirstGpx: boolean; var LastCoord: string): integer;

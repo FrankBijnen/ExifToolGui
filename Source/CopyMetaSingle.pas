@@ -100,7 +100,7 @@ begin
   begin
     with LvTagNames.Items.Add do
     begin
-      Caption := FrmTagNames.EdTagName.Text;
+      Caption := FrmTagNames.SelectedTag(true);
       ImageIndex := TagImageIndex(Caption);
     end;
   end;
@@ -171,7 +171,7 @@ begin
     for ANItem in LvTagNames.Items do
     begin
       if (ANitem.Checked) then
-        result := result + '-' + ANItem.Caption + CRLF;
+        result := result + '-' + RemoveInvalidTags(ANItem.Caption) + CRLF;
     end;
   end;
 end;
@@ -244,6 +244,7 @@ end;
 
 procedure TFCopyMetaSingle.LvTagNamesEdited(Sender: TObject; Item: TListItem; var S: string);
 begin
+  S := RemoveInvalidTags(S, true);
   Item.ImageIndex := TagImageIndex(S);
   BtnExecute.Default := true;
 end;

@@ -114,6 +114,7 @@ resourcestring
   ImportRecursive4          = 'source and destination filename is equal.';
   ImportRecursive5          = 'Should files in subfolders also be processed?';
   StrSelectAnyOfSource      = 'Select any of source files';
+  StrInvalidCharsRemoved    = 'Invalid char(s) removed in Tag: %s';
   ImportXMP1                = 'This will import GPS data from XMP sidecar files into';
   ImportXMP2                = 'Exif GPS region of currently selected files.';
   ImportXMP3                = 'Only those selected files will be processed,';
