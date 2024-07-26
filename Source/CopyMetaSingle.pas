@@ -35,21 +35,20 @@ type
     procedure SpbDelClick(Sender: TObject);
     procedure SpbEditClick(Sender: TObject);
     procedure SpbResetClick(Sender: TObject);
-    procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure LvTagNamesItemChecked(Sender: TObject; Item: TListItem);
     procedure LvTagNamesEdited(Sender: TObject; Item: TListItem; var S: string);
   private
     { Private declarations }
     SrcFile: string;
+    FShowLogWindow: boolean;
     procedure DisplayHint(Sender: TObject);
     procedure SetupListView;
     procedure GetSelectedTags;
     procedure GetTagNames;
     procedure CheckSelection;
-
   public
     { Public declarations }
-    procedure SetSourceFile(ASource: string);
+    procedure PrepareShow(ASource: string);
     function TagSelection: string;
   end;
 
@@ -176,9 +175,12 @@ begin
   end;
 end;
 
-procedure TFCopyMetaSingle.SetSourceFile(ASource: string);
+procedure TFCopyMetaSingle.PrepareShow(ASource: string);
 begin
   SrcFile := ASource;
+
+  FShowLogWindow := FLogWin.Showing;
+  FLogWin.Close;
 end;
 
 procedure TFCopyMetaSingle.BtnExecuteClick(Sender: TObject);
@@ -215,11 +217,6 @@ begin
   StatusBar1.SimpleText := GetShortHint(Application.Hint);
 end;
 
-procedure TFCopyMetaSingle.FormClose(Sender: TObject; var Action: TCloseAction);
-begin
-  FLogWin.Close;
-end;
-
 procedure TFCopyMetaSingle.FormShow(Sender: TObject);
 begin
   Left := FMain.Left + FMain.GUIBorderWidth + FMain.AdvPageFilelist.Left;
@@ -234,6 +231,9 @@ begin
   ChkImportAll.Checked := false;
   ChkImportAllClick(Sender);
   ChkNoOverWrite.Checked := false;
+
+  if (FShowLogWindow) then
+    FLogWin.Show;
 end;
 
 procedure TFCopyMetaSingle.LvTagNamesCustomDrawItem(Sender: TCustomListView; Item: TListItem; State: TCustomDrawState;

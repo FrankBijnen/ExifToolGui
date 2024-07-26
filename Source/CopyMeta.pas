@@ -31,17 +31,17 @@ type
     procedure SpbAddClick(Sender: TObject);
     procedure SpbResetClick(Sender: TObject);
     procedure BtnPreviewClick(Sender: TObject);
-    procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure LvTagNamesEdited(Sender: TObject; Item: TListItem; var S: string);
   private
     { Private declarations }
     FSample: string;
+    FShowLogWindow: boolean;
     procedure SetupListView;
     procedure GetSelectedTags;
     procedure GetTagNames;
     procedure DisplayHint(Sender: TObject);
   public
-    procedure SetSample(ASample: string);
+    procedure PrepareShow(ASample: string);
     function TagSelection: string;
     { Public declarations }
   end;
@@ -147,11 +147,6 @@ begin
   end;
 end;
 
-procedure TFCopyMetadata.FormClose(Sender: TObject; var Action: TCloseAction);
-begin
-  FlogWin.Close;
-end;
-
 procedure TFCopyMetadata.FormShow(Sender: TObject);
 begin
   Left := FMain.Left + FMain.GUIBorderWidth + FMain.AdvPageFilelist.Left;
@@ -164,11 +159,17 @@ begin
   SetupListView;
 
   Application.OnHint := DisplayHint;
+
+  if (FShowLogWindow) then
+    FLogWin.Show;
 end;
 
-procedure TFCopyMetadata.SetSample(ASample: string);
+procedure TFCopyMetadata.PrepareShow(ASample: string);
 begin
   FSample := ASample;
+
+  FShowLogWindow := FLogWin.Showing;
+  FLogWin.Close;
 end;
 
 procedure TFCopyMetadata.BtnPreviewClick(Sender: TObject);
