@@ -421,21 +421,24 @@ end;
 
 procedure TShellListView.CMThumbStart(var Message: TMessage);
 begin
-  if (Assigned(FOnNotifyGenerateEvent)) then
+  if (Assigned(FOnNotifyGenerateEvent)) and
+     (Message.WParam < WParam(Items.Count)) then
     FOnNotifyGenerateEvent(Self, Items[Message.WParam], TThumbGenStatus.Started, Items.Count, FGenerating);
 end;
 
 procedure TShellListView.CMThumbEnd(var Message: TMessage);
 begin
   RemoveThumbTask(Message.WParam);
-  if (Assigned(FOnNotifyGenerateEvent)) then
+  if (Assigned(FOnNotifyGenerateEvent)) and
+     (Message.WParam < WParam(Items.Count)) then
     FOnNotifyGenerateEvent(Self, Items[Message.WParam], TThumbGenStatus.Ended, Items.Count, FGenerating);
 end;
 
 procedure TShellListView.CMThumbError(var Message: TMessage);
 begin
   RemoveThumbTask(Message.WParam);
-  if (Assigned(FOnNotifyErrorEvent)) then
+  if (Assigned(FOnNotifyErrorEvent)) and
+     (Message.WParam < WParam(Items.Count)) then
     FOnNotifyErrorEvent(Self, Items[Message.WParam], Exception(Message.LParam));
 end;
 
