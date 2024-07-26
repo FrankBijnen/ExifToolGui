@@ -35,12 +35,12 @@ type
     procedure SpbDelClick(Sender: TObject);
     procedure SpbEditClick(Sender: TObject);
     procedure SpbResetClick(Sender: TObject);
-    procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure LvTagNamesItemChecked(Sender: TObject; Item: TListItem);
     procedure LvTagNamesEdited(Sender: TObject; Item: TListItem; var S: string);
   private
     { Private declarations }
     FSample: string;
+    FShowLogWindow: boolean;
     procedure SetupListView;
     procedure GetSelectedTags;
     procedure GetTagNames;
@@ -48,7 +48,7 @@ type
     procedure DisplayHint(Sender: TObject);
   public
     { Public declarations }
-    procedure SetSample(ASample: string);
+    procedure PrepareShow(ASample: string);
     function TagSelection(const DoRemove: string = ''): string;
   end;
 
@@ -147,9 +147,12 @@ begin
   end;
 end;
 
-procedure TFRemoveMeta.SetSample(ASample: string);
+procedure TFRemoveMeta.PrepareShow(ASample: string);
 begin
   FSample := ASample;
+
+  FShowLogWindow := FLogWin.Showing;
+  FLogWin.Close;
 end;
 
 function TFRemoveMeta.TagSelection(const DoRemove: string = ''): string;
@@ -211,11 +214,6 @@ begin
   StatusBar1.SimpleText := GetShortHint(Application.Hint);
 end;
 
-procedure TFRemoveMeta.FormClose(Sender: TObject; var Action: TCloseAction);
-begin
-  FLogWin.Close;
-end;
-
 procedure TFRemoveMeta.FormShow(Sender: TObject);
 begin
   Left := FMain.Left + FMain.GUIBorderWidth + FMain.AdvPageFilelist.Left;
@@ -229,6 +227,9 @@ begin
   Application.OnHint := DisplayHint;
   ChkRemoveAll.Checked := false;
   ChkRemoveAllClick(Sender);
+
+  if (FShowLogWindow) then
+    FLogWin.Show;
 end;
 
 procedure TFRemoveMeta.LvTagNamesCustomDrawItem(Sender: TCustomListView; Item: TListItem; State: TCustomDrawState;

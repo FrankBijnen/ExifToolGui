@@ -1244,7 +1244,7 @@ begin
         // multiple files
         ETcmd := '-TagsFromFile' + CRLF + ETcmd + CRLF + '-All:All' + CRLF;
 
-        FCopyMetadata.SetSample(OpenPictureDlg.FileName);
+        FCopyMetadata.PrepareShow(OpenPictureDlg.FileName);
         if FCopyMetadata.ShowModal = mrOK then
         begin
           ETcmd := ETcmd + FCopyMetadata.TagSelection;
@@ -1280,7 +1280,7 @@ begin
     end;
     if OpenPictureDlg.Execute then
     begin
-      FCopyMetaSingle.SetSourceFile(OpenPictureDlg.FileName);
+      FCopyMetaSingle.PrepareShow(OpenPictureDlg.FileName);
       if FCopyMetaSingle.ShowModal = mrOK then
       begin
         RefreshSelected(Sender);
@@ -1327,7 +1327,7 @@ begin
           ETcmd := ETcmd + CRLF + '-r';
         ETcmd := ETcmd + CRLF + '-All:All' + CRLF;
 
-        FCopyMetadata.SetSample(OpenPictureDlg.FileName);
+        FCopyMetadata.PrepareShow(OpenPictureDlg.FileName);
         if FCopyMetadata.ShowModal = mrOK then
         begin
           ETcmd := ETcmd + FCopyMetadata.TagSelection;
@@ -1439,7 +1439,7 @@ end;
 
 procedure TFMain.MRemoveMetaClick(Sender: TObject);
 begin
-  FRemoveMeta.SetSample(GetFirstSelectedFilePath);
+  FRemoveMeta.PrepareShow(GetFirstSelectedFilePath);
   if FRemoveMeta.ShowModal = mrOK then
     ShowMetadata;
 end;

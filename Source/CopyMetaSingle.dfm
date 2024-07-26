@@ -11,7 +11,6 @@ object FCopyMetaSingle: TFCopyMetaSingle
   Font.Height = -11
   Font.Name = 'Tahoma'
   Font.Style = []
-  OnClose = FormClose
   OnShow = FormShow
   TextHeight = 13
   object Label1: TLabel
