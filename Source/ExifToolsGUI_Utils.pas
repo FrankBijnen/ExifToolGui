@@ -86,7 +86,7 @@ function GetTags(ETResult: TStringList; CmbTags: TComboBox): TTagInfoList;
 procedure FillGroupsInCombo(SelectedFile: string; CmbTags: TComboBox; const Family: string);
 procedure FillTagsInCombo(SelectedFile: string; CmbTags: TComboBox; const Family, GroupName: string);
 procedure DrawItemTagName(Control: TWinControl; Index: Integer; Rect: TRect; State: TOwnerDrawState);
-function TagImageIndex(const Caption: string): integer;
+procedure SetTagItem(const AnItem: TlistItem; ACaption: string = '');
 function RemoveInvalidTags(const Tag: string; AllowExclude: boolean = false): string;
 
 // GeoCoding
@@ -1074,9 +1074,19 @@ begin
 
 end;
 
-function TagImageIndex(const Caption: string): integer;
+procedure SetTagItem(const AnItem: TlistItem; ACaption: string = '');
+var
+  ImgIndex: integer;
 begin
-  result := integer(Pos('-', Caption) = 1);
+  if (ACaption <> '') then
+    AnItem.Caption := ACaption;
+  if (Pos('-', AnItem.Caption) = 1) then
+    ImgIndex := 0
+  else
+    ImgIndex := 2;
+  if (AnItem.Checked) then
+    Inc(ImgIndex);
+  AnItem.ImageIndex := ImgIndex;
 end;
 
 function RemoveInvalidTags(const Tag: string; AllowExclude: boolean = false): string;

@@ -81,9 +81,8 @@ begin
       begin
         ATag := NextField(AllTags, ' ');
         ANItem := LvTagNames.Items.Add;
-        ANitem.Caption := ATag;
-        ANItem.ImageIndex := TagImageIndex(ANitem.Caption);
         ANItem.Checked := (Pos(' ' + ATag + ' ', ' ' + SelRemoveTagList) > 0);
+        SetTagItem(ANitem, ATag);
       end;
     end;
   finally
@@ -93,15 +92,14 @@ begin
 end;
 
 procedure TFRemoveMeta.SpbAddClick(Sender: TObject);
+var
+  AnItem: TListItem;
 begin
   FrmTagNames.SetSample(FSample);
   if (FrmTagNames.ShowModal = IDOK) then
   begin
-    with LvTagNames.Items.Add do
-    begin
-      Caption := FrmTagNames.SelectedTag(true);
-      ImageIndex := TagImageIndex(Caption);
-    end;
+    AnItem := LvTagNames.Items.Add;
+    SetTagItem(AnItem, FrmTagNames.SelectedTag(true));
   end;
 end;
 
@@ -169,6 +167,7 @@ begin
     result := '';
     for ANItem in LvTagNames.Items do
     begin
+      SetTagItem(ANItem);
       if (ANitem.Checked) then
         result := result + '-' + RemoveInvalidTags(ANItem.Caption, true) + DoRemove + CRLF;
     end;
@@ -241,7 +240,7 @@ end;
 procedure TFRemoveMeta.LvTagNamesEdited(Sender: TObject; Item: TListItem; var S: string);
 begin
   S := RemoveInvalidTags(S, true);
-  Item.ImageIndex := TagImageIndex(S);
+  SetTagItem(Item, S);
   BtnExecute.Default := true;
 end;
 
