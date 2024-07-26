@@ -40,7 +40,6 @@ type
     procedure GetSelectedTags;
     procedure GetTagNames;
     procedure DisplayHint(Sender: TObject);
-    function CheckValidItem(const ACaption: string): string;
   public
     procedure SetSample(ASample: string);
     function TagSelection: string;
@@ -71,7 +70,7 @@ begin
     AllTags := ExcludeCopyTagList;
     while (AllTags <> '') do
     begin
-      ATag := CheckValidItem(NextField(AllTags, ' '));
+      ATag := NextField(AllTags, ' ');
       ANItem := LvTagNames.Items.Add;
       ANitem.Caption := ATag;
       ANItem.Checked := (Pos(' ' + ATag + ' ', ' ' + SelExcludeCopyTagList) > 0);
@@ -85,7 +84,7 @@ procedure TFCopyMetadata.SpbAddClick(Sender: TObject);
 begin
   FrmTagNames.SetSample(FSample);
   if (FrmTagNames.ShowModal = IDOK) then
-    LvTagNames.Items.Add.Caption := CheckValidItem(FrmTagNames.EdTagName.Text);
+    LvTagNames.Items.Add.Caption := FrmTagNames.SelectedTag;
 end;
 
 procedure TFCopyMetadata.SpbResetClick(Sender: TObject);
@@ -143,7 +142,7 @@ begin
   for ANItem in LvTagNames.Items do
   begin
     if (ANitem.Checked = false) then
-      result := result + '--' + ANItem.Caption + CRLF;
+      result := result + '--' + RemoveInvalidTags(ANItem.Caption) + CRLF;
   end;
 end;
 
@@ -191,14 +190,9 @@ begin
   StyledDrawListviewItem(FStyleServices, Sender, Item, State);
 end;
 
-function TFCopyMetadata.CheckValidItem(const ACaption: string): string;
-begin
-  result := StringReplace(ACaption, '-', '', [rfReplaceAll]);
-end;
-
 procedure TFCopyMetadata.LvTagNamesEdited(Sender: TObject; Item: TListItem; var S: string);
 begin
-  CheckValidItem(S);
+  S := RemoveInvalidTags(S);
   BtnExecute.Default := true;
 end;
 

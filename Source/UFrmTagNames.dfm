@@ -57,13 +57,13 @@ object FrmTagNames: TFrmTagNames
     Height = 29
     Align = alBottom
     TabOrder = 6
-    ExplicitTop = 278
-    ExplicitWidth = 588
+    ExplicitTop = 288
+    ExplicitWidth = 556
     DesignSize = (
       560
       29)
     object BtnOk: TBitBtn
-      Left = 377
+      Left = 373
       Top = 3
       Width = 85
       Height = 25
@@ -90,9 +90,10 @@ object FrmTagNames: TFrmTagNames
       ModalResult = 1
       NumGlyphs = 2
       TabOrder = 0
+      ExplicitLeft = 369
     end
     object BtnCancel: TBitBtn
-      Left = 468
+      Left = 464
       Top = 3
       Width = 85
       Height = 25
@@ -119,6 +120,7 @@ object FrmTagNames: TFrmTagNames
       ModalResult = 2
       NumGlyphs = 2
       TabOrder = 1
+      ExplicitLeft = 460
     end
   end
   object CmbGroupName: TComboBox

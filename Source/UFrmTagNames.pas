@@ -38,6 +38,7 @@ type
     { Public declarations }
     procedure SetSample(ASample: string);
     function PreferredFamily: string;
+    function SelectedTag(AllowExclude: boolean = false): string;
   end;
 
 var
@@ -46,7 +47,7 @@ var
 implementation
 
 uses
-  ExifToolsGUI_Utils;
+  ExifToolsGUI_Utils, UnitLangResources;
 
 {$R *.dfm}
 
@@ -150,6 +151,11 @@ begin
   FillGroupsInCombo(UseSample, CmbGroupName, PreferredFamily);
   CmbGroupNameChange(Sender);
   CmbTagNameChange(Sender);
+end;
+
+function TFrmTagNames.SelectedTag(AllowExclude: boolean = false): string;
+begin
+  result := RemoveInvalidTags(EdTagName.Text, AllowExclude);
 end;
 
 end.
