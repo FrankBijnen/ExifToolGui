@@ -12,15 +12,15 @@ type
   TValueListEditor = class(Vcl.ValEdit.TValueListEditor)
   private
     FProportionalVScroll: boolean;
-    FRowsInGrid: integer;
+    FDataRows: integer;
+    FRowsPossible: integer;
     FOnCtrlKeyDown: TkeyEvent;
   protected
     procedure KeyDown(var Key: Word; Shift: TShiftState); override;
-    function GetRowsInGrid: integer;
+    function GetRowsPossible: integer;
     procedure SetProportionalVScroll(Value: boolean);
     procedure UpdateScrollBar;
     procedure WMVScroll(var Msg: TWMVScroll); message WM_VSCROLL;
-    procedure CMShowingChanged(var Message: TMessage); message CM_SHOWINGCHANGED;
     procedure WMSize(var Msg: TWMSize); message WM_SIZE;
     procedure SizeChanged(OldColCount, OldRowCount: Longint); override;
     procedure TopLeftChanged; override;
@@ -32,13 +32,15 @@ type
 
 implementation
 
-uses Winapi.Windows, System.UITypes;
+uses Winapi.Windows, System.UITypes, Vcl.Grids;
 
 constructor TValueListEditor.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
+
   FProportionalVScroll := false;
-  FRowsInGrid := 0;
+  FDataRows := 0;
+  FRowsPossible := 0;
 end;
 
 procedure TValueListEditor.KeyDown(var Key: Word; Shift: TShiftState);
@@ -54,12 +56,16 @@ end;
 // This function calculates the #rows possible in the grid. Used for nPage in Scrollbar.
 // In contrast to VisibleRowCount. That returns the rows actually in the grid.
 // E.G.: RowCount = 200, Toprow = 199. => VisibleRowCount = 2. We would get a scrollbar with nPage = 2!
-
-function TValueListEditor.GetRowsInGrid: integer;
+// Assumed that all rows are the same height.
+function TValueListEditor.GetRowsPossible: integer;
+var
+  DrawInfo: TGridDrawInfo;
 begin
-  if (DefaultRowHeight = 0) then
+  if (FDataRows < 1) then  // Need at least 1 DataRow
     exit(0);
-  result := (ClientHeight div DefaultRowHeight) - FixedRows;
+
+  CalcDrawInfo(DrawInfo);
+  result := ClientHeight div (DrawInfo.Vert.GetExtent(FixedRows) + DrawInfo.Vert.EffectiveLineWidth) - FixedRows;
 end;
 
 procedure TValueListEditor.SetProportionalVScroll(Value: boolean);
@@ -89,25 +95,23 @@ procedure TValueListEditor.UpdateScrollBar;
 var
   Si: tagSCROLLINFO;
 begin
-
-  FRowsInGrid := GetRowsInGrid;
-
   FillChar(Si, SizeOf(Si), Chr(0));
   Si.cbSize := SizeOf(Si);
   Si.fMask := SIF_POS;              // Get current pos from scrollbar. Other fields remain zero.
   GetScrollInfo(Self.Handle, SB_VERT, Si);
 
-  if (FRowsInGrid < RowCount) then  // We can have a proportional scrollbar
+  if (FRowsPossible < FDataRows) then
   begin
-    Si.nMin := 1;
-    Si.nMax := RowCount;
-    Si.nPage := FRowsInGrid;
+    Si.nMin := 1;                   // We can have a proportional scrollbar
+    Si.nMax := FDataRows;
+    Si.nPage := FRowsPossible;
   end;
+
   if (Si.nPos > Si.nMax) then       // Verify Position within bounds
     Si.nPos := Si.nMax;
 
   Si.fMask := SIF_ALL;              // Update all fields
-  SetScrollInfo(Self.Handle, SB_VERT, Si, true);
+  SetScrollInfo(Self.Handle, SB_VERT, Si, false); // Redraw not needed?
 end;
 
 procedure TValueListEditor.WMVScroll(var Msg: TWMVScroll);
@@ -144,8 +148,8 @@ begin
   end;
 
   // Sanity checks on nPos
-  if (Si.nPos > Si.nMax + 1 - FRowsInGrid) then
-    Si.nPos := Si.nMax + 1 - FRowsInGrid;
+  if (Si.nPos > FDataRows +1 - FRowsPossible) then
+    Si.nPos := FDataRows +1 - FRowsPossible;
   if (Si.nPos < Si.nMin) then
     Si.nPos := Si.nMin;
 
@@ -155,20 +159,15 @@ begin
   Msg.Result := 0; // Handled
 end;
 
-procedure TValueListEditor.CMShowingChanged(var Message: TMessage);
-begin
-  inherited;
-
-  if (FProportionalVScroll) then
-    UpdateScrollBar;
-end;
-
 procedure TValueListEditor.WMSize(var Msg: TWMSize);
 begin
   inherited;
 
   if (FProportionalVScroll) then
+  begin
+    FRowsPossible := GetRowsPossible;
     UpdateScrollBar;
+  end;
 end;
 
 procedure TValueListEditor.SizeChanged(OldColCount, OldRowCount: Longint);
@@ -178,6 +177,8 @@ begin
 
   if (FProportionalVScroll) then
   begin
+    FDataRows := RowCount - FixedRows;
+
     // Must hide first, else thumb is not drawn correctly
     SetScrollRange(Self.Handle, SB_VERT, 0, 0, false);
     UpdateScrollBar;
