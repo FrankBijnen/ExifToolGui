@@ -99,6 +99,7 @@ begin
   if (LvTagNames.Selected <> nil) then
   begin
     BtnExecute.Default := false;
+    LvTagNames.Selected.Checked := false;
     LvTagNames.Selected.EditCaption;
   end;
 end;

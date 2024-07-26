@@ -82,9 +82,8 @@ begin
       begin
         ATag := NextField(AllTags, ' ');
         ANItem := LvTagNames.Items.Add;
-        ANitem.Caption := ATag;
-        ANItem.ImageIndex := TagImageIndex(ANItem.Caption);
         ANItem.Checked := (Pos(' ' + ATag + ' ', ' ' + SelCopySingleTagList) > 0);
+        SetTagItem(ANItem, ATag);
       end;
     end;
   finally
@@ -94,15 +93,14 @@ begin
 end;
 
 procedure TFCopyMetaSingle.SpbAddClick(Sender: TObject);
+var
+  AnItem: TlistItem;
 begin
   FrmTagNames.SetSample(SrcFile);
   if (FrmTagNames.ShowModal = IDOK) then
   begin
-    with LvTagNames.Items.Add do
-    begin
-      Caption := FrmTagNames.SelectedTag(true);
-      ImageIndex := TagImageIndex(Caption);
-    end;
+    AnItem := LvTagNames.Items.Add;
+    SetTagItem(AnItem, FrmTagNames.SelectedTag(true));
   end;
 end;
 
@@ -124,6 +122,7 @@ begin
   if (LvTagNames.Selected <> nil) then
   begin
     BtnExecute.Default := false;
+    LvTagNames.Selected.Checked := false;
     LvTagNames.Selected.EditCaption;
   end;
 end;
@@ -170,8 +169,9 @@ begin
     result := '';
     for ANItem in LvTagNames.Items do
     begin
+      SetTagItem(ANItem);
       if (ANitem.Checked) then
-        result := result + '-' + RemoveInvalidTags(ANItem.Caption) + CRLF;
+        result := result + '-' + RemoveInvalidTags(ANItem.Caption, true) + CRLF;
     end;
   end;
 end;
@@ -245,7 +245,7 @@ end;
 procedure TFCopyMetaSingle.LvTagNamesEdited(Sender: TObject; Item: TListItem; var S: string);
 begin
   S := RemoveInvalidTags(S, true);
-  Item.ImageIndex := TagImageIndex(S);
+  SetTagItem(Item, S);
   BtnExecute.Default := true;
 end;
 
