@@ -390,6 +390,9 @@ begin
   P := 0;
   if (FHome <> '') then
     Inc(P);
+  result := '';
+  if (Pos(':', FCurrentItems[P]) = 0) then
+    result := '\\';
   for I := P to FCurrentItems.Count - 1 do
     if I < FCurrentItems.Count - 1 then
       result := result + FCurrentItems[I] + '\'
@@ -1014,10 +1017,13 @@ var
   SepPos: IntegerArray;
   i: Integer;
 begin
+  CurPath := APath;
+  if (Copy(CurPath, 1, 2) = '\\') then
+    Delete(CurPath, 1, 2);
   if (FHome <> '') then
-    CurPath := FHome + '\' + APath
+    CurPath := FHome + '\' + CurPath
   else
-    CurPath := APath;
+    CurPath := CurPath;
 
   SetLength(SepPos, 1);
   SepPos[0] := 0;
@@ -1110,15 +1116,19 @@ end;
 
 function TDirBreadcrumbBar.GetDirUpTo(Level: integer): string;
 var
-  i: Integer;
-  p: integer;
+  I: Integer;
+  P: integer;
 begin
-  p := 0;
+  P := 0;
   if (FHome <> '') then
-    inc(p);
-  result := FBreadcrumbs[p];
-  for i := p +1 to Level do
-    result := result + '\' + FBreadcrumbs[i];
+    inc(P);
+  result := '';
+  if (Pos(':', FBreadcrumbs[P]) = 0) then
+    result := '\\';
+  result := result + FBreadcrumbs[P];
+
+  for I := P +1 to Level do
+    result := result + '\' + FBreadcrumbs[I];
 end;
 
 procedure TDirBreadcrumbBar.SetDirectory(const Value: string);
