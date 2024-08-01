@@ -3,8 +3,8 @@ object FFileDateTime: TFFileDateTime
   Top = 0
   BorderStyle = bsDialog
   Caption = 'Rename files'
-  ClientHeight = 475
-  ClientWidth = 572
+  ClientHeight = 474
+  ClientWidth = 568
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -15,19 +15,17 @@ object FFileDateTime: TFFileDateTime
   TextHeight = 13
   object StatusBar1: TStatusBar
     Left = 0
-    Top = 456
-    Width = 572
+    Top = 455
+    Width = 568
     Height = 19
     Panels = <>
     SimplePanel = True
-    ExplicitTop = 455
-    ExplicitWidth = 568
   end
   object AdvPanel1: TPanel
     Left = 0
     Top = 0
     Width = 497
-    Height = 456
+    Height = 455
     Align = alLeft
     DoubleBuffered = True
     Font.Charset = DEFAULT_CHARSET
@@ -38,7 +36,6 @@ object FFileDateTime: TFFileDateTime
     ParentDoubleBuffered = False
     ParentFont = False
     TabOrder = 1
-    ExplicitHeight = 455
     object AdvPanel2: TPanel
       Left = 16
       Top = 16

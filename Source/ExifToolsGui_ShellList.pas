@@ -19,18 +19,30 @@ uses
 
 type
   THeaderSortState = (hssNone, hssAscending, hssDescending);
-
   TThumbGenStatus = (Started, Ended);
+
   TThumbErrorEvent = procedure(Sender: TObject; Item: TListItem; E: Exception) of object;
   TThumbGenerateEvent = procedure(Sender: TObject; Item: TListItem; Status: TThumbGenStatus; Total, Remaining: integer) of object;
   TPopulateBeforeEvent = procedure(Sender: TObject; var DoDefault: boolean) of object;
-  TOwnerDataFetchEvent = procedure(Sender: TObject; Item: TListItem; Request: TItemRequest; Afolder: TShellFolder) of object;
+  TOwnerDataFetchEvent = procedure(Sender: TObject; Item: TListItem; Request: TItemRequest; AFolder: TShellFolder) of object;
+
+  TSubShellFolder = class(TShellFolder)
+    FRelativePath: string;
+    function RelativePath: string;
+  public
+    destructor Destroy; override;
+    function DisplayName: string;
+    class function GetDisplayName(Folder: pointer): string;
+  end;
 
   TShellListView = class(Vcl.Shell.ShellCtrls.TShellListView, IShellCommandVerbExifTool)
   private
+    FHiddenFolders: TList;
     FThreadPool: TThreadPool;
     FThumbTasks: Tlist;
     FDoDefault: boolean;
+    FSubFolders: WPARAM;
+    FIncludeSubFolders: boolean;
 
     FonColumnResized: TNotifyEvent;
     FColumnSorted: boolean;
@@ -57,7 +69,9 @@ type
     ICM2: IContextMenu2;
     FRefreshAfterContext: boolean;
     procedure SetColumnSorted(AValue: boolean);
+    procedure ClearHiddenItems;
     procedure InitThumbNails;
+
     procedure SetThumbNailSize(AValue: integer);
     procedure CMThumbStart(var Message: TMessage); message CM_ThumbStart;
     procedure CMThumbEnd(var Message: TMessage); message CM_ThumbEnd;
@@ -69,10 +83,12 @@ type
     procedure InitSortSpec(SortColumn: integer; SortState: THeaderSortState);
     procedure ColumnSort; virtual;
     procedure CreateWnd; override;
+    procedure DestroyWnd; override;
     procedure EnumColumns; override;
     procedure GetThumbNails; virtual;
     procedure DoContextPopup(MousePos: TPoint; var Handled: boolean); override;
     procedure Edit(const Item: TLVItem); override;
+    procedure PopulateSubDirs(FRootFolder, FRelativeFolder: TSubShellFolder); overload;
     procedure Populate; override;
     function OwnerDataFetch(Item: TListItem; Request: TItemRequest): boolean; override;
     procedure Add2ThumbNails(ABmp: HBITMAP; ANitemIndex: integer; NeedsGenerating: boolean);
@@ -87,12 +103,14 @@ type
     procedure ClearSelectionRefresh;
 
     function Path: string;
+    function GetSelectedFolder(ItemIndex: integer): TShellFolder;
     function FilePath(ItemIndex: integer = -1): string;
-    function FileName(ItemIndex: integer = -1): string;
+    function RelFileName(ItemIndex: integer = -1): string;
     function FileExt(ItemIndex: integer = -1): string;
     procedure ColumnClick(Column: TListColumn);
     procedure FileNamesToClipboard(Cut: boolean = false);
     procedure PasteFilesFromClipboard;
+    procedure PopulateSubDirs(FRootFolder: TSubShellFolder); overload;
     procedure ExecuteCommandExif(Verb: string; var Handled: boolean);
     procedure CommandCompletedExif(Verb: String; Succeeded: Boolean);
     procedure ShellListOnGenerateReady(Sender: TObject);
@@ -117,20 +135,44 @@ type
     property OnOwnerDataFetchEvent: TOwnerDataFetchEvent read FOnOwnerDataFetchEvent write FOnOwnerDataFetchEvent;
     property OnMouseWheel;
     property OnCustomDrawItem;
+    property IncludeSubFolders: boolean read FIncludeSubFolders write FIncludeSubFolders;
   end;
 
 implementation
 
 uses System.Win.ComObj, System.UITypes,
-     Vcl.Graphics, ExifToolsGUI_Utils,
-     UnitFilesOnClipBoard;
+     Vcl.Graphics,
+     ExifToolsGUI_Utils, UnitFilesOnClipBoard, UFrmGenerate;
 
 // res file contains the ?
 
 {$R ShellList.res}
 
 const
-  QUESTIONMARK = 'QUESTIONMARK';
+  HOURGLASS = 'HOURGLASS';
+
+  // ShellFolder support routines.
+
+function DesktopShellFolder: IShellFolder;
+begin
+  OleCheck(SHGetDesktopFolder(Result));
+end;
+
+function GetIShellFolder(IFolder: IShellFolder; PIDL: PItemIDList; Handle: THandle): IShellFolder;
+var
+  HR: HResult;
+begin
+  if Assigned(IFolder) then
+  begin
+    HR := IFolder.BindToObject(PIDL, nil, IID_IShellFolder, Pointer(Result));
+    if HR <> S_OK then
+      IFolder.GetUIObjectOf(Handle, 1, PIDL, IID_IShellFolder, nil, Pointer(Result));
+    if HR <> S_OK then
+      IFolder.CreateViewObject(Handle, IID_IShellFolder, Pointer(Result));
+  end;
+  if not Assigned(Result) then
+    DesktopShellFolder.BindToObject(PIDL, nil, IID_IShellFolder, Pointer(Result));
+end;
 
   // Listview Sort
 
@@ -176,6 +218,40 @@ begin
   Header_SetItem(Header, Column.Index, Item);
 end;
 
+destructor TSubShellFolder.Destroy;
+begin
+  FRelativePath := '';
+  inherited;
+end;
+
+function TSubShellFolder.RelativePath: string;
+begin
+  result := FRelativePath;
+  if not (IsFolder) and
+     (result <> '') then
+    result := IncludeTrailingPathDelimiter(result);
+end;
+
+function TSubShellFolder.DisplayName: string;
+begin
+  if (IsFolder) then
+    result := RelativePath
+  else
+    result := RelativePath + inherited DisplayName;
+end;
+
+class function TSubShellFolder.GetDisplayName(Folder: pointer): string;
+begin
+  result := '';
+  if (Assigned(Folder)) then
+  begin
+    if TObject(Folder) is TSubShellFolder then
+      result := TSubShellFolder(Folder).DisplayName
+    else
+      result := TShellFolder(Folder).DisplayName;
+  end;
+end;
+
 procedure TShellListView.WMNotify(var Msg: TWMNotify);
 var
   Column: TListColumn;
@@ -209,18 +285,31 @@ end;
 procedure TShellListView.ColumnSort;
 var
   ANitem: TListItem;
-  SortOnDetails: boolean;
+  DetailsNeeded: boolean;
+  CustomSortNeeded: boolean;
 begin
   if (ViewStyle = vsReport) and
-      FColumnSorted then
+     (FColumnSorted) then
   begin
-    if (FSortColumn < Columns.Count) then
-      SetListHeaderSortState(Self, Columns[FSortColumn], FSortState);
+    if (SortColumn < Columns.Count) then
+      SetListHeaderSortState(Self, Columns[SortColumn], FSortState);
 
-    SortOnDetails := (FSortColumn <> 0) and
-                     (FDoDefault = false);
-    if (SortOnDetails) then
-      for ANitem in Items do; // Need to get all the details of the items
+    CustomSortNeeded := (FDoDefault = false) or FIncludeSubFolders;
+    DetailsNeeded := (SortColumn <> 0);
+
+    if (DetailsNeeded) then
+    begin
+      for ANitem in Items do // Need to get all the details of the items
+      begin
+        if (FIncludeSubFolders) then
+        begin
+          if boolean(SendMessage(FrmGenerate.Handle, CM_WantsToClose, 0, 0)) then
+            exit;
+          if (ANitem.Index mod FrmGenerate.ModCount = 0) then
+            SendMessage(FrmGenerate.Handle, CM_SubFolderSortProgress, ANitem.Index, LPARAM(ANitem.Caption));
+        end;
+      end;
+    end;
 
     // Use an anonymous method. So we can test for FDoDefault, SortColumn and SortState
     // See also method ListSortFunc in Vcl.Shell.ShellCtrls.pas
@@ -228,14 +317,20 @@ begin
       function(Item1, Item2: Pointer): integer
       const
         R: array [boolean] of Byte = (0, 1);
-      begin
+
+       begin
         Result := R[TShellFolder(Item2).IsFolder] - R[TShellFolder(Item1).IsFolder];
         if (Result = 0) then
         begin
-          if (SortOnDetails) then
-          begin // Compare the values from DetailStrings. Always text.
-            if (SortColumn <= TShellFolder(Item1).DetailStrings.Count) and (SortColumn <= TShellFolder(Item2).DetailStrings.Count) then
-              Result := CompareText(TShellFolder(Item1).Details[SortColumn], TShellFolder(Item2).Details[SortColumn]);
+          if (CustomSortNeeded) then
+          begin
+            if (SortColumn = 0) then // Compare the relative name, not just the filename.
+              Result := CompareText(TSubShellFolder.GetDisplayName(Item1), TSubShellFolder.GetDisplayName(Item2))
+            else
+            begin // Compare the values from DetailStrings. Always text.
+              if (SortColumn <= TShellFolder(Item1).DetailStrings.Count) and (SortColumn <= TShellFolder(Item2).DetailStrings.Count) then
+                Result := CompareText(TShellFolder(Item1).Details[SortColumn], TShellFolder(Item2).Details[SortColumn]);
+            end;
           end
           else
           begin // Use the standard compare
@@ -244,13 +339,13 @@ begin
                 TShellFolder(Item2).RelativeID));
           end;
         end;
+
         // Sort on Filename (Column 0), within SortColumn
         if (Result = 0) and
            (SortColumn <> 0) then
-        begin
-          Result := Smallint(TShellFolder(Item1).ParentShellFolder.CompareIDs(0, TShellFolder(Item1).RelativeID,
-            TShellFolder(Item2).RelativeID));
-        end;
+          Result := CompareText(TSubShellFolder.GetDisplayName(Item1), TSubShellFolder.GetDisplayName(Item2));
+
+        // Reverse order
         if (SortState = THeaderSortState.hssDescending) then
           Result := Result * -1;
       end);
@@ -314,16 +409,26 @@ end;
 
 procedure TShellListView.CommandCompletedExif(Verb: String; Succeeded: Boolean);
 begin
-{}
+  if (not Succeeded) and (Verb = '') then
+  begin
+    FRefreshAfterContext := false;
+    MessageDlgEx('Context menu failed', '', TMsgDlgType.mtWarning, [TMsgDlgBtn.mbOK]);
+  end;
 end;
 
 procedure TShellListView.ShowMultiContextMenu(MousePos: TPoint);
-var FileList: TStringList;
+var
+  FileList: TStringList;
 begin
+//TODO: Decide which items need a refresh. Not which items dont need it.
+  FRefreshAfterContext := false;
   FileList := CreateSelectedFileList(false);
   try
-    FRefreshAfterContext := true;
-    InvokeMultiContextMenu(Self, RootFolder, MousePos, ICM2, FileList);
+    if (SelectedFolder <> nil) then
+    begin
+      FRefreshAfterContext := not FIncludeSubFolders;
+      InvokeMultiContextMenu(Self, SelectedFolder, MousePos, ICM2, FileList);
+    end;
   finally
     FileList.Free;
     if FRefreshAfterContext then
@@ -403,7 +508,18 @@ begin
       if (Assigned(FOnPathChange)) then
         FOnPathChange(Self);
 
-      ColumnSort;
+      if (FIncludeSubFolders) then
+      begin
+        FrmGenerate.Show;
+        SendMessage(FrmGenerate.Handle, CM_SubFolderSort, Items.Count, LPARAM(Path));
+      end;
+
+      try
+        ColumnSort;
+      finally
+        if (FIncludeSubFolders) then
+          FrmGenerate.Close;
+      end;
 
       // All data loaded
       if (Assigned(FOnItemsLoaded)) then
@@ -453,7 +569,6 @@ end;
 
 procedure TShellListView.GetThumbNails;
 var
-  ANitem: TListItem;
   Hr: HRESULT;
   HBmp: HBITMAP;
   ItemIndx: integer;
@@ -475,9 +590,19 @@ begin
     FGenerating := 0;
     SendMessage(Self.Handle, CM_ThumbEnd, -1, 0);
 
-    for ANitem in Items do
+    for ItemIndx := 0 to FoldersList.Count -1 do
     begin
-      ItemIndx := ANitem.Index;
+
+      if (FIncludeSubFolders) then // Only get icons for folders
+      begin
+        if (Folders[ItemIndx].IsFolder) then
+        begin
+          Hr := GetThumbCache(Folders[ItemIndx].AbsoluteID, HBmp, SIIGBF_ICONONLY, FThumbNails.Width, FThumbNails.Height);
+          if (Hr = S_OK) then
+            Add2ThumbNails(HBmp, ItemIndx, false);
+        end;
+        continue;
+      end;
 
       Hr := GetThumbCache(Folders[ItemIndx].AbsoluteID, HBmp, SIIGBF_THUMBNAILONLY or SIIGBF_INCACHEONLY, FThumbNails.Width, FThumbNails.Height);
       if (Hr = S_OK) then
@@ -505,7 +630,7 @@ begin
       if (FullPaths) then
         Result.AddObject(Folders[AnItem.Index].PathName, Pointer(Folders[AnItem.Index].RelativeID))
       else
-        Result.AddObject(FileName(AnItem.Index), Pointer(Folders[AnItem.Index].RelativeID));
+        Result.AddObject(RelFileName(AnItem.Index), Pointer(Folders[AnItem.Index].RelativeID));
     end;
 end;
 
@@ -527,6 +652,62 @@ begin
     ShellTreeView.Refresh(ShellTreeView.Selected);
 end;
 
+procedure TShellListView.PopulateSubDirs(FRootFolder, FRelativeFolder: TSubShellFolder);
+var
+  ID: PItemIDList;
+  EnumList: IEnumIDList;
+  NumIDs: LongWord;
+  HR: HResult;
+  CanAdd: Boolean;
+  NewFolder: IShellFolder;
+  NewRelativeFolder: TSubShellFolder;
+
+begin
+  if (FRelativeFolder.ShellFolder = nil) then
+    exit;
+
+  Inc(FSubFolders);
+  SendMessage(FrmGenerate.Handle, CM_SubFolderScan, FSubFolders, LPARAM(FRelativeFolder.PathName));
+
+  HR := FRelativeFolder.ShellFolder.EnumObjects(0, SHCONTF_FOLDERS + SHCONTF_NONFOLDERS, EnumList); // No user input
+  if HR <> S_OK then
+   exit;
+
+  while EnumList.Next(1, ID, NumIDs) = S_OK do
+  begin
+    if boolean(SendMessage(FrmGenerate.Handle, CM_WantsToClose, 0, 0)) then
+      exit;
+
+    NewFolder := GetIShellFolder(FRelativeFolder.ShellFolder, ID, 0);
+    NewRelativeFolder := TSubShellFolder.Create(FRelativeFolder, ID, NewFolder);
+    NewRelativeFolder.FRelativePath := FRelativeFolder.FRelativePath;
+
+    if (NewRelativeFolder.IsFolder) then
+    begin
+
+      NewRelativeFolder.FRelativePath := IncludeTrailingPathDelimiter(NewRelativeFolder.FRelativePath) +
+                                         TShellFolder(NewRelativeFolder).DisplayName;
+
+      PopulateSubDirs(FRootFolder, NewRelativeFolder);
+      FHiddenFolders.Add(NewRelativeFolder); // We dont want subfoldernames visible. But keep a reference, so we can free them
+      Continue;
+    end;
+
+    CanAdd := True;
+    if Assigned(OnAddFolder) then OnAddFolder(Self, NewRelativeFolder, CanAdd);
+
+    if CanAdd then
+      FoldersList.Add(NewRelativeFolder)
+    else
+      NewRelativeFolder.Free;
+  end;
+end;
+
+procedure TShellListView.PopulateSubDirs(FRootFolder: TSubShellFolder);
+begin
+  PopulateSubDirs(FRootFolder, FRootFolder);
+end;
+
 procedure TShellListView.Populate;
 begin
   // Prevent flicker by skipping populate when not yet needed.
@@ -543,21 +724,45 @@ begin
 
   // Force initialization of array with zeroes
   SetLength(FThumbNailCache, 0);
+  ClearHiddenItems;
 
-  inherited;
+  Items.BeginUpdate;
+  if (FIncludeSubFolders) then
+  begin
+    FSubFolders := 0;
+    FrmGenerate.Show;
+    SendMessage(FrmGenerate.Handle, CM_SubFolderScan, FSubFolders, LPARAM(Path));
+  end;
 
-  // Optimize memory allocation
-  AllocBy := Items.Count;
+  try
+    try
+      inherited;
+    finally
+      Items.Count := FoldersList.Count;
+      Items.EndUpdate;
+    end;
 
-  if (ViewStyle = vsReport) then
-    exit;
+    // Optimize memory allocation
+    AllocBy := Items.Count;
 
-  // Allow starting exiftool
-  if (Assigned(FOnPathChange)) then
-    FOnPathChange(Self);
+    if (ViewStyle = vsReport) then
+      exit;
 
-  // Get Thumbnails and load in imagelist.
-  GetThumbNails;
+    // Allow starting exiftool
+    if (Assigned(FOnPathChange)) then
+      FOnPathChange(Self);
+
+    // Get Thumbnails and load in imagelist.
+
+    if (FIncludeSubFolders) then
+      SendMessage(FrmGenerate.Handle, CM_IconStart, Items.Count, LPARAM(Path));
+
+    GetThumbNails;
+
+  finally
+    if (FIncludeSubFolders) then
+      FrmGenerate.Close;
+  end;
 
   // All data loaded
   if (Assigned(FOnItemsLoaded)) then
@@ -624,10 +829,15 @@ function TShellListView.OwnerDataFetch(Item: TListItem; Request: TItemRequest): 
 begin
   Result := true; // The inherited always return true!
 
-  if not(FDoDefault) and not(csDesigning in ComponentState) and Assigned(FOnOwnerDataFetchEvent) then
+  if (not(FDoDefault) and
+      not(csDesigning in ComponentState) and Assigned(FOnOwnerDataFetchEvent)) then
     FOnOwnerDataFetchEvent(Self, Item, Request, Folders[Item.Index])
   else
     Result := inherited;
+
+  if (irText in Request) and
+     (Item.Index >= 0) then
+    Item.Caption := TSubShellFolder.GetDisplayName(Folders[Item.Index]);
 
   if (ViewStyle = vsIcon) then
     DoIcon;
@@ -642,6 +852,8 @@ begin
   DoubleBuffered := true;
   FThumbNailSize := 0;
   FGenerating := 0;
+  FHiddenFolders := Tlist.Create;
+  FIncludeSubFolders := false;
   InitSortSpec(0, THeaderSortState.hssNone);
   FThumbTasks := Tlist.Create;
   FThumbNails := TImageList.Create(Self);
@@ -663,8 +875,16 @@ begin
   FThumbNails.Free;
   SetLength(FThumbNailCache, 0);
   FreeAndNil(FThreadPool);
+  ClearHiddenItems;
+  FHiddenFolders.Free;
 
   inherited;
+end;
+
+procedure TShellListView.DestroyWnd;
+begin
+  ClearHiddenItems;
+  inherited DestroyWnd;
 end;
 
 procedure TShellListView.CancelThumbTasks;
@@ -721,10 +941,11 @@ begin
   result := RootFolder.PathName;
 end;
 
-function TShellListView.FilePath(ItemIndex: integer = -1): string;
-var SelIndex: integer;
+function TShellListView.GetSelectedFolder(ItemIndex: integer): TShellFolder;
+var
+  SelIndex: integer;
 begin
-  Result := '';
+  result := nil;
 
   SelIndex := ItemIndex;
   if (SelIndex = -1) and
@@ -735,13 +956,43 @@ begin
      (SelIndex >= Items.Count) then
     exit;
 
-  if (not Folders[SelIndex].IsFolder) then
-    result := Folders[SelIndex].PathName;
+  result := Folders[SelIndex];
 end;
 
-function TShellListView.FileName(ItemIndex: integer = -1): string;
+function TShellListView.FilePath(ItemIndex: integer = -1): string;
+var
+  AFolder: TShellFolder;
 begin
-  Result := ExtractFileName(FilePath(ItemIndex));
+  Result := '';
+
+  AFolder := GetSelectedFolder(ItemIndex);
+  if (AFolder = nil) then
+    exit;
+
+  if (not AFolder.IsFolder) then
+  begin
+    if (AFolder is TSubShellFolder) then
+      result := TSubShellFolder(AFolder).PathName
+    else
+      result := AFolder.PathName;
+  end;
+end;
+
+function TShellListView.RelFileName(ItemIndex: integer = -1): string;
+var
+  AFolder: TShellFolder;
+begin
+  AFolder := GetSelectedFolder(ItemIndex);
+  if (AFolder = nil) then
+    exit;
+
+  if (not AFolder.IsFolder) then
+  begin
+    if (AFolder is TSubShellFolder) then
+      result := TSubShellFolder(AFolder).DisplayName
+    else
+      result := ExtractFileName(AFolder.PathName);
+  end;
 end;
 
 function TShellListView.FileExt(ItemIndex: integer = -1): string;
@@ -816,9 +1067,20 @@ begin
   SetIconSpacing(Delta(Cx), Delta(Cy));
 end;
 
+procedure TShellListView.ClearHiddenItems;
+var
+  I: Integer;
+begin
+  for I := 0 to FHiddenFolders.Count-1 do
+    if Assigned(FHiddenFolders[I]) then
+      TSubShellFolder(FHiddenFolders[I]).Free;
+
+  FHiddenFolders.Clear;
+end;
+
 procedure TShellListView.InitThumbNails;
 var
-  AQuestionMark: TBitmap;
+  AnHourGlass: TBitmap;
 begin
   FThumbNails.Clear;
   if (FThumbNailSize <> 0) then
@@ -827,13 +1089,13 @@ begin
     FThumbNails.Height := FThumbNailSize;
     FThumbNails.BlendColor := clBlack;
     FThumbNails.BkColor := clBlack;
-    AQuestionMark := TBitmap.Create;
+    AnHourGlass := TBitmap.Create;
     try
-      AQuestionMark.LoadFromResourceName(HInstance, QUESTIONMARK);
-      ResizeBitmapCanvas(AQuestionMark, FThumbNailSize, FThumbNailSize, clWhite);
-      FThumbNails.Add(AQuestionMark, nil);
+      AnHourGlass.LoadFromResourceName(HInstance, HOURGLASS);
+      ResizeBitmapCanvas(AnHourGlass, FThumbNailSize, FThumbNailSize, clWhite);
+      FThumbNails.Add(AnHourGlass, nil);
     finally
-      AQuestionMark.Free
+      AnHourGlass.Free
     end;
     // Set the imagelist to our thumbnail list.
     SendMessage(Handle, LVM_SETIMAGELIST, LVSIL_NORMAL, FThumbNails.Handle);

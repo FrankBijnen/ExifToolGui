@@ -117,6 +117,11 @@ begin
     else
       ETcmd := ETcmd  + '-W' + CRLF;
 
+    if (ET_Options.ETAPIWindowsWideFile <> '') then
+      ETcmd := ETcmd + '.\%d\'
+    else
+      ETcmd := ETcmd + '%d\';
+
     if ChkSubdirs.Checked then
       ETcmd := ETcmd + '%g1\%t\%f.%s' + CRLF
     else
