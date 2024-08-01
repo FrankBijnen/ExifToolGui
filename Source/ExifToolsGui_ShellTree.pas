@@ -14,6 +14,7 @@ type
 
   TShellTreeView = class(Vcl.Shell.ShellCtrls.TShellTreeView, IShellCommandVerbExifTool)
   private
+    FPreferredRoot: string;
     FPaths2Refresh: TStringList;
     ICM2: IContextMenu2;
     FOnBeforeContextMenu: TNotifyEvent;
@@ -23,6 +24,8 @@ type
     procedure ShowMultiContextMenu(MousePos: TPoint);
     procedure WndProc(var Message: TMessage); override;
     procedure RefreshParentPaths(const APaths: TStringList);
+    function  GetPath: string;
+    procedure SetPath(APath: string);
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
@@ -37,11 +40,14 @@ type
     property OnBeforeContextMenu: TNotifyEvent read FOnBeforeContextMenu write FOnBeforeContextMenu;
     property OnAfterContextMenu: TNotifyEvent read FOnAfterContextMenu write FOnAfterContextMenu;
     property OnCustomDrawItem;
+    property Path: string read GetPath write SetPath;
+    property PreferredRoot: string read FPreferredRoot write FPreferredRoot;
  end;
 
 implementation
 
 uses
+  System.IOUtils,
   Winapi.ActiveX,
   Vcl.Shell.ShellConsts,
   ExifToolsGUI_Thumbnails, ExiftoolsGui_ShellList, UnitFilesOnClipBoard;
@@ -53,6 +59,7 @@ begin
   FPaths2Refresh.Sorted := true;
   FPaths2Refresh.Duplicates := TDuplicates.dupIgnore;
   ICM2 := nil;
+  FPreferredRoot := '';
 end;
 
 destructor TShellTreeView.Destroy;
@@ -227,6 +234,24 @@ begin
     FPaths2Refresh.Clear;
     SetCursor(CrNormal);
   end;
+end;
+
+function TShellTreeView.GetPath: string;
+begin
+  result := inherited Path;
+end;
+
+procedure TShellTreeView.SetPath(APath: string);
+begin
+  if TPath.IsUNCPath(APath) then
+    Root := APath
+  else
+  begin
+   if (FPreferredRoot <> '') and
+      (Root <> FPreferredRoot) then
+    Root := FPreferredRoot;
+  end;
+  inherited Path := APath;
 end;
 
 // to handle submenus of context menus.
