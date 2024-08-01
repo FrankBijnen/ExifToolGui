@@ -165,7 +165,7 @@ var
 begin
   CoInitialize(nil);
   try
-    if (GetStatus = TTaskStatus.Canceled) or (boolean(SendMessage(FHandle, CM_ThumbGenWantsToClose, 0, 0))) then
+    if (GetStatus = TTaskStatus.Canceled) or (boolean(SendMessage(FHandle, CM_WantsToClose, 0, 0))) then
       exit;
 
     Flags := SIIGBF_THUMBNAILONLY;
@@ -230,7 +230,7 @@ var
   ThisThumb: string;
   Tasks: array of ITask;
 begin
-  result := not boolean(SendMessage(AForm.Handle, CM_ThumbGenWantsToClose, 0, 0));
+  result := not boolean(SendMessage(AForm.Handle, CM_WantsToClose, 0, 0));
   if (result = false) then
     exit;
 
@@ -251,7 +251,7 @@ begin
 
   while (Rc = 0) and (result) do
   begin
-    result := not boolean(SendMessage(AForm.Handle, CM_ThumbGenWantsToClose, 0, 0));
+    result := not boolean(SendMessage(AForm.Handle, CM_WantsToClose, 0, 0));
     if (result = false) then
       break;
 

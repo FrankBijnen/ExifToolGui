@@ -102,7 +102,7 @@ begin
       begin
 
         // Only care about JPG
-        AnImport := IncludeTrailingPathDelimiter(DirJPG) + ChangeFileExt(AFile, '.jpg');
+        AnImport := IncludeTrailingPathDelimiter(DirJPG) + ChangeFileExt(ExtractFileName(AFile), '.jpg');
         if not FileExists(AnImport) then
           continue;
 

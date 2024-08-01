@@ -79,7 +79,7 @@ begin
   begin
     if (AnItem.Selected = false) then
       continue;
-    FileName := Fmain.ShellList.FileName(AnItem.Index);
+    FileName := Fmain.ShellList.RelFileName(AnItem.Index);
     FullPathName := Fmain.ShellList.Folders[AnItem.Index].PathName;
     if (IsJpeg(FullPathName) = false) then
       continue;

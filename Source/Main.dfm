@@ -167,7 +167,7 @@ object FMain: TFMain
     Top = 25
     Width = 320
     Height = 536
-    ActivePage = AdvTabMetadata
+    ActivePage = AdvTabOSMMap
     Align = alRight
     DoubleBuffered = True
     ParentDoubleBuffered = False
@@ -284,7 +284,6 @@ object FMain: TFMain
         Font.Style = []
         ParentFont = False
         TabOrder = 1
-        ExplicitTop = 401
         DesignSize = (
           312
           106)
@@ -374,7 +373,6 @@ object FMain: TFMain
         OnMouseDown = MetadataListMouseDown
         OnMouseMove = MetadataListMouseMove
         OnSelectCell = MetadataListSelectCell
-        ExplicitHeight = 344
         ColWidths = (
           150
           160)
@@ -396,6 +394,7 @@ object FMain: TFMain
         Font.Style = []
         ParentFont = False
         TabOrder = 0
+        ExplicitHeight = 418
         object EdgeBrowser1: TEdgeBrowser
           Left = 1
           Top = 1
@@ -408,6 +407,7 @@ object FMain: TFMain
           OnNavigationStarting = EdgeBrowser1NavigationStarting
           OnWebMessageReceived = EdgeBrowser1WebMessageReceived
           OnZoomFactorChanged = EdgeBrowser1ZoomFactorChanged
+          ExplicitHeight = 416
         end
       end
       object AdvPanel_MapBottom: TPanel
@@ -424,6 +424,7 @@ object FMain: TFMain
         Font.Style = []
         ParentFont = False
         TabOrder = 1
+        ExplicitTop = 475
         object SpeedBtn_Geotag: TSpeedButton
           AlignWithMargins = True
           Left = 1
@@ -969,7 +970,6 @@ object FMain: TFMain
     Top = 0
     Width = 940
     Height = 25
-    UseSystemFont = False
     ActionManager = MainActionManager
     Caption = 'ActionMainMenuBar'
     Color = clMenuBar
@@ -978,7 +978,7 @@ object FMain: TFMain
     ColorMap.BtnSelectedFont = clBlack
     ColorMap.UnusedColor = clWhite
     Font.Charset = DEFAULT_CHARSET
-    Font.Color = clBlack
+    Font.Color = clWindowText
     Font.Height = -12
     Font.Name = 'Segoe UI'
     Font.Style = []
@@ -1474,7 +1474,7 @@ object FMain: TFMain
       OnExecute = MImportMetaSelectedClick
     end
     object MaImportRecursiveAll: TAction
-      Tag = 20
+      Tag = 25
       Category = 'Export_Import'
       Caption = 'Copy metadata into all JPG or TIF files...'
       OnExecute = MImportRecursiveAllClick

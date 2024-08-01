@@ -1203,6 +1203,7 @@ var
   ETerrs: string;
 begin
   ETcmd := '-s3' + CRLF + '-f' + CRLF + '-n' + CRLF + '-q';
+  ETcmd := ETcmd + CRLF + '-Directory';
   ETcmd := ETcmd + CRLF + '-Filename';
   ETcmd := ETcmd + CRLF + '-Composite:GpsLatitude';
   ETcmd := ETcmd + CRLF + '-GpsLatitude';
@@ -1219,6 +1220,11 @@ var
   CompLat, CompLon: string;
 begin
   result := NextField(ETout, CRLF);
+  if (result = '.') then
+    result := '';
+  if (result <> '') then
+    result := IncludeTrailingPathDelimiter(StringReplace(result, '/', '\', [rfReplaceAll]));
+  result := result + NextField(ETout, CRLF);
 
   // Take Composite Lat & Lon. If not avail get without group.
   // Needed to get Lat & Lon for .XMP files. They are not avail in composite

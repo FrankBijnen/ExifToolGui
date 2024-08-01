@@ -59,6 +59,9 @@ resourcestring
   StrMISSING                = 'MISSING!';
 
   StrGeneratingDThumbn      = 'Generating %d thumbnails for: %s';
+  StrScanningSubFolder      = 'Currently scanning %s. Total scanned: %d';
+  StrSortingSubFolder       = 'Sorting %d subfolders of: %s';
+  StrIconsSubFolder         = 'Loading %d Thumbnails in subfolders of: %s';
   StrWaitingForActive       = 'Waiting for active tasks to complete';
 
   StrUseSrc                 = '-use as source';

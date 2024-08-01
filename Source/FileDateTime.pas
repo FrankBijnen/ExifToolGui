@@ -113,7 +113,7 @@ begin
   begin
     if ANitem.Selected then
     begin
-      ETcmd := FMain.ShellList.FileName(ANitem.Index);
+      ETcmd := FMain.ShellList.RelFileName(ANitem.Index);
       k := pos(' ', ETcmd);
       if k > 0 then
       begin

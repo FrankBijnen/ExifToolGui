@@ -713,9 +713,9 @@ function TFMain.GetFirstSelectedFile: string;
 begin
   result := '';
   if (ShellList.Selected <> nil) then
-    result := ShellList.FileName + CRLF
+    result := ShellList.RelFileName + CRLF
   else if (ShellList.Items.Count > 0) then
-    result := ShellList.FileName(0) + CRLF;
+    result := ShellList.RelFileName(0) + CRLF;
 end;
 
 function TFMain.GetFirstSelectedFilePath: string;
@@ -761,7 +761,7 @@ begin
     if (AnItem.Selected) and
        (ShellList.Folders[AnItem.Index].IsFolder = false) then
     begin
-      result := result + FullPath + ShellList.FileName(AnItem.Index) + CRLF;
+      result := result + FullPath + ShellList.RelFileName(AnItem.Index) + CRLF;
       Inc(Cnt);
     end;
   end;
@@ -1149,7 +1149,11 @@ var
   Indx: integer;
   ETcmd, XDir, ETout, ETerr: string;
 begin
-  XDir := '';
+  if (ET_Options.ETAPIWindowsWideFile <> '') then
+    XDir := '.\%d\'
+  else
+    XDir := '%d\';
+
   if GUIsettings.DefExportUse then
   begin
     XDir := GUIsettings.DefExportDir;
@@ -1519,7 +1523,7 @@ begin
   try
     if ET_Options.ETLangDef <> '' then
     begin
-      ET_OpenExec('-X' + CRLF + '-l' + CRLF + xMeta + 'All', GetSelectedFile(ShellList.FileName), ETout);
+      ET_OpenExec('-X' + CRLF + '-l' + CRLF + xMeta + 'All', GetSelectedFile(ShellList.RelFileName), ETout);
       Indx := ETout.Count;
       while Indx > 1 do
       begin
@@ -1831,7 +1835,7 @@ begin
   I := MetadataList.Row;
   MetadataList.Keys[I] := QuickTags[I - 1].Caption;
   Tx := '-s3' + CRLF + '-f' + CRLF + QuickTags[I - 1].Command;
-  ET_OpenExec(Tx, GetSelectedFile(ShellList.FileName), ETouts, ETerrs);
+  ET_OpenExec(Tx, GetSelectedFile(ShellList.RelFileName), ETouts, ETerrs);
   MetadataList.Cells[1, I] := ETouts;
   N := MetadataList.RowCount - 1;
   X := 0;
@@ -2322,10 +2326,11 @@ procedure TFMain.CBoxFileFilterChange(Sender: TObject);
 var
   Indx: integer;
 begin
-  INdx := CBoxFileFilter.ItemIndex;
+  Indx := CBoxFileFilter.ItemIndex;
   if (Indx >= 0) then
   begin
     SpeedBtnFilterEdit.Enabled := (Indx <> 0);
+    Shelllist.IncludeSubFolders := ContainsText(CBoxFileFilter.Text, '/s');
     ShellList.ClearSelectionRefresh;
     ShellList.SetFocus;
   end;
@@ -2444,6 +2449,7 @@ begin
   ShellTree.OnBeforeContextMenu := ShellTreeBeforeContext;
   ShellTree.OnAfterContextMenu := ShellTreeAfterContext;
   ShellTree.OnCustomDrawItem := ShellTreeCustomDrawItem;
+  ShellTree.PreferredRoot := ShellTree.Root;
 
   // Set properties of Shelllist in code.
   ShellList.OnPopulateBeforeEvent := ShellListBeforePopulate;
@@ -2458,6 +2464,7 @@ begin
   // Enable Column sorting if Sorted = true. Disables Sorted.
   ShellList.ColumnSorted := ShellList.Sorted;
   ShellList.OnCustomDrawItem := ShellListCustomDrawItem;
+  ShellList.IncludeSubFolders := false;
 
   // Metadatalist Ctrl handler
   MetadataList.OnCtrlKeyDown := MetadataListCtrlKeyDown;
@@ -2520,7 +2527,7 @@ begin
       FName := ExtractFileName(FName);
       for AnItem in ShellList.Items do
       begin
-        if ShellList.FileName(AnItem.Index) = FName then
+        if ShellList.RelFileName(AnItem.Index) = FName then
         begin
           ShellList.ItemIndex := AnItem.Index;
           break;
@@ -2621,7 +2628,7 @@ begin
         ShellList.ItemIndex := -1;
         for AnItem in ShellList.Items do
         begin
-          if SameText(ShellList.FileName(AnItem.Index), Param) then
+          if SameText(ShellList.RelFileName(AnItem.Index), Param) then
           begin
             ShellList.ItemIndex := AnItem.Index;
             break;
@@ -2675,7 +2682,8 @@ begin
 
   // Setting ObjectTypes will always call RootChanged, even if the value has not changed.
   ShellTree.ObjectTypes := ShellTree.ObjectTypes;
-  ShellTree.Refresh(ShellTree.TopItem);
+  ShellTree.Root := ShellTree.PreferredRoot;
+//  ShellTree.Refresh(ShellTree.TopItem);
 end;
 
 procedure TFMain.ShellListAddItem(Sender: TObject; AFolder: TShellFolder; var CanAdd: boolean);
@@ -2683,17 +2691,33 @@ var
   FolderName: string;
   FilterItem, Filter: string;
   FilterMatches: boolean;
+  CopyFolder: TSubShellFolder;
 begin
   CanAdd := TShellListView(Sender).Enabled and not FrmStyle.Showing and ValidFile(AFolder);
+
+  if (TShellListView(Sender).IncludeSubFolders) and
+     (AFolder.IsFolder) then
+  begin
+    CanAdd := false;
+    CopyFolder := TSubShellFolder.Create(AFolder.Parent, AFolder.RelativeID, AFolder.ShellFolder);
+    CopyFolder.FRelativePath := AFolder.DisplayName;
+
+    TShellListView(Sender).FoldersList.Add(CopyFolder);
+    TShellListView(Sender).PopulateSubDirs(CopyFolder);
+    exit;
+  end;
+
+  Application.ProcessMessages;
   FolderName := ExtractFileName(AFolder.PathName);
   if (CBoxFileFilter.Text <> SHOWALL) then
   begin
     Filter := CBoxFileFilter.Text;
-    FilterMatches := Afolder.IsFolder;
+    FilterMatches := AFolder.IsFolder;
     while (FilterMatches = false) and (Filter <> '') do
     begin
       FilterItem := NextField(Filter, ';');
-      FilterMatches := MatchesMask(FolderName, FilterItem);
+      if (LeftStr(FilterItem, 1) <> '/') then
+        FilterMatches := MatchesMask(FolderName, FilterItem);
     end;
     CanAdd := CanAdd and FilterMatches;
   end;
@@ -2752,7 +2776,7 @@ end;
 
 procedure TFMain.ShellListBeforePopulate(Sender: TObject; var DoDefault: boolean);
 begin
-  DoDefault := (ShellList.ViewStyle <> vsReport) or (CBoxDetails.ItemIndex = 0);
+  DoDefault := ((ShellList.ViewStyle <> vsReport) or (CBoxDetails.ItemIndex = 0));
 end;
 
 procedure TFMain.ShellListAfterEnumColumns(Sender: TObject);
@@ -2830,7 +2854,10 @@ begin
 
   if PnlBreadCrumb.Visible then
   begin
-    BreadcrumbBar.Home := ShellTree.Items[0].Text;
+    if (LeftStr(ShellTree.PreferredRoot,2) = 'rf') then
+      BreadcrumbBar.Home := Copy(ShellTree.PreferredRoot, 3)
+    else
+      BreadcrumbBar.Home := ShellTree.Items[0].Text;
     BreadcrumbBar.Directory := TShellListView(Sender).Path;
   end;
 
@@ -2855,7 +2882,6 @@ begin
     if (Assigned(AShellList.OnClick)) then
       AShellList.OnClick(Sender);
   end;
-
   EnableMenuItems;
 end;
 
@@ -2878,9 +2904,7 @@ begin
   if not Assigned(AFolder) then
     exit;
 
-  // The Item.Caption and Item.ImageIndex (for small icons) should always be set
-  if (irText in Request) then
-    Item.Caption := AFolder.DisplayName;
+  // The Item.ImageIndex (for small icons) should always be set
   if (irImage in Request) then
     Item.ImageIndex := AFolder.ImageIndex(AShellList.ViewStyle = vsIcon);
 
@@ -2932,9 +2956,10 @@ begin
           end
           else
           begin
-            if (GUIsettings.EnableUnsupported) then
+            if (Foto.Supported = false) and // Dont scan JPG needlessly
+               (GUIsettings.EnableUnsupported) then
               ET_OpenExec(GUIsettings.Fast3(ShellList.FileExt(Item.Index)) + CameraFields,
-                          GetSelectedFile(ShellList.FileName(Item.Index)),
+                          GetSelectedFile(ShellList.RelFileName(Item.Index)),
                           Details,
                           False)
             else
@@ -2963,10 +2988,11 @@ begin
           end
           else
           begin
-            if (GUIsettings.EnableUnsupported) then
+            if (Foto.Supported = false) and // Dont scan JPG needlessly
+               (GUIsettings.EnableUnsupported) then
             begin
               ET_OpenExec(GUIsettings.Fast3(ShellList.FileExt(Item.Index)) + LocationFields,
-                          GetSelectedFile(ShellList.FileName(Item.Index)),
+                          GetSelectedFile(ShellList.RelFileName(Item.Index)),
                           Details,
                           False);
               if (Details.Count < 2) then
@@ -3015,9 +3041,10 @@ begin
           end
           else
           begin
-            if (GUIsettings.EnableUnsupported) then
+            if (Foto.Supported = false) and // Dont scan JPG needlessly
+               (GUIsettings.EnableUnsupported) then
               ET_OpenExec(GUIsettings.Fast3(ShellList.FileExt(Item.Index)) + AboutFields,
-                          GetSelectedFile(ShellList.FileName(Item.Index)),
+                          GetSelectedFile(ShellList.RelFileName(Item.Index)),
                           Details,
                           False)
             else
@@ -3030,7 +3057,7 @@ begin
           for Indx := 0 to High(FListColUsr) do
             ETcmd := ETcmd + CRLF + FListColUsr[Indx].Command;
           ET_OpenExec(GUIsettings.Fast3(ShellList.FileExt(Item.Index)) + ETcmd,
-                      GetSelectedFile(ShellList.FileName(Item.Index)),
+                      GetSelectedFile(ShellList.RelFileName(Item.Index)),
                       Details,
                       False);
         end;
@@ -3189,6 +3216,7 @@ begin
 //  0: Program (Has also 99, never disable)
 // 10: Options
 // 20: Export/Import
+// 25: Export/Import, Only if not include sub folders
 // 30: Modify
 // 40: Various
 // 50: Help
@@ -3202,6 +3230,8 @@ begin
         continue;
       20, 30, 40:
         MainActionManager.Actions[Indx].Enabled := MenusEnabled and EnableItem;
+      25:
+        MainActionManager.Actions[Indx].Enabled := MenusEnabled and EnableItem and (ShellList.IncludeSubFolders = false);
       else
         MainActionManager.Actions[Indx].Enabled := MenusEnabled;
     end;
@@ -3292,7 +3322,7 @@ var
   NoChars:  TSysCharSet;
 begin
   MetadataList.Tag := -1; // Reset hint row
-  Item := GetSelectedFile(ShellList.FileName);
+  Item := GetSelectedFile(ShellList.RelFileName);
   SetCaption(Item);
   if (Item = '') then
   begin

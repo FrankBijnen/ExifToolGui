@@ -125,7 +125,8 @@ type
     IPTC: IPTCrec;
     XMP: XMPrec;
     ICC: ICCrec;
-
+    
+    Supported: boolean;
     FotoF: THandleStream;
     GetOptions: TGetOptions;
     FotoKeySep: string[3];
@@ -965,15 +966,16 @@ begin
     if not (IsValidMarker(APPType)) then
       break;
 
+    // We at least have something
+    Supported := true;
+
     FotoF.Read(APPsize, 2);
     APPsize := Swap(APPsize);
     APPmarkNext := FotoF.Position + APPsize - 2;
     if (APPmarkNext >= FotoF.Size) then // Past file?
       break;
 
-    // ------------------$FFE0=APP0:JFIF-----------------------
-    // -don't parse
-   // ------------------$FFE1=APP1:EXIF or XMP----------------
+    // APP1 = EXIF or XMP
     if APPType = mkAPP1 then
     begin
       FotoF.Read(Tx[1], 6);
@@ -1002,7 +1004,7 @@ begin
       end;
     end;
 
-    // -----------------$FFE2=APP2:ICC_Profile-----------------
+    // APP1 = ICC colour profile
     if (TGetOption.gmICC in GetOptions) and
        (APPType = mkAPP2) then
     begin
@@ -1016,7 +1018,7 @@ begin
       end;
     end;
 
-    // -----------------$FFED=APP13:IPTC-----------------------
+    // APP13 = IPTC or Adobe IRB
     if (TGetOption.gmIPTC in GetOptions) and
        (APPType = mkAPP13) then
     begin
@@ -1054,7 +1056,7 @@ begin
           end;
         end;
       end;
-      // ---------------------------------------------------
+
     end;
     FotoF.Seek(APPmarkNext, TSeekOrigin.soBeginning);
   end;

@@ -917,6 +917,8 @@ begin
     while (ETout <> '') do
     begin
       FileName := AnalyzeGPSCoords(ETOut, Lat, Lon, MIMEType, IsQuickTime);
+      if (ET_Options.ETAPIWindowsWideFile <> '') then
+        Filename := IncludeTrailingPathDelimiter(Apath) + Filename;
       if ((Pos('image', MIMEType) > 0) or
           (Pos('video', MIMEType) > 0) or
           (Pos('application/rdf+xml', MIMEType) > 0)  // XMP side car
@@ -925,7 +927,7 @@ begin
          ((Lat <> '-') and // Need Lat
           (Lon <> '-')     // and Lon
          ) then
-          OsmHelper.WritePoint(Lat, Lon, IncludeTrailingPathDelimiter(Apath) + Filename, true)
+          OsmHelper.WritePoint(Lat, Lon, Filename, true)
       else
       begin
         if (CreateTrkPoints(FileName, FirstGpx, LastCoord) > 0) then

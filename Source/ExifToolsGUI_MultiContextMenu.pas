@@ -55,13 +55,13 @@ var
   Index: integer;
 
 begin
-  if (AFolder.ShellFolder = nil) then
+  if (AFolder.ParentShellFolder = nil) then
     exit;
 
   if not Assigned(AFileList) then     // get the IContextMenu Interface for FilePIDL
   begin
     PIDL := AFolder.RelativeID;
-    AFolder.ParentShellFolder.GetUIObjectOf(Owner.Handle, 1, PIDL, IID_IContextMenu, nil, CM);
+    HR := AFolder.ParentShellFolder.GetUIObjectOf(Owner.Handle, 1, PIDL, IID_IContextMenu, nil, CM);
   end
   else
   begin                             // get the IContextMenu Interface for the file array
@@ -69,10 +69,17 @@ begin
     SetLength(ItemIDListArray, AFileList.Count);
     for Index := 0 to AFileList.Count - 1 do
       ItemIDListArray[Index] := Pointer(AFileList.Objects[Index]);
-    AFolder.ShellFolder.GetUIObjectOf(Owner.Handle, AFileList.Count, ItemIDListArray[0], IID_IContextMenu, nil, CM);
+    HR := AFolder.ParentShellFolder.GetUIObjectOf(Owner.Handle, AFileList.Count, ItemIDListArray[0], IID_IContextMenu, nil, CM);
   end;
-  if CM = nil then
+  // Indicate nothing happened
+  if ((HR <> 0) or
+      (CM = nil)) and
+      (Supports(Owner, IShellCommandVerbExifTool, SCVEXIF)) then
+  begin
+    Handled := false;
+    SCVEXIF.ExecuteCommandExif('', Handled);
     exit;
+  end;
 
   Winapi.Windows.ClientToScreen(Owner.Handle, MousePos);
   Menu := CreatePopupMenu;
@@ -115,14 +122,14 @@ begin
 
       Handled := False;
       if not Handled and
-         Supports(Owner , IShellCommandVerbExifTool, SCVEXIF) then
+         Supports(Owner, IShellCommandVerbExifTool, SCVEXIF) then
       begin
         HR := 0;
         SCVEXIF.ExecuteCommandExif(Verb, Handled);
       end;
 
       if not Handled and
-         Supports(Owner , IShellCommandVerb, SCV) then
+         Supports(Owner, IShellCommandVerb, SCV) then
       begin
         HR := 0;
         SCV.ExecuteCommand(Verb, Handled);
