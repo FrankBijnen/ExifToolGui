@@ -479,8 +479,12 @@ begin
 end;
 
 procedure TShellListView.ClearSelectionRefresh;
+var
+  Indx: integer;
 begin
-  ClearSelection;
+  // Prevent calling OwnerDataFetch
+  for Indx := 0 to Items.Count -1 do
+    ListView_SetItemState(Handle, Indx, 0, LVIS_SELECTED);
   Refresh;
 end;
 
@@ -1024,7 +1028,7 @@ begin
       State := hssNone;
     SetListHeaderSortState(Self, Columns[I], State);
   end;
-  ClearSelectionRefresh;
+  EnumColumns;
 end;
 
 procedure TShellListView.SetColumnSorted(AValue: boolean);
