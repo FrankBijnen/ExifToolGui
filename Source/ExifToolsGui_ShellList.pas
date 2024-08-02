@@ -294,7 +294,7 @@ begin
     if (SortColumn < Columns.Count) then
       SetListHeaderSortState(Self, Columns[SortColumn], FSortState);
 
-    CustomSortNeeded := (FDoDefault = false) or FIncludeSubFolders;
+    CustomSortNeeded := (FDoDefault = false) or (FDoDefault and FIncludeSubFolders and (SortColumn = 0));
     DetailsNeeded := (SortColumn <> 0);
 
     if (DetailsNeeded) then
