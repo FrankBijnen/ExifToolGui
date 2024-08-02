@@ -1064,9 +1064,10 @@ end;
 
 // ==============================================================================
 const
-  XMPEncoding = 'utf-8';
-  XMPMETA     = 'x:xmpmeta';
-  RDF         = 'rdf:RDF';
+  XMPEncoding         = 'utf-8';
+  XMPDefaultEncoding  = 'default';
+  XMPMETA             = 'x:xmpmeta';
+  RDF                 = 'rdf:RDF';
 
 function GetRDF(const Xml: TXmlVerySimple): TXmlNode;
 begin
@@ -1170,8 +1171,16 @@ begin
   try
     TmpStream.Position := 0;
     Xml.Encoding := XMPEncoding;
-    Xml.LoadFromStream(TmpStream);
-
+    try
+      Xml.LoadFromStream(TmpStream);
+    except
+      Xml.Encoding := XMPDefaultEncoding;
+      try
+        Xml.LoadFromStream(TmpStream);
+      except
+        exit;
+      end;
+    end;
     RDF := GetRDF(Xml);
     if (RDF = nil) then
       exit;
