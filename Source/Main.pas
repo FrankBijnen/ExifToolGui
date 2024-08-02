@@ -2919,20 +2919,15 @@ begin
           if (Foto.ExifIFD.Supported) then
           begin
             Tx := Foto.ExifIFD.ExposureTime;
-            Tx.PadLeft(7);
-            Details.Add(Tx);
+            Details.Add(Tx.PadLeft(7));
             Tx := Foto.ExifIFD.FNumber;
-            Tx.PadLeft(4);
-            Details.Add(Tx);
+            Details.Add(Tx.PadLeft(4));
             Tx := Foto.ExifIFD.ISO;
-            Tx.PadLeft(5);
-            Details.Add(Tx);
+            Details.Add(Tx.PadLeft(5));
             Tx := Foto.ExifIFD.ExposureBias;
-            Tx.PadLeft(4);
-            Details.Add(Tx);
+            Details.Add(Tx.PadLeft(4));
             Tx := Foto.ExifIFD.FocalLength;
-            Tx.PadLeft(6);
-            Details.Add(Tx);
+            Details.Add(Tx.PadLeft(6));
             if (Foto.ExifIFD.Flash and $FF00) <> 0 then
             begin
               if (Foto.ExifIFD.Flash and 1) = 1 then
