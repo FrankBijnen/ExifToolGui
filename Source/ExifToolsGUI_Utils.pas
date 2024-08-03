@@ -1253,7 +1253,7 @@ var
   IsQuickTime: boolean;
 begin
   Foto := GetMetadata(ANImage, [TGetOption.gmGPS]);
-  if (Foto.GPS.Supported) then
+  if (Foto.GPS.HasData) then
   begin
     Lat := Foto.GPS.GeoLat;
     Lon := Foto.GPS.GeoLon;
