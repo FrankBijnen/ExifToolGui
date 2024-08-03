@@ -637,7 +637,7 @@ begin
       $02BC:
         begin
           XMPsize := IFDentry.TypeCount;
-          XMPoffset := IFDentry.ValueOffs;
+          XMPoffset := IFDentry.ValueOffs + TIFFoffset;
         end;
       $8298:
         Copyright := DecodeASCII(IFDentry, 64);
@@ -1004,7 +1004,7 @@ begin
         FotoF.Seek(6, TSeekOrigin.soCurrent);  // 14 + 3 + 6 = 23 as original code.
         if (XMPType = 'xap') then
         begin
-          XMPoffset := FotoF.Position - TIFFoffset;         // Point to '<?xpacket...'
+          XMPoffset := FotoF.Position;         // Point to '<?xpacket...'
           XMPsize := APPsize - 31;
         end;
       end;
@@ -1163,7 +1163,7 @@ var Bytes: TBytes;
   end;
 
 begin
-  FotoF.Seek(TIFFoffset + XMPoffset, TSeekOrigin.soBeginning);
+  FotoF.Seek(XMPoffset, TSeekOrigin.soBeginning);
   Setlength(Bytes, XMPsize);
   FotoF.Read(Bytes[0], XMPsize);
 
@@ -1292,7 +1292,7 @@ begin
       if XmpMagic = #$be + #$7a + #$cf + #$cb then
       begin
         XMPsize := TagLen - UuidLen;
-        XMPoffset := UuidLen;
+        XMPoffset := UuidLen + TIFFoffset;
       end;
     end;
 
