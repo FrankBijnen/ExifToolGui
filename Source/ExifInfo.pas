@@ -17,7 +17,7 @@ type
   end;
 
   IPTCrec = packed record
-    Supported: boolean;
+    HasData: boolean;
     ObjectName: string;
     Category: string;
     SuppCategories: string;
@@ -32,7 +32,7 @@ type
   end;
 
   IFD0rec = packed record
-    Supported: boolean;
+    HasData: boolean;
     Make, Model: string;
     PreviewOffset, PreviewSize: longint;
     Orientation: word; // 1=Normal, 3=180, 6=90right, 8=90left, else=Mirror
@@ -46,7 +46,7 @@ type
   end;
 
   ExifIFDrec = packed record
-    Supported: boolean;
+    HasData: boolean;
     ExposureTime: string[7];
     FNumber: string[5];
     ExposureProgram: string;
@@ -64,31 +64,32 @@ type
   end;
 
   InteropIFDrec = packed record
-    Supported: boolean;
+    HasData: boolean;
     InteropIndex: string[9];
     procedure Clear;
   end;
 
   GPSrec = packed record
-    Supported: boolean;
-    LatitudeRef: string[1]; // North/South
+    HasData: boolean;
+    LatitudeRef: string[1];     // North/South
     Latitude: string[11];
-    LongitudeRef: string[1]; // East/West
+    LongitudeRef: string[1];    // East/West
     Longitude: string[11];
-    AltitudeRef: string[1]; // +/-
+    AltitudeRef: string[1];     // +/-
     Altitude: string[5];
-    GeoLat, GeoLon: string[11]; // for OSM Map
+    GeoLat: string[11];         // for OSM Map
+    GeoLon: string[11];         // for OSM Map
     procedure Clear;
   end;
 
   MakernotesRec = packed record
-    Supported: boolean;
+    HasData: boolean;
     LensFocalRange: string[11]; // i.e."17-55"
     procedure Clear;
   end;
 
   XMPrec = packed record
-    Supported: boolean;
+    HasData: boolean;
     Creator, Rights: string;
     Date: string[19];
     PhotoType: string;
@@ -101,7 +102,7 @@ type
   end;
 
   ICCrec = packed record
-    Supported: boolean;
+    HasData: boolean;
     ProfileCMMType: string[4];
     ProfileClass: string[4];
     ColorSpaceData: string[4];
@@ -116,6 +117,8 @@ type
   TParseIFDProc = procedure(IFDentry: IFDentryRec) of object;
   TGetOption = (gmXMP, gmIPTC, gmGPS, gmICC);
   TGetOptions = set of TGetOption;
+  TSupportedType = (supJPEG, supTIFF);
+  TSupportedTypes = set of TSupportedType;
 
   FotoRec = packed record
     IFD0: IFD0rec;
@@ -126,7 +129,7 @@ type
     XMP: XMPrec;
     ICC: ICCrec;
     
-    Supported: boolean;
+    Supported: TSupportedTypes;
     FotoF: THandleStream;
     GetOptions: TGetOptions;
     FotoKeySep: string[3];
@@ -556,7 +559,7 @@ begin
   Dec(IPTCsize, IPTCtagSz);
   with IPTC do
   begin
-    Supported := true;
+    HasData := true;
     case IPTCtagID of
       5:
         ObjectName := StripLen(Tx, 32);
@@ -598,7 +601,7 @@ begin
   SavePos := FotoF.Position;
   with IFD0 do
   begin
-    Supported := true;
+    HasData := true;
     case IFDentry.Tag of
       $002E:
         JPGfromRAWoffset := IFDentry.ValueOffs; // Panasonic RW2
@@ -666,7 +669,7 @@ begin
   SavePos := FotoF.Position;
   with ExifIFD do
   begin
-    Supported := true;
+    HasData := true;
     case IFDentry.Tag of
       $829A:
         ExposureTime := ConvertRational(IFDentry, false);
@@ -735,7 +738,7 @@ begin
   SavePos := FotoF.Position;
   with InteropIFD do
   begin
-    Supported := true;
+    HasData := true;
     case IFDentry.Tag of
       $0001:
         begin
@@ -758,7 +761,7 @@ begin
   SavePos := FotoF.Position;
   with GPS do
   begin
-    Supported := true;
+    HasData := true;
     case IFDentry.Tag of
       $01:
         LatitudeRef := DecodeASCII(IFDentry);
@@ -791,7 +794,7 @@ var
 begin
   FotoF.Seek(ICCoffset, TSeekOrigin.soBeginning);
 
-  ICC.Supported := true;
+  ICC.HasData := true;
   FotoF.Read(ICC.ProfileCMMType[1], 4);
   ICC.ProfileCMMType[0] := #4;
   FotoF.Read(Tx[1], 4); // skip ProfileVersion
@@ -883,6 +886,9 @@ begin
      (WordData = $0055) or   // $0055=PanasonicRW2
      (WordData = $4F52) then // $4F52=OlympusORF
   begin
+    // We have a TIFF IFD
+    Include(Supported, TSupportedType.supTIFF);
+
     FotoF.Read(LongData, 4);
     if IsMM then
       LongData := SwapL(LongData);
@@ -967,7 +973,7 @@ begin
       break;
 
     // We at least have something
-    Supported := true;
+    Include(Supported, TSupportedType.supJPEG);
 
     FotoF.Read(APPsize, 2);
     APPsize := Swap(APPsize);
@@ -998,7 +1004,7 @@ begin
         FotoF.Seek(6, TSeekOrigin.soCurrent);  // 14 + 3 + 6 = 23 as original code.
         if (XMPType = 'xap') then
         begin
-          XMPoffset := FotoF.Position;         // Point to '<?xpacket...'
+          XMPoffset := FotoF.Position - TIFFoffset;         // Point to '<?xpacket...'
           XMPsize := APPsize - 31;
         end;
       end;
@@ -1065,7 +1071,6 @@ end;
 // ==============================================================================
 const
   XMPEncoding         = 'utf-8';
-  XMPDefaultEncoding  = 'default';
   XMPMETA             = 'x:xmpmeta';
   RDF                 = 'rdf:RDF';
 
@@ -1158,7 +1163,7 @@ var Bytes: TBytes;
   end;
 
 begin
-  FotoF.Seek(XMPoffset, TSeekOrigin.soBeginning);
+  FotoF.Seek(TIFFoffset + XMPoffset, TSeekOrigin.soBeginning);
   Setlength(Bytes, XMPsize);
   FotoF.Read(Bytes[0], XMPsize);
 
@@ -1174,19 +1179,14 @@ begin
     try
       Xml.LoadFromStream(TmpStream);
     except
-      Xml.Encoding := XMPDefaultEncoding;
-      try
-        Xml.LoadFromStream(TmpStream);
-      except
-        exit;
-      end;
+      exit;
     end;
     RDF := GetRDF(Xml);
     if (RDF = nil) then
       exit;
 
     RDFDescNodes := RDF.ChildNodes;
-    Xmp.Supported := (RDFDescNodes.Count > 0);
+    Xmp.HasData := (RDFDescNodes.Count > 0);
 
     // Recurse thru all subnodes, and look in attributes and node names
     for RDFDesc in RDFDescNodes do
@@ -1292,8 +1292,7 @@ begin
       if XmpMagic = #$be + #$7a + #$cf + #$cb then
       begin
         XMPsize := TagLen - UuidLen;
-        XMPoffset := TIFFoffset + UuidLen;
-        ReadXMP;
+        XMPoffset := UuidLen;
       end;
     end;
 
@@ -1455,7 +1454,7 @@ begin
       Foto := GetMetadata(StartDir + SR.Name, []);
       with Foto do
       begin
-        if (ExifIFD.Supported) then
+        if (ExifIFD.HasData) then
         begin
 
           // focal length:

@@ -1918,7 +1918,7 @@ var
   SavedLang: string;
 begin
   Foto := GetMetadata(GetFirstSelectedFilePath, [TGetOption.gmGPS]);
-  if (Foto.GPS.Supported) then
+  if (Foto.GPS.HasData) then
   begin
     FGeoSetup.Lat := Foto.GPS.GeoLat;
     FGeoSetup.Lon := Foto.GPS.GeoLon;
@@ -2916,7 +2916,7 @@ begin
       1:
         begin
           Foto := GetMetadata(AFolder.PathName, []);
-          if (Foto.ExifIFD.Supported) then
+          if (Foto.ExifIFD.HasData) then
           begin
             Tx := Foto.ExifIFD.ExposureTime;
             Details.Add(Tx.PadLeft(7));
@@ -2938,7 +2938,7 @@ begin
             else
               Details.Add('');
             Details.Add(Foto.ExifIFD.ExposureProgram);
-            if (Foto.IFD0.Supported) and
+            if (Foto.IFD0.HasData) and
                (Foto.IFD0.Orientation > 0) then
             begin
               if (Foto.IFD0.Orientation and 1) = 1 then
@@ -2951,7 +2951,7 @@ begin
           end
           else
           begin
-            if (Foto.Supported = false) and // Dont scan JPG needlessly
+            if (Foto.Supported = []) and // Dont scan Jpeg, Tiff needlessly
                (GUIsettings.EnableUnsupported) then
               ET_OpenExec(GUIsettings.Fast3(ShellList.FileExt(Item.Index)) + CameraFields,
                           GetSelectedFile(ShellList.RelFileName(Item.Index)),
@@ -2964,8 +2964,8 @@ begin
       2:
         begin
           Foto := GetMetadata(AFolder.PathName, [TGetOption.gmXMP, TGetOption.gmGPS]);
-          if (Foto.ExifIFD.Supported) and
-             (Foto.XMP.Supported) then
+          if (Foto.ExifIFD.HasData) and
+             (Foto.XMP.HasData) then
           begin
             Details.Add(Foto.ExifIFD.DateTimeOriginal);
             if (Foto.GPS.Latitude <> '') then
@@ -2983,50 +2983,53 @@ begin
           end
           else
           begin
-            if (Foto.Supported = false) and // Dont scan JPG needlessly
-               (GUIsettings.EnableUnsupported) then
+            if (Foto.Supported = []) then // Dont scan Jpeg, Tiff needlessly
             begin
-              ET_OpenExec(GUIsettings.Fast3(ShellList.FileExt(Item.Index)) + LocationFields,
-                          GetSelectedFile(ShellList.RelFileName(Item.Index)),
-                          Details,
-                          False);
-              if (Details.Count < 2) then
-                Details.Add(NotSupported)
-              else
+              if (GUIsettings.EnableUnsupported) then
               begin
-                // Details[0] = DateTimeOriginal
-                // Details[1] = CreateDate
-                if (Details[0] = '-') then
-                  Details.Delete(0)
+                ET_OpenExec(GUIsettings.Fast3(ShellList.FileExt(Item.Index)) + LocationFields,
+                            GetSelectedFile(ShellList.RelFileName(Item.Index)),
+                            Details,
+                            False);
+                if (Details.Count < 2) then
+                  Details.Add(NotSupported)
                 else
-                  Details.Delete(1);
+                begin
+                  // Details[0] = DateTimeOriginal
+                  // Details[1] = CreateDate
+                  if (Details[0] = '-') then
+                    Details.Delete(0)
+                  else
+                    Details.Delete(1);
 
-                // Now Details[1] = GPS:GPSLatitude
-                // GPS tagged?
-                if (Details[1] = '-') or
-                   (Details[1] = '0') then
-                  Details[1] := StrNo
-                else
-                  Details[1] := StrYes;
+                  // Now Details[1] = GPS:GPSLatitude
+                  // GPS tagged?
+                  if (Details[1] = '-') or
+                     (Details[1] = '0') then
+                    Details[1] := StrNo
+                  else
+                    Details[1] := StrYes;
 
-                // Prefer CountryCode
-                if (GeoSettings.CountryCodeLocation) and
-                   (Trim(Details[2]) <> '-') then
-                  Details.Delete(3)   // We have a Country Code, delete the Country Name
-                else
-                  Details.Delete(2);
-
-              end;
+                  // Prefer CountryCode
+                  if (GeoSettings.CountryCodeLocation) and
+                     (Trim(Details[2]) <> '-') then
+                    Details.Delete(3)   // We have a Country Code, delete the Country Name
+                  else
+                    Details.Delete(2);
+                end;
+              end
+              else
+                Details.Add(NotSupported);
             end
             else
-              Details.Add(NotSupported);
+              Details.Add(ReqDataNotFound)
           end;
         end;
       3:
         begin
           Foto := GetMetadata(AFolder.PathName, [TGetOption.gmXMP]);
-          if (Foto.IFD0.Supported) and
-             (Foto.XMP.Supported) then
+          if (Foto.IFD0.HasData) and
+             (Foto.XMP.HasData) then
           begin
             Details.Add(Foto.IFD0.Artist);
             Details.Add(Foto.Xmp.Rating);
@@ -3036,14 +3039,18 @@ begin
           end
           else
           begin
-            if (Foto.Supported = false) and // Dont scan JPG needlessly
-               (GUIsettings.EnableUnsupported) then
-              ET_OpenExec(GUIsettings.Fast3(ShellList.FileExt(Item.Index)) + AboutFields,
-                          GetSelectedFile(ShellList.RelFileName(Item.Index)),
-                          Details,
-                          False)
+            if (Foto.Supported = []) then // Dont scan Jpeg, Tiff needlessly
+            begin
+              if (GUIsettings.EnableUnsupported) then
+                ET_OpenExec(GUIsettings.Fast3(ShellList.FileExt(Item.Index)) + AboutFields,
+                            GetSelectedFile(ShellList.RelFileName(Item.Index)),
+                            Details,
+                            False)
+              else
+                Details.Add(NotSupported);
+            end
             else
-              Details.Add(NotSupported);
+              Details.Add(ReqDataNotFound)
           end;
         end;
       4:
