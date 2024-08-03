@@ -2916,7 +2916,19 @@ begin
       1:
         begin
           Foto := GetMetadata(AFolder.PathName, []);
-          if (Foto.ExifIFD.HasData) then
+          if (Foto.ExifIFD.HasData = false) and
+             (Foto.IFD0.HasData = false) and
+             (Foto.Supported = []) then
+          begin
+            if (GUIsettings.EnableUnsupported) then
+              ET_OpenExec(GUIsettings.Fast3(ShellList.FileExt(Item.Index)) + CameraFields,
+                          GetSelectedFile(ShellList.RelFileName(Item.Index)),
+                          Details,
+                          False)
+            else
+              Details.Add(NotSupported);
+          end
+          else
           begin
             Tx := Foto.ExifIFD.ExposureTime;
             Details.Add(Tx.PadLeft(7));
@@ -2938,34 +2950,60 @@ begin
             else
               Details.Add('');
             Details.Add(Foto.ExifIFD.ExposureProgram);
-            if (Foto.IFD0.HasData) and
-               (Foto.IFD0.Orientation > 0) then
+            if (Foto.IFD0.Orientation > 0) then
             begin
               if (Foto.IFD0.Orientation and 1) = 1 then
                 Details.Add(StrHor)
               else
                 Details.Add(StrVer);
-            end
-            else
-              Details.Add('');
-          end
-          else
-          begin
-            if (Foto.Supported = []) and // Dont scan Jpeg, Tiff needlessly
-               (GUIsettings.EnableUnsupported) then
-              ET_OpenExec(GUIsettings.Fast3(ShellList.FileExt(Item.Index)) + CameraFields,
-                          GetSelectedFile(ShellList.RelFileName(Item.Index)),
-                          Details,
-                          False)
-            else
-              Details.Add(NotSupported);
+            end;
           end;
         end;
       2:
         begin
           Foto := GetMetadata(AFolder.PathName, [TGetOption.gmXMP, TGetOption.gmGPS]);
-          if (Foto.ExifIFD.HasData) and
-             (Foto.XMP.HasData) then
+          if (Foto.ExifIFD.HasData = false) and
+             (Foto.XMP.HasData = false) and
+             (Foto.GPS.HasData = false) and
+             (Foto.Supported = []) then
+          begin
+            if (GUIsettings.EnableUnsupported) then
+            begin
+              ET_OpenExec(GUIsettings.Fast3(ShellList.FileExt(Item.Index)) + LocationFields,
+                          GetSelectedFile(ShellList.RelFileName(Item.Index)),
+                          Details,
+                          False);
+              if (Details.Count < 2) then
+                Details.Add(NotSupported)
+              else
+              begin
+                // Details[0] = DateTimeOriginal
+                // Details[1] = CreateDate
+                if (Details[0] = '-') then
+                  Details.Delete(0)
+                else
+                  Details.Delete(1);
+
+                // Now Details[1] = GPS:GPSLatitude
+                // GPS tagged?
+                if (Details[1] = '-') or
+                   (Details[1] = '0') then
+                  Details[1] := StrNo
+                else
+                  Details[1] := StrYes;
+
+                // Prefer CountryCode
+                if (GeoSettings.CountryCodeLocation) and
+                   (Trim(Details[2]) <> '-') then
+                  Details.Delete(3)   // We have a Country Code, delete the Country Name
+                else
+                  Details.Delete(2);
+              end;
+            end
+            else
+              Details.Add(NotSupported);
+          end
+          else
           begin
             Details.Add(Foto.ExifIFD.DateTimeOriginal);
             if (Foto.GPS.Latitude <> '') then
@@ -2980,77 +3018,30 @@ begin
             Details.Add(Foto.Xmp.ProvinceShown);
             Details.Add(Foto.Xmp.CityShown);
             Details.Add(Foto.Xmp.LocationShown);
-          end
-          else
-          begin
-            if (Foto.Supported = []) then // Dont scan Jpeg, Tiff needlessly
-            begin
-              if (GUIsettings.EnableUnsupported) then
-              begin
-                ET_OpenExec(GUIsettings.Fast3(ShellList.FileExt(Item.Index)) + LocationFields,
-                            GetSelectedFile(ShellList.RelFileName(Item.Index)),
-                            Details,
-                            False);
-                if (Details.Count < 2) then
-                  Details.Add(NotSupported)
-                else
-                begin
-                  // Details[0] = DateTimeOriginal
-                  // Details[1] = CreateDate
-                  if (Details[0] = '-') then
-                    Details.Delete(0)
-                  else
-                    Details.Delete(1);
-
-                  // Now Details[1] = GPS:GPSLatitude
-                  // GPS tagged?
-                  if (Details[1] = '-') or
-                     (Details[1] = '0') then
-                    Details[1] := StrNo
-                  else
-                    Details[1] := StrYes;
-
-                  // Prefer CountryCode
-                  if (GeoSettings.CountryCodeLocation) and
-                     (Trim(Details[2]) <> '-') then
-                    Details.Delete(3)   // We have a Country Code, delete the Country Name
-                  else
-                    Details.Delete(2);
-                end;
-              end
-              else
-                Details.Add(NotSupported);
-            end
-            else
-              Details.Add(ReqDataNotFound)
           end;
         end;
       3:
         begin
           Foto := GetMetadata(AFolder.PathName, [TGetOption.gmXMP]);
-          if (Foto.IFD0.HasData) and
-             (Foto.XMP.HasData) then
+          if (Foto.IFD0.HasData = false) and
+             (Foto.XMP.HasData = false) and
+             (Foto.Supported = []) then
+          begin
+            if (GUIsettings.EnableUnsupported) then
+              ET_OpenExec(GUIsettings.Fast3(ShellList.FileExt(Item.Index)) + AboutFields,
+                          GetSelectedFile(ShellList.RelFileName(Item.Index)),
+                          Details,
+                          False)
+            else
+              Details.Add(NotSupported);
+          end
+          else
           begin
             Details.Add(Foto.IFD0.Artist);
             Details.Add(Foto.Xmp.Rating);
             Details.Add(Foto.Xmp.PhotoType);
             Details.Add(Foto.Xmp.Event);
             Details.Add(Foto.Xmp.PersonInImage);
-          end
-          else
-          begin
-            if (Foto.Supported = []) then // Dont scan Jpeg, Tiff needlessly
-            begin
-              if (GUIsettings.EnableUnsupported) then
-                ET_OpenExec(GUIsettings.Fast3(ShellList.FileExt(Item.Index)) + AboutFields,
-                            GetSelectedFile(ShellList.RelFileName(Item.Index)),
-                            Details,
-                            False)
-              else
-                Details.Add(NotSupported);
-            end
-            else
-              Details.Add(ReqDataNotFound)
           end;
         end;
       4:

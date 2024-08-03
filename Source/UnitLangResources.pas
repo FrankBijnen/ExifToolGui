@@ -92,7 +92,6 @@ resourcestring
   StrOverwriteSFailed       = 'Overwrite %s failed.';
 
   NotSupported              = 'File type unsupported';
-  ReqDataNotFound           = 'Requested data not found';
   StrNrOfPhotos             = 'Nr of photos';
   StrFocalLength            = 'Focal length';
   StrFNumber                = 'F-Number';
