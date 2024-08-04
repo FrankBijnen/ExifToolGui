@@ -4,8 +4,8 @@ object FrmGenerate: TFrmGenerate
   BorderIcons = [biSystemMenu]
   BorderStyle = bsToolWindow
   Caption = 'Generating thumbnails'
-  ClientHeight = 31
-  ClientWidth = 549
+  ClientHeight = 50
+  ClientWidth = 565
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -18,8 +18,8 @@ object FrmGenerate: TFrmGenerate
     AlignWithMargins = True
     Left = 20
     Top = 0
-    Width = 526
-    Height = -2
+    Width = 542
+    Height = 17
     Margins.Left = 20
     Margins.Top = 0
     Align = alClient
@@ -30,21 +30,19 @@ object FrmGenerate: TFrmGenerate
   end
   object PnlBottom: TPanel
     Left = 0
-    Top = 1
-    Width = 549
+    Top = 20
+    Width = 565
     Height = 30
     Align = alBottom
     TabOrder = 0
-    ExplicitTop = -11
-    ExplicitWidth = 541
     object PbProgress: TProgressBar
       Left = 107
       Top = 1
-      Width = 441
+      Width = 465
       Height = 28
       Align = alClient
       TabOrder = 0
-      ExplicitWidth = 433
+      ExplicitWidth = 457
     end
     object BtnClose: TBitBtn
       Left = 1

@@ -62,10 +62,11 @@ end;
 
 procedure TFrmGenerate.CMSubFolderScan(var Message: TMessage);
 begin
-  Caption := Format(StrScanningSubFolder, [string(Message.LParam), Message.WParam]);
-  Self.Update;
+  Caption := Format(StrScanningSubFolder, [Message.WParam]);
+  LblGenerate.Caption := string(Message.LParam);
   PbProgress.Position := 0;
   PbProgress.Max := 0;
+  Application.ProcessMessages;
 end;
 
 procedure TFrmGenerate.CMSubFolderSort(var Message: TMessage);
