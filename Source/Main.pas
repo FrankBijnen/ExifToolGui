@@ -2913,7 +2913,7 @@ begin
      (Afolder.IsFolder = false) then
   begin
     case CBoxDetails.ItemIndex of
-      1:
+      1: // Camera settings
         begin
           Foto := GetMetadata(AFolder.PathName, []);
           if (Foto.ExifIFD.HasData = false) and
@@ -2959,7 +2959,7 @@ begin
             end;
           end;
         end;
-      2:
+      2: // Location info
         begin
           Foto := GetMetadata(AFolder.PathName, [TGetOption.gmXMP, TGetOption.gmGPS]);
           if (Foto.ExifIFD.HasData = false) and
@@ -3020,7 +3020,7 @@ begin
             Details.Add(Foto.Xmp.LocationShown);
           end;
         end;
-      3:
+      3: // About photo
         begin
           Foto := GetMetadata(AFolder.PathName, [TGetOption.gmXMP]);
           if (Foto.IFD0.HasData = false) and
@@ -3044,7 +3044,7 @@ begin
             Details.Add(Foto.Xmp.PersonInImage);
           end;
         end;
-      4:
+      4: // User defined
         begin
           ETcmd := '-s3' + CRLF + '-f';
           for Indx := 0 to High(FListColUsr) do

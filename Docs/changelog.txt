@@ -110,3 +110,13 @@ Version:        Description             Issue
                 Fix Issue #443          Add check for valid JSON, before processing
                 Fix Issue #445          Dont show metadata hint if cursor is not on a line
                 Fix Issue #448          Update installer to support downloading and installing ExifTool V12.88 and late
+6.3.5.0         Fix Issue #400          Metadata remove XMP-drone-dji
+                Fix Issue #418          Copy metadata from file
+                Fix Issue #432          Show all files including subfolders
+                Fix Issue #452          "Bad Request" with Overpass query if no bounds and no country is specified
+                Fix Issue #454          "ExifTool could not be loaded" when using the filelist context menu. Related to .ZIP files in directory structure.
+                Fix Issue #456          When adding ExifToolGui to the context menu of Windows Explorer also add an icon.
+                Fix Issue #459          Make Scrollbar of Metadata proportional. (The size of thumb changes wth the nr of rows)
+                Fix Issue #470          Rare AV generating thumbs
+                Fix Issue #472          ExifToolGUI ability to handle UNC/network path as (startup) parameter
+                Fix Issue #476          Fix sorting issues that showed up after enabling subfolders

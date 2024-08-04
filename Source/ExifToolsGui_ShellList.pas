@@ -299,14 +299,17 @@ begin
 
     if (DetailsNeeded) then
     begin
-      for ANitem in Items do // Need to get all the details of the items
+      for ANitem in Items do // Need to get all the details of the items. This will trigger the OwnerDataFetch event!
       begin
         if (FIncludeSubFolders) then
         begin
           if boolean(SendMessage(FrmGenerate.Handle, CM_WantsToClose, 0, 0)) then
             exit;
           if (ANitem.Index mod FrmGenerate.ModCount = 0) then
-            SendMessage(FrmGenerate.Handle, CM_SubFolderSortProgress, ANitem.Index, LPARAM(ANitem.Caption));
+            SendMessage(FrmGenerate.Handle,
+                        CM_SubFolderSortProgress,
+                        ANitem.Index,
+                        LPARAM(TSubShellFolder.GetDisplayName(Folders[ANitem.Index])));
         end;
       end;
     end;
