@@ -2685,8 +2685,13 @@ begin
   ShellTree.Root := ShellTree.PreferredRoot;
 
   // Clicking Home for Desktop with IncludeSubfolders takes to long.
-  CBoxFileFilter.ItemIndex := 0;
-  ShellList.IncludeSubFolders := false;
+  ShellList.Enabled := false;
+  try
+    CBoxFileFilter.ItemIndex := 0;
+    ShellList.IncludeSubFolders := false;
+  finally
+    ShellList.Enabled := true;
+  end;
   ShellTree.Refresh(ShellTree.TopItem);
 end;
 
