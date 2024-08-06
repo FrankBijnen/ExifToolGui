@@ -2902,15 +2902,18 @@ var
   Indx: integer;
   Details: TStrings;
 begin
-  if (Item.Index < 0) then
-    exit;
-
   AShellList := TShellListView(Sender);
   if (AShellList.ViewStyle <> vsReport) then
     exit;
 
+  // Need a valid Folder, not a directory
+  if (Item.Index < 0) or
+     (Item.Index > AShellList.FoldersList.Count -1) then
+    exit;
   AFolder := AShellList.Folders[Item.Index];
   if not Assigned(AFolder) then
+    exit;
+  if (AFolder.IsFolder) then
     exit;
 
   // The Item.ImageIndex (for small icons) should always be set
@@ -2918,8 +2921,7 @@ begin
     Item.ImageIndex := AFolder.ImageIndex(AShellList.ViewStyle = vsIcon);
 
   Details := AFolder.DetailStrings;
-  if (Details.Count = 0) and
-     (Afolder.IsFolder = false) then
+  if (Details.Count = 0) then // Only get details once
   begin
     case CBoxDetails.ItemIndex of
       1: // Camera settings
