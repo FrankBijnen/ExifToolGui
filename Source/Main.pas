@@ -2688,6 +2688,7 @@ begin
   ShellList.Enabled := false;
   try
     CBoxFileFilter.ItemIndex := 0;
+    ShellList.ColumnSorted := false;
     ShellList.IncludeSubFolders := false;
   finally
     ShellList.Enabled := true;
