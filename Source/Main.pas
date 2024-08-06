@@ -2683,7 +2683,11 @@ begin
   // Setting ObjectTypes will always call RootChanged, even if the value has not changed.
   ShellTree.ObjectTypes := ShellTree.ObjectTypes;
   ShellTree.Root := ShellTree.PreferredRoot;
-//  ShellTree.Refresh(ShellTree.TopItem);
+
+  // Clicking Home for Desktop with IncludeSubfolders takes to long.
+  CBoxFileFilter.ItemIndex := 0;
+  ShellList.IncludeSubFolders := false;
+  ShellTree.Refresh(ShellTree.TopItem);
 end;
 
 procedure TFMain.ShellListAddItem(Sender: TObject; AFolder: TShellFolder; var CanAdd: boolean);
@@ -2700,7 +2704,7 @@ begin
   begin
     CanAdd := false;
     CopyFolder := TSubShellFolder.Create(AFolder.Parent, AFolder.RelativeID, AFolder.ShellFolder);
-    CopyFolder.FRelativePath := AFolder.DisplayName;
+    CopyFolder.FRelativePath := TSubShellFolder.GetRelativeName(AFolder);
 
     TShellListView(Sender).FoldersList.Add(CopyFolder);
     TShellListView(Sender).PopulateSubDirs(CopyFolder);
