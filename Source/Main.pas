@@ -2898,7 +2898,7 @@ procedure TFMain.ShellListOwnerDataFetch(Sender: TObject; Item: TListItem; Reque
 var
   Foto: FotoRec;
   AShellList: TShellListView;
-  ETcmd, Tx, ADetail: String;
+  ETcmd, Tx, ADetail: string;
   Indx: integer;
   Details: TStrings;
 begin
@@ -2906,22 +2906,22 @@ begin
   if (AShellList.ViewStyle <> vsReport) then
     exit;
 
-  // Need a valid Folder, not a directory
-  if (Item.Index < 0) or
-     (Item.Index > AShellList.FoldersList.Count -1) then
-    exit;
-  AFolder := AShellList.Folders[Item.Index];
+  // Need a valid TShellListFolder
   if not Assigned(AFolder) then
-    exit;
-  if (AFolder.IsFolder) then
     exit;
 
   // The Item.ImageIndex (for small icons) should always be set
   if (irImage in Request) then
     Item.ImageIndex := AFolder.ImageIndex(AShellList.ViewStyle = vsIcon);
 
+  // Dont get details for directory
+  if (AFolder.IsFolder) then
+    exit;
+
   Details := AFolder.DetailStrings;
-  if (Details.Count = 0) then // Only get details once
+
+  // Only get details once
+  if (Details.Count = 0) then
   begin
     case CBoxDetails.ItemIndex of
       1: // Camera settings
