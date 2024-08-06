@@ -31,8 +31,7 @@ type
     function RelativePath: string;
   public
     destructor Destroy; override;
-    function DisplayName: string;
-    class function GetDisplayName(Folder: pointer): string;
+    class function GetRelativeName(Folder: pointer; ForDisplay: boolean = false): string;
   end;
 
   TShellListView = class(Vcl.Shell.ShellCtrls.TShellListView, IShellCommandVerbExifTool)
@@ -232,24 +231,27 @@ begin
     result := IncludeTrailingPathDelimiter(result);
 end;
 
-function TSubShellFolder.DisplayName: string;
-begin
-  if (IsFolder) then
-    result := RelativePath
-  else
-    result := RelativePath + inherited DisplayName;
-end;
-
-class function TSubShellFolder.GetDisplayName(Folder: pointer): string;
+class function TSubShellFolder.GetRelativeName(Folder: pointer; ForDisplay: boolean = false): string;
 begin
   result := '';
-  if (Assigned(Folder)) then
-  begin
-    if TObject(Folder) is TSubShellFolder then
-      result := TSubShellFolder(Folder).DisplayName
-    else
-      result := TShellFolder(Folder).DisplayName;
-  end;
+
+  // Need at least a valid TShellFolder
+  if not Assigned(Folder) or
+     not (TObject(Folder) is TShellFolder) then
+    exit;
+
+  // Get Filename
+  if (ForDisplay) then
+    result := TShellFolder(Folder).DisplayName // For Display in the ShellList
+  else
+    result := ExtractFilename(ExcludeTrailingPathDelimiter(TShellFolder(Folder).PathName)); // For File IO functions
+  if (TShellFolder(Folder).IsFolder) then
+    exit;
+
+  // Prepend (relative) directory name?
+  // The RelativePath needs a TSubShellFolder
+  if TObject(Folder) is TSubShellFolder then
+    result := TSubShellFolder(Folder).RelativePath + result;
 end;
 
 procedure TShellListView.WMNotify(var Msg: TWMNotify);
@@ -309,7 +311,7 @@ begin
             SendMessage(FrmGenerate.Handle,
                         CM_SubFolderSortProgress,
                         ANitem.Index,
-                        LPARAM(TSubShellFolder.GetDisplayName(Folders[ANitem.Index])));
+                        LPARAM(TSubShellFolder.GetRelativeName(Folders[ANitem.Index])));
         end;
       end;
     end;
@@ -328,7 +330,7 @@ begin
           if (CustomSortNeeded) then
           begin
             if (SortColumn = 0) then // Compare the relative name, not just the filename.
-              Result := CompareText(TSubShellFolder.GetDisplayName(Item1), TSubShellFolder.GetDisplayName(Item2))
+              Result := CompareText(TSubShellFolder.GetRelativeName(Item1), TSubShellFolder.GetRelativeName(Item2))
             else
             begin // Compare the values from DetailStrings. Always text.
               if (SortColumn <= TShellFolder(Item1).DetailStrings.Count) and (SortColumn <= TShellFolder(Item2).DetailStrings.Count) then
@@ -346,7 +348,7 @@ begin
         // Sort on Filename (Column 0), within SortColumn
         if (Result = 0) and
            (SortColumn <> 0) then
-          Result := CompareText(TSubShellFolder.GetDisplayName(Item1), TSubShellFolder.GetDisplayName(Item2));
+          Result := CompareText(TSubShellFolder.GetRelativeName(Item1), TSubShellFolder.GetRelativeName(Item2));
 
         // Reverse order
         if (SortState = THeaderSortState.hssDescending) then
@@ -844,7 +846,7 @@ begin
 
   if (irText in Request) and
      (Item.Index >= 0) then
-    Item.Caption := TSubShellFolder.GetDisplayName(Folders[Item.Index]);
+    Item.Caption := TSubShellFolder.GetRelativeName(Folders[Item.Index], true);
 
   if (ViewStyle = vsIcon) then
     DoIcon;
@@ -989,17 +991,12 @@ function TShellListView.RelFileName(ItemIndex: integer = -1): string;
 var
   AFolder: TShellFolder;
 begin
-  AFolder := GetSelectedFolder(ItemIndex);
-  if (AFolder = nil) then
-    exit;
+  result := '';
 
-  if (not AFolder.IsFolder) then
-  begin
-    if (AFolder is TSubShellFolder) then
-      result := TSubShellFolder(AFolder).DisplayName
-    else
-      result := ExtractFileName(AFolder.PathName);
-  end;
+  AFolder := GetSelectedFolder(ItemIndex);
+  if (AFolder <> nil) and
+     (AFolder.IsFolder = false) then
+    result := TSubShellFolder.GetRelativeName(AFolder);
 end;
 
 function TShellListView.FileExt(ItemIndex: integer = -1): string;
