@@ -2680,19 +2680,18 @@ begin
   if FrmStyle.Showing then
     exit;
 
-  // Setting ObjectTypes will always call RootChanged, even if the value has not changed.
-  ShellTree.ObjectTypes := ShellTree.ObjectTypes;
-  ShellTree.Root := ShellTree.PreferredRoot;
-
-  // Clicking Home for Desktop with IncludeSubfolders takes to long.
+// Clicking Home for Desktop with IncludeSubfolders takes to long.
   ShellList.Enabled := false;
   try
     CBoxFileFilter.ItemIndex := 0;
-    ShellList.ColumnSorted := false;
     ShellList.IncludeSubFolders := false;
+    ShellList.ClearSelectionRefresh;
   finally
     ShellList.Enabled := true;
   end;
+
+// Now set the root
+  ShellTree.Root := ShellTree.PreferredRoot;
   ShellTree.Refresh(ShellTree.TopItem);
 end;
 
@@ -2904,6 +2903,8 @@ var
   Details: TStrings;
 begin
   AShellList := TShellListView(Sender);
+  if not ShellList.Enabled then
+    exit;
   if (AShellList.ViewStyle <> vsReport) then
     exit;
 
@@ -2915,14 +2916,11 @@ begin
   if (irImage in Request) then
     Item.ImageIndex := AFolder.ImageIndex(AShellList.ViewStyle = vsIcon);
 
-  // Dont get details for directory
-  if (AFolder.IsFolder) then
-    exit;
-
+  // Get possibly cached Details
   Details := AFolder.DetailStrings;
 
-  // Only get details once
-  if (Details.Count = 0) then
+  if (Details.Count = 0) and   // Only get details once
+     (Afolder.IsFolder = false) then // Dont get details for directory
   begin
     case CBoxDetails.ItemIndex of
       1: // Camera settings
