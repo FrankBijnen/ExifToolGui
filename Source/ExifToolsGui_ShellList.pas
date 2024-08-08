@@ -217,6 +217,7 @@ begin
   result := (Folder.ParentShellFolder <> nil);
 end;
 
+// Safe version of IsFolder. (Prevent Access Violations)
 class function TSubShellFolder.GetIsFolder(Folder: TShellFolder): boolean;
 begin
   result := true; // Assume a folder, if ParentShellFolder = nil
@@ -299,7 +300,7 @@ begin
       SetListHeaderSortState(Self, Columns[SortColumn], FSortState);
 
     CustomSortNeeded := (FDoDefault = false) or (FDoDefault and FIncludeSubFolders and (SortColumn = 0));
-    DetailsNeeded := (SortColumn <> 0);
+    DetailsNeeded := (SortColumn <> 0) and (FDoDefault = false);
 
     if (DetailsNeeded) then
     begin
@@ -521,7 +522,8 @@ begin
       if (Assigned(FOnPathChange)) then
         FOnPathChange(Self);
 
-      if (FIncludeSubFolders) then
+      if (FIncludeSubFolders) and
+         (FDoDefault = false) then
       begin
         FrmGenerate.Show;
         SendMessage(FrmGenerate.Handle, CM_SubFolderSort, Items.Count, LPARAM(Path));
@@ -530,7 +532,8 @@ begin
       try
         ColumnSort;
       finally
-        if (FIncludeSubFolders) then
+        if (FIncludeSubFolders) and
+           (FDoDefault = false) then
           FrmGenerate.Close;
       end;
 
