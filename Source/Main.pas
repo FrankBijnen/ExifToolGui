@@ -1445,7 +1445,10 @@ procedure TFMain.MRemoveMetaClick(Sender: TObject);
 begin
   FRemoveMeta.PrepareShow(GetFirstSelectedFilePath);
   if FRemoveMeta.ShowModal = mrOK then
+  begin
+    RefreshSelected(Sender);
     ShowMetadata;
+  end;
 end;
 
 procedure TFMain.MShowNumbersClick(Sender: TObject);
