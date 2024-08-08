@@ -848,8 +848,7 @@ begin
   // Set the Item.caption. Could be a relative filename. E.g. Subdir\file1.jpg
   if (irText in Request) and
      (Item.Index >= 0) and
-     (Item.Index < FoldersList.Count) and
-     (Item.Caption = '') then
+     (Item.Index < FoldersList.Count) then
     Item.Caption := TSubShellFolder.GetRelativeName(Folders[Item.Index]);
 
   if (ViewStyle = vsIcon) then
