@@ -759,7 +759,7 @@ begin
   for AnItem in ShellList.Items do
   begin
     if (AnItem.Selected) and
-       (ShellList.Folders[AnItem.Index].IsFolder = false) then
+       (TSubShellFolder.GetIsFolder(ShellList.Folders[AnItem.Index]) = false) then
     begin
       result := result + FullPath + ShellList.RelFileName(AnItem.Index) + CRLF;
       Inc(Cnt);
@@ -2705,11 +2705,11 @@ begin
   CanAdd := TShellListView(Sender).Enabled and not FrmStyle.Showing and ValidFile(AFolder);
 
   if (TShellListView(Sender).IncludeSubFolders) and
-     (AFolder.IsFolder) then
+     (TSubShellFolder.GetIsFolder(AFolder)) then
   begin
     CanAdd := false;
     CopyFolder := TSubShellFolder.Create(AFolder.Parent, AFolder.RelativeID, AFolder.ShellFolder);
-    CopyFolder.FRelativePath := TSubShellFolder.GetRelativeName(AFolder);
+    CopyFolder.FRelativePath := TSubShellFolder.GetRelativeName(AFolder, false);
 
     TShellListView(Sender).FoldersList.Add(CopyFolder);
     TShellListView(Sender).PopulateSubDirs(CopyFolder);
@@ -2721,7 +2721,7 @@ begin
   if (CBoxFileFilter.Text <> SHOWALL) then
   begin
     Filter := CBoxFileFilter.Text;
-    FilterMatches := AFolder.IsFolder;
+    FilterMatches := TSubShellFolder.GetIsFolder(AFolder);
     while (FilterMatches = false) and (Filter <> '') do
     begin
       FilterItem := NextField(Filter, ';');
@@ -2920,7 +2920,7 @@ begin
   Details := AFolder.DetailStrings;
 
   if (Details.Count = 0) and   // Only get details once
-     (Afolder.IsFolder = false) then // Dont get details for directory
+     (TSubShellFolder.GetIsFolder(AFolder) = false) then // Dont get details for directory
   begin
     case CBoxDetails.ItemIndex of
       1: // Camera settings
