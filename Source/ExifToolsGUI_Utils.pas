@@ -36,6 +36,9 @@ procedure DebugMsg(const Msg: array of variant);
 function GetFileVersionNumber(FName: string): string;
 function GetFileVersionNumberPlatForm(FName: string): string;
 
+// Shell
+function GetIShellFolder(IFolder: IShellFolder; PIDL: PItemIDList): IShellFolder;
+
 // FileSystem
 function ValidDir(ADir: string): boolean;
 function ValidFile(AFolder: TShellFolder): boolean;
@@ -208,6 +211,14 @@ begin
   ;
 end;
 
+// ShellFolder 
+function GetIShellFolder(IFolder: IShellFolder; PIDL: PItemIDList): IShellFolder;
+begin
+  result := nil;
+  if Assigned(IFolder) then
+    IFolder.BindToObject(PIDL, nil, IID_IShellFolder, Pointer(Result));
+end;
+
 // Directories
 function ValidDir(ADir: string): boolean;
 var
@@ -232,20 +243,6 @@ begin
   Flags := SFGAO_FILESYSTEM;
   AFolder.ParentShellFolder.GetAttributesOf(1, PIDL, Flags);
   result := SFGAO_FILESYSTEM and Flags <> 0;
-end;
-
-function IsDesktop(AFolder: TShellFolder): boolean;
-var
-  DesktopPIDL: PItemIDList;
-  DesktopShellFolder: IShellFolder;
-begin
-  SHGetSpecialFolderLocation(0, CSIDL_DESKTOP, DesktopPIDL);
-  try
-    SHGetDesktopFolder(DesktopShellFolder);
-    result := DesktopShellFolder = AFolder.ShellFolder;
-  finally
-    CoTaskMemFree(DesktopPIDL);
-  end;
 end;
 
 function GetINIPath(AllowCreate: boolean = false): string;
