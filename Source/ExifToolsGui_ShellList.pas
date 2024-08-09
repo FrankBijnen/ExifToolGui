@@ -73,7 +73,6 @@ type
     FOnItemsLoaded: TNotifyEvent;
     FOnOwnerDataFetchEvent: TOwnerDataFetchEvent;
     ICM2: IContextMenu2;
-    FRefreshAfterContext: boolean;
     procedure SetColumnSorted(AValue: boolean);
     procedure ClearHiddenItems;
     procedure InitThumbNails;
@@ -84,6 +83,7 @@ type
     procedure CMThumbError(var Message: TMessage); message CM_ThumbError;
     procedure CMThumbRefresh(var Message: TMessage); message CM_ThumbRefresh;
     function CreateSelectedFileList(FullPaths: boolean): TStringList;
+    procedure RefreshTreeViewAfterContext;
   protected
     procedure WMNotify(var Msg: TWMNotify); message WM_NOTIFY;
     procedure InitSortSpec(SortColumn: integer; SortState: THeaderSortState);
@@ -219,7 +219,8 @@ end;
 
 class function TSubShellFolder.HasParentShellFolder(Folder: TShellFolder): boolean;
 begin
-  result := (Folder.ParentShellFolder <> nil);
+  result := (Folder.Parent <> nil) and
+            (Folder.ParentShellFolder <> nil);
 end;
 
 // Safe version of IsFolder. (Prevent Access Violations)
@@ -424,6 +425,20 @@ begin
   end;
 end;
 
+procedure TShellListView.RefreshTreeViewAfterContext;
+begin
+  if (Assigned(ShellTreeView)) and
+     (Assigned(ShellTreeView.Selected)) then
+  begin
+    Self.Enabled := false;
+    try
+      ShellTreeView.Refresh(ShellTreeView.Selected);
+    finally
+      Self.Enabled := true;
+    end;
+  end;
+end;
+
 procedure TShellListView.ExecuteCommandExif(Verb: string; var Handled: boolean);
 begin
 
@@ -449,9 +464,17 @@ end;
 
 procedure TShellListView.CommandCompletedExif(Verb: String; Succeeded: Boolean);
 begin
-  if SameText(Verb, SCmdVerbDelete) or
-     SameText(Verb, SCmdVerbPaste) then
-    FRefreshAfterContext := true;
+  if SameText(Verb, SCmdVerbDelete) then
+  begin
+    ClearSelection;
+    RefreshTreeViewAfterContext;
+  end;
+
+  if SameText(Verb, SCmdVerbPaste) then
+  begin
+    ClearSelectionRefresh;
+    RefreshTreeViewAfterContext;
+  end;
 
   if (not Succeeded) and (Verb = '') then
     MessageDlgEx(StrContextMenuFailed, '', TMsgDlgType.mtWarning, [TMsgDlgBtn.mbOK]);
@@ -461,27 +484,14 @@ procedure TShellListView.ShowMultiContextMenu(MousePos: TPoint);
 var
   FileList: TStringList;
 begin
-  FRefreshAfterContext := false;
+  if (SelectedFolder = nil) then
+    exit;
+
   FileList := CreateSelectedFileList(false);
   try
-    if (SelectedFolder <> nil) then
-      InvokeMultiContextMenu(Self, SelectedFolder, MousePos, ICM2, FileList);
+    InvokeMultiContextMenu(Self, SelectedFolder, MousePos, ICM2, FileList);
   finally
     FileList.Free;
-    if FRefreshAfterContext then
-    begin
-      ClearSelectionRefresh;
-      if (Assigned(ShellTreeView)) and
-         (Assigned(ShellTreeView.Selected)) then
-      begin
-        Self.Enabled := false;
-        try
-          ShellTreeView.Refresh(ShellTreeView.Selected);
-        finally
-          Self.Enabled := true;
-        end;
-      end;
-    end;
   end;
 end;
 
@@ -666,12 +676,10 @@ function TShellListView.CreateSelectedFileList(FullPaths: boolean): TStringList;
 var
   Index: integer;
   SelectedParent: TShellFolder;
-  MultipleParents: boolean;
 begin
   SelectedParent := nil;
   if (SelectedFolder <> nil) then
     SelectedParent := SelectedFolder.Parent;
-  MultipleParents := false;
 
   Result := TStringList.Create;
   for Index := 0 to Items.Count -1 do
@@ -679,9 +687,14 @@ begin
     // Prevent calling OwnerDataFetch
     if (ListView_GetItemState(Handle, Index, LVIS_SELECTED) = LVIS_SELECTED) then
     begin
-      if (MultipleParents = false) and
-         (Folders[Index].Parent <> SelectedParent) then
-        MultipleParents := true;
+
+      if (Folders[Index].Parent <> SelectedParent) then
+      begin
+        MessageDlgEx(StrMultipleDirsInContext, '', TMsgDlgType.mtWarning, [TMsgDlgBtn.mbOK]);
+        Result.Clear;
+        exit;
+      end;
+
       if (FullPaths) then
         Result.AddObject(Folders[Index].PathName, Pointer(Folders[Index].RelativeID))
       else
@@ -689,8 +702,6 @@ begin
     end;
   end;
 
-  if (MultipleParents) then
-    MessageDlgEx(StrMultipleDirsInContext, '', TMsgDlgType.mtWarning, [TMsgDlgBtn.mbOK]);
 end;
 
 procedure TShellListView.DoContextPopup(MousePos: TPoint; var Handled: boolean);
