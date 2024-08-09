@@ -2713,7 +2713,7 @@ begin
   begin
     CanAdd := false;
     CopyFolder := TSubShellFolder.Create(AFolder.Parent, AFolder.RelativeID, AFolder.ShellFolder);
-    CopyFolder.FRelativePath := TSubShellFolder.GetRelativeName(AFolder, false);
+    CopyFolder.FRelativePath := TSubShellFolder.GetRelativeFileName(AFolder);
 
     TShellListView(Sender).FoldersList.Add(CopyFolder);
     TShellListView(Sender).PopulateSubDirs(CopyFolder);
