@@ -1141,6 +1141,7 @@ var Bytes: TBytes;
   var
     ANodeList: TXmlNodeList;
     ASubNode: TXmlNode;
+    Attribute: TXmlAttribute;
     SelNode: string;
   begin
     SelNode := Trim(AParent);
@@ -1150,6 +1151,15 @@ var Bytes: TBytes;
     // Add . , but not for first
     if (SelNode <> '') then
       SelNode := SelNode + '.';
+
+    // Look in Attributes of Node
+    for Attribute in ANode.AttributeList do
+    begin
+      // Skip xml:lang etc.
+      if StartsText('xml:', Attribute.Name) then
+        continue;
+      Add2Xmp(SelNode + Attribute.Name, Attribute.Value);
+    end;
 
     // Look in Childnodes
     ANodeList := ANode.ChildNodes;
