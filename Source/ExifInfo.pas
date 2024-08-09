@@ -1099,20 +1099,20 @@ var Bytes: TBytes;
   var
     UnEscaped: string;
   begin
-    // ExifTool escapes (needless) ' and " in XML.
+    // ExifTool escapes (needlessly) ' and " in XML.
     // VerySimpleXML does not UnEscape '&#39;' .
     UnEscaped := StringReplace(AValue, '&#39;', '''', [rfReplaceAll]);
 
     if (EndsText('Iptc4xmpExt:CountryCode', AKey)) then
-      XMP.CountryCodeShown := UnEscaped
+      AddBag(XMP.CountryCodeShown, UnEscaped)
     else if (EndsText('Iptc4xmpExt:CountryName', AKey)) then
-      XMP.CountryNameShown := UnEscaped
+      AddBag(XMP.CountryNameShown, UnEscaped)
     else if (EndsText('Iptc4xmpExt:ProvinceState', AKey)) then
-      XMP.ProvinceShown := UnEscaped
+      AddBag(XMP.ProvinceShown, UnEscaped)
     else if (EndsText('Iptc4xmpExt:City', AKey)) then
-      XMP.CityShown := UnEscaped
+      AddBag(XMP.CityShown, UnEscaped)
     else if (EndsText('Iptc4xmpExt:Sublocation', AKey)) then
-      XMP.LocationShown := UnEscaped
+      AddBag(XMP.LocationShown, UnEscaped)
     else if (StartsText('Iptc4xmpExt:PersonInImage.rdf:Bag', AKey)) then
       AddBag(XMP.PersonInImage, UnEscaped)
 
@@ -1142,7 +1142,6 @@ var Bytes: TBytes;
     ANodeList: TXmlNodeList;
     ASubNode: TXmlNode;
     SelNode: string;
-    Attribute: TXmlAttribute;
   begin
     SelNode := Trim(AParent);
     if (ANode.NodeValue <> '') then
@@ -1151,10 +1150,6 @@ var Bytes: TBytes;
     // Add . , but not for first
     if (SelNode <> '') then
       SelNode := SelNode + '.';
-
-    // Look in Attributes of Node
-    for Attribute in ANode.AttributeList do
-      Add2Xmp(SelNode + Attribute.Name, Attribute.Value);
 
     // Look in Childnodes
     ANodeList := ANode.ChildNodes;
