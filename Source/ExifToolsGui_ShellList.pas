@@ -144,7 +144,7 @@ implementation
 
 uses System.Win.ComObj, System.UITypes,
      Vcl.Graphics,
-     ExifToolsGUI_Utils, UnitFilesOnClipBoard, UFrmGenerate;
+     ExifToolsGUI_Utils, UnitFilesOnClipBoard, UnitLangResources, UFrmGenerate;
 
 // res file contains the ?
 
@@ -152,7 +152,6 @@ uses System.Win.ComObj, System.UITypes,
 
 const
   HOURGLASS = 'HOURGLASS';
-
 
   // Listview Sort
 
@@ -413,32 +412,27 @@ begin
     Handled := true;
   end;
 
-  if SameText(Verb, SCmdVerbRename) then
-    FRefreshAfterContext := false;
 end;
 
 procedure TShellListView.CommandCompletedExif(Verb: String; Succeeded: Boolean);
 begin
+  if SameText(Verb, SCmdVerbDelete) or
+     SameText(Verb, SCmdVerbPaste) then
+    FRefreshAfterContext := true;
+
   if (not Succeeded) and (Verb = '') then
-  begin
-    FRefreshAfterContext := false;
-    MessageDlgEx('Context menu failed', '', TMsgDlgType.mtWarning, [TMsgDlgBtn.mbOK]);
-  end;
+    MessageDlgEx(StrContextMenuFailed, '', TMsgDlgType.mtWarning, [TMsgDlgBtn.mbOK]);
 end;
 
 procedure TShellListView.ShowMultiContextMenu(MousePos: TPoint);
 var
   FileList: TStringList;
 begin
-//TODO: Decide which items need a refresh. Not which items dont need it.
   FRefreshAfterContext := false;
   FileList := CreateSelectedFileList(false);
   try
     if (SelectedFolder <> nil) then
-    begin
-      FRefreshAfterContext := not FIncludeSubFolders;
       InvokeMultiContextMenu(Self, SelectedFolder, MousePos, ICM2, FileList);
-    end;
   finally
     FileList.Free;
     if FRefreshAfterContext then
@@ -637,17 +631,33 @@ end;
 
 function TShellListView.CreateSelectedFileList(FullPaths: boolean): TStringList;
 var
-  AnItem: TListItem;
+  Index: integer;
+  SelectedParent: TShellFolder;
+  MultipleParents: boolean;
 begin
+  SelectedParent := nil;
+  if (SelectedFolder <> nil) then
+    SelectedParent := SelectedFolder.Parent;
+  MultipleParents := false;
+
   Result := TStringList.Create;
-  for AnItem in Items do
-    if (AnItem.Selected) then
+  for Index := 0 to Items.Count -1 do
+  begin
+    // Prevent calling OwnerDataFetch
+    if (ListView_GetItemState(Handle, Index, LVIS_SELECTED) = LVIS_SELECTED) then
     begin
+      if (MultipleParents = false) and
+         (Folders[Index].Parent <> SelectedParent) then
+        MultipleParents := true;
       if (FullPaths) then
-        Result.AddObject(Folders[AnItem.Index].PathName, Pointer(Folders[AnItem.Index].RelativeID))
+        Result.AddObject(Folders[Index].PathName, Pointer(Folders[Index].RelativeID))
       else
-        Result.AddObject(RelFileName(AnItem.Index), Pointer(Folders[AnItem.Index].RelativeID));
+        Result.AddObject(RelFileName(Index), Pointer(Folders[Index].RelativeID));
     end;
+  end;
+
+  if (MultipleParents) then
+    MessageDlgEx(StrMultipleDirsInContext, '', TMsgDlgType.mtWarning, [TMsgDlgBtn.mbOK]);
 end;
 
 procedure TShellListView.DoContextPopup(MousePos: TPoint; var Handled: boolean);
@@ -946,9 +956,12 @@ procedure TShellListView.ShellListOnGenerateReady(Sender: TObject);
 var
   AnItem: TListItem;
 begin
-  GetThumbNails;
-  for AnItem in Items do
-    AnItem.Update;
+  if (ViewStyle = vsIcon) and (FThumbNailSize > 0) then
+  begin
+    GetThumbNails;
+    for AnItem in Items do
+      AnItem.Update;
+  end;
 end;
 
 function TShellListView.Path: string;

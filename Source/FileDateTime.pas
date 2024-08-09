@@ -46,7 +46,7 @@ var
 
 implementation
 
-uses Main, ExifTool, UnitLangResources;
+uses Main, ExifTool, UnitLangResources, ExifToolsGui_ShellList, Winapi.CommCtrl;
 
 {$R *.dfm}
 
@@ -103,28 +103,31 @@ end;
 
 procedure TFFileDateTime.Button4Click(Sender: TObject);
 var
-  k, renamed: integer;
+  Index: integer;
+  P: integer;
+  Renamed: integer;
   NewFname: string;
-  ANitem: TListItem;
 begin
-  renamed := 0;
+  Renamed := 0;
   SetCurrentDir(FMain.ShellList.Path);
-  for ANitem in FMain.ShellList.Items do
+
+  for Index := 0 to FMain.ShellList.Items.Count -1 do
   begin
-    if ANitem.Selected then
+    if (ListView_GetItemState(FMain.ShellList.Handle, Index, LVIS_SELECTED) = LVIS_SELECTED) and
+       (TSubShellFolder.GetIsFolder(FMain.ShellList.Folders[Index]) = false) then
     begin
-      ETcmd := FMain.ShellList.RelFileName(ANitem.Index);
-      k := pos(' ', ETcmd);
-      if k > 0 then
+      ETcmd := FMain.ShellList.RelFileName(Index);
+      P := Pos(' ', ETcmd);
+      if P > 0 then
       begin
         NewFname := ETcmd;
-        Delete(NewFname, 1, k);
+        Delete(NewFname, 1, P);
         if RenameFile(ETcmd, NewFname) then
-          inc(renamed);
+          Inc(Renamed);
       end;
     end;
   end;
-  ShowMessage(intToStr(renamed) + StrFilesRenamed);
+  ShowMessage(intToStr(Renamed) + StrFilesRenamed);
   ModalResult := mrOK;
 end;
 
