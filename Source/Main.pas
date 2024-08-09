@@ -749,19 +749,19 @@ end;
 
 function TFMain.GetSelectedFiles(MustExpandPath: boolean): string;
 var
-  AnItem: TListItem;
   FullPath: string;
   Cnt: integer;
+  Index: integer;
 begin
   Cnt := 0;
   result := '';
   FullPath := GetFullPath(MustExpandPath);
-  for AnItem in ShellList.Items do
+  for Index := 0 to ShellList.Items.Count -1 do
   begin
-    if (AnItem.Selected) and
-       (TSubShellFolder.GetIsFolder(ShellList.Folders[AnItem.Index]) = false) then
+    if (ListView_GetItemState(ShellList.Handle, Index, LVIS_SELECTED) = LVIS_SELECTED) and
+       (TSubShellFolder.GetIsFolder(ShellList.Folders[Index]) = false) then
     begin
-      result := result + FullPath + ShellList.RelFileName(AnItem.Index) + CRLF;
+      result := result + FullPath + ShellList.RelFileName(Index) + CRLF;
       Inc(Cnt);
     end;
   end;
@@ -2509,7 +2509,7 @@ var
   PBuffer: PChar absolute Buffer;
   LBuffer: integer;
   FName: string;
-  AnItem: TListItem;
+  Index: integer;
 begin
   NumFiles := DragQueryFile(Msg.Drop, UINT(-1), nil, 0);
   if NumFiles > 1 then
@@ -2528,11 +2528,12 @@ begin
     begin
       ShellTree.Path := ExtractFileDir(FName);
       FName := ExtractFileName(FName);
-      for AnItem in ShellList.Items do
+      ShellList.ClearSelection;
+      for Index := 0 to ShellList.Items.Count -1 do
       begin
-        if ShellList.RelFileName(AnItem.Index) = FName then
+        if ShellList.RelFileName(Index) = FName then
         begin
-          ShellList.ItemIndex := AnItem.Index;
+          ShellList.ItemIndex := Index;
           break;
         end;
       end;
@@ -2547,9 +2548,9 @@ end;
 
 procedure TFMain.FormShow(Sender: TObject);
 var
-  AnItem: TListItem;
   Param: string;
   Lat, Lon: string;
+  Index: integer;
   I: integer;
   PathFromParm: boolean;
 begin
@@ -2629,11 +2630,11 @@ begin
         ShellTree.Path := ExtractFileDir(Param);
         Param := ExtractFileName(Param);
         ShellList.ItemIndex := -1;
-        for AnItem in ShellList.Items do
+        for Index := 0 to ShellList.Items.Count -1 do
         begin
-          if SameText(ShellList.RelFileName(AnItem.Index), Param) then
+          if SameText(ShellList.RelFileName(Index), Param) then
           begin
-            ShellList.ItemIndex := AnItem.Index;
+            ShellList.ItemIndex := Index;
             break;
           end;
         end;
@@ -3096,7 +3097,7 @@ procedure TFMain.ShellListKeyDown(Sender: TObject; var Key: Word; Shift: TShiftS
 
   procedure DeleteSelected;
   var
-    ANItem: TListItem;
+    Index: integer;
     CurIndex: integer;
     CrWait, CrNormal: HCURSOR;
   begin
@@ -3108,11 +3109,11 @@ procedure TFMain.ShellListKeyDown(Sender: TObject; var Key: Word; Shift: TShiftS
     ShellList.Items.BeginUpdate;
     try
       CurIndex := ShellList.Selected.Index -1;
-      for ANItem in ShellList.Items do
+      for Index := 0 to ShellList.Items.Count -1 do
       begin
-        if (ANItem.Selected = false) then
-          Continue;
-        DoContextMenuVerb(ShellList.Folders[ANItem.Index], SCmdVerbDelete);
+        if (ListView_GetItemState(ShellList.Handle, Index, LVIS_SELECTED) <> LVIS_SELECTED) then
+            Continue;
+        DoContextMenuVerb(ShellList.Folders[Index], SCmdVerbDelete);
       end;
 
       ShellList.ClearSelectionRefresh;
@@ -3273,13 +3274,16 @@ begin
 end;
 
 procedure TFMain.RefreshSelected(Sender: TObject);
-var AnItem: TListItem;
+var
+  Index: integer;
+  AnItem: TListItem;
 begin
-  for AnItem in ShellList.Items do
+  for Index := 0 to ShellList.Items.Count -1 do
   begin
-    if AnItem.Selected then
+    if (ListView_GetItemState(ShellList.Handle, Index, LVIS_SELECTED) = LVIS_SELECTED) then
     begin
-      ShellList.Folders[AnItem.Index].DetailStrings.Clear;
+      ShellList.Folders[Index].DetailStrings.Clear;
+      AnItem := ShellList.Items[Index];
       AnItem.Update;
     end;
   end;

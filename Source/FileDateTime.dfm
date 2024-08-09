@@ -20,6 +20,8 @@ object FFileDateTime: TFFileDateTime
     Height = 19
     Panels = <>
     SimplePanel = True
+    ExplicitTop = 454
+    ExplicitWidth = 564
   end
   object AdvPanel1: TPanel
     Left = 0
@@ -36,6 +38,7 @@ object FFileDateTime: TFFileDateTime
     ParentDoubleBuffered = False
     ParentFont = False
     TabOrder = 1
+    ExplicitHeight = 454
     object AdvPanel2: TPanel
       Left = 16
       Top = 16
