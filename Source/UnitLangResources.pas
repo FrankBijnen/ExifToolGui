@@ -16,7 +16,7 @@ resourcestring
   SrCmdVerbGenThumbs        = 'Generate Thumbnails';
   SrCmdVerbGenThumbsSub     = 'Generate Thumbnails (Incl Subdirs)';
   StrContextMenuFailed      = 'Context menu failed';
-  StrMultipleDirsInContext  = 'Selecting files from multiple directories for Context menu';
+  StrMultipleDirsInContext  = 'Context menu for files from multiple directories not supported';
 
   StrRemDirectoryFail       = 'Remove directory failed code %u';
   StrWriteToSFailed         = 'Write to %s failed';
