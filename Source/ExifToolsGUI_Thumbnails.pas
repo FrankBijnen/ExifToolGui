@@ -123,10 +123,10 @@ begin
         dec(Tries);
         Hr := GetThumbCache(FPitemIDListItem, hBmp, Flags, FMax, FMax);
         if (Hr <> S_OK) then
-        begin
-          DeleteObject(hBmp); // Not sure if this is needed
+//        begin
+//          DeleteObject(hBmp); // Not sure if this is needed
           Sleep(50);
-        end;
+//        end;
       end;
 
       // The task is canceled, or the current path has changed.
@@ -137,8 +137,13 @@ begin
         exit;
       end;
 
+      // Getting a thumbnail failed. return an Icon
+      if (HR <> S_OK) then
+        Hr := GetThumbCache(FPitemIDListItem, hBmp, SIIGBF_ICONONLY, FMax, FMax);
+
       if (Hr = S_OK) then
         // We must update the imagelist in the main thread, send a message
+
         PostMessage(FHandle, CM_ThumbRefresh, FItemIndex, hBmp);
 
       // Sendmessage that task has finished.
