@@ -184,8 +184,8 @@ type
     MaUserDefLoad: TAction;
     MaCustomViewSave: TAction;
     MaCustomViewLoad: TAction;
-    MaMarkedSave: TAction;
-    MaMarkedLoad: TAction;
+    MaPredefinedSave: TAction;
+    MaPredefinedLoad: TAction;
     AdvPanelBrowser: TPanel;
     procedure ShellListClick(Sender: TObject);
     procedure ShellListKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
@@ -310,8 +310,8 @@ type
     procedure MaUserDefSaveExecute(Sender: TObject);
     procedure MaCustomViewLoadExecute(Sender: TObject);
     procedure MaCustomViewSaveExecute(Sender: TObject);
-    procedure MaMarkedLoadExecute(Sender: TObject);
-    procedure MaMarkedSaveExecute(Sender: TObject);
+    procedure MaPredefinedLoadExecute(Sender: TObject);
+    procedure MaPredefinedSaveExecute(Sender: TObject);
     procedure FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
     procedure ShellTreeKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
     procedure ShellListKeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
@@ -524,7 +524,7 @@ end;
 procedure TFMain.BtnETdirectAddClick(Sender: TObject);
 begin
   EditETdirect.Text := trim(EditETdirect.Text);
-  ETdirectCmd.Append(EditETdirect.Text); // store command
+  ETdirectCmdList.Append(EditETdirect.Text); // store command
   EditETcmdName.Text := trim(EditETcmdName.Text);
   CBoxETdirect.ItemIndex := CBoxETdirect.Items.Add(EditETcmdName.Text);
   // store name
@@ -537,7 +537,7 @@ var
 begin
   Indx := CBoxETdirect.ItemIndex;
   CBoxETdirect.ItemIndex := -1;
-  ETdirectCmd.Delete(Indx);
+  ETdirectCmdList.Delete(Indx);
   CBoxETdirect.Items.Delete(Indx);
   EditETcmdName.Text := '';
   EditETcmdName.Modified := false;
@@ -552,7 +552,7 @@ begin
   Indx := CBoxETdirect.ItemIndex;
   CBoxETdirect.ItemIndex := -1;
   EditETdirect.Text := trim(EditETdirect.Text);
-  ETdirectCmd[Indx] := EditETdirect.Text;
+  ETdirectCmdList[Indx] := EditETdirect.Text;
   EditETcmdName.Text := trim(EditETcmdName.Text);
   CBoxETdirect.Items[Indx] := EditETcmdName.Text;
   CBoxETdirect.ItemIndex := Indx;
@@ -841,15 +841,15 @@ begin
   SaveIniDialog(SaveFileDlg, TIniData.idCustomView, true);
 end;
 
-procedure TFMain.MaMarkedLoadExecute(Sender: TObject);
+procedure TFMain.MaPredefinedLoadExecute(Sender: TObject);
 begin
-  if (LoadIniDialog(OpenFileDlg, TIniData.idMarked, False)) then
+  if (LoadIniDialog(OpenFileDlg, TIniData.idPredefinedTags, False)) then
     ShowMetadata;
 end;
 
-procedure TFMain.MaMarkedSaveExecute(Sender: TObject);
+procedure TFMain.MaPredefinedSaveExecute(Sender: TObject);
 begin
-  SaveIniDialog(SaveFileDlg, TIniData.idMarked, true);
+  SaveIniDialog(SaveFileDlg, TIniData.idPredefinedTags, true);
 end;
 
 procedure TFMain.MaAPILargeFileSupportExecute(Sender: TObject);
@@ -2311,7 +2311,7 @@ begin
   Indx := CBoxETdirect.ItemIndex;
   if Indx >= 0 then
   begin
-    EditETdirect.Text := ETdirectCmd[Indx];
+    EditETdirect.Text := ETdirectCmdList[Indx];
     EditETdirect.Modified := false;
     EditETcmdName.Text := CBoxETdirect.Text;
     EditETcmdName.Modified := false;

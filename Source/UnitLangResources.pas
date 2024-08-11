@@ -133,7 +133,7 @@ resourcestring
   StrETDirect               = 'ExifTool direct';
   StrUserDef                = 'User defined';
   StrCustomView             = 'Custom view';
-  StrMarked                 = 'Marked tags';
+  StrPredefinedTags         = 'Predefined tags (Marked, Remove/Copy Metadata)';
 
   StrLoadIniDefine          = 'Load %s definition file';
   StrNewIniLoaded           = 'New %s loaded.';

@@ -23,15 +23,15 @@ type
     SpbAdd: TSpeedButton;
     SpbDel: TSpeedButton;
     SpbEdit: TSpeedButton;
-    SpbReset: TSpeedButton;
+    SpbPredefined: TSpeedButton;
     procedure FormShow(Sender: TObject);
     procedure LvTagNamesCustomDrawItem(Sender: TCustomListView; Item: TListItem; State: TCustomDrawState; var DefaultDraw: Boolean);
     procedure SpbEditClick(Sender: TObject);
     procedure SpbDelClick(Sender: TObject);
     procedure SpbAddClick(Sender: TObject);
-    procedure SpbResetClick(Sender: TObject);
     procedure BtnPreviewClick(Sender: TObject);
     procedure LvTagNamesEdited(Sender: TObject; Item: TListItem; var S: string);
+    procedure SpbPredefinedClick(Sender: TObject);
   private
     { Private declarations }
     FSample: string;
@@ -52,7 +52,7 @@ var
 implementation
 
 uses
-  Main, MainDef, ExifToolsGUI_Utils, ExifTool, LogWin, UnitLangResources, UFrmTagNames,
+  Main, MainDef, ExifToolsGUI_Utils, ExifTool, LogWin, UnitLangResources, UFrmTagNames, UFrmPredefinedTags,
   Vcl.Themes;
 
 {$R *.dfm}
@@ -87,13 +87,6 @@ begin
     LvTagNames.Items.Add.Caption := FrmTagNames.SelectedTag;
 end;
 
-procedure TFCopyMetadata.SpbResetClick(Sender: TObject);
-begin
-  ExcludeCopyTagList := DefExcludeCopyTags;
-  SelExcludeCopyTagList := '';
-  SetupListView;
-end;
-
 procedure TFCopyMetadata.SpbEditClick(Sender: TObject);
 begin
   if (LvTagNames.Selected <> nil) then
@@ -101,6 +94,20 @@ begin
     BtnExecute.Default := false;
     LvTagNames.Selected.Checked := false;
     LvTagNames.Selected.EditCaption;
+  end;
+end;
+
+procedure TFCopyMetadata.SpbPredefinedClick(Sender: TObject);
+begin
+  GetTagNames;
+
+  FrmPredefinedTags.Caller := TIniTagsData.idtCopyTags;
+  FrmPredefinedTags.CallerTags := ExcludeCopyTagList;
+  if (FrmPredefinedTags.ShowModal = IDOK) then
+  begin
+    ExcludeCopyTagList := FrmPredefinedTags.CallerTags;
+    SelExcludeCopyTagList := '';
+    SetupListView;
   end;
 end;
 

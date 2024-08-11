@@ -6,6 +6,7 @@ uses System.Classes, Vcl.Dialogs, ExifTool, GEOMap, UnitLangResources;
 
 const
   SHOWALL = 'Show All Files';
+
   DefExcludeCopyTags =
     'exif:ExifImageWidth ' +
     'exif:ExifImageHeight ' +
@@ -48,7 +49,10 @@ const
     'Gps:All ';
 
 type
-  TIniData = (idWorkSpace, idETDirect, idUserDefined, idCustomView, idMarked);
+  TIniTagsData = (idtWorkSpace, idtETDirect, idtUserDefined, idtCustomView, idtPredefinedTags,
+                  idtMarked, idtRemoveTags, idtCopySingleTags, idtCopyTags);
+
+  TIniData = (idWorkSpace, idETDirect, idUserDefined, idCustomView, idPredefinedTags);
 
   GUIsettingsRec = record
     Language: string[7];
@@ -133,7 +137,7 @@ var
   FListColUsr: array of FListColUsrRec;
 
   GUIsettings: GUIsettingsRec;
-  ETdirectCmd: TStringList;
+  ETdirectCmdList: TStringList;
   QuickTags: array of QuickTagRec;
   MarkedTagList: string;
   CustomViewTagList: string;
@@ -141,6 +145,7 @@ var
   WrkIniDir: string = '';
   ParmIniPath: string = '';
   DontSaveIni: boolean;
+  PredefinedTagList: TStringList;
   ExcludeCopyTagList: string;
   RemoveTagList: string;
   CopySingleTagList: string;
@@ -173,10 +178,11 @@ const
   IniVersion = 'V6';
   PrevIniVersion = 'V5';
   WorkSpaceTags = 'WorkSpaceTags';
-  ETDirectCmds = 'ETdirectCmd';
+  ETDirectCmd = 'ETdirectCmd';
   UserDefTags = 'FListUserDefColumn';
   TagList = 'TagList';
   CustomView = 'CustomView';
+  PredefinedTags = 'PredefinedTags';
   MarkedTags = 'MarkedTags';
   ExcludeCopyTags = 'ExcludeCopyTags';
   SelExcludeCopyTags = 'SelExcludeCopyTags';
@@ -351,23 +357,23 @@ var
   Indx, ETcnt: integer;
 begin
 
-  ETdirectCmd.Clear;
-  GUIini.ReadSection(ETDirectCmds, CbETDirect.Items);
+  ETdirectCmdList.Clear;
+  GUIini.ReadSection(ETDirectCmd, CbETDirect.Items);
   ETcnt := CbETDirect.Items.Count;
   result := ETcnt;
   if ETcnt = 0 then
   begin
     CbETDirect.Items.Append('Set Exif:Copyright to [©Year by MyName]');
-    ETdirectCmd.Append('-d %Y "-Exif:Copyright<©$DateTimeOriginal by MyName"');
+    ETdirectCmdList.Append('-d %Y "-Exif:Copyright<©$DateTimeOriginal by MyName"');
   end
   else
   begin
     for Indx := 0 to ETcnt - 1 do
-      ETdirectCmd.Append(GUIini.ReadString(ETDirectCmds, CbETDirect.Items[Indx], '?'));
+      ETdirectCmdList.Append(GUIini.ReadString(ETDirectCmd, CbETDirect.Items[Indx], '?'));
   end;
 
   // Setup default ET Direct command
-  if GUIsettings.ETdirDefCmd > ETdirectCmd.Count then
+  if GUIsettings.ETdirDefCmd > ETdirectCmdList.Count then
     GUIsettings.ETdirDefCmd := -1;
   CbETDirect.ItemIndex := GUIsettings.ETdirDefCmd;
   CbETDirect.OnChange(CbETDirect);
@@ -433,15 +439,22 @@ begin
   result := Length(CustomViewTagList);
 end;
 
+function ReadPredefinedTags(GUIini: TMemIniFile): integer;
+begin
+  GUIini.ReadSectionValues(PredefinedTags, PredefinedTagList);
+  result := PredefinedTagList.Count;
+end;
+
 function ReadMarkedTags(GUIini: TMemIniFile): integer;
 begin
   MarkedTagList := ReplaceLastChar(GUIini.ReadString(TagList, MarkedTags, '<'), '<', ' ');
   result := Length(MarkedTagList);
 end;
 
-procedure ReadCopyTags(GUIini: TMemIniFile);
+function ReadCopyTags(GUIini: TMemIniFile): integer;
 begin
   ExcludeCopyTagList := ReplaceLastChar(GUIini.ReadString(TagList, ExcludeCopyTags, '<'), '<', ' ');
+  result := Length(Trim(ExcludeCopyTagList));
 
   if (ExcludeCopyTagList = ' ') then
     ExcludeCopyTagList := DefExcludeCopyTags;
@@ -449,9 +462,10 @@ begin
   SelExcludeCopyTagList := ReplaceLastChar(GUIini.ReadString(TagList, SelExcludeCopyTags, '<'), '<', ' ');
 end;
 
-procedure ReadRemoveTags(GUIini: TMemIniFile);
+function ReadRemoveTags(GUIini: TMemIniFile): integer;
 begin
   RemoveTagList := ReplaceLastChar(GUIini.ReadString(TagList, RemoveTags, '<'), '<', ' ');
+  result := Length(Trim(ExcludeCopyTagList));
 
   if (RemoveTagList = ' ') then
     RemoveTagList := DefRemoveTags;
@@ -459,9 +473,10 @@ begin
   SelRemoveTagList := ReplaceLastChar(GUIini.ReadString(TagList, SelRemoveTags, '<'), '<', ' ');
 end;
 
-procedure ReadCopySingleTags(GUIini: TMemIniFile);
+function ReadCopySingleTags(GUIini: TMemIniFile): integer;
 begin
   CopySingleTagList := ReplaceLastChar(GUIini.ReadString(TagList, CopySingleTags, '<'), '<', ' ');
+  result := Length(Trim(CopySingleTagList));
 
   if (CopySingleTagList = ' ') then
     CopySingleTagList := DefCopySingleTags;
@@ -502,10 +517,10 @@ begin
   TmpItems := TStringList.Create;
   try
     GUIini.GetStrings(TmpItems); // Get strings written so far.
-    TmpItems.Add(Format('[%s]', [ETDirectCmds]));
-    for Indx := 0 to ETdirectCmd.Count -1 do
+    TmpItems.Add(Format('[%s]', [ETDirectCmd]));
+    for Indx := 0 to ETdirectCmdList.Count -1 do
     begin
-      Tx := Format('%s=%s', [CbETDirect.Items[Indx], ETdirectCmd[Indx]]);
+      Tx := Format('%s=%s', [CbETDirect.Items[Indx], ETdirectCmdList[Indx]]);
       TmpItems.Add(Tx);
     end;
     GUIini.SetStrings(TmpItems);
@@ -566,6 +581,23 @@ end;
 procedure WriteCustomViewTags(GUIini: TMemIniFile);
 begin
   WriteTagList(GUIini, CustomView, CustomViewTagList);
+end;
+
+procedure WritePredefinedTags(GUIini: TMemIniFile);
+var
+  Indx: integer;
+  TmpItems: TStringList;
+begin
+  TmpItems := TStringList.Create;
+  try
+    GUIini.GetStrings(TmpItems); // Get strings written so far.
+    TmpItems.Add(Format('[%s]', [PredefinedTags]));
+    for Indx := 0 to PredefinedTagList.Count -1 do
+      TmpItems.Add(PredefinedTagList[Indx]);
+    GUIini.SetStrings(TmpItems);
+  finally
+    TmpItems.Free;
+  end;
 end;
 
 procedure WriteMarkedTags(GUIini: TMemIniFile);
@@ -799,6 +831,9 @@ begin
       // --- CustomView tags---
       ReadCustomViewTags(GUIini);
 
+      // --- Predefined tags---
+      ReadPredefinedTags(GUIini);
+
       // --- Marked tags---
       ReadMarkedTags(GUIini);
 
@@ -1010,6 +1045,9 @@ begin
         // Custom view tags
         WriteCustomViewTags(GUIini);
 
+        // Predefined Tags
+        WritePredefinedTags(GUIini);
+
         // Marked Tags
         WriteMarkedTags(GUIini);
 
@@ -1049,12 +1087,15 @@ begin
       result := StrUserDef;
     TIniData.idCustomView:
       result := StrCustomView;
-    TIniData.idMarked:
-      result := StrMarked;
+    TIniData.idPredefinedTags:
+      result := StrPredefinedTags;
   end;
 end;
 
-function LoadIni(IniFName: string; AIniData: TIniData): boolean;
+function LoadIni(IniFName: string; AIniData: array of TIniTagsData): boolean;
+var
+  LoadOK: boolean;
+  ThisIniTag: TIniTagsData;
 begin
   result := false;
   if not FileExists(IniFName) then
@@ -1062,12 +1103,22 @@ begin
 
   GUIini := TMemIniFile.Create(IniFName, TEncoding.UTF8);
   try
-    case AIniData of
-      TIniData.idWorkSpace: result := (ReadWorkSpaceTags(GuiIni) <> 0);
-      TIniData.idETDirect: result := (ReadETdirectCmds(Fmain.CBoxETdirect, GuiIni) <> 0);
-      TIniData.idUserDefined: result := (ReadUserDefTags(GuiIni) <> 0);
-      TIniData.idCustomView: result := (ReadCustomViewTags(GuiIni) <> 0);
-      TIniData.idMarked: result := (ReadMarkedTags(GuiIni) <> 0);
+    for ThisIniTag in AIniData do
+    begin
+      case ThisIniTag of
+        TIniTagsData.idtWorkSpace:        LoadOK := (ReadWorkSpaceTags(GuiIni) <> 0);
+        TIniTagsData.idtETDirect:         LoadOK := (ReadETdirectCmds(Fmain.CBoxETdirect, GuiIni) <> 0);
+        TIniTagsData.idtUserDefined:      LoadOK := (ReadUserDefTags(GuiIni) <> 0);
+        TIniTagsData.idtCustomView:       LoadOK := (ReadCustomViewTags(GuiIni) <> 0);
+        TIniTagsData.idtMarked:           LoadOK := (ReadMarkedTags(GuiIni) <> 0);
+        TIniTagsData.idtPredefinedTags:   LoadOK := (ReadPredefinedTags(GUIini) <> 0);
+        TIniTagsData.idtRemoveTags:       LoadOK := (ReadRemoveTags(GuiIni) <> 0);
+        TIniTagsData.idtCopySingleTags:   LoadOK := (ReadCopySingleTags(GuiIni) <> 0);
+        TIniTagsData.idtCopyTags:         LoadOK := (ReadCopyTags(GuiIni) <> 0);
+      else
+        LoadOK := false;
+      end;
+      result := result or LoadOK;
     end;
   finally
     GUIini.Free;
@@ -1077,8 +1128,10 @@ end;
 function LoadIniDialog(OpenFileDlg: TOpenDialog; AIniData: TIniData; ShowMsg: boolean = true): boolean;
 var
   HrIniData: string;
+  IniLoaded: boolean;
 begin
   result := false;
+  IniLoaded := false;
 
   HrIniData := GetHrIniData(AIniData);
   with OpenFileDlg do
@@ -1088,7 +1141,23 @@ begin
     Title := Format(StrLoadIniDefine, [HrIniData]);
     if Execute then
     begin
-      if LoadIni(FileName, AIniData) then
+      case AIniData of
+        TIniData.idWorkSpace:
+          IniLoaded := LoadIni(FileName, [TIniTagsData.idtWorkSpace]);
+        TIniData.idETDirect:
+          IniLoaded := LoadIni(FileName, [TIniTagsData.idtETDirect]);
+        TIniData.idUserDefined:
+          IniLoaded := LoadIni(FileName, [TIniTagsData.idtUserDefined]);
+        TIniData.idCustomView:
+          IniLoaded := LoadIni(FileName, [TIniTagsData.idtCustomView]);
+        TIniData.idPredefinedTags:
+          IniLoaded := LoadIni(FileName, [TIniTagsData.idtPredefinedTags,
+                                          TIniTagsData.idtMarked,
+                                          TIniTagsData.idtRemoveTags,
+                                          TIniTagsData.idtCopySingleTags,
+                                          TIniTagsData.idtCopyTags]);
+      end;
+      if IniLoaded then
       begin
         if (ShowMsg) then
           ShowMessage(Format(StrNewIniLoaded, [HrIniData]))
@@ -1102,19 +1171,28 @@ begin
   end;
 end;
 
-function SaveIni(IniFName: string; AIniData: TIniData): boolean;
+function SaveIni(IniFName: string; AIniData: array of TIniTagsData): boolean;
+var
+  ThisIniTag: TIniTagsData;
 begin
   result := true;
   try
     System.SysUtils.DeleteFile(IniFName);
     GUIini := TMemIniFile.Create(IniFName, TEncoding.UTF8);
     try
-      case AIniData of
-        TIniData.idWorkSpace: WriteWorkSpaceTags(GuiIni);
-        TIniData.idETDirect: WriteEtDirectCmds(FMain.CBoxETdirect, GuiIni);
-        TIniData.idUserDefined: WriteUserDefTags(GuiIni);
-        TIniData.idCustomView: WriteCustomViewTags(GuiIni);
-        TIniData.idMarked: WriteMarkedTags(GuiIni);
+      for ThisIniTag in AIniData do
+      begin
+        case ThisIniTag of
+          TIniTagsData.idtWorkSpace:      WriteWorkSpaceTags(GuiIni);
+          TIniTagsData.idtETDirect:       WriteEtDirectCmds(FMain.CBoxETdirect, GuiIni);
+          TIniTagsData.idtUserDefined:    WriteUserDefTags(GuiIni);
+          TIniTagsData.idtCustomView:     WriteCustomViewTags(GuiIni);
+          TIniTagsData.idtPredefinedTags: WritePredefinedTags(GuiIni);
+          TIniTagsData.idtMarked:         WriteMarkedTags(GuiIni);
+          TIniTagsData.idtRemoveTags:     WriteRemoveTags(GuiIni);
+          TIniTagsData.idtCopySingleTags: WriteCopySingleTags(GuiIni);
+          TIniTagsData.idtCopyTags:       WriteCopyTags(GuiIni);
+        end;
       end;
       GUIini.UpdateFile;
     finally
@@ -1127,10 +1205,13 @@ end;
 
 function SaveIniDialog(SaveFileDlg: TSaveDialog; AIniData: TIniData; ShowMsg: boolean = true): boolean;
 var
-  DoSave, IsOK: boolean;
+  DoSave: boolean;
+  IsOK: boolean;
+  IniSaved: boolean;
   HrIniData: string;
 begin
   result := false;
+  IniSaved := false;
 
   HrIniData := GetHrIniData(AIniData);
   with SaveFileDlg do
@@ -1152,7 +1233,23 @@ begin
     until not DoSave or IsOK;
     if DoSave then
     begin
-      if SaveIni(FileName, AIniData) then
+      case AIniData of
+        TIniData.idWorkSpace:
+          IniSaved := SaveIni(FileName, [TIniTagsData.idtWorkSpace]);
+        TIniData.idETDirect:
+          IniSaved := SaveIni(FileName, [TIniTagsData.idtETDirect]);
+        TIniData.idUserDefined:
+          IniSaved := SaveIni(FileName, [TIniTagsData.idtUserDefined]);
+        TIniData.idCustomView:
+          IniSaved := SaveIni(FileName, [TIniTagsData.idtCustomView]);
+        TIniData.idPredefinedTags:
+          IniSaved := SaveIni(FileName, [TIniTagsData.idtPredefinedTags,
+                                         TIniTagsData.idtMarked,
+                                         TIniTagsData.idtRemoveTags,
+                                         TIniTagsData.idtCopySingleTags,
+                                         TIniTagsData.idtCopyTags]);
+      end;
+      if IniSaved then
       begin
         if (ShowMsg) then
           ShowMessage(Format(StrIniDefinition, [HrIniData]))
@@ -1206,14 +1303,16 @@ end;
 initialization
 
 begin
-  ETdirectCmd := TStringList.Create;
+  ETdirectCmdList := TStringList.Create;
+  PredefinedTagList := TStringList.Create;
   ParmIniPath := GetParmIniPath;
 end;
 
 finalization
 
 begin
-  ETdirectCmd.Free;
+  ETdirectCmdList.Free;
+  PredefinedTagList.Free;
 end;
 
 end.

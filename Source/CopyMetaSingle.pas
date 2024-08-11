@@ -21,7 +21,7 @@ type
     SpbAdd: TSpeedButton;
     SpbDel: TSpeedButton;
     SpbEdit: TSpeedButton;
-    SpbReset: TSpeedButton;
+    SpbPredefined: TSpeedButton;
     LvTagNames: TListView;
     BtnPreview: TButton;
     ImageCollection: TImageCollection;
@@ -34,9 +34,9 @@ type
     procedure SpbAddClick(Sender: TObject);
     procedure SpbDelClick(Sender: TObject);
     procedure SpbEditClick(Sender: TObject);
-    procedure SpbResetClick(Sender: TObject);
     procedure LvTagNamesItemChecked(Sender: TObject; Item: TListItem);
     procedure LvTagNamesEdited(Sender: TObject; Item: TListItem; var S: string);
+    procedure SpbPredefinedClick(Sender: TObject);
   private
     { Private declarations }
     SrcFile: string;
@@ -58,7 +58,7 @@ var
 implementation
 
 uses
-  Main, ExifTool, UnitLangResources, ExifToolsGUI_Utils, LogWin, UFrmTagNames, MainDef,
+  Main, ExifTool, UnitLangResources, ExifToolsGUI_Utils, LogWin, UFrmTagNames, UFrmPredefinedTags, MainDef,
   VCL.Themes;
 
 {$R *.dfm}
@@ -103,13 +103,6 @@ begin
   end;
 end;
 
-procedure TFCopyMetaSingle.SpbResetClick(Sender: TObject);
-begin
-  CopySingleTagList := DefCopySingleTags;
-  SelCopySingleTagList := '';
-  SetupListView;
-end;
-
 procedure TFCopyMetaSingle.SpbDelClick(Sender: TObject);
 begin
   if (LvTagNames.Selected <> nil) then
@@ -123,6 +116,20 @@ begin
     BtnExecute.Default := false;
     LvTagNames.Selected.Checked := false;
     LvTagNames.Selected.EditCaption;
+  end;
+end;
+
+procedure TFCopyMetaSingle.SpbPredefinedClick(Sender: TObject);
+begin
+  GetTagNames;
+
+  FrmPredefinedTags.Caller := TIniTagsData.idtCopySingleTags;
+  FrmPredefinedTags.CallerTags := CopySingleTagList;
+  if (FrmPredefinedTags.ShowModal = IDOK) then
+  begin
+    CopySingleTagList := FrmPredefinedTags.CallerTags;
+    SelCopySingleTagList := '';
+    SetupListView;
   end;
 end;
 
