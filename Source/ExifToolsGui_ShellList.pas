@@ -326,8 +326,7 @@ var
   DetailsNeeded: boolean;
   CustomSortNeeded: boolean;
 begin
-  if (ViewStyle = vsReport) and
-     (FColumnSorted) then
+  if (FColumnSorted) then
   begin
     if (SortColumn < Columns.Count) then
       SetListHeaderSortState(Self, Columns[SortColumn], FSortState);
@@ -818,6 +817,11 @@ begin
     // Allow starting exiftool
     if (Assigned(FOnPathChange)) then
       FOnPathChange(Self);
+
+    // Sort may not be needed for files, but the directories need to go first.
+    FSortColumn := 0;
+    SortState := THeaderSortState.hssNone;
+    ColumnSort;
 
     // Get Thumbnails and load in imagelist.
 
