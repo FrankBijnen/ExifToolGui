@@ -755,7 +755,7 @@ object FMain: TFMain
         object EditETdirect: TLabeledEdit
           Left = 1
           Top = 50
-          Width = 327
+          Width = 323
           Height = 23
           Hint = 
             'Spaces in data require double quotes, double quotes in data requ' +
@@ -778,7 +778,7 @@ object FMain: TFMain
           Text = ''
           OnChange = EditETdirectChange
           OnKeyDown = EditETdirectKeyDown
-          ExplicitWidth = 323
+          ExplicitWidth = 319
         end
         object CBoxETdirect: TComboBox
           Left = 1
@@ -1081,14 +1081,14 @@ object FMain: TFMain
               item
                 Items = <
                   item
-                    Action = MaMarkedLoad
+                    Action = MaPredefinedLoad
                     Caption = '&Load..'
                   end
                   item
-                    Action = MaMarkedSave
+                    Action = MaPredefinedSave
                     Caption = '&Save...'
                   end>
-                Caption = '&Marked tags definition file'
+                Caption = 'P&redefined tags definition file'
                 UsageCount = 1
               end
               item
@@ -1612,15 +1612,15 @@ object FMain: TFMain
       Caption = 'Save...'
       OnExecute = MaCustomViewSaveExecute
     end
-    object MaMarkedLoad: TAction
-      Category = 'Program_Marked'
+    object MaPredefinedLoad: TAction
+      Category = 'Program_Predefined'
       Caption = 'Load..'
-      OnExecute = MaMarkedLoadExecute
+      OnExecute = MaPredefinedLoadExecute
     end
-    object MaMarkedSave: TAction
-      Category = 'Program_Marked'
+    object MaPredefinedSave: TAction
+      Category = 'Program_Predefined'
       Caption = 'Save...'
-      OnExecute = MaMarkedSaveExecute
+      OnExecute = MaPredefinedSaveExecute
     end
   end
   object QuickPopUpMenu: TPopupMenu

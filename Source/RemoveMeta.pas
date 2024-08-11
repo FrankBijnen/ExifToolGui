@@ -22,9 +22,9 @@ type
     SpbAdd: TSpeedButton;
     SpbDel: TSpeedButton;
     SpbEdit: TSpeedButton;
-    SpbReset: TSpeedButton;
     ImageCollection: TImageCollection;
     VirtualImageList: TVirtualImageList;
+    SpbPredefined: TSpeedButton;
     procedure FormShow(Sender: TObject);
 
     procedure BtnExecuteClick(Sender: TObject);
@@ -34,9 +34,9 @@ type
     procedure SpbAddClick(Sender: TObject);
     procedure SpbDelClick(Sender: TObject);
     procedure SpbEditClick(Sender: TObject);
-    procedure SpbResetClick(Sender: TObject);
     procedure LvTagNamesItemChecked(Sender: TObject; Item: TListItem);
     procedure LvTagNamesEdited(Sender: TObject; Item: TListItem; var S: string);
+    procedure SpbPredefinedClick(Sender: TObject);
   private
     { Private declarations }
     FSample: string;
@@ -58,7 +58,7 @@ var
 implementation
 
 uses
-  Main, MainDef, ExifToolsGUI_Utils, ExifTool, LogWin, UFrmTagNames, UnitLangResources,
+  Main, MainDef, ExifToolsGUI_Utils, ExifTool, LogWin, UFrmTagNames, UFrmPredefinedTags, UnitLangResources,
   Vcl.Themes;
 
 {$R *.dfm}
@@ -103,13 +103,6 @@ begin
   end;
 end;
 
-procedure TFRemoveMeta.SpbResetClick(Sender: TObject);
-begin
-  RemoveTagList := DefRemoveTags;
-  SelRemoveTagList := '';
-  SetupListView;
-end;
-
 procedure TFRemoveMeta.SpbDelClick(Sender: TObject);
 begin
   if (LvTagNames.Selected <> nil) then
@@ -123,6 +116,20 @@ begin
     BtnExecute.Default := false;
     LvTagNames.Selected.Checked := false;
     LvTagNames.Selected.EditCaption;
+  end;
+end;
+
+procedure TFRemoveMeta.SpbPredefinedClick(Sender: TObject);
+begin
+  GetTagNames;
+
+  FrmPredefinedTags.Caller := TIniTagsData.idtRemoveTags;
+  FrmPredefinedTags.CallerTags := RemoveTagList;
+  if (FrmPredefinedTags.ShowModal = IDOK) then
+  begin
+    RemoveTagList := FrmPredefinedTags.CallerTags;
+    SelRemoveTagList := '';
+    SetupListView;
   end;
 end;
 

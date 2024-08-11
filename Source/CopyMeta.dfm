@@ -94,34 +94,34 @@ object FCopyMetadata: TFCopyMetadata
       object SpbAdd: TSpeedButton
         Left = 2
         Top = 2
-        Width = 70
+        Width = 80
         Height = 22
         Caption = 'Add'
         OnClick = SpbAddClick
       end
       object SpbDel: TSpeedButton
-        Left = 68
+        Left = 90
         Top = 2
-        Width = 70
+        Width = 80
         Height = 22
         Caption = 'Del'
         OnClick = SpbDelClick
       end
       object SpbEdit: TSpeedButton
-        Left = 134
+        Left = 179
         Top = 2
-        Width = 70
+        Width = 80
         Height = 22
         Caption = 'Edit'
         OnClick = SpbEditClick
       end
-      object SpbReset: TSpeedButton
-        Left = 200
+      object SpbPredefined: TSpeedButton
+        Left = 268
         Top = 2
-        Width = 70
+        Width = 80
         Height = 22
-        Caption = 'Reset'
-        OnClick = SpbResetClick
+        Caption = 'Predefined'
+        OnClick = SpbPredefinedClick
       end
     end
   end
