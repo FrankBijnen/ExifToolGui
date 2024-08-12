@@ -20,13 +20,13 @@ object FrmPredefinedTags: TFrmPredefinedTags
     Height = 29
     Align = alBottom
     TabOrder = 2
-    ExplicitTop = 288
-    ExplicitWidth = 556
+    ExplicitTop = 303
+    ExplicitWidth = 748
     DesignSize = (
       752
       29)
     object BtnOk: TBitBtn
-      Left = 549
+      Left = 545
       Top = 3
       Width = 85
       Height = 25
@@ -53,10 +53,10 @@ object FrmPredefinedTags: TFrmPredefinedTags
       ModalResult = 1
       NumGlyphs = 2
       TabOrder = 0
-      ExplicitLeft = 353
+      ExplicitLeft = 541
     end
     object BtnCancel: TBitBtn
-      Left = 640
+      Left = 636
       Top = 3
       Width = 85
       Height = 25
@@ -83,7 +83,7 @@ object FrmPredefinedTags: TFrmPredefinedTags
       ModalResult = 2
       NumGlyphs = 2
       TabOrder = 1
-      ExplicitLeft = 444
+      ExplicitLeft = 632
     end
   end
   object PnlButtons: TPanel
@@ -93,28 +93,29 @@ object FrmPredefinedTags: TFrmPredefinedTags
     Height = 32
     Align = alTop
     TabOrder = 0
+    ExplicitWidth = 748
     object BtnAdd: TButton
       Left = 8
       Top = 2
-      Width = 75
+      Width = 100
       Height = 25
       Caption = 'Add'
       TabOrder = 0
       OnClick = BtnAddClick
     end
     object BtnDelete: TButton
-      Left = 89
+      Left = 117
       Top = 2
-      Width = 75
+      Width = 100
       Height = 25
       Caption = 'Delete'
       TabOrder = 1
       OnClick = BtnDeleteClick
     end
     object BtnDefaults: TButton
-      Left = 170
+      Left = 227
       Top = 2
-      Width = 75
+      Width = 100
       Height = 25
       Caption = 'Defaults'
       TabOrder = 2
@@ -129,9 +130,8 @@ object FrmPredefinedTags: TFrmPredefinedTags
     Align = alClient
     KeyOptions = [keyEdit, keyUnique]
     TabOrder = 1
-    ExplicitTop = 41
-    ExplicitWidth = 744
-    ExplicitHeight = 239
+    ExplicitWidth = 748
+    ExplicitHeight = 271
     ColWidths = (
       150
       596)
