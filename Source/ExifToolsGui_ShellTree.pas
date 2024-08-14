@@ -176,7 +176,11 @@ function TShellTreeView.NodeFromPath(const APath: string): TTreeNode;
 var
   APidl: PItemIDList;
 begin
+  result := nil;
   APidl := GetPidlFromName(APath);
+  if not Assigned(APidl) then
+    exit;
+
   try
     result := NodeFromAbsoluteID(Items[0], APidl);
   finally
