@@ -210,17 +210,20 @@ begin
   end;
 end;
 
+// Caller should check
 function GetPidlFromName(const Name: string): PItemIDList;
 begin
   Result := ILCreateFromPath(PChar(Name));
-  if not Assigned(Result) then
-    RaiseLastOSError;
 end;
 
 function GetThumbCache(APath: string; var hBmp: HBITMAP; Flags: TSIIGBF; AMaxX: longint; AMaxY: longint): HRESULT;
 var APidl: PItemIDList;
 begin
+  result := S_FALSE;
   APidl := GetPidlFromName(APath);
+  if not Assigned(APidl) then
+    exit;
+
   try
     result := GetThumbCache(APidl, hBmp, Flags, AMaxX, AMaxY);
   finally
