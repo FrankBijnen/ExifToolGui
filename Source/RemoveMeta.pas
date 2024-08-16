@@ -210,7 +210,8 @@ end;
 
 procedure TFRemoveMeta.FormResize(Sender: TObject);
 begin
-  LvTagNames.Columns[0].Width := LvTagNames.ClientWidth;
+  if LvTagNames.HandleAllocated then
+    LvTagNames.Columns[0].Width := LvTagNames.ClientWidth;
 end;
 
 procedure TFRemoveMeta.FormShow(Sender: TObject);

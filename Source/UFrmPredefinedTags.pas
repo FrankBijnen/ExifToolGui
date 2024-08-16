@@ -9,7 +9,10 @@ uses
   ExifToolsGui_ValEdit, MainDef, System.ImageList, Vcl.ImgList, Vcl.VirtualImageList, Vcl.BaseImageCollection, Vcl.ImageCollection,
   Vcl.ComCtrls;
 
-const UnNamed = 'UnNamed';
+const
+  UnNamed = 'UnNamed';
+  WM_CellSelected = WM_USER + 1;
+
 type
 
   TFrmPredefinedTags = class(TScaleForm)
@@ -30,6 +33,7 @@ type
     SpbDelTag: TSpeedButton;
     SpbEditTag: TSpeedButton;
     SpbEditPred: TSpeedButton;
+    SpbDuplicate: TSpeedButton;
     procedure FormShow(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure SpbAddPredClick(Sender: TObject);
@@ -45,6 +49,8 @@ type
     procedure SGPredefinedTagsDrawCell(Sender: TObject; ACol, ARow: Integer; Rect: TRect; State: TGridDrawState);
     procedure SpbEditPredClick(Sender: TObject);
     procedure SGPredefinedTagsDblClick(Sender: TObject);
+    procedure SpbDuplicateClick(Sender: TObject);
+    procedure SGPredefinedTagsExit(Sender: TObject);
   private
     { Private declarations }
     Sample: string;
@@ -52,9 +58,12 @@ type
     SelectedPredefined: string;
     function GetLVTagNames: string;
     procedure GetTagNames;
-    procedure SetupStringGrid;
+    procedure SetupStringGrid(Position: boolean = false);
     procedure SetupListView(ARow: integer);
     procedure SetEdit(EditMode: boolean);
+    procedure AddPredefined(NewName, FromTags: string);
+  protected
+    procedure WndProc(var Message: TMessage); override;
   public
     { Public declarations }
     function GetSelectedPredefined: string;
@@ -67,7 +76,7 @@ var
 implementation
 
 uses
-  Vcl.Themes, ExifToolsGUI_Utils, UnitLangResources, UFrmTagNames;
+  Vcl.Themes, ExifToolsGUI_Utils, UFrmTagNames, UnitLangResources, Main;
 
 var FStyleServices: TCustomStyleServices;
 
@@ -78,18 +87,12 @@ var
   NewOptions: TGridOptions;
 begin
   NewOptions := SGPredefinedTags.Options;
+
   if (EditMode) then
-  begin
-    Include(NewOptions, goEditing);
-    Include(NewOptions, goAlwaysShowEditor);
-    Exclude(NewOptions, goRowSelect);
-  end
+    Include(NewOptions, goAlwaysShowEditor)
   else
-  begin
-    Exclude(NewOptions, goEditing);
     Exclude(NewOptions, goAlwaysShowEditor);
-    Include(NewOptions, goRowSelect);
-  end;
+
   SGPredefinedTags.Options := NewOptions;
 end;
 
@@ -111,7 +114,7 @@ begin
     PredefinedTagList.AddPair(SGPredefinedTags.Cells[0, Indx], SGPredefinedTags.Cells[1, Indx]);
 end;
 
-procedure TFrmPredefinedTags.SetupStringGrid;
+procedure TFrmPredefinedTags.SetupStringGrid(Position: boolean = false);
 var
   Indx: integer;
 begin
@@ -120,6 +123,7 @@ begin
   if (PredefinedTagList.Count = 0) then
   begin
     SGPredefinedTags.RowCount := 2;
+    SGPredefinedTags.Row := 1;
     SGPredefinedTags.Cells[0, 1] := UnNamed;
     SGPredefinedTags.Cells[1, 1] := '';
     LvTagNames.Items.Clear;
@@ -130,9 +134,11 @@ begin
     for Indx := SGPredefinedTags.FixedRows to PredefinedTagList.Count do
     begin
       SGPredefinedTags.Cells[0, Indx] := PredefinedTagList.KeyNames[Indx -1];
-      if (SGPredefinedTags.Cells[0, Indx] = SelectedPredefined) then
-        SGPredefinedTags.Row := Indx;
       SGPredefinedTags.Cells[1, Indx] := PredefinedTagList.ValueFromIndex[Indx -1];
+
+      if (Position) and
+         (SGPredefinedTags.Cells[0, Indx] = SelectedPredefined) then
+        SGPredefinedTags.Row := Indx;
     end;
     SGPredefinedTags.SetFocus;
     SetupListView(SGPredefinedTags.Row);
@@ -161,18 +167,39 @@ begin
   end;
 end;
 
-procedure TFrmPredefinedTags.SpbAddPredClick(Sender: TObject);
+procedure TFrmPredefinedTags.AddPredefined(NewName, FromTags: string);
+
+  function UnusedName(BaseName: string): string;
+  var
+    SubNum: integer;
+    Used: boolean;
+  begin
+    Used := true;
+    SubNum := 0;
+    while Used do
+    begin
+      Inc(SubNum);
+      result := BaseName + '_' + IntToStr(SubNum);
+      Used := (PredefinedTagList.IndexOfName(result) >= 0);
+    end;
+  end;
+
 begin
   SGPredefinedTags.RowCount := SGPredefinedTags.RowCount +1;
   SGPredefinedTags.Col := 0;
   SGPredefinedTags.Row := SGPredefinedTags.RowCount -1;
-  SGPredefinedTags.Cells[0, SGPredefinedTags.Row] := UnNamed;
-  SGPredefinedTags.Cells[1, SGPredefinedTags.Row] := '';
+  SGPredefinedTags.Cells[0, SGPredefinedTags.Row] := UnusedName(NewName);
+  SGPredefinedTags.Cells[1, SGPredefinedTags.Row] := FromTags;
+
   SetupListView(SGPredefinedTags.Row);
   SetEdit(true);
   SGPredefinedTags.SetFocus;
+  GetTagNames;
+end;
 
-  SGPredefinedTags.SetFocus;
+procedure TFrmPredefinedTags.SpbAddPredClick(Sender: TObject);
+begin
+  AddPredefined(UnNamed, '');
 end;
 
 procedure TFrmPredefinedTags.SpbDelPredClick(Sender: TObject);
@@ -183,6 +210,7 @@ begin
     PredefinedTagList.Delete(SGPredefinedTags.Row -1);
     SetupStringGrid;
     SetupListView(SGPredefinedTags.Row);
+    GetTagNames;
   end;
 end;
 
@@ -192,12 +220,20 @@ begin
   SGPredefinedTags.SetFocus;
 end;
 
+procedure TFrmPredefinedTags.SpbDuplicateClick(Sender: TObject);
+begin
+  AddPredefined(SGPredefinedTags.Cells[0, SGPredefinedTags.Row], SGPredefinedTags.Cells[1, SGPredefinedTags.Row]);
+end;
+
 procedure TFrmPredefinedTags.SpbDefaultsClick(Sender: TObject);
 begin
+  if (MessageDlgEx(StrDeleteCustom, '', TMsgDlgType.mtConfirmation, [TMsgDlgBtn.mbOK, TMsgDlgBtn.mbCancel]) = IdCancel) then
+    exit;
+
   PredefinedTagList.Clear;
-  PredefinedTagList.AddPair(StrDefRemoveTagsName, DefRemoveTags);
-  PredefinedTagList.AddPair(StrDefCopySingleTagsName, DefCopySingleTags);
-  PredefinedTagList.AddPair(StrDefExcludeCopyTagsName, DefExcludeCopyTags);
+  PredefinedTagList.AddPair(Fmain.MaRemoveMeta.Caption, DefRemoveTags);
+  PredefinedTagList.AddPair(Fmain.MaImportMetaSingle.Caption, DefCopySingleTags);
+  PredefinedTagList.AddPair(Fmain.MaImportMetaSelected.Caption, DefExcludeCopyTags);
 
   SetupStringGrid;
 
@@ -229,11 +265,15 @@ begin
     SGPredefinedTags.Canvas.Brush.Color := FStyleServices.GetSystemColor(clWindow);
 end;
 
-procedure TFrmPredefinedTags.SGPredefinedTagsSelectCell(Sender: TObject; ACol, ARow: Integer; var CanSelect: Boolean);
+procedure TFrmPredefinedTags.SGPredefinedTagsExit(Sender: TObject);
 begin
   SetEdit(false);
+end;
 
+procedure TFrmPredefinedTags.SGPredefinedTagsSelectCell(Sender: TObject; ACol, ARow: Integer; var CanSelect: Boolean);
+begin
   SetupListView(ARow);
+  PostMessage(Self.Handle, WM_CellSelected, 0, 0);
 end;
 
 procedure TFrmPredefinedTags.LvTagNamesCustomDrawItem(Sender: TCustomListView; Item: TListItem; State: TCustomDrawState;
@@ -299,9 +339,13 @@ end;
 
 procedure TFrmPredefinedTags.FormResize(Sender: TObject);
 begin
-  SGPredefinedTags.ColWidths[0] := SGPredefinedTags.ClientWidth;
-  SGPredefinedTags.ColWidths[1] := 0; // Hide column with Tag names
-  LvTagNames.Columns[0].Width := LvTagNames.ClientWidth;
+  if SGPredefinedTags.HandleAllocated then
+  begin
+    SGPredefinedTags.ColWidths[0] := SGPredefinedTags.ClientWidth;
+    SGPredefinedTags.ColWidths[1] := 0; // Hide column with Tag names
+  end;
+  if LvTagNames.HandleAllocated then
+    LvTagNames.Columns[0].Width := LvTagNames.ClientWidth;
 end;
 
 procedure TFrmPredefinedTags.FormShow(Sender: TObject);
@@ -310,7 +354,8 @@ begin
   if (PredefinedTagList.Count = 0) then
     SpbDefaultsClick(Sender)
   else
-    SetupStringGrid;
+    SetupStringGrid(true);
+  SetEdit(false);
 end;
 
 procedure TFrmPredefinedTags.PrepareShow(ASource: string; ACaller: TIniTagsData; ACallerPredefined: string);
@@ -324,6 +369,17 @@ function TFrmPredefinedTags.GetSelectedPredefined: string;
 begin
   result := SelectedPredefined;
 end;
+
+procedure TFrmPredefinedTags.WndProc(var Message: TMessage);
+begin
+  case Message.Msg of
+    WM_CellSelected:
+      SetEdit(false);
+  end;
+
+  inherited;
+end;
+
 
 end.
 

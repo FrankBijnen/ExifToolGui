@@ -466,7 +466,7 @@ begin
   result := Length(Trim(ExcludeCopyTagList));
   if (result = 0) then
   begin
-    ExcludeCopyTagListName := StrDefExcludeCopyTagsName;
+    ExcludeCopyTagListName := Fmain.MaImportMetaSelected.Caption;
     ExcludeCopyTagList := DefExcludeCopyTags;
   end;
 
@@ -481,7 +481,7 @@ begin
   result := Length(Trim(RemoveTagList));
   if (result = 0) then
   begin
-    RemoveTagListName := StrDefRemoveTagsName;
+    RemoveTagListName := Fmain.MaRemoveMeta.Caption;
     RemoveTagList := DefRemoveTags;
   end;
 
@@ -496,7 +496,7 @@ begin
   result := Length(Trim(CopySingleTagList));
   if (result = 0) then
   begin
-    CopySingleTagListName := StrDefCopySingleTagsName;
+    CopySingleTagListName := Fmain.MaImportMetaSingle.Caption;
     CopySingleTagList := DefCopySingleTags;
   end;
 
