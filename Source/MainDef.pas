@@ -7,20 +7,7 @@ uses System.Classes, Vcl.Dialogs, ExifTool, GEOMap, UnitLangResources;
 const
   SHOWALL = 'Show All Files';
 
-  DefExcludeCopyTags =
-    'exif:ExifImageWidth ' +
-    'exif:ExifImageHeight ' +
-    'exif:Orientation ' +
-    'exif:Xresolution ' +
-    'exif:Yresolution ' +
-    'exif:ResolutionUnit ' +
-    'exif:ColorSpace ' +
-    'exif:InteropIndex ' +
-    'Makernotes:All ' +
-    'Xmp-photoshop:All ' +
-    'Xmp-crs:All ' +
-    'Xmp-exif:All ';
-
+  DefRemoveTagsName = 'Remove Metadata';
   DefRemoveTags =
     'Exif:All ' +
     'Makernotes:All ' +
@@ -39,6 +26,7 @@ const
     'Jfif:All ' +
     'ICC_profile:All ';
 
+  DefCopySingleTagsName =  'Copy MetaData From Single';
   DefCopySingleTags =
     'Exif:all ' +
     '-Makernotes:All ' +
@@ -47,6 +35,21 @@ const
     'IPTC:All ' +
     'ICC_Profile:All ' +
     'Gps:All ';
+
+  DefExcludeCopyTagsName = 'Copy MetaData From Jpg or Tiff';
+  DefExcludeCopyTags =
+    'exif:ExifImageWidth ' +
+    'exif:ExifImageHeight ' +
+    'exif:Orientation ' +
+    'exif:Xresolution ' +
+    'exif:Yresolution ' +
+    'exif:ResolutionUnit ' +
+    'exif:ColorSpace ' +
+    'exif:InteropIndex ' +
+    'Makernotes:All ' +
+    'Xmp-photoshop:All ' +
+    'Xmp-crs:All ' +
+    'Xmp-exif:All ';
 
 type
   TIniTagsData = (idtWorkSpace, idtETDirect, idtUserDefined, idtCustomView, idtPredefinedTags,
@@ -146,9 +149,16 @@ var
   ParmIniPath: string = '';
   DontSaveIni: boolean;
   PredefinedTagList: TStringList;
+
+  ExcludeCopyTagListName: string;
   ExcludeCopyTagList: string;
+
+  RemoveTagListName: string;
   RemoveTagList: string;
+
+  CopySingleTagListName: string;
   CopySingleTagList: string;
+
   SelExcludeCopyTagList: string;
   SelRemoveTagList: string;
   SelCopySingleTagList: string;
@@ -453,33 +463,45 @@ end;
 
 function ReadCopyTags(GUIini: TMemIniFile): integer;
 begin
-  ExcludeCopyTagList := ReplaceLastChar(GUIini.ReadString(TagList, ExcludeCopyTags, '<'), '<', ' ');
-  result := Length(Trim(ExcludeCopyTagList));
+  ExcludeCopyTagListName := GUIini.ReadString(TagList, ExcludeCopyTags, '');
 
-  if (ExcludeCopyTagList = ' ') then
+  ExcludeCopyTagList := PredefinedTagList.Values[ExcludeCopyTagListName];
+  result := Length(Trim(ExcludeCopyTagList));
+  if (result = 0) then
+  begin
+    ExcludeCopyTagListName := DefExcludeCopyTagsName;
     ExcludeCopyTagList := DefExcludeCopyTags;
+  end;
 
   SelExcludeCopyTagList := ReplaceLastChar(GUIini.ReadString(TagList, SelExcludeCopyTags, '<'), '<', ' ');
 end;
 
 function ReadRemoveTags(GUIini: TMemIniFile): integer;
 begin
-  RemoveTagList := ReplaceLastChar(GUIini.ReadString(TagList, RemoveTags, '<'), '<', ' ');
-  result := Length(Trim(ExcludeCopyTagList));
+  RemoveTagListName := GUIini.ReadString(TagList, RemoveTags, '');
 
-  if (RemoveTagList = ' ') then
+  RemoveTagList := PredefinedTagList.Values[RemoveTagListName];
+  result := Length(Trim(RemoveTagList));
+  if (result = 0) then
+  begin
+    RemoveTagListName := DefRemoveTagsName;
     RemoveTagList := DefRemoveTags;
+  end;
 
   SelRemoveTagList := ReplaceLastChar(GUIini.ReadString(TagList, SelRemoveTags, '<'), '<', ' ');
 end;
 
 function ReadCopySingleTags(GUIini: TMemIniFile): integer;
 begin
-  CopySingleTagList := ReplaceLastChar(GUIini.ReadString(TagList, CopySingleTags, '<'), '<', ' ');
-  result := Length(Trim(CopySingleTagList));
+  CopySingleTagListName := GUIini.ReadString(TagList, CopySingleTags, '');
 
-  if (CopySingleTagList = ' ') then
+  CopySingleTagList := PredefinedTagList.Values[CopySingleTagListName];
+  result := Length(Trim(CopySingleTagList));
+  if (result = 0) then
+  begin
+    CopySingleTagListName := DefCopySingleTagsName;
     CopySingleTagList := DefCopySingleTags;
+  end;
 
   SelCopySingleTagList := ReplaceLastChar(GUIini.ReadString(TagList, SelCopySingleTags, '<'), '<', ' ');
 end;
@@ -607,19 +629,19 @@ end;
 
 procedure WriteCopyTags(GUIini: TMemIniFile);
 begin
-  WriteTagList(GUIini, ExcludeCopyTags, ExcludeCopyTagList);
+  GUIini.WriteString(TagList, ExcludeCopyTags, ExcludeCopyTagListName);
   WriteTagList(GUIini, SelExcludeCopyTags, SelExcludeCopyTagList);
 end;
 
 procedure WriteRemoveTags(GUIini: TMemIniFile);
 begin
-  WriteTagList(GUIini, RemoveTags, RemoveTagList);
+  GUIini.WriteString(TagList, RemoveTags, RemoveTagListName);
   WriteTagList(GUIini, SelRemoveTags, SelRemoveTagList);
 end;
 
 procedure WriteCopySingleTags(GUIini: TMemIniFile);
 begin
-  WriteTagList(GUIini, CopySingleTags, CopySingleTagList);
+  GUIini.WriteString(TagList, CopySingleTags, CopySingleTagListName);
   WriteTagList(GUIini, SelCopySingleTags, SelCopySingleTagList);
 end;
 

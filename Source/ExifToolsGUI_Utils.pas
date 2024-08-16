@@ -1013,6 +1013,7 @@ begin
     begin
       ETCmd := '-listw' + CRLF + '-' + Groupname + ':All';
       ET_OpenExec(ETcmd, '', ETResult);
+      CmbTags.Items.Add('All');
       for Indx := 1 to ETResult.Count -1 do
       begin
         AGroupLine := ETResult[Indx];
