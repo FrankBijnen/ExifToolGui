@@ -3,8 +3,8 @@ object FRemoveMeta: TFRemoveMeta
   Top = 0
   BorderStyle = bsDialog
   Caption = 'Remove metadata'
-  ClientHeight = 366
-  ClientWidth = 466
+  ClientHeight = 365
+  ClientWidth = 462
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -23,19 +23,17 @@ object FRemoveMeta: TFRemoveMeta
   end
   object StatusBar1: TStatusBar
     Left = 0
-    Top = 347
-    Width = 466
+    Top = 346
+    Width = 462
     Height = 19
     Panels = <>
     SimplePanel = True
-    ExplicitTop = 346
-    ExplicitWidth = 462
   end
   object AdvPanel1: TPanel
     Left = 0
     Top = 0
     Width = 380
-    Height = 347
+    Height = 346
     Align = alLeft
     DoubleBuffered = True
     Font.Charset = DEFAULT_CHARSET
@@ -46,7 +44,6 @@ object FRemoveMeta: TFRemoveMeta
     ParentDoubleBuffered = False
     ParentFont = False
     TabOrder = 0
-    ExplicitHeight = 346
     object ChkRemoveAll: TCheckBox
       Left = 16
       Top = 16

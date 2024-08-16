@@ -11,7 +11,6 @@ uses
 
 const
   UnNamed = 'UnNamed';
-  WM_CellSelected = WM_USER + 1;
 
 type
 
@@ -51,19 +50,19 @@ type
     procedure SGPredefinedTagsDblClick(Sender: TObject);
     procedure SpbDuplicateClick(Sender: TObject);
     procedure SGPredefinedTagsExit(Sender: TObject);
+    procedure LvTagNamesItemChecked(Sender: TObject; Item: TListItem);
   private
     { Private declarations }
     Sample: string;
     Caller: TIniTagsData;
     SelectedPredefined: string;
-    function GetLVTagNames: string;
+    procedure SetColumnWidths;
+    function GetLVTagNames(Checked: boolean = false): string;
     procedure GetTagNames;
     procedure SetupStringGrid(Position: boolean = false);
     procedure SetupListView(ARow: integer);
     procedure SetEdit(EditMode: boolean);
-    procedure AddPredefined(NewName, FromTags: string);
-  protected
-    procedure WndProc(var Message: TMessage); override;
+    procedure AddPredefined(NewName, FromTags, FromSelTags: string);
   public
     { Public declarations }
     function GetSelectedPredefined: string;
@@ -82,6 +81,16 @@ var FStyleServices: TCustomStyleServices;
 
 {$R *.dfm}
 
+procedure TFrmPredefinedTags.SetColumnWidths;
+begin
+  if (SGPredefinedTags.HandleAllocated) then
+  begin
+    SGPredefinedTags.ColWidths[0] := SGPredefinedTags.ClientWidth - GetSystemMetrics(SM_CXVSCROLL);
+    SGPredefinedTags.ColWidths[1] := -1; // Hide column with Tag names
+    SGPredefinedTags.ColWidths[2] := -1; // Hide column with Selected Tag names
+  end;
+end;
+
 procedure TFrmPredefinedTags.SetEdit(EditMode: boolean);
 var
   NewOptions: TGridOptions;
@@ -93,16 +102,21 @@ begin
   else
     Exclude(NewOptions, goAlwaysShowEditor);
 
+  SetColumnWidths;
   SGPredefinedTags.Options := NewOptions;
 end;
 
-function TFrmPredefinedTags.GetLVTagNames: string;
+function TFrmPredefinedTags.GetLVTagNames(Checked: boolean = false): string;
 var
   ANItem: TListItem;
 begin
   result := '';
   for ANItem in LvTagNames.Items do
+  begin
+    if (Checked = false) or
+       (ANItem.Checked) then
     result := result + ANItem.Caption + ' ';
+  end;
 end;
 
 procedure TFrmPredefinedTags.GetTagNames;
@@ -110,8 +124,12 @@ var
   Indx: integer;
 begin
   PredefinedTagList.Clear;
+  SelPredefinedTagList.Clear;
   for Indx := SGPredefinedTags.FixedRows to SGPredefinedTags.RowCount -1 do
+  begin
     PredefinedTagList.AddPair(SGPredefinedTags.Cells[0, Indx], SGPredefinedTags.Cells[1, Indx]);
+    SelPredefinedTagList.AddPair(SGPredefinedTags.Cells[0, Indx], SGPredefinedTags.Cells[2, Indx]);
+  end;
 end;
 
 procedure TFrmPredefinedTags.SetupStringGrid(Position: boolean = false);
@@ -126,6 +144,7 @@ begin
     SGPredefinedTags.Row := 1;
     SGPredefinedTags.Cells[0, 1] := UnNamed;
     SGPredefinedTags.Cells[1, 1] := '';
+    SGPredefinedTags.Cells[2, 1] := '';
     LvTagNames.Items.Clear;
   end
   else
@@ -135,7 +154,7 @@ begin
     begin
       SGPredefinedTags.Cells[0, Indx] := PredefinedTagList.KeyNames[Indx -1];
       SGPredefinedTags.Cells[1, Indx] := PredefinedTagList.ValueFromIndex[Indx -1];
-
+      SGPredefinedTags.Cells[2, Indx] := SelPredefinedTagList.Values[PredefinedTagList.KeyNames[Indx -1]];
       if (Position) and
          (SGPredefinedTags.Cells[0, Indx] = SelectedPredefined) then
         SGPredefinedTags.Row := Indx;
@@ -147,7 +166,7 @@ end;
 
 procedure TFrmPredefinedTags.SetupListView(ARow: integer);
 var
-  ATag, AllTags: string;
+  ATag, AllTags, AllSelTags: string;
   ANItem: TListItem;
 begin
   LvTagNames.Tag := 1;
@@ -155,10 +174,12 @@ begin
   try
     LvTagNames.Items.Clear;
     AllTags := SGPredefinedTags.Cells[1, ARow];
+    AllSelTags := ' ' + SGPredefinedTags.Cells[2, ARow] + ' ';
     while (AllTags <> '') do
     begin
       ATag := NextField(AllTags, ' ');
       ANItem := LvTagNames.Items.Add;
+      ANItem.Checked := (Pos(' ' + ATag + ' ', AllSelTags) > 0);
       SetTagItem(ANItem, ATag);
     end;
   finally
@@ -167,7 +188,7 @@ begin
   end;
 end;
 
-procedure TFrmPredefinedTags.AddPredefined(NewName, FromTags: string);
+procedure TFrmPredefinedTags.AddPredefined(NewName, FromTags, FromSelTags: string);
 
   function UnusedName(BaseName: string): string;
   var
@@ -187,19 +208,28 @@ procedure TFrmPredefinedTags.AddPredefined(NewName, FromTags: string);
 begin
   SGPredefinedTags.RowCount := SGPredefinedTags.RowCount +1;
   SGPredefinedTags.Col := 0;
+
+  // Setting Row in code will trigger OnSelectCell
+  // But we dont want that here, because SetEdit(false) would be called
+  // Setting Tag to 1 will prevent that
+  SGPredefinedTags.Tag := 1;
   SGPredefinedTags.Row := SGPredefinedTags.RowCount -1;
+  SetEdit(true);
+
+  // Fill Data
   SGPredefinedTags.Cells[0, SGPredefinedTags.Row] := UnusedName(NewName);
   SGPredefinedTags.Cells[1, SGPredefinedTags.Row] := FromTags;
+  SGPredefinedTags.Cells[2, SGPredefinedTags.Row] := FromSelTags;
 
   SetupListView(SGPredefinedTags.Row);
-  SetEdit(true);
   SGPredefinedTags.SetFocus;
+
   GetTagNames;
 end;
 
 procedure TFrmPredefinedTags.SpbAddPredClick(Sender: TObject);
 begin
-  AddPredefined(UnNamed, '');
+  AddPredefined(UnNamed, '', '');
 end;
 
 procedure TFrmPredefinedTags.SpbDelPredClick(Sender: TObject);
@@ -208,6 +238,7 @@ begin
   if (PredefinedTagList.Count > 0) then
   begin
     PredefinedTagList.Delete(SGPredefinedTags.Row -1);
+    SelPredefinedTagList.Delete(SGPredefinedTags.Row -1);
     SetupStringGrid;
     SetupListView(SGPredefinedTags.Row);
     GetTagNames;
@@ -222,7 +253,9 @@ end;
 
 procedure TFrmPredefinedTags.SpbDuplicateClick(Sender: TObject);
 begin
-  AddPredefined(SGPredefinedTags.Cells[0, SGPredefinedTags.Row], SGPredefinedTags.Cells[1, SGPredefinedTags.Row]);
+  AddPredefined(SGPredefinedTags.Cells[0, SGPredefinedTags.Row],
+                SGPredefinedTags.Cells[1, SGPredefinedTags.Row],
+                SGPredefinedTags.Cells[2, SGPredefinedTags.Row]);
 end;
 
 procedure TFrmPredefinedTags.SpbDefaultsClick(Sender: TObject);
@@ -231,9 +264,16 @@ begin
     exit;
 
   PredefinedTagList.Clear;
+  SelPredefinedTagList.Clear;
+
   PredefinedTagList.AddPair(Fmain.MaRemoveMeta.Caption, DefRemoveTags);
+  SelPredefinedTagList.AddPair(Fmain.MaRemoveMeta.Caption, DefRemoveTags);
+
   PredefinedTagList.AddPair(Fmain.MaImportMetaSingle.Caption, DefCopySingleTags);
+  SelPredefinedTagList.AddPair(Fmain.MaImportMetaSingle.Caption, DefCopySingleTags);
+
   PredefinedTagList.AddPair(Fmain.MaImportMetaSelected.Caption, DefExcludeCopyTags);
+  SelPredefinedTagList.AddPair(Fmain.MaImportMetaSelected.Caption, '');
 
   SetupStringGrid;
 
@@ -273,7 +313,10 @@ end;
 procedure TFrmPredefinedTags.SGPredefinedTagsSelectCell(Sender: TObject; ACol, ARow: Integer; var CanSelect: Boolean);
 begin
   SetupListView(ARow);
-  PostMessage(Self.Handle, WM_CellSelected, 0, 0);
+  if (SGPredefinedTags.Tag = 0) then
+    SetEdit(false)
+  else
+    SGPredefinedTags.Tag := 0;
 end;
 
 procedure TFrmPredefinedTags.LvTagNamesCustomDrawItem(Sender: TCustomListView; Item: TListItem; State: TCustomDrawState;
@@ -285,8 +328,20 @@ end;
 procedure TFrmPredefinedTags.LvTagNamesEdited(Sender: TObject; Item: TListItem; var S: string);
 begin
   S := RemoveInvalidTags(S, (Caller <> TIniTagsData.idtCopyTags));
+  SetTagItem(Item, S);
   SGPredefinedTags.Cells[1, SGPredefinedTags.Row] := GetLVTagNames;
   GetTagNames;
+  BtnOk.Default := true;
+end;
+
+procedure TFrmPredefinedTags.LvTagNamesItemChecked(Sender: TObject; Item: TListItem);
+begin
+  if (LvTagNames.Tag = 0) then
+  begin
+    SetTagItem(Item);
+    SGPredefinedTags.Cells[2, SGPredefinedTags.Row] := GetLVTagNames(true);
+    GetTagNames;
+  end;
 end;
 
 procedure TFrmPredefinedTags.SpbAddTagClick(Sender: TObject);
@@ -325,7 +380,10 @@ end;
 procedure TFrmPredefinedTags.SpbEditTagClick(Sender: TObject);
 begin
   if (LvTagNames.Selected <> nil) then
+  begin
     LvTagNames.Selected.EditCaption;
+    BtnOk.Default := false;
+  end;
 end;
 
 procedure TFrmPredefinedTags.FormClose(Sender: TObject; var Action: TCloseAction);
@@ -340,10 +398,8 @@ end;
 procedure TFrmPredefinedTags.FormResize(Sender: TObject);
 begin
   if SGPredefinedTags.HandleAllocated then
-  begin
-    SGPredefinedTags.ColWidths[0] := SGPredefinedTags.ClientWidth;
-    SGPredefinedTags.ColWidths[1] := 0; // Hide column with Tag names
-  end;
+    SetColumnWidths;
+
   if LvTagNames.HandleAllocated then
     LvTagNames.Columns[0].Width := LvTagNames.ClientWidth;
 end;
@@ -369,17 +425,6 @@ function TFrmPredefinedTags.GetSelectedPredefined: string;
 begin
   result := SelectedPredefined;
 end;
-
-procedure TFrmPredefinedTags.WndProc(var Message: TMessage);
-begin
-  case Message.Msg of
-    WM_CellSelected:
-      SetEdit(false);
-  end;
-
-  inherited;
-end;
-
 
 end.
 
