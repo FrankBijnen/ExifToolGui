@@ -3,7 +3,7 @@ object FrmPredefinedTags: TFrmPredefinedTags
   Top = 0
   Caption = 'Predefined Tags'
   ClientHeight = 525
-  ClientWidth = 726
+  ClientWidth = 694
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -17,7 +17,7 @@ object FrmPredefinedTags: TFrmPredefinedTags
   object Splitter1: TSplitter
     Left = 0
     Top = 209
-    Width = 726
+    Width = 694
     Height = 3
     Cursor = crVSplit
     Align = alTop
@@ -26,18 +26,18 @@ object FrmPredefinedTags: TFrmPredefinedTags
   object PnlBottom: TPanel
     Left = 0
     Top = 496
-    Width = 726
+    Width = 694
     Height = 29
     Align = alBottom
     TabOrder = 2
     ExplicitTop = 495
-    ExplicitWidth = 722
+    ExplicitWidth = 690
     DesignSize = (
-      726
+      694
       29)
     object BtnOk: TBitBtn
-      Left = 475
-      Top = 3
+      Left = 501
+      Top = 2
       Width = 85
       Height = 25
       Anchors = [akRight, akBottom]
@@ -63,11 +63,11 @@ object FrmPredefinedTags: TFrmPredefinedTags
       ModalResult = 1
       NumGlyphs = 2
       TabOrder = 0
-      ExplicitLeft = 471
+      ExplicitLeft = 497
     end
     object BtnCancel: TBitBtn
-      Left = 566
-      Top = 3
+      Left = 592
+      Top = 2
       Width = 85
       Height = 25
       Anchors = [akRight, akBottom]
@@ -93,17 +93,17 @@ object FrmPredefinedTags: TFrmPredefinedTags
       ModalResult = 2
       NumGlyphs = 2
       TabOrder = 1
-      ExplicitLeft = 562
+      ExplicitLeft = 588
     end
   end
   object PnlButtons: TPanel
     Left = 0
     Top = 0
-    Width = 726
+    Width = 694
     Height = 32
     Align = alTop
     TabOrder = 0
-    ExplicitWidth = 722
+    ExplicitWidth = 690
     object SpbAddPred: TSpeedButton
       Left = 2
       Top = 3
@@ -148,28 +148,29 @@ object FrmPredefinedTags: TFrmPredefinedTags
   object SGPredefinedTags: TStringGrid
     Left = 0
     Top = 32
-    Width = 726
+    Width = 694
     Height = 177
     Align = alTop
-    ColCount = 2
+    ColCount = 3
     FixedCols = 0
-    Options = [goFixedVertLine, goFixedHorzLine, goVertLine, goHorzLine, goDrawFocusSelected, goEditing, goFixedColDefAlign, goFixedRowDefAlign]
+    Options = [goFixedVertLine, goFixedHorzLine, goVertLine, goHorzLine, goRangeSelect, goDrawFocusSelected, goEditing, goFixedRowDefAlign]
     TabOrder = 1
     OnDblClick = SGPredefinedTagsDblClick
     OnDrawCell = SGPredefinedTagsDrawCell
     OnExit = SGPredefinedTagsExit
     OnSelectCell = SGPredefinedTagsSelectCell
-    ExplicitTop = 31
     ColWidths = (
       624
+      64
       64)
   end
   object LvTagNames: TListView
     Left = 0
     Top = 241
-    Width = 726
+    Width = 694
     Height = 255
     Align = alClient
+    Checkboxes = True
     Columns = <
       item
         Caption = 'Tag name'
@@ -182,17 +183,18 @@ object FrmPredefinedTags: TFrmPredefinedTags
     ViewStyle = vsReport
     OnCustomDrawItem = LvTagNamesCustomDrawItem
     OnEdited = LvTagNamesEdited
-    ExplicitWidth = 722
+    OnItemChecked = LvTagNamesItemChecked
+    ExplicitWidth = 690
     ExplicitHeight = 254
   end
   object PnlTags: TPanel
     Left = 0
     Top = 212
-    Width = 726
+    Width = 694
     Height = 29
     Align = alTop
     TabOrder = 4
-    ExplicitWidth = 722
+    ExplicitWidth = 690
     object SpbAddTag: TSpeedButton
       Left = 2
       Top = 2
@@ -330,8 +332,8 @@ object FrmPredefinedTags: TFrmPredefinedTags
               3B2DA8D14BD1E0765A0000000049454E44AE426082}
           end>
       end>
-    Left = 665
-    Top = 265
+    Left = 629
+    Top = 264
   end
   object VirtualImageList: TVirtualImageList
     DisabledOpacity = 127
@@ -357,7 +359,7 @@ object FrmPredefinedTags: TFrmPredefinedTags
         Name = 'LvIncludeTag'
       end>
     ImageCollection = ImageCollection
-    Left = 674
-    Top = 339
+    Left = 631
+    Top = 333
   end
 end

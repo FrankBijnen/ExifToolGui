@@ -167,7 +167,7 @@ procedure TFCopyMetadata.CmbPredefinedChange(Sender: TObject);
 begin
   ExcludeCopyTagListName := CmbPredefined.Text;
   ExcludeCopyTagList := PredefinedTagList.Values[ExcludeCopyTagListName];
-  SelExcludeCopyTagList := '';
+  SelExcludeCopyTagList := SelPredefinedTagList.Values[ExcludeCopyTagListName];;
   SetupListView;
 end;
 

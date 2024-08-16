@@ -205,7 +205,7 @@ procedure TFCopyMetaSingle.CmbPredefinedChange(Sender: TObject);
 begin
   CopySingleTagListName := CmbPredefined.Text;
   CopySingleTagList := PredefinedTagList.Values[CopySingleTagListName];
-  SelCopySingleTagList := '';
+  SelCopySingleTagList := SelPredefinedTagList.Values[CopySingleTagListName];
   SetupListView;
 end;
 

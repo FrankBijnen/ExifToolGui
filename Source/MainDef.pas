@@ -146,6 +146,7 @@ var
   ParmIniPath: string = '';
   DontSaveIni: boolean;
   PredefinedTagList: TStringList;
+  SelPredefinedTagList: TStringList;
 
   ExcludeCopyTagListName: string;
   ExcludeCopyTagList: string;
@@ -190,6 +191,7 @@ const
   TagList = 'TagList';
   CustomView = 'CustomView';
   PredefinedTags = 'PredefinedTags';
+  SelPredefinedTags = 'SelPredefinedTags';
   MarkedTags = 'MarkedTags';
   ExcludeCopyTags = 'ExcludeCopyTags';
   SelExcludeCopyTags = 'SelExcludeCopyTags';
@@ -449,6 +451,7 @@ end;
 function ReadPredefinedTags(GUIini: TMemIniFile): integer;
 begin
   GUIini.ReadSectionValues(PredefinedTags, PredefinedTagList);
+  GUIini.ReadSectionValues(SelPredefinedTags, SelPredefinedTagList);
   result := PredefinedTagList.Count;
 end;
 
@@ -466,7 +469,7 @@ begin
   result := Length(Trim(ExcludeCopyTagList));
   if (result = 0) then
   begin
-    ExcludeCopyTagListName := Fmain.MaImportMetaSelected.Caption;
+    ExcludeCopyTagListName := FMain.MaImportMetaSelected.Caption;
     ExcludeCopyTagList := DefExcludeCopyTags;
   end;
 
@@ -481,7 +484,7 @@ begin
   result := Length(Trim(RemoveTagList));
   if (result = 0) then
   begin
-    RemoveTagListName := Fmain.MaRemoveMeta.Caption;
+    RemoveTagListName := FMain.MaRemoveMeta.Caption;
     RemoveTagList := DefRemoveTags;
   end;
 
@@ -496,7 +499,7 @@ begin
   result := Length(Trim(CopySingleTagList));
   if (result = 0) then
   begin
-    CopySingleTagListName := Fmain.MaImportMetaSingle.Caption;
+    CopySingleTagListName := FMain.MaImportMetaSingle.Caption;
     CopySingleTagList := DefCopySingleTags;
   end;
 
@@ -610,9 +613,17 @@ begin
   TmpItems := TStringList.Create;
   try
     GUIini.GetStrings(TmpItems); // Get strings written so far.
+
+    // Predefined tags
     TmpItems.Add(Format('[%s]', [PredefinedTags]));
     for Indx := 0 to PredefinedTagList.Count -1 do
       TmpItems.Add(PredefinedTagList[Indx]);
+
+    // Predefined Selected tags
+    TmpItems.Add(Format('[%s]', [SelPredefinedTags]));
+    for Indx := 0 to SelPredefinedTagList.Count -1 do
+      TmpItems.Add(SelPredefinedTagList[Indx]);
+
     GUIini.SetStrings(TmpItems);
   finally
     TmpItems.Free;
@@ -1324,6 +1335,7 @@ initialization
 begin
   ETdirectCmdList := TStringList.Create;
   PredefinedTagList := TStringList.Create;
+  SelPredefinedTagList := TStringList.Create;
   ParmIniPath := GetParmIniPath;
 end;
 
@@ -1332,6 +1344,7 @@ finalization
 begin
   ETdirectCmdList.Free;
   PredefinedTagList.Free;
+  SelPredefinedTagList.Free;
 end;
 
 end.

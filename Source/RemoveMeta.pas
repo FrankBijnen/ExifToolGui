@@ -193,7 +193,7 @@ procedure TFRemoveMeta.CmbPredefinedChange(Sender: TObject);
 begin
   RemoveTagListName := CmbPredefined.Text;
   RemoveTagList := PredefinedTagList.Values[RemoveTagListName];
-  SelRemoveTagList := '';
+  SelRemoveTagList := SelPredefinedTagList.Values[RemoveTagListName];
   SetupListView;
 end;
 
