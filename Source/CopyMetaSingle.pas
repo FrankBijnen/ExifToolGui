@@ -18,30 +18,27 @@ type
     Label1: TLabel;
     ChkNoOverWrite: TCheckBox;
     PnlButtons: TPanel;
-    SpbAdd: TSpeedButton;
-    SpbDel: TSpeedButton;
-    SpbEdit: TSpeedButton;
     SpbPredefined: TSpeedButton;
     LvTagNames: TListView;
     BtnPreview: TButton;
     ImageCollection: TImageCollection;
     VirtualImageList: TVirtualImageList;
+    CmbPredefined: TComboBox;
     procedure FormShow(Sender: TObject);
     procedure BtnExecuteClick(Sender: TObject);
     procedure ChkImportAllClick(Sender: TObject);
     procedure LvTagNamesCustomDrawItem(Sender: TCustomListView; Item: TListItem; State: TCustomDrawState; var DefaultDraw: Boolean);
     procedure BtnPreviewClick(Sender: TObject);
-    procedure SpbAddClick(Sender: TObject);
-    procedure SpbDelClick(Sender: TObject);
-    procedure SpbEditClick(Sender: TObject);
     procedure LvTagNamesItemChecked(Sender: TObject; Item: TListItem);
-    procedure LvTagNamesEdited(Sender: TObject; Item: TListItem; var S: string);
     procedure SpbPredefinedClick(Sender: TObject);
+    procedure FormResize(Sender: TObject);
+    procedure CmbPredefinedChange(Sender: TObject);
   private
     { Private declarations }
     SrcFile: string;
     FShowLogWindow: boolean;
     procedure DisplayHint(Sender: TObject);
+    procedure SetupPredefined;
     procedure SetupListView;
     procedure GetSelectedTags;
     procedure GetTagNames;
@@ -58,12 +55,23 @@ var
 implementation
 
 uses
-  Main, ExifTool, UnitLangResources, ExifToolsGUI_Utils, LogWin, UFrmTagNames, UFrmPredefinedTags, MainDef,
+  Main, ExifTool, UnitLangResources, ExifToolsGUI_Utils, LogWin, UFrmPredefinedTags, MainDef,
   VCL.Themes;
 
 {$R *.dfm}
 
 var FStyleServices: TCustomStyleServices;
+
+
+procedure TFCopyMetaSingle.SetupPredefined;
+var
+  Indx: integer;
+begin
+  CmbPredefined.Items.Clear;
+  for Indx := 0 to PredefinedTagList.Count -1 do
+    CmbPredefined.Items.Add(PredefinedTagList.KeyNames[Indx]);
+  CmbPredefined.Text := CopySingleTagListName;
+end;
 
 procedure TFCopyMetaSingle.SetupListView;
 var
@@ -91,43 +99,17 @@ begin
   end;
 end;
 
-procedure TFCopyMetaSingle.SpbAddClick(Sender: TObject);
-var
-  AnItem: TlistItem;
-begin
-  FrmTagNames.SetSample(SrcFile);
-  if (FrmTagNames.ShowModal = IDOK) then
-  begin
-    AnItem := LvTagNames.Items.Add;
-    SetTagItem(AnItem, FrmTagNames.SelectedTag(true));
-  end;
-end;
-
-procedure TFCopyMetaSingle.SpbDelClick(Sender: TObject);
-begin
-  if (LvTagNames.Selected <> nil) then
-    LvTagNames.Selected.Delete;
-end;
-
-procedure TFCopyMetaSingle.SpbEditClick(Sender: TObject);
-begin
-  if (LvTagNames.Selected <> nil) then
-  begin
-    BtnExecute.Default := false;
-    LvTagNames.Selected.Checked := false;
-    LvTagNames.Selected.EditCaption;
-  end;
-end;
-
 procedure TFCopyMetaSingle.SpbPredefinedClick(Sender: TObject);
 begin
   GetTagNames;
 
-  FrmPredefinedTags.Caller := TIniTagsData.idtCopySingleTags;
-  FrmPredefinedTags.CallerTags := CopySingleTagList;
+  FrmPredefinedTags.PrepareShow(SrcFile, TIniTagsData.idtCopySingleTags, CmbPredefined.Text);
   if (FrmPredefinedTags.ShowModal = IDOK) then
   begin
-    CopySingleTagList := FrmPredefinedTags.CallerTags;
+    CopySingleTagListName := FrmPredefinedTags.GetSelectedPredefined;
+    SetupPredefined;
+    CmbPredefinedChange(CmbPredefined);
+
     SelCopySingleTagList := '';
     SetupListView;
   end;
@@ -219,13 +201,28 @@ begin
   CheckSelection;
 end;
 
+procedure TFCopyMetaSingle.CmbPredefinedChange(Sender: TObject);
+begin
+  CopySingleTagListName := CmbPredefined.Text;
+  CopySingleTagList := PredefinedTagList.Values[CopySingleTagListName];
+  SelCopySingleTagList := '';
+  SetupListView;
+end;
+
 procedure TFCopyMetaSingle.DisplayHint(Sender: TObject);
 begin
   StatusBar1.SimpleText := GetShortHint(Application.Hint);
 end;
 
+procedure TFCopyMetaSingle.FormResize(Sender: TObject);
+begin
+  LvTagNames.Columns[0].Width := LvTagNames.ClientWidth;
+end;
+
 procedure TFCopyMetaSingle.FormShow(Sender: TObject);
 begin
+  Application.OnHint := DisplayHint;
+  FStyleServices := TStyleManager.Style[GUIsettings.GuiStyle];
   Left := FMain.Left + FMain.GUIBorderWidth + FMain.AdvPageFilelist.Left;
   Top := FMain.Top + FMain.GUIBorderHeight;
 
@@ -233,8 +230,10 @@ begin
     Label1.Caption := StrBackupOFF
   else
     Label1.Caption := StrBackupON;
-  Application.OnHint := DisplayHint;
+
+  SetupPredefined;
   SetupListView;
+
   ChkImportAll.Checked := false;
   ChkImportAllClick(Sender);
   ChkNoOverWrite.Checked := false;
@@ -247,13 +246,6 @@ procedure TFCopyMetaSingle.LvTagNamesCustomDrawItem(Sender: TCustomListView; Ite
   var DefaultDraw: Boolean);
 begin
   StyledDrawListviewItem(FStyleServices, Sender, Item, State);
-end;
-
-procedure TFCopyMetaSingle.LvTagNamesEdited(Sender: TObject; Item: TListItem; var S: string);
-begin
-  S := RemoveInvalidTags(S, true);
-  SetTagItem(Item, S);
-  BtnExecute.Default := true;
 end;
 
 procedure TFCopyMetaSingle.LvTagNamesItemChecked(Sender: TObject; Item: TListItem);

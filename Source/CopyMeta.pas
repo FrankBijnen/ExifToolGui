@@ -20,22 +20,19 @@ type
     LvTagNames: TListView;
     BtnPreview: TButton;
     PnlButtons: TPanel;
-    SpbAdd: TSpeedButton;
-    SpbDel: TSpeedButton;
-    SpbEdit: TSpeedButton;
     SpbPredefined: TSpeedButton;
+    CmbPredefined: TComboBox;
     procedure FormShow(Sender: TObject);
     procedure LvTagNamesCustomDrawItem(Sender: TCustomListView; Item: TListItem; State: TCustomDrawState; var DefaultDraw: Boolean);
-    procedure SpbEditClick(Sender: TObject);
-    procedure SpbDelClick(Sender: TObject);
-    procedure SpbAddClick(Sender: TObject);
     procedure BtnPreviewClick(Sender: TObject);
-    procedure LvTagNamesEdited(Sender: TObject; Item: TListItem; var S: string);
     procedure SpbPredefinedClick(Sender: TObject);
+    procedure FormResize(Sender: TObject);
+    procedure CmbPredefinedChange(Sender: TObject);
   private
     { Private declarations }
     FSample: string;
     FShowLogWindow: boolean;
+    procedure SetupPredefined;
     procedure SetupListView;
     procedure GetSelectedTags;
     procedure GetTagNames;
@@ -52,12 +49,22 @@ var
 implementation
 
 uses
-  Main, MainDef, ExifToolsGUI_Utils, ExifTool, LogWin, UnitLangResources, UFrmTagNames, UFrmPredefinedTags,
+  Main, MainDef, ExifToolsGUI_Utils, ExifTool, LogWin, UnitLangResources, UFrmPredefinedTags,
   Vcl.Themes;
 
 {$R *.dfm}
 
 var FStyleServices: TCustomStyleServices;
+
+procedure TFCopyMetadata.SetupPredefined;
+var
+  Indx: integer;
+begin
+  CmbPredefined.Items.Clear;
+  for Indx := 0 to PredefinedTagList.Count -1 do
+    CmbPredefined.Items.Add(PredefinedTagList.KeyNames[Indx]);
+  CmbPredefined.Text := ExcludeCopyTagListName;
+end;
 
 procedure TFCopyMetadata.SetupListView;
 var
@@ -80,41 +87,20 @@ begin
   end;
 end;
 
-procedure TFCopyMetadata.SpbAddClick(Sender: TObject);
-begin
-  FrmTagNames.SetSample(FSample);
-  if (FrmTagNames.ShowModal = IDOK) then
-    LvTagNames.Items.Add.Caption := FrmTagNames.SelectedTag;
-end;
-
-procedure TFCopyMetadata.SpbEditClick(Sender: TObject);
-begin
-  if (LvTagNames.Selected <> nil) then
-  begin
-    BtnExecute.Default := false;
-    LvTagNames.Selected.Checked := false;
-    LvTagNames.Selected.EditCaption;
-  end;
-end;
-
 procedure TFCopyMetadata.SpbPredefinedClick(Sender: TObject);
 begin
   GetTagNames;
 
-  FrmPredefinedTags.Caller := TIniTagsData.idtCopyTags;
-  FrmPredefinedTags.CallerTags := ExcludeCopyTagList;
+  FrmPredefinedTags.PrepareShow(FSample, TIniTagsData.idtCopyTags, CmbPredefined.Text);
   if (FrmPredefinedTags.ShowModal = IDOK) then
   begin
-    ExcludeCopyTagList := FrmPredefinedTags.CallerTags;
+    ExcludeCopyTagListName := FrmPredefinedTags.GetSelectedPredefined;
+    SetupPredefined;
+    CmbPredefinedChange(CmbPredefined);
+
     SelExcludeCopyTagList := '';
     SetupListView;
   end;
-end;
-
-procedure TFCopyMetadata.SpbDelClick(Sender: TObject);
-begin
-  if (LvTagNames.Selected <> nil) then
-    LvTagNames.Selected.Delete;
 end;
 
 procedure TFCopyMetadata.GetTagNames;
@@ -154,23 +140,6 @@ begin
   end;
 end;
 
-procedure TFCopyMetadata.FormShow(Sender: TObject);
-begin
-  Left := FMain.Left + FMain.GUIBorderWidth + FMain.AdvPageFilelist.Left;
-  Top := FMain.Top + FMain.GUIBorderHeight;
-
-  if FMain.MaDontBackup.Checked then
-    Label1.Caption := StrBackupOFF
-  else
-    Label1.Caption := StrBackupON;
-  SetupListView;
-
-  Application.OnHint := DisplayHint;
-
-  if (FShowLogWindow) then
-    FLogWin.Show;
-end;
-
 procedure TFCopyMetadata.PrepareShow(ASample: string);
 begin
   FSample := ASample;
@@ -188,21 +157,46 @@ begin
   ET_OpenExec(ETcmd, FSample);
 end;
 
-procedure TFCopyMetadata.DisplayHint(Sender: TObject);
-begin
-  StatusBar1.SimpleText := GetShortHint(Application.Hint);
-end;
-
 procedure TFCopyMetadata.LvTagNamesCustomDrawItem(Sender: TCustomListView; Item: TListItem; State: TCustomDrawState;
   var DefaultDraw: Boolean);
 begin
   StyledDrawListviewItem(FStyleServices, Sender, Item, State);
 end;
 
-procedure TFCopyMetadata.LvTagNamesEdited(Sender: TObject; Item: TListItem; var S: string);
+procedure TFCopyMetadata.CmbPredefinedChange(Sender: TObject);
 begin
-  S := RemoveInvalidTags(S);
-  BtnExecute.Default := true;
+  ExcludeCopyTagListName := CmbPredefined.Text;
+  ExcludeCopyTagList := PredefinedTagList.Values[ExcludeCopyTagListName];
+  SelExcludeCopyTagList := '';
+  SetupListView;
+end;
+
+procedure TFCopyMetadata.FormResize(Sender: TObject);
+begin
+  LvTagNames.Columns[0].Width := LvTagNames.ClientWidth;
+end;
+
+procedure TFCopyMetadata.FormShow(Sender: TObject);
+begin
+  Application.OnHint := DisplayHint;
+  FStyleServices := TStyleManager.Style[GUIsettings.GuiStyle];
+  Left := FMain.Left + FMain.GUIBorderWidth + FMain.AdvPageFilelist.Left;
+  Top := FMain.Top + FMain.GUIBorderHeight;
+
+  if FMain.MaDontBackup.Checked then
+    Label1.Caption := StrBackupOFF
+  else
+    Label1.Caption := StrBackupON;
+  SetupPredefined;
+  SetupListView;
+
+  if (FShowLogWindow) then
+    FLogWin.Show;
+end;
+
+procedure TFCopyMetadata.DisplayHint(Sender: TObject);
+begin
+  StatusBar1.SimpleText := GetShortHint(Application.Hint);
 end;
 
 end.

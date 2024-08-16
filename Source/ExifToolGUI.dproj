@@ -232,6 +232,10 @@
             <Form>FrmTagNames</Form>
             <FormType>dfm</FormType>
         </DCCReference>
+        <DCCReference Include="UFrmPredefinedTags.pas">
+            <Form>FrmPredefinedTags</Form>
+            <FormType>dfm</FormType>
+        </DCCReference>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>

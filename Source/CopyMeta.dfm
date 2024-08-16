@@ -11,6 +11,7 @@ object FCopyMetadata: TFCopyMetadata
   Font.Height = -11
   Font.Name = 'Tahoma'
   Font.Style = []
+  OnResize = FormResize
   OnShow = FormShow
   TextHeight = 13
   object Label1: TLabel
@@ -83,7 +84,6 @@ object FCopyMetadata: TFCopyMetadata
       TabOrder = 1
       ViewStyle = vsReport
       OnCustomDrawItem = LvTagNamesCustomDrawItem
-      OnEdited = LvTagNamesEdited
     end
     object PnlButtons: TPanel
       Left = 16
@@ -91,37 +91,30 @@ object FCopyMetadata: TFCopyMetadata
       Width = 348
       Height = 25
       TabOrder = 0
-      object SpbAdd: TSpeedButton
-        Left = 2
-        Top = 3
-        Width = 95
-        Height = 22
-        Caption = 'Add'
-        OnClick = SpbAddClick
-      end
-      object SpbDel: TSpeedButton
-        Left = 84
-        Top = 3
-        Width = 95
-        Height = 22
-        Caption = 'Del'
-        OnClick = SpbDelClick
-      end
-      object SpbEdit: TSpeedButton
-        Left = 167
-        Top = 3
-        Width = 95
-        Height = 22
-        Caption = 'Edit'
-        OnClick = SpbEditClick
-      end
       object SpbPredefined: TSpeedButton
-        Left = 250
-        Top = 3
+        Left = 252
+        Top = 1
         Width = 95
-        Height = 22
+        Height = 23
+        Align = alRight
         Caption = 'Predefined'
         OnClick = SpbPredefinedClick
+        ExplicitLeft = 250
+        ExplicitTop = 3
+        ExplicitHeight = 22
+      end
+      object CmbPredefined: TComboBox
+        Left = 1
+        Top = 1
+        Width = 251
+        Height = 22
+        Align = alClient
+        TabOrder = 0
+        Text = 'CmbPredefined'
+        OnChange = CmbPredefinedChange
+        ExplicitLeft = 12
+        ExplicitTop = 14
+        ExplicitWidth = 145
       end
     end
   end

@@ -65,7 +65,8 @@ uses
   UFrmAbout in 'UFrmAbout.pas' {FrmAbout},
   UFrmGenerate in 'UFrmGenerate.pas' {FrmGenerate},
   UFrmCheckVersions in 'UFrmCheckVersions.pas' {FrmCheckVersions},
-  UFrmTagNames in 'UFrmTagNames.pas' {FrmTagNames};
+  UFrmTagNames in 'UFrmTagNames.pas' {FrmTagNames},
+  UFrmPredefinedTags in 'UFrmPredefinedTags.pas' {FrmPredefinedTags};
 
 {$R *.res}
 
@@ -114,5 +115,6 @@ begin
   Application.CreateForm(TFGeotagFiles, FGeotagFiles);
   Application.CreateForm(TFGeoSetup, FGeoSetup);
   Application.CreateForm(TFrmTagNames, FrmTagNames);
+  Application.CreateForm(TFrmPredefinedTags, FrmPredefinedTags);
   Application.Run;
 end.

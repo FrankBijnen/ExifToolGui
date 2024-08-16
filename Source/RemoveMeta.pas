@@ -19,28 +19,25 @@ type
     LvTagNames: TListView;
     BtnPreview: TButton;
     PnlButtons: TPanel;
-    SpbAdd: TSpeedButton;
-    SpbDel: TSpeedButton;
-    SpbEdit: TSpeedButton;
     ImageCollection: TImageCollection;
     VirtualImageList: TVirtualImageList;
     SpbPredefined: TSpeedButton;
+    CmbPredefined: TComboBox;
     procedure FormShow(Sender: TObject);
 
     procedure BtnExecuteClick(Sender: TObject);
     procedure ChkRemoveAllClick(Sender: TObject);
     procedure BtnPreviewClick(Sender: TObject);
     procedure LvTagNamesCustomDrawItem(Sender: TCustomListView; Item: TListItem; State: TCustomDrawState; var DefaultDraw: Boolean);
-    procedure SpbAddClick(Sender: TObject);
-    procedure SpbDelClick(Sender: TObject);
-    procedure SpbEditClick(Sender: TObject);
     procedure LvTagNamesItemChecked(Sender: TObject; Item: TListItem);
-    procedure LvTagNamesEdited(Sender: TObject; Item: TListItem; var S: string);
     procedure SpbPredefinedClick(Sender: TObject);
+    procedure FormResize(Sender: TObject);
+    procedure CmbPredefinedChange(Sender: TObject);
   private
     { Private declarations }
     FSample: string;
     FShowLogWindow: boolean;
+    procedure SetupPredefined;
     procedure SetupListView;
     procedure GetSelectedTags;
     procedure GetTagNames;
@@ -58,12 +55,22 @@ var
 implementation
 
 uses
-  Main, MainDef, ExifToolsGUI_Utils, ExifTool, LogWin, UFrmTagNames, UFrmPredefinedTags, UnitLangResources,
+  Main, MainDef, ExifToolsGUI_Utils, ExifTool, LogWin, UFrmPredefinedTags, UnitLangResources,
   Vcl.Themes;
 
 {$R *.dfm}
 
 var FStyleServices: TCustomStyleServices;
+
+procedure TFRemoveMeta.SetupPredefined;
+var
+  Indx: integer;
+begin
+  CmbPredefined.Items.Clear;
+  for Indx := 0 to PredefinedTagList.Count -1 do
+    CmbPredefined.Items.Add(PredefinedTagList.KeyNames[Indx]);
+  CmbPredefined.Text := RemoveTagListName;
+end;
 
 procedure TFRemoveMeta.SetupListView;
 var
@@ -91,45 +98,17 @@ begin
   end;
 end;
 
-procedure TFRemoveMeta.SpbAddClick(Sender: TObject);
-var
-  AnItem: TListItem;
-begin
-  FrmTagNames.SetSample(FSample);
-  if (FrmTagNames.ShowModal = IDOK) then
-  begin
-    AnItem := LvTagNames.Items.Add;
-    SetTagItem(AnItem, FrmTagNames.SelectedTag(true));
-  end;
-end;
-
-procedure TFRemoveMeta.SpbDelClick(Sender: TObject);
-begin
-  if (LvTagNames.Selected <> nil) then
-    LvTagNames.Selected.Delete;
-end;
-
-procedure TFRemoveMeta.SpbEditClick(Sender: TObject);
-begin
-  if (LvTagNames.Selected <> nil) then
-  begin
-    BtnExecute.Default := false;
-    LvTagNames.Selected.Checked := false;
-    LvTagNames.Selected.EditCaption;
-  end;
-end;
-
 procedure TFRemoveMeta.SpbPredefinedClick(Sender: TObject);
 begin
+  SetupPredefined;
   GetTagNames;
 
-  FrmPredefinedTags.Caller := TIniTagsData.idtRemoveTags;
-  FrmPredefinedTags.CallerTags := RemoveTagList;
+  FrmPredefinedTags.PrepareShow(FSample, TIniTagsData.idtRemoveTags, CmbPredefined.Text);
   if (FrmPredefinedTags.ShowModal = IDOK) then
   begin
-    RemoveTagList := FrmPredefinedTags.CallerTags;
-    SelRemoveTagList := '';
-    SetupListView;
+    RemoveTagListName := FrmPredefinedTags.GetSelectedPredefined;
+    SetupPredefined;
+    CmbPredefinedChange(CmbPredefined);
   end;
 end;
 
@@ -210,6 +189,14 @@ begin
   CheckSelection;
 end;
 
+procedure TFRemoveMeta.CmbPredefinedChange(Sender: TObject);
+begin
+  RemoveTagListName := CmbPredefined.Text;
+  RemoveTagList := PredefinedTagList.Values[RemoveTagListName];
+  SelRemoveTagList := '';
+  SetupListView;
+end;
+
 procedure TFRemoveMeta.CheckSelection;
 begin
   BtnExecute.Enabled := TagSelection <> '';
@@ -221,8 +208,15 @@ begin
   StatusBar1.SimpleText := GetShortHint(Application.Hint);
 end;
 
+procedure TFRemoveMeta.FormResize(Sender: TObject);
+begin
+  LvTagNames.Columns[0].Width := LvTagNames.ClientWidth;
+end;
+
 procedure TFRemoveMeta.FormShow(Sender: TObject);
 begin
+  Application.OnHint := DisplayHint;
+  FStyleServices := TStyleManager.Style[GUIsettings.GuiStyle];
   Left := FMain.Left + FMain.GUIBorderWidth + FMain.AdvPageFilelist.Left;
   Top := FMain.Top + FMain.GUIBorderHeight;
 
@@ -230,8 +224,9 @@ begin
     Label1.Caption := StrBackupOFF
   else
     Label1.Caption := StrBackupON;
+
+  SetupPredefined;
   SetupListView;
-  Application.OnHint := DisplayHint;
   ChkRemoveAll.Checked := false;
   ChkRemoveAllClick(Sender);
 
@@ -243,13 +238,6 @@ procedure TFRemoveMeta.LvTagNamesCustomDrawItem(Sender: TCustomListView; Item: T
   var DefaultDraw: Boolean);
 begin
   StyledDrawListviewItem(FStyleServices, Sender, Item, State);
-end;
-
-procedure TFRemoveMeta.LvTagNamesEdited(Sender: TObject; Item: TListItem; var S: string);
-begin
-  S := RemoveInvalidTags(S, true);
-  SetTagItem(Item, S);
-  BtnExecute.Default := true;
 end;
 
 procedure TFRemoveMeta.LvTagNamesItemChecked(Sender: TObject; Item: TListItem);
