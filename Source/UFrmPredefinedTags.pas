@@ -195,9 +195,9 @@ end;
 procedure TFrmPredefinedTags.SpbDefaultsClick(Sender: TObject);
 begin
   PredefinedTagList.Clear;
-  PredefinedTagList.AddPair(DefRemoveTagsName, DefRemoveTags);
-  PredefinedTagList.AddPair(DefCopySingleTagsName, DefCopySingleTags);
-  PredefinedTagList.AddPair(DefExcludeCopyTagsName, DefExcludeCopyTags);
+  PredefinedTagList.AddPair(StrDefRemoveTagsName, DefRemoveTags);
+  PredefinedTagList.AddPair(StrDefCopySingleTagsName, DefCopySingleTags);
+  PredefinedTagList.AddPair(StrDefExcludeCopyTagsName, DefExcludeCopyTags);
 
   SetupStringGrid;
 

@@ -40,6 +40,9 @@ resourcestring
 
   StrNoCustomTags           = 'No custom tags defined';
   StrCannotSaveGUI          = 'Cannot save GUI settings.';
+  StrDefRemoveTagsName      = 'Remove Metadata';
+  StrDefCopySingleTagsName  = 'Copy MetaData From Single';
+  StrDefExcludeCopyTagsName = 'Copy MetaData Into Jpg or Tiff';
 
   StrNotInstalled           = '(Not installed)';
   StrCheckTheGeoCodeRe      = 'Check the GeoCode requirements. (Apikey required. Max 1 call per second for a free account)';
