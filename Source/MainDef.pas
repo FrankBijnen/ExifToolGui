@@ -7,7 +7,6 @@ uses System.Classes, Vcl.Dialogs, ExifTool, GEOMap, UnitLangResources;
 const
   SHOWALL = 'Show All Files';
 
-  DefRemoveTagsName = 'Remove Metadata';
   DefRemoveTags =
     'Exif:All ' +
     'Makernotes:All ' +
@@ -26,7 +25,6 @@ const
     'Jfif:All ' +
     'ICC_profile:All ';
 
-  DefCopySingleTagsName =  'Copy MetaData From Single';
   DefCopySingleTags =
     'Exif:all ' +
     '-Makernotes:All ' +
@@ -36,7 +34,6 @@ const
     'ICC_Profile:All ' +
     'Gps:All ';
 
-  DefExcludeCopyTagsName = 'Copy MetaData From Jpg or Tiff';
   DefExcludeCopyTags =
     'exif:ExifImageWidth ' +
     'exif:ExifImageHeight ' +
@@ -469,7 +466,7 @@ begin
   result := Length(Trim(ExcludeCopyTagList));
   if (result = 0) then
   begin
-    ExcludeCopyTagListName := DefExcludeCopyTagsName;
+    ExcludeCopyTagListName := StrDefExcludeCopyTagsName;
     ExcludeCopyTagList := DefExcludeCopyTags;
   end;
 
@@ -484,7 +481,7 @@ begin
   result := Length(Trim(RemoveTagList));
   if (result = 0) then
   begin
-    RemoveTagListName := DefRemoveTagsName;
+    RemoveTagListName := StrDefRemoveTagsName;
     RemoveTagList := DefRemoveTags;
   end;
 
@@ -499,7 +496,7 @@ begin
   result := Length(Trim(CopySingleTagList));
   if (result = 0) then
   begin
-    CopySingleTagListName := DefCopySingleTagsName;
+    CopySingleTagListName := StrDefCopySingleTagsName;
     CopySingleTagList := DefCopySingleTags;
   end;
 
