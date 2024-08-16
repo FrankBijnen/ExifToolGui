@@ -173,7 +173,8 @@ end;
 
 procedure TFCopyMetadata.FormResize(Sender: TObject);
 begin
-  LvTagNames.Columns[0].Width := LvTagNames.ClientWidth;
+  if LvTagNames.HandleAllocated then
+    LvTagNames.Columns[0].Width := LvTagNames.ClientWidth;
 end;
 
 procedure TFCopyMetadata.FormShow(Sender: TObject);

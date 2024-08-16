@@ -216,7 +216,8 @@ end;
 
 procedure TFCopyMetaSingle.FormResize(Sender: TObject);
 begin
-  LvTagNames.Columns[0].Width := LvTagNames.ClientWidth;
+  if LvTagNames.HandleAllocated then
+    LvTagNames.Columns[0].Width := LvTagNames.ClientWidth;
 end;
 
 procedure TFCopyMetaSingle.FormShow(Sender: TObject);
