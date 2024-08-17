@@ -34,6 +34,24 @@ td.A4
  vertical-align:top;
  padding-left:4px}
 
+table.A5
+{table-layout:auto;
+ width:760px;
+ border:0px #AA0000 solid;
+ margin-top:0px;
+ margin-left:0px;
+ border-spacing:4px;
+ border-collapse: collapse;
+ background-color:#F4F8FF;
+ font-family:arial;
+ font-size:11pt;
+ color:#000000
+}
+td.A5
+{width:80%;
+ vertical-align:top;
+ padding-left:4px}
+
 font.blue
 {color:#0000FF;
 }
