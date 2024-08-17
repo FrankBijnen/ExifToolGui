@@ -742,7 +742,7 @@ In addition you have more control over how the function is performed.<br><br>
 <b>File filter</b> drop-down box<br>
 -is set to <font class="blue">Show ALL files</font> by default on every 
 GUI startup and this behaviour can't be changed. This drop-down box 
-allready contain few predefined file filters and by clicking on <font class="blue">Edit</font> button, you can add additional filters which you need most often.<br>
+already contain a few predefined file filters and by clicking on <font class="blue">Edit</font> button, you can add additional filters which you need most often.<br>
 The <b>File filter</b> also enables you to show sub folders in the filelist. See: <a href="#p_subfolder">Enabling Subfolders in the FileList</a><br>
 
 <br>
@@ -757,7 +757,7 @@ appropriate raw "codec", to be able to see thumbnails and previews.<br>
 <br>
 
 <b>Details</b> drop-down box<br>
--is set to <font class="blue">Standard filelist</font> by default. This drop-down box also contain few predefined details views:<br>
+-is set to <font class="blue">Standard filelist</font> by default. This drop-down box also contain a few predefined details views:<br>
 <font class="blue">Camera settings, Location info</font> and <font class="blue">About photo</font> -where each of these views shows few metadata values inside files; i.e.:<br> 
 <u><b>Note:</b></u> The Folders and the Breadcrumb bar are shown only when enabled in Preferences/Other.<br>
 <img src="ExifToolGUI_V6_files/filelistcamerasettings.jpg"><br>
@@ -776,7 +776,7 @@ But to give you at least something, the last entry in this drop-down box is <fon
 this view on relative small amount of files in folder. In short: tryout.<br>
 <br>
 
-<h2><a name="p_subfolder">Scanning and displaying sub folders in the filelist</a></h2>
+<h3><a name="p_subfolder">Scanning and displaying sub folders in the filelist</a></h2>
 <br><b>Prerequisite</b>
 <ul>
 <li>Enable <b>Show folders</b> in <b>Preferences</b><br>
@@ -801,18 +801,18 @@ A mask can contain literal characters, or special characters like *, [-] or ?.<b
 <tr><td>All Files</td><td>*.*;/s</td><td>Time consuming!</td><tr>
 <tr><td>Advanced</td><td>[A-Z][A-Z][A-Z][A-Z][0-9][0-9][0-9][0-9].jpg;/s</td><td>IMGP0001.jpg (first 4 chars need to be A-Z, last 4 chars need to be 0-9)</td><td></td></tr>
 </table>
-For more info on the file filter see the Embarcadero documentation on the Delphi function:<a href="https://docwiki.embarcadero.com/Libraries/Athens/en/System.Masks.MatchesMask">MatchesMask</a>
+For more info on the file filter see the Embarcadero documentation on the Delphi function: <a href="https://docwiki.embarcadero.com/Libraries/Athens/en/System.Masks.MatchesMask">MatchesMask</a>
 <br>
 
 <br><b>Usage</b><br>
 <ul>
-<li>When /s is found sub folders are scanned. Obviously this can take longer, so you will see a progress form, with a button <b>Close</b>.<br>
+<li>Select a file filter that has the '/s' modifier and sub folders are scanned. Obviously this can take longer, so you will see a progress form, with a button <b>Close</b>.<br>
 <b>Close</b> will stop the scannning.<br><br>
 <img src="ExifToolGUI_V6_files/filelistsubfolderprogress.jpg"><br></li>
 <br>
-<li>Folders are only included the next level relative to the selected folder.</li>
+<li>Folder names are only shown the next level relative to the selected folder.</li>
 <br>
-<li>Files are included until no more files are found matching the pattern.</li>
+<li>File names are shown until no more files are found matching the pattern.</li>
 <br>
 <li>Most functions are available on the (sub)files shown, with these 2 exceptions:
 <ul>
@@ -827,11 +827,13 @@ All other functions, including ExifTool Direct, Metadata panel, OSM panel work a
 <li>Column sorting (Activated by clicking on the column header)<br>
 <ul>
 <li>
-In thumbnail mode the sort order is always Folders first, followed by files. The relative name is used for sorting. This can not be changed.<br>
+In thumbnail mode the sort order is always Folders first, followed by files. The relative name is used for sorting.<br>
+This can not be changed.<br>
 Relative name = The name relative to the currently selected path.<br>
 </li><br>
 <li>
-In detail mode you can use column sorting. But beware of the performance considerations.<br>
+In detail mode you can use column sorting.<br>
+But beware of the performance considerations combined with subfolders containing many files.<br>
 <ul>
 <li>Standard file list. This works relatively fast on all columns.<br><br></li>
 
@@ -1006,7 +1008,7 @@ Here's how to edit metadata in <font class="blue">Workspace</font>:
 
 <br>
 If you've changed your mind and don't wish to change particular tag,
-then select that tag, right-click (to show pop-up menu) and choose <font class="blue">Undo selected editing</font> -this is usefull in cases when many tags are allready edited and not saved.<br>
+then select that tag, right-click (to show pop-up menu) and choose <font class="blue">Undo selected editing</font> -this is usefull in cases when many tags are already edited and not saved.<br>
 If you've changed your mind completely (don't wish to apply any changes), then just click on <font class="blue">Workspace</font> button and changes will disappear.<br>
 <u>Note:</u> Changes are lost in most cases when you click elsewhere outside Metadata view area.<br>
 <br>
