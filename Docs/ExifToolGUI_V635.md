@@ -795,21 +795,16 @@ A mask can contain literal characters, or special characters like *, [-] or ?.<b
 </ul>
 <br>
 
-</td></tr>
-
-<tr><td class="A4">
 <b>Sample file filters</b>:<br>
 <table>
 <tr><td>Typical usage</td><td>*.jpg;*.mp4</td><td>Show Jpg and mp4 in current folder</td></tr>
 <tr><td></td><td>*.jpg;*.mp4;/s</td><td>Show Jpg and mp4 in sub folders</td></tr>
 <tr><td>All Files</td><td>*.*;/s</td><td>Time consuming!</td></tr>
-<tr><td>Advanced</td><td>[A-Z][A-Z][A-Z][A-Z][0-9][0-9][0-9][0-9].jpg;/s</td><td>IMGP0001.jpg (first 4 chars need to be A-Z, last 4 chars need to be 0-9)</td><td></td></tr>
+<tr><td>Advanced</td><td>[A-Z][A-Z][A-Z][A-Z][0-9][0-9][0-9][0-9].jpg;/s</td><td>IMGP0001.jpg<br>(first 4 chars need to be A-Z, last 4 chars need to be 0-9)</td></tr>
 </table>
+<br>
 For more info on the file filter see the Embarcadero documentation on the Delphi function: <a href="https://docwiki.embarcadero.com/Libraries/Athens/en/System.Masks.MatchesMask">MatchesMask</a>
 <br>
-</td></tr>
-
-<tr><td class="A4">
 
 <br><b>Usage</b><br>
 <ul>
