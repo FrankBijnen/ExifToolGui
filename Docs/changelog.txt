@@ -120,3 +120,5 @@ Version:        Description             Issue
                 Fix Issue #470          Rare AV generating thumbs
                 Fix Issue #472          ExifToolGUI ability to handle UNC/network path as (startup) parameter
                 Fix Issue #476          Fix sorting issues that showed up after enabling subfolders
+                Fix Issue #482          Fix Issues for V6.3.5
+                Fix Issue #516          Using cursor keys left-right in thumbnail mode does not refresh preview/metadata

@@ -3155,10 +3155,15 @@ end;
 
 procedure TFMain.ShellListKeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
 begin
-  if (Key = VK_UP) or (Key = VK_DOWN) then       // Up-Down arrow
-    ShellListClick(Sender);
-  if (Key = VK_PRIOR) or (Key = VK_NEXT) then    // PageUp/Down
-    ShellListClick(Sender);
+  case Key of
+    VK_UP,
+    VK_DOWN,
+    VK_LEFT,
+    VK_RIGHT,
+    VK_PRIOR,
+    VK_NEXT:
+      ShellListClick(Sender);
+  end;
 end;
 
 procedure TFMain.ShellListSetFolders;
