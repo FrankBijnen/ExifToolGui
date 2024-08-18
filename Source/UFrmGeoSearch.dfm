@@ -3,8 +3,8 @@ object FGeoSearch: TFGeoSearch
   Top = 0
   BorderStyle = bsDialog
   Caption = 'Search place'
-  ClientHeight = 420
-  ClientWidth = 589
+  ClientHeight = 419
+  ClientWidth = 592
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -15,13 +15,13 @@ object FGeoSearch: TFGeoSearch
   TextHeight = 13
   object StatusBar1: TStatusBar
     Left = 0
-    Top = 401
-    Width = 589
+    Top = 400
+    Width = 592
     Height = 19
     Panels = <>
     SimplePanel = True
-    ExplicitTop = 400
-    ExplicitWidth = 585
+    ExplicitTop = 399
+    ExplicitWidth = 581
   end
   object BtnCancel: TButton
     Left = 518

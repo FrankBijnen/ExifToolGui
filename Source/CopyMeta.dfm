@@ -1,43 +1,36 @@
 object FCopyMetadata: TFCopyMetadata
   Left = 0
   Top = 0
-  BorderStyle = bsDialog
+  BorderStyle = bsSizeToolWin
   Caption = 'Copy metadata options'
-  ClientHeight = 387
-  ClientWidth = 462
+  ClientHeight = 473
+  ClientWidth = 464
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
   Font.Height = -11
   Font.Name = 'Tahoma'
   Font.Style = []
+  Position = poDesigned
+  OnCreate = FormCreate
   OnResize = FormResize
   OnShow = FormShow
   TextHeight = 13
-  object Label1: TLabel
-    Left = 388
-    Top = 317
-    Width = 31
-    Height = 13
-    Caption = 'Label1'
-  end
   object StatusBar1: TStatusBar
     Left = 0
-    Top = 368
-    Width = 462
+    Top = 454
+    Width = 464
     Height = 19
     Panels = <>
     SimplePanel = True
-    ExplicitTop = 367
-    ExplicitWidth = 458
   end
   object AdvPanel1: TPanel
     Left = 0
     Top = 0
-    Width = 380
-    Height = 368
+    Width = 352
+    Height = 454
     Hint = 'Above data might not be desired to be copied.'
-    Align = alLeft
+    Align = alClient
     DoubleBuffered = True
     Font.Charset = DEFAULT_CHARSET
     Font.Color = clWindowText
@@ -47,12 +40,14 @@ object FCopyMetadata: TFCopyMetadata
     ParentDoubleBuffered = False
     ParentFont = False
     TabOrder = 0
-    ExplicitHeight = 367
     object Label2: TLabel
-      Left = 16
-      Top = 16
-      Width = 196
-      Height = 14
+      Left = 1
+      Top = 1
+      Width = 358
+      Height = 40
+      Align = alTop
+      Alignment = taCenter
+      AutoSize = False
       Caption = 'Confirm copying should include:'
       Font.Charset = DEFAULT_CHARSET
       Font.Color = clWindowText
@@ -60,19 +55,32 @@ object FCopyMetadata: TFCopyMetadata
       Font.Name = 'Tahoma'
       Font.Style = [fsBold]
       ParentFont = False
+      Layout = tlCenter
+      WordWrap = True
+      ExplicitWidth = 422
     end
     object Label3: TLabel
-      Left = 16
-      Top = 342
-      Width = 301
-      Height = 14
+      Left = 1
+      Top = 425
+      Width = 358
+      Height = 40
+      Align = alBottom
+      Alignment = taCenter
+      AutoSize = False
       Caption = 'Above tags/groups will only be copied where checked!'
+      Layout = tlCenter
+      WordWrap = True
+      ExplicitTop = 428
+      ExplicitWidth = 422
     end
     object LvTagNames: TListView
-      Left = 16
-      Top = 76
-      Width = 348
-      Height = 260
+      AlignWithMargins = True
+      Left = 11
+      Top = 75
+      Width = 345
+      Height = 347
+      Margins.Left = 10
+      Align = alClient
       Checkboxes = True
       Columns = <
         item
@@ -84,15 +92,21 @@ object FCopyMetadata: TFCopyMetadata
       TabOrder = 1
       ViewStyle = vsReport
       OnCustomDrawItem = LvTagNamesCustomDrawItem
+      ExplicitWidth = 337
+      ExplicitHeight = 335
     end
     object PnlButtons: TPanel
-      Left = 16
-      Top = 45
-      Width = 348
+      AlignWithMargins = True
+      Left = 11
+      Top = 44
+      Width = 345
       Height = 25
+      Margins.Left = 10
+      Align = alTop
       TabOrder = 0
+      ExplicitWidth = 337
       object SpbPredefined: TSpeedButton
-        Left = 252
+        Left = 249
         Top = 1
         Width = 95
         Height = 23
@@ -106,7 +120,7 @@ object FCopyMetadata: TFCopyMetadata
       object CmbPredefined: TComboBox
         Left = 1
         Top = 1
-        Width = 251
+        Width = 248
         Height = 22
         Align = alClient
         TabOrder = 0
@@ -115,32 +129,56 @@ object FCopyMetadata: TFCopyMetadata
       end
     end
   end
-  object BtnCancel: TButton
-    Left = 388
-    Top = 10
-    Width = 65
-    Height = 25
-    Caption = 'Cancel'
-    ModalResult = 2
-    TabOrder = 1
-  end
-  object BtnExecute: TButton
-    Left = 388
-    Top = 339
-    Width = 65
-    Height = 25
-    Caption = 'Execute'
-    Default = True
-    ModalResult = 1
-    TabOrder = 3
-  end
-  object BtnPreview: TButton
-    Left = 388
-    Top = 286
-    Width = 65
-    Height = 25
-    Caption = 'Preview'
+  object PnlRight: TPanel
+    Left = 352
+    Top = 0
+    Width = 112
+    Height = 454
+    Align = alRight
     TabOrder = 2
-    OnClick = BtnPreviewClick
+    DesignSize = (
+      112
+      454)
+    object Label1: TLabel
+      Left = 0
+      Top = 376
+      Width = 110
+      Height = 25
+      Alignment = taCenter
+      Anchors = [akRight, akBottom]
+      AutoSize = False
+      Caption = 'Label1'
+      ExplicitTop = 374
+    end
+    object BtnCancel: TButton
+      Left = 2
+      Top = 8
+      Width = 110
+      Height = 25
+      Caption = 'Cancel'
+      ModalResult = 2
+      TabOrder = 0
+    end
+    object BtnPreview: TButton
+      Left = 0
+      Top = 340
+      Width = 110
+      Height = 25
+      Anchors = [akRight, akBottom]
+      Caption = 'Preview'
+      TabOrder = 1
+      OnClick = BtnPreviewClick
+    end
+    object BtnExecute: TButton
+      Left = 0
+      Top = 412
+      Width = 110
+      Height = 25
+      Anchors = [akRight, akBottom]
+      Caption = 'Execute'
+      Default = True
+      ModalResult = 1
+      TabOrder = 2
+    end
   end
 end

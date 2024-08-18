@@ -75,8 +75,8 @@ var
 begin
   ETresult := TStringList.Create;
   try
-    Left := FMain.Left + FMain.GUIBorderWidth + FMain.AdvPageFilelist.Left;
-    Top := FMain.Top + FMain.GUIBorderHeight;
+    Left := FMain.GetFormOffset.X;
+    Top := FMain.GetFormOffset.Y;
 
     RadioButton1Click(Sender);
 

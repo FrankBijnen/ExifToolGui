@@ -62,8 +62,9 @@ end;
 
 procedure TFGeotag.FormShow(Sender: TObject);
 begin
-  Left := FMain.Left + FMain.GUIBorderWidth + FMain.AdvPageFilelist.Left;
-  Top := FMain.Top + FMain.GUIBorderHeight;
+  Left := FMain.GetFormOffset.X;
+  Top := FMain.GetFormOffset.Y;
+
   with TrackBar1 do
   begin
     Enabled := not Enabled;

@@ -1,6 +1,6 @@
 object FLogWin: TFLogWin
-  Left = 0
-  Top = 0
+  Left = 108
+  Top = 106
   BorderIcons = [biSystemMenu]
   Caption = 'ExifTool LOG'
   ClientHeight = 544
@@ -11,6 +11,7 @@ object FLogWin: TFLogWin
   Font.Height = -11
   Font.Name = 'Tahoma'
   Font.Style = []
+  Position = poDesigned
   OnCreate = FormCreate
   OnDestroy = FormDestroy
   OnShow = FormShow

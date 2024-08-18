@@ -28,6 +28,7 @@ object FQuickManager: TFQuickManager
     ParentDoubleBuffered = False
     ParentFont = False
     TabOrder = 0
+    ExplicitHeight = 482
     object StringGrid1: TStringGrid
       Left = 16
       Top = 8
@@ -142,5 +143,7 @@ object FQuickManager: TFQuickManager
     Height = 19
     Panels = <>
     SimplePanel = True
+    ExplicitTop = 482
+    ExplicitWidth = 747
   end
 end

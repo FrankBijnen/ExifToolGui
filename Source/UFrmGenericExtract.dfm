@@ -3,8 +3,8 @@ object FGenericExtract: TFGenericExtract
   Top = 0
   BorderStyle = bsDialog
   Caption = 'Generic extract previews'
-  ClientHeight = 356
-  ClientWidth = 598
+  ClientHeight = 354
+  ClientWidth = 590
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -16,8 +16,8 @@ object FGenericExtract: TFGenericExtract
   TextHeight = 13
   object StatusBar1: TStatusBar
     Left = 0
-    Top = 337
-    Width = 598
+    Top = 335
+    Width = 590
     Height = 19
     Panels = <>
     SimplePanel = True
@@ -28,7 +28,7 @@ object FGenericExtract: TFGenericExtract
     Left = 0
     Top = 0
     Width = 495
-    Height = 337
+    Height = 335
     Align = alLeft
     DoubleBuffered = True
     Font.Charset = DEFAULT_CHARSET

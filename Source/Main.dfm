@@ -755,7 +755,7 @@ object FMain: TFMain
         object EditETdirect: TLabeledEdit
           Left = 1
           Top = 50
-          Width = 323
+          Width = 315
           Height = 23
           Hint = 
             'Spaces in data require double quotes, double quotes in data requ' +
@@ -778,7 +778,7 @@ object FMain: TFMain
           Text = ''
           OnChange = EditETdirectChange
           OnKeyDown = EditETdirectKeyDown
-          ExplicitWidth = 319
+          ExplicitWidth = 311
         end
         object CBoxETdirect: TComboBox
           Left = 1
@@ -843,7 +843,6 @@ object FMain: TFMain
         ViewStyle = vsReport
         OnKeyDown = ShellListKeyDown
         OnKeyUp = ShellListKeyUp
-        ExplicitLeft = 2
       end
       object PnlBreadCrumb: TPanel
         Left = 0
@@ -971,7 +970,6 @@ object FMain: TFMain
     Top = 0
     Width = 940
     Height = 25
-    UseSystemFont = False
     ActionManager = MainActionManager
     Caption = 'ActionMainMenuBar'
     Color = clMenuBar
@@ -980,7 +978,7 @@ object FMain: TFMain
     ColorMap.BtnSelectedFont = clBlack
     ColorMap.UnusedColor = clWhite
     Font.Charset = DEFAULT_CHARSET
-    Font.Color = clBlack
+    Font.Color = clWindowText
     Font.Height = -12
     Font.Name = 'Segoe UI'
     Font.Style = []

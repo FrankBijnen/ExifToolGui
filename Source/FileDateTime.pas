@@ -173,8 +173,9 @@ end;
 
 procedure TFFileDateTime.FormShow(Sender: TObject);
 begin
-  Left := FMain.Left + FMain.GUIBorderWidth + FMain.AdvPageFilelist.Left;
-  Top := FMain.Top + FMain.GUIBorderHeight;
+  Left := FMain.GetFormOffset.X;
+  Top := FMain.GetFormOffset.Y;
+
   RadioGroup3Click(Sender);
   CheckBox1Click(Sender);
   Application.OnHint := DisplayHint;

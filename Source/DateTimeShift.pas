@@ -116,8 +116,8 @@ var
 begin
   ETResult := TStringList.Create;
   try
-    Left := FMain.Left + FMain.GUIBorderWidth + FMain.AdvPageFilelist.Left;
-    Top := FMain.Top + FMain.GUIBorderHeight;
+    Left := FMain.GetFormOffset.X;
+    Top := FMain.GetFormOffset.Y;
     if FMain.MaDontBackup.Checked then
       Label1.Caption := StrBackupOFF
     else
