@@ -1,4 +1,4 @@
-# ExifToolGui
+﻿# ExifToolGui
 <h4>A GUI for ExifTool</h4>
 
 This is an updated version of the ExifToolGui program created by Bogdan Hrastnik. Many thanks go out to him.
