@@ -406,6 +406,9 @@ end;
 
 procedure TFrmPredefinedTags.FormShow(Sender: TObject);
 begin
+  Left := FMain.GetFormOffset.X;
+  Top := FMain.GetFormOffset.Y;
+
   FStyleServices := TStyleManager.Style[GUIsettings.GuiStyle];
   if (PredefinedTagList.Count = 0) then
     SpbDefaultsClick(Sender)

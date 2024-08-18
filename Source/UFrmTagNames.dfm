@@ -63,7 +63,7 @@ object FrmTagNames: TFrmTagNames
       560
       29)
     object BtnOk: TBitBtn
-      Left = 373
+      Left = 369
       Top = 3
       Width = 85
       Height = 25
@@ -90,10 +90,10 @@ object FrmTagNames: TFrmTagNames
       ModalResult = 1
       NumGlyphs = 2
       TabOrder = 0
-      ExplicitLeft = 369
+      ExplicitLeft = 365
     end
     object BtnCancel: TBitBtn
-      Left = 464
+      Left = 460
       Top = 3
       Width = 85
       Height = 25
@@ -120,7 +120,7 @@ object FrmTagNames: TFrmTagNames
       ModalResult = 2
       NumGlyphs = 2
       TabOrder = 1
-      ExplicitLeft = 460
+      ExplicitLeft = 456
     end
   end
   object CmbGroupName: TComboBox

@@ -40,13 +40,14 @@ type
     procedure BtnPowerShellClick(Sender: TObject);
     procedure BtnCmdClick(Sender: TObject);
     procedure RadShowCmdsClick(Sender: TObject);
-  protected
   private
     { Private declarations }
     LogId: Integer;
     AnsiWarned: boolean;
     function EscapeForCmd(const Cmd: string): string;
     function IsArgs: boolean;
+  protected
+    function GetDefWindowSizes: TRect; override;
   public
     { Public declarations }
     FExecs: TStringList;
@@ -66,6 +67,11 @@ uses Main, MainDef, ExifToolsGUI_Utils, Winapi.ShellAPI, UnitLangResources;
 
 
 {$R *.dfm}
+
+function TFLogWin.GetDefWindowSizes: TRect;
+begin
+  result := Rect(108, 106, 580, 580);
+end;
 
 function TFLogWin.IsArgs: boolean;
 begin
@@ -243,7 +249,7 @@ end;
 
 procedure TFLogWin.FormCreate(Sender: TObject);
 begin
-  ReadGUILog;
+  ReadFormSizes(Self, Self.DefWindowSizes);
 
 // Note to fill the stringlists with 10 empty lines
   FExecs := TStringList.Create;

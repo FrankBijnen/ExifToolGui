@@ -358,6 +358,8 @@ type
     procedure ShellListColumnResized(Sender: TObject);
     procedure ShellListMouseWheel(Sender: TObject; Shift: TShiftState; WheelDelta: Integer; MousePos: TPoint; var Handled: Boolean);
     procedure CounterETEvent(Counter: integer);
+  protected
+    function GetDefWindowSizes: TRect; override;
   public
     { Public declarations }
     function GetFirstSelectedFile: string;
@@ -371,6 +373,8 @@ type
     procedure ExecRestEvent_Done(Url, Response: string; Succes: boolean);
     procedure UpdateStatusBar_FilesShown;
     procedure SetGuiStyle;
+    function GetFormOffset(AddFileList: boolean = true): TPoint;
+
     var GUIBorderWidth, GUIBorderHeight: integer;
     var GUIColorWindow: TColor;
   end;
@@ -427,6 +431,22 @@ const
     '-XMP-dc:Type' + CRLF +
     '-XMP-iptcExt:Event' + CRLF +
     '-XMP-iptcExt:PersonInImage';
+
+function TFMain.GetDefWindowSizes: TRect;
+begin
+  result := Rect(40, 60, 1024, 660);
+end;
+
+function TFMain.GetFormOffset(AddFileList: boolean = true): TPoint;
+begin
+  result.X := Left + GUIBorderWidth;
+  if (AddFileList) then
+    result.X := result.X + AdvPageFilelist.Left;
+
+  result.Y := Top + GUIBorderHeight;
+  if (AddFileList) then
+    result.Y := result.Y + AdvPageFilelist.Top;
+end;
 
 procedure TFMain.WMEndSession(var Msg: TWMEndSession);
 begin // for Windows Shutdown/Log-off while GUI is open
@@ -2414,7 +2434,9 @@ procedure TFMain.FormCreate(Sender: TObject);
 begin
   Application.OnMinimize := ApplicationMinimize;
 
+  ReadFormSizes(Self, Self.DefWindowSizes);
   ReadGUIini;
+
   // AdvPageFilelist.Constraints.MinWidth only used at design time. Form does not align well.
   // We check for MinFileListWidth in code.
   MinFileListWidth := AdvPageFilelist.Constraints.MinWidth;
@@ -3564,20 +3586,23 @@ procedure TFMain.SpeedBtnDetailsClick(Sender: TObject);
 var
   SavedPath: string;
 begin
-  with ShellList do
-  begin
-    SavedPath := ShellTreeView.Path;
-    Enabled := false;
-    if SpeedBtnDetails.Down then
-      ViewStyle := vsReport
-    else
-      ViewStyle := vsIcon;
-    Enabled := true;
-    ShellTreeView.Path := SavedPath;
+  SpeedBtnDetails.Enabled := false;
+  try
+    with ShellList do
+    begin
+      SavedPath := ShellTreeView.Path;
+      Enabled := false;
+      if SpeedBtnDetails.Down then
+        ViewStyle := vsReport
+      else
+        ViewStyle := vsIcon;
+      Enabled := true;
+      ShellTreeView.Path := SavedPath;
+    end;
+  finally
+    SpeedBtnDetails.Enabled := true;
+    CBoxDetails.Enabled := SpeedBtnDetails.Down;
   end;
-  ShowMetadata;
-  ShowPreview;
-  CBoxDetails.Enabled := SpeedBtnDetails.Down;
 end;
 
 procedure TFMain.SpeedBtnExifClick(Sender: TObject);

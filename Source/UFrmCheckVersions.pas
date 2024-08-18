@@ -126,8 +126,8 @@ end;
 procedure TFrmCheckVersions.FormShow(Sender: TObject);
 begin
   FStyleServices := TStyleManager.Style[GUIsettings.GuiStyle];
-  Left := FMain.Left + FMain.GUIBorderWidth + FMain.AdvPageFilelist.Left;
-  Top := FMain.Top + FMain.GUIBorderHeight;
+  Left := FMain.GetFormOffset.X;
+  Top := FMain.GetFormOffset.Y;
   GetVersions;
 end;
 

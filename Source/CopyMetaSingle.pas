@@ -13,17 +13,18 @@ type
     StatusBar1: TStatusBar;
     AdvPanel1: TPanel;
     ChkImportAll: TCheckBox;
-    BtnCancel: TButton;
-    BtnExecute: TButton;
-    Label1: TLabel;
     ChkNoOverWrite: TCheckBox;
     PnlButtons: TPanel;
     SpbPredefined: TSpeedButton;
     LvTagNames: TListView;
-    BtnPreview: TButton;
     ImageCollection: TImageCollection;
     VirtualImageList: TVirtualImageList;
     CmbPredefined: TComboBox;
+    PnlRight: TPanel;
+    BtnCancel: TButton;
+    BtnPreview: TButton;
+    Label1: TLabel;
+    BtnExecute: TButton;
     procedure FormShow(Sender: TObject);
     procedure BtnExecuteClick(Sender: TObject);
     procedure ChkImportAllClick(Sender: TObject);
@@ -33,6 +34,7 @@ type
     procedure SpbPredefinedClick(Sender: TObject);
     procedure FormResize(Sender: TObject);
     procedure CmbPredefinedChange(Sender: TObject);
+    procedure FormCreate(Sender: TObject);
   private
     { Private declarations }
     SrcFile: string;
@@ -43,6 +45,8 @@ type
     procedure GetSelectedTags;
     procedure GetTagNames;
     procedure CheckSelection;
+  protected
+    function GetDefWindowSizes: TRect; override;
   public
     { Public declarations }
     procedure PrepareShow(ASource: string);
@@ -62,6 +66,12 @@ uses
 
 var FStyleServices: TCustomStyleServices;
 
+function TFCopyMetaSingle.GetDefWindowSizes: TRect;
+begin
+  result := DesignRect;
+  result.Offset(FMain.GetFormOffset.X,
+                FMain.GetFormOffset.Y);
+end;
 
 procedure TFCopyMetaSingle.SetupPredefined;
 var
@@ -109,8 +119,6 @@ begin
     CopySingleTagListName := FrmPredefinedTags.GetSelectedPredefined;
     SetupPredefined;
     CmbPredefinedChange(CmbPredefined);
-
-    SelCopySingleTagList := '';
     SetupListView;
   end;
 end;
@@ -214,6 +222,11 @@ begin
   StatusBar1.SimpleText := GetShortHint(Application.Hint);
 end;
 
+procedure TFCopyMetaSingle.FormCreate(Sender: TObject);
+begin
+  ReadFormSizes(Self, Self.DefWindowSizes);
+end;
+
 procedure TFCopyMetaSingle.FormResize(Sender: TObject);
 begin
   if LvTagNames.HandleAllocated then
@@ -224,8 +237,8 @@ procedure TFCopyMetaSingle.FormShow(Sender: TObject);
 begin
   Application.OnHint := DisplayHint;
   FStyleServices := TStyleManager.Style[GUIsettings.GuiStyle];
-  Left := FMain.Left + FMain.GUIBorderWidth + FMain.AdvPageFilelist.Left;
-  Top := FMain.Top + FMain.GUIBorderHeight;
+  Left := FMain.GetFormOffset.X;
+  Top := FMain.GetFormOffset.Y;
 
   if FMain.MaDontBackup.Checked then
     Label1.Caption := StrBackupOFF

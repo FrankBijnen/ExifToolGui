@@ -167,8 +167,9 @@ end;
 
 procedure TFGenericExtract.FormShow(Sender: TObject);
 begin
-  Left := FMain.Left + FMain.GUIBorderWidth + FMain.AdvPageFilelist.Left;
-  Top := FMain.Top + FMain.GUIBorderHeight;
+  Left := FMain.GetFormOffset.X;
+  Top := FMain.GetFormOffset.Y;
+
   StatusBar1.SimpleText := '';
   LblSample.Caption := Format(StrSampleS, [ExtractFileName(Fmain.GetFirstSelectedFile)]);
   FillPreviewInListView(FMain.GetFirstSelectedFile, LvPreviews);

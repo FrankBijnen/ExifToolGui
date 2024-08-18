@@ -179,6 +179,7 @@ procedure TFQuickManager.FormShow(Sender: TObject);
 var
   I, N, X: integer;
 begin
+//TODO
   Left := FMain.Left + 8;
   Top := FMain.Top + 56;
   if FMain.SpeedBtnQuick.Down then

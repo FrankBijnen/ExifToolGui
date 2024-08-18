@@ -3,8 +3,8 @@ object FGeotag: TFGeotag
   Top = 0
   BorderStyle = bsDialog
   Caption = 'Import GPS data'
-  ClientHeight = 359
-  ClientWidth = 665
+  ClientHeight = 357
+  ClientWidth = 657
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -22,8 +22,8 @@ object FGeotag: TFGeotag
   end
   object StatusBar1: TStatusBar
     Left = 0
-    Top = 340
-    Width = 665
+    Top = 338
+    Width = 657
     Height = 19
     Panels = <>
     SimplePanel = True
@@ -34,7 +34,7 @@ object FGeotag: TFGeotag
     Left = 0
     Top = 0
     Width = 549
-    Height = 340
+    Height = 338
     Align = alLeft
     DoubleBuffered = True
     Font.Charset = DEFAULT_CHARSET

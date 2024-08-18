@@ -11,7 +11,33 @@
 <tbody><tr><td class="A4">
 <h1>ExifToolGUI for Windows v6.xx</h1><hr>
 <br>
-<h2>Introduction</h2>
+<h3>Content</h3>
+<br>
+<b>General info:</b><br>
+<li><a href="#m_introduction">Introduction</a></li>
+<li><a href="#m_changesv6">Major changes with ExifToolGUI v6.xx</a></li>
+<li><a href="#m_require_preparation">Requirements and preparations</a></li>
+<br>
+<b>Menu:</b><br>
+<li><a href="#m_program">Program</a> menu</li>
+<ul><li><a href="#m_workspace">Workspace manager</a> menu</li></ul>
+<ul><li><a href="#m_style">Style</a> menu</li></ul>
+<li><a href="#m_options">Options</a> menu</li>
+<li><a href="#m_exp_imp">Export/Import</a> menu</li>
+<li><a href="#m_modify">Modify</a> menu</li>
+<li><a href="#m_various">Various</a> menu</li>
+<li><a href="#m_help">Help</a> menu</li>
+<br>
+<b>Panels:</b><br>
+<li><a href="#p_filelist">Filelist</a> panel</li>
+<li><a href="#p_etdirect">ExifTool direct</a> panel</li>
+<li><a href="#p_metadata">Metadata</a> panel</li>
+<li><a href="#p_osmmap">OSM Map</a> panel</li>
+<br>
+<a href="#final">Final words</a><br><br>
+
+<br>
+<h2><a name="m_introduction">Introduction</a></h2>
 In the summer of 2023 I decided to revive the ExifToolGui project initally created by <b>Bogdan Hrastnik</b>.
 This revival resulted in <b>Version 6</b><br>
 Read his complete documentation <a href="https://htmlpreview.github.io/?https://github.com/FrankBijnen/ExifToolGui/blob/main/Docs/Original%20notes/ExifToolGUI_V516.htm"><b>here</b></a><br><br>
@@ -45,7 +71,8 @@ There are already some GUI's that make use of ExifTool, but some of them
 Basic idea behind GUI is, to keep it <u>simple!</u> Thus, only those options are implemented, which I believe, are essential for majority of users.<br>
 </em>
 <br>
-<font class="red"><b>Important changes in ExifToolGUI v6.xx</b></font><br>
+<h2><a name="m_changesv6">Major changes with ExifToolGUI v6.xx</h2>
+<br>
 <ul>
 <li>The source code now compiles with Delphi Community Edition. Version used, as of writing, Rad 11.3.</li>
 <li class="tab">No (closed source) 3rd party libraries needed.</li>
@@ -92,7 +119,7 @@ Basic idea behind GUI is, to keep it <u>simple!</u> Thus, only those options are
 <a href="changelog.txt"><b>See changelog.txt for a complete list of issues.</b></a>
 
 <a name="m_reqs_general">
-<h2>Requirements and preparations</h2>
+<h2><a name="m_require_preparation">Requirements and preparations</a></h2>
 ExiftoolGUI should run on Windows 7, 8 32-64bit. However, it is highly recommended to use Windows 10 or 11 when you plan to use the OSM map, or GEOcoding.<br>
 It will not run on Windows XP or earlier!<br>
 
@@ -181,25 +208,6 @@ That's all you need. And when a new ExifTool or GUI version is available, you on
 <br>
 
 <a name="gui_screen"><img src="ExifToolGUI_V6_files/gui_screen.jpg"></a><br>
-<br>
-<h3>Content</h3>
-<b>Menu:</b><br>
-<li><a href="#m_program">Program</a> menu</li>
-<ul><li><a href="#m_workspace">Workspace manager</a> menu</li></ul>
-<ul><li><a href="#m_style">Style</a> menu</li></ul>
-<li><a href="#m_options">Options</a> menu</li>
-<li><a href="#m_exp_imp">Export/Import</a> menu</li>
-<li><a href="#m_modify">Modify</a> menu</li>
-<li><a href="#m_various">Various</a> menu</li>
-<li><a href="#m_help">Help</a> menu</li>
-<br>
-<b>Panels:</b><br>
-<li><a href="#p_filelist">Filelist</a> panel</li>
-<li><a href="#p_etdirect">ExifTool direct</a> panel</li>
-<li><a href="#p_metadata">Metadata</a> panel</li>
-<li><a href="#p_osmmap">OSM Map</a> panel</li>
-<br>
-<a href="#final">Final words</a><br><br>
 
 <h2><a name="m_program">Program menu</a></h2>
 <h3>Preferences</h3>

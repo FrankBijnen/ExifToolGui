@@ -2,7 +2,7 @@ unit MainDef;
 
 interface
 
-uses System.Classes, Vcl.Dialogs, ExifTool, GEOMap, UnitLangResources;
+uses System.Classes, Winapi.Windows, Vcl.Dialogs, ExifTool, GEOMap, UnitLangResources, UnitScaleForm;
 
 const
   SHOWALL = 'Show All Files';
@@ -162,7 +162,7 @@ var
   SelCopySingleTagList: string;
 
 function GetIniFilePath(AllowPrevVer: boolean): string;
-procedure ReadGUILog;
+procedure ReadFormSizes(AForm: TScaleForm; DefaultPos: TRect);
 function ReadSingleInstanceApp: boolean;
 procedure ResetWindowSizes;
 procedure ReadGUIini;
@@ -174,9 +174,9 @@ function BrowseFolderDlg(const Title: string; iFlag: integer; const StartFolder:
 implementation
 
 uses System.SysUtils, System.StrUtils, System.IniFiles,
-  Winapi.Windows, Winapi.ShellAPI, Winapi.ShlObj,
+  Winapi.ShellAPI, Winapi.ShlObj,
   Vcl.Forms, Vcl.StdCtrls, Vcl.ComCtrls,
-  Main, LogWin, ExifToolsGUI_Utils, ExifInfo;
+  Main, ExifToolsGUI_Utils, ExifInfo, LogWin;
 
 const
   CRLF = #13#10;
@@ -188,6 +188,7 @@ const
   WorkSpaceTags = 'WorkSpaceTags';
   ETDirectCmd = 'ETdirectCmd';
   UserDefTags = 'FListUserDefColumn';
+  FormSizes = 'FormSizes';
   TagList = 'TagList';
   CustomView = 'CustomView';
   PredefinedTags = 'PredefinedTags';
@@ -506,6 +507,28 @@ begin
   SelCopySingleTagList := ReplaceLastChar(GUIini.ReadString(TagList, SelCopySingleTags, '<'), '<', ' ');
 end;
 
+procedure WriteAllFormSizes(GUIini: TMemIniFile);
+var
+  Indx: integer;
+  AForm: TScaleForm;
+begin
+  for Indx := 0 to Screen.FormCount -1 do
+  begin
+    if (Screen.Forms[Indx] is TScaleForm) then
+    begin
+      AForm := Screen.Forms[Indx] as TScaleForm;
+      if (AForm.DefWindowSizes.Width <> 0) and
+         (AForm.DefWindowSizes.Height <> 0) then
+      begin
+        GUIini.WriteInteger(FormSizes, AForm.Name + '_Left',   AForm.Left);
+        GUIini.WriteInteger(FormSizes, AForm.Name + '_Top',    AForm.Top);
+        GUIini.WriteInteger(FormSizes, AForm.Name + '_Width',  AForm.Width);
+        GUIini.WriteInteger(FormSizes, AForm.Name + '_Height', AForm.Height);
+      end;
+    end;
+  end;
+end;
+
 // Writing the workspace tags this way allows duplicate tag names.
 // Not what's intended by MS, but hey....
 procedure WriteWorkSpaceTags(GUIini: TMemIniFile);
@@ -702,23 +725,20 @@ begin
       inc(N); // check shortcut setting
     if ReadBool(Ini_ETGUI, 'StartMax', false) then
       inc(N);
-    Top := ReadInteger(Ini_ETGUI, 'WinTop', 40);
-    Left := ReadInteger(Ini_ETGUI, 'WinLeft', 60);
-    Width := ReadInteger(Ini_ETGUI, 'WinWidth', 1024);
-    Height := ReadInteger(Ini_ETGUI, 'WinHeight', 660);
+
     if N > 0 then
       WindowState := wsMaximized;
   end;
 end;
 
-procedure ReadLogWindowSizes(const AIniFile: TMemIniFile);
+procedure ReadWindowSizes(const AIniFile: TMemIniFile; AForm: TScaleForm; DefaultPos: TRect);
 begin
-  with AIniFile, FLogWin do
+  with AIniFile do
   begin
-    Top := ReadInteger(Ini_ETGUI, 'LogWinTop', 106);
-    Left := ReadInteger(Ini_ETGUI, 'LogWinLeft', 108);
-    Width := ReadInteger(Ini_ETGUI, 'LogWinWidth', ScaleDesignDpi(580));
-    Height := ReadInteger(Ini_ETGUI, 'LogWinHeight', ScaleDesignDpi(580));
+    AForm.Left    := ReadInteger(FormSizes, AForm.Name + '_Left',   DefaultPos.Left);
+    AForm.Top     := ReadInteger(FormSizes, AForm.Name + '_Top',    DefaultPos.Top);
+    AForm.Width   := ReadInteger(FormSizes, AForm.Name + '_Width',  DefaultPos.Width);
+    AForm.Height  := ReadInteger(FormSizes, AForm.Name + '_Height', DefaultPos.Height);
   end;
 end;
 
@@ -885,7 +905,7 @@ begin
   end;
 end;
 
-procedure ReadGUILog;
+procedure ReadFormSizes(AForm: TScaleForm; DefaultPos: TRect);
 begin
   try
     GUIini := TMemIniFile.Create(GetIniFilePath(True), TEncoding.UTF8);
@@ -894,7 +914,7 @@ begin
   end;
 
   try
-    ReadLogWindowSizes(GUIini);
+    ReadWindowSizes(GUIini, AForm, DefaultPos);
   finally
     GUIini.Free;
   end;
@@ -916,12 +936,28 @@ begin
 end;
 
 procedure ResetWindowSizes;
-var TempIni: TMemIniFile;
+var
+  TempIni: TMemIniFile;
+  Indx: integer;
+  AForm: TScaleForm;
+  DefSize: TRect;
 begin
   TempIni := TMemIniFile.Create('NUL'); // Should not exist, forcing all values to default
   try
     ReadMainWindowSizes(TempIni);
-    ReadLogWindowSizes(TempIni);
+
+    for Indx := 0 to Screen.FormCount -1 do
+    begin
+      if (Screen.Forms[Indx] is TScaleForm) then
+      begin
+        AForm := Screen.Forms[Indx] as TScaleForm;
+        DefSize := AForm.DefWindowSizes;
+        if (DefSize.Width <> 0) and
+           (DefSize.Height <> 0) then
+          ReadWindowSizes(TempIni, AForm, DefSize);
+      end;
+    end;
+
   finally
     TempIni.Free;
   end;
@@ -943,28 +979,16 @@ begin
     try
       with GUIini, FMain do
       begin
-        if WindowState <> wsMaximized then
-        begin
-          WriteBool(Ini_ETGUI, 'StartMax', false);
-          WriteInteger(Ini_ETGUI, 'WinTop', Top);
-          WriteInteger(Ini_ETGUI, 'WinLeft', Left);
-          WriteInteger(Ini_ETGUI, 'WinWidth', Width);
-          WriteInteger(Ini_ETGUI, 'WinHeight', Height);
-        end
-        else
-          WriteBool(Ini_ETGUI, 'StartMax', True);
+        // Main form settings, Except Form self
+        WriteBool(Ini_ETGUI, 'StartMax', (WindowState = wsMaximized));
         WriteInteger(Ini_ETGUI, 'BrowseWidth', AdvPanelBrowse.Width);
         WriteInteger(Ini_ETGUI, 'PreviewHeight', AdvPagePreview.Height);
         WriteInteger(Ini_ETGUI, 'MetadataWidth', AdvPageMetadata.Width);
         WriteInteger(Ini_ETGUI, 'MetadataTagWidth', MetadataList.ColWidths[0]);
         WriteString(Ini_ETGUI, 'DefaultDir', ShellList.path);
-        with FLogWin do
-        begin
-          WriteInteger(Ini_ETGUI, 'LogWinTop', Top);
-          WriteInteger(Ini_ETGUI, 'LogWinLeft', Left);
-          WriteInteger(Ini_ETGUI, 'LogWinWidth', Width);
-          WriteInteger(Ini_ETGUI, 'LogWinHeight', Height);
-        end;
+
+        // Write all form sizes to INI
+        WriteAllFormSizes(GUIini);
 
         // Std (file list) col widths
         WriteInteger(Ini_ETGUI, 'StdColWidth0', FListStdColWidth[0]);

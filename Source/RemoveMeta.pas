@@ -12,17 +12,19 @@ type
   TFRemoveMeta = class(TScaleForm)
     StatusBar1: TStatusBar;
     AdvPanel1: TPanel;
-    BtnCancel: TButton;
-    BtnExecute: TButton;
-    Label1: TLabel;
-    ChkRemoveAll: TCheckBox;
     LvTagNames: TListView;
-    BtnPreview: TButton;
     PnlButtons: TPanel;
     ImageCollection: TImageCollection;
     VirtualImageList: TVirtualImageList;
     SpbPredefined: TSpeedButton;
     CmbPredefined: TComboBox;
+    PnlRight: TPanel;
+    BtnCancel: TButton;
+    BtnPreview: TButton;
+    Label1: TLabel;
+    BtnExecute: TButton;
+    PnlRemoveAll: TPanel;
+    ChkRemoveAll: TCheckBox;
     procedure FormShow(Sender: TObject);
 
     procedure BtnExecuteClick(Sender: TObject);
@@ -33,6 +35,7 @@ type
     procedure SpbPredefinedClick(Sender: TObject);
     procedure FormResize(Sender: TObject);
     procedure CmbPredefinedChange(Sender: TObject);
+    procedure FormCreate(Sender: TObject);
   private
     { Private declarations }
     FSample: string;
@@ -43,6 +46,8 @@ type
     procedure GetTagNames;
     procedure CheckSelection;
     procedure DisplayHint(Sender: TObject);
+  protected
+    function GetDefWindowSizes: TRect;  override;
   public
     { Public declarations }
     procedure PrepareShow(ASample: string);
@@ -61,6 +66,13 @@ uses
 {$R *.dfm}
 
 var FStyleServices: TCustomStyleServices;
+
+function TFRemoveMeta.GetDefWindowSizes: TRect;
+begin
+  result := DesignRect;
+  result.Offset(FMain.GetFormOffset.X,
+                FMain.GetFormOffset.Y);
+end;
 
 procedure TFRemoveMeta.SetupPredefined;
 var
@@ -208,6 +220,11 @@ begin
   StatusBar1.SimpleText := GetShortHint(Application.Hint);
 end;
 
+procedure TFRemoveMeta.FormCreate(Sender: TObject);
+begin
+  ReadFormSizes(Self, DefWindowSizes);
+end;
+
 procedure TFRemoveMeta.FormResize(Sender: TObject);
 begin
   if LvTagNames.HandleAllocated then
@@ -218,8 +235,8 @@ procedure TFRemoveMeta.FormShow(Sender: TObject);
 begin
   Application.OnHint := DisplayHint;
   FStyleServices := TStyleManager.Style[GUIsettings.GuiStyle];
-  Left := FMain.Left + FMain.GUIBorderWidth + FMain.AdvPageFilelist.Left;
-  Top := FMain.Top + FMain.GUIBorderHeight;
+  Left := FMain.GetFormOffset.X;
+  Top := FMain.GetFormOffset.Y;
 
   if FMain.MaDontBackup.Checked then
     Label1.Caption := StrBackupOFF

@@ -13,21 +13,23 @@ type
     StatusBar1: TStatusBar;
     AdvPanel1: TPanel;
     Label2: TLabel;
-    BtnCancel: TButton;
-    Label1: TLabel;
-    BtnExecute: TButton;
     Label3: TLabel;
     LvTagNames: TListView;
-    BtnPreview: TButton;
     PnlButtons: TPanel;
     SpbPredefined: TSpeedButton;
     CmbPredefined: TComboBox;
+    PnlRight: TPanel;
+    BtnCancel: TButton;
+    BtnPreview: TButton;
+    Label1: TLabel;
+    BtnExecute: TButton;
     procedure FormShow(Sender: TObject);
     procedure LvTagNamesCustomDrawItem(Sender: TCustomListView; Item: TListItem; State: TCustomDrawState; var DefaultDraw: Boolean);
     procedure BtnPreviewClick(Sender: TObject);
     procedure SpbPredefinedClick(Sender: TObject);
     procedure FormResize(Sender: TObject);
     procedure CmbPredefinedChange(Sender: TObject);
+    procedure FormCreate(Sender: TObject);
   private
     { Private declarations }
     FSample: string;
@@ -37,6 +39,8 @@ type
     procedure GetSelectedTags;
     procedure GetTagNames;
     procedure DisplayHint(Sender: TObject);
+  protected
+    function GetDefWindowSizes: TRect; override;
   public
     procedure PrepareShow(ASample: string);
     function TagSelection: string;
@@ -55,6 +59,13 @@ uses
 {$R *.dfm}
 
 var FStyleServices: TCustomStyleServices;
+
+function TFCopyMetadata.GetDefWindowSizes: TRect;
+begin
+  result := DesignRect;
+  result.Offset(FMain.GetFormOffset.X,
+                FMain.GetFormOffset.Y);
+end;
 
 procedure TFCopyMetadata.SetupPredefined;
 var
@@ -97,8 +108,6 @@ begin
     ExcludeCopyTagListName := FrmPredefinedTags.GetSelectedPredefined;
     SetupPredefined;
     CmbPredefinedChange(CmbPredefined);
-
-    SelExcludeCopyTagList := '';
     SetupListView;
   end;
 end;
@@ -171,6 +180,11 @@ begin
   SetupListView;
 end;
 
+procedure TFCopyMetadata.FormCreate(Sender: TObject);
+begin
+  ReadFormSizes(Self, Self.DefWindowSizes);
+end;
+
 procedure TFCopyMetadata.FormResize(Sender: TObject);
 begin
   if LvTagNames.HandleAllocated then
@@ -181,8 +195,8 @@ procedure TFCopyMetadata.FormShow(Sender: TObject);
 begin
   Application.OnHint := DisplayHint;
   FStyleServices := TStyleManager.Style[GUIsettings.GuiStyle];
-  Left := FMain.Left + FMain.GUIBorderWidth + FMain.AdvPageFilelist.Left;
-  Top := FMain.Top + FMain.GUIBorderHeight;
+  Left := FMain.GetFormOffset.X;
+  Top := FMain.GetFormOffset.Y;
 
   if FMain.MaDontBackup.Checked then
     Label1.Caption := StrBackupOFF

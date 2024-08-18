@@ -35,14 +35,16 @@ object FrmGenerate: TFrmGenerate
     Height = 30
     Align = alBottom
     TabOrder = 0
+    ExplicitTop = 8
+    ExplicitWidth = 557
     object PbProgress: TProgressBar
       Left = 107
       Top = 1
-      Width = 465
+      Width = 457
       Height = 28
       Align = alClient
       TabOrder = 0
-      ExplicitWidth = 457
+      ExplicitWidth = 449
     end
     object BtnClose: TBitBtn
       Left = 1

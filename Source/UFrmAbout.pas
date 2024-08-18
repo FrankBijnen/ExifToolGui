@@ -43,8 +43,8 @@ var
   Output: string;
   I, X, Y: integer;
 begin
-  Left := FMain.Left + FMain.GUIBorderWidth + FMain.AdvPageFilelist.Left;
-  Top := FMain.Top + FMain.GUIBorderHeight;
+  Left := FMain.GetFormOffset.X;
+  Top := FMain.GetFormOffset.Y;
 
   // These Labels dont have a styled font, copy it from a styled one.
   LblSource.Font.Assign(LblExifTool.Font);

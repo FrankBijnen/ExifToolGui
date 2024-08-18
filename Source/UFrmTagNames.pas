@@ -47,7 +47,7 @@ var
 implementation
 
 uses
-  ExifToolsGUI_Utils, UnitLangResources;
+  ExifToolsGUI_Utils, UnitLangResources, Main;
 
 {$R *.dfm}
 
@@ -96,6 +96,9 @@ end;
 
 procedure TFrmTagNames.FormShow(Sender: TObject);
 begin
+  Left := FMain.GetFormOffset.X;
+  Top := FMain.GetFormOffset.Y;
+
   RadTagValuesClick(RadTagValues);
 end;
 

@@ -36,7 +36,7 @@ object FrmPredefinedTags: TFrmPredefinedTags
       694
       29)
     object BtnOk: TBitBtn
-      Left = 501
+      Left = 493
       Top = 2
       Width = 85
       Height = 25
@@ -63,10 +63,10 @@ object FrmPredefinedTags: TFrmPredefinedTags
       ModalResult = 1
       NumGlyphs = 2
       TabOrder = 0
-      ExplicitLeft = 497
+      ExplicitLeft = 489
     end
     object BtnCancel: TBitBtn
-      Left = 592
+      Left = 584
       Top = 2
       Width = 85
       Height = 25
@@ -93,7 +93,7 @@ object FrmPredefinedTags: TFrmPredefinedTags
       ModalResult = 2
       NumGlyphs = 2
       TabOrder = 1
-      ExplicitLeft = 588
+      ExplicitLeft = 580
     end
   end
   object PnlButtons: TPanel
@@ -159,6 +159,7 @@ object FrmPredefinedTags: TFrmPredefinedTags
     OnDrawCell = SGPredefinedTagsDrawCell
     OnExit = SGPredefinedTagsExit
     OnSelectCell = SGPredefinedTagsSelectCell
+    ExplicitWidth = 690
     ColWidths = (
       624
       64

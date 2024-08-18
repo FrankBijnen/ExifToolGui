@@ -99,7 +99,7 @@ procedure TFrmGenerate.FormShow(Sender: TObject);
 begin
   LblGenerate.Caption := '';
   WantsToClose := false;
-  ModCount := 100;
+  ModCount := 25;
 end;
 
 procedure TFrmGenerate.BtnCloseClick(Sender: TObject);

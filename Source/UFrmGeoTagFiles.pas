@@ -188,8 +188,9 @@ procedure TFGeotagFiles.FormShow(Sender: TObject);
 const
   IsQuickTimeStr: array[False..True] of string = ('','QuickTime ');
 begin
-  Left := FMain.Left + FMain.GUIBorderWidth + FMain.AdvPageFilelist.Left;
-  Top := FMain.Top + FMain.GUIBorderHeight;
+  Left := FMain.GetFormOffset.X;
+  Top := FMain.GetFormOffset.Y;
+
   StatusBar1.SimpleText := '';
   IsQuickTime := GetIsQuickTime(Fmain.GetFirstSelectedFile);
   LblSample.Caption := Format(StrSampleS, [IsQuickTimeStr[IsQuickTime] + ExtractFileName(Fmain.GetFirstSelectedFile)]);

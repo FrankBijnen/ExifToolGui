@@ -293,8 +293,8 @@ end;
 
 procedure TFPreferences.FormShow(Sender: TObject);
 begin
-  Left := FMain.Left + FMain.GUIBorderWidth;
-  Top := FMain.Top + FMain.GUIBorderHeight;
+  Left := FMain.GetFormOffset(false).X;
+  Top := FMain.GetFormOffset(false).Y;
 
   MemoWin11.Visible := CheckWin32Version(10, 0) and
                        (TOSversion.Build >= 22000); //WIN11

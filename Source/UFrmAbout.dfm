@@ -4,8 +4,8 @@ object FrmAbout: TFrmAbout
   BorderIcons = []
   BorderStyle = bsToolWindow
   Caption = 'About'
-  ClientHeight = 272
-  ClientWidth = 413
+  ClientHeight = 281
+  ClientWidth = 417
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -156,26 +156,25 @@ object FrmAbout: TFrmAbout
   end
   object Panel1: TPanel
     Left = 0
-    Top = 243
-    Width = 413
+    Top = 252
+    Width = 417
     Height = 29
     Align = alBottom
     TabOrder = 0
-    ExplicitTop = 231
-    ExplicitWidth = 405
+    ExplicitTop = 219
+    ExplicitWidth = 397
     DesignSize = (
-      413
+      417
       29)
     object BtnOk: TBitBtn
-      Left = 292
-      Top = 2
+      Left = 319
+      Top = 1
       Width = 85
       Height = 25
       Anchors = [akRight, akBottom]
       Kind = bkClose
       NumGlyphs = 2
       TabOrder = 0
-      ExplicitLeft = 284
     end
   end
 end

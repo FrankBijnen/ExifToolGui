@@ -1,41 +1,34 @@
 object FCopyMetaSingle: TFCopyMetaSingle
   Left = 0
   Top = 0
-  BorderStyle = bsDialog
+  BorderStyle = bsSizeToolWin
   Caption = 'Import into selected files'
-  ClientHeight = 386
-  ClientWidth = 520
+  ClientHeight = 473
+  ClientWidth = 464
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
   Font.Height = -11
   Font.Name = 'Tahoma'
   Font.Style = []
+  Position = poDesigned
+  OnCreate = FormCreate
   OnResize = FormResize
   OnShow = FormShow
   TextHeight = 13
-  object Label1: TLabel
-    Left = 436
-    Top = 317
-    Width = 31
-    Height = 13
-    Caption = 'Label1'
-  end
   object StatusBar1: TStatusBar
     Left = 0
-    Top = 367
-    Width = 520
+    Top = 454
+    Width = 464
     Height = 19
     Panels = <>
-    ExplicitTop = 366
-    ExplicitWidth = 516
   end
   object AdvPanel1: TPanel
     Left = 0
     Top = 0
-    Width = 417
-    Height = 367
-    Align = alLeft
+    Width = 349
+    Height = 454
+    Align = alClient
     DoubleBuffered = True
     Font.Charset = DEFAULT_CHARSET
     Font.Color = clWindowText
@@ -45,34 +38,46 @@ object FCopyMetaSingle: TFCopyMetaSingle
     ParentDoubleBuffered = False
     ParentFont = False
     TabOrder = 0
-    ExplicitHeight = 366
     object ChkImportAll: TCheckBox
-      Left = 16
-      Top = 16
-      Width = 355
-      Height = 17
+      AlignWithMargins = True
+      Left = 11
+      Top = 4
+      Width = 342
+      Height = 25
+      Margins.Left = 10
+      Align = alTop
       Caption = '-import ALL metadata'
       Checked = True
       State = cbChecked
       TabOrder = 0
       OnClick = ChkImportAllClick
+      ExplicitWidth = 334
     end
     object ChkNoOverWrite: TCheckBox
-      Left = 16
-      Top = 342
-      Width = 355
-      Height = 17
+      AlignWithMargins = True
+      Left = 11
+      Top = 437
+      Width = 342
+      Height = 25
+      Margins.Left = 10
+      Align = alBottom
       Caption = 'Dont overwrite existing data (-wm cg)'
       TabOrder = 3
+      ExplicitTop = 425
+      ExplicitWidth = 334
     end
     object PnlButtons: TPanel
-      Left = 16
-      Top = 45
-      Width = 355
+      AlignWithMargins = True
+      Left = 11
+      Top = 35
+      Width = 342
       Height = 25
+      Margins.Left = 10
+      Align = alTop
       TabOrder = 1
+      ExplicitWidth = 334
       object SpbPredefined: TSpeedButton
-        Left = 259
+        Left = 246
         Top = 1
         Width = 95
         Height = 23
@@ -86,7 +91,7 @@ object FCopyMetaSingle: TFCopyMetaSingle
       object CmbPredefined: TComboBox
         Left = 1
         Top = 1
-        Width = 258
+        Width = 245
         Height = 22
         Align = alClient
         TabOrder = 0
@@ -95,10 +100,13 @@ object FCopyMetaSingle: TFCopyMetaSingle
       end
     end
     object LvTagNames: TListView
-      Left = 16
-      Top = 76
-      Width = 355
-      Height = 260
+      AlignWithMargins = True
+      Left = 11
+      Top = 66
+      Width = 334
+      Height = 353
+      Margins.Left = 10
+      Align = alClient
       Checkboxes = True
       Columns = <
         item
@@ -114,36 +122,61 @@ object FCopyMetaSingle: TFCopyMetaSingle
       OnItemChecked = LvTagNamesItemChecked
     end
   end
-  object BtnCancel: TButton
-    Left = 436
-    Top = 16
-    Width = 64
-    Height = 25
-    Caption = 'Cancel'
-    ModalResult = 2
-    TabOrder = 1
-  end
-  object BtnExecute: TButton
-    Left = 436
-    Top = 336
-    Width = 64
-    Height = 25
-    Caption = 'Execute'
-    Default = True
-    Enabled = False
-    ModalResult = 1
-    TabOrder = 3
-    OnClick = BtnExecuteClick
-  end
-  object BtnPreview: TButton
-    Left = 436
-    Top = 286
-    Width = 64
-    Height = 25
-    Caption = 'Preview'
-    Enabled = False
+  object PnlRight: TPanel
+    Left = 349
+    Top = 0
+    Width = 115
+    Height = 454
+    Align = alRight
     TabOrder = 2
-    OnClick = BtnPreviewClick
+    DesignSize = (
+      115
+      454)
+    object Label1: TLabel
+      Left = 2
+      Top = 377
+      Width = 110
+      Height = 27
+      Alignment = taCenter
+      Anchors = [akRight, akBottom]
+      AutoSize = False
+      Caption = 'Label1'
+      Layout = tlCenter
+      ExplicitTop = 373
+    end
+    object BtnCancel: TButton
+      Left = 2
+      Top = 16
+      Width = 110
+      Height = 25
+      Caption = 'Cancel'
+      ModalResult = 2
+      TabOrder = 0
+    end
+    object BtnPreview: TButton
+      Left = 2
+      Top = 341
+      Width = 110
+      Height = 25
+      Anchors = [akRight, akBottom]
+      Caption = 'Preview'
+      Enabled = False
+      TabOrder = 1
+      OnClick = BtnPreviewClick
+    end
+    object BtnExecute: TButton
+      Left = 2
+      Top = 414
+      Width = 110
+      Height = 25
+      Anchors = [akRight, akBottom]
+      Caption = 'Execute'
+      Default = True
+      Enabled = False
+      ModalResult = 1
+      TabOrder = 2
+      OnClick = BtnExecuteClick
+    end
   end
   object ImageCollection: TImageCollection
     Images = <
