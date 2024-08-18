@@ -3156,6 +3156,8 @@ end;
 procedure TFMain.ShellListKeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
 begin
   case Key of
+    VK_HOME,
+    VK_END,
     VK_UP,
     VK_DOWN,
     VK_LEFT,
