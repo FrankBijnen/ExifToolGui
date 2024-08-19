@@ -4,7 +4,7 @@ object FGeotag: TFGeotag
   BorderStyle = bsDialog
   Caption = 'Import GPS data'
   ClientHeight = 357
-  ClientWidth = 657
+  ClientWidth = 661
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -14,21 +14,22 @@ object FGeotag: TFGeotag
   OnShow = FormShow
   TextHeight = 13
   object Label1: TLabel
-    Left = 574
+    Left = 565
     Top = 285
-    Width = 31
+    Width = 90
     Height = 13
+    AutoSize = False
     Caption = 'Label1'
   end
   object StatusBar1: TStatusBar
     Left = 0
     Top = 338
-    Width = 657
+    Width = 661
     Height = 19
     Panels = <>
     SimplePanel = True
-    ExplicitTop = 339
-    ExplicitWidth = 661
+    ExplicitTop = 337
+    ExplicitWidth = 653
   end
   object AdvPanel1: TPanel
     Left = 0
@@ -45,7 +46,7 @@ object FGeotag: TFGeotag
     ParentDoubleBuffered = False
     ParentFont = False
     TabOrder = 1
-    ExplicitHeight = 339
+    ExplicitHeight = 337
     object Label2: TLabel
       Left = 25
       Top = 201
@@ -175,18 +176,18 @@ object FGeotag: TFGeotag
     end
   end
   object Button1: TButton
-    Left = 574
+    Left = 565
     Top = 23
-    Width = 80
+    Width = 90
     Height = 25
     Caption = 'Cancel'
     ModalResult = 2
     TabOrder = 2
   end
   object Button2: TButton
-    Left = 574
+    Left = 565
     Top = 304
-    Width = 80
+    Width = 90
     Height = 25
     Caption = 'Execute'
     Default = True
@@ -194,18 +195,18 @@ object FGeotag: TFGeotag
     OnClick = Button2Click
   end
   object BtnSetupGeoCode: TButton
-    Left = 574
+    Left = 565
     Top = 254
-    Width = 80
+    Width = 90
     Height = 25
     Caption = 'Setup Geo'
     TabOrder = 4
     OnClick = BtnSetupGeoCodeClick
   end
   object BtnOnMap: TButton
-    Left = 574
+    Left = 565
     Top = 213
-    Width = 75
+    Width = 90
     Height = 25
     Caption = 'Show on Map'
     TabOrder = 5

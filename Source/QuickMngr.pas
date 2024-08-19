@@ -179,9 +179,8 @@ procedure TFQuickManager.FormShow(Sender: TObject);
 var
   I, N, X: integer;
 begin
-//TODO
-  Left := FMain.Left + 8;
-  Top := FMain.Top + 56;
+  Left := FMain.GetFormOffset(false).X;
+  Top := FMain.GetFormOffset(false).Y;
   if FMain.SpeedBtnQuick.Down then
     X := FMain.MetadataList.Row - 1
   else

@@ -946,13 +946,22 @@ begin
   try
     ReadMainWindowSizes(TempIni);
 
+    // First do Main form.
+    if (Application.MainForm is TScaleForm) then
+    begin
+      AForm := Application.MainForm as TScaleForm;
+      ReadWindowSizes(TempIni, AForm, AForm.DefWindowSizes);
+    end;
+
+    // Now others
     for Indx := 0 to Screen.FormCount -1 do
     begin
       if (Screen.Forms[Indx] is TScaleForm) then
       begin
         AForm := Screen.Forms[Indx] as TScaleForm;
         DefSize := AForm.DefWindowSizes;
-        if (DefSize.Width <> 0) and
+        if (AForm.Name <> Application.MainForm.Name) and
+           (DefSize.Width <> 0) and
            (DefSize.Height <> 0) then
           ReadWindowSizes(TempIni, AForm, DefSize);
       end;

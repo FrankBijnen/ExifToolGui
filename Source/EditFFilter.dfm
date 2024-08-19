@@ -28,6 +28,7 @@ object FEditFFilter: TFEditFFilter
     ParentDoubleBuffered = False
     ParentFont = False
     TabOrder = 0
+    ExplicitHeight = 239
     object Edit1: TEdit
       Left = 8
       Top = 8
