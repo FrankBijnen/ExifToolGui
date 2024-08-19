@@ -101,8 +101,8 @@ procedure TFEditFFilter.FormShow(Sender: TObject);
 var
   I, N: integer;
 begin
-  Left := FMain.Left + 8;
-  Top := FMain.Top + 56;
+  Left := FMain.GetFormOffset(false).X;
+  Top := FMain.GetFormOffset(false).Y;
   ListBox1.Items.Clear;
   I := FMain.CBoxFileFilter.Items.Count;
   for N := 0 to I - 1 do

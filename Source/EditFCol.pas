@@ -163,8 +163,8 @@ var
   I, N: integer;
   CanSelect: boolean;
 begin
-  Left := FMain.Left + 8;
-  Top := FMain.Top + 56;
+  Left := FMain.GetFormOffset(false).X;
+  Top := FMain.GetFormOffset(false).Y;
   Width := FMain.Width - FMain.GUIBorderWidth;
 
   I := Length(FListColUsr);

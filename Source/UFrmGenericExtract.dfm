@@ -21,8 +21,8 @@ object FGenericExtract: TFGenericExtract
     Height = 19
     Panels = <>
     SimplePanel = True
-    ExplicitTop = 336
-    ExplicitWidth = 594
+    ExplicitTop = 334
+    ExplicitWidth = 586
   end
   object AdvPanel1: TPanel
     Left = 0
@@ -39,7 +39,7 @@ object FGenericExtract: TFGenericExtract
     ParentDoubleBuffered = False
     ParentFont = False
     TabOrder = 0
-    ExplicitHeight = 336
+    ExplicitHeight = 334
     object Label1: TLabel
       Left = 10
       Top = 20
