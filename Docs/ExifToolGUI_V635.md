@@ -114,6 +114,7 @@ Basic idea behind GUI is, to keep it <u>simple!</u> Thus, only those options are
 <li>Feature Request: Display the imported gps file track on the map.</li>
 <li>Improvements searching for places, and reverse geocoding.</li>
 <li>Showing sub folders can be enabled in the filelist. See: <a href="#p_subfolder">Enabling Subfolders in the FileList</a></li>
+<li>Managing metadata enhancements. E.G. removing and copying metadata. See: <a href="#p_metadataenhancement">Managing metadata enhancements</a></li>
 </ul>
 <br>
 <a href="changelog.txt"><b>See changelog.txt for a complete list of issues.</b></a>
@@ -571,6 +572,7 @@ processed.<br>
 That's it: after click on <font class="blue">Execute</font>, metadata will be copied into all files inside <font class="brown">MyJpg\Dir1</font> folder (incl. <font class="brown">Dir2</font> folder) from files inside <font class="brown">MyRaw\Dir1</font> folder (incl. <font class="brown">Dir2</font> folder).<br>
 If we would choose <font class="blue">No</font> in step 3 above, then only files inside <font class="brown">MyJpg\Dir1</font> would be processed.<br>
 <br>
+See also: <a href="#p_metadataenhancement">Managing metadata enhancements</a><br>
 
 <h3>Import GPS data from: Log files</h3>
 This option allows geotagging your files in batch by using log file of your GPS device (see here for <a href="https://exiftool.org/geotag.html">supported GPS files</a>).<br> 
@@ -687,6 +689,7 @@ Note, that in some cases (depending on the image file format), it's not
 possible/safe to remove the metadata you've selected to remove. In such 
 cases, ExifTool will simply refuse to remove such metadata (also see <font class="blue">Ignore minor errors in metadata</font> menu above).<br>
 <br>
+See also: <a href="#p_metadataenhancement">Managing metadata enhancements</a><br>
 
 <h3>Update City, Province, Country from GPS coordinates</h3>
 This option can update the location info (Country, Province and City) for the selected files.<br>
@@ -705,6 +708,28 @@ Notes:<br>
 </ul>
 - If you open the log window you can see the rest requests and their responses.<br><br>
 <a href="Readme GeoCoding.txt">See also Readme GeoCoding.txt</a><br>
+
+<h2><a name="p_metadataenhancement">Managing metadata enhancements</a></h2>
+
+The enhancements apply to these functions: <br>
+<a href="#m_modify">Modify/Remove metadata</a><br>
+<a href="#m_exp_imp">Export/Import Copy metadata</a><br>
+<br>
+<li>The selected tag names are saved and restored (remembered).</li>
+<br>
+<img src="ExifToolGUI_V635_files/metadataenhancements.jpg"><br><br>
+
+<li>A button <b>Preview</b> has been added. It will give you a preview of the tag names, with their values</li>
+<li>You can customize the tags, by clicking on the button <b>Predefined</b></i><br><br>
+
+<img src="ExifToolGUI_V635_files/metadatapreview.jpg"><br><br>
+<br>
+<li>Customizing the predefined tags</li><br><br>
+<img src="ExifToolGUI_V635_files/predefinedtags.jpg"><br><br>
+<br>
+<li>You can add a tag by selecting one from a list.</i><br><br>
+<br>
+<img src="ExifToolGUI_V635_files/predefinedadd.jpg"><br><br>
 
 <h2><a name="m_various">Various menu</a></h2>
 
@@ -784,7 +809,7 @@ But to give you at least something, the last entry in this drop-down box is <fon
 this view on relative small amount of files in folder. In short: tryout.<br>
 <br>
 
-<h3><a name="p_subfolder">Scanning and displaying sub folders in the filelist</a></h2>
+<h2><a name="p_subfolder">Scanning and displaying sub folders in the filelist</a></h2>
 <br><b>Prerequisite</b>
 <ul>
 <li>Enable <b>Show folders</b> in <b>Preferences</b><br>
