@@ -358,6 +358,7 @@ type
     procedure ShellListColumnResized(Sender: TObject);
     procedure ShellListMouseWheel(Sender: TObject; Shift: TShiftState; WheelDelta: Integer; MousePos: TPoint; var Handled: Boolean);
     procedure CounterETEvent(Counter: integer);
+    procedure ResetShowAll;
   protected
     function GetDefWindowSizes: TRect; override;
   public
@@ -446,6 +447,18 @@ begin
   result.Y := Top + GUIBorderHeight;
   if (AddFileList) then
     result.Y := result.Y + AdvPageFilelist.Top;
+end;
+
+procedure TFMain.ResetShowAll;
+begin
+  ShellList.Enabled := false;
+  try
+    CBoxFileFilter.ItemIndex := 0;
+    ShellList.IncludeSubFolders := false;
+    ShellList.ClearSelectionRefresh;
+  finally
+    ShellList.Enabled := true;
+  end;
 end;
 
 procedure TFMain.WMEndSession(var Msg: TWMEndSession);
@@ -803,6 +816,9 @@ end;
 
 procedure TFMain.MGUIStyleClick(Sender: TObject);
 begin
+  // Selecting a style with subfolders enabled takes to long
+  ResetShowAll;
+
   ShellTree.SetFocus;
   with FrmStyle do
   begin
@@ -2707,14 +2723,7 @@ begin
     exit;
 
 // Clicking Home for Desktop with IncludeSubfolders takes to long.
-  ShellList.Enabled := false;
-  try
-    CBoxFileFilter.ItemIndex := 0;
-    ShellList.IncludeSubFolders := false;
-    ShellList.ClearSelectionRefresh;
-  finally
-    ShellList.Enabled := true;
-  end;
+  ResetShowAll;
 
 // Now set the root
   ShellTree.Root := ShellTree.PreferredRoot;
