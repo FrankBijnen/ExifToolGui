@@ -18,10 +18,11 @@ ul {margin-left:16px; margin-top:0px; margin-bottom:0px}
 
 table.A4
 {table-layout:auto;
- width:800px;
+ minWidth:800px;
+ width:98%;
  border:0px #AA0000 solid;
  margin-top:0px;
- margin-left:0px;
+ margin-left:1%;
  border-spacing:4px;
  border-collapse: collapse;
  background-color:#F4F8FF;
