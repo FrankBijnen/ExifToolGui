@@ -23,6 +23,8 @@ object FRemoveMeta: TFRemoveMeta
     Height = 19
     Panels = <>
     SimplePanel = True
+    ExplicitTop = 442
+    ExplicitWidth = 456
   end
   object AdvPanel1: TPanel
     Left = 0
@@ -39,12 +41,14 @@ object FRemoveMeta: TFRemoveMeta
     ParentDoubleBuffered = False
     ParentFont = False
     TabOrder = 0
+    ExplicitWidth = 341
+    ExplicitHeight = 442
     object LvTagNames: TListView
       AlignWithMargins = True
       Left = 11
       Top = 73
-      Width = 342
-      Height = 389
+      Width = 334
+      Height = 377
       Margins.Left = 10
       Align = alClient
       Checkboxes = True
@@ -60,21 +64,21 @@ object FRemoveMeta: TFRemoveMeta
       ViewStyle = vsReport
       OnCustomDrawItem = LvTagNamesCustomDrawItem
       OnItemChecked = LvTagNamesItemChecked
-      ExplicitWidth = 334
-      ExplicitHeight = 377
+      ExplicitWidth = 326
+      ExplicitHeight = 365
     end
     object PnlButtons: TPanel
       AlignWithMargins = True
       Left = 11
       Top = 42
-      Width = 342
+      Width = 334
       Height = 25
       Margins.Left = 10
       Align = alTop
       TabOrder = 0
-      ExplicitWidth = 334
+      ExplicitWidth = 326
       object SpbPredefined: TSpeedButton
-        Left = 246
+        Left = 238
         Top = 1
         Width = 95
         Height = 23
@@ -87,12 +91,13 @@ object FRemoveMeta: TFRemoveMeta
       object CmbPredefined: TComboBox
         Left = 1
         Top = 1
-        Width = 245
+        Width = 237
         Height = 22
         Align = alClient
         TabOrder = 0
         Text = 'CmbPredefined'
         OnChange = CmbPredefinedChange
+        ExplicitWidth = 229
       end
     end
     object PnlRemoveAll: TPanel
@@ -102,18 +107,19 @@ object FRemoveMeta: TFRemoveMeta
       Height = 38
       Align = alTop
       TabOrder = 2
+      ExplicitWidth = 339
       object ChkRemoveAll: TCheckBox
         AlignWithMargins = True
         Left = 11
         Top = 4
-        Width = 340
+        Width = 332
         Height = 30
         Margins.Left = 10
         Align = alClient
         Caption = '-remove ALL metadata'
         TabOrder = 0
         OnClick = ChkRemoveAllClick
-        ExplicitWidth = 332
+        ExplicitWidth = 324
       end
     end
   end
@@ -123,7 +129,10 @@ object FRemoveMeta: TFRemoveMeta
     Width = 115
     Height = 454
     Align = alRight
+    BevelOuter = bvNone
     TabOrder = 2
+    ExplicitLeft = 341
+    ExplicitHeight = 442
     DesignSize = (
       115
       454)
@@ -159,6 +168,7 @@ object FRemoveMeta: TFRemoveMeta
       Enabled = False
       TabOrder = 1
       OnClick = BtnPreviewClick
+      ExplicitTop = 331
     end
     object BtnExecute: TButton
       Left = 2
@@ -171,6 +181,7 @@ object FRemoveMeta: TFRemoveMeta
       Enabled = False
       TabOrder = 2
       OnClick = BtnExecuteClick
+      ExplicitTop = 404
     end
   end
   object ImageCollection: TImageCollection

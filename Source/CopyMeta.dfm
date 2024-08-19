@@ -23,6 +23,8 @@ object FCopyMetadata: TFCopyMetadata
     Height = 19
     Panels = <>
     SimplePanel = True
+    ExplicitTop = 442
+    ExplicitWidth = 456
   end
   object AdvPanel1: TPanel
     Left = 0
@@ -40,10 +42,12 @@ object FCopyMetadata: TFCopyMetadata
     ParentDoubleBuffered = False
     ParentFont = False
     TabOrder = 0
+    ExplicitWidth = 344
+    ExplicitHeight = 442
     object Label2: TLabel
       Left = 1
       Top = 1
-      Width = 358
+      Width = 350
       Height = 40
       Align = alTop
       Alignment = taCenter
@@ -61,8 +65,8 @@ object FCopyMetadata: TFCopyMetadata
     end
     object Label3: TLabel
       Left = 1
-      Top = 425
-      Width = 358
+      Top = 413
+      Width = 350
       Height = 40
       Align = alBottom
       Alignment = taCenter
@@ -77,8 +81,8 @@ object FCopyMetadata: TFCopyMetadata
       AlignWithMargins = True
       Left = 11
       Top = 75
-      Width = 345
-      Height = 347
+      Width = 337
+      Height = 335
       Margins.Left = 10
       Align = alClient
       Checkboxes = True
@@ -92,21 +96,21 @@ object FCopyMetadata: TFCopyMetadata
       TabOrder = 1
       ViewStyle = vsReport
       OnCustomDrawItem = LvTagNamesCustomDrawItem
-      ExplicitWidth = 337
-      ExplicitHeight = 335
+      ExplicitWidth = 329
+      ExplicitHeight = 323
     end
     object PnlButtons: TPanel
       AlignWithMargins = True
       Left = 11
       Top = 44
-      Width = 345
+      Width = 337
       Height = 25
       Margins.Left = 10
       Align = alTop
       TabOrder = 0
-      ExplicitWidth = 337
+      ExplicitWidth = 329
       object SpbPredefined: TSpeedButton
-        Left = 249
+        Left = 241
         Top = 1
         Width = 95
         Height = 23
@@ -120,12 +124,13 @@ object FCopyMetadata: TFCopyMetadata
       object CmbPredefined: TComboBox
         Left = 1
         Top = 1
-        Width = 248
+        Width = 240
         Height = 22
         Align = alClient
         TabOrder = 0
         Text = 'CmbPredefined'
         OnChange = CmbPredefinedChange
+        ExplicitWidth = 232
       end
     end
   end
@@ -135,7 +140,10 @@ object FCopyMetadata: TFCopyMetadata
     Width = 112
     Height = 454
     Align = alRight
+    BevelOuter = bvNone
     TabOrder = 2
+    ExplicitLeft = 344
+    ExplicitHeight = 442
     DesignSize = (
       112
       454)
@@ -168,6 +176,7 @@ object FCopyMetadata: TFCopyMetadata
       Caption = 'Preview'
       TabOrder = 1
       OnClick = BtnPreviewClick
+      ExplicitTop = 328
     end
     object BtnExecute: TButton
       Left = 0
@@ -179,6 +188,7 @@ object FCopyMetadata: TFCopyMetadata
       Default = True
       ModalResult = 1
       TabOrder = 2
+      ExplicitTop = 400
     end
   end
 end
