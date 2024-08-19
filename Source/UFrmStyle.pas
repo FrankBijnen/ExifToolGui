@@ -55,7 +55,7 @@ procedure TFrmStyle.SetNewStyle(Style: string);
 begin
   GUIsettings.GuiStyle := Style;
   TStyleManager.TrySetStyle(GUIsettings.GuiStyle, false);
-  Fmain.SetGuiStyle;
+  FMain.SetGuiStyle;
 
   if (GUIsettings.GuiStyle = cSystemStyleName) then // AV unregistering style hooks
     exit;
@@ -68,7 +68,7 @@ procedure TFrmStyle.RequestClose;
 begin
   Close; // First close this form, so items can be added again to the shellist
   if ValidDir(CurPath) then
-    Fmain.ShellTree.Path := CurPath; // restore path
+    FMain.ShellTree.Path := CurPath; // restore path
 end;
 
 procedure TFrmStyle.FormShow(Sender: TObject);
