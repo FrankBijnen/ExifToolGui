@@ -93,6 +93,7 @@ object FCopyMetadata: TFCopyMetadata
         end>
       GridLines = True
       HideSelection = False
+      PopupMenu = PopupMenuLv
       TabOrder = 1
       ViewStyle = vsReport
       OnCustomDrawItem = LvTagNamesCustomDrawItem
@@ -189,6 +190,28 @@ object FCopyMetadata: TFCopyMetadata
       ModalResult = 1
       TabOrder = 2
       ExplicitTop = 400
+    end
+  end
+  object PopupMenuLv: TPopupMenu
+    OnPopup = PopupMenuLvPopup
+    Left = 387
+    Top = 242
+    object Groupview1: TMenuItem
+      AutoCheck = True
+      Caption = 'Group view'
+      OnClick = Groupview1Click
+    end
+    object N1: TMenuItem
+      Caption = '-'
+    end
+    object Checkgroup1: TMenuItem
+      Caption = 'Check group'
+      OnClick = Checkgroup1Click
+    end
+    object Uncheckgroup1: TMenuItem
+      Tag = 1
+      Caption = 'Uncheck group'
+      OnClick = Checkgroup1Click
     end
   end
 end

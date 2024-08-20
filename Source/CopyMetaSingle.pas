@@ -6,7 +6,8 @@ uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants,
   System.Classes, Vcl.Graphics,
   Vcl.Controls, Vcl.Forms, UnitScaleForm, Vcl.Dialogs, Vcl.StdCtrls, Vcl.ExtCtrls,
-  Vcl.ComCtrls, Vcl.Buttons, System.ImageList, Vcl.ImgList, Vcl.VirtualImageList, Vcl.BaseImageCollection, Vcl.ImageCollection;
+  Vcl.ComCtrls, Vcl.Buttons, System.ImageList, Vcl.ImgList, Vcl.VirtualImageList, Vcl.BaseImageCollection, Vcl.ImageCollection,
+  Vcl.Menus;
 
 type
   TFCopyMetaSingle = class(TScaleForm)
@@ -25,6 +26,11 @@ type
     BtnPreview: TButton;
     Label1: TLabel;
     BtnExecute: TButton;
+    PopupMenuLv: TPopupMenu;
+    Groupview1: TMenuItem;
+    N1: TMenuItem;
+    Checkgroup1: TMenuItem;
+    Uncheckgroup1: TMenuItem;
     procedure FormShow(Sender: TObject);
     procedure BtnExecuteClick(Sender: TObject);
     procedure ChkImportAllClick(Sender: TObject);
@@ -35,6 +41,9 @@ type
     procedure FormResize(Sender: TObject);
     procedure CmbPredefinedChange(Sender: TObject);
     procedure FormCreate(Sender: TObject);
+    procedure PopupMenuLvPopup(Sender: TObject);
+    procedure Groupview1Click(Sender: TObject);
+    procedure Checkgroup1Click(Sender: TObject);
   private
     { Private declarations }
     SrcFile: string;
@@ -87,10 +96,12 @@ procedure TFCopyMetaSingle.SetupListView;
 var
   ATag, AllTags: string;
   ANItem: TListItem;
+  NewGroupId: integer;
 begin
   LvTagNames.Tag := 1;
   LvTagNames.Items.BeginUpdate;
   try
+    LvTagNames.Groups.Clear;
     LvTagNames.Items.Clear;
     if (ChkImportAll.Checked = false) then
     begin
@@ -98,8 +109,11 @@ begin
       while (AllTags <> '') do
       begin
         ATag := NextField(AllTags, ' ');
+        NewGroupId := GetGroupIdForLv(LvTagNames, GetGroupNameFromTag(ATag));
+
         ANItem := LvTagNames.Items.Add;
         ANItem.Checked := (Pos(' ' + ATag + ' ', ' ' + SelCopySingleTagList) > 0);
+        ANitem.GroupID := NewGroupId;
         SetTagItem(ANItem, ATag);
       end;
     end;
@@ -130,6 +144,25 @@ begin
   CopySingleTagList := '';
   for ANItem in LvTagNames.Items do
     CopySingleTagList := CopySingleTagList + ANItem.Caption + ' ';
+end;
+
+procedure TFCopyMetaSingle.Groupview1Click(Sender: TObject);
+begin
+  LvTagNames.GroupView := Groupview1.Checked;
+end;
+
+procedure TFCopyMetaSingle.Checkgroup1Click(Sender: TObject);
+var
+  AnItem: TlistItem;
+begin
+  if (LvTagNames.Selected = nil) then
+    exit;
+  for AnItem in LvTagNames.Items do
+  begin
+    if (AnItem.GroupID <> LvTagNames.Selected.GroupID) then
+      continue;
+    AnItem.Checked := TMenuItem(Sender).Tag = 0;
+  end;
 end;
 
 procedure TFCopyMetaSingle.CheckSelection;
@@ -170,6 +203,12 @@ begin
         result := result + '-' + RemoveInvalidTags(ANItem.Caption, true) + CRLF;
     end;
   end;
+end;
+
+procedure TFCopyMetaSingle.PopupMenuLvPopup(Sender: TObject);
+begin
+  Checkgroup1.Enabled := LvTagNames.GroupView;
+  UnCheckgroup1.Enabled := LvTagNames.GroupView;
 end;
 
 procedure TFCopyMetaSingle.PrepareShow(ASource: string);

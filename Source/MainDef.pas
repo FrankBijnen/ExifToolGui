@@ -51,14 +51,14 @@ const
     'Gps:All ';
 
   DefExcludeCopyTags =
-    'exif:ExifImageWidth ' +
-    'exif:ExifImageHeight ' +
-    'exif:Orientation ' +
-    'exif:Xresolution ' +
-    'exif:Yresolution ' +
-    'exif:ResolutionUnit ' +
-    'exif:ColorSpace ' +
-    'exif:InteropIndex ' +
+    'Exif:ExifImageWidth ' +
+    'Exif:ExifImageHeight ' +
+    'Exif:Orientation ' +
+    'Exif:Xresolution ' +
+    'Exif:Yresolution ' +
+    'Exif:ResolutionUnit ' +
+    'Exif:ColorSpace ' +
+    'Exif:InteropIndex ' +
     'Makernotes:All ' +
     'Xmp-photoshop:All ' +
     'Xmp-crs:All ' +
