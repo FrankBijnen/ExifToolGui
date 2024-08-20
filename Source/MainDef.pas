@@ -9,8 +9,9 @@ const
 
   DefRemoveTags =
     'Exif:All ' +
-    'Makernotes:All ' +
-    'Gps:All ' +
+    'Exif:Makernotes ' +
+    'Exif:Gps:All ' +
+    'Exif:IFD1:All ' +
     'Xmp:All ' +
     'Xmp-exif:All ' +
     'Xmp-Acdsee:All ' +
@@ -25,10 +26,25 @@ const
     'Jfif:All ' +
     'ICC_profile:All ';
 
+  DefSelRemoveTags =
+    'Exif:All ' +
+    'Xmp:All ' +
+    'Iptc:All ' +
+    'Photoshop:All ' +
+    'Jfif:All ' +
+    'ICC_profile:All ';
+
   DefCopySingleTags =
     'Exif:all ' +
-    '-Makernotes:All ' +
-    '-Gps:All ' +
+    '-Exif:Makernotes ' +
+    '-Exif:Gps:All ' +
+    'Xmp:All ' +
+    'IPTC:All ' +
+    'ICC_Profile:All ' +
+    'Gps:All ';
+
+  DefSelCopySingleTags =
+    'Exif:all ' +
     'Xmp:All ' +
     'IPTC:All ' +
     'ICC_Profile:All ' +
@@ -47,6 +63,8 @@ const
     'Xmp-photoshop:All ' +
     'Xmp-crs:All ' +
     'Xmp-exif:All ';
+
+  DefSelExcludeCopyTags = '';
 
 type
   TIniTagsData = (idtWorkSpace, idtETDirect, idtUserDefined, idtCustomView, idtPredefinedTags,
@@ -467,14 +485,15 @@ begin
   ExcludeCopyTagListName := GUIini.ReadString(TagList, ExcludeCopyTags, '');
 
   ExcludeCopyTagList := PredefinedTagList.Values[ExcludeCopyTagListName];
+  SelExcludeCopyTagList := ReplaceLastChar(GUIini.ReadString(TagList, SelExcludeCopyTags, '<'), '<', ' ');
+
   result := Length(Trim(ExcludeCopyTagList));
   if (result = 0) then
   begin
     ExcludeCopyTagListName := FMain.MaImportMetaSelected.Caption;
     ExcludeCopyTagList := DefExcludeCopyTags;
+    SelExcludeCopyTagList := DefSelExcludeCopyTags;
   end;
-
-  SelExcludeCopyTagList := ReplaceLastChar(GUIini.ReadString(TagList, SelExcludeCopyTags, '<'), '<', ' ');
 end;
 
 function ReadRemoveTags(GUIini: TMemIniFile): integer;
@@ -482,14 +501,15 @@ begin
   RemoveTagListName := GUIini.ReadString(TagList, RemoveTags, '');
 
   RemoveTagList := PredefinedTagList.Values[RemoveTagListName];
+  SelRemoveTagList := ReplaceLastChar(GUIini.ReadString(TagList, SelRemoveTags, '<'), '<', ' ');
+
   result := Length(Trim(RemoveTagList));
   if (result = 0) then
   begin
     RemoveTagListName := FMain.MaRemoveMeta.Caption;
     RemoveTagList := DefRemoveTags;
+    SelRemoveTagList := DefSelRemoveTags;
   end;
-
-  SelRemoveTagList := ReplaceLastChar(GUIini.ReadString(TagList, SelRemoveTags, '<'), '<', ' ');
 end;
 
 function ReadCopySingleTags(GUIini: TMemIniFile): integer;
@@ -497,14 +517,15 @@ begin
   CopySingleTagListName := GUIini.ReadString(TagList, CopySingleTags, '');
 
   CopySingleTagList := PredefinedTagList.Values[CopySingleTagListName];
+  SelCopySingleTagList := ReplaceLastChar(GUIini.ReadString(TagList, SelCopySingleTags, '<'), '<', ' ');
+
   result := Length(Trim(CopySingleTagList));
   if (result = 0) then
   begin
     CopySingleTagListName := FMain.MaImportMetaSingle.Caption;
     CopySingleTagList := DefCopySingleTags;
+    SelCopySingleTagList := DefSelCopySingleTags;
   end;
-
-  SelCopySingleTagList := ReplaceLastChar(GUIini.ReadString(TagList, SelCopySingleTags, '<'), '<', ' ');
 end;
 
 procedure WriteAllFormSizes(GUIini: TMemIniFile);

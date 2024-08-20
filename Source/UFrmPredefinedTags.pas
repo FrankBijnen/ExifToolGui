@@ -63,6 +63,7 @@ type
     procedure SetupListView(ARow: integer);
     procedure SetEdit(EditMode: boolean);
     procedure AddPredefined(NewName, FromTags, FromSelTags: string);
+    procedure CreateDefaults;
   public
     { Public declarations }
     function GetSelectedPredefined: string;
@@ -258,22 +259,19 @@ begin
                 SGPredefinedTags.Cells[2, SGPredefinedTags.Row]);
 end;
 
-procedure TFrmPredefinedTags.SpbDefaultsClick(Sender: TObject);
+procedure TFrmPredefinedTags.CreateDefaults;
 begin
-  if (MessageDlgEx(StrDeleteCustom, '', TMsgDlgType.mtConfirmation, [TMsgDlgBtn.mbOK, TMsgDlgBtn.mbCancel]) = IdCancel) then
-    exit;
-
   PredefinedTagList.Clear;
   SelPredefinedTagList.Clear;
 
   PredefinedTagList.AddPair(Fmain.MaRemoveMeta.Caption, DefRemoveTags);
-  SelPredefinedTagList.AddPair(Fmain.MaRemoveMeta.Caption, DefRemoveTags);
+  SelPredefinedTagList.AddPair(Fmain.MaRemoveMeta.Caption, DefSelRemoveTags);
 
   PredefinedTagList.AddPair(Fmain.MaImportMetaSingle.Caption, DefCopySingleTags);
-  SelPredefinedTagList.AddPair(Fmain.MaImportMetaSingle.Caption, DefCopySingleTags);
+  SelPredefinedTagList.AddPair(Fmain.MaImportMetaSingle.Caption, DefSelCopySingleTags);
 
   PredefinedTagList.AddPair(Fmain.MaImportMetaSelected.Caption, DefExcludeCopyTags);
-  SelPredefinedTagList.AddPair(Fmain.MaImportMetaSelected.Caption, '');
+  SelPredefinedTagList.AddPair(Fmain.MaImportMetaSelected.Caption, DefSelExcludeCopyTags);
 
   SetupStringGrid;
 
@@ -287,6 +285,14 @@ begin
   end;
   SGPredefinedTags.SetFocus;
   SGPredefinedTags.Col := 0;
+end;
+
+procedure TFrmPredefinedTags.SpbDefaultsClick(Sender: TObject);
+begin
+  if (MessageDlgEx(StrDeleteCustom, '', TMsgDlgType.mtConfirmation, [TMsgDlgBtn.mbOK, TMsgDlgBtn.mbCancel]) = IdCancel) then
+    exit;
+
+  CreateDefaults;
 end;
 
 procedure TFrmPredefinedTags.SGPredefinedTagsDblClick(Sender: TObject);
@@ -411,7 +417,7 @@ begin
 
   FStyleServices := TStyleManager.Style[GUIsettings.GuiStyle];
   if (PredefinedTagList.Count = 0) then
-    SpbDefaultsClick(Sender)
+    CreateDefaults
   else
     SetupStringGrid(true);
   SetEdit(false);
