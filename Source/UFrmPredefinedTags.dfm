@@ -36,7 +36,7 @@ object FrmPredefinedTags: TFrmPredefinedTags
       694
       29)
     object BtnOk: TBitBtn
-      Left = 493
+      Left = 489
       Top = 2
       Width = 85
       Height = 25
@@ -63,10 +63,10 @@ object FrmPredefinedTags: TFrmPredefinedTags
       ModalResult = 1
       NumGlyphs = 2
       TabOrder = 0
-      ExplicitLeft = 489
+      ExplicitLeft = 485
     end
     object BtnCancel: TBitBtn
-      Left = 584
+      Left = 580
       Top = 2
       Width = 85
       Height = 25
@@ -93,7 +93,7 @@ object FrmPredefinedTags: TFrmPredefinedTags
       ModalResult = 2
       NumGlyphs = 2
       TabOrder = 1
-      ExplicitLeft = 580
+      ExplicitLeft = 576
     end
   end
   object PnlButtons: TPanel
@@ -198,23 +198,23 @@ object FrmPredefinedTags: TFrmPredefinedTags
     ExplicitWidth = 690
     object SpbAddTag: TSpeedButton
       Left = 2
-      Top = 2
+      Top = 3
       Width = 100
       Height = 22
       Caption = 'Add'
       OnClick = SpbAddTagClick
     end
     object SpbDelTag: TSpeedButton
-      Left = 88
-      Top = 2
+      Left = 104
+      Top = 3
       Width = 100
       Height = 22
       Caption = 'Delete'
       OnClick = SpbDelTagClick
     end
     object SpbEditTag: TSpeedButton
-      Left = 175
-      Top = 2
+      Left = 206
+      Top = 3
       Width = 100
       Height = 22
       Caption = 'Edit'

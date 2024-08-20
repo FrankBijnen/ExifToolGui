@@ -24,12 +24,16 @@
 <ul><li><a href="#m_style">Style</a> menu</li></ul>
 <li><a href="#m_options">Options</a> menu</li>
 <li><a href="#m_exp_imp">Export/Import</a> menu</li>
+<ul><li><a href="#p_metadataenhancement">Managing metadata enhancements</a></li></ul>
 <li><a href="#m_modify">Modify</a> menu</li>
+<ul><li><a href="#p_metadataenhancement">Managing metadata enhancements</a></li></ul>
 <li><a href="#m_various">Various</a> menu</li>
 <li><a href="#m_help">Help</a> menu</li>
 <br>
 <b>Panels:</b><br>
 <li><a href="#p_filelist">Filelist</a> panel</li>
+<ul><li><a href="#p_subfolder">Scanning and displaying sub folders in the filelist</a></li></ul>
+
 <li><a href="#p_etdirect">ExifTool direct</a> panel</li>
 <li><a href="#p_metadata">Metadata</a> panel</li>
 <li><a href="#p_osmmap">OSM Map</a> panel</li>

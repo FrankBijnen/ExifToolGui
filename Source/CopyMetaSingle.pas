@@ -215,6 +215,7 @@ begin
   CopySingleTagList := PredefinedTagList.Values[CopySingleTagListName];
   SelCopySingleTagList := SelPredefinedTagList.Values[CopySingleTagListName];
   SetupListView;
+  CheckSelection;
 end;
 
 procedure TFCopyMetaSingle.DisplayHint(Sender: TObject);

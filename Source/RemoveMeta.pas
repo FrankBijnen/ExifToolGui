@@ -207,6 +207,7 @@ begin
   RemoveTagList := PredefinedTagList.Values[RemoveTagListName];
   SelRemoveTagList := SelPredefinedTagList.Values[RemoveTagListName];
   SetupListView;
+  CheckSelection;
 end;
 
 procedure TFRemoveMeta.CheckSelection;
