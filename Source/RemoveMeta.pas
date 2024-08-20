@@ -6,7 +6,8 @@ uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants,
   System.Classes, Vcl.Graphics,
   Vcl.Controls, Vcl.Forms, UnitScaleForm, Vcl.Dialogs, Vcl.ExtCtrls, Vcl.ComCtrls,
-  Vcl.StdCtrls, Vcl.Buttons, System.ImageList, Vcl.ImgList, Vcl.VirtualImageList, Vcl.BaseImageCollection, Vcl.ImageCollection;
+  Vcl.StdCtrls, Vcl.Buttons, System.ImageList, Vcl.ImgList, Vcl.VirtualImageList, Vcl.BaseImageCollection, Vcl.ImageCollection,
+  Vcl.Menus;
 
 type
   TFRemoveMeta = class(TScaleForm)
@@ -25,6 +26,11 @@ type
     BtnExecute: TButton;
     PnlRemoveAll: TPanel;
     ChkRemoveAll: TCheckBox;
+    PopupMenuLv: TPopupMenu;
+    Groupview1: TMenuItem;
+    N1: TMenuItem;
+    Checkgroup1: TMenuItem;
+    Uncheckgroup1: TMenuItem;
     procedure FormShow(Sender: TObject);
 
     procedure BtnExecuteClick(Sender: TObject);
@@ -36,6 +42,9 @@ type
     procedure FormResize(Sender: TObject);
     procedure CmbPredefinedChange(Sender: TObject);
     procedure FormCreate(Sender: TObject);
+    procedure Groupview1Click(Sender: TObject);
+    procedure CheckGroup1Click(Sender: TObject);
+    procedure PopupMenuLvPopup(Sender: TObject);
   private
     { Private declarations }
     FSample: string;
@@ -88,10 +97,12 @@ procedure TFRemoveMeta.SetupListView;
 var
   ATag, AllTags: string;
   ANItem: TListItem;
+  NewGroupId: integer;
 begin
   LvTagNames.Tag := 1;
   LvTagNames.Items.BeginUpdate;
   try
+    LvTagNames.Groups.Clear;
     LvTagNames.Items.Clear;
     if (ChkRemoveAll.Checked = false) then
     begin
@@ -99,8 +110,11 @@ begin
       while (AllTags <> '') do
       begin
         ATag := NextField(AllTags, ' ');
+        NewGroupId := GetGroupIdForLv(LvTagNames, GetGroupNameFromTag(ATag));
+
         ANItem := LvTagNames.Items.Add;
         ANItem.Checked := (Pos(' ' + ATag + ' ', ' ' + SelRemoveTagList) > 0);
+        ANItem.GroupID := NewGroupId;
         SetTagItem(ANitem, ATag);
       end;
     end;
@@ -133,6 +147,11 @@ begin
     RemoveTagList := RemoveTagList + ANItem.Caption + ' ';
 end;
 
+procedure TFRemoveMeta.Groupview1Click(Sender: TObject);
+begin
+  LvTagNames.GroupView := Groupview1.Checked;
+end;
+
 procedure TFRemoveMeta.GetSelectedTags;
 var
   ANItem: TListItem;
@@ -143,6 +162,12 @@ begin
     if (ANitem.Checked) then
       SelRemoveTagList := SelRemoveTagList + ANItem.Caption + ' ';
   end;
+end;
+
+procedure TFRemoveMeta.PopupMenuLvPopup(Sender: TObject);
+begin
+  Checkgroup1.Enabled := LvTagNames.GroupView;
+  UnCheckgroup1.Enabled := LvTagNames.GroupView;
 end;
 
 procedure TFRemoveMeta.PrepareShow(ASample: string);
@@ -172,6 +197,20 @@ begin
       if (ANitem.Checked) then
         result := result + '-' + RemoveInvalidTags(ANItem.Caption, true) + DoRemove + CRLF;
     end;
+  end;
+end;
+
+procedure TFRemoveMeta.CheckGroup1Click(Sender: TObject);
+var
+  AnItem: TlistItem;
+begin
+  if (LvTagNames.Selected = nil) then
+    exit;
+  for AnItem in LvTagNames.Items do
+  begin
+    if (AnItem.GroupID <> LvTagNames.Selected.GroupID) then
+      continue;
+    AnItem.Checked := TMenuItem(Sender).Tag = 0;
   end;
 end;
 

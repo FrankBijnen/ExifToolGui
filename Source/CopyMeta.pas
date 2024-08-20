@@ -6,7 +6,7 @@ uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants,
   System.Classes, Vcl.Graphics,
   Vcl.Controls, Vcl.Forms, UnitScaleForm, Vcl.Dialogs, Vcl.StdCtrls, Vcl.ExtCtrls,
-  Vcl.ComCtrls, Vcl.Buttons;
+  Vcl.ComCtrls, Vcl.Buttons, Vcl.Menus;
 
 type
   TFCopyMetadata = class(TScaleForm)
@@ -23,6 +23,11 @@ type
     BtnPreview: TButton;
     Label1: TLabel;
     BtnExecute: TButton;
+    PopupMenuLv: TPopupMenu;
+    Groupview1: TMenuItem;
+    N1: TMenuItem;
+    Checkgroup1: TMenuItem;
+    Uncheckgroup1: TMenuItem;
     procedure FormShow(Sender: TObject);
     procedure LvTagNamesCustomDrawItem(Sender: TCustomListView; Item: TListItem; State: TCustomDrawState; var DefaultDraw: Boolean);
     procedure BtnPreviewClick(Sender: TObject);
@@ -30,6 +35,9 @@ type
     procedure FormResize(Sender: TObject);
     procedure CmbPredefinedChange(Sender: TObject);
     procedure FormCreate(Sender: TObject);
+    procedure Groupview1Click(Sender: TObject);
+    procedure Checkgroup1Click(Sender: TObject);
+    procedure PopupMenuLvPopup(Sender: TObject);
   private
     { Private declarations }
     FSample: string;
@@ -81,17 +89,22 @@ procedure TFCopyMetadata.SetupListView;
 var
   ATag, AllTags: string;
   ANItem: TListItem;
+  NewGroupId: integer;
 begin
   LvTagNames.Items.BeginUpdate;
   try
+    LvTagNames.Groups.Clear;
     LvTagNames.Items.Clear;
     AllTags := ExcludeCopyTagList;
     while (AllTags <> '') do
     begin
       ATag := NextField(AllTags, ' ');
+      NewGroupId := GetGroupIdForLv(LvTagNames, GetGroupNameFromTag(ATag));
+
       ANItem := LvTagNames.Items.Add;
       ANitem.Caption := ATag;
       ANItem.Checked := (Pos(' ' + ATag + ' ', ' ' + SelExcludeCopyTagList) > 0);
+      ANitem.GroupID := NewGroupId;
     end;
   finally
     LvTagNames.Items.EndUpdate;
@@ -119,6 +132,11 @@ begin
   ExcludeCopyTagList := '';
   for ANItem in LvTagNames.Items do
     ExcludeCopyTagList := ExcludeCopyTagList + ANItem.Caption + ' ';
+end;
+
+procedure TFCopyMetadata.Groupview1Click(Sender: TObject);
+begin
+  LvTagNames.GroupView := Groupview1.Checked;
 end;
 
 procedure TFCopyMetadata.GetSelectedTags;
@@ -149,6 +167,12 @@ begin
   end;
 end;
 
+procedure TFCopyMetadata.PopupMenuLvPopup(Sender: TObject);
+begin
+  Checkgroup1.Enabled := LvTagNames.GroupView;
+  UnCheckgroup1.Enabled := LvTagNames.GroupView;
+end;
+
 procedure TFCopyMetadata.PrepareShow(ASample: string);
 begin
   FSample := ASample;
@@ -170,6 +194,20 @@ procedure TFCopyMetadata.LvTagNamesCustomDrawItem(Sender: TCustomListView; Item:
   var DefaultDraw: Boolean);
 begin
   StyledDrawListviewItem(FStyleServices, Sender, Item, State);
+end;
+
+procedure TFCopyMetadata.Checkgroup1Click(Sender: TObject);
+var
+  AnItem: TlistItem;
+begin
+  if (LvTagNames.Selected = nil) then
+    exit;
+  for AnItem in LvTagNames.Items do
+  begin
+    if (AnItem.GroupID <> LvTagNames.Selected.GroupID) then
+      continue;
+    AnItem.Checked := TMenuItem(Sender).Tag = 0;
+  end;
 end;
 
 procedure TFCopyMetadata.CmbPredefinedChange(Sender: TObject);

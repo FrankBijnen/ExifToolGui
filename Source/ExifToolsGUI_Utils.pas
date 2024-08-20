@@ -91,6 +91,8 @@ procedure FillTagsInCombo(SelectedFile: string; CmbTags: TComboBox; const Family
 procedure DrawItemTagName(Control: TWinControl; Index: Integer; Rect: TRect; State: TOwnerDrawState);
 procedure SetTagItem(const AnItem: TlistItem; ACaption: string = '');
 function RemoveInvalidTags(const Tag: string; AllowExclude: boolean = false): string;
+function GetGroupNameFromTag(ATag: string): string;
+function GetGroupIdForLv(AListView: TListView; AGroupName: string): integer;
 
 // GeoCoding
 function CreateTrkPoints(const LogPath: string; FirstGpx: boolean; var LastCoord: string): integer;
@@ -1103,6 +1105,50 @@ begin
 
   if result <> Tag then
     MessageDlgEx(Format(StrInvalidCharsRemoved, [Tag]), '', TMsgDlgType.mtError, [TMsgDlgBtn.mbOK]);
+end;
+
+function GetGroupNameFromTag(ATag: string): string;
+var
+  P: integer;
+begin
+  result := '';
+
+  // Group name ends with :
+  P := Pos(':', ATag);
+  if (P > 0) then
+    result := Copy(ATag, 1 , P -1);
+
+  // - In group name?
+  P := Pos('-', result, 2);
+  if (P > 0) then
+    SetLength(result, P -1);
+
+  // - Exclusion
+  if (Length(result) > 1) and
+     (result[1] = '-') then
+    result := Copy(result, 2);
+end;
+
+function GetGroupIdForLv(AListView: TListView; AGroupName: string): integer;
+var
+  Indx: integer;
+  AGroup: TListGroup;
+begin
+  for Indx := 0 to AListView.Groups.Count -1 do
+  begin
+    AGroup := AListView.Groups[Indx];
+    if (AGroup.Header = AGroupName) then
+    begin
+      AGroup.State := [TListGroupState.lgsNormal];
+      AGroup.Footer := '________';
+      AGroup.FooterAlign := TAlignment.taCenter;
+      exit(AGroup.GroupId);
+    end;
+  end;
+  AGroup := AListView.Groups.Add;
+  AGroup.Header := AGroupName;
+  AGroup.State := [TListGroupState.lgsNoHeader];
+  result := AGroup.GroupID;
 end;
 
 function CreateTrkPoints(const LogPath: string; FirstGpx: boolean; var LastCoord: string): integer;

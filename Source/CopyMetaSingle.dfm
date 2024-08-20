@@ -120,6 +120,7 @@ object FCopyMetaSingle: TFCopyMetaSingle
         end>
       GridLines = True
       HideSelection = False
+      PopupMenu = PopupMenuLv
       SmallImages = VirtualImageList
       TabOrder = 2
       ViewStyle = vsReport
@@ -302,8 +303,8 @@ object FCopyMetaSingle: TFCopyMetaSingle
               3B2DA8D14BD1E0765A0000000049454E44AE426082}
           end>
       end>
-    Left = 461
-    Top = 78
+    Left = 403
+    Top = 59
   end
   object VirtualImageList: TVirtualImageList
     DisabledOpacity = 127
@@ -329,7 +330,29 @@ object FCopyMetaSingle: TFCopyMetaSingle
         Name = 'LvIncludeTag'
       end>
     ImageCollection = ImageCollection
-    Left = 460
-    Top = 142
+    Left = 396
+    Top = 147
+  end
+  object PopupMenuLv: TPopupMenu
+    OnPopup = PopupMenuLvPopup
+    Left = 387
+    Top = 242
+    object Groupview1: TMenuItem
+      AutoCheck = True
+      Caption = 'Group view'
+      OnClick = Groupview1Click
+    end
+    object N1: TMenuItem
+      Caption = '-'
+    end
+    object Checkgroup1: TMenuItem
+      Caption = 'Check group'
+      OnClick = Checkgroup1Click
+    end
+    object Uncheckgroup1: TMenuItem
+      Tag = 1
+      Caption = 'Uncheck group'
+      OnClick = Checkgroup1Click
+    end
   end
 end

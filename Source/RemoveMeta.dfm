@@ -59,6 +59,7 @@ object FRemoveMeta: TFRemoveMeta
         end>
       GridLines = True
       HideSelection = False
+      PopupMenu = PopupMenuLv
       SmallImages = VirtualImageList
       TabOrder = 1
       ViewStyle = vsReport
@@ -296,8 +297,8 @@ object FRemoveMeta: TFRemoveMeta
               3B2DA8D14BD1E0765A0000000049454E44AE426082}
           end>
       end>
-    Left = 416
-    Top = 80
+    Left = 394
+    Top = 77
   end
   object VirtualImageList: TVirtualImageList
     DisabledOpacity = 127
@@ -323,7 +324,29 @@ object FRemoveMeta: TFRemoveMeta
         Name = 'LvIncludeTag'
       end>
     ImageCollection = ImageCollection
-    Left = 416
+    Left = 398
     Top = 144
+  end
+  object PopupMenuLv: TPopupMenu
+    OnPopup = PopupMenuLvPopup
+    Left = 387
+    Top = 242
+    object Groupview1: TMenuItem
+      AutoCheck = True
+      Caption = 'Group view'
+      OnClick = Groupview1Click
+    end
+    object N1: TMenuItem
+      Caption = '-'
+    end
+    object Checkgroup1: TMenuItem
+      Caption = 'Check group'
+      OnClick = CheckGroup1Click
+    end
+    object Uncheckgroup1: TMenuItem
+      Tag = 1
+      Caption = 'Uncheck group'
+      OnClick = CheckGroup1Click
+    end
   end
 end
