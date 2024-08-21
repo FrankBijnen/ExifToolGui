@@ -768,7 +768,6 @@ are capable of:<br>
 <li>To display the preview GUI uses the Log Window.</li>
 <li>The data (Tag names and values) shown are from the first selected/source file.</li>
 <br>
-<br>
 <img src="ExifToolGUI_V635_files/metadatapreview.jpg"><br><br>
 <ul>
 <li>You can customize the tags, by clicking on the button <b>Predefined</b>.<br>
@@ -776,7 +775,7 @@ This will open the form <b>Predefined Tags</b>.</li>
 <br>
 <li>The buttons on top allow you to <b>Add/Delete/Add/Duplicate</b> a predefined list.<br>
 This predefined list can be chosen when removing, or copying metadata, and will be remembered.<br>
-The button <b>Defaults</b> can be used to reset the predefined lists to thier defaults.</li>
+The button <b>Defaults</b> can be used to reset the predefined lists to their defaults.</li>
 </ul>
 <br>
 <img src="ExifToolGUI_V635_files/predefinedtags.jpg"><br><br>
@@ -787,11 +786,34 @@ The button <b>Defaults</b> can be used to reset the predefined lists to thier de
 </ul>
 <br>
 <img src="ExifToolGUI_V635_files/predefinedadd_sample.jpg"><br><br>
+<br>
+<ul>
+<li>You can choose 3 modes:</li>
+<ul>
+<li>From sample. Select a Tag that exists in the sample file, along with the values.</li>
+<li>All writeable tags. Select a Tag from the list that ExifTool supports for writing.</li>
+<li>Free choice. You can type in anything you like in the Edit box <b>Selected Tag name</b>.</li>
+</ul><br>
+For the first 2 modes you first have to select a <b>Family</b>.<br>
+Then you can choose a <b>Group</b> from that family.<br>
+And lastly a <b>Tag</b> from that group.<br>
+<br>
+The build Tag name will always be in the form Group:Tag. Except when you choose Free choice.<br> 
+If <b>Exclude Tag</b> is checked the tag will be prefixed by a - (minus), to serve as an exclusion.<br><br>
+</ul>
+<a href="https://exiftool.org/#tagnames">See here for more info how tag names are build up.</a>
+<br>
+<br>
+<br>
+
 <img src="ExifToolGUI_V635_files/predefinedadd.jpg"><br><br>
-<li>You can add a tag by selecting one from a list.<br>
-<b>Ok</b> will add the newly created tag after the selected tag.
-</li><br>
-You can export and import your <a href="#m_predefinedfile">predefined</a> tags.
+<br>
+<ul>
+<li><b>Ok</b> will add the newly created tag after the selected tag.</li>
+</ul><br><br>
+<u>Note:</u>
+When you're done modifying the predefined tags, you can export and import them using:<br>
+<a href="#m_predefinedfile">Predefined tags definition file Load/Save</a>.
 
 <h2><a name="m_various">Various menu</a></h2>
 
