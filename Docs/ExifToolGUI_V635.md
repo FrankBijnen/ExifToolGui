@@ -687,13 +687,28 @@ This will fill <font class="brown">Exif:LensInfo</font> of selected file(s) with
 <br>
 
 <h3>Remove metadata</h3>
+<br>
 <img src="ExifToolGUI_V635_files/removemetadata.jpg"><br>
 <br>
-Note, that in some cases (depending on the image file format), it's not 
-possible/safe to remove the metadata you've selected to remove. In such 
-cases, ExifTool will simply refuse to remove such metadata (also see <font class="blue">Ignore minor errors in metadata</font> menu above).<br>
+Notes:
+<li>A <b>Grayed</b> Plus or Minus means the tag is <b>not selected</b> for processing.</li>
+<li>A <b>Green Plus</b> means the Tag is <b>selected</b> for processing and the tag will be deleted</li>
+<li>A <b>Red Minus</b> means the Tag is <b>excluded</b> for processing and the tag will not be deleted</li>
+<br><ul>
+Technically: For every Tag selected a - (minus) is prefixed and a = (equal) suffixed and passed to ExifTool. <br>
+A Tag name that begins with a - (minus) will result in -- (2 minus) and function as an exclusion.<br>
+The selection in the screenshot would result in:<br>
+<pre>-Exif:all= --Exif:Makernotes= -Xmp:all= -Iptc:All= -PhotoShop:All= -Jfif:All= -ICCprofile=</pre>
+</ul>
+<li>To verify your selection use the <b>Preview</b> button.</li>
+<li>Your selection (The tags that you have checked) will be remembered and proposed next time.</li>
+<li>In some cases (depending on the image file format), it's not possible/safe to remove the metadata you've selected to remove.<br>
+In such cases, ExifTool will simply refuse to remove such metadata (also see <font class="blue">Ignore minor errors in metadata</font> menu above).<br></li>
 <br>
-See also: <a href="#p_metadataenhancement">Managing metadata enhancements</a><br>
+See also:<br>
+<a href="#p_metadataenhancement">Managing metadata enhancements</a> how you can customize the predefined lists and tags.<br>
+<a href="https://exiftool.org/exiftool_pod.html#Tag-operations">Tag-operations</a> ExifTool documentation on Tags.<br>
+<br>
 
 <h3>Update City, Province, Country from GPS coordinates</h3>
 This option can update the location info (Country, Province and City) for the selected files.<br>
@@ -833,7 +848,7 @@ A mask can contain literal characters, or special characters like *, [-] or ?.<b
 <br>
 
 <b>Sample file filters</b>:<br>
-<table>
+<table border="1">
 <tr><td>Typical usage</td><td>*.jpg;*.mp4</td><td>Show Jpg and mp4 in current folder</td></tr>
 <tr><td></td><td>*.jpg;*.mp4;/s</td><td>Show Jpg and mp4 in sub folders</td></tr>
 <tr><td>All Files</td><td>*.*;/s</td><td>Time consuming!</td></tr>
@@ -868,15 +883,16 @@ All other functions, including ExifTool Direct, Metadata panel, OSM panel work a
 <li>
 In thumbnail mode the sort order is always Folders first, followed by files. The relative name is used for sorting.<br>
 This can not be changed.<br>
-Relative name = The name relative to the currently selected path.<br>
+Relative name = The name relative to the currently selected path. (E.G. subdir1\subdir2\file1.jpg)<br>
 </li><br>
 <li>
 In detail mode you can use column sorting.<br>
 But beware of the performance considerations combined with subfolders containing many files.<br>
 <ul>
-<li>Standard file list. This works relatively fast on all columns.<br><br></li>
+<li>Standard file list.<br>
+This works relatively fast on all columns.<br><br></li>
 
-<li>Camera details, Location info, About photo.
+<li>Camera details, Location info, About photo.<br>
 When sorting is active on Filename this is also relatively fast.<br>
 Sorting on other columns force GUI to get the details of all files selected, this will be much slower.<br>
 Even more if you have enabled <b>Use exiftool for unsupported files</b> in <b>preferences</b>.<br>
