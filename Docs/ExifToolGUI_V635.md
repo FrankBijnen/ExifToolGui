@@ -27,9 +27,9 @@
 <ul><li><a href="#m_style">Style</a> menu</li></ul>
 <li><a href="#m_options">Options</a> menu</li>
 <li><a href="#m_exp_imp">Export/Import</a> menu</li>
-<ul><li><a href="#p_metadataenhancement">Managing metadata enhancements</a></li></ul>
+<ul><li><a href="#p_managemetadata">Managing metadata</a></li></ul>
 <li><a href="#m_modify">Modify</a> menu</li>
-<ul><li><a href="#p_metadataenhancement">Managing metadata enhancements</a></li></ul>
+<ul><li><a href="#p_managemetadata">Managing metadata</a></li></ul>
 <li><a href="#m_various">Various</a> menu</li>
 <li><a href="#m_help">Help</a> menu</li>
 </ul>
@@ -124,7 +124,7 @@ li>Optionally copy the stack trace to the clipboard in case of an exception. Ava
 <li>Feature Request: Display the imported gps file track on the map.</li>
 <li>Improvements searching for places, and reverse geocoding.</li>
 <li>Showing sub folders can be enabled in the filelist. See: <a href="#p_subfolder">Enabling Subfolders in the FileList</a></li>
-<li>Managing metadata enhancements. E.G. removing and copying metadata. See: <a href="#p_metadataenhancement">Managing metadata enhancements</a></li>
+<li>Managing metadata enhancements. E.G. removing and copying metadata. See: <a href="#p_managemetadata">Managing metadata</a></li>
 </ul>
 <br>
 <a href="changelog.txt"><b>See changelog.txt for a complete list of issues.</b></a>
@@ -436,7 +436,7 @@ ExifToolGUIv6.ini -you should use any names that reminds you on content,
 <h3>ExifTool direct definition file: Load/Save</h3>
 <h3>User defined fields definition file: Load/Save</h3>
 <h3>Custom view definition file: Load/Save</h3>
-<h3>Predefined tags definition file: Load/Save</h3>
+<h3><a name="m_predefinedfile">Predefined tags definition file: Load/Save</h3>
 Starting with V6.3.1 these definitions can also be Loaded and Saved. Its workings are analogous to the <b>Workspace</b>:<br>
 
 <h3><a name="m_style">Style</a></h3>
@@ -592,7 +592,7 @@ processed.<br>
 That's it: after click on <font class="blue">Execute</font>, metadata will be copied into all files inside <font class="brown">MyJpg\Dir1</font> folder (incl. <font class="brown">Dir2</font> folder) from files inside <font class="brown">MyRaw\Dir1</font> folder (incl. <font class="brown">Dir2</font> folder).<br>
 If we would choose <font class="blue">No</font> in step 3 above, then only files inside <font class="brown">MyJpg\Dir1</font> would be processed.<br>
 <br>
-See also: <a href="#p_metadataenhancement">Managing metadata enhancements</a><br>
+See also: <a href="#p_managemetadata">Managing metadata</a><br>
 <br>
 <h3>Import GPS data from: Log files</h3>
 <br>
@@ -724,7 +724,7 @@ In such cases, ExifTool will simply refuse to remove such metadata (also see <fo
 </ul>
 <br>
 See also:<br>
-<a href="#p_metadataenhancement">Managing metadata enhancements</a> how you can customize the predefined lists and tags.<br>
+<a href="#p_managemetadata">Managing metadata</a> how you can customize the predefined lists and tags.<br>
 <a href="https://exiftool.org/exiftool_pod.html#Tag-operations">Tag-operations</a> ExifTool documentation on Tags.<br>
 <br>
 
@@ -746,41 +746,52 @@ In the dialog you can customize how the fields are filled.<br><br>
 - If you open the log window you can see the rest requests and their responses.<br><br>
 <a href="Readme GeoCoding.txt">See also Readme GeoCoding.txt</a><br>
 
-<h2><a name="p_metadataenhancement">Managing metadata enhancements</a></h2>
-
-The enhancements apply to these functions: <br>
+<h2><a name="p_managemetadata">Managing metadata</a></h2>
 <br>
-<a href="#m_modify">Modify/Remove metadata</a><br>
-<a href="#m_exp_imp">Export/Import Copy metadata</a><br>
+Starting with V6.3.5 the functions
+<a href="#m_modify">Modify/Remove metadata</a> and 
+<a href="#m_exp_imp">Export/Import Copy metadata</a>
+are capable of:<br>
 <br>
-<li>The selected tag names are saved and restored (remembered).</li>
+<ul>
+<li>Saving and restoring (remembering) the selected tag names.</li>
+<li>Previewing which tags will be processed.</li>
+<li>Customizing the tags to process, by creating your own predefined lists.</li>
+</ul>
 <br>
-<img src="ExifToolGUI_V635_files/metadataenhancements.jpg"><br><br>
+<img src="ExifToolGUI_V635_files/managingmetadata.jpg"><br><br>
 <ul>
 <li>A button <b>Preview</b> has been added. It will give you a preview of the selected tag names, with their values.</li>
-Beware: When removing metatadata the displayed tags are the tags to delete, when copying metadata the tags to copy.<br>
-</ul>
+</ul><br>
+<u>Notes:</u>
+<li>When removing metatadata the displayed tags are the tags to delete, when copying metadata the tags to copy.</li>
+<li>To display the preview GUI uses the Log Window.</li>
+<li>The data (Tag names and values) shown are from the first selected/source file.</li>
 <br>
 <br>
 <img src="ExifToolGUI_V635_files/metadatapreview.jpg"><br><br>
-<br>
 <ul>
-<li>You can customize the tags, by clicking on the button <b>Predefined</b></i><br>
-<br><br>
-<li>
-The buttons on top allow you to Add/Delete/Add/Duplicate a predefined list.<br>
+<li>You can customize the tags, by clicking on the button <b>Predefined</b>.<br>
+This will open the form <b>Predefined Tags</b>.</li> 
+<br>
+<li>The buttons on top allow you to <b>Add/Delete/Add/Duplicate</b> a predefined list.<br>
 This predefined list can be chosen when removing, or copying metadata, and will be remembered.<br>
-</li>
+The button <b>Defaults</b> can be used to reset the predefined lists to thier defaults.</li>
 </ul>
 <br>
 <img src="ExifToolGUI_V635_files/predefinedtags.jpg"><br><br>
 <br>
 <ul>
-<li>You can add a tag by selecting one from a list.</i><br><br>
+<li>The buttons in the middle <b>Delete/Edit</b> will remove/modify the selected tag.</li>
+<li><b>Add</b> will open a new form where you can select a tag.</li>
 </ul>
 <br>
 <img src="ExifToolGUI_V635_files/predefinedadd_sample.jpg"><br><br>
 <img src="ExifToolGUI_V635_files/predefinedadd.jpg"><br><br>
+<li>You can add a tag by selecting one from a list.<br>
+<b>Ok</b> will add the newly created tag after the selected tag.
+</li><br>
+You can export and import your <a href="#m_predefinedfile">predefined</a> tags.
 
 <h2><a name="m_various">Various menu</a></h2>
 
