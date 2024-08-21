@@ -357,7 +357,12 @@ begin
   FrmTagNames.SetSample(Sample);
   if (FrmTagNames.ShowModal = IDOK) then
   begin
-    AnItem := LvTagNames.Items.Add;
+    // Insert after the currently selected item
+    if (LvTagNames.Selected <> nil) then
+      AnItem := LvTagNames.Items.Insert(LvTagNames.Selected.Index +1)
+    else
+      AnItem := LvTagNames.Items.Add;
+
     SetTagItem(AnItem, FrmTagNames.SelectedTag(Caller <> TIniTagsData.idtCopyTags));
     LvTagNames.Selected := AnItem;
     LvTagNames.Selected.MakeVisible(false);
