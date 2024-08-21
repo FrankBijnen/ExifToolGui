@@ -11,14 +11,17 @@
 <tbody><tr><td class="A4">
 <h1>ExifToolGUI for Windows v6.xx</h1><hr>
 <br>
-<h3>Content</h3>
+<h2>Content</h2>
 <br>
 <b>General info:</b><br>
+<ul>
 <li><a href="#m_introduction">Introduction</a></li>
 <li><a href="#m_changesv6">Major changes with ExifToolGUI v6.xx</a></li>
 <li><a href="#m_require_preparation">Requirements and preparations</a></li>
+</ul>
 <br>
 <b>Menu:</b><br>
+<ul>
 <li><a href="#m_program">Program</a> menu</li>
 <ul><li><a href="#m_workspace">Workspace manager</a> menu</li></ul>
 <ul><li><a href="#m_style">Style</a> menu</li></ul>
@@ -29,14 +32,17 @@
 <ul><li><a href="#p_metadataenhancement">Managing metadata enhancements</a></li></ul>
 <li><a href="#m_various">Various</a> menu</li>
 <li><a href="#m_help">Help</a> menu</li>
+</ul>
 <br>
 <b>Panels:</b><br>
+<ul>
 <li><a href="#p_filelist">Filelist</a> panel</li>
 <ul><li><a href="#p_subfolder">Scanning and displaying sub folders in the filelist</a></li></ul>
 
 <li><a href="#p_etdirect">ExifTool direct</a> panel</li>
 <li><a href="#p_metadata">Metadata</a> panel</li>
 <li><a href="#p_osmmap">OSM Map</a> panel</li>
+</ul>
 <br>
 <a href="#final">Final words</a><br><br>
 
@@ -85,7 +91,7 @@ Basic idea behind GUI is, to keep it <u>simple!</u> Thus, only those options are
 <li>Image preview is handled by WIC (Windows Imaging Component).</li>
 <li>Google Maps is replaced by Open Street Map.</li>
 <li>64 Bits executable available.</li>
-<li>Optionally copy the stack trace to the clipboard in case of an exception. Available in the released executables, If you compile from source code the Project-JEDI/JCL is required.</li>
+li>Optionally copy the stack trace to the clipboard in case of an exception. Available in the released executables, If you compile from source code the Project-JEDI/JCL is required.</li>
 <li>Better support for international characters. All internal code now uses Unicode (UTF16), to interface with Exiftool UTF8.</li>
 <li>Enhanced Log Window. The last 10 commands are shown, with their respective output and error. Option to replay the command in PowerShell/Cmd prompt.</li>
 <li>The external programs Jhead.exe and Jpegtran.exe are no longer needed. Rotation, and cropping, are handled in Delphi native code. With a modified library called NativeJpg by SimDesign B.V. (I tried contacting SimDesign to verify the License requirements, but was unable to.)</li>
@@ -430,12 +436,15 @@ ExifToolGUIv6.ini -you should use any names that reminds you on content,
 <h3>ExifTool direct definition file: Load/Save</h3>
 <h3>User defined fields definition file: Load/Save</h3>
 <h3>Custom view definition file: Load/Save</h3>
-<h3>Marked tags definition file: Load/Save</h3>
+<h3>Predefined tags definition file: Load/Save</h3>
 Starting with V6.3.1 these definitions can also be Loaded and Saved. Its workings are analogous to the <b>Workspace</b>:<br>
 
 <h3><a name="m_style">Style</a></h3>
+<br>
 Shows a list of available style/skins. To change the appearance of GUI.<br>
+<br>
 <img src="ExifToolGUI_V635_files/style.jpg"><br>
+<br>
 The Styles Silver, Green and Blue try to mimic the colors available in V516
 <br>
 
@@ -549,39 +558,47 @@ JPG/TIFF and you know, that your raw converter doesn't copy all metadata
 <u>Note:</u> Because it's assumed, that destination file has been 
 modified inbetween (resized, etc.), not all metadata is desired to be 
 copied. Because of this, you'll be asked, if you also wish to copy 
-following tags:<br>
+following tags:<br><br>
 <img src="ExifToolGUI_V635_files/copymetadataoptions.jpg"><br>
+<br>
 -in 99% cases, there will be no reason to check any of above option.<br>
 <br>
 <h3>Copy metadata into all JPG or TIF files</h3>
 This option is very similar to above. The difference is:<br>
+<ul>
 <li>No matter how many destination files you select (you must select at 
 least one for menu to be enabled), metadata will always be copied into <b>all</b> JPG or TIF (but not both) files inside current folder. That is, this option behaves as if all JPG or TIF files are selected in <b>Scenario 2</b> above.</li>
 <li>After you choose this menu option, you'll be first asked "<font class="blue">should files in subfolders also be processed?</font>". If we choose <font class="blue">No</font>, then again, this option behaves the same way as if all files are selected in <b>Scenario 2</b> above. However, if we choose <font class="blue">Yes</font>, then metadata will be copied into images in all subfolders as well (only where folder/file names are equal, of course).</li>
+</ul>
 <br>
 Let's see an example, where we wish to update <font class="brown">jpg</font> files with metadata from <font class="brown">raw</font> files:<br>
+<br>
 <img src="ExifToolGUI_V635_files/copymetadatamulti.jpg"><br>
 <br>
+<ul>
 1. Select any destination file inside <font class="brown">MyJpg\Dir1</font>
- folder. If you select any JPG file, then only JPG files will be 
+folder. If you select any JPG file, then only JPG files will be 
 processed; if you select TIF instead, then only TIF files will be 
 processed.<br>
 2. Choose menu <font class="blue">Copy metadata into all JPG or TIF files</font><br>
 3. Click on <font class="blue">Yes</font> button when asked<br>
 4. File browser will appear, where you select any (source) file inside <font class="brown">MyRaw\Dir1</font> folder. <u>Note:</u> You only need to select one file (to specify file extension).<br>
 5. A panel will appear, where you confirm/check which of "not desired" metadata you <u>wish</u> to be copied:<br>
+</ul><br>
 <img src="ExifToolGUI_V635_files/copymetadataoptions.jpg"><br>
+<br>
 <u>Note:</u> Even if none of above is checked, the rest of metadata in source files (Exif, Xmp, etc.) will be copied into destination files.<br>
 <br>
 That's it: after click on <font class="blue">Execute</font>, metadata will be copied into all files inside <font class="brown">MyJpg\Dir1</font> folder (incl. <font class="brown">Dir2</font> folder) from files inside <font class="brown">MyRaw\Dir1</font> folder (incl. <font class="brown">Dir2</font> folder).<br>
 If we would choose <font class="blue">No</font> in step 3 above, then only files inside <font class="brown">MyJpg\Dir1</font> would be processed.<br>
 <br>
 See also: <a href="#p_metadataenhancement">Managing metadata enhancements</a><br>
-
-<h3>Import GPS data from: Log files</h3>
-This option allows geotagging your files in batch by using log file of your GPS device (see here for <a href="https://exiftool.org/geotag.html">supported GPS files</a>).<br> 
-<img src="ExifToolGUI_V635_files/importgpsdata.jpg"><br>
 <br>
+<h3>Import GPS data from: Log files</h3>
+<br>
+This option allows geotagging your files in batch by using log file of your GPS device (see here for <a href="https://exiftool.org/geotag.html">supported GPS files</a>).<br><br>
+<img src="ExifToolGUI_V635_files/importgpsdata.jpg"><br>
+<br><br>
 <u>Step 1:</u> <b>Select log file</b> of your GPS device.<br>
 As usual in GUI, you first must select files you wish to geotag. In 
 most cases, folder contents will contain series of "session" photos, so 
@@ -658,7 +675,7 @@ if photo would be taken in JPG mode" -while this is true for exposure
 and colors, resolution (pixel size) may differ (depends on camera).<br>
 Because there are many flavours possible I created a generic function.
 It shows, for the selected file, what previews are available, and their sizes.<br>
-You can check which preview(s) to extract and optionally perform autorate, and or crop.<br>
+You can check which preview(s) to extract and optionally perform autorate, and or crop.<br><br>
 <img src="ExifToolGUI_V635_files/genericextractpreviews.jpg">
 <br><br>
 
@@ -666,7 +683,7 @@ You can check which preview(s) to extract and optionally perform autorate, and o
 Use this option to update a preview. Before you choose this option select in the filelist which files to update.<br>
 In this dialog select which preview to update. Optionally rotate and or crop.<br>
 When you click on <b>Execute</b> browse to the folder containing the previews. The previews should have
-the same base name as the raw files. Typically they are created by the previous option.<br>
+the same base name as the raw files. Typically they are created by the previous option.<br><br>
 <img src="ExifToolGUI_V635_files/genericimportpreview.jpg">
 <br>
 <br>
@@ -690,20 +707,21 @@ This will fill <font class="brown">Exif:LensInfo</font> of selected file(s) with
 <br>
 <img src="ExifToolGUI_V635_files/removemetadata.jpg"><br>
 <br>
-Notes:
+<u>Notes:</u>
+<ul>
 <li>A <b>Grayed</b> Plus or Minus means the tag is <b>not selected</b> for processing.</li>
 <li>A <b>Green Plus</b> means the Tag is <b>selected</b> for processing and the tag will be deleted</li>
 <li>A <b>Red Minus</b> means the Tag is <b>excluded</b> for processing and the tag will not be deleted</li>
-<br><ul>
+<br>
 Technically: For every Tag selected a - (minus) is prefixed and a = (equal) suffixed and passed to ExifTool. <br>
 A Tag name that begins with a - (minus) will result in -- (2 minus) and function as an exclusion.<br>
 The selection in the screenshot would result in:<br>
 <pre>-Exif:all= --Exif:Makernotes= -Xmp:all= -Iptc:All= -PhotoShop:All= -Jfif:All= -ICCprofile=</pre>
-</ul>
 <li>To verify your selection use the <b>Preview</b> button.</li>
 <li>Your selection (The tags that you have checked) will be remembered and proposed next time.</li>
 <li>In some cases (depending on the image file format), it's not possible/safe to remove the metadata you've selected to remove.<br>
 In such cases, ExifTool will simply refuse to remove such metadata (also see <font class="blue">Ignore minor errors in metadata</font> menu above).<br></li>
+</ul>
 <br>
 See also:<br>
 <a href="#p_metadataenhancement">Managing metadata enhancements</a> how you can customize the predefined lists and tags.<br>
@@ -716,7 +734,7 @@ The selected files should already be geotagged, that is contain lat and lon valu
 For every selected file a lookup is done using the selected provider. To reduce the nbr of calls a cache is used.<br>
 In the dialog you can customize how the fields are filled.<br><br>
 <img src="ExifToolGUI_V635_files/updatelocationfromgps.jpg"><br><br>
-Notes:<br>
+<u>Notes:</u><br>
 - If you use Gecode provider 'Exiftool geolocation' no internet connection is required.<br>
 - The other providers use an external webservice, and thus there are some 'point of failures'.<br>
 <ul>
@@ -731,23 +749,37 @@ Notes:<br>
 <h2><a name="p_metadataenhancement">Managing metadata enhancements</a></h2>
 
 The enhancements apply to these functions: <br>
+<br>
 <a href="#m_modify">Modify/Remove metadata</a><br>
 <a href="#m_exp_imp">Export/Import Copy metadata</a><br>
 <br>
 <li>The selected tag names are saved and restored (remembered).</li>
 <br>
 <img src="ExifToolGUI_V635_files/metadataenhancements.jpg"><br><br>
-
-<li>A button <b>Preview</b> has been added. It will give you a preview of the tag names, with their values</li>
-<li>You can customize the tags, by clicking on the button <b>Predefined</b></i><br><br>
-
+<ul>
+<li>A button <b>Preview</b> has been added. It will give you a preview of the selected tag names, with their values.</li>
+Beware: When removing metatadata the displayed tags are the tags to delete, when copying metadata the tags to copy.<br>
+</ul>
+<br>
+<br>
 <img src="ExifToolGUI_V635_files/metadatapreview.jpg"><br><br>
 <br>
-<li>Customizing the predefined tags</li><br><br>
+<ul>
+<li>You can customize the tags, by clicking on the button <b>Predefined</b></i><br>
+<br><br>
+<li>
+The buttons on top allow you to Add/Delete/Add/Duplicate a predefined list.<br>
+This predefined list can be chosen when removing, or copying metadata, and will be remembered.<br>
+</li>
+</ul>
+<br>
 <img src="ExifToolGUI_V635_files/predefinedtags.jpg"><br><br>
 <br>
+<ul>
 <li>You can add a tag by selecting one from a list.</i><br><br>
+</ul>
 <br>
+<img src="ExifToolGUI_V635_files/predefinedadd_sample.jpg"><br><br>
 <img src="ExifToolGUI_V635_files/predefinedadd.jpg"><br><br>
 
 <h2><a name="m_various">Various menu</a></h2>
@@ -828,7 +860,7 @@ But to give you at least something, the last entry in this drop-down box is <fon
 this view on relative small amount of files in folder. In short: tryout.<br>
 <br>
 
-<h2><a name="p_subfolder">Scanning and displaying sub folders in the filelist</a></h2>
+<h3><a name="p_subfolder">Scanning and displaying sub folders in the filelist</a></h3>
 <br><b>Prerequisite</b>
 <ul>
 <li>Enable <b>Show folders</b> in <b>Preferences</b><br>
