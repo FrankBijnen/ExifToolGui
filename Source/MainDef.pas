@@ -468,9 +468,17 @@ begin
 end;
 
 function ReadPredefinedTags(GUIini: TMemIniFile): integer;
+var
+  Indx: integer;
 begin
   GUIini.ReadSectionValues(PredefinedTags, PredefinedTagList);
+  for Indx := 0 to PredefinedTagList.Count -1 do
+    PredefinedTagList[Indx] := ReplaceLastChar(PredefinedTagList[Indx], '<', ' ');
+
   GUIini.ReadSectionValues(SelPredefinedTags, SelPredefinedTagList);
+  for Indx := 0 to SelPredefinedTagList.Count -1 do
+    SelPredefinedTagList[Indx] := ReplaceLastChar(SelPredefinedTagList[Indx], '<', ' ');
+
   result := PredefinedTagList.Count;
 end;
 
@@ -484,7 +492,7 @@ function ReadCopyTags(GUIini: TMemIniFile): integer;
 begin
   ExcludeCopyTagListName := GUIini.ReadString(TagList, ExcludeCopyTags, '');
 
-  ExcludeCopyTagList := PredefinedTagList.Values[ExcludeCopyTagListName];
+  ExcludeCopyTagList := ReplaceLastChar(PredefinedTagList.Values[ExcludeCopyTagListName], '<', ' ');
   SelExcludeCopyTagList := ReplaceLastChar(GUIini.ReadString(TagList, SelExcludeCopyTags, '<'), '<', ' ');
 
   result := Length(Trim(ExcludeCopyTagList));
@@ -500,7 +508,7 @@ function ReadRemoveTags(GUIini: TMemIniFile): integer;
 begin
   RemoveTagListName := GUIini.ReadString(TagList, RemoveTags, '');
 
-  RemoveTagList := PredefinedTagList.Values[RemoveTagListName];
+  RemoveTagList := ReplaceLastChar(PredefinedTagList.Values[RemoveTagListName], '<', ' ');
   SelRemoveTagList := ReplaceLastChar(GUIini.ReadString(TagList, SelRemoveTags, '<'), '<', ' ');
 
   result := Length(Trim(RemoveTagList));
@@ -516,7 +524,7 @@ function ReadCopySingleTags(GUIini: TMemIniFile): integer;
 begin
   CopySingleTagListName := GUIini.ReadString(TagList, CopySingleTags, '');
 
-  CopySingleTagList := PredefinedTagList.Values[CopySingleTagListName];
+  CopySingleTagList := ReplaceLastChar(PredefinedTagList.Values[CopySingleTagListName], '<', ' ');
   SelCopySingleTagList := ReplaceLastChar(GUIini.ReadString(TagList, SelCopySingleTags, '<'), '<', ' ');
 
   result := Length(Trim(CopySingleTagList));
@@ -661,12 +669,12 @@ begin
     // Predefined tags
     TmpItems.Add(Format('[%s]', [PredefinedTags]));
     for Indx := 0 to PredefinedTagList.Count -1 do
-      TmpItems.Add(PredefinedTagList[Indx]);
+      TmpItems.Add(ReplaceLastChar(PredefinedTagList[Indx], ' ', '<'));
 
     // Predefined Selected tags
     TmpItems.Add(Format('[%s]', [SelPredefinedTags]));
     for Indx := 0 to SelPredefinedTagList.Count -1 do
-      TmpItems.Add(SelPredefinedTagList[Indx]);
+      TmpItems.Add(ReplaceLastChar(SelPredefinedTagList[Indx], ' ', '<'));
 
     GUIini.SetStrings(TmpItems);
   finally
