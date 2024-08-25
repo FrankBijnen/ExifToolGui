@@ -1,4 +1,4 @@
-This source can be compiled with the Delphi Community Edition. (11.3 at the time of writing).
+﻿This source can be compiled with the Delphi Community Edition. (11.3 at the time of writing).
 
 There are 2 steps to take before compiling.
 
@@ -133,5 +133,36 @@ Version 6.3.2
 
 - Updated the installer and preferences to allow the Alternate GeoLocation DB.
 - Mainly bug fixes. See ChangeLog.txt
+
+Version 6.3.5
+
+- Changes to exifinfo.pas 
+  - Fixed an XMP bug.
+  - Performance improvements JPG and Tiff. Prevent GUI calling exiftool for these types.
+
+- Changes to ExifToolsGui_Shelllist.pas
+  - Added TSubShellFolder, and PopulateSubDirs to allow scanning subfolders.
+  - Refreshing updated, to prevent needless refreshing
+  - FileName renamed to RelFilename. This gives the relative filename.
+  - Reviewed Sorting and display Icons/Thumbnails to improve performance when icluding subfolders.
+  - Introduced a new list 'FhiddenItems'. The folders that we do not want to show, but still are need 
+    because they are referenced as 'ParentFolder'.
+  - Changed looping thru Listview items to prevent calling 'OwnerDataFetch'.
+
+    old:
+    for AnItem in Items do
+        if (AnItem.Selected) then
+
+    new:
+    for Index := 0 to Items.Count -1 do
+    begin
+      if (ListView_GetItemState(Handle, Index, LVIS_SELECTED) = LVIS_SELECTED) then
+
+- Changes to ExifToolsGui_ValEdit.pas
+  - Added code to show a proportional scrollbar
+
+- Saving and restoring Form sizes and position more generic. See Maindef.pas
+
+- Added more messages to FrmGenerate, to show progress with include subfolders.
 
 Frank
