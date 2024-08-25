@@ -118,22 +118,23 @@ begin
 
       // TODO: Figure out why a retry is needed.
       Tries := 2; // Try a few times.
-      while (Tries > 0) and (Hr <> S_OK) and (GetStatus <> TTaskStatus.Canceled) do
+      while (Tries > 0) and
+            (Hr <> S_OK) and
+            (GetStatus <> TTaskStatus.Canceled) do
       begin
         dec(Tries);
         Hr := GetThumbCache(FPitemIDListItem, hBmp, Flags, FMax, FMax);
         if (Hr <> S_OK) then
-//        begin
-//          DeleteObject(hBmp); // Not sure if this is needed
           Sleep(50);
-//        end;
       end;
 
       // The task is canceled, or the current path has changed.
       // Dont send any messages, but delete bitmap. If the handle is invalid, doesn't matter
-      if (GetStatus = TTaskStatus.Canceled) or (FPitemIDListRoot <> FListView.RootFolder.AbsoluteID) then
+      if (GetStatus = TTaskStatus.Canceled) or
+         (FPitemIDListRoot <> FListView.RootFolder.AbsoluteID) then
       begin
-        DeleteObject(hBmp);
+        if (Hr = S_OK) then
+          DeleteObject(hBmp); // Delete the Bitmap, The caller will not!
         exit;
       end;
 
@@ -200,6 +201,7 @@ var
   FileShellItemImage: IShellItemImageFactory;
   S: TSize;
 begin
+  hBmp := 0;
   result := SHCreateItemFromIDList(APIdl, IShellItemImageFactory, FileShellItemImage);
 
   if Succeeded(result) then
