@@ -644,29 +644,18 @@ begin
 
     for ItemIndx := 0 to FoldersList.Count -1 do
     begin
-
-      if (FIncludeSubFolders) then // Only get icons for folders
+      Hr := S_FALSE;
+      if (TSubShellFolder.GetIsFolder(Folders[ItemIndx])) then // Only get icons for folders
+        Hr := GetThumbCache(Folders[ItemIndx].AbsoluteID, HBmp, SIIGBF_ICONONLY, FThumbNails.Width, FThumbNails.Height)
+      else if (FIncludeSubFolders = false) then // Defer loading thumbnails when including subfolders.
       begin
-        if (TSubShellFolder.GetIsFolder(Folders[ItemIndx])) then
-        begin
+        Hr := GetThumbCache(Folders[ItemIndx].AbsoluteID, HBmp, SIIGBF_THUMBNAILONLY or SIIGBF_INCACHEONLY, FThumbNails.Width, FThumbNails.Height);
+        if (Hr <> S_OK) then
           Hr := GetThumbCache(Folders[ItemIndx].AbsoluteID, HBmp, SIIGBF_ICONONLY, FThumbNails.Width, FThumbNails.Height);
-          if (Hr = S_OK) then
-            Add2ThumbNails(HBmp, ItemIndx, false);
-        end;
-        continue;
       end;
 
-      Hr := GetThumbCache(Folders[ItemIndx].AbsoluteID, HBmp, SIIGBF_THUMBNAILONLY or SIIGBF_INCACHEONLY, FThumbNails.Width, FThumbNails.Height);
       if (Hr = S_OK) then
-        Add2ThumbNails(HBmp, ItemIndx, false)
-      else
-      begin
-        // No thumbnail in cache.
-        // Show the Icon. That is reasonably fast.
-        Hr := GetThumbCache(Folders[ItemIndx].AbsoluteID, HBmp, SIIGBF_ICONONLY, FThumbNails.Width, FThumbNails.Height);
-        if (Hr = S_OK) then
-          Add2ThumbNails(HBmp, ItemIndx, true);
-      end;
+        Add2ThumbNails(HBmp, ItemIndx, true);
     end;
   end;
 end;
