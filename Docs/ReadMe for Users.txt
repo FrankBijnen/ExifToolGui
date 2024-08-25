@@ -162,4 +162,18 @@ Changed with version 6.3.2
 Changed with version 6.3.4
 - The Installer can now be used to download and install the new ExifTool V12.88 format.
 
+Changed with version 6.3.5
+- Fixed a bug using UNC paths.
+- Redesigned the functions 'Remove metadata', and 'Copy metadata...'
+  - The checkboxes have been replaced by a listview.
+  - Your selection will be saved and restored. (E.G. Remembered)
+  - Added a Preview to check the affected tags.
+  - You can add your own predefined lists, with their own tags.
+  - When adding a tag GUI can help you find the correct one.
+    By showing sample data, or selection from a list of writable tags.
+- Added the option to show files in subfolders.
+  - Make sure you enabled 'Show folders' in Preferences.
+  - Define a 'File filter' with '/s', and select that.
+
+
 Frank
