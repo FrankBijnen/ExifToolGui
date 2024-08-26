@@ -12,7 +12,6 @@ This is an updated version of the ExifToolGui program created by Bogdan Hrastnik
 - Various bugfixes.<br>
 - For the complete info see the [changelog](Docs/changelog.txt).<br>
 
-[Change log](Docs/changelog.txt)<br>
 [Download Release](https://github.com/FrankBijnen/ExifToolGui/releases/latest)<br>
 
 <h4>Important</h4>
