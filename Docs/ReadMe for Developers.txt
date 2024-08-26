@@ -136,6 +136,9 @@ Version 6.3.2
 
 Version 6.3.5
 
+- Changes to BreadcrumbBar.pas
+  Fixed display when a UNC path is selected.
+
 - Changes to exifinfo.pas 
   - Fixed an XMP bug.
   - Performance improvements JPG and Tiff. Prevent GUI calling exiftool for these types.
@@ -164,5 +167,9 @@ Version 6.3.5
 - Saving and restoring Form sizes and position more generic. See Maindef.pas
 
 - Added more messages to FrmGenerate, to show progress with include subfolders.
+
+- CopyMeta.pas, CopyMetaSingle.pas and RemoveMeta.pas
+  - Redesigned to use configurable Listview
+  - Added UFrmPredefinedTags and UFrmTagNames to maintain the predefined lists.
 
 Frank
