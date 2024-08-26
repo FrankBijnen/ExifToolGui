@@ -116,7 +116,7 @@ Version:        Description             Issue
                 Fix Issue #452          "Bad Request" with Overpass query if no bounds and no country is specified
                 Fix Issue #454          "ExifTool could not be loaded" when using the filelist context menu. Related to .ZIP files in directory structure.
                 Fix Issue #456          When adding ExifToolGui to the context menu of Windows Explorer also add an icon.
-                Fix Issue #459          Make Scrollbar of Metadata proportional. (The size of thumb changes wth the nr of rows)
+                Fix Issue #459          Make Scrollbar of Metadata proportional. (The size of thumb changes with the nr of rows)
                 Fix Issue #470          Rare AV generating thumbs
                 Fix Issue #472          ExifToolGUI ability to handle UNC/network path as (startup) parameter
                 Fix Issue #476          Fix sorting issues that showed up after enabling subfolders
