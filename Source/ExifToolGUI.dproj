@@ -78,7 +78,6 @@
         <VerInfo_MajorVer>6</VerInfo_MajorVer>
         <VerInfo_MinorVer>3</VerInfo_MinorVer>
         <VerInfo_Release>5</VerInfo_Release>
-        <VerInfo_PreRelease>true</VerInfo_PreRelease>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Base_Win32)'!=''">
         <DCC_UsePackage>TeeDB;inetdbbde;Tee;DBXOdbcDriver;JamShellDelphiXE2;DBXSybaseASEDriver;svnui;vclimg;fmi;vclactnband;FMXTee;TeeUI;vcldb;bindcompvcl;RotateImg;vclie;tmsxlsdxe2;DBXDb2Driver;vcltouch;vclribbon;VclSmp;vcl;DBXMSSQLDriver;FmxTeeUI;tmsexdxe2;tmsdxe2;vclx;tmswizdxe2;svn;bdertl;$(DCC_UsePackage)</DCC_UsePackage>
