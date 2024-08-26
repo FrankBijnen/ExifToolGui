@@ -3,7 +3,7 @@
 <meta http-equiv="Description" content="ExifToolGUI">
 <meta http-equiv="Content-Language" content="en-us">
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-<link rel="stylesheet" type="text/css" href="ExifToolGUI_V635_files/page.css">
+<link rel="stylesheet" type="text/css" href="ExifToolGUI_V6_files/page.css">
 </head>
 
 <body>
@@ -186,13 +186,13 @@ On modern Windows versions the runtime will be available standard. If it is miss
 <h4><a name="m_edge_dll">WebView2Loader.dll</a></h4>
 This dll is not standard available and can be downloaded from NuGet. I recommend to save it in the same directory as ExifToolGui.exe, but any directory that Windows searches will do.
 If the dll can not be loaded you will get this dialog.<br><br>
-<img src="ExifToolGUI_V635_files/WebView2Loader_dll.jpg"><br><br><br>
+<img src="ExifToolGUI_V6_files/WebView2Loader_dll.jpg"><br><br><br>
 <ul>
 <li>
 Download only the DLL from <a href="https://nuget.info/packages/Microsoft.Web.WebView2/"><b>Package explorer</b></a>.<br>
 Navigate in the <b>Contents</b> pane to runtimes\<b>win-x86</b>\native or runtimes\<b>win-x64</b>\native, depending on your platform.<br>
 Double-click on WebView2Loader.dll to start the download.<br><br>
-<img src="ExifToolGUI_V635_files/package explorer.jpg"><br><br>
+<img src="ExifToolGUI_V6_files/package explorer.jpg"><br><br>
 </li>
 <li>
 Download the complete package from <a href="https://www.nuget.org/packages/Microsoft.Web.WebView2"><b>NuGet</b></a> manually.<br>
@@ -218,11 +218,11 @@ These files are no longer needed.<br>
 That's all you need. And when a new ExifTool or GUI version is available, you only need to repeat process as described above.<br>
 <br>
 
-<a name="gui_screen"><img src="ExifToolGUI_V635_files/gui_screen.jpg"></a><br>
+<a name="gui_screen"><img src="ExifToolGUI_V6_files/gui_screen.jpg"></a><br>
 
 <h2><a name="m_program">Program menu</a></h2>
 <h3>Preferences</h3>
-<img src="ExifToolGUI_V635_files/preferences_general.jpg"><br>
+<img src="ExifToolGUI_V6_files/preferences_general.jpg"><br>
 <br><br>
 <b><u>General</u></b> settings tab<br>
 <br>
@@ -260,7 +260,7 @@ multi-value tags on <u>your</u> PC.<br>
 If checked, then <font class="blue">Details:</font> button state and selected Filelist view (Standard filelist, Camera settings,..etc.) are saved when closing GUI.<br>
 <br><br>
 
-<img src="ExifToolGUI_V635_files/preferences_thumbnails.jpg"><br>
+<img src="ExifToolGUI_V6_files/preferences_thumbnails.jpg"><br>
 <br><br>
 <b><u>Thumbnail</u></b> settings tab<br>
 <br>
@@ -281,7 +281,7 @@ In the next dialog keep only 'Thumbnail' checked, and click on OK.</li>
 </ul>
 <br><br>
 
-<img src="ExifToolGUI_V635_files/preferences_geocoding.jpg"><br>
+<img src="ExifToolGUI_V6_files/preferences_geocoding.jpg"><br>
 <br><br>
 <b><u>GeoCoding</u></b> settings tab<br>
 <br>
@@ -290,7 +290,7 @@ Getting started: <a href="Readme GeoCoding Getting started.txt"><b>Readme GeoCod
 For an in-depth explanation see <a href="Readme GeoCoding.txt"><b>Readme GeoCoding.txt</b></a>
 <br><br>
 
-<img src="ExifToolGUI_V635_files/preferences_shell.jpg"><br>
+<img src="ExifToolGUI_V6_files/preferences_shell.jpg"><br>
 <br><br>
 <b><u>Shell Integration</u></b> settings tab<br>
 <br>
@@ -299,7 +299,7 @@ Put an icon for GUI in the Windows System Tray, also known as the notification a
 You will likely have to make the icon visible in <b>Windows Taskbar Settings</b>.<br>
 By clicking on the icon on the taskbar you can easily start GUI. A Right Click on the icon will show a menu with Version info, and the option to reset the window sizes.<br>
 <br>
-<img src="ExifToolGUI_V635_files/trayicon.jpg"><br>
+<img src="ExifToolGUI_V6_files/trayicon.jpg"><br>
 <br>
 <b>-application Single instance</b><br>
 Allow only one running instance of GUI. If you try to start a second instance of GUI, it will try to make the running instance visible.<br>
@@ -308,7 +308,7 @@ Use this option when you have registered GUI in the Contextmenu, or you will get
 <b>Register ExifToolGui in Contextmenu (Requires elevation)</b><br>
 The buttons <b>Add</b> and <b>Remove</b> are only enabled when you have started GUI as Admin.<br>
 If you have added GUI to the contextmenu you can start it by Right clicking on a folder.<br>
-<img src="ExifToolGUI_V635_files/contextmenu.jpg"><br>
+<img src="ExifToolGUI_V6_files/contextmenu.jpg"><br>
 <br><br>
 <u>Notes:</u>
 <ul>
@@ -317,7 +317,7 @@ If you have added GUI to the contextmenu you can start it by Right clicking on a
 </ul>
 <br><br>
 
-<img src="ExifToolGUI_V635_files/preferences_other.jpg"><br>
+<img src="ExifToolGUI_V6_files/preferences_other.jpg"><br>
 <br><br>
 <b><u>Other</u></b> settings tab<br>
 <br>
@@ -357,7 +357,7 @@ Setting this value to 0 (zero) will effectively disable the hints.
 <h3><a name="m_workspace">Workspace manager</a></h3>
 Here you define what will be shown in <font class="blue">Metadata</font> panel when <font class="blue">Workspace</font> is selected. Besides <font class="blue">ExifTool direct</font> option, this is the most powerfull GUI feature.<br>
 <br>
-<img src="ExifToolGUI_V635_files/workspace.jpg"><br>
+<img src="ExifToolGUI_V6_files/workspace.jpg"><br>
 <br>
 <br>
 <b>Tag name column</b><br>
@@ -406,7 +406,7 @@ To separate group of tags in <font class="blue">Workspace</font> view, special "
 
 <b>Hint text column</b><br>
 Text entered here is your <u>short</u> "private" help, which will be displayed in GUI's status bar when you start modifying tag value:<br>
-<img src="ExifToolGUI_V635_files/hint.jpg"><br>
+<img src="ExifToolGUI_V6_files/hint.jpg"><br>
 <br>
 I hope you can recognize the power of <font class="blue">Workspace manager</font>:
  YOU define any metadata tag you wish to change regulary. Btw. you can 
@@ -443,7 +443,7 @@ Starting with V6.3.1 these definitions can also be Loaded and Saved. Its working
 <br>
 Shows a list of available style/skins. To change the appearance of GUI.<br>
 <br>
-<img src="ExifToolGUI_V635_files/style.jpg"><br>
+<img src="ExifToolGUI_V6_files/style.jpg"><br>
 <br>
 The Styles Silver, Green and Blue try to mimic the colors available in V516
 <br>
@@ -524,7 +524,7 @@ This will copy metadata from single source file (can be MIE file too)
 into currently selected files. That is, all selected files will be 
 populated with the same metadata. After you choose the source file, 
 you'll have a chance to reduce the amount of metadata to be copied:<br>
-<img src="ExifToolGUI_V635_files/copymetadatasingle.jpg"><br>
+<img src="ExifToolGUI_V6_files/copymetadatasingle.jpg"><br>
 <br>
 
 <h3>Copy metadata into JPG or TIF files</h3>
@@ -559,7 +559,7 @@ JPG/TIFF and you know, that your raw converter doesn't copy all metadata
 modified inbetween (resized, etc.), not all metadata is desired to be 
 copied. Because of this, you'll be asked, if you also wish to copy 
 following tags:<br><br>
-<img src="ExifToolGUI_V635_files/copymetadataoptions.jpg"><br>
+<img src="ExifToolGUI_V6_files/copymetadataoptions.jpg"><br>
 <br>
 -in 99% cases, there will be no reason to check any of above option.<br>
 <br>
@@ -573,7 +573,7 @@ least one for menu to be enabled), metadata will always be copied into <b>all</b
 <br>
 Let's see an example, where we wish to update <font class="brown">jpg</font> files with metadata from <font class="brown">raw</font> files:<br>
 <br>
-<img src="ExifToolGUI_V635_files/copymetadatamulti.jpg"><br>
+<img src="ExifToolGUI_V6_files/copymetadatamulti.jpg"><br>
 <br>
 <ul>
 1. Select any destination file inside <font class="brown">MyJpg\Dir1</font>
@@ -585,7 +585,7 @@ processed.<br>
 4. File browser will appear, where you select any (source) file inside <font class="brown">MyRaw\Dir1</font> folder. <u>Note:</u> You only need to select one file (to specify file extension).<br>
 5. A panel will appear, where you confirm/check which of "not desired" metadata you <u>wish</u> to be copied:<br>
 </ul><br>
-<img src="ExifToolGUI_V635_files/copymetadataoptions.jpg"><br>
+<img src="ExifToolGUI_V6_files/copymetadataoptions.jpg"><br>
 <br>
 <u>Note:</u> Even if none of above is checked, the rest of metadata in source files (Exif, Xmp, etc.) will be copied into destination files.<br>
 <br>
@@ -597,7 +597,7 @@ See also: <a href="#p_managemetadata">Managing metadata</a><br>
 <h3>Import GPS data from: Log files</h3>
 <br>
 This option allows geotagging your files in batch by using log file of your GPS device (see here for <a href="https://exiftool.org/geotag.html">supported GPS files</a>).<br><br>
-<img src="ExifToolGUI_V635_files/importgpsdata.jpg"><br>
+<img src="ExifToolGUI_V6_files/importgpsdata.jpg"><br>
 <br><br>
 <u>Step 1:</u> <b>Select log file</b> of your GPS device.<br>
 As usual in GUI, you first must select files you wish to geotag. In 
@@ -676,7 +676,7 @@ and colors, resolution (pixel size) may differ (depends on camera).<br>
 Because there are many flavours possible I created a generic function.
 It shows, for the selected file, what previews are available, and their sizes.<br>
 You can check which preview(s) to extract and optionally perform autorate, and or crop.<br><br>
-<img src="ExifToolGUI_V635_files/genericextractpreviews.jpg">
+<img src="ExifToolGUI_V6_files/genericextractpreviews.jpg">
 <br><br>
 
 <h3>Generic import preview</h3>
@@ -684,7 +684,7 @@ Use this option to update a preview. Before you choose this option select in the
 In this dialog select which preview to update. Optionally rotate and or crop.<br>
 When you click on <b>Execute</b> browse to the folder containing the previews. The previews should have
 the same base name as the raw files. Typically they are created by the previous option.<br><br>
-<img src="ExifToolGUI_V635_files/genericimportpreview.jpg">
+<img src="ExifToolGUI_V6_files/genericimportpreview.jpg">
 <br>
 <br>
 See also the readme.<a href="Readme Lossless rotate_Import_Export previews.txt">Readme Lossless rotate_Import_Export previews.txt</a><br>
@@ -692,11 +692,11 @@ See also the readme.<a href="Readme Lossless rotate_Import_Export previews.txt">
 <h2><a name="m_modify">Modify menu</a></h2>
 
 <h3>Exif: DateTime shift</h3>
-<img src="ExifToolGUI_V635_files/exifdatetimeshift.jpg"><br>
+<img src="ExifToolGUI_V6_files/exifdatetimeshift.jpg"><br>
 <br><br>
 
 <h3>Exif: DateTime equalize</h3>
-<img src="ExifToolGUI_V635_files/exifdatetimeequalize.jpg"><br>
+<img src="ExifToolGUI_V6_files/exifdatetimeequalize.jpg"><br>
 <br>
 
 <h3>Exif: LensInfo from Makernotes</h3>
@@ -705,7 +705,7 @@ This will fill <font class="brown">Exif:LensInfo</font> of selected file(s) with
 
 <h3>Remove metadata</h3>
 <br>
-<img src="ExifToolGUI_V635_files/removemetadata.jpg"><br>
+<img src="ExifToolGUI_V6_files/removemetadata.jpg"><br>
 <br>
 <u>Notes:</u>
 <ul>
@@ -733,7 +733,7 @@ This option can update the location info (Country, Province and City) for the se
 The selected files should already be geotagged, that is contain lat and lon values.<br>
 For every selected file a lookup is done using the selected provider. To reduce the nbr of calls a cache is used.<br>
 In the dialog you can customize how the fields are filled.<br><br>
-<img src="ExifToolGUI_V635_files/updatelocationfromgps.jpg"><br><br>
+<img src="ExifToolGUI_V6_files/updatelocationfromgps.jpg"><br><br>
 <u>Notes:</u><br>
 - If you use Gecode provider 'Exiftool geolocation' no internet connection is required.<br>
 - The other providers use an external webservice, and thus there are some 'point of failures'.<br>
@@ -759,7 +759,7 @@ are capable of:<br>
 <li>Customizing the tags to process, by creating your own predefined lists.</li>
 </ul>
 <br>
-<img src="ExifToolGUI_V635_files/managingmetadata.jpg"><br><br>
+<img src="ExifToolGUI_V6_files/managingmetadata.jpg"><br><br>
 <ul>
 <li>A button <b>Preview</b> has been added. It will give you a preview of the selected tag names, with their values.</li>
 </ul><br>
@@ -768,7 +768,7 @@ are capable of:<br>
 <li>To display the preview GUI uses the Log Window.</li>
 <li>The data (Tag names and values) shown are from the first selected/source file.</li>
 <br>
-<img src="ExifToolGUI_V635_files/metadatapreview.jpg"><br><br>
+<img src="ExifToolGUI_V6_files/metadatapreview.jpg"><br><br>
 <ul>
 <li>You can customize the tags, by clicking on the button <b>Predefined</b>.<br>
 This will open the form <b>Predefined Tags</b>.</li> 
@@ -778,14 +778,14 @@ This predefined list can be chosen when removing, or copying metadata, and will 
 The button <b>Defaults</b> can be used to reset the predefined lists to their defaults.</li>
 </ul>
 <br>
-<img src="ExifToolGUI_V635_files/predefinedtags.jpg"><br><br>
+<img src="ExifToolGUI_V6_files/predefinedtags.jpg"><br><br>
 <br>
 <ul>
 <li>The buttons in the middle <b>Delete/Edit</b> will remove/modify the selected tag.</li>
 <li><b>Add</b> will open a new form where you can select a tag.</li>
 </ul>
 <br>
-<img src="ExifToolGUI_V635_files/predefinedadd_sample.jpg"><br><br>
+<img src="ExifToolGUI_V6_files/predefinedadd_sample.jpg"><br><br>
 <br>
 <ul>
 <li>You can choose 3 modes:</li>
@@ -806,7 +806,7 @@ If <b>Exclude Tag</b> is checked the tag will be prefixed by a - (minus), to ser
 <br>
 <br>
 
-<img src="ExifToolGUI_V635_files/predefinedadd.jpg"><br><br>
+<img src="ExifToolGUI_V6_files/predefinedadd.jpg"><br><br>
 <br>
 <ul>
 <li><b>Ok</b> will add the newly created tag after the selected tag.</li>
@@ -824,14 +824,14 @@ If you have a backup tool that relies on the Date Modified, it will not notice t
 
 <br>
 <h3>File: Name=DateTime+Name</h3>
-<img src="ExifToolGUI_V635_files/renamefiles.jpg"><br>
+<img src="ExifToolGUI_V6_files/renamefiles.jpg"><br>
 <br>
 
 <h3>JPG: Lossless autorotate + crop</h3>
 This will physically rotate selected JPG images according to Exif:Orientation value inside files.<br>
 It uses a library NativeJpg by SimDesign B.V. to do the actual rotating. No external program is needed.<br>
 In addition you have more control over how the function is performed.<br><br>
-<img src="ExifToolGUI_V635_files/jpeglosslessrotate.jpg"><br><br>
+<img src="ExifToolGUI_V6_files/jpeglosslessrotate.jpg"><br><br>
 <a href="Readme Lossless rotate_Import_Export previews.txt">See also Readme Lossless rotate_Import_Export previews.txt</a>
 <br>
 <br>
@@ -848,7 +848,7 @@ In addition you have more control over how the function is performed.<br><br>
 <br>
 
 <h2><a name="p_filelist">Filelist panel</a></h2>
-<img src="ExifToolGUI_V635_files/filelistpanel.jpg"><br>
+<img src="ExifToolGUI_V6_files/filelistpanel.jpg"><br>
 <br>
 
 <b>Refresh</b> button<br>
@@ -877,7 +877,7 @@ appropriate raw "codec", to be able to see thumbnails and previews.<br>
 -is set to <font class="blue">Standard filelist</font> by default. This drop-down box also contain a few predefined details views:<br>
 <font class="blue">Camera settings, Location info</font> and <font class="blue">About photo</font> -where each of these views shows few metadata values inside files; i.e.:<br> 
 <u><b>Note:</b></u> The Folders and the Breadcrumb bar are shown only when enabled in Preferences/Other.<br>
-<img src="ExifToolGUI_V635_files/filelistcamerasettings.jpg"><br>
+<img src="ExifToolGUI_V6_files/filelistcamerasettings.jpg"><br>
 <br>
 
 No matter how disappointed you might be, you can't define/change tags 
@@ -886,7 +886,7 @@ that's the only way I could get reasonable speed to show this data.<br>
 <br>
 
 But to give you at least something, the last entry in this drop-down box is <font class="blue">User defined</font>. If you select that, then <font class="blue">Edit</font> button on the right side becomes enabled, and by clicking on it, you'll get:<br>
-<img src="ExifToolGUI_V635_files/filelistuserdefined.jpg"><br>
+<img src="ExifToolGUI_V6_files/filelistuserdefined.jpg"><br>
 -here you can define your own columns and metadata values to be shown.<br>
 <font class="red">Note:</font> Displaying <font class="blue">User defined</font>
  details view is noticeable slower than fixed predefined views. So, use 
@@ -904,7 +904,7 @@ Sub folders will only be shown when this option is enabled.
 <ul>
 <li>Edit file filter (Right to 'Show all files')</li>
 <li>Add an entry with <b>/s</b><br><br>
-<img src="ExifToolGUI_V635_files/filelistsubfolderdef.jpg"><br><br>
+<img src="ExifToolGUI_V6_files/filelistsubfolderdef.jpg"><br><br>
 A File filter consists of entries separated by a semicolon<br>
 Each entry specifies a mask, or the modifier '/s'.<br>
 A mask can contain literal characters, or special characters like *, [-] or ?.<br>
@@ -927,7 +927,7 @@ For more info on the file filter see the Embarcadero documentation on the Delphi
 <ul>
 <li>Select a file filter that has the '/s' modifier and sub folders are scanned. Obviously this can take longer, so you will see a progress form, with a button <b>Close</b>.<br>
 <b>Close</b> will stop the scannning.<br><br>
-<img src="ExifToolGUI_V635_files/filelistsubfolderprogress.jpg"><br></li>
+<img src="ExifToolGUI_V6_files/filelistsubfolderprogress.jpg"><br></li>
 <br>
 <li>Folder names are only shown the next level relative to the selected folder.</li>
 <br>
@@ -974,7 +974,7 @@ GUI has to execute exiftool for all files found to get the details. It does that
 
 <br><br>
 <br>Sample detail mode:<br>
-<img src="ExifToolGUI_V635_files/filelistsubfolderdetails.jpg"><br>
+<img src="ExifToolGUI_V6_files/filelistsubfolderdetails.jpg"><br>
 
 <br><br>
 Developer note: Bogdan Hrastnik used JAM Shellbrowser for the filelist, and folderlist. I wanted to have sourcecode that did not rely on 3rd party libraries. The additional functionality needed for
@@ -985,7 +985,7 @@ A few small modifications to the Embarcadero source are needed. You can find the
 
 <h2><a name="p_etdirect">ExifTool direct panel</a></h2>
 By clicking on <font class="blue">ExifTool direct</font> button, you get an input field where ExifTool commands can be entered and executed:<br>
-<img src="ExifToolGUI_V635_files/exiftooldirect.jpg"><br>
+<img src="ExifToolGUI_V6_files/exiftooldirect.jpg"><br>
 <br>
 <b>StayOpen/Classic</b> Starting with version 6.2.0 you can choose how the commands are executed.<br>
 <li>StayOpen. Send the commands to the ExifTool.exe program using stay open mode. This is the default, and doesn't start a new instance of ExifTool.exe.</li>
@@ -1042,7 +1042,7 @@ If you wish to modify all files inside currently selected folder, <u>including f
 There's one predefined ExifTool command in GUI, so you can see what's 
 all about. To access it, you click on combo-box (blank on above image) 
 and choose it:<br>
-<img src="ExifToolGUI_V635_files/exiftooldirect.jpg"><br>
+<img src="ExifToolGUI_V6_files/exiftooldirect.jpg"><br>
 Once command is chosen, you can execute it by pressing Enter key (while 
 you're in edit field). If needed, you can modify displayed command and 
 execute it, without actually changing predefined command.<br>
@@ -1050,7 +1050,7 @@ execute it, without actually changing predefined command.<br>
 
 <h3>Modifying predefined commands</h3>
 By clicking on <font class="blue">Edit predefined</font> button, panel increases with additional options:<br>
-<img src="ExifToolGUI_V635_files/exiftooldirectpredefined.jpg"><br>
+<img src="ExifToolGUI_V6_files/exiftooldirectpredefined.jpg"><br>
 <br>
 <font class="blue">^Delete</font> -deletes currently selected predefined command permanently.<br>
 <font class="blue">^Replace</font> -replaces currently selected predefined command (i.e. after changes have been made).<br>
@@ -1087,7 +1087,7 @@ If, for example, we select two files and execute following <font class="blue">Ex
 <pre>-e -gps:all
 </pre>
 -we will get something like this:<br>
-<img src="ExifToolGUI_V635_files/logwindow.jpg"><br>
+<img src="ExifToolGUI_V6_files/logwindow.jpg"><br>
 <br>
 <u>Note:</u> In case of errors, the <font class="blue">Log window</font> with relevant messages automatically appears after ExifTool ends processing files.<br>
 Starting with version 6.2.0 the Log window will show the last 10 commands. In the top panel you can select the command issued, <br>
@@ -1099,10 +1099,10 @@ In the top you will see a checkbox 'Show all commands'. By default only the comm
 If you check this also the commands that GUI uses internally are displayed.<br>
 With the buttons <b>Cmd prompt</b> and <b>PowerShell</b> you can generate a <b>.cmd</b> or <b>.ps1</b> script to replay the commmands.<br>
 <br>
-<img src="ExifToolGUI_V635_files/powershell.jpg"><br>
+<img src="ExifToolGUI_V6_files/powershell.jpg"><br>
 
 <h2><a name="p_metadata">Metadata panel</a></h2>
-<img src="ExifToolGUI_V635_files/metadataworkspace.jpg"><br>
+<img src="ExifToolGUI_V6_files/metadataworkspace.jpg"><br>
 <br>
 By clicking on any button on top row, relevant metadata will be shown -that is, top row is for displaying metadata only.<br>
 <br>
@@ -1111,13 +1111,13 @@ And where are the "good old" <font class="blue"><b>[ ^ ]</b></font> edit buttons
 As explained above (see <font class="blue">Workspace manager</font> menu), <font class="blue">Workspace</font> is fully customizable: user can define which tags he wishes to be listed here.<br>
 And the value of any tag listed in <font class="blue">Workspace</font> can be edited at will.<br><br>
 
-<img src="ExifToolGUI_V635_files/metadataworkspacefind.jpg"><br><br>
+<img src="ExifToolGUI_V6_files/metadataworkspacefind.jpg"><br><br>
 In the <b>Find</b> edit box you can enter a text, press Enter and the first line containing that text in 'Tag name' or 'Value' is highlighted.<br>
 Pressing Enter again searches for the next occurence.<br>
 <br>
 
 <h3>Edit metadata in Workspace</h3>
-<br><img src="ExifToolGUI_V635_files/metadataworkspaceedit.jpg"><br>
+<br><img src="ExifToolGUI_V6_files/metadataworkspaceedit.jpg"><br>
 Here's how to edit metadata in <font class="blue">Workspace</font>:
 <li>Click on tag line you wish to modify</li>
 <li>Press Enter key or click into Value edit field (which becomes yellow)</li>
@@ -1135,7 +1135,7 @@ If you've changed your mind completely (don't wish to apply any changes), then j
 <li>When you're finished with editing metadata values, click on <font class="blue">Save</font> button.</li>
 <br>
 Some tag values may require a bit longer text to be entered (just <u>a bit</u> longer, please). To do that more comfortable, click on <font class="blue">Large</font> button and you'll get some more space:<br>
-<img src="ExifToolGUI_V635_files/metadataworkspacelong.jpg"><br>
+<img src="ExifToolGUI_V6_files/metadataworkspacelong.jpg"><br>
 <br>
 
 <b>Keyboard shortcuts</b><br>
@@ -1165,7 +1165,7 @@ or you can delete multiple keywords at once, for example: <font class="brown">-w
 <h3><a name="m_popup_meta">Pop-up menu in Metadata panel</a></h3>
 As mentioned, if you right-click on any tag shown in <font class="blue">Metadata</font> panel, a pop-up menu will appear:<br>
 <br>
-<img src="ExifToolGUI_V635_files/metadataworkspacepopup.jpg">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<img src="ExifToolGUI_V635_files/metadataworkspacemark.jpg"><br>
+<img src="ExifToolGUI_V6_files/metadataworkspacepopup.jpg">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<img src="ExifToolGUI_V6_files/metadataworkspacemark.jpg"><br>
 <br>
 <u>Note:</u> Not all options are available all the time.<br>
 <u>Note:</u> Tag names will appear colored (as in image above right) only if <font class="blue">Metadata language</font> in <font class="blue">Preferences</font> is set to <font class="blue">ExifTool standard (short)</font>.<br>
@@ -1207,7 +1207,7 @@ Marked tag name is shown in red color in any view (except in <font class="blue">
 <br>
 
 <h2><a name="p_osmmap">OSM Map panel</a></h2>
-<img src="ExifToolGUI_V635_files/osmmap.jpg"><br>
+<img src="ExifToolGUI_V6_files/osmmap.jpg"><br>
 <br>
 <u>Notes:</u>
 <ul>
@@ -1224,7 +1224,7 @@ Starting with version V6.3.1 you can also show track logs on the map, if the sel
 <li>You can increase/decrease the font size used in the map by holding the CTRL key and using the mouse wheel.<br> </li>
 <li>If you setup both <font class="blue">Province and City</font> to <font class="blue">None</font> in the <font class="blue">Setup Geo</font> parameters only the filenames will be shown.<br> </li>
 </ul>
-<img src="ExifToolGUI_V635_files/osmmapshowonmap.jpg"><br>
+<img src="ExifToolGUI_V6_files/osmmapshowonmap.jpg"><br>
 <br>
 
 <b><< Back</b> and <b>Forward >></b> buttons<br>
@@ -1251,11 +1251,11 @@ Tries to get the location (City, Province and Country) from the currently select
 <li>If no valid lat-lon coordinates were found, GUI assumes you're searching for a City.</li>
 <li>Enter the name of a City, optionally followed by a comma and the Country. (eg: Amsterdam or Amsterdam, NL) Enter a least 5 characters.</li>
 <li>The <b>Search place</b> dialog appears, where you can adjust your query.<br><br></li>
-<img src="ExifToolGUI_V635_files/osmmapsearch.jpg"><br><br>
+<img src="ExifToolGUI_V6_files/osmmapsearch.jpg"><br><br>
 <li>You can disable this dialog in Preferences.<br></li>
 <li>Click on <b>OK</b> to start the search.<br><br></li>
 <li>The <b>Places found</b> dialog appears.<br><br></li>
-<img src="ExifToolGUI_V635_files/osmmapplacesfound.jpg"><br><br>
+<img src="ExifToolGUI_V6_files/osmmapplacesfound.jpg"><br><br>
 <li>Click on <b>OK</b>, or Double-click to reposition the map to the selected place.</li>
 </ul>
 <br>
@@ -1284,11 +1284,11 @@ Examples that have happened to me:</li>
 </ul>
 <li>The Geotag files dialog appears.<br></li>
 <li>You can disable this dialog in Preferences.<br><br></li>
-<img src="ExifToolGUI_V635_files/geotagfiles.jpg"><br><br>
+<img src="ExifToolGUI_V6_files/geotagfiles.jpg"><br><br>
 <ul>
 </li><a name="m_geotag_setup">Setting up Geo tagging<a><br></li>
 <li>Use the <b>Setup Geo</b> button to customize how City, Province and Country are filled.<br><br></li>
-<img src="ExifToolGUI_V635_files/setupgeotag.jpg"><br><br>
+<img src="ExifToolGUI_V6_files/setupgeotag.jpg"><br><br>
 </ul>
 <li>You can also manually update these fields.</li>
 <li>Location is an exception, it will never be automatically filled. You can only update it manually.<br></li>
