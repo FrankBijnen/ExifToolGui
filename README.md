@@ -3,11 +3,14 @@
 
 This is an updated version of the ExifToolGui program created by Bogdan Hrastnik. Many thanks go out to him.
 
-<b>Released version: <b>V6.3.4</b> updated July 12, 2024</b><br>
+<b>Released version: <b>V6.3.5</b> updated August 26, 2024</b><br>
 
-- Some small bugfixes.<br>
-- Changed installer to support the new ExifTool distribution format, introduced with V12.88.<br>
-- For the complete info see the changelog.<br>
+- Added the option to scan and display sub folders in the filelist.<br>
+  See: [Scanning and displaying sub folders in the filelist](Docs/ExifToolGUI_V6.md#p_subfolder)<br>
+- Managing (removing, copying) metadata has become much more flexible. See:<br>
+  See: [Managing metadata](Docs/ExifToolGUI_V6.md#p_managemetadata)<br>
+- Various bugfixes.<br>
+- For the complete info see the [changelog](Docs/changelog.txt).<br>
 
 [Change log](Docs/changelog.txt)<br>
 [Download Release](https://github.com/FrankBijnen/ExifToolGui/releases/latest)<br>
