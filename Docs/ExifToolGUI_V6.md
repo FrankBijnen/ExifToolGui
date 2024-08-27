@@ -1320,7 +1320,7 @@ Modified on April, 2024<br>
 <li><a href="..\Source\Vcl.ShellControls\ReadMe.txt">ReadMe ShellControls</a></li>
 <li><a href="..\Source\NativeJpg\README.txt">ReadMe NativeJpg</a></li>
 <li><a href="..\Source\BreadcrumbBar\README.txt">ReadMe Breadcrumb Bar</a></li>
-<li><a href="..\Source\\Xml.VerySimple\readme">ReadMe XML verySimpler</a></li>
+<li><a href="..\Source\Xml.VerySimple\readme.txt">ReadMe XML verySimple</a></li>
 <li><a href="ReadMe for Users.txt">ReadMe for Users</a></li>
 <li><a href="Readme GeoCoding.txt">Readme GeoCoding</a></li>
 <li><a href="Readme GeoCoding Getting started.txt">Readme GeoCoding Getting started</a></li>
