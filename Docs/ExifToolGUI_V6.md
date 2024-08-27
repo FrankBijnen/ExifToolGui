@@ -523,8 +523,27 @@ needs.<br>
 This will copy metadata from single source file (can be MIE file too) 
 into currently selected files. That is, all selected files will be 
 populated with the same metadata. After you choose the source file, 
-you'll have a chance to reduce the amount of metadata to be copied:<br>
+you'll have a chance to reduce the amount of metadata to be copied:<br><br>
+
 <img src="ExifToolGUI_V6_files/copymetadatasingle.jpg"><br>
+<br>
+<u>Notes:</u>
+<ul>
+<li>A <b>Grayed</b> Plus or Minus means the tag is <b>not selected</b> for processing.</li>
+<li>A <b>Green Plus</b> means the Tag is <b>selected</b> for processing and the tag will be copied</li>
+<li>A <b>Red Minus</b> means the Tag is <b>excluded</b> for processing and the tag will not be copied</li>
+<br>
+Technically: For every Tag selected a - (minus) is prefixed and passed to ExifTool. <br>
+A Tag name that begins with a - (minus) will result in -- (2 minus) and function as an exclusion.<br>
+The selection in the screenshot would result in:<br>
+<pre>-Exif:all --Exif:Makernotes --Gps:All -Xmp:all -Iptc:All -ICC_Profile:All -Gps:All</pre>
+<li>To verify your selection use the <b>Preview</b> button.</li>
+<li>Your selection (The tags that you have checked) will be remembered and proposed next time.</li>
+</ul>
+<br>
+See also:<br>
+<a href="#p_managemetadata">Managing metadata</a> how you can customize the predefined lists and tags.<br>
+<a href="https://exiftool.org/exiftool_pod.html#Tag-operations">Tag-operations</a> ExifTool documentation on Tags.<br>
 <br>
 
 <h3>Copy metadata into JPG or TIF files</h3>
