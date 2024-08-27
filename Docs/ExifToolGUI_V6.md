@@ -91,7 +91,7 @@ Basic idea behind GUI is, to keep it <u>simple!</u> Thus, only those options are
 <li>Image preview is handled by WIC (Windows Imaging Component).</li>
 <li>Google Maps is replaced by Open Street Map.</li>
 <li>64 Bits executable available.</li>
-li>Optionally copy the stack trace to the clipboard in case of an exception. Available in the released executables, If you compile from source code the Project-JEDI/JCL is required.</li>
+<li>Optionally copy the stack trace to the clipboard in case of an exception. Available in the released executables, If you compile from source code the Project-JEDI/JCL is required.</li>
 <li>Better support for international characters. All internal code now uses Unicode (UTF16), to interface with Exiftool UTF8.</li>
 <li>Enhanced Log Window. The last 10 commands are shown, with their respective output and error. Option to replay the command in PowerShell/Cmd prompt.</li>
 <li>The external programs Jhead.exe and Jpegtran.exe are no longer needed. Rotation, and cropping, are handled in Delphi native code. With a modified library called NativeJpg by SimDesign B.V. (I tried contacting SimDesign to verify the License requirements, but was unable to.)</li>
