@@ -1235,7 +1235,8 @@ end;
 
 procedure TFMain.MFileNameDateTimeClick(Sender: TObject);
 begin
-  FFileDateTime.ShowModal;
+  if (FFileDateTime.ShowModal = idOK) then
+    ShellList.ClearSelectionRefresh;
 end;
 
 procedure TFMain.MIgnoreErrorsClick(Sender: TObject);
