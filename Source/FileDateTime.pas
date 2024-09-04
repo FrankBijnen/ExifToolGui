@@ -28,12 +28,15 @@ type
     AdvPanel4: TPanel;
     RadioButton2: TRadioButton;
     Button4: TButton;
+    ChkDateFirst: TCheckBox;
+    ChkSequence: TCheckBox;
     procedure FormShow(Sender: TObject);
     procedure CheckBox1Click(Sender: TObject);
     procedure RadioGroup3Click(Sender: TObject);
     procedure Button2Click(Sender: TObject);
     procedure Button3Click(Sender: TObject);
     procedure Button4Click(Sender: TObject);
+    procedure FormCreate(Sender: TObject);
   private
     { Private declarations }
     procedure DisplayHint(Sender: TObject);
@@ -57,22 +60,55 @@ procedure TFFileDateTime.Button2Click(Sender: TObject);
 var
   Ds, Ts: string[1];
   ETout, ETerr: string;
+
+  procedure AddName;
+  begin
+  if RadioGroup3.ItemIndex = 0 then
+    ETcmd := ETcmd + '%f'
+  else
+    ETcmd := ETcmd + Edit1.Text;
+  end;
+
+  procedure AddDateTime;
+  begin
+    case RadioGroup1.ItemIndex of
+      0:
+        ETcmd := ETcmd + '${Exif:DateTimeOriginal}';
+      1:
+        ETcmd := ETcmd + '${Exif:CreateDate}';
+      2:
+        ETcmd := ETcmd + '${Exif:ModifyDate}';
+    end;
+  end;
+
+  procedure AddSeq;
+  begin
+    ETcmd := ETcmd + '%-c';
+  end;
+
 begin
   ETcmd := '-overwrite_original' + CRLF;
   if RadioGroup4.ItemIndex = 0 then
     ETcmd := ETcmd + '-Exif:DocumentName<filename' + CRLF;
-  case RadioGroup1.ItemIndex of
-    0:
-      ETcmd := ETcmd + '-filename<${Exif:DateTimeOriginal}';
-    1:
-      ETcmd := ETcmd + '-filename<${Exif:CreateDate}';
-    2:
-      ETcmd := ETcmd + '-filename<${Exif:ModifyDate}';
-  end;
-  if RadioGroup3.ItemIndex = 0 then
-    ETcmd := ETcmd + ' %f.%e'
+
+  ETcmd := ETcmd + '-filename<';
+  if ChkDateFirst.Checked then
+  begin
+    AddDateTime;
+    ETcmd := ETcmd + ' ';
+    AddName;
+  end
   else
-    ETcmd := ETcmd + ' ' + Edit1.Text + '.%e';
+  begin
+    AddName;
+    ETcmd := ETcmd + ' ';
+    AddDateTime;
+  end;
+  if (ChkSequence.Checked) then
+    AddSeq;
+
+  ETcmd := ETcmd + '.%e';
+
   ETcmd := ETcmd + CRLF + '-d' + CRLF;
   Ds := '';
   Ts := '';
@@ -171,6 +207,12 @@ begin
   StatusBar1.SimpleText := GetShortHint(Application.Hint);
 end;
 
+procedure TFFileDateTime.FormCreate(Sender: TObject);
+begin
+  ChkDateFirst.Checked := true;
+  ChkSequence.Checked := true;
+end;
+
 procedure TFFileDateTime.FormShow(Sender: TObject);
 begin
   Left := FMain.GetFormOffset.X;
@@ -183,7 +225,7 @@ end;
 
 procedure TFFileDateTime.RadioGroup3Click(Sender: TObject);
 begin
-  Edit1.Enabled := (RadioGroup3.ItemIndex = 0);
+  Edit1.Enabled := (RadioGroup3.ItemIndex <> 0);
 end;
 
 end.

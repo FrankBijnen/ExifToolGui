@@ -11,6 +11,7 @@ object FFileDateTime: TFFileDateTime
   Font.Height = -11
   Font.Name = 'Tahoma'
   Font.Style = []
+  OnCreate = FormCreate
   OnShow = FormShow
   TextHeight = 13
   object StatusBar1: TStatusBar
@@ -21,7 +22,7 @@ object FFileDateTime: TFFileDateTime
     Panels = <>
     SimplePanel = True
     ExplicitTop = 452
-    ExplicitWidth = 556
+    ExplicitWidth = 571
   end
   object AdvPanel1: TPanel
     Left = 0
@@ -43,7 +44,7 @@ object FFileDateTime: TFFileDateTime
       Left = 16
       Top = 16
       Width = 457
-      Height = 297
+      Height = 302
       Hint = 'Note: No backup files are created when renaming!'
       BevelOuter = bvLowered
       Font.Charset = DEFAULT_CHARSET
@@ -72,7 +73,7 @@ object FFileDateTime: TFFileDateTime
         Top = 72
         Width = 249
         Height = 97
-        Caption = 'New Filename starts with'
+        Caption = 'New Filename starts/ends with'
         ItemIndex = 0
         Items.Strings = (
           'YYYYMMDD_HHMMSS Filename'
@@ -82,7 +83,7 @@ object FFileDateTime: TFFileDateTime
       end
       object RadioGroup3: TRadioGroup
         Left = 16
-        Top = 183
+        Top = 175
         Width = 249
         Height = 73
         Caption = 'Change Filename'
@@ -95,7 +96,7 @@ object FFileDateTime: TFFileDateTime
       end
       object RadioGroup4: TRadioGroup
         Left = 280
-        Top = 183
+        Top = 175
         Width = 161
         Height = 73
         Caption = 'Save existing Filename to'
@@ -107,7 +108,7 @@ object FFileDateTime: TFFileDateTime
       end
       object CheckBox1: TCheckBox
         Left = 280
-        Top = 89
+        Top = 84
         Width = 169
         Height = 17
         Caption = '-set separator in Date field'
@@ -116,7 +117,7 @@ object FFileDateTime: TFFileDateTime
       end
       object CheckBox2: TCheckBox
         Left = 280
-        Top = 112
+        Top = 107
         Width = 169
         Height = 17
         Caption = '-set separator in Time field'
@@ -140,6 +141,24 @@ object FFileDateTime: TFFileDateTime
         Caption = 'Rename'
         TabOrder = 7
         OnClick = Button2Click
+      end
+      object ChkDateFirst: TCheckBox
+        Left = 16
+        Top = 254
+        Width = 249
+        Height = 17
+        Caption = '-DateTime first'
+        TabOrder = 8
+        OnClick = CheckBox1Click
+      end
+      object ChkSequence: TCheckBox
+        Left = 16
+        Top = 277
+        Width = 249
+        Height = 17
+        Caption = '-Unique filenames (%-c)'
+        TabOrder = 9
+        OnClick = CheckBox1Click
       end
     end
     object AdvPanel3: TPanel
