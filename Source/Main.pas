@@ -1158,7 +1158,7 @@ procedure TFMain.MExifDateTimeshiftClick(Sender: TObject);
 begin
   if FDateTimeShift.ShowModal = mrOK then
   begin
-    RefreshSelected(Sender);
+    ShellList.ClearSelectionRefresh;
     ShowMetadata;
   end;
 end;

@@ -12,32 +12,46 @@ type
   TFDateTimeShift = class(TScaleForm)
     StatusBar1: TStatusBar;
     AdvPanel1: TPanel;
-    LabeledEdit1: TLabeledEdit;
-    LabeledEdit2: TLabeledEdit;
-    LabeledEdit3: TLabeledEdit;
-    CheckBox1: TCheckBox;
-    CheckBox2: TCheckBox;
-    CheckBox3: TCheckBox;
-    MaskEdit1: TMaskEdit;
+    LblEdOriginal: TLabeledEdit;
+    LblEdCreate: TLabeledEdit;
+    LblEdModify: TLabeledEdit;
+    ChkShiftOriginal: TCheckBox;
+    ChkShiftCreate: TCheckBox;
+    ChkShiftModify: TCheckBox;
+    MeShiftAmount: TMaskEdit;
     Label2: TLabel;
-    CheckBox4: TCheckBox;
-    LabeledEdit4: TLabeledEdit;
-    CheckBox5: TCheckBox;
-    Button1: TButton;
-    Button2: TButton;
+    ChkIncrement: TCheckBox;
+    ChkFileModified: TCheckBox;
+    BtnCancel: TButton;
+    BtnExecute: TButton;
     Label1: TLabel;
+    ChkFileCreated: TCheckBox;
+    DtPickDateResult: TDateTimePicker;
+    Label3: TLabel;
+    DtPickTimeResult: TDateTimePicker;
     procedure FormShow(Sender: TObject);
-    procedure CheckBox1Click(Sender: TObject);
-    procedure CheckBox4Click(Sender: TObject);
-    procedure MaskEdit1Change(Sender: TObject);
-    procedure Button2Click(Sender: TObject);
+    procedure ChkShiftOriginalClick(Sender: TObject);
+    procedure ChkIncrementClick(Sender: TObject);
+    procedure MeShiftAmountChange(Sender: TObject);
+    procedure BtnExecuteClick(Sender: TObject);
+    procedure DtPickDateResultUserInput(Sender: TObject; const UserString: string; var DateAndTime: TDateTime; var AllowChange: Boolean);
+    procedure DtPickResultChange(Sender: TObject);
+    procedure DtPickTimeResultUserInput(Sender: TObject; const UserString: string; var DateAndTime: TDateTime;
+      var AllowChange: Boolean);
   private
     { Private declarations }
+    ETcmd: string;
+    ETouts: string;
+    ETerrs: string;
+    DateSample: TDateTime;
+    NewDateSample: TDateTime;
+    DateTimeOK: boolean;
+    procedure SetMaskEdit(Y, M, D, hh, mm, ss: integer);
+    procedure ComputeDiff(NDate: TdateTime);
+    procedure GetDateTimeOriginal;
     procedure DisplayHint(Sender: TObject);
   public
     { Public declarations }
-  var
-    ETouts, ETerrs: string;
   end;
 
 var
@@ -45,7 +59,7 @@ var
 
 implementation
 
-uses Main, ExifTool, System.DateUtils, UnitLangResources;
+uses Main, ExifTool, ExifToolsGUI_Utils, System.DateUtils, UnitLangResources, System.Types;
 
 {$R *.dfm}
 
@@ -54,60 +68,155 @@ const
   CmdDateCreate = '-exif:CreateDate';
   CmdDateModify = '-exif:ModifyDate';
 
-var
-  ETcmd: string;
-  DTstr: string[23];
-  DTx: TDateTime;
-  Y, M, D, hh, mm, ss, tt: word;
-  DateTimeOK: boolean;
 
-procedure TFDateTimeShift.Button2Click(Sender: TObject);
+procedure TFDateTimeShift.BtnExecuteClick(Sender: TObject);
 var
   PN: string[3];
 begin
-  if CheckBox4.Checked then
+  if ChkIncrement.Checked then
     PN := '+='
   else
     PN := '-=';
-  if (CheckBox1.Checked) and (CheckBox2.Checked) and (CheckBox3.Checked) then
-    ETcmd := '-exif:AllDates' + PN + MaskEdit1.EditText + CRLF
+
+  ETcmd := '';
+  if (ChkShiftOriginal.Checked) and (ChkShiftCreate.Checked) and (ChkShiftModify.Checked) then
+    ETcmd := '-exif:AllDates' + PN + MeShiftAmount.EditText + CRLF
   else
   begin
-    ETcmd := '';
-    if CheckBox1.Checked then
-      ETcmd := CmdDateOriginal + PN + MaskEdit1.EditText + CRLF;
-    if CheckBox2.Checked then
-      ETcmd := ETcmd + CmdDateCreate + PN + MaskEdit1.EditText + CRLF;
-    if CheckBox3.Checked then
-      ETcmd := ETcmd + CmdDateModify + PN + MaskEdit1.EditText + CRLF;
+    if (CompareDateTime(NewDateSample, DateSample) <> EqualsValue)  then
+    begin
+      if ChkShiftOriginal.Checked then
+        ETcmd := CmdDateOriginal + PN + MeShiftAmount.EditText;
+      if ChkShiftCreate.Checked then
+        ETcmd := EndsWithCRLF(ETcmd) + CmdDateCreate + PN + MeShiftAmount.EditText;
+      if ChkShiftModify.Checked then
+        ETcmd := EndsWithCRLF(ETcmd) + CmdDateModify + PN + MeShiftAmount.EditText;
+    end;
   end;
+  // ShiftDates in Exif?
+  if (ETcmd <> '') then
+    ET_OpenExec(ETcmd, FMain.GetSelectedFiles, ETouts, ETerrs);
 
-  Y := length(ETcmd);
-  SetLength(ETcmd, Y - 2); // remove last CRLF
-  ET_OpenExec(ETcmd, FMain.GetSelectedFiles, ETouts, ETerrs);
-  if CheckBox5.Checked then
-    ET_OpenExec('-FileModifyDate<Exif:DateTimeOriginal', FMain.GetSelectedFiles);
+  // Correct FileDates?
+  ETcmd := '';
+  if ChkFileModified.Checked then
+    ETcmd := '-FileModifyDate<Exif:DateTimeOriginal';
+  if ChkFileCreated.Checked then
+    ETcmd := EndsWithCRLF(ETcmd) + '-FileCreateDate<Exif:DateTimeOriginal';
+  if (ETcmd <> '') then
+    ET_OpenExec(Etcmd, FMain.GetSelectedFiles);
+
   ModalResult := mrOK;
 end;
 
-procedure TFDateTimeShift.CheckBox1Click(Sender: TObject);
+procedure TFDateTimeShift.ChkShiftOriginalClick(Sender: TObject);
 begin
-  Button2.Enabled := (CheckBox1.Checked) or (CheckBox2.Checked) or (CheckBox3.Checked);
+  BtnExecute.Enabled := (ChkShiftOriginal.Checked) or (ChkShiftCreate.Checked) or (ChkShiftModify.Checked) or
+                        (ChkFileModified.Checked) or (ChkFileCreated.Checked);
 end;
 
-procedure TFDateTimeShift.CheckBox4Click(Sender: TObject);
+procedure TFDateTimeShift.ChkIncrementClick(Sender: TObject);
 begin
-  with CheckBox4 do
-    if Checked then
-      Caption := '=' + StrIncrement
-    else
-      Caption := '=' + StrDecrement;
-  MaskEdit1Change(Sender);
+
+  if (ChkIncrement.Checked) then
+    ChkIncrement.Caption := '=' + StrIncrement
+  else
+     ChkIncrement.Caption := '=' + StrDecrement;
+
+  MeShiftAmountChange(Sender);
 end;
 
 procedure TFDateTimeShift.DisplayHint(Sender: TObject);
 begin
   StatusBar1.SimpleText := GetShortHint(Application.Hint);
+end;
+
+procedure TFDateTimeShift.SetMaskEdit(Y, M, D, hh, mm, ss: integer);
+begin
+  MeShiftAmount.Tag := 1; // Dont call maskedit1 change
+  try
+    MeShiftAmount.EditText := Format('%.4d:%.2d:%.2d %.2d:%.2d:%.2d',
+                                     [Y, M, D, hh, mm, ss]);
+  finally
+    MeShiftAmount.Tag := 0;
+  end;
+end;
+
+procedure TFDateTimeShift.ComputeDiff(NDate: TdateTime);
+var
+  F, T: TDateTime;
+  Y, M, D, hh, mm, ss: integer;
+begin
+  NewDateSample := NDate;
+  if (CompareDateTime(DateSample, NewDateSample) = GreaterThanValue)  then
+  begin
+    F := DateSample;
+    T := NewDateSample;
+    ChkIncrement.Checked := false;
+  end
+  else
+  begin
+    F := NewDateSample;
+    T := DateSample;
+    ChkIncrement.Checked := true;
+  end;
+
+  Y := YearsBetween(F, T);
+  T := IncYear(T, Y);
+
+  M := MonthsBetween(F, T);
+  T := IncMonth(T, M);
+
+  D := DaysBetween(F, T);
+  T := IncDay(T, D);
+
+  hh := HoursBetween(F, T);
+  T := IncHour(T, hh);
+
+  mm := MinutesBetween(F, T);
+  T := IncMinute(T, mm);
+
+  ss := SecondsBetween(F, T);
+
+  SetMaskEdit(Y, M, D, hh, mm, ss);
+end;
+
+procedure TFDateTimeShift.DtPickResultChange(Sender: TObject);
+begin
+  ComputeDiff(DtPickDateResult.Date + DtPickTimeResult.Time);
+end;
+
+procedure TFDateTimeShift.DtPickDateResultUserInput(Sender: TObject; const UserString: string; var DateAndTime: TDateTime;
+  var AllowChange: Boolean);
+begin
+  ComputeDiff(DateAndTime + DtPickTimeResult.Time);
+end;
+
+procedure TFDateTimeShift.DtPickTimeResultUserInput(Sender: TObject; const UserString: string; var DateAndTime: TDateTime;
+  var AllowChange: Boolean);
+begin
+  ComputeDiff(DtPickDateResult.Date + DateAndTime);
+end;
+
+procedure TFDateTimeShift.GetDateTimeOriginal;
+var
+  DTstr: string;
+  Y, M, D, hh, mm, ss: integer;
+begin
+  DTstr := LblEdOriginal.Text; // Check DateTimeOriginal
+  Y := StrToIntDef(Copy(DTstr, 1, 4), 0);
+  M := StrToIntDef(Copy(DTstr, 6, 2), 0);
+  D := StrToIntDef(Copy(DTstr, 9, 2), 0);
+  hh := StrToIntDef(Copy(DTstr, 12, 2), 0);
+  mm := StrToIntDef(Copy(DTstr, 15, 2), 0);
+  ss := StrToIntDef(Copy(DTstr, 18, 2), 0);
+  DateTimeOK := (Y * M * D <> 0);
+  if DateTimeOK then
+  begin
+    DateSample := EncodeDateTime(Y, M, D, hh, mm, ss, 0);
+    DtPickDateResult.Date := DateSample;
+    DtPickTimeResult.Date := DateSample;
+  end;
 end;
 
 procedure TFDateTimeShift.FormShow(Sender: TObject);
@@ -122,7 +231,9 @@ begin
       Label1.Caption := StrBackupOFF
     else
       Label1.Caption := StrBackupON;
-    CheckBox4Click(Sender);
+
+    ChkFileModified.Checked := FMain.MaPreserveDateMod.Checked;
+    ChkFileCreated.Checked := true;
 
     Application.OnHint := DisplayHint;
 
@@ -130,76 +241,53 @@ begin
     ET_OpenExec(ETcmd, FMain.GetFirstSelectedFile, ETResult, false);
     if (ETResult.Count > 2) then
     begin
-      LabeledEdit1.Text := ETResult[0];
-      LabeledEdit2.Text := ETResult[1];
-      LabeledEdit3.Text := ETResult[2];
+      LblEdOriginal.Text := ETResult[0];
+      LblEdCreate.Text := ETResult[1];
+      LblEdModify.Text := ETResult[2];
     end;
-    DTstr := LabeledEdit1.Text; // Check DateTimeOriginal
-    Y := StrToIntDef(Copy(DTstr, 1, 4), 0);
-    M := StrToIntDef(Copy(DTstr, 6, 2), 0);
-    D := StrToIntDef(Copy(DTstr, 9, 2), 0);
-    hh := StrToIntDef(Copy(DTstr, 12, 2), 0);
-    mm := StrToIntDef(Copy(DTstr, 15, 2), 0);
-    ss := StrToIntDef(Copy(DTstr, 18, 2), 0);
-    DateTimeOK := (Y * M * D <> 0);
-    if DateTimeOK then
-    begin
-      DTx := EncodeDateTime(Y, M, D, hh, mm, ss, 0);
-      LabeledEdit4.Text := LabeledEdit1.Text;
-    end
-    else
-      LabeledEdit4.Clear;
-    MaskEdit1.Clear;
-    MaskEdit1.SetFocus;
+    GetDateTimeOriginal;
+    ChkIncrementClick(Sender);
+    MeShiftAmount.Clear;
+    MeShiftAmount.SetFocus;
   finally
     ETResult.Free;
   end;
 end;
 
-procedure TFDateTimeShift.MaskEdit1Change(Sender: TObject);
+procedure TFDateTimeShift.MeShiftAmountChange(Sender: TObject);
 var
-  Yd, Md, Dd, hhd, mmd, ssd, i: integer;
+  Yd, Md, Dd, hhd, mmd, ssd, I: integer;
   NewDT: TDateTime;
+  DTstr: string;
 begin
-  if DateTimeOK then
+  if not DateTimeOK then
+    exit;
+
+  if ChkIncrement.Checked then
+    I := 1
+  else
+    I := -1;
+
+  DTstr := MeShiftAmount.EditText;
+  Yd := StrToIntDef(Copy(DTstr, 1, 4), 0) * I;
+  Md := StrToIntDef(Copy(DTstr, 6, 2), 0) * I;
+  Dd := StrToIntDef(Copy(DTstr, 9, 2), 0) * I;
+  hhd := StrToIntDef(Copy(DTstr, 12, 2), 0) * I;
+  mmd := StrToIntDef(Copy(DTstr, 15, 2), 0) * I;
+  ssd := StrToIntDef(Copy(DTstr, 18, 2), 0) * I;
+
+  NewDT := IncYear(DateSample, Yd); // get original DateTime here
+  NewDT := IncMonth(NewDT, Md);
+  NewDT := IncDay(NewDT, Dd);
+  NewDT := IncHour(NewDT, hhd);
+  NewDT := IncMinute(NewDT, mmd);
+  NewDT := IncSecond(NewDT, ssd);
+
+  if (MeShiftAmount.Tag = 0) then
   begin
-    if CheckBox4.Checked then
-      i := 1
-    else
-      i := -1;
-    DTstr := MaskEdit1.EditText;
-    Yd := StrToIntDef(Copy(DTstr, 1, 4), 0) * i;
-    Md := StrToIntDef(Copy(DTstr, 6, 2), 0) * i;
-    Dd := StrToIntDef(Copy(DTstr, 9, 2), 0) * i;
-    hhd := StrToIntDef(Copy(DTstr, 12, 2), 0) * i;
-    mmd := StrToIntDef(Copy(DTstr, 15, 2), 0) * i;
-    ssd := StrToIntDef(Copy(DTstr, 18, 2), 0) * i;
-
-    NewDT := IncYear(DTx, Yd); // get original DateTime here
-    NewDT := IncMonth(NewDT, Md);
-    NewDT := IncDay(NewDT, Dd);
-    NewDT := IncHour(NewDT, hhd);
-    NewDT := IncMinute(NewDT, mmd);
-    NewDT := IncSecond(NewDT, ssd);
-
-    DecodeDateTime(NewDT, Y, M, D, hh, mm, ss, tt);
-    DTstr := IntToStr(Y) + ':';
-    if M < 10 then
-      DTstr := DTstr + '0';
-    DTstr := DTstr + IntToStr(M) + ':';
-    if D < 10 then
-      DTstr := DTstr + '0';
-    DTstr := DTstr + IntToStr(D) + ' ';
-    if hh < 10 then
-      DTstr := DTstr + '0';
-    DTstr := DTstr + IntToStr(hh) + ':';
-    if mm < 10 then
-      DTstr := DTstr + '0';
-    DTstr := DTstr + IntToStr(mm) + ':';
-    if ss < 10 then
-      DTstr := DTstr + '0';
-    DTstr := DTstr + IntToStr(ss);
-    LabeledEdit4.Text := DTstr;
+    if (NewDT > DtPickDateResult.MinDate) then
+      DtPickDateResult.Date := NewDT;
+    DtPickTimeResult.Time := NewDT;
   end;
 end;
 

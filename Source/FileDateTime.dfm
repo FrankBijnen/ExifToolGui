@@ -71,7 +71,7 @@ object FFileDateTime: TFFileDateTime
       object RadioGroup2: TRadioGroup
         Left = 16
         Top = 72
-        Width = 249
+        Width = 260
         Height = 97
         Caption = 'New Filename starts/ends with'
         ItemIndex = 0
@@ -84,7 +84,7 @@ object FFileDateTime: TFFileDateTime
       object RadioGroup3: TRadioGroup
         Left = 16
         Top = 175
-        Width = 249
+        Width = 260
         Height = 73
         Caption = 'Change Filename'
         ItemIndex = 0
@@ -125,9 +125,9 @@ object FFileDateTime: TFFileDateTime
         OnClick = CheckBox1Click
       end
       object Edit1: TEdit
-        Left = 82
-        Top = 226
-        Width = 169
+        Left = 115
+        Top = 220
+        Width = 159
         Height = 22
         Color = clBtnFace
         MaxLength = 64
