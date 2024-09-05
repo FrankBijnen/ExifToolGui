@@ -4,7 +4,7 @@ object FFileDateTime: TFFileDateTime
   BorderStyle = bsDialog
   Caption = 'Rename files'
   ClientHeight = 472
-  ClientWidth = 575
+  ClientWidth = 603
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -17,7 +17,7 @@ object FFileDateTime: TFFileDateTime
   object StatusBar1: TStatusBar
     Left = 0
     Top = 453
-    Width = 575
+    Width = 603
     Height = 19
     Panels = <>
     SimplePanel = True
@@ -27,7 +27,7 @@ object FFileDateTime: TFFileDateTime
   object AdvPanel1: TPanel
     Left = 0
     Top = 0
-    Width = 497
+    Width = 523
     Height = 453
     Align = alLeft
     DoubleBuffered = True
@@ -39,11 +39,10 @@ object FFileDateTime: TFFileDateTime
     ParentDoubleBuffered = False
     ParentFont = False
     TabOrder = 1
-    ExplicitHeight = 452
     object AdvPanel2: TPanel
       Left = 16
       Top = 16
-      Width = 457
+      Width = 493
       Height = 302
       Hint = 'Note: No backup files are created when renaming!'
       BevelOuter = bvLowered
@@ -57,7 +56,7 @@ object FFileDateTime: TFFileDateTime
       object RadioGroup1: TRadioGroup
         Left = 16
         Top = 8
-        Width = 409
+        Width = 469
         Height = 49
         Caption = 'Get DateTime from Exif'
         Columns = 3
@@ -97,7 +96,7 @@ object FFileDateTime: TFFileDateTime
       object RadioGroup4: TRadioGroup
         Left = 280
         Top = 175
-        Width = 161
+        Width = 205
         Height = 73
         Caption = 'Save existing Filename to'
         ItemIndex = 0
@@ -109,7 +108,7 @@ object FFileDateTime: TFFileDateTime
       object CheckBox1: TCheckBox
         Left = 280
         Top = 84
-        Width = 169
+        Width = 200
         Height = 17
         Caption = '-set separator in Date field'
         TabOrder = 4
@@ -118,7 +117,7 @@ object FFileDateTime: TFFileDateTime
       object CheckBox2: TCheckBox
         Left = 280
         Top = 107
-        Width = 169
+        Width = 200
         Height = 17
         Caption = '-set separator in Time field'
         TabOrder = 5
@@ -134,7 +133,7 @@ object FFileDateTime: TFFileDateTime
         TabOrder = 6
       end
       object Button2: TButton
-        Left = 366
+        Left = 410
         Top = 262
         Width = 75
         Height = 25
@@ -164,7 +163,7 @@ object FFileDateTime: TFFileDateTime
     object AdvPanel3: TPanel
       Left = 16
       Top = 344
-      Width = 457
+      Width = 493
       Height = 41
       Hint = 'Files will only be renamed where Exif:DocumentName is defined.'
       BevelOuter = bvLowered
@@ -186,7 +185,7 @@ object FFileDateTime: TFFileDateTime
         TabStop = True
       end
       object Button3: TButton
-        Left = 366
+        Left = 410
         Top = 8
         Width = 75
         Height = 25
@@ -198,7 +197,7 @@ object FFileDateTime: TFFileDateTime
     object AdvPanel4: TPanel
       Left = 16
       Top = 400
-      Width = 457
+      Width = 493
       Height = 41
       Hint = 'DateTime part must be separated by SPACE!'
       BevelOuter = bvLowered
@@ -220,7 +219,7 @@ object FFileDateTime: TFFileDateTime
         TabStop = True
       end
       object Button4: TButton
-        Left = 366
+        Left = 410
         Top = 8
         Width = 75
         Height = 25
@@ -231,7 +230,7 @@ object FFileDateTime: TFFileDateTime
     end
   end
   object Button1: TButton
-    Left = 503
+    Left = 529
     Top = 16
     Width = 68
     Height = 25

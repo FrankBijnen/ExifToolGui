@@ -102,7 +102,7 @@ resourcestring
   StrThisWillFillExif1      = 'This will fill Exif:LensInfo of selected files with relevant';
   StrThisWillFillExif2      = 'values from Makernotes data (where possible).';
   StrOKToProceed            = 'OK to proceed?';
-  FileDateFromExif1         = 'This will set "Date modified" of selected files';
+  FileDateFromExif1         = 'This will set "Date Created" and "Date modified" of selected files';
   FileDateFromExif2         = 'according to Exif:DateTimeOriginal value.';
   ImportMetaSel1            = 'This will copy ALL metadata from any source into';
   ImportMetaSel2            = 'currently *selected* %s files.';

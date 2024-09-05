@@ -1275,7 +1275,6 @@ object FMain: TFMain
             Items = <
               item
                 Action = MaFileDateFromExif
-                Caption = '&File: Date modified as in Exif...'
               end
               item
                 Action = MaFileNameDateTime
@@ -1542,7 +1541,7 @@ object FMain: TFMain
     object MaFileDateFromExif: TAction
       Tag = 40
       Category = 'Various'
-      Caption = 'File: Date modified as in Exif...'
+      Caption = 'File: Date created and modified as in Exif...'
       OnExecute = MFileDateFromExifClick
     end
     object MaFileNameDateTime: TAction

@@ -171,33 +171,54 @@ procedure TFFileDateTime.CheckBox1Click(Sender: TObject);
 begin
   with RadioGroup2 do
   begin
+    Items[0] := '';
+    Items[1] := '';
+    Items[2] := '';
+    if not ChkDateFirst.Checked then
+    begin
+      Items[0] := StrFilename + ' ';
+      Items[1] := StrFilename + ' ';
+      Items[2] := StrFilename + ' ';
+    end;
     if CheckBox1.Checked then
     begin
       if CheckBox2.Checked then
       begin
-        Items[0] := 'YYYY-MM-DD_HH-MM-SS ' + StrFilename;
-        Items[1] := 'YYYY-MM-DD_HH-MM ' + StrFilename;
+        Items[0] := Items[0] + 'YYYY-MM-DD_HH-MM-SS';
+        Items[1] := Items[1] + 'YYYY-MM-DD_HH-MM';
       end
       else
       begin
-        Items[0] := 'YYYY-MM-DD_HHMMSS ' + StrFilename;
-        Items[1] := 'YYYY-MM-DD_HHMM ' + StrFilename;
+        Items[0] := Items[0] + 'YYYY-MM-DD_HHMMSS';
+        Items[1] := Items[1] + 'YYYY-MM-DD_HHMM';
       end;
-      Items[2] := 'YYYY-MM-DD ' + StrFilename;
+      Items[2] := Items[2] + 'YYYY-MM-DD';
     end
     else
     begin
       if CheckBox2.Checked then
       begin
-        Items[0] := 'YYYYMMDD_HH-MM-SS ' + StrFilename;
-        Items[1] := 'YYYYMMDD_HH-MM ' + StrFilename;
+        Items[0] := Items[0] + 'YYYYMMDD_HH-MM-SS';
+        Items[1] := Items[1] + 'YYYYMMDD_HH-MM';
       end
       else
       begin
-        Items[0] := 'YYYYMMDD_HHMMSS ' + StrFilename;
-        Items[1] := 'YYYYMMDD_HHMM ' + StrFilename;
+        Items[0] := Items[0] + 'YYYYMMDD_HHMMSS';
+        Items[1] := Items[1] + 'YYYYMMDD_HHMM';
       end;
-      Items[2] := 'YYYYMMDD ' + StrFilename;
+      Items[2] := Items[2] + 'YYYYMMDD ';
+    end;
+    if ChkDateFirst.Checked then
+    begin
+      Items[0] := Items[0] + ' ' + StrFilename;
+      Items[1] := Items[1] + ' ' + StrFilename;
+      Items[2] := Items[2] + ' ' + StrFilename;
+    end;
+    if (ChkSequence.Checked) then
+    begin
+      Items[0] := Items[0] + '-1';
+      Items[1] := Items[1] + '-1';
+      Items[2] := Items[2] + '-1';
     end;
   end;
 end;

@@ -1226,7 +1226,9 @@ begin
                 FileDateFromExif2 + #10#10 +
                 StrOKToProceed, mtInformation, [mbOk, mbCancel], 0) = mrOK then
   begin
-    ET_OpenExec('-FileModifyDate<Exif:DateTimeOriginal', GetSelectedFiles, ETout, ETerr);
+    ET_OpenExec('-FileCreateDate<Exif:DateTimeOriginal' + CRLF +
+                '-FileModifyDate<Exif:DateTimeOriginal',
+                GetSelectedFiles, ETout, ETerr);
     RefreshSelected(Sender);
     ShowMetadata;
     ShowPreview;
