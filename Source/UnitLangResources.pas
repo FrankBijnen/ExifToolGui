@@ -103,7 +103,7 @@ resourcestring
   StrThisWillFillExif2      = 'values from Makernotes data (where possible).';
   StrOKToProceed            = 'OK to proceed?';
   FileDateFromExif1         = 'This will set "Date Created" and "Date modified" of selected files';
-  FileDateFromExif2         = 'according to Exif:DateTimeOriginal value.';
+  FileDateFromExif2         = 'according to "%s" and "%s" values.';
   ImportMetaSel1            = 'This will copy ALL metadata from any source into';
   ImportMetaSel2            = 'currently *selected* %s files.';
   ImportMetaSel3            = 'Only those selected files will be processed,';
@@ -188,6 +188,8 @@ resourcestring
   StrDFilesRemaining        = '%d Files remaining';
 
   StrFLName                 = 'Name';
+  StrFLModel                = 'Model';
+  StrFLLensModel            = 'LensModel';
   StrFLExpTime              = 'ExpTime';
   StrFLFNumber              = 'FNumber';
   StrFLISO                  = 'ISO';

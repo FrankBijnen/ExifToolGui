@@ -1275,6 +1275,7 @@ object FMain: TFMain
             Items = <
               item
                 Action = MaFileDateFromExif
+                Caption = '&File: Date created and modified as in Exif...'
               end
               item
                 Action = MaFileNameDateTime

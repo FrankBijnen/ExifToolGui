@@ -29,8 +29,9 @@ type
     DtPickDateResult: TDateTimePicker;
     Label3: TLabel;
     DtPickTimeResult: TDateTimePicker;
+    LblDebug: TLabel;
     procedure FormShow(Sender: TObject);
-    procedure ChkShiftOriginalClick(Sender: TObject);
+    procedure ChkShiftClick(Sender: TObject);
     procedure ChkIncrementClick(Sender: TObject);
     procedure MeShiftAmountChange(Sender: TObject);
     procedure BtnExecuteClick(Sender: TObject);
@@ -38,6 +39,7 @@ type
     procedure DtPickResultChange(Sender: TObject);
     procedure DtPickTimeResultUserInput(Sender: TObject; const UserString: string; var DateAndTime: TDateTime;
       var AllowChange: Boolean);
+    procedure FormCreate(Sender: TObject);
   private
     { Private declarations }
     ETcmd: string;
@@ -46,8 +48,7 @@ type
     DateSample: TDateTime;
     NewDateSample: TDateTime;
     DateTimeOK: boolean;
-    procedure SetMaskEdit(Y, M, D, hh, mm, ss: integer);
-    procedure ComputeDiff(NDate: TdateTime);
+    procedure ComputeDiff(NewDT: TdateTime);
     procedure GetDateTimeOriginal;
     procedure DisplayHint(Sender: TObject);
   public
@@ -62,12 +63,6 @@ implementation
 uses Main, ExifTool, ExifToolsGUI_Utils, System.DateUtils, UnitLangResources, System.Types;
 
 {$R *.dfm}
-
-const
-  CmdDateOriginal = '-exif:DateTimeOriginal';
-  CmdDateCreate = '-exif:CreateDate';
-  CmdDateModify = '-exif:ModifyDate';
-
 
 procedure TFDateTimeShift.BtnExecuteClick(Sender: TObject);
 var
@@ -86,11 +81,11 @@ begin
     if (CompareDateTime(NewDateSample, DateSample) <> EqualsValue)  then
     begin
       if ChkShiftOriginal.Checked then
-        ETcmd := CmdDateOriginal + PN + MeShiftAmount.EditText;
+        ETcmd := CmdStr + CmdDateOriginal + PN + MeShiftAmount.EditText;
       if ChkShiftCreate.Checked then
-        ETcmd := EndsWithCRLF(ETcmd) + CmdDateCreate + PN + MeShiftAmount.EditText;
+        ETcmd := EndsWithCRLF(ETcmd) + CmdStr + CmdDateCreate + PN + MeShiftAmount.EditText;
       if ChkShiftModify.Checked then
-        ETcmd := EndsWithCRLF(ETcmd) + CmdDateModify + PN + MeShiftAmount.EditText;
+        ETcmd := EndsWithCRLF(ETcmd) + CmdStr + CmdDateModify + PN + MeShiftAmount.EditText;
     end;
   end;
   // ShiftDates in Exif?
@@ -100,23 +95,26 @@ begin
   // Correct FileDates?
   ETcmd := '';
   if ChkFileModified.Checked then
-    ETcmd := '-FileModifyDate<Exif:DateTimeOriginal';
+    ETcmd := '-FileModifyDate<' + CmdDateModify;
   if ChkFileCreated.Checked then
-    ETcmd := EndsWithCRLF(ETcmd) + '-FileCreateDate<Exif:DateTimeOriginal';
+    ETcmd := EndsWithCRLF(ETcmd) + '-FileCreateDate<' + CmdDateOriginal;
   if (ETcmd <> '') then
     ET_OpenExec(Etcmd, FMain.GetSelectedFiles);
 
   ModalResult := mrOK;
 end;
 
-procedure TFDateTimeShift.ChkShiftOriginalClick(Sender: TObject);
+procedure TFDateTimeShift.ChkShiftClick(Sender: TObject);
 begin
+  GetDateTimeOriginal;
   BtnExecute.Enabled := (ChkShiftOriginal.Checked) or (ChkShiftCreate.Checked) or (ChkShiftModify.Checked) or
                         (ChkFileModified.Checked) or (ChkFileCreated.Checked);
 end;
 
 procedure TFDateTimeShift.ChkIncrementClick(Sender: TObject);
 begin
+  if (ChkIncrement.Tag <> 0) then
+    exit;
 
   if (ChkIncrement.Checked) then
     ChkIncrement.Caption := '=' + StrIncrement
@@ -131,54 +129,21 @@ begin
   StatusBar1.SimpleText := GetShortHint(Application.Hint);
 end;
 
-procedure TFDateTimeShift.SetMaskEdit(Y, M, D, hh, mm, ss: integer);
+procedure TFDateTimeShift.ComputeDiff(NewDT: TdateTime);
+var
+  Increment: boolean;
 begin
-  MeShiftAmount.Tag := 1; // Dont call maskedit1 change
+  NewDateSample := NewDT;
+  // Prevent eventhandlers from firing
+  MeShiftAmount.Tag := 1;
+  ChkIncrement.Tag := 1;
   try
-    MeShiftAmount.EditText := Format('%.4d:%.2d:%.2d %.2d:%.2d:%.2d',
-                                     [Y, M, D, hh, mm, ss]);
+    MeShiftAmount.EditText := DateDiff(DateSample, NewDateSample, Increment);
+    ChkIncrement.Checked := Increment;
   finally
     MeShiftAmount.Tag := 0;
+    ChkIncrement.Tag := 0;
   end;
-end;
-
-procedure TFDateTimeShift.ComputeDiff(NDate: TdateTime);
-var
-  F, T: TDateTime;
-  Y, M, D, hh, mm, ss: integer;
-begin
-  NewDateSample := NDate;
-  if (CompareDateTime(DateSample, NewDateSample) = GreaterThanValue)  then
-  begin
-    F := DateSample;
-    T := NewDateSample;
-    ChkIncrement.Checked := false;
-  end
-  else
-  begin
-    F := NewDateSample;
-    T := DateSample;
-    ChkIncrement.Checked := true;
-  end;
-
-  Y := YearsBetween(F, T);
-  T := IncYear(T, Y);
-
-  M := MonthsBetween(F, T);
-  T := IncMonth(T, M);
-
-  D := DaysBetween(F, T);
-  T := IncDay(T, D);
-
-  hh := HoursBetween(F, T);
-  T := IncHour(T, hh);
-
-  mm := MinutesBetween(F, T);
-  T := IncMinute(T, mm);
-
-  ss := SecondsBetween(F, T);
-
-  SetMaskEdit(Y, M, D, hh, mm, ss);
 end;
 
 procedure TFDateTimeShift.DtPickResultChange(Sender: TObject);
@@ -189,7 +154,8 @@ end;
 procedure TFDateTimeShift.DtPickDateResultUserInput(Sender: TObject; const UserString: string; var DateAndTime: TDateTime;
   var AllowChange: Boolean);
 begin
-  ComputeDiff(DateAndTime + DtPickTimeResult.Time);
+  if (AllowChange) then
+    ComputeDiff(DateAndTime + DtPickTimeResult.Time);
 end;
 
 procedure TFDateTimeShift.DtPickTimeResultUserInput(Sender: TObject; const UserString: string; var DateAndTime: TDateTime;
@@ -203,7 +169,17 @@ var
   DTstr: string;
   Y, M, D, hh, mm, ss: integer;
 begin
-  DTstr := LblEdOriginal.Text; // Check DateTimeOriginal
+  DtPickDateResult.Date := Now;
+  DtPickTimeResult.Date := Now;
+
+  DTstr := LblEdOriginal.Text;  // If none checked
+  if (ChkShiftOriginal.Checked = true) then
+    DTstr := LblEdOriginal.Text
+  else if (ChkShiftCreate.Checked = true)  then
+      DTstr := LblEdCreate.Text
+  else if (ChkShiftModify.Checked = true) then
+    DTstr := LblEdModify.Text;
+
   Y := StrToIntDef(Copy(DTstr, 1, 4), 0);
   M := StrToIntDef(Copy(DTstr, 6, 2), 0);
   D := StrToIntDef(Copy(DTstr, 9, 2), 0);
@@ -217,6 +193,20 @@ begin
     DtPickDateResult.Date := DateSample;
     DtPickTimeResult.Date := DateSample;
   end;
+
+  ChkIncrement.Tag := 1;
+  try
+    ChkIncrement.Checked := true;
+    MeShiftAmountChange(MeShiftAmount);
+  finally
+    ChkIncrement.Tag := 0;
+  end;
+end;
+
+procedure TFDateTimeShift.FormCreate(Sender: TObject);
+begin
+  ChkFileCreated.Caption := ChkFileCreated.Caption + '<' + CmdStr + CmdDateCreate;
+  ChkFileModified.Caption := ChkFileModified.Caption + '<' + CmdStr + CmdDateModify;
 end;
 
 procedure TFDateTimeShift.FormShow(Sender: TObject);
@@ -232,21 +222,29 @@ begin
     else
       Label1.Caption := StrBackupON;
 
+    ChkShiftOriginal.Checked := false;
+    ChkShiftCreate.Checked := false;
+    ChkShiftModify.Checked := FMain.MaPreserveDateMod.Checked;
     ChkFileModified.Checked := FMain.MaPreserveDateMod.Checked;
-    ChkFileCreated.Checked := true;
+    ChkFileCreated.Checked := false;
 
     Application.OnHint := DisplayHint;
 
-    ETcmd := '-s3' + CRLF + '-f' + CRLF + CmdDateOriginal + CRLF + CmdDateCreate + CRLF + CmdDateModify;
+    ETcmd := '-s3' + CRLF + '-f' + CRLF +
+             CmdStr + CmdDateOriginal + CRLF +
+             CmdStr + CmdDateCreate + CRLF +
+             CmdStr + CmdDateModify;
     ET_OpenExec(ETcmd, FMain.GetFirstSelectedFile, ETResult, false);
     if (ETResult.Count > 2) then
     begin
+      ChkShiftOriginal.Checked := true;
+      ChkShiftCreate.Checked := true;
+      ChkFileCreated.Checked := true;
       LblEdOriginal.Text := ETResult[0];
       LblEdCreate.Text := ETResult[1];
       LblEdModify.Text := ETResult[2];
     end;
     GetDateTimeOriginal;
-    ChkIncrementClick(Sender);
     MeShiftAmount.Clear;
     MeShiftAmount.SetFocus;
   finally
@@ -282,13 +280,23 @@ begin
   NewDT := IncHour(NewDT, hhd);
   NewDT := IncMinute(NewDT, mmd);
   NewDT := IncSecond(NewDT, ssd);
+  NewDateSample := NewDT;
 
   if (MeShiftAmount.Tag = 0) then
   begin
     if (NewDT > DtPickDateResult.MinDate) then
+    begin
       DtPickDateResult.Date := NewDT;
-    DtPickTimeResult.Time := NewDT;
+      DtPickTimeResult.Time := NewDT;
+      StatusBar1.SimpleText := '';
+    end
+    else
+      StatusBar1.SimpleText := Format('Warning: Computed date %s can not be shown' , [FormatDateTime('YYYY:MM:DD hh:mm:ss', NewDT)]);
   end;
+  {$IFDEF DEBUG}
+  LblDebug.Visible := true;
+  LblDebug.Caption := FormatDateTime('YYYY:MM:DD hh:mm:ss', NewDT);
+  {$ENDIF}
 end;
 
 end.

@@ -67,6 +67,9 @@ function ArgsFromDirectCmd(const CmdIn: string): string;
 function DirectCmdFromArgs(const ArgsIn: string): string;
 procedure WriteArgsFile(const ETInp, ArgsFile: string; Preamble: boolean = false);
 
+// Date
+function DateDiff(ODate, NDate: TDateTime; var Increment: boolean): string;
+
 // Image
 function IsJpeg(Filename: string): boolean;
 function GetBitmapFromWic(const FWicBitmapSource: IWICBitmapSource): TBitmap;
@@ -122,8 +125,8 @@ var
 implementation
 
 uses
-  Winapi.ShellAPI, Winapi.KnownFolders, System.Win.Registry, System.UITypes, UFrmGenerate, MainDef, ExifTool, ExifInfo,
-  UnitLangResources;
+  Winapi.ShellAPI, Winapi.KnownFolders, System.Win.Registry, System.UITypes, System.Types, System.DateUtils,
+  UFrmGenerate, MainDef, ExifTool, ExifInfo, UnitLangResources;
 
 var
   GlobalImgFact: IWICImagingFactory;
@@ -569,6 +572,135 @@ begin
   finally
     CloseHandle(Handle);
   end;
+end;
+
+// Date
+function DateDiff(ODate, NDate: TDateTime; var Increment: boolean): string;
+var
+  LY, LM, LD, Lhh, Lmm, Lss, Lmss: word;      // The lowest Values
+  HY, HM, HD, Hhh, Hmm, Hss, Hmss: word;      // The highest Values
+  DY, DM, DD, Dhh, Dmm, Dss: integer;         // Difference, disregard mss);
+  CY, CM: integer; // New year month, after correction. Used to get days in month
+
+  procedure ChkYear(ChkOnly: boolean = true);
+  begin
+    if not ChkOnly then
+      DY := HY - LY;
+  end;
+
+  procedure ChkMonth(ChkOnly: boolean = true);
+  begin
+    if not ChkOnly then
+      DM := HM - LM;
+
+    if (DM < 0) then
+    begin
+      Dec(DY); // Correct Year
+      ChkYear;
+
+      DM := DM + 12;
+    end;
+  end;
+
+  procedure ChkDay(ChkOnly: boolean = true);
+  begin
+    if not ChkOnly then
+      DD := HD - LD;
+    if (DD < 0) then
+    begin
+      Dec(DM);  // Correct month
+      ChkMonth;
+
+      if (Increment) then
+      begin
+        Dec(CM);
+        if (CM < 1) then
+        begin
+          CM := 12;
+          Dec(CY);
+        end;
+      end;
+
+      case CM of
+        1,3,5,7,8,10,12:
+           DD := DD + 31;
+        2: if (IsLeapYear(CY)) then
+             DD := DD + 29
+           else
+             DD := DD + 28;
+        4,6,9,11:
+            DD := DD + 30;
+      end;
+    end;
+  end;
+
+  procedure ChkHour(ChkOnly: boolean = true);
+  begin
+    if not ChkOnly then
+      Dhh := Hhh - Lhh;
+    if (Dhh < 0) then
+    begin
+      Dec(DD);
+      ChkDay;
+
+      Dhh := Dhh + 24;
+    end;
+  end;
+
+  procedure ChkMin(ChkOnly: boolean = true);
+  begin
+    if not ChkOnly then
+      Dmm := Hmm - Lmm;
+    if (Dmm < 0) then
+    begin
+      Dec(Dhh);
+      ChkHour;
+
+      Dmm := Dmm + 60;
+    end;
+  end;
+
+  procedure Chkss(ChkOnly: boolean = true);
+  begin
+    if not ChkOnly then
+      Dss := Hss - Lss;
+    if (Dss < 0) then
+    begin
+      Dec(Dmm);
+      ChkMin;
+
+      Dss := Dss + 60;
+    end;
+  end;
+
+begin
+  if (CompareDateTime(ODate, NDate) = GreaterThanValue)  then
+  begin
+    Increment := false;
+    DecodeDateTime(NDate, LY, LM, LD, Lhh, Lmm, Lss, Lmss);
+    DecodeDateTime(ODate, HY, HM, HD, Hhh, Hmm, Hss, Hmss);
+    CY := LY;
+    CM := LM;
+  end
+  else
+  begin
+    Increment := true;
+    DecodeDateTime(ODate, LY, LM, LD, Lhh, Lmm, Lss, Lmss);
+    DecodeDateTime(NDate, HY, HM, HD, Hhh, Hmm, Hss, Hmss);
+    CY := HY;
+    CM := HM;
+  end;
+
+  ChkYear(false);
+  ChkMonth(false);
+  ChkDay(false);
+  ChkHour(false);
+  ChkMin(false);
+  Chkss(false);
+
+  result := Format('%.4d:%.2d:%.2d %.2d:%.2d:%.2d',
+                   [DY, DM, DD, Dhh, Dmm, Dss]);
+
 end;
 
 // Image

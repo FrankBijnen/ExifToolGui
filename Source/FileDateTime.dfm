@@ -4,7 +4,7 @@ object FFileDateTime: TFFileDateTime
   BorderStyle = bsDialog
   Caption = 'Rename files'
   ClientHeight = 472
-  ClientWidth = 603
+  ClientWidth = 718
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -17,17 +17,17 @@ object FFileDateTime: TFFileDateTime
   object StatusBar1: TStatusBar
     Left = 0
     Top = 453
-    Width = 603
+    Width = 718
     Height = 19
     Panels = <>
     SimplePanel = True
     ExplicitTop = 452
-    ExplicitWidth = 571
+    ExplicitWidth = 599
   end
   object AdvPanel1: TPanel
     Left = 0
     Top = 0
-    Width = 523
+    Width = 631
     Height = 453
     Align = alLeft
     DoubleBuffered = True
@@ -42,7 +42,7 @@ object FFileDateTime: TFFileDateTime
     object AdvPanel2: TPanel
       Left = 16
       Top = 16
-      Width = 493
+      Width = 600
       Height = 302
       Hint = 'Note: No backup files are created when renaming!'
       BevelOuter = bvLowered
@@ -56,7 +56,7 @@ object FFileDateTime: TFFileDateTime
       object RadioGroup1: TRadioGroup
         Left = 16
         Top = 8
-        Width = 469
+        Width = 564
         Height = 49
         Caption = 'Get DateTime from Exif'
         Columns = 3
@@ -70,7 +70,7 @@ object FFileDateTime: TFFileDateTime
       object RadioGroup2: TRadioGroup
         Left = 16
         Top = 72
-        Width = 260
+        Width = 324
         Height = 97
         Caption = 'New Filename starts/ends with'
         ItemIndex = 0
@@ -83,7 +83,7 @@ object FFileDateTime: TFFileDateTime
       object RadioGroup3: TRadioGroup
         Left = 16
         Top = 175
-        Width = 260
+        Width = 324
         Height = 73
         Caption = 'Change Filename'
         ItemIndex = 0
@@ -94,9 +94,9 @@ object FFileDateTime: TFFileDateTime
         OnClick = RadioGroup3Click
       end
       object RadioGroup4: TRadioGroup
-        Left = 280
-        Top = 175
-        Width = 205
+        Left = 357
+        Top = 176
+        Width = 208
         Height = 73
         Caption = 'Save existing Filename to'
         ItemIndex = 0
@@ -106,18 +106,18 @@ object FFileDateTime: TFFileDateTime
         TabOrder = 3
       end
       object CheckBox1: TCheckBox
-        Left = 280
-        Top = 84
-        Width = 200
+        Left = 357
+        Top = 85
+        Width = 208
         Height = 17
         Caption = '-set separator in Date field'
         TabOrder = 4
         OnClick = CheckBox1Click
       end
       object CheckBox2: TCheckBox
-        Left = 280
-        Top = 107
-        Width = 200
+        Left = 357
+        Top = 108
+        Width = 208
         Height = 17
         Caption = '-set separator in Time field'
         TabOrder = 5
@@ -126,15 +126,16 @@ object FFileDateTime: TFFileDateTime
       object Edit1: TEdit
         Left = 115
         Top = 220
-        Width = 159
+        Width = 206
         Height = 22
         Color = clBtnFace
         MaxLength = 64
         TabOrder = 6
+        OnChange = Edit1Change
       end
       object Button2: TButton
-        Left = 410
-        Top = 262
+        Left = 490
+        Top = 263
         Width = 75
         Height = 25
         Caption = 'Rename'
@@ -144,7 +145,7 @@ object FFileDateTime: TFFileDateTime
       object ChkDateFirst: TCheckBox
         Left = 16
         Top = 254
-        Width = 249
+        Width = 324
         Height = 17
         Caption = '-DateTime first'
         TabOrder = 8
@@ -153,7 +154,7 @@ object FFileDateTime: TFFileDateTime
       object ChkSequence: TCheckBox
         Left = 16
         Top = 277
-        Width = 249
+        Width = 324
         Height = 17
         Caption = '-Unique filenames (%-c)'
         TabOrder = 9
@@ -163,7 +164,7 @@ object FFileDateTime: TFFileDateTime
     object AdvPanel3: TPanel
       Left = 16
       Top = 344
-      Width = 493
+      Width = 600
       Height = 41
       Hint = 'Files will only be renamed where Exif:DocumentName is defined.'
       BevelOuter = bvLowered
@@ -177,7 +178,7 @@ object FFileDateTime: TFFileDateTime
       object RadioButton1: TRadioButton
         Left = 24
         Top = 8
-        Width = 340
+        Width = 450
         Height = 17
         Caption = 'Use Filename from Exif:DocumentName'
         Checked = True
@@ -185,8 +186,8 @@ object FFileDateTime: TFFileDateTime
         TabStop = True
       end
       object Button3: TButton
-        Left = 410
-        Top = 8
+        Left = 490
+        Top = 7
         Width = 75
         Height = 25
         Caption = 'Rename'
@@ -197,7 +198,7 @@ object FFileDateTime: TFFileDateTime
     object AdvPanel4: TPanel
       Left = 16
       Top = 400
-      Width = 493
+      Width = 600
       Height = 41
       Hint = 'DateTime part must be separated by SPACE!'
       BevelOuter = bvLowered
@@ -211,7 +212,7 @@ object FFileDateTime: TFFileDateTime
       object RadioButton2: TRadioButton
         Left = 24
         Top = 8
-        Width = 340
+        Width = 450
         Height = 17
         Caption = 'Remove leading DateTime (incl. SPACE)'
         Checked = True
@@ -219,8 +220,8 @@ object FFileDateTime: TFFileDateTime
         TabStop = True
       end
       object Button4: TButton
-        Left = 410
-        Top = 8
+        Left = 490
+        Top = 7
         Width = 75
         Height = 25
         Caption = 'Rename'
@@ -230,7 +231,7 @@ object FFileDateTime: TFFileDateTime
     end
   end
   object Button1: TButton
-    Left = 529
+    Left = 637
     Top = 16
     Width = 68
     Height = 25
