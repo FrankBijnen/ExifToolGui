@@ -107,6 +107,7 @@ type
     destructor Destroy; override;
     procedure Invalidate; override;
     procedure ClearSelectionRefresh;
+    procedure AddDate; // Adds next columns if it is a Date.
 
     function Path: string;
     function GetSelectedFolder(ItemIndex: integer): TShellFolder;
@@ -532,6 +533,20 @@ begin
   for Indx := 0 to Items.Count -1 do
     ListView_SetItemState(Handle, Indx, 0, LVIS_SELECTED);
   Refresh;
+end;
+
+procedure TShellListView.AddDate;
+var
+  ColFlags: LongWord;
+  SD: TShellDetails;
+begin
+  if Assigned(RootFolder.ShellFolder2) and // Have IShellFolder2 interface
+    (RootFolder.ShellFolder2.GetDefaultColumnState(Columns.Count, ColFlags) = S_OK) and
+    ((ColFlags and SHCOLSTATE_TYPE_DATE) = SHCOLSTATE_TYPE_DATE) then
+  begin
+    if (RootFolder.ShellFolder2.GetDetailsOf(nil, Columns.Count, SD) = S_OK) then
+     Columns.Add.Caption := SD.str.pOleStr;
+  end;
 end;
 
 procedure TShellListView.EnumColumns;

@@ -404,6 +404,8 @@ const
 const
   CameraFields =
     '-s3' + CRLF + '-f' + CRLF +
+    '-IFD0:Model' + CRLF +
+    '-ExifIFD:LensModel' + CRLF +
     '-ExifIFD:ExposureTime' + CRLF +
     '-ExifIFD:FNumber' + CRLF +
     '-ExifIFD:ISO' + CRLF +
@@ -719,6 +721,8 @@ begin
   with ShellList do
   if (Enabled) then
   begin
+    SortColumn := 0;
+    SortState := THeaderSortState.hssNone;
     ClearSelectionRefresh;
     ShellListItemsLoaded(ShellList);
     SetFocus;
@@ -1223,11 +1227,11 @@ var
   ETout, ETerr: string;
 begin
   if MessageDlg(FileDateFromExif1 + #10 +
-                FileDateFromExif2 + #10#10 +
+                Format(FileDateFromExif2, [CmdDateCreate, CmdDateModify]) + #10#10 +
                 StrOKToProceed, mtInformation, [mbOk, mbCancel], 0) = mrOK then
   begin
-    ET_OpenExec('-FileCreateDate<Exif:DateTimeOriginal' + CRLF +
-                '-FileModifyDate<Exif:DateTimeOriginal',
+    ET_OpenExec('-FileCreateDate<' + CmdDateCreate + CRLF +
+                '-FileModifyDate<' + CmdDateModify,
                 GetSelectedFiles, ETout, ETerr);
     RefreshSelected(Sender);
     ShowMetadata;
@@ -2830,11 +2834,11 @@ procedure TFMain.ShellListAfterEnumColumns(Sender: TObject);
 
   procedure AdjustColumns(ColumnDefs: array of integer);
   var
-    i, j: integer;
+    I, J: integer;
   begin
-    j := Min(High(ColumnDefs), ShellList.Columns.Count - 1);
-    for i := 0 to j do
-      ShellList.Columns[i].Width := ColumnDefs[i];
+    J := Min(High(ColumnDefs), ShellList.Columns.Count - 1);
+    for I := 0 to J do
+      ShellList.Columns[I].Width := ColumnDefs[I];
   end;
 
   procedure AddColumn(const ACaption: string; AWidth: integer; const AAlignment: integer = 0);
@@ -2878,7 +2882,11 @@ begin
 
   case CBoxDetails.ItemIndex of
     0:
+    begin
+      ShellList.AddDate; // Add next column, if a date. Likely Date created.
+
       AdjustColumns(FListStdColWidth);
+    end;
     1:
       AddColumns(FListColDef1);
     2:
@@ -2978,6 +2986,10 @@ begin
           end
           else
           begin
+            Tx := Foto.IFD0.Model;
+            Details.Add(Trim(Tx));
+            Tx := Foto.ExifIFD.LensModel;
+            Details.Add(Trim(Tx));
             Tx := Foto.ExifIFD.ExposureTime;
             Details.Add(Tx.PadLeft(7));
             Tx := Foto.ExifIFD.FNumber;

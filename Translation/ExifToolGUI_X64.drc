@@ -8,34 +8,36 @@
   resources were bound to the produced executable.
 */
 
-#define sdJpegTypes_sUnsupportedEncoding 64288
-#define sdJpegTypes_sMarkerExpected 64289
-#define sdJpegTypes_sInvalidTableClass 64290
-#define sdJpegTypes_sInputStreamChopped 64291
-#define sdJpegTypes_sUnexpectedMarkerInEncodedStream 64292
-#define sdJpegTypes_sInvalidFrameRef 64293
-#define sdJpegTypes_sNoDCTCoefficentsAvailable 64294
-#define sdJpegTypes_sOperationOnlyFor8x8 64295
-#define sdJpegTypes_sCommentCannotBeSet 64296
-#define sdJpegTypes_sDNLMarkerExpected 64297
-#define sdJpegTypes_sCannotUseTileMode 64298
-#define sdJpegTypes_sRangeErrorInTileLoading 64299
-#define UnitLangResources_StrFLFLength 64304
-#define UnitLangResources_StrFLFlash 64305
-#define UnitLangResources_StrFLExpProgram 64306
-#define UnitLangResources_StrFLOrientation 64307
-#define UnitLangResources_StrFLDateTime 64308
-#define UnitLangResources_StrFLGPS 64309
-#define UnitLangResources_StrFLCountry 64310
-#define UnitLangResources_StrFLProvince 64311
-#define UnitLangResources_StrFLCity 64312
-#define UnitLangResources_StrFLLocation 64313
-#define UnitLangResources_StrFLArtist 64314
-#define UnitLangResources_StrFLRating 64315
-#define UnitLangResources_StrFLType 64316
-#define UnitLangResources_StrFLEvent 64317
-#define UnitLangResources_StrFLPersonInImage 64318
-#define sdJpegTypes_sInternalError 64319
+#define UnitLangResources_StrFLPersonInImage 64288
+#define sdJpegTypes_sInternalError 64289
+#define sdJpegTypes_sUnsupportedEncoding 64290
+#define sdJpegTypes_sMarkerExpected 64291
+#define sdJpegTypes_sInvalidTableClass 64292
+#define sdJpegTypes_sInputStreamChopped 64293
+#define sdJpegTypes_sUnexpectedMarkerInEncodedStream 64294
+#define sdJpegTypes_sInvalidFrameRef 64295
+#define sdJpegTypes_sNoDCTCoefficentsAvailable 64296
+#define sdJpegTypes_sOperationOnlyFor8x8 64297
+#define sdJpegTypes_sCommentCannotBeSet 64298
+#define sdJpegTypes_sDNLMarkerExpected 64299
+#define sdJpegTypes_sCannotUseTileMode 64300
+#define sdJpegTypes_sRangeErrorInTileLoading 64301
+#define UnitLangResources_StrFLISO 64304
+#define UnitLangResources_StrFLExpComp 64305
+#define UnitLangResources_StrFLFLength 64306
+#define UnitLangResources_StrFLFlash 64307
+#define UnitLangResources_StrFLExpProgram 64308
+#define UnitLangResources_StrFLOrientation 64309
+#define UnitLangResources_StrFLDateTime 64310
+#define UnitLangResources_StrFLGPS 64311
+#define UnitLangResources_StrFLCountry 64312
+#define UnitLangResources_StrFLProvince 64313
+#define UnitLangResources_StrFLCity 64314
+#define UnitLangResources_StrFLLocation 64315
+#define UnitLangResources_StrFLArtist 64316
+#define UnitLangResources_StrFLRating 64317
+#define UnitLangResources_StrFLType 64318
+#define UnitLangResources_StrFLEvent 64319
 #define UnitLangResources_StrERRORExifTool9 64320
 #define UnitLangResources_StrAdministrator 64321
 #define UnitLangResources_StrWarningOnlyDRes 64322
@@ -48,10 +50,10 @@
 #define UnitLangResources_StrRemainingThumbnails 64329
 #define UnitLangResources_StrDFilesRemaining 64330
 #define UnitLangResources_StrFLName 64331
-#define UnitLangResources_StrFLExpTime 64332
-#define UnitLangResources_StrFLFNumber 64333
-#define UnitLangResources_StrFLISO 64334
-#define UnitLangResources_StrFLExpComp 64335
+#define UnitLangResources_StrFLModel 64332
+#define UnitLangResources_StrFLLensModel 64333
+#define UnitLangResources_StrFLExpTime 64334
+#define UnitLangResources_StrFLFNumber 64335
 #define UnitLangResources_StrMinimizedToTray 64336
 #define UnitLangResources_StrClickToDisableThi 64337
 #define UnitLangResources_StrDropOnlyOneFileA 64338
@@ -1254,6 +1256,8 @@
 #define System_SysConst_SInvalidUnknownFilename 65535
 STRINGTABLE
 BEGIN
+	UnitLangResources_StrFLPersonInImage,	L"PersonInImage"
+	sdJpegTypes_sInternalError,	L"Internal error"
 	sdJpegTypes_sUnsupportedEncoding,	L"Unsupported encoding: SOF%d"
 	sdJpegTypes_sMarkerExpected,	L"Jpeg Marker expected"
 	sdJpegTypes_sInvalidTableClass,	L"Invalid table class in DHT marker"
@@ -1266,6 +1270,8 @@ BEGIN
 	sdJpegTypes_sDNLMarkerExpected,	L"DNL marker expected"
 	sdJpegTypes_sCannotUseTileMode,	L"Cannot use tilemode with progressive jpeg"
 	sdJpegTypes_sRangeErrorInTileLoading,	L"Range error in tiled loading: make sure to select tilemode"
+	UnitLangResources_StrFLISO,	L"ISO"
+	UnitLangResources_StrFLExpComp,	L"ExpComp."
 	UnitLangResources_StrFLFLength,	L"FLength"
 	UnitLangResources_StrFLFlash,	L"Flash"
 	UnitLangResources_StrFLExpProgram,	L"ExpProgram"
@@ -1280,8 +1286,6 @@ BEGIN
 	UnitLangResources_StrFLRating,	L"Rating"
 	UnitLangResources_StrFLType,	L"Type"
 	UnitLangResources_StrFLEvent,	L"Event"
-	UnitLangResources_StrFLPersonInImage,	L"PersonInImage"
-	sdJpegTypes_sInternalError,	L"Internal error"
 	UnitLangResources_StrERRORExifTool9,	L"Note: This error can also occur if you browse to an invalid folder. A DVD/CD drive without media, or a Zip file, for example."
 	UnitLangResources_StrAdministrator,	L"Administrator:"
 	UnitLangResources_StrWarningOnlyDRes,	L"Warning. Only %d results returned from %d workspace commands."
@@ -1294,10 +1298,10 @@ BEGIN
 	UnitLangResources_StrRemainingThumbnails,	L"Remaining Thumbnails to generate: %d"
 	UnitLangResources_StrDFilesRemaining,	L"%d Files remaining"
 	UnitLangResources_StrFLName,	L"Name"
+	UnitLangResources_StrFLModel,	L"Model"
+	UnitLangResources_StrFLLensModel,	L"LensModel"
 	UnitLangResources_StrFLExpTime,	L"ExpTime"
 	UnitLangResources_StrFLFNumber,	L"FNumber"
-	UnitLangResources_StrFLISO,	L"ISO"
-	UnitLangResources_StrFLExpComp,	L"ExpComp."
 	UnitLangResources_StrMinimizedToTray,	L"Minimized to tray."
 	UnitLangResources_StrClickToDisableThi,	L"Click to disable this hint."
 	UnitLangResources_StrDropOnlyOneFileA,	L"Drop only one file at a time!"
@@ -1374,7 +1378,7 @@ BEGIN
 	UnitLangResources_StrThisWillFillExif2,	L"values from Makernotes data (where possible)."
 	UnitLangResources_StrOKToProceed,	L"OK to proceed?"
 	UnitLangResources_FileDateFromExif1,	L"This will set \"Date Created\" and \"Date modified\" of selected files"
-	UnitLangResources_FileDateFromExif2,	L"according to Exif:DateTimeOriginal value."
+	UnitLangResources_FileDateFromExif2,	L"according to \"%s\" and \"%s\" values."
 	UnitLangResources_ImportMetaSel1,	L"This will copy ALL metadata from any source into"
 	UnitLangResources_ImportMetaSel2,	L"currently *selected* %s files."
 	UnitLangResources_ImportMetaSel3,	L"Only those selected files will be processed,"

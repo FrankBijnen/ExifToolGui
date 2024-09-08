@@ -133,24 +133,42 @@ type
   end;
 
 var
-  FListStdColWidth: array [0 .. 3] of integer; // [Filename][Size][Type][Date modified]
+  FListStdColWidth: array [0 .. 4] of integer; // [Filename][Size][Type][Date modified][Date created]
 
   // Note: Default widths are in ReadGui
   // Captions will be loaded at runtime from resourcestrings
-  FListColDef1: array [0 .. 7] of FListColDefRec = (
-    (
-      Caption: @StrFLExpTime; AlignR: 6), (Caption: @StrFLFNumber; AlignR: 4), (Caption: @StrFLISO; AlignR: 5), (Caption: @StrFLExpComp; AlignR: 4),
-    (Caption: @StrFLFLength; AlignR: 8), (Caption: @StrFLFlash; AlignR: 0), (Caption: @StrFLExpProgram; AlignR: 0), (Caption: @StrFLOrientation; AlignR: 0));
+  FListColDef1: array [0 .. 9] of FListColDefRec =
+  (
+    (Caption: @StrFLModel; AlignR: 0),
+    (Caption: @StrFLLensModel; AlignR: 0),
+    (Caption: @StrFLExpTime; AlignR: 6),
+    (Caption: @StrFLFNumber; AlignR: 4),
+    (Caption: @StrFLISO; AlignR: 5),
+    (Caption: @StrFLExpComp; AlignR: 4),
+    (Caption: @StrFLFLength; AlignR: 8),
+    (Caption: @StrFLFlash; AlignR: 0),
+    (Caption: @StrFLExpProgram; AlignR: 0),
+    (Caption: @StrFLOrientation; AlignR: 0)
+  );
 
-  FListColDef2: array [0 .. 5] of FListColDefRec = (
-    (
-      Caption: @StrFLDateTime; AlignR: 0), (Caption: @StrFLGPS; AlignR: 0), (Caption: @StrFLCountry; AlignR: 0), (Caption: @StrFLProvince; AlignR: 0),
-    (Caption: @StrFLCity; AlignR: 0), (Caption: @StrFLLocation; AlignR: 0));
+  FListColDef2: array [0 .. 5] of FListColDefRec =
+  (
+    (Caption: @StrFLDateTime; AlignR: 0),
+    (Caption: @StrFLGPS; AlignR: 0),
+    (Caption: @StrFLCountry; AlignR: 0),
+    (Caption: @StrFLProvince; AlignR: 0),
+    (Caption: @StrFLCity; AlignR: 0),
+    (Caption: @StrFLLocation; AlignR: 0)
+  );
 
-  FListColDef3: array [0 .. 4] of FListColDefRec = (
-    (
-      Caption: @StrFLArtist; AlignR: 0), (Caption: @StrFLRating; AlignR: 0), (Caption: @StrFLType; AlignR: 0), (Caption: @StrFLEvent; AlignR: 0),
-    (Caption: @StrFLPersonInImage; AlignR: 0));
+  FListColDef3: array [0 .. 4] of FListColDefRec =
+  (
+    (Caption: @StrFLArtist; AlignR: 0),
+    (Caption: @StrFLRating; AlignR: 0),
+    (Caption: @StrFLType; AlignR: 0),
+    (Caption: @StrFLEvent; AlignR: 0),
+    (Caption: @StrFLPersonInImage; AlignR: 0)
+  );
 
   FListColUsr: array of FListColUsrRec;
 
@@ -721,16 +739,19 @@ begin
     FListStdColWidth[1] := ReadInteger(Ini_ETGUI, 'StdColWidth1', 88);
     FListStdColWidth[2] := ReadInteger(Ini_ETGUI, 'StdColWidth2', 80);
     FListStdColWidth[3] := ReadInteger(Ini_ETGUI, 'StdColWidth3', 120);
+    FListStdColWidth[4] := ReadInteger(Ini_ETGUI, 'StdColWidth4', 120);
 
     // Column widths Camera settings
-    FListColDef1[0].Width := ReadInteger(Ini_ETGUI, 'Def1ColWidth0', 64);
-    FListColDef1[1].Width := ReadInteger(Ini_ETGUI, 'Def1ColWidth1', 64);
-    FListColDef1[2].Width := ReadInteger(Ini_ETGUI, 'Def1ColWidth2', 48);
-    FListColDef1[3].Width := ReadInteger(Ini_ETGUI, 'Def1ColWidth3', 73);
-    FListColDef1[4].Width := ReadInteger(Ini_ETGUI, 'Def1ColWidth4', 73);
-    FListColDef1[5].Width := ReadInteger(Ini_ETGUI, 'Def1ColWidth5', 56);
-    FListColDef1[6].Width := ReadInteger(Ini_ETGUI, 'Def1ColWidth6', 88);
-    FListColDef1[7].Width := ReadInteger(Ini_ETGUI, 'Def1ColWidth7', 80);
+    FListColDef1[0].Width := ReadInteger(Ini_ETGUI, 'Def1ColWidth0', 80);
+    FListColDef1[1].Width := ReadInteger(Ini_ETGUI, 'Def1ColWidth1', 80);
+    FListColDef1[2].Width := ReadInteger(Ini_ETGUI, 'Def1ColWidth2', 64);
+    FListColDef1[3].Width := ReadInteger(Ini_ETGUI, 'Def1ColWidth3', 64);
+    FListColDef1[4].Width := ReadInteger(Ini_ETGUI, 'Def1ColWidth4', 48);
+    FListColDef1[5].Width := ReadInteger(Ini_ETGUI, 'Def1ColWidth5', 73);
+    FListColDef1[6].Width := ReadInteger(Ini_ETGUI, 'Def1ColWidth6', 73);
+    FListColDef1[7].Width := ReadInteger(Ini_ETGUI, 'Def1ColWidth7', 56);
+    FListColDef1[8].Width := ReadInteger(Ini_ETGUI, 'Def1ColWidth8', 88);
+    FListColDef1[9].Width := ReadInteger(Ini_ETGUI, 'Def1ColWidth9', 80);
 
     // Column widths Location info
     FListColDef2[0].Width := ReadInteger(Ini_ETGUI, 'Def2ColWidth0', 120);
@@ -1033,6 +1054,7 @@ begin
         WriteInteger(Ini_ETGUI, 'StdColWidth1', FListStdColWidth[1]);
         WriteInteger(Ini_ETGUI, 'StdColWidth2', FListStdColWidth[2]);
         WriteInteger(Ini_ETGUI, 'StdColWidth3', FListStdColWidth[3]);
+        WriteInteger(Ini_ETGUI, 'StdColWidth4', FListStdColWidth[4]);
 
         // Column widths Camera settings
         WriteInteger(Ini_ETGUI, 'Def1ColWidth0', FListColDef1[0].Width);
@@ -1043,6 +1065,8 @@ begin
         WriteInteger(Ini_ETGUI, 'Def1ColWidth5', FListColDef1[5].Width);
         WriteInteger(Ini_ETGUI, 'Def1ColWidth6', FListColDef1[6].Width);
         WriteInteger(Ini_ETGUI, 'Def1ColWidth7', FListColDef1[7].Width);
+        WriteInteger(Ini_ETGUI, 'Def1ColWidth8', FListColDef1[8].Width);
+        WriteInteger(Ini_ETGUI, 'Def1ColWidth9', FListColDef1[9].Width);
 
         // Column widths Location info
         WriteInteger(Ini_ETGUI, 'Def2ColWidth0', FListColDef2[0].Width);

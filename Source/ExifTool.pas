@@ -41,6 +41,11 @@ type
 const
   CRLF = #13#10;
 
+  CmdStr = '-';
+  CmdDateOriginal = 'exif:DateTimeOriginal';
+  CmdDateCreate = 'exif:CreateDate';
+  CmdDateModify = 'exif:ModifyDate';
+
 var
   ExecETEvent: TExecETEvent;
 
