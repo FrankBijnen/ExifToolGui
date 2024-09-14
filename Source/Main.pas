@@ -2801,7 +2801,12 @@ begin
   begin
     case CBoxDetails.ItemIndex of
       0:
-        FListStdColWidth[ColIndex] := TListColumn(Sender).Width;
+        begin
+          if (ColIndex +1 > Length(FListStdColWidth)) then // Resize Array
+            SetLength(FListStdColWidth, ColIndex +1);
+
+          FListStdColWidth[ColIndex] := TListColumn(Sender).Width;
+        end;
       1:
         FListColDef1[ColIndex - 1].Width := TListColumn(Sender).Width;
       2:
