@@ -37,7 +37,7 @@ begin
     begin
       // Rotate ?
       Foto := GetMetadata(FileName, []);
-      case Foto.IFD0.Orientation of
+      case Foto.IFD0.OrientationValue of
         0, 1:
           Rotate := 0; // no tag or don't rotate
         3:
