@@ -56,7 +56,7 @@ function GetComSpec: string;
 function PasteDirectory(ADir, TargetDir: string; Cut: boolean = false): boolean;
 
 // Swap
-procedure Swap(var A, B: Cardinal);
+procedure Swap(var A, B: integer);
 
 // String
 function NextField(var AString: string; const ADelimiter: string): string;
@@ -75,6 +75,7 @@ function IsJpeg(Filename: string): boolean;
 function GetBitmapFromWic(const FWicBitmapSource: IWICBitmapSource): TBitmap;
 function WicPreview(AImg: string; Rotate, MaxW, MaxH: cardinal): IWICBitmapSource;
 procedure ResizeBitmapCanvas(Bitmap: TBitmap; W, H: integer; BackColor: TColor);
+function BitMapFromHBitMap(ABmp: HBITMAP; W, H: Integer; BkColor: TColor): TBitMap;
 
 // Message dialog that allows for caption and doesn't wrap lines at spaces.
 function MessageDlgEx(const AMsg, ACaption: string; ADlgType: TMsgDlgType; AButtons: TMsgDlgButtons; UseTaskMessage: boolean = false): integer;
@@ -424,9 +425,9 @@ begin
   end;
 end;
 
-procedure Swap(var A, B: Cardinal);
+procedure Swap(var A, B: integer);
 var
-  Temp: Cardinal;
+  Temp: integer;
 begin
   Temp := A;
   A := B;
@@ -775,39 +776,10 @@ begin
   SetDIBits(0, result.Handle, 0, FHeight, LockedArea, BitmapInfo, DIB_RGB_COLORS);
 end;
 
-function WicPreview(AImg: string; Rotate, MaxW, MaxH: cardinal): IWICBitmapSource;
+procedure NewSizeRetainRatio(W, H, MaxW, MaxH: integer; var NewW, NewH: integer; Portrait: boolean = false);
 var
-  IwD: IWICBitmapDecoder;
-  IwdR: IWICBitmapFlipRotator;
-  IwdS: IWICBitmapScaler;
-  W, H, NewW, NewH: cardinal;
-  Portrait: boolean;
-  ImgRatio: double;
+  ImgRatio: Double;
 begin
-  result := nil;
-  GlobalImgFact.CreateDecoderFromFilename(PWideChar(AImg), GUID_VendorMicrosoftBuiltIn, // Use only builtin codecs. No additional installs needed.
-    GENERIC_READ, WICDecodeMetadataCacheOnDemand, IwD);
-  if IwD = nil then
-    exit;
-
-  IwD.GetPreview(result);
-  if (result = nil) then // Preview not supported, get real
-    IwD.GetFrame(0, IWICBitmapFrameDecode(result));
-  if (result = nil) then
-    exit;
-
-  GlobalImgFact.CreateBitmapScaler(IwdS);
-  if (IwdS = nil) then
-    exit;
-
-  result.GetSize(W, H);
-  if (W = 0) or (H = 0) then
-    exit;
-
-  Portrait :=(Rotate = 90) or
-             (Rotate = 270);
-  // Compute NewW, NewH.
-  // Take largest Ratio possible
   if Portrait then
     ImgRatio := W / H
   else
@@ -831,6 +803,41 @@ begin
       NewW := Round(MaxH / ImgRatio);
     end;
   end;
+end;
+
+function WicPreview(AImg: string; Rotate, MaxW, MaxH: cardinal): IWICBitmapSource;
+var
+  IwD: IWICBitmapDecoder;
+  IwdR: IWICBitmapFlipRotator;
+  IwdS: IWICBitmapScaler;
+  W, H: cardinal;
+  NewW, NewH: integer;
+  Portrait: boolean;
+begin
+  result := nil;
+  GlobalImgFact.CreateDecoderFromFilename(PWideChar(AImg), GUID_VendorMicrosoftBuiltIn, // Use only builtin codecs. No additional installs needed.
+    GENERIC_READ, WICDecodeMetadataCacheOnDemand, IwD);
+  if IwD = nil then
+    exit;
+
+  IwD.GetPreview(result);
+  if (result = nil) then // Preview not supported, get real
+    IwD.GetFrame(0, IWICBitmapFrameDecode(result));
+  if (result = nil) then
+    exit;
+
+  GlobalImgFact.CreateBitmapScaler(IwdS);
+  if (IwdS = nil) then
+    exit;
+
+  result.GetSize(W, H);
+  if (W = 0) or (H = 0) then
+    exit;
+
+  Portrait :=(Rotate = 90) or
+             (Rotate = 270);
+
+  NewSizeRetainRatio(W, H, MaxW, MaxH, NewW, NewH, Portrait);
 
   // Scaling occurs before Rotating (performs better).
   // In portrait mode swap NewW and NewH
@@ -857,36 +864,52 @@ begin
   end;
 end;
 
+// Prepares a Bitmap for Sizes W and H transparently.
 // The image size of the Bitmap passed should not exceed W or H!
 procedure ResizeBitmapCanvas(Bitmap: TBitmap; W, H: integer; BackColor: TColor);
 var
   Bmp: TBitmap;
-  Source, Dest: TRect;
   Xshift, Yshift: integer;
+  Left, Top: integer;
+  NewW, NewH: integer;
 begin
-  Xshift := (Bitmap.Width - W) div 2;
-  Yshift := (Bitmap.Height - H) div 2;
+  NewSizeRetainRatio(Bitmap.Width, Bitmap.Height, W, H, NewW, NewH);
 
-  Source.Left := Max(0, Xshift);
-  Source.Top := Max(0, Yshift);
-  Source.Width := Min(W, Bitmap.Width);
-  Source.Height := Min(H, Bitmap.Height);
-
-  Dest.Left := Max(0, -Xshift);
-  Dest.Top := Max(0, -Yshift);
-  Dest.Width := Source.Width;
-  Dest.Height := Source.Height;
+  Xshift := (NewW - W) div 2;
+  Yshift := (NewH - H) div 2;
+  Left := Max(0, -Xshift);
+  Top := Max(0, -Yshift);
 
   Bmp := TBitmap.Create;
   try
     Bmp.SetSize(W, H);
     Bmp.Canvas.Brush.Style := bsSolid;
     Bmp.Canvas.Brush.Color := BackColor;
+    Bmp.AlphaFormat := TAlphaFormat.afDefined;
+
     Bmp.Canvas.FillRect(Rect(0, 0, W, H));
-    Bmp.Canvas.CopyRect(Dest, Bitmap.Canvas, Source);
+    if (W <= NewW) and
+       (H <= NewH) then
+      Bmp.Canvas.Draw(Left, Top, BitMap)
+    else
+      Bmp.Canvas.StretchDraw(Rect(Left, Top, Left + NewW, Top + NewH), BitMap);
     Bitmap.Assign(Bmp);
   finally
     Bmp.Free;
+  end;
+end;
+
+function BitMapFromHBitMap(ABmp: HBITMAP; W, H: Integer; BkColor: TColor): TBitMap;
+begin
+  result := TBitmap.Create;
+  result.Canvas.Lock;
+  try
+    result.Handle := ABmp;
+    result.AlphaFormat := TAlphaFormat.afDefined;
+    ResizeBitmapCanvas(result, W, H, BkColor);
+  finally
+    result.Canvas.Unlock;
+    DeleteObject(ABmp);
   end;
 end;
 

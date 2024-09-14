@@ -148,6 +148,10 @@ begin
       FMain.ShellList.ThumbNailSize := 128;
     2:
       FMain.ShellList.ThumbNailSize := 160;
+    3:
+      FMain.ShellList.ThumbNailSize := 256;
+    4:
+      FMain.ShellList.ThumbNailSize := 512;
   end;
   GUIsettings.ThumbSize := RadioGroup3.ItemIndex;
 

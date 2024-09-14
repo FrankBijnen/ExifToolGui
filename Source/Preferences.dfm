@@ -185,12 +185,14 @@ object FPreferences: TFPreferences
         Width = 539
         Height = 40
         Caption = 'Thumbnails size'
-        Columns = 3
+        Columns = 5
         ItemIndex = 0
         Items.Strings = (
           '-96pix'
           '-128pix'
-          '-160pix')
+          '-160pix'
+          '-256pix'
+          '-512pix')
         TabOrder = 0
       end
       object ChkThumbAutoGenerate: TCheckBox

@@ -2301,10 +2301,10 @@ var
   Rotate: integer;
   FPath: string;
   ABitMap: TBitmap;
-  HBmp: HBITMAP;
   CrWait, CrNormal: HCURSOR;
 begin
   RotateImg.Picture.Bitmap := nil;
+  ABitMap := nil;
   if ShellList.SelCount > 0 then
   begin
     CrWait := LoadCursor(0, IDC_WAIT);
@@ -2327,21 +2327,14 @@ begin
         end;
       end;
       ABitMap := GetBitmapFromWic(WicPreview(FPath, Rotate, RotateImg.Width, RotateImg.Height));
-      if (ABitMap = nil) then
-      begin
-        if (GetThumbCache(FPath, HBmp, SIIGBF_THUMBNAILONLY, RotateImg.Width, RotateImg.Height) = S_OK) then
-        begin
-          ABitMap := TBitmap.Create;
-          ABitMap.Handle := HBmp;
-        end;
-      end;
       if (ABitMap <> nil) then
-      begin
-        ResizeBitmapCanvas(ABitMap, RotateImg.Width, RotateImg.Height, GUIColorWindow);
-        RotateImg.Picture.Bitmap := ABitMap;
-        ABitMap.Free;
-      end;
+        ResizeBitmapCanvas(ABitMap, RotateImg.Width, RotateImg.Height, GUIColorWindow)
+      else
+        ABitMap := ShellList.GetThumbNail(ShellList.Selected.Index, RotateImg.Width, RotateImg.Height, GUIColorWindow);
+
+      RotateImg.Picture.Bitmap := ABitMap;
     finally
+      ABitMap.Free;
       SetCursor(CrNormal);
     end;
   end;

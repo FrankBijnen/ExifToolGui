@@ -852,6 +852,10 @@ begin
             Indx := 128;
           2:
             Indx := 160;
+          3:
+            Indx := 256;
+          4:
+            Indx := 512;
         else
           Indx := 96;
         end;
