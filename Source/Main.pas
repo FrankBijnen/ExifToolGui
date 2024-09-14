@@ -463,6 +463,8 @@ begin
   end;
 
   ShellTree.Root := ShellTree.PreferredRoot;
+  // Setting ObjectTypes will always call RootChanged, even if the value has not changed.
+  ShellTree.ObjectTypes := ShellTree.ObjectTypes;
   ShellTree.Refresh(ShellTree.TopItem);
 end;
 
