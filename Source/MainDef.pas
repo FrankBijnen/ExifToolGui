@@ -133,7 +133,7 @@ type
   end;
 
 var
-  FListStdColWidth: array [0 .. 4] of integer; // [Filename][Size][Type][Date modified][Date created]
+  FListStdColWidth: array of integer; // [Filename][Size][Type][Date modified] Can be extended
 
   // Note: Default widths are in ReadGui
   // Captions will be loaded at runtime from resourcestrings
@@ -735,11 +735,19 @@ begin
     AdvPageMetadata.Width := ReadInteger(Ini_ETGUI, 'MetadataWidth', ScaleDesignDpi(322));
     MetadataList.ColWidths[0] := ReadInteger(Ini_ETGUI, 'MetadataTagWidth', ScaleDesignDpi(144));
 
+    N := 4;
+    SetLength(FListStdColWidth, N);
     FListStdColWidth[0] := ReadInteger(Ini_ETGUI, 'StdColWidth0', 200);
     FListStdColWidth[1] := ReadInteger(Ini_ETGUI, 'StdColWidth1', 88);
     FListStdColWidth[2] := ReadInteger(Ini_ETGUI, 'StdColWidth2', 80);
     FListStdColWidth[3] := ReadInteger(Ini_ETGUI, 'StdColWidth3', 120);
-    FListStdColWidth[4] := ReadInteger(Ini_ETGUI, 'StdColWidth4', 120);
+
+    while (ValueExists(Ini_ETGUI, 'StdColWidth' + IntToStr(N))) do
+    begin
+      SetLength(FListStdColWidth, N +1); // Should be only a few
+      FListStdColWidth[N] := ReadInteger(Ini_ETGUI, 'StdColWidth' + IntToStr(N), 120);
+      Inc(N);
+    end;
 
     // Column widths Camera settings
     FListColDef1[0].Width := ReadInteger(Ini_ETGUI, 'Def1ColWidth0', 80);
@@ -1054,11 +1062,8 @@ begin
         WriteAllFormSizes(GUIini);
 
         // Std (file list) col widths
-        WriteInteger(Ini_ETGUI, 'StdColWidth0', FListStdColWidth[0]);
-        WriteInteger(Ini_ETGUI, 'StdColWidth1', FListStdColWidth[1]);
-        WriteInteger(Ini_ETGUI, 'StdColWidth2', FListStdColWidth[2]);
-        WriteInteger(Ini_ETGUI, 'StdColWidth3', FListStdColWidth[3]);
-        WriteInteger(Ini_ETGUI, 'StdColWidth4', FListStdColWidth[4]);
+        for N := 0 to Length(FListStdColWidth) -1 do
+          WriteInteger(Ini_ETGUI, 'StdColWidth' + IntToStr(N), FListStdColWidth[N]);
 
         // Column widths Camera settings
         WriteInteger(Ini_ETGUI, 'Def1ColWidth0', FListColDef1[0].Width);
