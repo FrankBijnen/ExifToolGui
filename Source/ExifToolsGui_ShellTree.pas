@@ -33,7 +33,7 @@ type
     procedure CommandCompletedExif(Verb: String; Succeeded: Boolean);
     procedure FileNamesToClipboard(Cut: boolean = false);
     procedure PasteFilesFromClipboard;
-    function NodeFromPath(const APath: string): TTreeNode;
+    function NodeFromPath(const FromNode: TTreenode; const APath: string): TTreeNode;
     procedure RefreshPath(const APath: string);
     procedure SetPaths2Refresh;
     procedure RefreshAfterPaste;
@@ -172,7 +172,7 @@ begin
   end;
 end;
 
-function TShellTreeView.NodeFromPath(const APath: string): TTreeNode;
+function TShellTreeView.NodeFromPath(const FromNode: TTreenode; const APath: string): TTreeNode;
 var
   APidl: PItemIDList;
 begin
@@ -182,7 +182,7 @@ begin
     exit;
 
   try
-    result := NodeFromAbsoluteID(Items[0], APidl);
+    result := NodeFromAbsoluteID(FromNode, APidl);
   finally
     CoTaskMemFree(APidl);
   end;
@@ -192,7 +192,7 @@ procedure TShellTreeView.RefreshPath(const APath: string);
 var
   ANode: TTreeNode;
 begin
-  ANode := NodeFromPath(APath);
+  ANode := NodeFromPath(Items[0], APath);
   if not Assigned(ANode) then
     exit;
   Refresh(ANode);

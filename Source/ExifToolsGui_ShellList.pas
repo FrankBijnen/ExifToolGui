@@ -5,7 +5,7 @@ interface
 uses
   System.Classes, System.SysUtils, System.Types, System.Threading,
   Winapi.Windows, Winapi.Messages, Winapi.CommCtrl, Winapi.ShlObj,
-  Vcl.Shell.ShellCtrls, Vcl.Shell.ShellConsts, Vcl.ComCtrls, Vcl.Menus, Vcl.Controls,
+  Vcl.Shell.ShellCtrls, Vcl.Shell.ShellConsts, Vcl.ComCtrls, Vcl.Menus, Vcl.Controls, Vcl.Graphics,
   ExifToolsGUI_Thumbnails, ExifToolsGUI_MultiContextMenu;
 
 // Extend ShellListview, keeping the same Type. So we dont have to register it in the IDE
@@ -76,8 +76,8 @@ type
     procedure SetColumnSorted(AValue: boolean);
     procedure ClearHiddenItems;
     procedure InitThumbNails;
-
     procedure SetThumbNailSize(AValue: integer);
+
     procedure CMThumbStart(var Message: TMessage); message CM_ThumbStart;
     procedure CMThumbEnd(var Message: TMessage); message CM_ThumbEnd;
     procedure CMThumbError(var Message: TMessage); message CM_ThumbError;
@@ -97,6 +97,7 @@ type
     procedure PopulateSubDirs(FRootFolder, FRelativeFolder: TSubShellFolder); overload;
     procedure Populate; override;
     function OwnerDataFetch(Item: TListItem; Request: TItemRequest): boolean; override;
+
     procedure Add2ThumbNails(ABmp: HBITMAP; ANitemIndex: integer; NeedsGenerating: boolean);
     procedure CancelThumbTasks;
     procedure RemoveThumbTask(ItemIndex: integer);
@@ -108,7 +109,6 @@ type
     procedure Invalidate; override;
     procedure ClearSelectionRefresh;
     procedure AddDate; // Adds next columns if it is a Date.
-
     function Path: string;
     function GetSelectedFolder(ItemIndex: integer): TShellFolder;
     function FilePath(ItemIndex: integer = -1): string;
@@ -124,12 +124,12 @@ type
     function GetIconSpacing: dword;
     procedure SetIconSpacing(Cx, Cy: word); overload;
     procedure SetIconSpacing(Cx, Cy: integer); overload;
+    function GetThumbNail(ItemIndex, W, H: integer; BkColor: TColor): TBitmap;
 
     property OnColumnResized: TNotifyEvent read FonColumnResized write FonColumnResized;
     property ColumnSorted: boolean read FColumnSorted write SetColumnSorted;
     property SortColumn: integer read FSortColumn write FSortColumn;
     property SortState: THeaderSortState read FSortState write FSortState;
-
     property ThumbNailSize: integer read FThumbNailSize write SetThumbNailSize;
     property ThumbAutoGenerate: boolean read FThumbAutoGenerate write FThumbAutoGenerate;
     property OnThumbError: TThumbErrorEvent read FOnNotifyErrorEvent write FOnNotifyErrorEvent;
@@ -148,7 +148,7 @@ type
 implementation
 
 uses System.Win.ComObj, System.UITypes,
-     Vcl.Graphics,
+     Vcl.ImgList,
      ExifToolsGUI_Utils, UnitFilesOnClipBoard, UnitLangResources, UFrmGenerate;
 
 // res file contains the ?
@@ -542,11 +542,9 @@ var
 begin
   if Assigned(RootFolder.ShellFolder2) and // Have IShellFolder2 interface
     (RootFolder.ShellFolder2.GetDefaultColumnState(Columns.Count, ColFlags) = S_OK) and
-    ((ColFlags and SHCOLSTATE_TYPE_DATE) = SHCOLSTATE_TYPE_DATE) then
-  begin
-    if (RootFolder.ShellFolder2.GetDetailsOf(nil, Columns.Count, SD) = S_OK) then
-     Columns.Add.Caption := SD.str.pOleStr;
-  end;
+    ((ColFlags and SHCOLSTATE_TYPE_DATE) = SHCOLSTATE_TYPE_DATE) and
+    (RootFolder.ShellFolder2.GetDetailsOf(nil, Columns.Count, SD) = S_OK) then
+      Columns.Add.Caption := SD.str.pOleStr;
 end;
 
 procedure TShellListView.EnumColumns;
@@ -1167,7 +1165,7 @@ begin
     AnHourGlass := TBitmap.Create;
     try
       AnHourGlass.LoadFromResourceName(HInstance, HOURGLASS);
-      ResizeBitmapCanvas(AnHourGlass, FThumbNailSize, FThumbNailSize, clWhite);
+      ResizeBitmapCanvas(AnHourGlass, FThumbNailSize, FThumbNailSize, Self.Color);
       FThumbNails.Add(AnHourGlass, nil);
     finally
       AnHourGlass.Free
@@ -1186,24 +1184,69 @@ begin
   end;
 end;
 
+function TShellListView.GetThumbNail(ItemIndex, W, H: integer; BkColor: TColor): TBitmap;
+var
+  Hr: HRESULT;
+  HBmp: HBITMAP;
+  SaveBkColor: TColor;
+begin
+  result := nil;
+
+  if (ItemIndex > Items.Count -1) then
+    exit;
+  if (ItemIndex > High(FThumbNailCache)) then
+    SetLength(FThumbNailCache, Items.Count);
+
+  // Get the cached (by Windows) thumbnail if avail
+  Hr := GetThumbCache(Folders[ItemIndex].AbsoluteID, HBmp, SIIGBF_THUMBNAILONLY or SIIGBF_INCACHEONLY or SIIGBF_BIGGERSIZEOK, W, H);
+  if (HR = S_OK) then
+  begin
+    result := TBitmap.Create;
+    result.Handle := HBmp;
+    ResizeBitmapCanvas(result, W, H, BkColor);
+  end
+  else
+  begin
+    // Need to update our cache?
+    // Notes:
+    //   - Sizes are smaller.
+    //   - Used when not in VsReport mode.
+    if (FThumbNailCache[ItemIndex] = 0) then
+    begin
+      Hr := GetThumbCache(Folders[ItemIndex].AbsoluteID, HBmp, SIIGBF_THUMBNAILONLY, FThumbNailSize, FThumbNailSize);
+      if (Hr <> S_OK) then
+        Hr := GetThumbCache(Folders[ItemIndex].AbsoluteID, HBmp, SIIGBF_ICONONLY, FThumbNailSize, FThumbNailSize);
+      if (Hr = S_OK) then
+        Add2ThumbNails(HBmp, ItemIndex, false);
+    end;
+    // Use what's in our cache. Maybe updated 2 lines earlier.
+    if (FThumbNailCache[ItemIndex] <> 0) then
+    begin
+      result := TBitmap.Create;
+      SaveBkColor := FThumbNails.BkColor;
+      try
+        FThumbNails.BkColor := BkColor;
+        FThumbNails.GetBitmap(Abs(FThumbNailCache[ItemIndex]), result);
+      finally
+        FThumbNails.BkColor := SaveBkColor;
+      end;
+      ResizeBitmapCanvas(result, W, H, BkColor);
+    end;
+  end;
+end;
+
 procedure TShellListView.Add2ThumbNails(ABmp: HBITMAP; ANitemIndex: integer; NeedsGenerating: boolean);
 var
   ABitMap: TBitmap;
 begin
-  ABitMap := TBitmap.Create;
-  ABitMap.Canvas.Lock;
+  ABitMap := BitMapFromHBitMap(ABmp, FThumbNails.Width, FThumbNails.Height, FThumbNails.BkColor);
   try
-    ABitMap.TransparentColor := FThumbNails.BkColor;
-    ABitMap.Handle := ABmp;
-    ResizeBitmapCanvas(ABitMap, FThumbNails.Width, FThumbNails.Height, FThumbNails.BkColor);
     Items[ANitemIndex].ImageIndex := FThumbNails.AddMasked(ABitMap, FThumbNails.BkColor);
     if (NeedsGenerating) then
       FThumbNailCache[ANitemIndex] := Items[ANitemIndex].ImageIndex * -1
     else
       FThumbNailCache[ANitemIndex] := Items[ANitemIndex].ImageIndex;
   finally
-    ABitMap.Canvas.Unlock;
-    DeleteObject(ABmp);
     ABitMap.Free;
   end;
 end;
