@@ -5,9 +5,12 @@ unit ExifInfo;
 
 interface
 
-uses System.Classes, System.SysUtils, Vcl.StdCtrls, ExifToolsGUI_StringList;
+uses System.Classes, System.SysUtils, System.Generics.Collections, System.Types,
+     Vcl.StdCtrls, ExifToolsGUI_StringList;
 
 type
+  TMetaInfo = variant;
+  TVarData = TObjectDictionary<string, TMetaInfo>;
 
   IFDentryRec = packed record
     Tag: word;
@@ -35,7 +38,8 @@ type
     HasData: boolean;
     Make, Model: string;
     PreviewOffset, PreviewSize: longint;
-    Orientation: word; // 1=Normal, 3=180, 6=90right, 8=90left, else=Mirror
+    OrientationValue: word; // 1=Normal, 3=180, 6=90right, 8=90left, else=Mirror
+    Orientation: string[3];
     Xresolution, Yresolution: word;
     ResolutionUnit: string[5];
     Software: string;
@@ -52,8 +56,9 @@ type
     ExposureProgram: string;
     ISO: string[5];
     DateTimeOriginal, DateTimeDigitized: string[19];
-    ExposureBias: string[7];
-    Flash: word; // if (ExifIFD.Flash and 1)=1 then 'Flash=Yes'
+    ExposureCompensation: string[7];
+    FlashValue: word; // if (ExifIFD.Flash and 1)=1 then 'Flash=Yes'
+    Flash: string[3];
     FocalLength: string[7];
     ColorSpace: string[13];
     FLin35mm: string[7];
@@ -117,7 +122,7 @@ type
   TParseIFDProc = procedure(IFDentry: IFDentryRec) of object;
   TGetOption = (gmXMP, gmIPTC, gmGPS, gmICC);
   TGetOptions = set of TGetOption;
-  TSupportedType = (supJPEG, supTIFF);
+  TSupportedType = (supJPEG, supTIFF, supError);
   TSupportedTypes = set of TSupportedType;
 
   FotoRec = packed record
@@ -128,20 +133,25 @@ type
     IPTC: IPTCrec;
     XMP: XMPrec;
     ICC: ICCrec;
-    
+    GroupName: string;
+    VarData: TVarData;
     Supported: TSupportedTypes;
-    FotoF: THandleStream;
+    FotoF: TBufferedFileStream;
     GetOptions: TGetOptions;
     FotoKeySep: string[3];
     IsMM: boolean;
     WordData: word;
-    LongData: longint;
+    DWordData: dword;
     XMPoffset, XMPsize, IPTCsize, IPTCoffset: int64;
     TIFFoffset, ExifIFDoffset, GPSoffset: int64;
     ICCoffset, InteropOffset, JPGfromRAWoffset: int64;
     ICCSize: word;
-
+    FileSize: int64;
     procedure Clear;
+    procedure SetVarData(const InVarData: TVarData);
+    procedure AddBag(var BagData: TMetaInfo; const ANode: TMetaInfo); overload;
+    function GetKeyName(const AKey: string): string;
+    function AddVarData(const AKey: string; AValue: TMetaInfo): TMetaInfo;
 
     function DecodeASCII(IFDentry: IFDentryRec; MaxLen: integer = 255): string;
     function DecodeWord(IFDentry: IFDentryRec): word;
@@ -168,7 +178,18 @@ type
 
   end;
 
-function GetMetadata(AName: string; AGetOptions: TGetOptions): FotoRec;
+  TMetaData = class(TObject)
+    VarData: TVarData;
+    FileName: string;
+    Foto: Fotorec;
+  public
+    constructor Create;
+    destructor Destroy; override;
+    procedure ReadMeta(const AName: string; AGetOptions: TGetOptions);
+
+  end;
+
+function GetMetadata(AName: string; AGetOptions: TGetOptions; VarData: TVarData = nil; BufSize: integer = 2048): FotoRec;
 procedure ChartFindFiles(StartDir, FileMask: string; SubDir: boolean;
                          var ETFocal, ETFnum, ETIso: TNrSortedStringList);
 
@@ -177,17 +198,37 @@ implementation
 uses
   System.StrUtils, Winapi.Windows, Vcl.Forms, Vcl.Dialogs,
   Main, ExifTool,
-  Xml.VerySimple, // XML parsing for XMP
-  SDJPegTypes;    // JPEG APP types
+  UnitLangResources, // Language
+  Xml.VerySimple,    // XML parsing for XMP
+  SDJPegTypes;       // JPEG APP types
 
 var
   Encoding: TEncoding;
   ExifFormatSettings: TFormatSettings; // for Formatfloat -see Initialization
-  GpsFormatSettings: TFormatSettings; // for StrToFloatDef -see Initialization
+  GpsFormatSettings: TFormatSettings;  // for StrToFloatDef -see Initialization
 
 {$IFDEF DEBUG}
   Filename:string;
 {$ENDIF}
+
+constructor TMetaData.Create;
+begin
+  inherited Create;
+  VarData := TVarData.Create;
+end;
+
+destructor TMetaData.Destroy;
+begin
+  if Assigned(VarData) then
+    VarData.Free;
+
+  inherited Destroy;
+end;
+
+procedure TMetaData.ReadMeta(const AName: string; AGetOptions: TGetOptions);
+begin
+  Foto := GetMetadata(AName, AGetOptions, VarData);
+end;
 
 procedure XMPrec.Clear;
 begin
@@ -242,6 +283,13 @@ begin
   Self := Default(FotoRec);
 end;
 
+procedure FotoRec.SetVarData(const InVarData: TVarData);
+begin
+  VarData := InVarData;
+  if (Assigned(VarData)) then
+    VarData.Clear;
+end;
+
 function SwapL(L: Cardinal): Cardinal;
 type
   TCardinalAsBytes = array[0..3] of byte;
@@ -281,6 +329,45 @@ begin
     else
       result := false;
   end;
+end;
+
+procedure FotoRec.AddBag(var BagData: TMetaInfo; const ANode: TMetaInfo);
+begin
+  if (BagData = '') then
+    BagData := ANode
+  else
+    BagData := BagData + FotoKeySep + ANode;
+end;
+
+function FotoRec.GetKeyName(const AKey: string): string;
+begin
+  if EndsText('-', GroupName) then
+    result := GroupName + AKey
+  else
+    result := GroupName + ':' + AKey;
+end;
+
+function FotoRec.AddVarData(const AKey: string; AValue: TMetaInfo): TMetaInfo;
+var
+  KeyName: string;
+begin
+  if Assigned(VarData) then
+  begin
+    KeyName := GetKeyName(AKey);
+    if (VarData.ContainsKey(KeyName)) then
+    begin
+      result := VarData.Items[KeyName];
+      AddBag(result, AValue);
+      VarData.Items[KeyName] := result;
+    end
+    else
+    begin
+      result := AValue;
+      VarData.Add(KeyName, result);
+    end;
+  end
+  else
+    result := AValue;
 end;
 
 function FotoRec.DecodeASCII(IFDentry: IFDentryRec; MaxLen: integer = 255): string;
@@ -372,7 +459,7 @@ begin
       Tx := Tx + '-' + FloatToStrF(L3 / L4, ffFixed, 7, Digits);
   end
   else
-    Tx := 'err!';
+    Tx := '?';
   Tx := Tx + 'mm f/';
   // Min-Max aperture
   FotoF.Read(L1, 4);
@@ -393,7 +480,7 @@ begin
       Tx := Tx + '-' + FloatToStrF(L3 / L4, ffFixed, 7, 1);
   end
   else
-    Tx := Tx + 'err!';
+    Tx := Tx + '?';
   Result := StringReplace(Tx, ',', '.', [rfReplaceAll]);
 end;
 
@@ -475,6 +562,7 @@ var
   Tx, Ty: string[11];
   Sec: string[7]; // Tx=Deg°Min.Sec, Ty=Deg.min°
 begin
+  GroupName := 'Gps';
   FotoF.Seek(TIFFoffset + IFDentry.ValueOffs, TSeekOrigin.soBeginning);
   FotoF.Read(L1, 4);
   FotoF.Read(L2, 4); // =Deg
@@ -530,9 +618,9 @@ begin
   if L1 > 0 then
     Ty[L1] := '.';
   if IsLat then
-    GPS.GeoLat := Ty
+    GPS.GeoLat := AddVarData('GeoLat', Ty)
   else
-    GPS.GeoLon := Ty;
+    GPS.GeoLon := AddVarData('GeoLon', Ty);
 
   Result := Tx;
 end;
@@ -547,6 +635,7 @@ var
   Bytes: Tbytes;
 
 begin
+  GroupName := 'Iptc';
   FotoF.Read(IPTCtagID, 1);
   FotoF.Read(IPTCtagSz, 2);
   IPTCtagSz := Swap(IPTCtagSz);
@@ -562,33 +651,33 @@ begin
     HasData := true;
     case IPTCtagID of
       5:
-        ObjectName := StripLen(Tx, 32);
+        ObjectName := AddVarData('ObjectName', StripLen(Tx, 32));
       15:
-        Category := StripLen(Tx, 3);
+        Category := AddVarData('Category', StripLen(Tx, 3));
       20:
-        SuppCategories := SuppCategories + Tx + FotoKeySep;
+        SuppCategories := AddVarData('SuppCategories', Tx);
       25:
-        Keywords := Keywords + Tx + FotoKeySep;
+        Keywords := AddVarData('Keywords', Tx);
       80:
-        By_line := StripLen(Tx, 32);
+        By_line := AddVarData('By_line', StripLen(Tx, 32));
       85:
-        By_lineTitle := StripLen(Tx, 32);
+        By_lineTitle := AddVarData('By_lineTitle', StripLen(Tx, 32));
       90:
-        City := StripLen(Tx, 31);
+        City := AddVarData('City', StripLen(Tx, 31));
       92:
-        Sub_location := StripLen(Tx, 31);
+        Sub_location := AddVarData('Sub_location', StripLen(Tx, 31));
       95:
-        Province_State := StripLen(Tx, 31);
+        Province_State := AddVarData('Province_State', StripLen(Tx, 31));
       101:
-        Country := StripLen(Tx, 31);
+        Country := AddVarData('Country', StripLen(Tx, 31));
       105:
-        Headline := StripLen(Tx, 64);
+        Headline := AddVarData('Headline', StripLen(Tx, 64));
       116:
-        CopyrightNotice := StripLen(Tx, 64);
+        CopyrightNotice := AddVarData('CopyrightNotice', StripLen(Tx, 64));
       120:
-        Caption_Abstract := StripLen(Tx, 128);
+        Caption_Abstract := AddVarData('Caption_Abstract', StripLen(Tx, 128));
       122:
-        Writer_Editor := StripLen(Tx, 32);
+        Writer_Editor := AddVarData('Writer_Editor', StripLen(Tx, 32));
     end;
   end;
 end;
@@ -598,6 +687,7 @@ procedure FotoRec.ParseIFD0(IFDentry: IFDentryRec);
 var
   SavePos: int64;
 begin
+  GroupName := 'Ifd0';
   SavePos := FotoF.Position;
   with IFD0 do
   begin
@@ -606,41 +696,56 @@ begin
       $002E:
         JPGfromRAWoffset := IFDentry.ValueOffs; // Panasonic RW2
       $010F:
-        Make := DecodeASCII(IFDentry, 64);
+        Make := AddVarData('Make', DecodeASCII(IFDentry, 64));
       $0110:
-        Model := DecodeASCII(IFDentry, 64);
+        Model := AddVarData('Model', DecodeASCII(IFDentry, 64));
       $0111:
         PreviewOffset := IFDentry.ValueOffs;
       $0112:
-        Orientation := DecodeWord(IFDentry);
+        begin
+          OrientationValue := AddVarData('OrientationValue', DecodeWord(IFDentry));
+          if (OrientationValue > 0) then
+          begin
+            if (OrientationValue and 1) = 1 then
+              Orientation := StrHor
+            else
+              Orientation := StrVer;
+          end
+          else
+            Orientation := '';
+          AddVarData('Orientation', Orientation);
+        end;
       $0117:
-        PreviewSize := IFDentry.ValueOffs;
+        PreviewSize := AddVarData('PreviewSize', IFDentry.ValueOffs);
       $011A:
-        Xresolution := DecodeRational(IFDentry);
+        Xresolution := AddVarData('Xresolution', DecodeRational(IFDentry));
       $011B:
-        Yresolution := DecodeRational(IFDentry);
+        Yresolution := AddVarData('Yresolution', DecodeRational(IFDentry));
       $0128:
-        case DecodeWord(IFDentry) of
-          2:
-            ResolutionUnit := 'dpi';
-          3:
-            ResolutionUnit := 'dpcm';
-        else
-          ResolutionUnit := '-'
+        begin
+          case DecodeWord(IFDentry) of
+            2:
+              ResolutionUnit := 'dpi';
+            3:
+              ResolutionUnit := 'dpcm';
+          else
+            ResolutionUnit := '-';
+          end;
+          AddVarData('ResolutionUnit', ResolutionUnit);
         end;
       $0131:
-        Software := DecodeASCII(IFDentry, 64);
+        Software := AddVarData('Software', DecodeASCII(IFDentry, 64));
       $0132:
-        DateTimeModify := DecodeASCII(IFDentry);
+        DateTimeModify := AddVarData('DateTimeModify', DecodeASCII(IFDentry));
       $013B:
-        Artist := DecodeASCII(IFDentry, 64);
+        Artist := AddVarData('Artist', DecodeASCII(IFDentry, 64));
       $02BC:
         begin
           XMPsize := IFDentry.TypeCount;
           XMPoffset := IFDentry.ValueOffs + TIFFoffset;
         end;
       $8298:
-        Copyright := DecodeASCII(IFDentry, 64);
+        Copyright := AddVarData('Copyright', DecodeASCII(IFDentry, 64));
       $83BB:
         begin
           if IFDentry.FieldType = 1 then
@@ -666,65 +771,84 @@ procedure FotoRec.ParseExifIFD(IFDentry: IFDentryRec);
 var
   SavePos: int64;
 begin
+  GroupName := 'ExifIfd';
   SavePos := FotoF.Position;
   with ExifIFD do
   begin
     HasData := true;
     case IFDentry.Tag of
       $829A:
-        ExposureTime := ConvertRational(IFDentry, false);
+        ExposureTime := AddVarData('ExposureTime', ConvertRational(IFDentry, false));
       $829D:
-        FNumber := FloatToStrF(GetRational(IFDentry), ffFixed, 7, 1, ExifFormatSettings);
+        FNumber := AddVarData('FNumber', FloatToStrF(GetRational(IFDentry), ffFixed, 7, 1, ExifFormatSettings));
       $8822:
-        case DecodeWord(IFDentry) of
-          0:
-            ExposureProgram := 'Undef.';
-          1:
-            ExposureProgram := 'M mode';
-          2:
-            ExposureProgram := 'P mode';
-          3:
-            ExposureProgram := 'A mode';
-          4:
-            ExposureProgram := 'T mode';
-        else
-          ExposureProgram := 'Unknown';
+        begin
+          case DecodeWord(IFDentry) of
+            0:
+              ExposureProgram := 'Undef.';
+            1:
+              ExposureProgram := 'M mode';
+            2:
+              ExposureProgram := 'P mode';
+            3:
+              ExposureProgram := 'A mode';
+            4:
+              ExposureProgram := 'T mode';
+          else
+            ExposureProgram := 'Unknown';
+          end;
+          AddVarData('ExposureProgram', ExposureProgram);
         end;
       $8827:
-        ISO := IntToStr(DecodeWord(IFDentry));
+        ISO := AddVarData('ISO', IntToStr(DecodeWord(IFDentry)));
       $9003:
-        DateTimeOriginal := DecodeASCII(IFDentry);
+        DateTimeOriginal := AddVarData('DateTimeOriginal', DecodeASCII(IFDentry));
       $9004:
-        DateTimeDigitized := DecodeASCII(IFDentry);
+        DateTimeDigitized := AddVarData('DateTimeDigitized', DecodeASCII(IFDentry));
       $9204:
-        ExposureBias := ConvertRational(IFDentry, true);
+        ExposureCompensation := AddVarData('ExposureCompensation', ConvertRational(IFDentry, true));
       $9209:
-        Flash := DecodeWord(IFDentry) or $FF00; // $FFnn=tag exist indicator
+        begin
+          FlashValue := AddVarData('FlashValue', DecodeWord(IFDentry) or $FF00); // $FFnn=tag exist indicator
+          if (FlashValue and $FF00) <> 0 then
+          begin
+            if (FlashValue and 1) = 1 then
+              Flash := StrYes
+            else
+              Flash := StrNo;
+          end
+          else
+            Flash := '';
+          AddVarData('Flash', Flash);
+        end;
       $920A:
-        FocalLength := FloatToStrF(GetRational(IFDentry), ffFixed, 7, 1, ExifFormatSettings);
+        FocalLength := AddVarData('FocalLength', FloatToStrF(GetRational(IFDentry), ffFixed, 7, 1, ExifFormatSettings));
       $A001:
-        case DecodeWord(IFDentry) of
-          $0001:
-            ColorSpace := 'sRGB';
-          $0002:
-            ColorSpace := 'AdobeRGB';
-          $FFFD:
-            ColorSpace := 'WideRGB';
-          $FFFE:
-            ColorSpace := 'ICCprofile';
-          $FFFF:
-            ColorSpace := 'Uncalibrated';
+        begin
+          case DecodeWord(IFDentry) of
+            $0001:
+              ColorSpace := 'sRGB';
+            $0002:
+              ColorSpace := 'AdobeRGB';
+            $FFFD:
+              ColorSpace := 'WideRGB';
+            $FFFE:
+              ColorSpace := 'ICCprofile';
+            $FFFF:
+              ColorSpace := 'Uncalibrated';
+          end;
+          AddVarData('ColorSpace', ColorSpace);
         end;
       $A005:
         InteropOffset := IFDentry.ValueOffs;
       $A405:
-        FLin35mm := IntToStr(DecodeWord(IFDentry));
+        FLin35mm := AddVarData('FLin35mm', IntToStr(DecodeWord(IFDentry)));
       $A432:
-        LensInfo := DecodeExifLens(IFDentry);
+        LensInfo := AddVarData('LensInfo', DecodeExifLens(IFDentry));
       $A433:
-        LensMake := DecodeASCII(IFDentry, 23);
+        LensMake := AddVarData('LensMake', DecodeASCII(IFDentry, 23));
       $A434:
-        LensModel := DecodeASCII(IFDentry, 47);
+        LensModel := AddVarData('LensModel', DecodeASCII(IFDentry, 47));
     end;
   end;
   FotoF.Seek(SavePos, TSeekOrigin.soBeginning);
@@ -735,6 +859,7 @@ procedure FotoRec.ParseInterop(IFDentry: IFDentryRec);
 var
   SavePos: int64;
 begin
+  GroupName := 'InterOp';
   SavePos := FotoF.Position;
   with InteropIFD do
   begin
@@ -747,6 +872,7 @@ begin
             InteropIndex := 'R03=Adobe'
           else if InteropIndex = 'R98' then
             InteropIndex := 'R98=sRGB';
+          AddVarData('InteropIndex', InteropIndex);
         end;
     end;
   end;
@@ -758,26 +884,30 @@ procedure FotoRec.ParseGPS(IFDentry: IFDentryRec);
 var
   SavePos: int64;
 begin
+  GroupName := 'Gps';
   SavePos := FotoF.Position;
   with GPS do
   begin
     HasData := true;
     case IFDentry.Tag of
       $01:
-        LatitudeRef := DecodeASCII(IFDentry);
+        LatitudeRef := AddVarData('LatitudeRef', DecodeASCII(IFDentry));
       $02:
-        Latitude := DecodeGPS(IFDentry, true);
+        Latitude := AddVarData('Latitude', DecodeGPS(IFDentry, true));
       $03:
-        LongitudeRef := DecodeASCII(IFDentry);
+        LongitudeRef := AddVarData('LongitudeRef', DecodeASCII(IFDentry));
       $04:
-        Longitude := DecodeGPS(IFDentry, false);
+        Longitude := AddVarData('Longitude', DecodeGPS(IFDentry, false));
       $05:
-        if IFDentry.ValueOffs = 0 then
-          AltitudeRef := '+'
-        else
-          AltitudeRef := '-';
+        begin
+          if IFDentry.ValueOffs = 0 then
+            AltitudeRef := '+'
+          else
+            AltitudeRef := '-';
+          AddVarData('AltitudeRef', AltitudeRef);
+        end;
       $06:
-        Altitude := IntToStr(DecodeRational(IFDentry)) + 'm';
+        Altitude := AddVarData('Altitude', IntToStr(DecodeRational(IFDentry)) + 'm');
     end;
   end;
   FotoF.Seek(SavePos, TSeekOrigin.soBeginning);
@@ -792,27 +922,42 @@ var
   XWord: word;
   Tx: string[31];
 begin
+  GroupName := 'ICCProfile';
   FotoF.Seek(ICCoffset, TSeekOrigin.soBeginning);
 
   ICC.HasData := true;
   FotoF.Read(ICC.ProfileCMMType[1], 4);
   ICC.ProfileCMMType[0] := #4;
+  AddVarData('ProfileCMMType', ICC.ProfileCMMType);
+
   FotoF.Read(Tx[1], 4); // skip ProfileVersion
   FotoF.Read(ICC.ProfileClass[1], 4);
   ICC.ProfileClass[0] := #4;
+  AddVarData('ProfileClass', ICC.ProfileClass);
+
   FotoF.Read(ICC.ColorSpaceData[1], 4);
   ICC.ColorSpaceData[0] := #4;
+  AddVarData('ColorSpaceData', ICC.ColorSpaceData);
+
   FotoF.Read(ICC.ProfileConnectionSpace[1], 4);
   ICC.ProfileConnectionSpace[0] := #4;
+  AddVarData('ProfileConnectionSpace', ICC.ProfileConnectionSpace);
+
   FotoF.Read(Tx[1], 16); // skip ProfileDateTime & ProfileFileSignature
   FotoF.Read(ICC.PrimaryPlatform[1], 4);
   ICC.PrimaryPlatform[0] := #4;
+  AddVarData('PrimaryPlatform', ICC.PrimaryPlatform);
+
   FotoF.Read(Tx[1], 4); // skip CMMFlags
   FotoF.Read(ICC.DeviceManufacturer[1], 4);
   ICC.DeviceManufacturer[0] := #4;
+  AddVarData('DeviceManufacturer', ICC.DeviceManufacturer);
+
   FotoF.Read(Tx[1], 28); // skip DeviceModel... goto ProfileCreator
   FotoF.Read(ICC.ProfileCreator[1], 4);
   ICC.ProfileCreator[0] := #4;
+  AddVarData('ProfileCreator', ICC.ProfileCreator);
+
   Remain := (ICCoffset + ICCSize) - FotoF.Position; // End of the ICC profile
   Tx := '????';
   while (Remain > 0) and
@@ -837,6 +982,7 @@ begin
     FotoF.Read(ICC.ProfileDescription[1], XWord);
     ICC.ProfileDescription[0] := AnsiChar(XWord);
   end;
+  AddVarData('ProfileDescription', ICC.ProfileDescription);
 end;
 
 procedure FotoRec.GetIFDentry(var IFDentry: IFDentryRec);
@@ -889,11 +1035,11 @@ begin
     // We have a TIFF IFD
     Include(Supported, TSupportedType.supTIFF);
 
-    FotoF.Read(LongData, 4);
+    FotoF.Read(DWordData, 4);
     if IsMM then
-      LongData := SwapL(LongData);
+      DWordData := SwapL(DWordData);
 
-    ParseIfd(TIFFoffset + LongData, ParseIFD0);
+    ParseIfd(TIFFoffset + DWordData, ParseIFD0);
 
     if ExifIFDoffset > 0 then
       ParseIFD(TIFFoffset + ExifIFDoffset, ParseExifIFD);
@@ -978,7 +1124,7 @@ begin
     FotoF.Read(APPsize, 2);
     APPsize := Swap(APPsize);
     APPmarkNext := FotoF.Position + APPsize - 2;
-    if (APPmarkNext >= FotoF.Size) then // Past file?
+    if (APPmarkNext >= FileSize) then // Past file?
       break;
 
     // APP1 = EXIF or XMP
@@ -1037,7 +1183,7 @@ begin
         FotoF.Read(WordData, 2);
         if WordData = $0404 then
         begin // $0404=IPTCData Photoshop tag
-          FotoF.Read(LongData, 4); // Ldata=0=dummy
+          FotoF.Read(DWordData, 4); // Ldata=0=dummy
           FotoF.Read(WordData, 2);
           WordData := Swap(WordData);
           IPTCsize := WordData;
@@ -1088,69 +1234,86 @@ var Bytes: TBytes;
     RDFDescNodes: TXmlNodeList;
     TmpStream: TMemoryStream;
 
-  procedure AddBag(var BagData: string; const ANode: string);
-  begin
-    if (BagData <> '') then
-      BagData := BagData + FotoKeySep;
-    BagData := BagData + ANode;
-  end;
-
-  procedure Add2Xmp(const AKey, AValue: string);
+  procedure Add2Xmp(const AKey, AValue: string; const isList: boolean);
   var
     UnEscaped: string;
+    MetaInfo: variant;
   begin
+    GroupName := 'Xmp-';
+
     // ExifTool escapes (needlessly) ' and " in XML.
     // VerySimpleXML does not UnEscape '&#39;' .
     UnEscaped := StringReplace(AValue, '&#39;', '''', [rfReplaceAll]);
 
-    if (EndsText('Iptc4xmpExt:CountryCode', AKey)) then
-      AddBag(XMP.CountryCodeShown, UnEscaped)
-    else if (EndsText('Iptc4xmpExt:CountryName', AKey)) then
-      AddBag(XMP.CountryNameShown, UnEscaped)
-    else if (EndsText('Iptc4xmpExt:ProvinceState', AKey)) then
-      AddBag(XMP.ProvinceShown, UnEscaped)
-    else if (EndsText('Iptc4xmpExt:City', AKey)) then
-      AddBag(XMP.CityShown, UnEscaped)
-    else if (EndsText('Iptc4xmpExt:Sublocation', AKey)) then
-      AddBag(XMP.LocationShown, UnEscaped)
-    else if (StartsText('Iptc4xmpExt:PersonInImage.rdf:Bag', AKey)) then
-      AddBag(XMP.PersonInImage, UnEscaped)
+    // For XMP add every node found.
+    MetaInfo := AddVarData(AKey, AValue);
 
-    else if (StartsText('dc:creator.rdf:Seq', AKey)) then
-      AddBag(XMP.Creator, UnEscaped)
-    else if (StartsText('dc:rights.rdf:Alt', AKey)) then
-      XMP.Rights := UnEscaped
-    else if (StartsText('dc:date.rdf:Seq', AKey)) then
-      XMP.Date := UnEscaped // Hardly a Bag!
-    else if (StartsText('dc:type.rdf', AKey)) then
-      AddBag(XMP.PhotoType, UnEscaped)
-    else if (StartsText('dc:title.rdf:Alt', AKey)) then
-      AddBag(XMP.Title, UnEscaped)
-    else if (StartsText('dc:subject.rdf:Bag', AKey)) then
-      AddBag(XMP.Keywords, UnEscaped)
+    // Only Fill the record if needed
+    if (StartsText('Iptc4xmpExt:LocationShownCountryCode', AKey)) then
+      XMP.CountryCodeShown := MetaInfo
+    else if (StartsText('Iptc4xmpExt:LocationShownCountryName', AKey)) then
+      XMP.CountryNameShown := MetaInfo
+    else if (StartsText('Iptc4xmpExt:LocationShownProvinceState', AKey)) then
+      XMP.ProvinceShown := MetaInfo
+    else if (StartsText('Iptc4xmpExt:LocationShownCity', AKey)) then
+      XMP.CityShown := MetaInfo
+    else if (StartsText('Iptc4xmpExt:LocationShownSublocation', AKey)) then
+      XMP.LocationShown := MetaInfo
+    else if (StartsText('Iptc4xmpExt:PersonInImage', AKey)) then
+      XMP.PersonInImage := MetaInfo
 
-    else if (StartsText('Iptc4xmpExt:Event.rdf:Alt', AKey)) then
-      XMP.Event := UnEscaped
+    else if (StartsText('dc:creator', AKey)) then
+      XMP.Creator := MetaInfo
+    else if (StartsText('dc:rights', AKey)) then
+      XMP.Rights := MetaInfo
+    else if (StartsText('dc:date', AKey)) then
+      XMP.Date := MetaInfo
+    else if (StartsText('dc:type', AKey)) then
+      XMP.PhotoType := MetaInfo
+    else if (StartsText('dc:title', AKey)) then
+      XMP.Title := MetaInfo
+    else if (StartsText('dc:subject', AKey)) then
+      XMP.Keywords := MetaInfo
+
+    else if (StartsText('Iptc4xmpExt:Event', AKey)) then
+      XMP.Event := MetaInfo
 
     else if (StartsText('xmp:Rating', AKey)) or
             (StartsText('xap:Rating', AKey)) then
-      XMP.Rating := UnEscaped;
+      XMP.Rating := MetaInfo
   end;
 
-  procedure LevelDeeper(const ANode: TXmlNode; AParent: string);
+  function GetNodeKey(ThisNode, SubNode: string; var ParmIsList: boolean): string;
+  var
+    P: integer;
+  begin
+    result := ThisNode;
+
+    if (Trim(result) = '') then
+      result := SubNode
+    else if (ParmIsList) then
+    begin
+      P := Pos(':', SubNode);
+      if (P > 0) then
+        result := result + Copy(SubNode, P +1);
+    end;
+
+    ParmIsList := ParmIsList or
+                  SameText('rdf:li', SubNode);
+  end;
+
+  procedure LevelDeeper(const ANode: TXmlNode; AParent: string = ''; ParentIsList: boolean = false);
   var
     ANodeList: TXmlNodeList;
     ASubNode: TXmlNode;
     Attribute: TXmlAttribute;
     SelNode: string;
+    ThisIsList: boolean;
   begin
     SelNode := Trim(AParent);
-    if (ANode.NodeValue <> '') then
-      Add2Xmp(SelNode, ANode.NodeValue);
 
-    // Add . , but not for first
-    if (SelNode <> '') then
-      SelNode := SelNode + '.';
+    if (ANode.NodeValue <> '') then
+      Add2Xmp(SelNode, ANode.NodeValue, ThisIsList);
 
     // Look in Attributes of Node
     for Attribute in ANode.AttributeList do
@@ -1158,13 +1321,22 @@ var Bytes: TBytes;
       // Skip xml:lang etc.
       if StartsText('xml:', Attribute.Name) then
         continue;
-      Add2Xmp(SelNode + Attribute.Name, Attribute.Value);
+      if StartsText('xmlns:', Attribute.Name) then
+        continue;
+      if StartsText('rdf:About', Attribute.Name) then
+        continue;
+
+      ThisIsList := false; // Attribute cant be a list
+      Add2Xmp(GetNodeKey(SelNode, Attribute.Name, ThisIsList), Attribute.Value, ThisIsList);
     end;
 
     // Look in Childnodes
     ANodeList := ANode.ChildNodes;
     for ASubNode in ANodeList do
-      LevelDeeper(ASubNode, SelNode + ASubNode.NodeName);
+    begin
+      ThisIsList := ParentIsList;
+      LevelDeeper(ASubNode, GetNodeKey(SelNode, ASubNode.NodeName, ThisIsList), ThisIsList);
+    end;
   end;
 
 begin
@@ -1189,13 +1361,12 @@ begin
     RDF := GetRDF(Xml);
     if (RDF = nil) then
       exit;
-
     RDFDescNodes := RDF.ChildNodes;
     Xmp.HasData := (RDFDescNodes.Count > 0);
 
     // Recurse thru all subnodes, and look in attributes and node names
     for RDFDesc in RDFDescNodes do
-      LevelDeeper(RDFDesc, '');
+      LevelDeeper(RDFDesc);
   finally
     Xml.Free;
     TmpStream.Free;
@@ -1217,16 +1388,16 @@ const
 begin
   result := WordData;
   SavePos := FotoF.Position;
-  fotoF.Seek(4, TSeekOrigin.soBeginning);
+  FotoF.Seek(4, TSeekOrigin.soBeginning);
   FotoF.Read(Cr3Magic, SizeOf(Cr3Magic));
 
   if (Cr3Magic = 'ftypcrx') then
   begin
-    fotoF.Seek(0, TSeekOrigin.soBeginning);
+    FotoF.Seek(0, TSeekOrigin.soBeginning);
     FotoF.Read(TagLen, SizeOf(TagLen));
     TagLen := SwapL(TagLen) - Sizeof(TagLen) - Sizeof(TagName);
     FotoF.Read(TagName, SizeOf(TagName));
-    EndPos := FotoF.Size;
+    EndPos := FileSize;
     while (FotoF.Position + TagLen <  EndPos) do
     begin
       if (TagName = 'moov') then
@@ -1277,7 +1448,7 @@ begin
   FotoF.Read(TagLen, SizeOf(TagLen));
   TagLen := SwapL(TagLen) - Sizeof(TagLen) - Sizeof(TagName);
   FotoF.Read(TagName, SizeOf(TagName));
-  EndPos := FotoF.Size;
+  EndPos := FileSize;
   while (FotoF.Position + TagLen < EndPos) do
   begin
     TIFFoffset := FotoF.Position;
@@ -1373,11 +1544,10 @@ begin
 end;
 
 // ======================================== MAIN ==============================================
-function GetMetadata(AName: string; AGetOptions: TGetOptions): FotoRec;
-var
-  FotoHandle: THandle;
+function GetMetadata(AName: string; AGetOptions: TGetOptions; VarData: TVarData = nil; BufSize: integer = 2048): FotoRec;
 begin
   result.Clear;  // Clear all variables
+
   if (AName = '') or
      not FileExists(AName) then
     exit;
@@ -1385,6 +1555,7 @@ begin
 {$IFDEF DEBUG}
   FileName := AName;
 {$ENDIF}
+  result.SetVarData(VarData);
 
   with result do
   begin
@@ -1393,45 +1564,45 @@ begin
     GetOptions := AGetOptions;
     FotoKeySep := ET_Options.GetSeparator;
 
-    // Open the file ourselves. We dont want an exception
-    FotoHandle := FileOpen(AName, fmOpenRead or fmShareDenyNone);
-    if (FotoHandle = INVALID_HANDLE_VALUE) then
-      exit;
-
-    FotoF := THandleStream.Create(FotoHandle);
     try
-      if (FotoF.Size > 31) then
-      begin // size must be at least 32 bytes
-        FotoF.Read(WordData, 2);
-        WordData := Swap(WordData);
-        case WordData of
-          $0000:
-            ReadCr3;  // CR3
-          $4655:
-            ReadFuji; // RAF
-          $FFD8:
-            ReadJPEG; // JPG
-          $4949:
-            ReadTIFF; // 'II'=TIF,DNG,CR2,CRW,RW2,ORF
-          $4D4D:
-            ReadTIFF; // 'MM'=NEF,PEF
-        end;
-        if JPGfromRAWoffset > 0 then
-        begin // in case of RW2
-          FotoF.Seek(JPGfromRAWoffset, TSeekOrigin.soBeginning);
+      //  There is no TBufferedHandleStream. So try to create, and handle the exception
+      FotoF := TBufferedFileStream.Create(AName, fmOpenRead or fmShareDenyNone, BufSize);
+      try
+        FileSize := FotoF.Size;
+        if (FileSize > 31) then
+        begin // size must be at least 32 bytes
           FotoF.Read(WordData, 2);
           WordData := Swap(WordData);
-          if WordData = $FFD8 then
-            ReadJPEG;
+          case WordData of
+            $0000:
+              ReadCr3;  // CR3
+            $4655:
+              ReadFuji; // RAF
+            $FFD8:
+              ReadJPEG; // JPG
+            $4949:
+              ReadTIFF; // 'II'=TIF,DNG,CR2,CRW,RW2,ORF
+            $4D4D:
+              ReadTIFF; // 'MM'=NEF,PEF
+          end;
+          if JPGfromRAWoffset > 0 then
+          begin // in case of RW2
+            FotoF.Seek(JPGfromRAWoffset, TSeekOrigin.soBeginning);
+            FotoF.Read(WordData, 2);
+            WordData := Swap(WordData);
+            if WordData = $FFD8 then
+              ReadJPEG;
+          end;
+          if (TGetOption.gmXMP in result.GetOptions) and
+              (XMPoffset > 0) and
+              (XMPsize > 0) then
+            ReadXMP;
         end;
-        if (TGetOption.gmXMP in result.GetOptions) and
-            (XMPoffset > 0) and
-            (XMPsize > 0) then
-          ReadXMP;
+      finally
+        FotoF.Free;
       end;
-    finally
-      FotoF.Free;
-      FileClose(FotoHandle);
+    except
+      result.Supported := [TSupportedType.supError];
     end;
   end;
 end;

@@ -2315,7 +2315,7 @@ begin
       if GUIsettings.AutoRotatePreview then
       begin
         Foto := GetMetadata(FPath, []);
-        case Foto.IFD0.Orientation of
+        case Foto.IFD0.OrientationValue of
           0, 1:
             Rotate := 0; // no tag or don't rotate
           3:
@@ -2879,7 +2879,6 @@ begin
     0:
     begin
       ShellList.AddDate; // Add next column, if a date. Likely Date created.
-
       AdjustColumns(FListStdColWidth);
     end;
     1:
@@ -2991,27 +2990,13 @@ begin
             Details.Add(Tx.PadLeft(4));
             Tx := Foto.ExifIFD.ISO;
             Details.Add(Tx.PadLeft(5));
-            Tx := Foto.ExifIFD.ExposureBias;
+            Tx := Foto.ExifIFD.ExposureCompensation;
             Details.Add(Tx.PadLeft(4));
             Tx := Foto.ExifIFD.FocalLength;
             Details.Add(Tx.PadLeft(6));
-            if (Foto.ExifIFD.Flash and $FF00) <> 0 then
-            begin
-              if (Foto.ExifIFD.Flash and 1) = 1 then
-                Details.Add(StrYes)
-              else
-                Details.Add(StrNo);
-            end
-            else
-              Details.Add('');
+            Details.Add(Foto.ExifIFD.Flash);
             Details.Add(Foto.ExifIFD.ExposureProgram);
-            if (Foto.IFD0.Orientation > 0) then
-            begin
-              if (Foto.IFD0.Orientation and 1) = 1 then
-                Details.Add(StrHor)
-              else
-                Details.Add(StrVer);
-            end;
+            Details.Add(Foto.IFD0.Orientation);
           end;
         end;
       2: // Location info
