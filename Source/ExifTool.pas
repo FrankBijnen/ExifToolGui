@@ -53,6 +53,7 @@ type
 
   TExifTool = class(TObject)
   private
+    FId: integer;
     FExecETEvent: TExecETEvent;
     FOptionsRec: TET_OptionsRec;
     FETprocessInfo: TProcessInformation;
@@ -62,14 +63,16 @@ type
     FPipeOutRead, FPipeOutWrite: THandle;
     FPipeErrRead, FPipeErrWrite: THandle;
     FETWorkDir: string;
+    FETTempFile: string;
     FETEvent: TEvent;
     FExecNum: word;
     FCounter: TET_Counter;
     function GetCounter: TET_Counter;
+    function GetTempFile: string;
   protected
     procedure AddExecNum(var FinalCmd: string);
   public
-    constructor Create;
+    constructor Create(const Id: integer = 0);
     destructor Destroy; override;
 
     function StayOpen(WorkDir: string): boolean;
@@ -82,10 +85,11 @@ type
     class function ExecET(ETcmd, FNames, WorkDir: string; var ETouts: string): boolean; overload;
 
     procedure SetCounter(ACounterETEvent: TCounterETEvent; ACounter: integer);
-    property ETWorkDir: string read FETWorkDir write FETWorkDir;
+    property ETWorkDir: string read FETWorkDir;
+    property ETTempFile: string read GetTempFile;
     property ExecETEvent: TExecETEvent read FExecETEvent write FExecETEvent;
-    property ExecNum: word read FExecNum write FExecNum;
-    property Options: TET_OptionsRec read FOptionsRec write FOptionsRec;
+    property ExecNum: word read FExecNum;
+    property Options: TET_OptionsRec read FOptionsRec;
     property Counter: TET_Counter read GetCounter;
   end;
 
@@ -283,13 +287,22 @@ begin
   result := FCounter;
 end;
 
-constructor TexifTool.Create;
+function TExifTool.GetTempFile: string;
+begin
+  if (FETTempFile = '') then
+    FETTempFile := GetExifToolTmp(FId);
+  result := FETTempFile;
+end;
+
+constructor TexifTool.Create(const Id: integer = 0);
 begin
   inherited Create;
 
+  FId := Id;
   FETEvent := TEvent.Create(nil, true, true, ExtractFileName(Paramstr(0)));
   FExecNum := 10; // From 10 to 99
   FETWorkDir := '';
+  FETTempFile := '';
   FEtOutPipe := nil;
   FEtErrPipe := nil;
   SetCounter(nil, 0);
@@ -304,7 +317,8 @@ begin
     FEtOutPipe.Free;
   if Assigned(FEtErrPipe) then
     FEtErrPipe.Free;
-
+  FETWorkDir := '';
+  FETTempFile := '';
   inherited Destroy;
 end;
 
@@ -402,7 +416,6 @@ var
   ReadOut: TSOReadPipeThread;
   ReadErr: TSOReadPipeThread;
   FinalCmd: string;
-  TempFile: string;
   StatusLine: string;
   LengthReady: integer;
   Call_ET: AnsiString; // Needs to be AnsiString. Only holds the -@ <argsfilename>
@@ -441,15 +454,14 @@ begin
       AddExecNum(FinalCmd);
 
       // Create tempfile
-      TempFile := GetExifToolTmp;
-      WriteArgsFile(FinalCmd, TempFile);
-      Call_ET := EndsWithCRLF('-@' + CRLF + TempFile);
+      WriteArgsFile(FinalCmd, ETTempFile);
+      Call_ET := EndsWithCRLF('-@' + CRLF + ETTempFile);
 
       // Write command to Pipe. Triggers ExifTool execution
       WriteFile(FPipeInWrite, Call_ET[1], ByteLength(Call_ET), BytesCount, nil);
       FlushFileBuffers(FPipeInWrite);
 
-      // ========= Read StdOut and stdErr =======================
+      // Read StdOut and stdErr
       FEtOutPipe.SetCounter(Counter);
       ReadOut := TSOReadPipeThread.Create(FEtOutPipe, FExecNum);
       ReadErr := TSOReadPipeThread.Create(FEtErrPipe, FExecNum);
@@ -506,7 +518,6 @@ var
   PipeOutRead, PipeOutWrite: THandle;
   PipeErrRead, PipeErrWrite: THandle;
   FinalCmd: string;
-  TempFile: string;
   StatusLine: string;
   LengthReady: integer;
   Call_ET: string;
@@ -548,9 +559,8 @@ begin
 
     ET.AddExecNum(FinalCmd);
 
-    TempFile := GetExifToolTmp;
-    WriteArgsFile(FinalCmd, TempFile);
-    Call_ET := GUIsettings.ETOverrideDir + 'exiftool ' + GUIsettings.GetCustomConfig + ' -@ "' + TempFile + '"';
+    WriteArgsFile(FinalCmd, ET.ETTempFile);
+    Call_ET := GUIsettings.ETOverrideDir + 'exiftool ' + GUIsettings.GetCustomConfig + ' -@ "' + ET.ETTempFile + '"';
 
     result := CreateProcess(nil, PChar(Call_ET), nil, nil, true,
                             CREATE_DEFAULT_ERROR_MODE or CREATE_NEW_CONSOLE or NORMAL_PRIORITY_CLASS,
