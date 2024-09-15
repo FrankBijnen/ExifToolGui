@@ -886,7 +886,6 @@ begin
     Bmp.Canvas.Brush.Style := bsSolid;
     Bmp.Canvas.Brush.Color := BackColor;
     Bmp.AlphaFormat := TAlphaFormat.afDefined;
-
     Bmp.Canvas.FillRect(Rect(0, 0, W, H));
     if (W <= NewW) and
        (H <= NewH) then
