@@ -880,8 +880,8 @@ var
 begin
   NewSizeRetainRatio(Bitmap.Width, Bitmap.Height, W, H, NewW, NewH);
 
-  Xshift := (NewW - W) div 2;
-  Yshift := (NewH - H) div 2;
+  Xshift := (Bitmap.Width - W) div 2;
+  Yshift := (Bitmap.Height - H) div 2;
   Left := Max(0, -Xshift);
   Top := Max(0, -Yshift);
 
@@ -892,8 +892,8 @@ begin
     Bmp.Canvas.Brush.Color := BackColor;
     Bmp.AlphaFormat := TAlphaFormat.afDefined;
     Bmp.Canvas.FillRect(Rect(0, 0, W, H));
-    if (W <= NewW) and
-       (H <= NewH) then
+    if (Left + Bitmap.Width <= W) and
+       (Top + Bitmap.Height <= H) then
       Bmp.Canvas.Draw(Left, Top, BitMap)
     else
       Bmp.Canvas.StretchDraw(Rect(Left, Top, Left + NewW, Top + NewH), BitMap);

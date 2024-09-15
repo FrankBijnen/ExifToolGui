@@ -755,7 +755,7 @@ object FMain: TFMain
         object EditETdirect: TLabeledEdit
           Left = 1
           Top = 50
-          Width = 315
+          Width = 311
           Height = 23
           Hint = 
             'Spaces in data require double quotes, double quotes in data requ' +
@@ -778,7 +778,7 @@ object FMain: TFMain
           Text = ''
           OnChange = EditETdirectChange
           OnKeyDown = EditETdirectKeyDown
-          ExplicitWidth = 311
+          ExplicitWidth = 307
         end
         object CBoxETdirect: TComboBox
           Left = 1
@@ -872,6 +872,7 @@ object FMain: TFMain
         Font.Style = []
         ParentFont = False
         TabOrder = 0
+        ExplicitWidth = 366
         object SpeedBtnChartRefresh: TSpeedButton
           Left = 214
           Top = 104

@@ -55,6 +55,8 @@ type
     FSortColumn: integer;
     FSortState: THeaderSortState;
 
+    FBackColor: TColor;
+    FHourGlassId: integer;
     FThumbNails: TImageList;
     FThumbNailSize: integer;
     FGenerating: integer;
@@ -124,12 +126,13 @@ type
     function GetIconSpacing: dword;
     procedure SetIconSpacing(Cx, Cy: word); overload;
     procedure SetIconSpacing(Cx, Cy: integer); overload;
-    function GetThumbNail(ItemIndex, W, H: integer; BkColor: TColor): TBitmap;
+    function GetThumbNail(ItemIndex, W, H: integer): TBitmap;
 
     property OnColumnResized: TNotifyEvent read FonColumnResized write FonColumnResized;
     property ColumnSorted: boolean read FColumnSorted write SetColumnSorted;
     property SortColumn: integer read FSortColumn write FSortColumn;
     property SortState: THeaderSortState read FSortState write FSortState;
+    property BackColor: TColor read FBackColor write FBackColor;
     property ThumbNailSize: integer read FThumbNailSize write SetThumbNailSize;
     property ThumbAutoGenerate: boolean read FThumbAutoGenerate write FThumbAutoGenerate;
     property OnThumbError: TThumbErrorEvent read FOnNotifyErrorEvent write FOnNotifyErrorEvent;
@@ -668,7 +671,9 @@ begin
       end;
 
       if (Hr = S_OK) then
-        Add2ThumbNails(HBmp, ItemIndx, true);
+        Add2ThumbNails(HBmp, ItemIndx, true)
+      else
+        Items[ItemIndx].ImageIndex := FHourGlassId;
     end;
   end;
 end;
@@ -1160,15 +1165,14 @@ begin
   begin
     FThumbNails.Width := FThumbNailSize;
     FThumbNails.Height := FThumbNailSize;
-    FThumbNails.BlendColor := clBlack;
-    FThumbNails.BkColor := clBlack;
+    FThumbNails.BkColor := BackColor;
     AnHourGlass := TBitmap.Create;
     try
       AnHourGlass.LoadFromResourceName(HInstance, HOURGLASS);
-      ResizeBitmapCanvas(AnHourGlass, FThumbNailSize, FThumbNailSize, Self.Color);
-      FThumbNails.Add(AnHourGlass, nil);
+      ResizeBitmapCanvas(AnHourGlass, FThumbNails.Width, FThumbNails.Height, ClWhite);
+      FHourGlassId := FThumbNails.AddMasked(AnHourGlass, ClWhite); // FHourGlassId Should be zero!
     finally
-      AnHourGlass.Free
+      AnHourGlass.Free;
     end;
     // Set the imagelist to our thumbnail list.
     SendMessage(Handle, LVM_SETIMAGELIST, LVSIL_NORMAL, FThumbNails.Handle);
@@ -1184,11 +1188,10 @@ begin
   end;
 end;
 
-function TShellListView.GetThumbNail(ItemIndex, W, H: integer; BkColor: TColor): TBitmap;
+function TShellListView.GetThumbNail(ItemIndex, W, H: integer): TBitmap;
 var
   Hr: HRESULT;
   HBmp: HBITMAP;
-  SaveBkColor: TColor;
 begin
   result := nil;
 
@@ -1200,7 +1203,7 @@ begin
   // Get the cached (by Windows) thumbnail if avail
   Hr := GetThumbCache(Folders[ItemIndex].AbsoluteID, HBmp, SIIGBF_THUMBNAILONLY or SIIGBF_INCACHEONLY or SIIGBF_BIGGERSIZEOK, W, H);
   if (HR = S_OK) then
-    result := BitMapFromHBitMap(HBmp, W, H, BkColor)
+    result := BitMapFromHBitMap(HBmp, W, H, FThumbNails.BkColor)
   else
   begin
     // Need to update our cache?
@@ -1219,15 +1222,9 @@ begin
     if (FThumbNailCache[ItemIndex] <> 0) then
     begin
       result := TBitmap.Create;
-      SaveBkColor := FThumbNails.BkColor;
-      try
-        // Draw the Bitmap with the currently selected BackColor. (From the Style)
-        FThumbNails.BkColor := BkColor;
-        FThumbNails.GetBitmap(Abs(FThumbNailCache[ItemIndex]), result);
-      finally
-        FThumbNails.BkColor := SaveBkColor;
-      end;
-      ResizeBitmapCanvas(result, W, H, BkColor);
+      // Draw the Bitmap with the currently selected BackColor. (From the Style)
+      FThumbNails.GetBitmap(Abs(FThumbNailCache[ItemIndex]), result);
+      ResizeBitmapCanvas(result, W, H, FThumbNails.BkColor);
     end;
   end;
 end;
