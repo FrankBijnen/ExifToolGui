@@ -5,7 +5,6 @@ interface
 uses System.Classes, System.Types, System.SyncObjs, Winapi.Windows,
      ExifTool_PipeStream;
 
-
 const
   CRLF = #13#10;
 
@@ -65,6 +64,8 @@ type
     FETWorkDir: string;
     FETEvent: TEvent;
     FExecNum: word;
+    FCounter: TET_Counter;
+    function GetCounter: TET_Counter;
   protected
     procedure AddExecNum(var FinalCmd: string);
   public
@@ -80,10 +81,12 @@ type
     class function ExecET(ETcmd, FNames, WorkDir: string; var ETouts, ETErrs: string): boolean; overload;
     class function ExecET(ETcmd, FNames, WorkDir: string; var ETouts: string): boolean; overload;
 
+    procedure SetCounter(ACounterETEvent: TCounterETEvent; ACounter: integer);
     property ETWorkDir: string read FETWorkDir write FETWorkDir;
     property ExecETEvent: TExecETEvent read FExecETEvent write FExecETEvent;
     property ExecNum: word read FExecNum write FExecNum;
     property Options: TET_OptionsRec read FOptionsRec write FOptionsRec;
+    property Counter: TET_Counter read GetCounter;
   end;
 
 var
@@ -269,6 +272,17 @@ begin
               Format('-execute%u%s', [FExecNum, CRLF]);
 end;
 
+procedure TExifTool.SetCounter(ACounterETEvent: TCounterETEvent; ACounter: integer);
+begin
+  FCounter.CounterEvent := ACounterETEvent;
+  FCounter.Counter := ACounter;
+end;
+
+function TExifTool.GetCounter: TET_Counter;
+begin
+  result := FCounter;
+end;
+
 constructor TexifTool.Create;
 begin
   inherited Create;
@@ -278,6 +292,7 @@ begin
   FETWorkDir := '';
   FEtOutPipe := nil;
   FEtErrPipe := nil;
+  SetCounter(nil, 0);
 end;
 
 destructor TExifTool.Destroy;
@@ -435,7 +450,7 @@ begin
       FlushFileBuffers(FPipeInWrite);
 
       // ========= Read StdOut and stdErr =======================
-      FEtOutPipe.SetCounter(GetCounter);
+      FEtOutPipe.SetCounter(Counter);
       ReadOut := TSOReadPipeThread.Create(FEtOutPipe, FExecNum);
       ReadErr := TSOReadPipeThread.Create(FEtErrPipe, FExecNum);
       try
@@ -546,7 +561,7 @@ begin
     begin
       // ========= Read StdOut and stdErr =======================
       ReadOut := TReadPipeThread.Create(PipeOutRead, SizePipeBuffer);
-      ReadOut.PipeStream.SetCounter(GetCounter);
+      ReadOut.PipeStream.SetCounter(ET.Counter);
       ReadErr := TReadPipeThread.Create(PipeErrRead, SizePipeBuffer);
       try
         ReadOut.WaitFor;
@@ -557,7 +572,7 @@ begin
       finally
         ReadOut.Free;
         ReadErr.Free;
-        SetCounter(nil, 0);
+        ET.SetCounter(nil, 0);
       end;
 
       // ----------------------------------------------

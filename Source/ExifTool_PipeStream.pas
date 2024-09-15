@@ -62,9 +62,6 @@ type
     constructor Create(APipeStream: TPipeStream; AExecNum: word);
   end;
 
-  procedure SetCounter(ACounterEvent: TCounterETEvent; ACounter: integer);
-  function GetCounter: TET_Counter;
-
 implementation
 
 uses System.SysUtils;
@@ -74,20 +71,6 @@ const
   LF = 10;
   ReadyPrompt: Utf8string = '{ready';
   FilePrompt: Utf8string  = '========';
-
-var
-  ET_Counter: TET_Counter;
-
-procedure SetCounter(ACounterEvent: TCounterETEvent; ACounter: integer);
-begin
-  ET_Counter.CounterEvent := ACounterEvent;
-  ET_Counter.Counter := ACounter;
-end;
-
-function GetCounter: TET_Counter;
-begin
-  result := ET_Counter;
-end;
 
 constructor TPipeStream.Create(AFile: THandle; ABufSize: integer);
 begin
@@ -290,11 +273,6 @@ begin
   // -executexx and -echo4 CRLF xx need to be set for this to work
   while (not FPipeStream.PipeHasReady(FExecNum)) do
     FPipeStream.ReadPipe;
-end;
-
-initialization
-begin
-  SetCounter(nil, 0);
 end;
 
 end.

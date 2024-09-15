@@ -848,7 +848,7 @@ begin
     end;
   end;
   if (Cnt > 1) then
-    SetCounter(CounterETEvent, Cnt);
+    ET.SetCounter(CounterETEvent, Cnt);
 end;
 
 function TFMain.GetSelectedFiles: string;
@@ -1416,7 +1416,7 @@ begin
         begin
           ETcmd := ETcmd + FCopyMetadata.TagSelection;
           ETcmd := ETcmd + '-ext' + CRLF + DstExt;
-          SetCounter(CounterETEvent, GetNrOfFiles(ShellList.Path, '*.' + DstExt, (I = mrYes)));
+          ET.SetCounter(CounterETEvent, GetNrOfFiles(ShellList.Path, '*.' + DstExt, (I = mrYes)));
           if (ET.OpenExec(ETcmd, '.', ETout, ETerr)) then
           begin
             RefreshSelected(Sender);
@@ -2204,7 +2204,7 @@ begin
           ETtx := LeftStr(ETtx, I - 1);
         ETtx := '*.' + ETtx;
       end;
-      SetCounter(CounterETEvent, GetNrOfFiles(ShellList.Path, ETtx, true));
+      ET.SetCounter(CounterETEvent, GetNrOfFiles(ShellList.Path, ETtx, true));
       SelectedFiles := '';
     end
     else
