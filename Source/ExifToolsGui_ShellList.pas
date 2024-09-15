@@ -1200,11 +1200,7 @@ begin
   // Get the cached (by Windows) thumbnail if avail
   Hr := GetThumbCache(Folders[ItemIndex].AbsoluteID, HBmp, SIIGBF_THUMBNAILONLY or SIIGBF_INCACHEONLY or SIIGBF_BIGGERSIZEOK, W, H);
   if (HR = S_OK) then
-  begin
-    result := TBitmap.Create;
-    result.Handle := HBmp;
-    ResizeBitmapCanvas(result, W, H, BkColor);
-  end
+    result := BitMapFromHBitMap(HBmp, W, H, BkColor)
   else
   begin
     // Need to update our cache?
@@ -1225,6 +1221,7 @@ begin
       result := TBitmap.Create;
       SaveBkColor := FThumbNails.BkColor;
       try
+        // Draw the Bitmap with the currently selected BackColor. (From the Style)
         FThumbNails.BkColor := BkColor;
         FThumbNails.GetBitmap(Abs(FThumbNailCache[ItemIndex]), result);
       finally
