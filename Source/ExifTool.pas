@@ -2,14 +2,22 @@ unit ExifTool;
 
 interface
 
-uses System.Classes, System.Types;
+uses System.Classes, System.Types, System.SyncObjs, Winapi.Windows,
+     ExifTool_PipeStream;
+
+
+const
+  CRLF = #13#10;
+
+  CmdStr = '-';
+  CmdDateOriginal = 'exif:DateTimeOriginal';
+  CmdDateCreate = 'exif:CreateDate';
+  CmdDateModify = 'exif:ModifyDate';
 
 type
   TExecETEvent = procedure(ExecNum: word; EtCmds, EtOuts, EtErrs, StatusLine: string; PopupOnError: boolean) of object;
 
-  // don't define '-a' (because of Filelist custom columns)
-  // don't define '-e' (because of extracting previews)
-  ET_OptionsRec = record
+  TET_OptionsRec = record
     ETLangDef: string;
     ETBackupMode: string;
     ETFileDate: string;
@@ -23,7 +31,13 @@ type
     ETAPILargeFileSupport: string;
     ETGeoDir: string;
     ETCustomOptions: string;
+    class operator Initialize (out ET_Options: TET_OptionsRec);
+    procedure SetLangDef(UseLangDef: string);
+    procedure SetBackupMode(UseBackUpMode: boolean);
+    procedure SetFileDate(UseFileDate: boolean);
+    procedure SetMinorError(UseMinorError: boolean);
     procedure SetGpsFormat(UseDecimal: boolean);
+    procedure SetShowNumber(UseShowNumber: boolean);
     procedure SetVerbose(Level: integer);
     procedure SetApiWindowsWideFile(UseWide: boolean);
     procedure SetApiLargeFileSupport(UseLarge: boolean);
@@ -38,63 +52,106 @@ type
     function GetSeparator: string;
   end;
 
-const
-  CRLF = #13#10;
+  TExifTool = class(TObject)
+  private
+    FExecETEvent: TExecETEvent;
+    FOptionsRec: TET_OptionsRec;
+    FETprocessInfo: TProcessInformation;
+    FEtOutPipe: TPipeStream;
+    FEtErrPipe: TPipeStream;
+    FPipeInRead, FPipeInWrite: THandle;
+    FPipeOutRead, FPipeOutWrite: THandle;
+    FPipeErrRead, FPipeErrWrite: THandle;
+    FETWorkDir: string;
+    FETEvent: TEvent;
+    FExecNum: word;
+  protected
+    procedure AddExecNum(var FinalCmd: string);
+  public
+    constructor Create;
+    destructor Destroy; override;
 
-  CmdStr = '-';
-  CmdDateOriginal = 'exif:DateTimeOriginal';
-  CmdDateCreate = 'exif:CreateDate';
-  CmdDateModify = 'exif:ModifyDate';
+    function StayOpen(WorkDir: string): boolean;
+    function OpenExec(ETcmd: string; FNames: string; var ETouts, ETErrs: string; PopupOnError: boolean = true): boolean; overload;
+    function OpenExec(ETcmd: string; FNames: string; ETout: TStrings; PopupOnError: boolean = true): boolean; overload;
+    function OpenExec(ETcmd: string; FNames: string; PopupOnError: boolean = true): boolean; overload;
+    procedure OpenExit(WaitForClose: boolean = false);
+
+    class function ExecET(ETcmd, FNames, WorkDir: string; var ETouts, ETErrs: string): boolean; overload;
+    class function ExecET(ETcmd, FNames, WorkDir: string; var ETouts: string): boolean; overload;
+
+    property ETWorkDir: string read FETWorkDir write FETWorkDir;
+    property ExecETEvent: TExecETEvent read FExecETEvent write FExecETEvent;
+    property ExecNum: word read FExecNum write FExecNum;
+    property Options: TET_OptionsRec read FOptionsRec write FOptionsRec;
+  end;
 
 var
-  ExecETEvent: TExecETEvent;
-
-  ET_Options: ET_OptionsRec = (ETLangDef: '';
-    ETBackupMode: '-overwrite_original' + CRLF;   // or ='' or='overwrite_original_in_place'
-    ETFileDate: '';                               // or '-P'+CRLF (preserve FileModify date)
-    ETSeparator: '-sep' + CRLF + '*' + CRLF;      // or '' (for keywords etc.)
-    ETMinorError: '';                             // or '-m'+CRLF
-    ETGpsFormat: '';                              // See SetGpsFormat
-    ETShowNumber: '';                             // or '-n'+CRLF
-    ETCharset: '-CHARSET' + CRLF + 'FILENAME=UTF8' + CRLF + '-CHARSET' + CRLF + 'UTF8'; // UTF8 it is. No choice
-    ETVerbose: 0;                                 // For file counter
-    ETGeoDir: '';                                 // Alternate GeoLocation Database
-    ETCustomOptions: '');                         // or -u + CRLF Unknown Tags
-
-function ETWorkDir: string;
-
-function ET_StayOpen(WorkDir: string): boolean;
-
-function ET_OpenExec(ETcmd: string; FNames: string; var ETouts, ETErrs: string; PopupOnError: boolean = true): boolean; overload;
-function ET_OpenExec(ETcmd: string; FNames: string; ETout: TStrings; PopupOnError: boolean = true): boolean; overload;
-function ET_OpenExec(ETcmd: string; FNames: string; PopupOnError: boolean = true): boolean; overload;
-
-procedure ET_OpenExit(WaitForClose: boolean = false);
-
-function ExecET(ETcmd, FNames, WorkDir: string; var ETouts, ETErrs: string): boolean; overload;
-function ExecET(ETcmd, FNames, WorkDir: string; var ETouts: string): boolean; overload;
+   ET: TExifTool;
 
 implementation
 
 uses
-  System.SysUtils, System.SyncObjs, Winapi.Windows, Main, MainDef, ExifToolsGUI_Utils, ExifTool_PipeStream,
+  System.SysUtils,
+  Main, MainDef, ExifToolsGUI_Utils,
   UnitLangResources;
 
 const
   SizePipeBuffer = 65535;
 
-var
-  ETprocessInfo: TProcessInformation;
-  EtOutPipe: TPipeStream;
-  EtErrPipe: TPipeStream;
-  PipeInRead, PipeInWrite: THandle;
-  PipeOutRead, PipeOutWrite: THandle;
-  PipeErrRead, PipeErrWrite: THandle;
-  FETWorkDir: string;
-  ETEvent: TEvent;
-  ExecNum: word;
+{ ET_Options}
 
-procedure ET_OptionsRec.SetGpsFormat(UseDecimal: boolean);
+class operator TET_OptionsRec.Initialize (out ET_Options: TET_OptionsRec);
+begin
+  with ET_Options do
+  begin
+    SetLangDef('');
+    SetBackupMode(true);
+    SetFileDate(false);
+    SetSeparator('*');
+    SetMinorError(false);
+    SetGpsFormat(true);
+    SetShowNumber(false);
+    ETCharset := '-CHARSET' + CRLF + 'FILENAME=UTF8' + CRLF + '-CHARSET' + CRLF + 'UTF8'; // UTF8 it is. No choice
+    SetVerbose(0);
+    SetGeoDir('');
+    SetCustomOptions('');
+  end;
+end;
+
+procedure TET_OptionsRec.SetLangDef(UseLangDef: string);
+begin
+  if (UseLangDef <> '') then
+    ETLangDef := UseLangDef + CRLF
+  else
+    ETLangDef := '';
+end;
+
+procedure TET_OptionsRec.SetBackupMode(UseBackUpMode: boolean);
+begin
+  if (UseBackUpMode) then
+    ETBackupMode := '-overwrite_original' + CRLF
+  else
+    ETBackupMode := '';
+end;
+
+procedure TET_OptionsRec.SetFileDate(UseFileDate: boolean);
+begin
+  if (UseFileDate) then
+    ETBackupMode := '-P' + CRLF
+  else
+    ETBackupMode := '';
+end;
+
+procedure TET_OptionsRec.SetMinorError(UseMinorError: boolean);
+begin
+  if (UseMinorError) then
+    ETMinorError := '-m' + CRLF
+  else
+    ETMinorError := '';
+end;
+
+procedure TET_OptionsRec.SetGpsFormat(UseDecimal: boolean);
 begin
   if UseDecimal then
     ETGpsFormat := '-c' + CRLF + '%.6f' + #$B0 + CRLF
@@ -102,12 +159,20 @@ begin
     ETGpsFormat := '-c' + CRLF + '%d' + #$B0 + '%.4f' + CRLF;
 end;
 
-procedure ET_OptionsRec.SetVerbose(Level: integer);
+procedure TET_OptionsRec.SetShowNumber(UseShowNumber: Boolean);
+begin
+  if UseShowNumber then
+    ETShowNumber := '-n' + CRLF
+  else
+    ETShowNumber := '';
+end;
+
+procedure TET_OptionsRec.SetVerbose(Level: integer);
 begin
   ETVerbose := Level;
 end;
 
-procedure ET_OptionsRec.SetApiWindowsWideFile(UseWide: boolean);
+procedure TET_OptionsRec.SetApiWindowsWideFile(UseWide: boolean);
 begin
   if UseWide then
     ETAPIWindowsWideFile := '-API' + CRLF + 'WindowsWideFile=1' + CRLF
@@ -115,7 +180,7 @@ begin
     ETAPIWindowsWideFile := '';
 end;
 
-procedure ET_OptionsRec.SetApiLargeFileSupport(UseLarge: boolean);
+procedure TET_OptionsRec.SetApiLargeFileSupport(UseLarge: boolean);
 begin
   if UseLarge then
     ETAPILargeFileSupport  := '-API' + CRLF + 'LargeFileSupport=1' + CRLF
@@ -123,7 +188,7 @@ begin
     ETAPILargeFileSupport := '';
 end;
 
-procedure ET_OptionsRec.SetGeoDir(GeoDir: string);
+procedure TET_OptionsRec.SetGeoDir(GeoDir: string);
 begin
   if (GeoDir <> '') then
     ETGeoDir := '-API' + CRLF + 'GeoDir=' + GeoDir + CRLF
@@ -131,27 +196,27 @@ begin
     ETGeoDir := '';
 end;
 
-procedure ET_OptionsRec.SetCustomOptions(Custom: string);
+procedure TET_OptionsRec.SetCustomOptions(Custom: string);
 begin
   ETCustomOptions := Custom;
 end;
 
-function ET_OptionsRec.GetVerbose: integer;
+function TET_OptionsRec.GetVerbose: integer;
 begin
   result := ETVerbose;
 end;
 
-function ET_OptionsRec.GetCustomOptions: string;
+function TET_OptionsRec.GetCustomOptions: string;
 begin
   result := EndsWithCRLF(ArgsFromDirectCmd(ETCustomOptions));
 end;
 
-function ET_OptionsRec.GetGeoDir: string;
+function TET_OptionsRec.GetGeoDir: string;
 begin
   result := ETGeoDir;
 end;
 
-function ET_OptionsRec.GetOptions(Charset: boolean = true): string;
+function TET_OptionsRec.GetOptions(Charset: boolean = true): string;
 begin
   result := '';
   if (Charset) then
@@ -170,7 +235,7 @@ begin
   // +further options...
 end;
 
-function ET_OptionsRec.GetSeparator: string;
+function TET_OptionsRec.GetSeparator: string;
 var
   ETSep: string;
 begin
@@ -179,7 +244,7 @@ begin
   result := NextField(ETSep, #13);
 end;
 
-procedure ET_OptionsRec.SetSeparator(const Sep: string);
+procedure TET_OptionsRec.SetSeparator(const Sep: string);
 var
   CorrectSep: string;
 begin
@@ -191,26 +256,44 @@ begin
 end;
 
 // Add ExecNum to FinalCmd
-procedure AddExecNum(var FinalCmd: string);
+procedure TExifTool.AddExecNum(var FinalCmd: string);
 begin
   // Update Execnum. From 10 to 99.
-  Inc(ExecNum);
-  if (ExecNum > 99) then
-    ExecNum := 10;
+  Inc(FExecNum);
+  if (FExecNum > 99) then
+    FExecNum := 10;
               // '-echo4 CRLF {readyxx} CRLF'    Ensures that something is written to StdErr. TSOPipeStream relies on it.
-  FinalCmd := Format('-echo4%s{ready%u}%s', [CRLF, ExecNum, CRLF]) +
+  FinalCmd := Format('-echo4%s{ready%u}%s', [CRLF, FExecNum, CRLF]) +
               FinalCmd +
               // '-executexx CRLF'               The same for STDout.
-              Format('-execute%u%s', [ExecNum, CRLF]);
+              Format('-execute%u%s', [FExecNum, CRLF]);
 end;
 
-function ETWorkDir: string;
+constructor TexifTool.Create;
 begin
-  result := FETWorkDir;
+  inherited Create;
+
+  FETEvent := TEvent.Create(nil, true, true, ExtractFileName(Paramstr(0)));
+  FExecNum := 10; // From 10 to 99
+  FETWorkDir := '';
+  FEtOutPipe := nil;
+  FEtErrPipe := nil;
 end;
 
-// ============================== ET_Open mode ==================================
-function ET_StayOpen(WorkDir: string): boolean;
+destructor TExifTool.Destroy;
+begin
+  OpenExit(true);
+  FETEvent.Free;
+
+  if Assigned(FEtOutPipe) then
+    FEtOutPipe.Free;
+  if Assigned(FEtErrPipe) then
+    FEtErrPipe.Free;
+
+  inherited Destroy;
+end;
+
+function TExifTool.StayOpen(WorkDir: string): boolean;
 var
   SecurityAttr: TSecurityAttributes;
   StartupInfo: TStartupInfo;
@@ -220,24 +303,24 @@ begin
   result := true;
   if (FETWorkDir = WorkDir) then
     exit;
-  ET_OpenExit; // -changing WorkDir OnTheFly requires Exit first
+  OpenExit; // -changing WorkDir OnTheFly requires Exit first
 
   ETcmd := GUIsettings.ETOverrideDir + 'exiftool ' + GUIsettings.GetCustomConfig + ' -stay_open True -@ -';
-  FillChar(ETprocessInfo, SizeOf(TProcessInformation), #0);
+  FillChar(FETprocessInfo, SizeOf(TProcessInformation), #0);
   FillChar(SecurityAttr, SizeOf(TSecurityAttributes), #0);
   SecurityAttr.nLength := SizeOf(SecurityAttr);
   SecurityAttr.bInheritHandle := true;
   SecurityAttr.lpSecurityDescriptor := nil;
-  CreatePipe(PipeInRead, PipeInWrite, @SecurityAttr, 0);
-  CreatePipe(PipeOutRead, PipeOutWrite, @SecurityAttr, 0);
-  CreatePipe(PipeErrRead, PipeErrWrite, @SecurityAttr, 0);
+  CreatePipe(FPipeInRead, FPipeInWrite, @SecurityAttr, 0);
+  CreatePipe(FPipeOutRead, FPipeOutWrite, @SecurityAttr, 0);
+  CreatePipe(FPipeErrRead, FPipeErrWrite, @SecurityAttr, 0);
   FillChar(StartupInfo, SizeOf(TStartupInfo), #0);
   StartupInfo.cb := SizeOf(StartupInfo);
   with StartupInfo do
   begin
-    hStdInput := PipeInRead;
-    hStdOutput := PipeOutWrite;
-    hStdError := PipeErrWrite;
+    hStdInput := FPipeInRead;
+    hStdOutput := FPipeOutWrite;
+    hStdError := FPipeErrWrite;
     wShowWindow := SW_HIDE;
     dwFlags := STARTF_USESHOWWINDOW or STARTF_USESTDHANDLES;
   end;
@@ -248,35 +331,58 @@ begin
   if CreateProcess(nil, PChar(ETcmd), nil, nil, true,
                    CREATE_DEFAULT_ERROR_MODE or CREATE_NEW_CONSOLE or NORMAL_PRIORITY_CLASS,
                    nil, PWorkDir,
-    StartupInfo, ETprocessInfo) then
+    StartupInfo, FETprocessInfo) then
   begin
-    CloseHandle(PipeInRead);
-    CloseHandle(PipeOutWrite);
-    CloseHandle(PipeErrWrite);
+    CloseHandle(FPipeInRead);
+    CloseHandle(FPipeOutWrite);
+    CloseHandle(FPipeErrWrite);
 
-    if Assigned(EtOutPipe) then
-      FreeAndNil(EtOutPipe);
-    ETOutPipe := TPipeStream.Create(PipeOutRead, SizePipeBuffer);
+    if Assigned(FEtOutPipe) then
+      FreeAndNil(FEtOutPipe);
+    FEtOutPipe := TPipeStream.Create(FPipeOutRead, SizePipeBuffer);
 
-    if Assigned(EtErrPipe) then
-      FreeAndNil(EtErrPipe);
-    ETErrPipe := TPipeStream.Create(PipeErrRead, SizePipeBuffer);
+    if Assigned(FEtErrPipe) then
+      FreeAndNil(FEtErrPipe);
+    FEtErrPipe := TPipeStream.Create(FPipeErrRead, SizePipeBuffer);
 
     FETWorkDir := WorkDir;
   end
   else
   begin
-    CloseHandle(PipeInRead);
-    CloseHandle(PipeInWrite);
-    CloseHandle(PipeOutRead);
-    CloseHandle(PipeOutWrite);
-    CloseHandle(PipeErrRead);
-    CloseHandle(PipeErrWrite);
+    CloseHandle(FPipeInRead);
+    CloseHandle(FPipeInWrite);
+    CloseHandle(FPipeOutRead);
+    CloseHandle(FPipeOutWrite);
+    CloseHandle(FPipeErrRead);
+    CloseHandle(FPipeErrWrite);
   end;
   result := (FETWorkDir <> '');
 end;
 
-function ET_OpenExec(ETcmd: string; FNames: string; var ETouts, ETErrs: string; PopupOnError: boolean = true): boolean;
+procedure TExifTool.OpenExit(WaitForClose: boolean = false);
+const
+  ExitCmd: AnsiString = '-stay_open' + CRLF + 'False' + CRLF; // Needs to be AnsiString.
+var
+  BytesCount: Dword;
+begin
+  if (FETWorkDir <> '') then
+  begin
+    WriteFile(FPipeInWrite, ExitCmd[1], Length(ExitCmd), BytesCount, nil);
+    FlushFileBuffers(FPipeInWrite);
+
+    if (WaitForClose) then
+      WaitForSingleObject(FETprocessInfo.hProcess, GUIsettings.ETTimeOut);
+
+    CloseHandle(FETprocessInfo.hThread);
+    CloseHandle(FETprocessInfo.hProcess);
+    CloseHandle(FPipeInWrite);
+    CloseHandle(FPipeOutRead);
+    CloseHandle(FPipeErrRead);
+    FETWorkDir := '';
+  end;
+end;
+
+function TExifTool.OpenExec(ETcmd: string; FNames: string; var ETouts, ETErrs: string; PopupOnError: boolean = true): boolean;
 var
   ReadOut: TSOReadPipeThread;
   ReadErr: TSOReadPipeThread;
@@ -295,16 +401,16 @@ begin
   if (FETWorkDir <> '') and
      (Length(ETcmd) > 1) then
   begin
-    Wr := ETEvent.WaitFor(GUIsettings.ETTimeOut);
+    Wr := FETEvent.WaitFor(GUIsettings.ETTimeOut);
     if (Wr <> wrSignaled) then
     begin
-      ETEvent.SetEvent;
+      FETEvent.SetEvent;
       result := false;
       ETouts := '';
       ETErrs := StrTimeOutWaitingFor + CRLF;
       exit;
     end;
-    ETEvent.ReSetEvent;
+    FETEvent.ReSetEvent;
 
     CrWait := LoadCursor(0, IDC_WAIT);
     CrNormal := SetCursor(CrWait);
@@ -313,7 +419,7 @@ begin
       if pos('||', ETcmd) > 0 then
         ETcmd := StringReplace(ETcmd, '||', CRLF, [rfReplaceAll]);
       CanUseUtf8 := (pos('-L' + CRLF, ETcmd) = 0);
-      FinalCmd := EndsWithCRLF(ET_Options.GetOptions(CanUseUtf8) + ETcmd);
+      FinalCmd := EndsWithCRLF(Options.GetOptions(CanUseUtf8) + ETcmd);
       if FNames <> '' then
         FinalCmd := EndsWithCRLF(FinalCmd + FNames);
 
@@ -325,13 +431,13 @@ begin
       Call_ET := EndsWithCRLF('-@' + CRLF + TempFile);
 
       // Write command to Pipe. Triggers ExifTool execution
-      WriteFile(PipeInWrite, Call_ET[1], ByteLength(Call_ET), BytesCount, nil);
-      FlushFileBuffers(PipeInWrite);
+      WriteFile(FPipeInWrite, Call_ET[1], ByteLength(Call_ET), BytesCount, nil);
+      FlushFileBuffers(FPipeInWrite);
 
       // ========= Read StdOut and stdErr =======================
-      EtOutPipe.SetCounter(GetCounter);
-      ReadOut := TSOReadPipeThread.Create(EtOutPipe, ExecNum);
-      ReadErr := TSOReadPipeThread.Create(EtErrPipe, ExecNum);
+      FEtOutPipe.SetCounter(GetCounter);
+      ReadOut := TSOReadPipeThread.Create(FEtOutPipe, FExecNum);
+      ReadErr := TSOReadPipeThread.Create(FEtErrPipe, FExecNum);
       try
         ReadOut.WaitFor;
         ReadErr.WaitFor;
@@ -340,68 +446,42 @@ begin
         ReadOut.Free;
         ReadErr.Free;
       end;
-      ETouts := ETOutPipe.AnalyseResult(StatusLine, LengthReady);
-      ETOutPipe.Clear;
+      ETouts := FEtOutPipe.AnalyseResult(StatusLine, LengthReady);
+      FEtOutPipe.Clear;
 
-      ETErrs := ETErrPipe.AnalyseError;
-      ETErrPipe.Clear;
+      ETErrs := FEtErrPipe.AnalyseError;
+      FEtErrPipe.Clear;
 
       // Callback for Logging
       if Assigned(ExecETEvent) then
-        ExecETEvent(ExecNum, FinalCmd, ETouts, ETErrs, StatusLine, PopupOnError);
+        ExecETEvent(FExecNum, FinalCmd, ETouts, ETErrs, StatusLine, PopupOnError);
 
       // Return result without {readyxx}#13#10
       SetLength(ETouts, Length(ETouts) - LengthReady);
       result := true;
     finally
       SetCursor(CrNormal);
-      ETEvent.SetEvent;
+      FETEvent.SetEvent;
     end;
   end;
 end;
 
-function ET_OpenExec(ETcmd: string; FNames: string; ETout: TStrings; PopupOnError: boolean = true): boolean;
+function TExifTool.OpenExec(ETcmd: string; FNames: string; ETout: TStrings; PopupOnError: boolean = true): boolean;
 var
   ETouts, ETErrs: string;
 begin
-  result := ET_OpenExec(ETcmd, FNames, ETouts, ETErrs, PopupOnError);
+  result := OpenExec(ETcmd, FNames, ETouts, ETErrs, PopupOnError);
   ETout.Text := ETouts;
 end;
 
-function ET_OpenExec(ETcmd: string; FNames: string; PopupOnError: boolean = true): boolean;
+function TExifTool.OpenExec(ETcmd: string; FNames: string; PopupOnError: boolean = true): boolean;
 var
   ETouts, ETErrs: string;
 begin
-  result := ET_OpenExec(ETcmd, FNames, ETouts, ETErrs, PopupOnError);
+  result := OpenExec(ETcmd, FNames, ETouts, ETErrs, PopupOnError);
 end;
 
-procedure ET_OpenExit(WaitForClose: boolean = false);
-const
-  ExitCmd: AnsiString = '-stay_open' + CRLF + 'False' + CRLF; // Needs to be AnsiString.
-var
-  BytesCount: Dword;
-begin
-  if (FETWorkDir <> '') then
-  begin
-    WriteFile(PipeInWrite, ExitCmd[1], Length(ExitCmd), BytesCount, nil);
-    FlushFileBuffers(PipeInWrite);
-
-    if (WaitForClose) then
-      WaitForSingleObject(ETprocessInfo.hProcess, GUIsettings.ETTimeOut);
-
-    CloseHandle(ETprocessInfo.hThread);
-    CloseHandle(ETprocessInfo.hProcess);
-    CloseHandle(PipeInWrite);
-    CloseHandle(PipeOutRead);
-    CloseHandle(PipeErrRead);
-    FETWorkDir := '';
-  end;
-end;
-
-// ^^^^^^^^^^^^^^^^^^^^^^^^^^^ End of ET_Open mode ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-//
-// =========================== ET classic mode ==================================
-function ExecET(ETcmd, FNames, WorkDir: string; var ETouts, ETErrs: string): boolean;
+class function TExifTool.ExecET(ETcmd, FNames, WorkDir: string; var ETouts, ETErrs: string): boolean;
 var
   ReadOut: TReadPipeThread;
   ReadErr: TReadPipeThread;
@@ -448,10 +528,10 @@ begin
 
     CanUseUtf8 := (pos('-L ', ETcmd) = 0);
 
-    FinalCmd := EndsWithCRLF(ET_Options.GetOptions(CanUseUtf8) + ArgsFromDirectCmd(ETcmd));
+    FinalCmd := EndsWithCRLF(ET.Options.GetOptions(CanUseUtf8) + ArgsFromDirectCmd(ETcmd));
     FinalCmd := EndsWithCRLF(FinalCmd + FNames);
 
-    AddExecNum(FinalCmd);
+    ET.AddExecNum(FinalCmd);
 
     TempFile := GetExifToolTmp;
     WriteArgsFile(FinalCmd, TempFile);
@@ -486,8 +566,8 @@ begin
       CloseHandle(ProcessInfo.hProcess);
 
       // Callback for Logging
-      if Assigned(ExecETEvent) then
-        ExecETEvent(ExecNum, FinalCmd, ETouts, ETErrs, StatusLine, true);
+      if Assigned(ET.ExecETEvent) then
+        ET.ExecETEvent(ET.ExecNum, FinalCmd, ETouts, ETErrs, StatusLine, true);
 
       // Return result without {readyxx}#13#10
       // Although this call will never have it.
@@ -501,36 +581,21 @@ begin
   end;
 end;
 
-function ExecET(ETcmd, FNames, WorkDir: string; var ETouts: string): boolean;
+class function TexifTool.ExecET(ETcmd, FNames, WorkDir: string; var ETouts: string): boolean;
 var
   ETErrs: string;
 begin
   result := ExecET(ETcmd, FNames, WorkDir, ETouts, ETErrs);
 end;
 
-// ^^^^^^^^^^^^^^^^^^^^^^^^^^ End of ET Classic mode ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-//
-// ==============================================================================
-
 initialization
-
 begin
-  ETEvent := TEvent.Create(nil, true, true, ExtractFileName(Paramstr(0)));
-  ExecNum := 10; // From 10 to 99
-  FETWorkDir := '';
-  EtOutPipe := nil;
-  EtErrPipe := nil;
+  ET := TExifTool.Create;
 end;
 
 finalization
-
 begin
-  ET_OpenExit(true);
-  ETEvent.Free;
-  if Assigned(EtOutPipe) then
-    EtOutPipe.Free;
-  if Assigned(EtErrPipe) then
-    EtErrPipe.Free;
+  ET.Free;
 end;
 
 end.

@@ -60,7 +60,7 @@ begin
   if RadioButton3.Checked then
     ETcmd := '-exif:ModifyDate>exif:DateTimeOriginal' + CRLF + '-exif:ModifyDate>exif:CreateDate';
 
-  ET_OpenExec(ETcmd, FMain.GetSelectedFiles, ETout, ETerr);
+  ET.OpenExec(ETcmd, FMain.GetSelectedFiles, ETout, ETerr);
   ModalResult := mrOK;
 end;
 
@@ -87,7 +87,7 @@ begin
     Application.OnHint := DisplayHint;
 
     ETcmd := '-s3' + CRLF + '-f' + CRLF + CmdDateOriginal + CRLF + CmdDateCreate + CRLF + CmdDateModify;
-    ET_OpenExec(ETcmd, FMain.GetFirstSelectedFile, ETresult, false);
+    ET.OpenExec(ETcmd, FMain.GetFirstSelectedFile, ETresult, false);
     if (ETresult.Count > 2) then
     begin
       LabeledEdit1.Text := ETresult[0];

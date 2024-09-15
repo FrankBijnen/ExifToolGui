@@ -96,7 +96,7 @@ begin
     EtCmd := '-listgeo' + CRLF + '-sort';
     if (LblEdlang.Text <> '') then
       EtCmd := EtCmd + CRLF + '-lang' + CRLF + LblEdlang.Text;
-    ET_OpenExec(EtCmd, '', EtOut);
+    ET.OpenExec(EtCmd, '', EtOut);
 
     for Indx := 2 to EtOut.Count -1 do
     begin
@@ -237,7 +237,7 @@ procedure TFrmCheckCity.FormCreate(Sender: TObject);
 var
   GUIini: TMemIniFile;
 begin
-  ET_StayOpen(GetTempDirectory);
+  ET.StayOpen(GetTempDirectory);
 
   GUIini := TMemIniFile.Create(GetIniFilePath(True), TEncoding.UTF8);
   geomap.ReadGeoCodeSettings(GUIini);
@@ -247,7 +247,7 @@ end;
 
 procedure TFrmCheckCity.FormDestroy(Sender: TObject);
 begin
-  ET_OpenExit(true);
+  ET.OpenExit(true);
 end;
 
 end.

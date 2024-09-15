@@ -3,8 +3,8 @@ object FDateTimeEqual: TFDateTimeEqual
   Top = 0
   BorderStyle = bsDialog
   Caption = 'Exif DateTime equalize'
-  ClientHeight = 145
-  ClientWidth = 495
+  ClientHeight = 144
+  ClientWidth = 491
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -22,8 +22,8 @@ object FDateTimeEqual: TFDateTimeEqual
   end
   object StatusBar1: TStatusBar
     Left = 0
-    Top = 126
-    Width = 495
+    Top = 125
+    Width = 491
     Height = 19
     Panels = <>
     ExplicitTop = 127
@@ -33,7 +33,7 @@ object FDateTimeEqual: TFDateTimeEqual
     Left = 0
     Top = 0
     Width = 424
-    Height = 126
+    Height = 125
     Align = alLeft
     DoubleBuffered = True
     Font.Charset = DEFAULT_CHARSET

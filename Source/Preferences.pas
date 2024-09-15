@@ -125,7 +125,7 @@ end;
 procedure TFPreferences.BtnSaveClick(Sender: TObject);
 begin
   GUIsettings.Language := GetExifToolLanguage(ComboBox1);
-  ET_Options.ETLangDef := GUIsettings.Language;
+  ET.Options.SetLangDef(GUIsettings.Language);
 
   with GUIsettings do
   begin
@@ -139,7 +139,7 @@ begin
       ETOverrideDir := IncludeTrailingPathDelimiter(EdETOverride.Text);
     ETCustomConfig := EdETCustomConfig.Text;
   end;
-  ET_Options.SetSeparator(LabeledEdit1.Text);
+  ET.Options.SetSeparator(LabeledEdit1.Text);
 
   case RadioGroup3.ItemIndex of
     0:
@@ -338,7 +338,7 @@ begin
     end;
     EdETCustomConfig.Text := ETCustomConfig;
   end;
-  LabeledEdit1.Text := ET_Options.GetSeparator;
+  LabeledEdit1.Text := ET.Options.GetSeparator;
 
   RadioGroup3.ItemIndex := GUIsettings.ThumbSize;
   ChkThumbAutoGenerate.Checked := GUIsettings.ThumbAutoGenerate;

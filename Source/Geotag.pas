@@ -141,7 +141,7 @@ var
   AFile: string;
   SelectedFiles: TStringList;
 begin
-  SavedVerbose := ET_Options.GetVerbose;
+  SavedVerbose := ET.Options.GetVerbose;
   try
     ETcmd := '-geotag' + CRLF + LogPath + CRLF;
     ETcmd := ETcmd + '-geotime<';
@@ -167,8 +167,8 @@ begin
 
     ETcmd := ETcmd + CRLF + '-API' + CRLF + Format('GeoMaxExtSecs=%s', [EdMargin.Text]);
 
-    ET_Options.SetVerbose(2);
-    ET_OpenExec(ETcmd, FMain.GetSelectedFiles, ETout, ETerr);
+    ET.Options.SetVerbose(2);
+    ET.OpenExec(ETcmd, FMain.GetSelectedFiles, ETout, ETerr);
 
     if (ChkUpdateLocation.Checked) and
        (GeoSettings.GetPlaceProvider <> TGeoCodeProvider.gpExifTool) then
@@ -183,7 +183,7 @@ begin
       end;
     end;
   finally
-    ET_Options.SetVerbose(SavedVerbose);
+    ET.Options.SetVerbose(SavedVerbose);
     ModalResult := mrOK;
   end;
 end;

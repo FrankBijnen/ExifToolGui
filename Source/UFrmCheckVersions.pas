@@ -90,7 +90,7 @@ begin
   LvVersions.Items.BeginUpdate;
   try
 
-    ExecET('-ver', '', '', ETver);
+    TExifTool.ExecET('-ver', '', '', ETver);
     ETver := Trim(ETver);
     for Indx := 0 to LvVersions.Items.Count -1 do
     begin

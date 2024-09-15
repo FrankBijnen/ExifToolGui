@@ -219,7 +219,7 @@ var
   ETcmd, ETout, ETerr: string;
 begin
   ETcmd := TagSelection('=');
-  ET_OpenExec(ETcmd, FMain.GetSelectedFiles, ETout, ETerr);
+  ET.OpenExec(ETcmd, FMain.GetSelectedFiles, ETout, ETerr);
   ModalResult := mrOK;
 end;
 
@@ -229,7 +229,7 @@ var
 begin
   ETcmd := '-G0:1' + CRLF + '-a' + CRLF + '-s1' + CRLF + TagSelection;
   FLogWin.Show;
-  ET_OpenExec(ETcmd, FSample);
+  ET.OpenExec(ETcmd, FSample);
 end;
 
 procedure TFRemoveMeta.ChkRemoveAllClick(Sender: TObject);

@@ -58,7 +58,7 @@ begin
   LblExifTool.Caption     := ReadResourceId(ETD_Credits_ET);
   LblGNUGPL.Caption       := ReadResourceId(ETD_GNUGPL);
 
-  if ExecET('-ver', '', '', Output) then
+  if TExifTool.ExecET('-ver', '', '', Output) then
     LblExifTool.Caption := LblExifTool.Caption + ' ' + Output
   else
     LblExifTool.Caption := LblExifTool.Caption + ' ' + StrMISSING;

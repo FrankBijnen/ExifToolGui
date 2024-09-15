@@ -89,7 +89,7 @@ begin
     case CmbRotate.ItemIndex of
       1:  begin
           // Read current Orientation
-            ET_OpenExec('-s3' + CRLF + '-exif:Orientation#', FileName, ETouts, ETerrs);
+            ET.OpenExec('-s3' + CRLF + '-exif:Orientation#', FileName, ETouts, ETerrs);
             result := result and (ETerrs = '');
             N := StrToIntDef(LeftStr(ETouts, 1), 1);
             case N of
@@ -129,7 +129,7 @@ begin
     if (Etcmd <> '') then
     begin
       StatusBar1.SimpleText := Format(StrResettingOrient, [FileName]);
-      ET_OpenExec(ETcmd, FileName, ETouts, ETerrs);
+      ET.OpenExec(ETcmd, FileName, ETouts, ETerrs);
       result := result and (ETerrs = '');
     end;
 
@@ -139,7 +139,7 @@ begin
       ETcmd := '-b' + CRLF + '-W!' + CRLF + GetPreviewTmp + CRLF;
       ETcmd := ETcmd + Preview;
       StatusBar1.SimpleText := Format(StrExtractingPreviewF, [FileName]);
-      ET_OpenExec(ETcmd, FileName, ETouts, ETerrs);
+      ET.OpenExec(ETcmd, FileName, ETouts, ETerrs);
       result := result and (ETerrs = '');
 
       StatusBar1.SimpleText := Format(StrRotatingPreviewS, [GetPreviewTmp, Angle, Modulo]);
@@ -147,7 +147,7 @@ begin
 
       ETcmd := Preview + '<=' + GetPreviewTmp + CRLF;
       StatusBar1.SimpleText := Format(StrImportingPreviewIn, [FileName]);
-      ET_OpenExec(ETcmd, FileName, ETouts, ETerrs);
+      ET.OpenExec(ETcmd, FileName, ETouts, ETerrs);
       result := result and (ETerrs = '');
     end;
   end;

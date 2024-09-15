@@ -90,7 +90,7 @@ begin
   end;
   // ShiftDates in Exif?
   if (ETcmd <> '') then
-    ET_OpenExec(ETcmd, FMain.GetSelectedFiles, ETouts, ETerrs);
+    ET.OpenExec(ETcmd, FMain.GetSelectedFiles, ETouts, ETerrs);
 
   // Correct FileDates?
   ETcmd := '';
@@ -99,7 +99,7 @@ begin
   if ChkFileCreated.Checked then
     ETcmd := EndsWithCRLF(ETcmd) + '-FileCreateDate<' + CmdDateOriginal;
   if (ETcmd <> '') then
-    ET_OpenExec(Etcmd, FMain.GetSelectedFiles);
+    ET.OpenExec(Etcmd, FMain.GetSelectedFiles);
 
   ModalResult := mrOK;
 end;
@@ -234,7 +234,7 @@ begin
              CmdStr + CmdDateOriginal + CRLF +
              CmdStr + CmdDateCreate + CRLF +
              CmdStr + CmdDateModify;
-    ET_OpenExec(ETcmd, FMain.GetFirstSelectedFile, ETResult, false);
+    ET.OpenExec(ETcmd, FMain.GetFirstSelectedFile, ETResult, false);
     if (ETResult.Count > 2) then
     begin
       ChkShiftOriginal.Checked := true;

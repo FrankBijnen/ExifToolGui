@@ -85,7 +85,7 @@ begin
         Angle := 0;
         if (ChkAutoRotate.Checked) then
         begin
-          ET_OpenExec('-s3' + CRLF + '-exif:Orientation#', FMain.GetSelectedFile(AFile), ETouts, ETerrs);
+          ET.OpenExec('-s3' + CRLF + '-exif:Orientation#', FMain.GetSelectedFile(AFile), ETouts, ETerrs);
           N := StrToIntDef(LeftStr(ETouts, 1), 1);
           case N of
             3: Angle := 180;
@@ -117,7 +117,7 @@ begin
     else
       ETcmd := ETcmd  + '-W' + CRLF;
 
-    if (ET_Options.ETAPIWindowsWideFile <> '') then
+    if (ET.Options.ETAPIWindowsWideFile <> '') then
       ETcmd := ETcmd + '.\%d\'
     else
       ETcmd := ETcmd + '%d\';
@@ -143,7 +143,7 @@ begin
     end;
 
     StatusBar1.SimpleText := StrExtractingPreviews;
-    ET_OpenExec(ETcmd, FMain.GetSelectedFiles, ETouts, ETerrs);
+    ET.OpenExec(ETcmd, FMain.GetSelectedFiles, ETouts, ETerrs);
 
     // Do AfterExtract always, even if errors occurred.
     AfterExtract(Sender);

@@ -826,9 +826,7 @@ begin
       with GUIsettings do
       begin
         Language := ReadString(Ini_Settings, 'Language', '');
-        ET_Options.ETLangDef := Language + CRLF;;
-        if Language = '' then
-          ET_Options.ETLangDef := '';
+        ET.Options.SetLangDef(Language);
         AutoRotatePreview := ReadBool(Ini_Settings, 'AutoRotatePreview', false);
         Tx := ReadString(Ini_Settings, 'FileFilters', '*.JPG|*.CR2|*.JPG;*.CR2|*.JPG;*.DNG|*.JPG;*.PEF');
         CBoxFileFilter.Items.Text := SHOWALL;
@@ -907,20 +905,17 @@ begin
         Application.HintHidePause := ReadInteger(Ini_Settings, 'HintHidePause', 5000);
       end;
 
-      with ET_Options do
+      with ET.Options do
       begin
         MaDontBackup.Checked := ReadBool(Ini_Options, 'DontBackup', True);
-        if not MaDontBackup.Checked then
-          ETBackupMode := '';
+        SetBackupMode(MaDontBackup.Checked);
         MaPreserveDateMod.Checked := ReadBool(Ini_Options, 'PreserveDateMod', false);
-        if MaPreserveDateMod.Checked then
-          ETFileDate := '-P' + CRLF;
+        SetFileDate(MaPreserveDateMod.Checked);
         SetSeparator(ReadString(Ini_Options, 'KeySeparator', '*'));
         MaIgnoreErrors.Checked := ReadBool(Ini_Options, 'IgnoreErrors', false);
-        if MaIgnoreErrors.Checked then
-          ETMinorError := '-m' + CRLF;
+        SetMinorError(MaIgnoreErrors.Checked);
         MaShowGPSdecimal.Checked := ReadBool(Ini_Options, 'GPSinDecimal', True);
-        ET_Options.SetGpsFormat(MaShowGPSdecimal.Checked);
+        ET.Options.SetGpsFormat(MaShowGPSdecimal.Checked);
         MaShowSorted.Checked := ReadBool(Ini_Options, 'ShowSorted', false);
         MaShowComposite.Checked := ReadBool(Ini_Options, 'ShowComposite', false);
         MaNotDuplicated.Checked := ReadBool(Ini_Options, 'NotDuplicated', false);
@@ -1148,7 +1143,7 @@ begin
 
         WriteBool(Ini_Options, 'DontBackup', MaDontBackup.Checked);
         WriteBool(Ini_Options, 'PreserveDateMod', MaPreserveDateMod.Checked);
-        WriteString(Ini_Options, 'KeySeparator', ET_Options.GetSeparator);
+        WriteString(Ini_Options, 'KeySeparator', ET.Options.GetSeparator);
         WriteBool(Ini_Options, 'IgnoreErrors', MaIgnoreErrors.Checked);
         WriteBool(Ini_Options, 'GPSinDecimal', MaShowGPSdecimal.Checked);
         WriteBool(Ini_Options, 'ShowSorted', MaShowSorted.Checked);
@@ -1156,7 +1151,7 @@ begin
         WriteBool(Ini_Options, 'NotDuplicated', MaNotDuplicated.Checked);
         WriteBool(Ini_Options, 'APIWindowsWideFile', MaAPIWindowsWideFile.Checked);
         WriteBool(Ini_Options, 'APILargeFileSupport', MaAPILargeFileSupport.Checked);
-        WriteString(Ini_Options, 'CustomOptions', ET_Options.ETCustomOptions);
+        WriteString(Ini_Options, 'CustomOptions', ET.Options.ETCustomOptions);
 
         // Write User defined fields
         WriteUserDefTags(GUIini);

@@ -2,8 +2,8 @@ object FrmCheckCity: TFrmCheckCity
   Left = 0
   Top = 0
   Caption = 'FrmCheckCity'
-  ClientHeight = 482
-  ClientWidth = 783
+  ClientHeight = 481
+  ClientWidth = 779
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -16,7 +16,7 @@ object FrmCheckCity: TFrmCheckCity
   object Splitter1: TSplitter
     Left = 0
     Top = 166
-    Height = 316
+    Height = 315
     ExplicitLeft = 373
     ExplicitTop = 103
     ExplicitHeight = 100
@@ -24,7 +24,7 @@ object FrmCheckCity: TFrmCheckCity
   object Panel1: TPanel
     Left = 0
     Top = 0
-    Width = 783
+    Width = 779
     Height = 166
     Align = alTop
     Alignment = taRightJustify
@@ -123,8 +123,8 @@ object FrmCheckCity: TFrmCheckCity
   object ListView1: TListView
     Left = 3
     Top = 166
-    Width = 780
-    Height = 316
+    Width = 776
+    Height = 315
     Align = alClient
     Checkboxes = True
     Columns = <
@@ -160,6 +160,7 @@ object FrmCheckCity: TFrmCheckCity
     TabOrder = 1
     ViewStyle = vsReport
     ExplicitTop = 157
+    ExplicitWidth = 780
     ExplicitHeight = 325
   end
   object SaveDialog1: TSaveDialog

@@ -217,7 +217,7 @@ begin
   ;
 end;
 
-// ShellFolder 
+// ShellFolder
 function GetIShellFolder(IFolder: IShellFolder; PIDL: PItemIDList): IShellFolder;
 begin
   result := nil;
@@ -1005,7 +1005,7 @@ begin
   ETResult := TStringList.Create;
   try
     ETcmd := '-s1' + CRLF + '-a' + CRLF + '-G1' + CRLF + '-Preview:All';
-    ET_OpenExec(ETcmd, SelectedFile, ETResult);
+    ET.OpenExec(ETcmd, SelectedFile, ETResult);
     LvPreviews.Items.Clear;
     APreviewList := GetPreviews(ETResult, AMaxPos);
     try
@@ -1100,7 +1100,7 @@ begin
         ETResult.Sorted := true;
         ETResult.Duplicates := TDuplicates.dupIgnore;
         ETCmd := '-sort' + CRLF + '-s1' + CRLF + '-G' + Family;
-        ET_OpenExec(ETcmd, SelectedFile, ETUnSorted);
+        ET.OpenExec(ETcmd, SelectedFile, ETUnSorted);
         for Indx := 0 to ETUnSorted.Count -1 do
         begin
           AGroupLine  := ETUnSorted[Indx];
@@ -1115,7 +1115,7 @@ begin
     else
     begin
       ETCmd := '-listg' + Family;
-      ET_OpenExec(ETcmd, '', ETResult);
+      ET.OpenExec(ETcmd, '', ETResult);
     end;
 
     for Indx := 1 to ETResult.Count -1 do
@@ -1152,7 +1152,7 @@ begin
     if (SelectedFile <> '') then
     begin
       ETCmd := '-sort' + CRLF + '-s1' + CRLF + '-a' + CRLF + '-G' + Family + CRLF + '-' + Groupname + ':All';
-      ET_OpenExec(ETcmd, SelectedFile, ETResult);
+      ET.OpenExec(ETcmd, SelectedFile, ETResult);
       ATagInfoList := GetTags(ETResult, CmbTags);
       try
         for ATagInfo in ATagInfoList do
@@ -1169,7 +1169,7 @@ begin
     else
     begin
       ETCmd := '-listw' + CRLF + '-' + Groupname + ':All';
-      ET_OpenExec(ETcmd, '', ETResult);
+      ET.OpenExec(ETcmd, '', ETResult);
       CmbTags.Items.Add('All');
       for Indx := 1 to ETResult.Count -1 do
       begin
@@ -1320,7 +1320,7 @@ begin
   result := 0;
   PointNum := 0;
 
-  SavedVerbose := ET_Options.GetVerbose;
+  SavedVerbose := ET.Options.GetVerbose;
   EtOut := TStringList.Create;
   AssignFile(F, GetTrackTmp);
   if not FileExists(GetTrackTmp) or
@@ -1331,8 +1331,8 @@ begin
 
   try
     ETcmd := '-geotag' + CRLF + LogPath + CRLF;
-    ET_Options.SetVerbose(4);
-    ET_OpenExec(ETcmd, 'NUL', ETout, false);
+    ET.Options.SetVerbose(4);
+    ET.OpenExec(ETcmd, 'NUL', ETout, false);
 {$IFDEF DEBUG}
     ETout.SaveToFile(ChangeFileExt(GetTrackTmp, '.dbg'));
 {$ENDIF}
@@ -1391,7 +1391,7 @@ begin
     if (PointNum > 0) then
       Writeln(F, 'CreateTrack(''' + ALogName + ''');');
     CloseFile(F);
-    ET_Options.SetVerbose(SavedVerbose);
+    ET.Options.SetVerbose(SavedVerbose);
     ETout.Free;
   end;
 end;
@@ -1410,7 +1410,7 @@ begin
   ETcmd := ETcmd + CRLF + '-GpsLongitude';
   ETcmd := ETcmd + CRLF + '-MIMEType';
   ETcmd := ETcmd + CRLF + '-QuickTime:MajorBrand';
-  ET_OpenExec(ETcmd, Images, result, ETerrs, false);
+  ET.OpenExec(ETcmd, Images, result, ETerrs, false);
 end;
 
 function AnalyzeGPSCoords(var ETout, Lat, Lon, MIMEType: string; var IsQuickTime: boolean): string;
@@ -1481,7 +1481,7 @@ begin
     ETCmd := ETCmd + CRLF + '-xmp:LocationShownProvinceState=' + APlace.Province;
     ETCmd := ETCmd + CRLF + '-xmp:LocationShownCity=' + APlace.City;
 
-    ET_OpenExec(ETcmd, ANImage);
+    ET.OpenExec(ETcmd, ANImage);
   end;
 end;
 
@@ -1503,10 +1503,10 @@ var
   SavedLang: string;
   ADefault: string;
 begin
-  SavedLang := ET_Options.ETLangDef;
-  ET_Options.ETLangDef := ''; // get list of languages in default lang.
+  SavedLang := ET.Options.ETLangDef;
+  ET.Options.SetLangDef(''); // get list of languages in default lang.
   try
-    ET_OpenExec('-lang', '', ACombo.Items, false);
+    ET.OpenExec('-lang', '', ACombo.Items, false);
     if ACombo.Items.Count > 0 then
       ACombo.Items.Delete(0);
 
@@ -1516,7 +1516,7 @@ begin
     for Indx := 0 to ACombo.Items.Count - 1 do
       ACombo.Items[Indx] := TrimLeft(ACombo.Items[Indx]);
   finally
-    ET_Options.ETLangDef := SavedLang;
+    ET.Options.SetLangDef(SavedLang);
   end;
 end;
 
@@ -1587,12 +1587,12 @@ var
   ETCmd: string;
   SavedLang: string;
 begin
-  SavedLang := ET_Options.ETLangDef;
+  SavedLang := ET.Options.ETLangDef;
   if (Lang <> PlaceDefault) and
      (Lang <> PlaceLocal) then
-    ET_Options.ETLangDef := Lang
+    ET.Options.SetLangDef(Lang)
   else
-    ET_Options.ETLangDef := '';
+    ET.Options.SetLangDef('');
 
   try
     result := TStringList.Create;
@@ -1602,9 +1602,9 @@ begin
     ETcmd := ETcmd + CRLF + '-GeolocationCountry';
     ETcmd := ETcmd + CRLF + '-GeolocationRegion';
     ETcmd := ETcmd + CRLF + '-GeolocationCity';
-    ET_OpenExec(ETcmd, '', result, false);
+    ET.OpenExec(ETcmd, '', result, false);
   finally
-    ET_Options.ETLangDef := SavedLang;
+    ET.Options.SetLangDef(SavedLang);
   end;
 end;
 
@@ -1613,12 +1613,12 @@ var
   ETCmd: string;
   SavedLang: string;
 begin
-  SavedLang := ET_Options.ETLangDef;
+  SavedLang := ET.Options.ETLangDef;
   if (Lang <> PlaceDefault) and
      (Lang <> PlaceLocal) then
-    ET_Options.ETLangDef := Lang
+    ET.Options.SetLangDef(Lang)
   else
-    ET_Options.ETLangDef := '';
+    ET.Options.SetLangDef('');
 
   try
     ETcmd := '-m' + CRLF + '-a';
@@ -1627,9 +1627,9 @@ begin
     if (CountryRegion <> '') then
       ETcmd := ETCmd + Format(',%s/%s/i',[Match, CountryRegion]);
 
-    ET_OpenExec(ETcmd, '', result, ETerr, false);
+    ET.OpenExec(ETcmd, '', result, ETerr, false);
   finally
-    ET_Options.ETLangDef := SavedLang;
+    ET.Options.SetLangDef(SavedLang);
   end;
 end;
 
@@ -1644,7 +1644,7 @@ begin
   ETOut := TStringList.Create;
   try
     ETcmd := '-listgeo' + CRLF + '-api' + CRLF + 'GeoLocFeature=pplc';
-    ET_OpenExec(ETcmd, '', ETOut, false);
+    ET.OpenExec(ETcmd, '', ETOut, false);
     if (ETOut.Count > 2) then
     begin
       ETOut.Delete(0); // Delete some header lines
@@ -1670,7 +1670,7 @@ var
   ETCmd, ETOuts, ETErrs: string;
 begin
   ETcmd := '-s3' + CRLF + '-f' + CRLF + '-n' + CRLF + '-q' + CRLF + '-QuickTime:MajorBrand';
-  ET_OpenExec(ETcmd, AFile, ETOuts, ETErrs, false);
+  ET.OpenExec(ETcmd, AFile, ETOuts, ETErrs, false);
   ETOuts := NextField(ETOuts, CRLF);
   result := ETOuts <> '-';
 end;
