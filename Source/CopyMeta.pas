@@ -187,7 +187,7 @@ var
 begin
   ETcmd := '-G0:1' + CRLF + '-a' + CRLF + '-All:all' + CRLF + '-s1' + CRLF + TagSelection;
   FLogWin.Show;
-  ET_OpenExec(ETcmd, FSample);
+  ET.OpenExec(ETcmd, FSample);
 end;
 
 procedure TFCopyMetadata.LvTagNamesCustomDrawItem(Sender: TCustomListView; Item: TListItem; State: TCustomDrawState;

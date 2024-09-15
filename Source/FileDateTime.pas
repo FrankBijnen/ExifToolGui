@@ -92,7 +92,7 @@ var
 
 begin
   ETcmd := '';
-  if (ET_Options.ETBackupMode = '') then  // Dont add twice!
+  if (ET.Options.ETBackupMode = '') then  // Dont add twice!
     ETcmd := '-overwrite_original' + CRLF;
 
   if RadioGroup4.ItemIndex = 0 then
@@ -131,7 +131,7 @@ begin
     2:
       ETcmd := ETcmd + '%Y' + Ds + '%m' + Ds + '%d';
   end;
-  ET_OpenExec(ETcmd, FMain.GetSelectedFiles, ETout, ETerr);
+  ET.OpenExec(ETcmd, FMain.GetSelectedFiles, ETout, ETerr);
   ModalResult := mrOK;
 end;
 
@@ -140,7 +140,7 @@ var
   ETout, ETerr: string;
 begin
   ETcmd := '-filename<Exif:DocumentName';
-  ET_OpenExec(ETcmd, FMain.GetSelectedFiles, ETout, ETerr);
+  ET.OpenExec(ETcmd, FMain.GetSelectedFiles, ETout, ETerr);
   ModalResult := mrOK;
 end;
 

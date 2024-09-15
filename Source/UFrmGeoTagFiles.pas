@@ -162,7 +162,7 @@ begin
         Etcmd := Etcmd + CRLF + '-xmp:LocationShownSublocation=' + ValLocation.Values['Location'];
       end;
     end;
-    ET_OpenExec(ETcmd, Fmain.GetSelectedFiles, ETouts, ETerrs);
+    ET.OpenExec(ETcmd, Fmain.GetSelectedFiles, ETouts, ETerrs);
 
     StatusBar1.SimpleText := StrAllDone;
   finally

@@ -227,7 +227,7 @@ begin
   if ChkNoOverWrite.Checked then
     ETcmd := ETcmd + CRLF + '-wm' + CRLF + 'cg';
 
-  ET_OpenExec(ETcmd, FMain.GetSelectedFiles, ETout, ETerr);
+  ET.OpenExec(ETcmd, FMain.GetSelectedFiles, ETout, ETerr);
   ModalResult := mrOK;
 end;
 
@@ -237,7 +237,7 @@ var
 begin
   ETcmd := '-G0:1' + CRLF + '-a' + CRLF + '-s1' + CRLF + TagSelection;
   FLogWin.Show;
-  ET_OpenExec(ETcmd, SrcFile);
+  ET.OpenExec(ETcmd, SrcFile);
 end;
 
 procedure TFCopyMetaSingle.ChkImportAllClick(Sender: TObject);

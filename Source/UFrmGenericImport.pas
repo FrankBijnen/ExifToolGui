@@ -109,7 +109,7 @@ begin
         Angle := 0;
         if (ChkAutoRotate.Checked) then
         begin
-          ET_OpenExec('-s3' + CRLF + '-exif:Orientation#', FMain.GetSelectedFile(AFile), ETouts, ETerrs);
+          ET.OpenExec('-s3' + CRLF + '-exif:Orientation#', FMain.GetSelectedFile(AFile), ETouts, ETerrs);
           N := StrToIntDef(LeftStr(ETouts, 1), 1);
           case N of
             3: Angle := 180;
@@ -125,7 +125,7 @@ begin
         begin
           EtCmd := '-a' + CRLF + '-Preview:All=' + CRLF;
           StatusBar1.SimpleText := Format(StrUpdatingPreviewIn, [AFile]);
-          ET_OpenExec(ETcmd, FMain.GetSelectedFile(AFile), ETouts, ETerrs);
+          ET.OpenExec(ETcmd, FMain.GetSelectedFile(AFile), ETouts, ETerrs);
           result := result and (ETerrs = '');
         end;
 
@@ -133,7 +133,7 @@ begin
                  '-' + IFD + ':ImageWidth=' + IntToStr(ASize.cx) + CRLF +
                  '-' + IFD + ':ImageHeight=' + IntToStr(ASize.cy);
         StatusBar1.SimpleText := Format(StrUpdatingPreviewIn, [AFile]);
-        ET_OpenExec(ETcmd, FMain.GetSelectedFile(AFile), ETouts, ETerrs);
+        ET.OpenExec(ETcmd, FMain.GetSelectedFile(AFile), ETouts, ETerrs);
         result := result and (ETerrs = '');
       end;
     end;

@@ -3,8 +3,8 @@ object FCopyMetadata: TFCopyMetadata
   Top = 0
   BorderStyle = bsSizeToolWin
   Caption = 'Copy metadata options'
-  ClientHeight = 473
-  ClientWidth = 464
+  ClientHeight = 461
+  ClientWidth = 456
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -18,19 +18,17 @@ object FCopyMetadata: TFCopyMetadata
   TextHeight = 13
   object StatusBar1: TStatusBar
     Left = 0
-    Top = 454
-    Width = 464
+    Top = 442
+    Width = 456
     Height = 19
     Panels = <>
     SimplePanel = True
-    ExplicitTop = 442
-    ExplicitWidth = 456
   end
   object AdvPanel1: TPanel
     Left = 0
     Top = 0
-    Width = 352
-    Height = 454
+    Width = 344
+    Height = 442
     Hint = 'Above data might not be desired to be copied.'
     Align = alClient
     DoubleBuffered = True
@@ -42,8 +40,6 @@ object FCopyMetadata: TFCopyMetadata
     ParentDoubleBuffered = False
     ParentFont = False
     TabOrder = 0
-    ExplicitWidth = 344
-    ExplicitHeight = 442
     object Label2: TLabel
       Left = 1
       Top = 1
@@ -131,26 +127,23 @@ object FCopyMetadata: TFCopyMetadata
         TabOrder = 0
         Text = 'CmbPredefined'
         OnChange = CmbPredefinedChange
-        ExplicitWidth = 232
       end
     end
   end
   object PnlRight: TPanel
-    Left = 352
+    Left = 344
     Top = 0
     Width = 112
-    Height = 454
+    Height = 442
     Align = alRight
     BevelOuter = bvNone
     TabOrder = 2
-    ExplicitLeft = 344
-    ExplicitHeight = 442
     DesignSize = (
       112
-      454)
+      442)
     object Label1: TLabel
       Left = 0
-      Top = 376
+      Top = 364
       Width = 110
       Height = 25
       Alignment = taCenter
@@ -170,18 +163,17 @@ object FCopyMetadata: TFCopyMetadata
     end
     object BtnPreview: TButton
       Left = 0
-      Top = 340
+      Top = 328
       Width = 110
       Height = 25
       Anchors = [akRight, akBottom]
       Caption = 'Preview'
       TabOrder = 1
       OnClick = BtnPreviewClick
-      ExplicitTop = 328
     end
     object BtnExecute: TButton
       Left = 0
-      Top = 412
+      Top = 400
       Width = 110
       Height = 25
       Anchors = [akRight, akBottom]
@@ -189,7 +181,6 @@ object FCopyMetadata: TFCopyMetadata
       Default = True
       ModalResult = 1
       TabOrder = 2
-      ExplicitTop = 400
     end
   end
   object PopupMenuLv: TPopupMenu

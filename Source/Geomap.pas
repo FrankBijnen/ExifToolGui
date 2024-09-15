@@ -250,7 +250,7 @@ begin
      (DirectoryExists(GetGeoPath)) then
     GeoLocation500Dir := GetGeoPath;
 
-  ET_Options.SetGeoDir(GeoLocation500Dir)
+  ET.Options.SetGeoDir(GeoLocation500Dir)
 end;
 
 constructor TPlace.Create;
@@ -917,7 +917,7 @@ begin
     while (ETout <> '') do
     begin
       FileName := AnalyzeGPSCoords(ETOut, Lat, Lon, MIMEType, IsQuickTime);
-      if (ET_Options.ETAPIWindowsWideFile <> '') then
+      if (ET.Options.ETAPIWindowsWideFile <> '') then
         Filename := IncludeTrailingPathDelimiter(Apath) + Filename;
       if ((Pos('image', MIMEType) > 0) or
           (Pos('video', MIMEType) > 0) or

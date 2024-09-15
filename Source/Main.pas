@@ -397,7 +397,7 @@ uses System.StrUtils, System.Math, System.Masks, System.Types, System.UITypes,
 
 {$R *.dfm}
 
-var FStyleServices: TCustomStyleServices; 
+var FStyleServices: TCustomStyleServices;
 
 const
   GUI_SEP = '-GUI-SEP';
@@ -740,7 +740,7 @@ begin
     end;
   end;
 
-  if (ET_OpenExec(ETcmd, GetSelectedFiles, ETout, ETerr)) then
+  if (ET.OpenExec(ETcmd, GetSelectedFiles, ETout, ETerr)) then
   begin
     RefreshSelected(Sender);
     ShowMetadata;
@@ -826,7 +826,7 @@ end;
 
 function TFMain.GetSelectedFile(FileName: string): string;
 begin
-  result := GetSelectedFile(FileName, ET_Options.ETAPIWindowsWideFile = '');
+  result := GetSelectedFile(FileName, ET.Options.ETAPIWindowsWideFile = '');
 end;
 
 function TFMain.GetSelectedFiles(MustExpandPath: boolean): string;
@@ -853,7 +853,7 @@ end;
 
 function TFMain.GetSelectedFiles: string;
 begin
-  result := GetSelectedFiles(ET_Options.ETAPIWindowsWideFile = '');
+  result := GetSelectedFiles(ET.Options.ETAPIWindowsWideFile = '');
 end;
 
 procedure TFMain.EditMapFindKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
@@ -900,7 +900,7 @@ end;
 
 procedure TFMain.MAPIWindowsWideFileClick(Sender: TObject);
 begin
-  with ET_Options do
+  with ET.Options do
     SetApiWindowsWideFile(MaAPIWindowsWideFile.Checked);
 end;
 
@@ -939,17 +939,13 @@ end;
 
 procedure TFMain.MaAPILargeFileSupportExecute(Sender: TObject);
 begin
-  with ET_Options do
+  with ET.Options do
     SetApiLargeFileSupport(MaAPILargeFileSupport.Checked);
 end;
 
 procedure TFMain.MDontBackupClick(Sender: TObject);
 begin
-  with ET_Options do
-    if MaDontBackup.Checked then
-      ETBackupMode := '-overwrite_original' + CRLF
-    else
-      ETBackupMode := '';
+  ET.Options.SetBackupMode(MaDontBackup.Checked);
 end;
 
 procedure TFMain.MetadataListDblClick(Sender: TObject);
@@ -1218,7 +1214,7 @@ begin
                 StrOKToProceed, mtInformation, [mbOk, mbCancel], 0) = mrOK then
   begin
     ETcmd := '-Exif:LensInfo<LensID' + CRLF + '-Exif:LensModel<LensID' + CRLF;
-    ET_OpenExec(ETcmd, GetSelectedFiles, ETout, ETerr);
+    ET.OpenExec(ETcmd, GetSelectedFiles, ETout, ETerr);
     RefreshSelected(Sender);
     ShowMetadata;
   end;
@@ -1234,7 +1230,7 @@ var
   Indx: integer;
   ETcmd, XDir, ETout, ETerr: string;
 begin
-  if (ET_Options.ETAPIWindowsWideFile <> '') then
+  if (ET.Options.ETAPIWindowsWideFile <> '') then
     XDir := '.\%d\'
   else
     XDir := '%d\';
@@ -1259,7 +1255,7 @@ begin
   if Sender = MaExportMetaHTML then
     ETcmd := '-w' + CRLF + XDir + '%f.html' + CRLF + '-htmldump';
 
-  ET_OpenExec(ETcmd, GetSelectedFiles, ETout, ETerr);
+  ET.OpenExec(ETcmd, GetSelectedFiles, ETout, ETerr);
   if XDir = '' then
     BtnFListRefreshClick(Sender);
 end;
@@ -1272,7 +1268,7 @@ begin
                 Format(FileDateFromExif2, [CmdDateCreate, CmdDateModify]) + #10#10 +
                 StrOKToProceed, mtInformation, [mbOk, mbCancel], 0) = mrOK then
   begin
-    ET_OpenExec('-FileCreateDate<' + CmdDateCreate + CRLF +
+    ET.OpenExec('-FileCreateDate<' + CmdDateCreate + CRLF +
                 '-FileModifyDate<' + CmdDateModify,
                 GetSelectedFiles, ETout, ETerr);
     RefreshSelected(Sender);
@@ -1289,11 +1285,7 @@ end;
 
 procedure TFMain.MIgnoreErrorsClick(Sender: TObject);
 begin
-  with ET_Options do
-    if MaIgnoreErrors.Checked then
-      ETMinorError := '-m' + CRLF
-    else
-      ET_Options.ETMinorError := '';
+  ET.Options.SetMinorError(MaIgnoreErrors.Checked);
 end;
 
 procedure TFMain.MImportMetaSelectedClick(Sender: TObject);
@@ -1341,7 +1333,7 @@ begin
         begin
           ETcmd := ETcmd + FCopyMetadata.TagSelection;
           ETcmd := ETcmd + '-ext' + CRLF + DstExt;
-          if (ET_OpenExec(ETcmd, GetSelectedFiles, ETout, ETerr)) then
+          if (ET.OpenExec(ETcmd, GetSelectedFiles, ETout, ETerr)) then
           begin
             RefreshSelected(Sender);
             ShowMetadata;
@@ -1425,7 +1417,7 @@ begin
           ETcmd := ETcmd + FCopyMetadata.TagSelection;
           ETcmd := ETcmd + '-ext' + CRLF + DstExt;
           SetCounter(CounterETEvent, GetNrOfFiles(ShellList.Path, '*.' + DstExt, (I = mrYes)));
-          if (ET_OpenExec(ETcmd, '.', ETout, ETerr)) then
+          if (ET.OpenExec(ETcmd, '.', ETout, ETerr)) then
           begin
             RefreshSelected(Sender);
             ShowMetadata;
@@ -1464,7 +1456,7 @@ begin
       ETcmd := ETcmd + '-GPS:GPSLatitude<Xmp-exif:GPSLatitude' + CRLF + '-GPS:GPSLongitude<Xmp-exif:GPSLongitude' + CRLF;
       ETcmd := ETcmd + '-GPS:GPSLatitudeRef<Composite:GPSLatitudeRef' + CRLF + '-GPS:GPSLongitudeRef<Composite:GPSLongitudeRef' + CRLF;
       ETcmd := ETcmd + '-GPS:GPSDateStamp<XMP-exif:GPSDateTime' + CRLF + '-GPS:GPSTimeStamp<XMP-exif:GPSDateTime';
-      if (ET_OpenExec(ETcmd, GetSelectedFiles, ETout, ETerr)) then
+      if (ET.OpenExec(ETcmd, GetSelectedFiles, ETout, ETerr)) then
       begin
         RefreshSelected(Sender);
         ShowMetadata;
@@ -1496,8 +1488,8 @@ procedure TFMain.MPreferencesClick(Sender: TObject);
 begin
   if FPreferences.ShowModal = mrOK then
   begin
-    ET_OpenExit(true); // Force restart of ExifTool. CustomConfig could have changed
-    EnableMenus(ET_StayOpen(ShellList.Path)); // Recheck Exiftool.exe.
+    ET.OpenExit(true); // Force restart of ExifTool. CustomConfig could have changed
+    EnableMenus(ET.StayOpen(ShellList.Path)); // Recheck Exiftool.exe.
     ShellListSetFolders;
     ShellList.ClearSelectionRefresh;
     ShowMetadata;
@@ -1506,11 +1498,7 @@ end;
 
 procedure TFMain.MPreserveDateModClick(Sender: TObject);
 begin
-  with ET_Options do
-    if MaPreserveDateMod.Checked then
-      ETFileDate := '-P' + CRLF
-    else
-      ETFileDate := '';
+  ET.Options.SetFileDate(MaPreserveDateMod.Checked);
 end;
 
 procedure TFMain.MQuickManagerClick(Sender: TObject);
@@ -1542,22 +1530,19 @@ end;
 procedure TFMain.MShowNumbersClick(Sender: TObject);
 begin
   if Sender = MaShowNumbers then
-    with ET_Options do
-      if MaShowNumbers.Checked then
-        ETShowNumber := '-n' + CRLF
-      else
-        ETShowNumber := '';
+    ET.Options.SetShowNumber(MaShowNumbers.Checked);
   if Sender = MaShowGPSdecimal then
-    ET_Options.SetGpsFormat(MaShowGPSdecimal.Checked); // + used by MaShowHexID, MaGroup_g4, MaShowComposite, MaShowSorted, MaNotDuplicated
+    ET.Options.SetGpsFormat(MaShowGPSdecimal.Checked);
+  // + used by MaShowHexID, MaGroup_g4, MaShowComposite, MaShowSorted, MaNotDuplicated
   RefreshSelected(Sender);
   ShowMetadata;
 end;
 
 procedure TFMain.MCustomOptionsClick(Sender: TObject);
 begin
-  ET_Options.ETCustomOptions := InputBox(StrSpecifyCustomOptio,
-                                         StrCustomOptions,
-                                         ET_Options.ETCustomOptions);
+  ET.Options.SetCustomOptions(InputBox(StrSpecifyCustomOptio,
+                                       StrCustomOptions,
+                                       ET.Options.ETCustomOptions));
 end;
 
 procedure TFMain.MWorkspaceLoadClick(Sender: TObject);
@@ -1612,9 +1597,9 @@ var
 begin
   ETout := TStringList.Create;
   try
-    if ET_Options.ETLangDef <> '' then
+    if ET.Options.ETLangDef <> '' then
     begin
-      ET_OpenExec('-X' + CRLF + '-l' + CRLF + xMeta + 'All', GetSelectedFile(ShellList.RelFileName), ETout);
+      ET.OpenExec('-X' + CRLF + '-l' + CRLF + xMeta + 'All', GetSelectedFile(ShellList.RelFileName), ETout);
       Indx := ETout.Count;
       while Indx > 1 do
       begin
@@ -1820,13 +1805,13 @@ var
   Tx, T1: string;
 begin
   I := MetadataList.Row;
-  if ET_Options.ETLangDef <> '' then
+  if ET.Options.ETLangDef <> '' then
   begin
-    T1 := ET_Options.ETLangDef;
-    ET_Options.ETLangDef := '';
+    T1 := ET.Options.ETLangDef;
+    ET.Options.SetLangDef('');
     ShowMetadata;
     Tx := MetadataList.Keys[I];
-    ET_Options.ETLangDef := T1;
+    ET.Options.SetLangDef(T1);
   end
   else
     Tx := MetadataList.Keys[I];
@@ -1926,7 +1911,7 @@ begin
   I := MetadataList.Row;
   MetadataList.Keys[I] := QuickTags[I - 1].Caption;
   Tx := '-s3' + CRLF + '-f' + CRLF + QuickTags[I - 1].Command;
-  ET_OpenExec(Tx, GetSelectedFile(ShellList.RelFileName), ETouts, ETerrs);
+  ET.OpenExec(Tx, GetSelectedFile(ShellList.RelFileName), ETouts, ETerrs);
   MetadataList.Cells[1, I] := ETouts;
   N := MetadataList.RowCount - 1;
   X := 0;
@@ -2035,18 +2020,18 @@ begin
     try
       if (GeoSettings.GetPlaceProvider = gpExifTool) then
       begin
-        SavedLang := ET_Options.ETLangDef;
+        SavedLang := ET.Options.ETLangDef;
         if (GeoSettings.ReverseGeoCodeLang <> PlaceDefault) and
            (GeoSettings.ReverseGeoCodeLang <> PlaceLocal) then
-          ET_Options.ETLangDef := GeoSettings.ReverseGeoCodeLang
+          ET.Options.SetLangDef(GeoSettings.ReverseGeoCodeLang)
         else
-          ET_Options.ETLangDef := '';
+          ET.Options.SetLangDef('');
 
         try
           ETCmd := '-XMP-photoshop:XMP-iptcCore:XMP-iptcExt:geolocate<GPSPosition' + CRLF;
-          ET_OpenExec(ETcmd, GetSelectedFiles);
+          ET.OpenExec(ETcmd, GetSelectedFiles);
         finally
-          ET_Options.ETLangDef := SavedLang;
+          ET.Options.SetLangDef(SavedLang);
         end;
 
       end
@@ -2225,10 +2210,10 @@ begin
     else
       SelectedFiles := GetSelectedFiles;
 
-    // Call ETDirect or ET_OpenExec
+    // Call ETDirect or ET.OpenExec
     case CmbETDirectMode.ItemIndex of
-      0: ETResult := ET_OpenExec(ArgsFromDirectCmd(ETprm), SelectedFiles, ETout, ETerr);
-      1: ETResult := ExecET(ETprm, SelectedFiles, ShellList.Path, ETout, ETerr);
+      0: ETResult := ET.OpenExec(ArgsFromDirectCmd(ETprm), SelectedFiles, ETout, ETerr);
+      1: ETResult := TExifTool.ExecET(ETprm, SelectedFiles, ShellList.Path, ETout, ETerr);
       else
         ETResult := false; // Make compiler happy
     end;
@@ -2337,6 +2322,12 @@ end;
 
 procedure TFMain.ShowPreview;
 var
+{$IFDEF DEBUG2}
+  MetaData: TMetaData;
+  K: String;
+  KL: TstringList;
+//  Indx: integer;
+{$ENDIF}
   Foto: FotoRec;
   Rotate: integer;
   FPath: string;
@@ -2365,6 +2356,23 @@ begin
           8:
             Rotate := 270;
         end;
+ {$IFDEF DEBUG2}
+        MetaData := TMetaData.Create;
+        //for Indx:= 0 to 5000 do
+          MetaData.ReadMeta(FPath, [gmXMP, gmGPS]);
+
+        allocconsole;
+        writeln(FPath);
+        Kl := TStringList.Create;
+        Kl.Sorted := true;
+        for K in MetaData.VarData.Keys do
+          Kl.Add(K);
+        for K in KL do
+          writeln(K, '=', MetaData.VarData.Items[K]);
+        Writeln('=====================================');
+        KL.Free;
+        MetaData.Free;
+ {$ENDIF}
       end;
       ABitMap := GetBitmapFromWic(WicPreview(FPath, Rotate, RotateImg.Width, RotateImg.Height));
       if (ABitMap <> nil) then
@@ -2557,7 +2565,7 @@ begin
   MetadataList.ProportionalVScroll := true;
 
   CBoxFileFilter.Text := SHOWALL;
-  ExifTool.ExecETEvent := ExecETEvent_Done;
+  ET.ExecETEvent := ExecETEvent_Done;
   Geomap.ExecRestEvent := ExecRestEvent_Done;
 end;
 
@@ -2822,6 +2830,7 @@ begin
 
   EnableMenuItems;
 
+//TODO: Add param
   SyncShellTree;
 end;
 
@@ -2958,7 +2967,7 @@ begin
   end;
 
   // Start ExifTool in this directory
-  ET_Active := ET_StayOpen(TShellListView(Sender).Path);
+  ET_Active := ET.StayOpen(TShellListView(Sender).Path);
 
   // Dis/Enable menus
   EnableMenus(ET_Active);
@@ -3018,7 +3027,7 @@ begin
              (Foto.Supported = []) then
           begin
             if (GUIsettings.EnableUnsupported) then
-              ET_OpenExec(GUIsettings.Fast3(ShellList.FileExt(Item.Index)) + CameraFields,
+              ET.OpenExec(GUIsettings.Fast3(ShellList.FileExt(Item.Index)) + CameraFields,
                           GetSelectedFile(ShellList.RelFileName(Item.Index)),
                           Details,
                           False)
@@ -3056,7 +3065,7 @@ begin
           begin
             if (GUIsettings.EnableUnsupported) then
             begin
-              ET_OpenExec(GUIsettings.Fast3(ShellList.FileExt(Item.Index)) + LocationFields,
+              ET.OpenExec(GUIsettings.Fast3(ShellList.FileExt(Item.Index)) + LocationFields,
                           GetSelectedFile(ShellList.RelFileName(Item.Index)),
                           Details,
                           False);
@@ -3115,7 +3124,7 @@ begin
              (Foto.Supported = []) then
           begin
             if (GUIsettings.EnableUnsupported) then
-              ET_OpenExec(GUIsettings.Fast3(ShellList.FileExt(Item.Index)) + AboutFields,
+              ET.OpenExec(GUIsettings.Fast3(ShellList.FileExt(Item.Index)) + AboutFields,
                           GetSelectedFile(ShellList.RelFileName(Item.Index)),
                           Details,
                           False)
@@ -3136,7 +3145,7 @@ begin
           ETcmd := '-s3' + CRLF + '-f';
           for Indx := 0 to High(FListColUsr) do
             ETcmd := ETcmd + CRLF + FListColUsr[Indx].Command;
-          ET_OpenExec(GUIsettings.Fast3(ShellList.FileExt(Item.Index)) + ETcmd,
+          ET.OpenExec(GUIsettings.Fast3(ShellList.FileExt(Item.Index)) + ETcmd,
                       GetSelectedFile(ShellList.RelFileName(Item.Index)),
                       Details,
                       False);
@@ -3380,14 +3389,14 @@ end;
 // Close Exiftool before context menu. Delete directory fails
 procedure TFMain.ShellTreeBeforeContext(Sender: TObject);
 begin
-  ET_OpenExit;
+  ET.OpenExit;
 end;
 
 // Restart Exiftool when context menu done.
 procedure TFMain.ShellTreeAfterContext(Sender: TObject);
 begin
   if (ValidDir(ShellList.Path)) then
-    ET_StayOpen(ShellList.Path);
+    ET.StayOpen(ShellList.Path);
 end;
 
 procedure TFMain.SetCaption(AnItem: string = '');
@@ -3443,7 +3452,7 @@ begin
           Tx := GUI_SEP;
         ETcmd := ETcmd + CRLF + Tx;
       end;
-      ET_OpenExec(ETcmd, Item, ETResult, false);
+      ET.OpenExec(ETcmd, Item, ETResult, false);
       N := Min(N, ETResult.Count - 1);
       with MetadataList do
       begin
@@ -3496,7 +3505,7 @@ begin
         ETcmd := ETcmd + '-sort' + CRLF;
       if MaShowHexID.Checked then
         ETcmd := ETcmd + '-H' + CRLF;
-      if ET_Options.ETLangDef = '' then
+      if ET.Options.ETLangDef = '' then
         ETcmd := ETcmd + '-S' + CRLF;
       if SpeedBtnExif.Down then
         ETcmd := ETcmd + '-Exif:All';
@@ -3530,7 +3539,7 @@ begin
         end;
       end;
 
-      ET_OpenExec(ETcmd, Item, ETResult, false);
+      ET.OpenExec(ETcmd, Item, ETResult, false);
       E := 0;
       if ETResult.Count = 0 then
       begin

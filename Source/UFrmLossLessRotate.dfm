@@ -3,8 +3,8 @@ object FLossLessRotate: TFLossLessRotate
   Top = 0
   BorderStyle = bsDialog
   Caption = 'JPG: Lossless autorotate'
-  ClientHeight = 398
-  ClientWidth = 588
+  ClientHeight = 397
+  ClientWidth = 584
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -16,8 +16,8 @@ object FLossLessRotate: TFLossLessRotate
   TextHeight = 13
   object StatusBar1: TStatusBar
     Left = 0
-    Top = 379
-    Width = 588
+    Top = 378
+    Width = 584
     Height = 19
     Panels = <>
     SimplePanel = True
@@ -28,7 +28,7 @@ object FLossLessRotate: TFLossLessRotate
     Left = 0
     Top = 0
     Width = 495
-    Height = 379
+    Height = 378
     Align = alLeft
     DoubleBuffered = True
     Font.Charset = DEFAULT_CHARSET

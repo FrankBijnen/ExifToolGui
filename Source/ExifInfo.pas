@@ -1562,7 +1562,7 @@ begin
 
     // Get parameters
     GetOptions := AGetOptions;
-    FotoKeySep := ET_Options.GetSeparator;
+    FotoKeySep := ET.Options.GetSeparator;
 
     try
       //  There is no TBufferedHandleStream. So try to create, and handle the exception

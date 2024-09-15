@@ -3,8 +3,8 @@ object FRemoveMeta: TFRemoveMeta
   Top = 0
   BorderStyle = bsSizeToolWin
   Caption = 'Remove metadata'
-  ClientHeight = 473
-  ClientWidth = 464
+  ClientHeight = 461
+  ClientWidth = 456
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -18,19 +18,17 @@ object FRemoveMeta: TFRemoveMeta
   TextHeight = 13
   object StatusBar1: TStatusBar
     Left = 0
-    Top = 454
-    Width = 464
+    Top = 442
+    Width = 456
     Height = 19
     Panels = <>
     SimplePanel = True
-    ExplicitTop = 442
-    ExplicitWidth = 456
   end
   object AdvPanel1: TPanel
     Left = 0
     Top = 0
-    Width = 349
-    Height = 454
+    Width = 341
+    Height = 442
     Align = alClient
     DoubleBuffered = True
     Font.Charset = DEFAULT_CHARSET
@@ -41,8 +39,6 @@ object FRemoveMeta: TFRemoveMeta
     ParentDoubleBuffered = False
     ParentFont = False
     TabOrder = 0
-    ExplicitWidth = 341
-    ExplicitHeight = 442
     object LvTagNames: TListView
       AlignWithMargins = True
       Left = 11
@@ -98,17 +94,15 @@ object FRemoveMeta: TFRemoveMeta
         TabOrder = 0
         Text = 'CmbPredefined'
         OnChange = CmbPredefinedChange
-        ExplicitWidth = 229
       end
     end
     object PnlRemoveAll: TPanel
       Left = 1
       Top = 1
-      Width = 347
+      Width = 339
       Height = 38
       Align = alTop
       TabOrder = 2
-      ExplicitWidth = 339
       object ChkRemoveAll: TCheckBox
         AlignWithMargins = True
         Left = 11
@@ -125,21 +119,19 @@ object FRemoveMeta: TFRemoveMeta
     end
   end
   object PnlRight: TPanel
-    Left = 349
+    Left = 341
     Top = 0
     Width = 115
-    Height = 454
+    Height = 442
     Align = alRight
     BevelOuter = bvNone
     TabOrder = 2
-    ExplicitLeft = 341
-    ExplicitHeight = 442
     DesignSize = (
       115
-      454)
+      442)
     object Label1: TLabel
       Left = 2
-      Top = 379
+      Top = 367
       Width = 110
       Height = 25
       Alignment = taCenter
@@ -161,7 +153,7 @@ object FRemoveMeta: TFRemoveMeta
     end
     object BtnPreview: TButton
       Left = 2
-      Top = 343
+      Top = 331
       Width = 110
       Height = 25
       Anchors = [akRight, akBottom]
@@ -169,11 +161,10 @@ object FRemoveMeta: TFRemoveMeta
       Enabled = False
       TabOrder = 1
       OnClick = BtnPreviewClick
-      ExplicitTop = 331
     end
     object BtnExecute: TButton
       Left = 2
-      Top = 416
+      Top = 404
       Width = 110
       Height = 25
       Anchors = [akRight, akBottom]
@@ -182,7 +173,6 @@ object FRemoveMeta: TFRemoveMeta
       Enabled = False
       TabOrder = 2
       OnClick = BtnExecuteClick
-      ExplicitTop = 404
     end
   end
   object ImageCollection: TImageCollection

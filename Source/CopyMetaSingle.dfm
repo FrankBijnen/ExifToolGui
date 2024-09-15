@@ -3,8 +3,8 @@ object FCopyMetaSingle: TFCopyMetaSingle
   Top = 0
   BorderStyle = bsSizeToolWin
   Caption = 'Import into selected files'
-  ClientHeight = 461
-  ClientWidth = 456
+  ClientHeight = 449
+  ClientWidth = 448
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -18,16 +18,18 @@ object FCopyMetaSingle: TFCopyMetaSingle
   TextHeight = 13
   object StatusBar1: TStatusBar
     Left = 0
-    Top = 442
-    Width = 456
+    Top = 430
+    Width = 448
     Height = 19
     Panels = <>
+    ExplicitTop = 442
+    ExplicitWidth = 456
   end
   object AdvPanel1: TPanel
     Left = 0
     Top = 0
-    Width = 341
-    Height = 442
+    Width = 333
+    Height = 430
     Align = alClient
     DoubleBuffered = True
     Font.Charset = DEFAULT_CHARSET
@@ -38,6 +40,8 @@ object FCopyMetaSingle: TFCopyMetaSingle
     ParentDoubleBuffered = False
     ParentFont = False
     TabOrder = 0
+    ExplicitWidth = 341
+    ExplicitHeight = 442
     object ChkImportAll: TCheckBox
       AlignWithMargins = True
       Left = 11
@@ -103,8 +107,8 @@ object FCopyMetaSingle: TFCopyMetaSingle
       AlignWithMargins = True
       Left = 11
       Top = 66
-      Width = 326
-      Height = 341
+      Width = 318
+      Height = 329
       Margins.Left = 10
       Align = alClient
       Checkboxes = True
@@ -121,22 +125,26 @@ object FCopyMetaSingle: TFCopyMetaSingle
       ViewStyle = vsReport
       OnCustomDrawItem = LvTagNamesCustomDrawItem
       OnItemChecked = LvTagNamesItemChecked
+      ExplicitWidth = 326
+      ExplicitHeight = 341
     end
   end
   object PnlRight: TPanel
-    Left = 341
+    Left = 333
     Top = 0
     Width = 115
-    Height = 442
+    Height = 430
     Align = alRight
     BevelOuter = bvNone
     TabOrder = 2
+    ExplicitLeft = 341
+    ExplicitHeight = 442
     DesignSize = (
       115
-      442)
+      430)
     object Label1: TLabel
       Left = 2
-      Top = 365
+      Top = 353
       Width = 110
       Height = 27
       Alignment = taCenter
@@ -157,7 +165,7 @@ object FCopyMetaSingle: TFCopyMetaSingle
     end
     object BtnPreview: TButton
       Left = 2
-      Top = 329
+      Top = 317
       Width = 110
       Height = 25
       Anchors = [akRight, akBottom]
@@ -165,10 +173,11 @@ object FCopyMetaSingle: TFCopyMetaSingle
       Enabled = False
       TabOrder = 1
       OnClick = BtnPreviewClick
+      ExplicitTop = 329
     end
     object BtnExecute: TButton
       Left = 2
-      Top = 402
+      Top = 390
       Width = 110
       Height = 25
       Anchors = [akRight, akBottom]
@@ -178,6 +187,7 @@ object FCopyMetaSingle: TFCopyMetaSingle
       ModalResult = 1
       TabOrder = 2
       OnClick = BtnExecuteClick
+      ExplicitTop = 402
     end
   end
   object ImageCollection: TImageCollection
