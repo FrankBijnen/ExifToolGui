@@ -55,7 +55,7 @@ uses Main, MainDef, ExifTool, ExifToolsGUI_Utils, UFrmGeoSetup, Geomap, UnitLang
 function TFGeotag.LogPath: string;
 begin
   if CheckBox1.Checked then
-    result := ExtractFileDir(LabeledEdit1.Text) + '*' + ExtractFileExt(LabeledEdit1.Text)
+    result := IncludeTrailingPathDelimiter(ExtractFileDir(LabeledEdit1.Text)) + '*' + ExtractFileExt(LabeledEdit1.Text)
   else
     result := LabeledEdit1.Text;
 end;

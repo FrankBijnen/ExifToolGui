@@ -1332,7 +1332,7 @@ begin
       begin
         ETcmd := OpenPictureDlg.FileName; // single file selected
         if J > 1 then
-          ETcmd := ExtractFileDir(ETcmd) + '\%f' + ExtractFileExt(ETcmd);
+          ETcmd := IncludeTrailingPathDelimiter(ExtractFileDir(ETcmd)) + '%f' + ExtractFileExt(ETcmd);
         // multiple files
         ETcmd := '-TagsFromFile' + CRLF + ETcmd + CRLF + '-All:All' + CRLF;
 
