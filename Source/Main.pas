@@ -476,6 +476,13 @@ begin
   while (APath <> '') do
   begin
     ASub := NextField(APath, PathDelim);
+
+    if (ASub = '?') then // Check for long filenames. \\?\C:\blabla\
+    begin
+      ASubPath := '';
+      continue;
+    end;
+
     ASubPath := ASubPath + ASub + PathDelim;
     NewNode := ShellTree.NodeFromPath(result, ASubPath);
     if (NewNode = nil) then
