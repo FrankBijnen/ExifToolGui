@@ -46,7 +46,7 @@ function GetINIPath(AllowCreate: boolean = false): string;
 function GetAppPath: string;
 function GetGeoPath: string;
 function GetTempDirectory: string;
-function GetExifToolTmp: string;
+function GetExifToolTmp(const Id: integer): string;
 function GetHtmlTmp: string;
 function GetTrackTmp: string;
 function GetPreviewTmp: string;
@@ -138,7 +138,7 @@ const
   TempPrefix = 'ExT';
 
 const
-  ExifToolTempFileName = 'ExifToolGUI.tmp';
+  ExifToolTempFileName = 'ExifToolGUI%s.tmp';
 
 const
   HtmlTempFileName = 'ExifToolGUI.html';
@@ -281,9 +281,14 @@ begin
   result := TempDirectory;
 end;
 
-function GetExifToolTmp: string;
+function GetExifToolTmp(const Id: integer): string;
+var
+  Seq: string;
 begin
-  result := GetTempDirectory + ExifToolTempFileName;
+  Seq := '';
+  if (Id > 0) then
+    Seq := Format('-%d', [Id]);
+  result := GetTempDirectory + Format(ExifToolTempFileName, [Seq]);
 end;
 
 function GetHtmlTmp: string;
