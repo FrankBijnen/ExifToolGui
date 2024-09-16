@@ -1170,7 +1170,7 @@ begin
     AnHourGlass := TBitmap.Create;
     try
       AnHourGlass.LoadFromResourceName(HInstance, HOURGLASS);
-      ResizeBitmapCanvas(AnHourGlass, FThumbNails.Width, FThumbNails.Height, HOURGLASS_TRANSPARENT);
+      ResizeBitmapCanvas(AnHourGlass, FThumbNails.Width, FThumbNails.Height, HOURGLASS_TRANSPARENT, false);
       // FHourGlassId Will normally be zero!
       FHourGlassId := FThumbNails.AddMasked(AnHourGlass, HOURGLASS_TRANSPARENT);
     finally
