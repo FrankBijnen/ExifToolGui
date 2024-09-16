@@ -74,7 +74,8 @@ function DateDiff(ODate, NDate: TDateTime; var Increment: boolean): string;
 function IsJpeg(Filename: string): boolean;
 function GetBitmapFromWic(const FWicBitmapSource: IWICBitmapSource): TBitmap;
 function WicPreview(AImg: string; Rotate, MaxW, MaxH: cardinal): IWICBitmapSource;
-procedure ResizeBitmapCanvas(Bitmap: TBitmap; W, H: integer; BackColor: TColor);
+procedure ResizeBitmapCanvas(Bitmap: TBitmap; MaxW, MaxH: integer;
+                             BackColor: TColor; Stretch: boolean = true);
 function BitMapFromHBitMap(ABmp: HBITMAP; W, H: Integer; BkColor: TColor): TBitMap;
 
 // Message dialog that allows for caption and doesn't wrap lines at spaces.
@@ -869,34 +870,42 @@ begin
   end;
 end;
 
-// Prepares a Bitmap for Sizes W and H transparently.
-// The image size of the Bitmap passed should not exceed W or H!
-procedure ResizeBitmapCanvas(Bitmap: TBitmap; W, H: integer; BackColor: TColor);
+// Prepares a Bitmap
+// - Centers Bitmap in Rectangle WxH
+// - Stretch True/False. Uses maximum size, or keeps original
+// - Retains aspect ratio.
+// - Transparent using backcolor.
+procedure ResizeBitmapCanvas(Bitmap: TBitmap; MaxW, MaxH: integer;
+                             BackColor: TColor; Stretch: boolean = true);
 var
   Bmp: TBitmap;
-  Xshift, Yshift: integer;
   Left, Top: integer;
-  NewW, NewH: integer;
+  ActualW, ActualH: integer;
 begin
-  NewSizeRetainRatio(Bitmap.Width, Bitmap.Height, W, H, NewW, NewH);
-
-  Xshift := (Bitmap.Width - W) div 2;
-  Yshift := (Bitmap.Height - H) div 2;
-  Left := Max(0, -Xshift);
-  Top := Max(0, -Yshift);
+  if (Stretch) then
+  begin
+    NewSizeRetainRatio(Bitmap.Width, Bitmap.Height, MaxW, MaxH, ActualW, ActualH);
+    Left := (MaxW - ActualW) div 2;
+    Top := (MaxH - ActualH) div 2;
+  end
+  else
+  begin
+    Left := (MaxW - Bitmap.Width) div 2;
+    Top := (MaxH - Bitmap.Height) div 2;
+  end;
 
   Bmp := TBitmap.Create;
   try
-    Bmp.SetSize(W, H);
+    Bmp.SetSize(MaxW, MaxH);
     Bmp.Canvas.Brush.Style := bsSolid;
     Bmp.Canvas.Brush.Color := BackColor;
     Bmp.AlphaFormat := TAlphaFormat.afDefined;
-    Bmp.Canvas.FillRect(Rect(0, 0, W, H));
-    if (Left + Bitmap.Width <= W) and
-       (Top + Bitmap.Height <= H) then
-      Bmp.Canvas.Draw(Left, Top, BitMap)
+    Bmp.Canvas.FillRect(Rect(0, 0, MaxW, MaxH));
+    if (Stretch) then
+      Bmp.Canvas.StretchDraw(Rect(Left, Top, Left + ActualW, Top + ActualH), BitMap)
     else
-      Bmp.Canvas.StretchDraw(Rect(Left, Top, Left + NewW, Top + NewH), BitMap);
+      Bmp.Canvas.Draw(Left, Top, BitMap);
+
     Bitmap.Assign(Bmp);
   finally
     Bmp.Free;
