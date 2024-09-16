@@ -160,6 +160,7 @@ uses System.Win.ComObj, System.UITypes,
 
 const
   HOURGLASS = 'HOURGLASS';
+  HOURGLASS_TRANSPARENT = $ff00ff;
 
 { Listview Sort }
 
@@ -1169,8 +1170,9 @@ begin
     AnHourGlass := TBitmap.Create;
     try
       AnHourGlass.LoadFromResourceName(HInstance, HOURGLASS);
-      ResizeBitmapCanvas(AnHourGlass, FThumbNails.Width, FThumbNails.Height, ClWhite);
-      FHourGlassId := FThumbNails.AddMasked(AnHourGlass, ClWhite); // FHourGlassId Should be zero!
+      ResizeBitmapCanvas(AnHourGlass, FThumbNails.Width, FThumbNails.Height, HOURGLASS_TRANSPARENT);
+      // FHourGlassId Will normally be zero!
+      FHourGlassId := FThumbNails.AddMasked(AnHourGlass, HOURGLASS_TRANSPARENT);
     finally
       AnHourGlass.Free;
     end;
