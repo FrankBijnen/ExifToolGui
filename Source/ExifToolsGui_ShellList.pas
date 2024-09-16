@@ -55,7 +55,7 @@ type
     FSortColumn: integer;
     FSortState: THeaderSortState;
 
-    FBackColor: TColor;
+    FBkColor: TColor;
     FHourGlassId: integer;
     FThumbNails: TImageList;
     FThumbNailSize: integer;
@@ -79,6 +79,7 @@ type
     procedure ClearHiddenItems;
     procedure InitThumbNails;
     procedure SetThumbNailSize(AValue: integer);
+    procedure SetBkColor(Value: TColor);
 
     procedure CMThumbStart(var Message: TMessage); message CM_ThumbStart;
     procedure CMThumbEnd(var Message: TMessage); message CM_ThumbEnd;
@@ -132,7 +133,7 @@ type
     property ColumnSorted: boolean read FColumnSorted write SetColumnSorted;
     property SortColumn: integer read FSortColumn write FSortColumn;
     property SortState: THeaderSortState read FSortState write FSortState;
-    property BackColor: TColor read FBackColor write FBackColor;
+    property BkColor: TColor read FBkColor write SetBkColor;
     property ThumbNailSize: integer read FThumbNailSize write SetThumbNailSize;
     property ThumbAutoGenerate: boolean read FThumbAutoGenerate write FThumbAutoGenerate;
     property OnThumbError: TThumbErrorEvent read FOnNotifyErrorEvent write FOnNotifyErrorEvent;
@@ -1166,7 +1167,7 @@ begin
   begin
     FThumbNails.Width := FThumbNailSize;
     FThumbNails.Height := FThumbNailSize;
-    FThumbNails.BkColor := BackColor;
+    FThumbNails.BkColor := FBkColor;
     AnHourGlass := TBitmap.Create;
     try
       AnHourGlass.LoadFromResourceName(HInstance, HOURGLASS);
@@ -1190,6 +1191,14 @@ begin
   end;
 end;
 
+procedure TShellListView.SetBkColor(Value: TColor);
+begin
+  if (Value <> FBkColor) then
+    FBkColor := Value;
+  if (Value <> FThumbNails.BkColor) then
+    FThumbNails.BkColor := Value;
+end;
+
 function TShellListView.GetThumbNail(ItemIndex, W, H: integer): TBitmap;
 var
   Hr: HRESULT;
@@ -1205,7 +1214,7 @@ begin
   // Get the cached (by Windows) thumbnail if avail
   Hr := GetThumbCache(Folders[ItemIndex].AbsoluteID, HBmp, SIIGBF_THUMBNAILONLY or SIIGBF_INCACHEONLY or SIIGBF_BIGGERSIZEOK, W, H);
   if (HR = S_OK) then
-    result := BitMapFromHBitMap(HBmp, W, H, FThumbNails.BkColor)
+    result := BitMapFromHBitMap(HBmp, W, H, FBkColor)
   else
   begin
     // Need to update our cache?
@@ -1226,7 +1235,7 @@ begin
       result := TBitmap.Create;
       // Draw the Bitmap with the currently selected BackColor. (From the Style)
       FThumbNails.GetBitmap(Abs(FThumbNailCache[ItemIndex]), result);
-      ResizeBitmapCanvas(result, W, H, FThumbNails.BkColor);
+      ResizeBitmapCanvas(result, W, H, FBkColor);
     end;
   end;
 end;
@@ -1235,9 +1244,9 @@ procedure TShellListView.Add2ThumbNails(ABmp: HBITMAP; ANitemIndex: integer; Nee
 var
   ABitMap: TBitmap;
 begin
-  ABitMap := BitMapFromHBitMap(ABmp, FThumbNails.Width, FThumbNails.Height, FThumbNails.BkColor);
+  ABitMap := BitMapFromHBitMap(ABmp, FThumbNails.Width, FThumbNails.Height, FBkColor);
   try
-    Items[ANitemIndex].ImageIndex := FThumbNails.AddMasked(ABitMap, FThumbNails.BkColor);
+    Items[ANitemIndex].ImageIndex := FThumbNails.AddMasked(ABitMap, FBkColor);
     if (NeedsGenerating) then
       FThumbNailCache[ANitemIndex] := Items[ANitemIndex].ImageIndex * -1
     else

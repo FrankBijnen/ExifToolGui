@@ -2387,7 +2387,6 @@ begin
         ResizeBitmapCanvas(ABitMap, RotateImg.Width, RotateImg.Height, GUIColorWindow)
       else
         ABitMap := ShellList.GetThumbNail(ShellList.Selected.Index, RotateImg.Width, RotateImg.Height);
-
       RotateImg.Picture.Bitmap := ABitMap;
     finally
       ABitMap.Free;
@@ -3821,7 +3820,7 @@ begin
   if Assigned(FStyleServices) then
     GUIColorWindow := FStyleServices.GetStyleColor(scWindow);
   BreadcrumbBar.Style := GUIsettings.GuiStyle;
-  ShellList.BackColor := GUIColorWindow;
+  ShellList.BkColor := GUIColorWindow;
 end;
 
 procedure TFMain.ShellistThumbError(Sender: TObject; Item: TListItem; E: Exception);
