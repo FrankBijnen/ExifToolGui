@@ -872,14 +872,15 @@ end;
 
 procedure TFMain.MGUIStyleClick(Sender: TObject);
 begin
-  // Selecting a style with subfolders enabled takes to long
-  ResetRootShowAll;
-
   ShellTree.SetFocus;
   with FrmStyle do
   begin
     CurPath := ShellList.Path;
     CurStyle := GUIsettings.GuiStyle;
+
+    // Selecting a style with subfolders enabled takes to long
+    ResetRootShowAll;
+
     Show;
   end;
 end;
