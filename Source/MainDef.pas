@@ -735,12 +735,13 @@ begin
     AdvPageMetadata.Width := ReadInteger(Ini_ETGUI, 'MetadataWidth', ScaleDesignDpi(322));
     MetadataList.ColWidths[0] := ReadInteger(Ini_ETGUI, 'MetadataTagWidth', ScaleDesignDpi(144));
 
-    N := 4;
+    N := 5;
     SetLength(FListStdColWidth, N);
-    FListStdColWidth[0] := ReadInteger(Ini_ETGUI, 'StdColWidth0', 200);
-    FListStdColWidth[1] := ReadInteger(Ini_ETGUI, 'StdColWidth1', 88);
-    FListStdColWidth[2] := ReadInteger(Ini_ETGUI, 'StdColWidth2', 80);
-    FListStdColWidth[3] := ReadInteger(Ini_ETGUI, 'StdColWidth3', 120);
+    FListStdColWidth[0] := ReadInteger(Ini_ETGUI, 'StdColWidth0', 200); // Filename
+    FListStdColWidth[1] := ReadInteger(Ini_ETGUI, 'StdColWidth1', 88);  // Size
+    FListStdColWidth[2] := ReadInteger(Ini_ETGUI, 'StdColWidth2', 80);  // Item Type
+    FListStdColWidth[3] := ReadInteger(Ini_ETGUI, 'StdColWidth3', 120); // Date Modified
+    FListStdColWidth[4] := ReadInteger(Ini_ETGUI, 'StdColWidth4', 120); // Date Created
 
     while (ValueExists(Ini_ETGUI, 'StdColWidth' + IntToStr(N))) do
     begin
