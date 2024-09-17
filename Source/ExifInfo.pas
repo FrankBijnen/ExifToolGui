@@ -149,9 +149,9 @@ type
     FileSize: int64;
     procedure Clear;
     procedure SetVarData(const InVarData: TVarData);
-    procedure AddBag(var BagData: TMetaInfo; const ANode: TMetaInfo); overload;
+    procedure AddBag(var BagData: TMetaInfo; const ANode: TMetaInfo);
     function GetKeyName(const AKey: string): string;
-    function AddVarData(const AKey: string; AValue: TMetaInfo): TMetaInfo;
+    function AddVarData(const AKey: string; AValue: TMetaInfo; AllowBag: boolean = false): TMetaInfo;
 
     function DecodeASCII(IFDentry: IFDentryRec; MaxLen: integer = 255): string;
     function DecodeWord(IFDentry: IFDentryRec): word;
@@ -186,7 +186,7 @@ type
     constructor Create;
     destructor Destroy; override;
     procedure ReadMeta(const AName: string; AGetOptions: TGetOptions);
-
+    function FieldData(FieldName: string): string;
   end;
 
 function GetMetadata(AName: string; AGetOptions: TGetOptions; VarData: TVarData = nil; BufSize: integer = 2048): FotoRec;
@@ -196,7 +196,7 @@ procedure ChartFindFiles(StartDir, FileMask: string; SubDir: boolean;
 implementation
 
 uses
-  System.StrUtils, Winapi.Windows, Vcl.Forms, Vcl.Dialogs,
+  System.StrUtils, System.Variants, Winapi.Windows, Vcl.Forms, Vcl.Dialogs,
   Main, ExifTool,
   UnitLangResources, // Language
   Xml.VerySimple,    // XML parsing for XMP
@@ -228,6 +228,13 @@ end;
 procedure TMetaData.ReadMeta(const AName: string; AGetOptions: TGetOptions);
 begin
   Foto := GetMetadata(AName, AGetOptions, VarData);
+end;
+
+function TMetaData.FieldData(FieldName: string): string;
+begin
+  result := '';
+  if (VarData.ContainsKey(FieldName)) then
+    result := VarData[FieldName];
 end;
 
 procedure XMPrec.Clear;
@@ -333,10 +340,15 @@ end;
 
 procedure FotoRec.AddBag(var BagData: TMetaInfo; const ANode: TMetaInfo);
 begin
-  if (BagData = '') then
+  if (VarType(BagData) <> varString) then // Should only be allowed for strings!
     BagData := ANode
   else
-    BagData := BagData + FotoKeySep + ANode;
+  begin
+    if (BagData = '') then
+      BagData := ANode
+    else
+      BagData := BagData + FotoKeySep + ANode;
+  end;
 end;
 
 function FotoRec.GetKeyName(const AKey: string): string;
@@ -347,7 +359,7 @@ begin
     result := GroupName + ':' + AKey;
 end;
 
-function FotoRec.AddVarData(const AKey: string; AValue: TMetaInfo): TMetaInfo;
+function FotoRec.AddVarData(const AKey: string; AValue: TMetaInfo; AllowBag: boolean = false): TMetaInfo;
 var
   KeyName: string;
 begin
@@ -356,9 +368,17 @@ begin
     KeyName := GetKeyName(AKey);
     if (VarData.ContainsKey(KeyName)) then
     begin
-      result := VarData.Items[KeyName];
-      AddBag(result, AValue);
-      VarData.Items[KeyName] := result;
+      if (AllowBag) then
+      begin
+        result := VarData.Items[KeyName];
+        AddBag(result, AValue);
+        VarData[KeyName] := result;
+      end
+      else
+      begin
+        result := AValue;
+        VarData[KeyName] := result;
+      end;
     end
     else
     begin
@@ -655,9 +675,9 @@ begin
       15:
         Category := AddVarData('Category', StripLen(Tx, 3));
       20:
-        SuppCategories := AddVarData('SuppCategories', Tx);
+        SuppCategories := AddVarData('SuppCategories', Tx, true);
       25:
-        Keywords := AddVarData('Keywords', Tx);
+        Keywords := AddVarData('Keywords', Tx, true);
       80:
         By_line := AddVarData('By_line', StripLen(Tx, 32));
       85:
@@ -1246,7 +1266,7 @@ var Bytes: TBytes;
     UnEscaped := StringReplace(AValue, '&#39;', '''', [rfReplaceAll]);
 
     // For XMP add every node found.
-    MetaInfo := AddVarData(AKey, AValue);
+    MetaInfo := AddVarData(AKey, AValue, true);
 
     // Only Fill the record if needed
     if (StartsText('Iptc4xmpExt:LocationShownCountryCode', AKey)) then

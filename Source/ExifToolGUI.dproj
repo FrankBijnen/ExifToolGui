@@ -152,6 +152,7 @@
         <DCCReference Include="ExifToolsGui_Data.pas"/>
         <DCCReference Include="ExifToolsGUI_StringList.pas"/>
         <DCCReference Include="ExifToolsGui_ComboBox.pas"/>
+        <DCCReference Include="ExifToolsGui_FileListColumns.pas"/>
         <DCCReference Include="ExifInfo.pas"/>
         <DCCReference Include="ExifTool.pas"/>
         <DCCReference Include="ExifTool_PipeStream.pas"/>
