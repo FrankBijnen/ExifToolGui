@@ -337,7 +337,7 @@ begin
     if (SortColumn < Columns.Count) then
       SetListHeaderSortState(Self, Columns[SortColumn], FSortState);
 
-    CustomSortNeeded := (FDoDefault = false) or (FDoDefault and FIncludeSubFolders and (SortColumn = 0));
+    CustomSortNeeded := ((FDoDefault = false) and (SortColumn <> 0)) or FIncludeSubFolders;
     DetailsNeeded := (SortColumn <> 0) and (FDoDefault = false);
 
     if (DetailsNeeded) then
@@ -365,37 +365,47 @@ begin
         R: array [boolean] of Byte = (0, 1);
 
        begin
-        Result := R[TSubShellFolder.GetIsFolder(Item2)] - R[TSubShellFolder.GetIsFolder(Item1)];
+        result := R[TSubShellFolder.GetIsFolder(Item2)] - R[TSubShellFolder.GetIsFolder(Item1)];
         if (Result = 0) then
         begin
           if (CustomSortNeeded) then
           begin
             if (SortColumn = 0) then // Compare the relative name, not just the filename.
-              Result := CompareText(TSubShellFolder.GetRelativeSortName(Item1), TSubShellFolder.GetRelativeSortName(Item2))
+              result := CompareText(TSubShellFolder.GetRelativeSortName(Item1), TSubShellFolder.GetRelativeSortName(Item2),
+                                    TLocaleOptions.loUserLocale)
             else
             begin // Compare the values from DetailStrings. Always text.
               if (SortColumn <= TShellFolder(Item1).DetailStrings.Count) and
                  (SortColumn <= TShellFolder(Item2).DetailStrings.Count) then
-                Result := CompareText(TShellFolder(Item1).Details[SortColumn], TShellFolder(Item2).Details[SortColumn]);
+                result := CompareText(TShellFolder(Item1).Details[SortColumn], TShellFolder(Item2).Details[SortColumn],
+                                      TLocaleOptions.loUserLocale);
             end;
           end
           else
           begin // Use the standard compare
             if (TShellFolder(Item1).ParentShellFolder <> nil) then
-              Result := Smallint(TShellFolder(Item1).ParentShellFolder.CompareIDs(SortColumn,
+              result := Smallint(TShellFolder(Item1).ParentShellFolder.CompareIDs(SortColumn,
                                                                                   TShellFolder(Item1).RelativeID,
                                                                                   TShellFolder(Item2).RelativeID));
           end;
         end;
 
         // Sort on Filename (Column 0), within SortColumn
-        if (Result = 0) and
+        if (result = 0) and
            (SortColumn <> 0) then
-          Result := CompareText(TSubShellFolder.GetRelativeSortName(Item1), TSubShellFolder.GetRelativeSortName(Item2));
+        begin
+          if (FIncludeSubFolders) then
+            result := CompareText(TSubShellFolder.GetRelativeSortName(Item1), TSubShellFolder.GetRelativeSortName(Item2),
+                                  TLocaleOptions.loUserLocale)
+          else
+            result := Smallint(TShellFolder(Item1).ParentShellFolder.CompareIDs(0,
+                                                                                TShellFolder(Item1).RelativeID,
+                                                                                TShellFolder(Item2).RelativeID));
+        end;
 
         // Reverse order
         if (SortState = THeaderSortState.hssDescending) then
-          Result := Result * -1;
+          result := result * -1;
       end);
   end;
 end;
