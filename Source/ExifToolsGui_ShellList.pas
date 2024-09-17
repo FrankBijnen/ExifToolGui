@@ -6,7 +6,7 @@ uses
   System.Classes, System.SysUtils, System.Types, System.Threading,
   Winapi.Windows, Winapi.Messages, Winapi.CommCtrl, Winapi.ShlObj,
   Vcl.Shell.ShellCtrls, Vcl.Shell.ShellConsts, Vcl.ComCtrls, Vcl.Menus, Vcl.Controls, Vcl.Graphics,
-  ExifToolsGUI_Thumbnails, ExifToolsGUI_MultiContextMenu;
+  ExifToolsGUI_Thumbnails, ExifInfo, ExifToolsGUI_MultiContextMenu;
 
 // Extend ShellListview, keeping the same Type. So we dont have to register it in the IDE
 // Extended to support:
@@ -128,6 +128,9 @@ type
     procedure SetIconSpacing(Cx, Cy: word); overload;
     procedure SetIconSpacing(Cx, Cy: integer); overload;
     function GetThumbNail(ItemIndex, W, H: integer): TBitmap;
+    function GetSysColumnData(ItemIndex, Column: integer): string;
+    function GetInternalColumnData(ItemIndex: integer): TMetaData;
+    procedure GetExifToolColumnData(ItemIndex: integer; ETCmd: string; Details: TStrings);
 
     property OnColumnResized: TNotifyEvent read FonColumnResized write FonColumnResized;
     property ColumnSorted: boolean read FColumnSorted write SetColumnSorted;
@@ -153,7 +156,7 @@ implementation
 
 uses System.Win.ComObj, System.UITypes,
      Vcl.ImgList,
-     ExifToolsGUI_Utils, UnitFilesOnClipBoard, UnitLangResources, UFrmGenerate;
+     ExifToolsGUI_Utils, ExifToolsGui_FileListColumns, UnitFilesOnClipBoard, UnitLangResources, UFrmGenerate;
 
 // res file contains the ?
 
@@ -552,14 +555,11 @@ end;
 
 procedure TShellListView.AddDate;
 var
-  ColFlags: LongWord;
-  SD: TShellDetails;
+  Column: integer;
 begin
-  if Assigned(RootFolder.ShellFolder2) and // Have IShellFolder2 interface
-    (RootFolder.ShellFolder2.GetDefaultColumnState(Columns.Count, ColFlags) = S_OK) and
-    ((ColFlags and SHCOLSTATE_TYPE_DATE) = SHCOLSTATE_TYPE_DATE) and
-    (RootFolder.ShellFolder2.GetDetailsOf(nil, Columns.Count, SD) = S_OK) then
-      Columns.Add.Caption := SD.str.pOleStr;
+  Column := Columns.Count;
+  if (SystemFieldIsDate(RootFolder, Column)) then
+    Columns.Add.Caption := GetSystemField(RootFolder, nil, Column); // Nil gets fieldname
 end;
 
 procedure TShellListView.EnumColumns;
@@ -1264,6 +1264,21 @@ begin
   finally
     ABitMap.Free;
   end;
+end;
+
+function TShellListView.GetSysColumnData(ItemIndex, Column: integer): string;
+begin
+  result := GetSystemField(RootFolder, Folders[ItemIndex].RelativeID, Column);
+end;
+
+function TShellListView.GetInternalColumnData(ItemIndex: integer): TMetaData;
+begin
+  result := GetInternalData(Folders[ItemIndex].PathName);
+end;
+
+procedure TShellListView.GetExifToolColumnData(ItemIndex: integer; ETCmd: string; Details: TStrings);
+begin
+  GetExifToolData(FileExt(ItemIndex), ETCmd, RelFileName(ItemIndex), Details);
 end;
 
 end.
