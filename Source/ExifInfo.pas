@@ -122,7 +122,7 @@ type
   TParseIFDProc = procedure(IFDentry: IFDentryRec) of object;
   TGetOption = (gmXMP, gmIPTC, gmGPS, gmICC);
   TGetOptions = set of TGetOption;
-  TSupportedType = (supJPEG, supTIFF, supError);
+  TSupportedType = (supJPEG, supTIFF);
   TSupportedTypes = set of TSupportedType;
 
   FotoRec = packed record
@@ -136,6 +136,7 @@ type
     GroupName: string;
     VarData: TVarData;
     Supported: TSupportedTypes;
+    ErrNotOpen: boolean;
     FotoF: TBufferedFileStream;
     GetOptions: TGetOptions;
     FotoKeySep: string[3];
@@ -189,7 +190,7 @@ type
     function FieldData(FieldName: string): string;
   end;
 
-function GetMetadata(AName: string; AGetOptions: TGetOptions; VarData: TVarData = nil; BufSize: integer = 2048): FotoRec;
+function GetMetadata(AName: string; AGetOptions: TGetOptions; VarData: TVarData = nil): FotoRec;
 procedure ChartFindFiles(StartDir, FileMask: string; SubDir: boolean;
                          var ETFocal, ETFnum, ETIso: TNrSortedStringList);
 
@@ -231,10 +232,13 @@ begin
 end;
 
 function TMetaData.FieldData(FieldName: string): string;
+var
+  LowerFieldName: string;
 begin
   result := '';
-  if (VarData.ContainsKey(FieldName)) then
-    result := VarData[FieldName];
+  LowerFieldName := LowerCase(FieldName);
+  if (VarData.ContainsKey(LowerFieldName)) then
+    result := VarData[LowerFieldName];
 end;
 
 procedure XMPrec.Clear;
@@ -354,9 +358,9 @@ end;
 function FotoRec.GetKeyName(const AKey: string): string;
 begin
   if EndsText('-', GroupName) then
-    result := GroupName + AKey
+    result := LowerCase(GroupName + AKey)
   else
-    result := GroupName + ':' + AKey;
+    result := LowerCase(GroupName + ':' + AKey);
 end;
 
 function FotoRec.AddVarData(const AKey: string; AValue: TMetaInfo; AllowBag: boolean = false): TMetaInfo;
@@ -1564,7 +1568,7 @@ begin
 end;
 
 // ======================================== MAIN ==============================================
-function GetMetadata(AName: string; AGetOptions: TGetOptions; VarData: TVarData = nil; BufSize: integer = 2048): FotoRec;
+function GetMetadata(AName: string; AGetOptions: TGetOptions; VarData: TVarData = nil): FotoRec;
 begin
   result.Clear;  // Clear all variables
 
@@ -1586,7 +1590,7 @@ begin
 
     try
       //  There is no TBufferedHandleStream. So try to create, and handle the exception
-      FotoF := TBufferedFileStream.Create(AName, fmOpenRead or fmShareDenyNone, BufSize);
+      FotoF := TBufferedFileStream.Create(AName, fmOpenRead or fmShareDenyNone);
       try
         FileSize := FotoF.Size;
         if (FileSize > 31) then
@@ -1622,7 +1626,7 @@ begin
         FotoF.Free;
       end;
     except
-      result.Supported := [TSupportedType.supError];
+      result.ErrNotOpen := true;
     end;
   end;
 end;
