@@ -6,7 +6,7 @@ uses
   System.Classes, System.SysUtils, System.Types, System.Threading,
   Winapi.Windows, Winapi.Messages, Winapi.CommCtrl, Winapi.ShlObj,
   Vcl.Shell.ShellCtrls, Vcl.Shell.ShellConsts, Vcl.ComCtrls, Vcl.Menus, Vcl.Controls, Vcl.Graphics,
-  ExifToolsGUI_Thumbnails, ExifInfo, ExifToolsGUI_MultiContextMenu;
+  ExifToolsGUI_Thumbnails, ExifToolsGUI_MultiContextMenu;
 
 // Extend ShellListview, keeping the same Type. So we dont have to register it in the IDE
 // Extended to support:
@@ -128,9 +128,9 @@ type
     procedure SetIconSpacing(Cx, Cy: word); overload;
     procedure SetIconSpacing(Cx, Cy: integer); overload;
     function GetThumbNail(ItemIndex, W, H: integer): TBitmap;
-    function GetSysColumnData(ItemIndex, Column: integer): string;
-    function GetInternalColumnData(ItemIndex: integer): TMetaData;
-    procedure GetExifToolColumnData(ItemIndex: integer; ETCmd: string; Details: TStrings);
+//    function GetSysColumnData(ItemIndex, Column: integer): string;
+//    function GetInternalColumnData(ItemIndex: integer): TMetaData;
+//    procedure GetExifToolColumnData(ItemIndex: integer; ETCmd: string; Details: TStrings);
 
     property OnColumnResized: TNotifyEvent read FonColumnResized write FonColumnResized;
     property ColumnSorted: boolean read FColumnSorted write SetColumnSorted;
@@ -1266,19 +1266,20 @@ begin
   end;
 end;
 
-function TShellListView.GetSysColumnData(ItemIndex, Column: integer): string;
-begin
-  result := GetSystemField(RootFolder, Folders[ItemIndex].RelativeID, Column);
-end;
+//function TShellListView.GetSysColumnData(ItemIndex, Column: integer): string;
+//begin
+//  result := GetSystemField(RootFolder, Folders[ItemIndex].RelativeID, Column);
+//end;
 
-function TShellListView.GetInternalColumnData(ItemIndex: integer): TMetaData;
-begin
-  result := GetInternalData(Folders[ItemIndex].PathName);
-end;
+//function TShellListView.GetInternalColumnData(ItemIndex: integer): TMetaData;
+//begin
+//  result := GetInternalData(Folders[ItemIndex].PathName);
+//end;
 
-procedure TShellListView.GetExifToolColumnData(ItemIndex: integer; ETCmd: string; Details: TStrings);
-begin
-  GetExifToolData(FileExt(ItemIndex), ETCmd, RelFileName(ItemIndex), Details);
-end;
+//procedure TShellListView.GetExifToolColumnData(ItemIndex: integer; ETCmd: string; Details: TStrings);
+//begin
+//  GetExifToolData(FileExt(ItemIndex), ETCmd, RelFileName(ItemIndex), Details);
+//end;
+
 
 end.

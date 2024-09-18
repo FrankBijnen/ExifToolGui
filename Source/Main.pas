@@ -389,7 +389,7 @@ implementation
 uses System.StrUtils, System.Math, System.Masks, System.Types, System.UITypes,
   Vcl.ClipBrd, Winapi.ShlObj, Winapi.ShellAPI, Winapi.CommCtrl, Vcl.Shell.ShellConsts, Vcl.Themes, Vcl.Styles,
   ExifTool, ExifInfo, ExifToolsGui_LossLess, ExifTool_PipeStream, ExifToolsGui_Data, ExifToolsGUI_MultiContextMenu,
-  ExifToolsGUI_StringList,
+  ExifToolsGUI_StringList, ExifToolsGui_FileListColumns,
   MainDef, LogWin, Preferences, EditFFilter, EditFCol, UFrmStyle, UFrmAbout, UFrmCheckVersions,
   QuickMngr, DateTimeShift, DateTimeEqual, CopyMeta, RemoveMeta, Geotag, Geomap, CopyMetaSingle, FileDateTime,
   UFrmGenericExtract, UFrmGenericImport, UFrmLossLessRotate, UFrmGeoTagFiles, UFrmGeoSetup,
@@ -3149,6 +3149,7 @@ begin
         end;
       4: // User defined
         begin
+//          GetUserDefColumns(ShellList, Item.Index, FListColUsr);
           ETcmd := '-s3' + CRLF + '-f';
           for Indx := 0 to High(FListColUsr) do
             ETcmd := ETcmd + CRLF + FListColUsr[Indx].Command;
