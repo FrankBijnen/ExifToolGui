@@ -200,7 +200,6 @@ uses
   UFrmPlaces, UFrmGeoSearch, ExifToolsGUI_Utils, ExifToolsGui_Data, ExifTool, UnitLangResources;
 
 var
-  CoordFormatSettings: TFormatSettings; // for StrToFloatDef -see Initialization
   LastQuery: TDateTime;
   CoordCache: TObjectDictionary<string, TPlace>;
   CountryList: TStringList;
@@ -607,7 +606,7 @@ begin
   FontSize := '';
   if (Scaled <> 100) then
     FontSize := Format('style="font-size: %sem;"',
-                      [FormatFloat('#0.##', 100 / Scaled, CoordFormatSettings)]);
+                      [FormatFloat('#0.##', 100 / Scaled, FloatFormatSettings)]);
 
   result := Format('<a %s %s>', [FontSize, HRef]);
 end;
@@ -1631,28 +1630,16 @@ function ValidLatLon(const Lat, Lon: string): boolean;
 var
   ADouble: Double;
 begin
-  result := TryStrToFloat(Lat, ADouble, CoordFormatSettings);
+  result := TryStrToFloat(Lat, ADouble, FloatFormatSettings);
   result := result and (Abs(ADouble) <= 90);
-  result := result and TryStrToFloat(Lon, ADouble, CoordFormatSettings);
+  result := result and TryStrToFloat(Lon, ADouble, FloatFormatSettings);
   result := result and (Abs(ADouble) <= 180);
 end;
 
 procedure AdjustLatLon(var Lat, Lon: string; No_Decimals: integer);
-
-  procedure AdjustUsingRound(var ACoord: string);
-  var
-    F: double;
-  begin
-    if TryStrToFloat(ACoord, F, CoordFormatSettings) then
-    begin
-      F := RoundTo(F, -No_Decimals);
-      ACoord := FloatToStr(F, CoordFormatSettings);
-    end;
-  end;
-
 begin
-  AdjustUsingRound(Lat);
-  AdjustUsingRound(Lon);
+  Lat := AdjustUsingRound(Lat, No_Decimals);
+  Lon := AdjustUsingRound(Lon, No_Decimals);
 end;
 
 procedure ParseLatLon(const LatLon: string; var Lat, Lon: string);
@@ -1730,8 +1717,6 @@ end;
 initialization
 begin
   IgnoreGeoProvider := false;
-  CoordFormatSettings.ThousandSeparator := ',';
-  CoordFormatSettings.DecimalSeparator := '.';
   GeoCityList := TStringList.Create;
   GeoProvinceList := TStringList.Create;
   CoordCache := TObjectDictionary<string, TPlace>.Create([doOwnsValues]);

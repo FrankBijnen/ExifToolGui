@@ -18,6 +18,7 @@ uses
   BreadcrumbBar, // BreadcrumbBar
   UnitScaleForm, // Scale form from Commandline parm.
   UnitSingleApp, // Single Instance App.
+  UnitColumnDefs, // Columndefs for file list
   ExifToolsGUI_ShellTree,   // Extension of ShellTreeView
   ExifToolsGUI_ShellList,   // Extension of ShellListView
   ExifToolsGUI_Thumbnails,  // Thumbnails
@@ -351,7 +352,7 @@ type
     procedure ShellListCustomDrawItem(Sender: TCustomListView; Item: TListItem; State: TCustomDrawState;
       var DefaultDraw: Boolean);
     procedure ShellListBeforePopulate(Sender: TObject; var DoDefault: boolean);
-    procedure ShellListAfterEnumColumns(Sender: TObject);
+    procedure ShellListAfterEnumColumns(Sender: TObject; var ColumnDefs: TArrayColRec);
     procedure ShellListPathChange(Sender: TObject);
     procedure ShellListItemsLoaded(Sender: TObject);
     procedure ShellListOwnerDataFetch(Sender: TObject; Item: TListItem; Request: TItemRequest; AFolder: TShellFolder);
@@ -401,40 +402,6 @@ var FStyleServices: TCustomStyleServices;
 
 const
   GUI_SEP = '-GUI-SEP';
-
-const
-  CameraFields =
-    '-s3' + CRLF + '-f' + CRLF +
-    '-IFD0:Model' + CRLF +
-    '-ExifIFD:LensModel' + CRLF +
-    '-ExifIFD:ExposureTime' + CRLF +
-    '-ExifIFD:FNumber' + CRLF +
-    '-ExifIFD:ISO' + CRLF +
-    '-ExifIFD:ExposureCompensation' + CRLF +
-    '-ExifIFD:FocalLength' + CRLF +
-    '-ExifIFD:Flash' + CRLF +
-    '-ExifIFD:ExposureProgram' + CRLF +
-    '-IFD0:Orientation';
-
-  LocationFields =
-    '-s3' + CRLF + '-f' + CRLF + '-api' + CRLF + 'QuickTimeUTC' + CRLF +
-    // In code we take DateTimeOriginal or CreateDate
-    '-ExifIFD:DateTimeOriginal' + CRLF +
-    '-CreateDate' + CRLF +
-    '-GPSLatitude#' + CRLF +
-    '-XMP-iptcExt:LocationShownCountryCode' + CRLF +
-    '-XMP-iptcExt:LocationShownCountryName' + CRLF +
-    '-XMP-iptcExt:LocationShownProvinceState' + CRLF +
-    '-XMP-iptcExt:LocationShownCity' + CRLF +
-    '-XMP-iptcExt:LocationShownSublocation';
-
-  AboutFields =
-    '-s3' + CRLF + '-f' + CRLF +
-    '-exif:Artist' + CRLF +
-    '-XMP-xmp:Rating' + CRLF +
-    '-XMP-dc:Type' + CRLF +
-    '-XMP-iptcExt:Event' + CRLF +
-    '-XMP-iptcExt:PersonInImage';
 
 function TFMain.GetDefWindowSizes: TRect;
 begin
@@ -1703,8 +1670,8 @@ var
   Tx, Tk: string;
   PrevSel, PrevRow: integer;
 begin
-  I := Length(FListColUsr);
-  SetLength(FListColUsr, I + 1);
+  I := Length(FListUserDef);
+  SetLength(FListUserDef, I + 1);
   N := MetadataList.Row;
   X := N;
   repeat // find group
@@ -1724,11 +1691,11 @@ begin
     Delete(Tk, 1, 2);
   Tk := TrimRight(Tk);
 
-  FListColUsr[I].Caption := Tk;
+  FListUserDef[I].Caption := Tk;
   Tk := TranslateTagName(Tx, Tk);
-  FListColUsr[I].Command := Tx + Tk;  // ='-IFD0:Make'
-  FListColUsr[I].Width := 96;
-  FListColUsr[I].AlignR := 0;
+  FListUserDef[I].Command := Tx + Tk;  // ='-IFD0:Make'
+  FListUserDef[I].Width := 96;
+  FListUserDef[I].AlignR := 0;
 
   with CBoxDetails do
   begin
@@ -2330,12 +2297,6 @@ end;
 
 procedure TFMain.ShowPreview;
 var
-{$IFDEF DEBUG2}
-  MetaData: TMetaData;
-  K: String;
-  KL: TstringList;
-//  Indx: integer;
-{$ENDIF}
   Foto: FotoRec;
   Rotate: integer;
   FPath: string;
@@ -2364,23 +2325,6 @@ begin
           8:
             Rotate := 270;
         end;
- {$IFDEF DEBUG2}
-        MetaData := TMetaData.Create;
-        //for Indx:= 0 to 5000 do
-          MetaData.ReadMeta(FPath, [gmXMP, gmGPS]);
-
-        allocconsole;
-        writeln(FPath);
-        Kl := TStringList.Create;
-        Kl.Sorted := true;
-        for K in MetaData.VarData.Keys do
-          Kl.Add(K);
-        for K in KL do
-          writeln(K, '=', MetaData.VarData.Items[K]);
-        Writeln('=====================================');
-        KL.Free;
-        MetaData.Free;
- {$ENDIF}
       end;
       ABitMap := GetBitmapFromWic(WicPreview(FPath, Rotate, RotateImg.Width, RotateImg.Height));
       if (ABitMap <> nil) then
@@ -2854,7 +2798,7 @@ var
 begin
   ColIndex := TListColumn(Sender).Index;
   if (ColIndex = 0) then // Name field
-    FListStdColWidth[ColIndex] := TListColumn(Sender).Width
+    FListStdColWidth[ColIndex].Width := TListColumn(Sender).Width
   else
   begin
     case CBoxDetails.ItemIndex of
@@ -2863,16 +2807,16 @@ begin
           if (ColIndex +1 > Length(FListStdColWidth)) then // Resize Array
             SetLength(FListStdColWidth, ColIndex +1);
 
-          FListStdColWidth[ColIndex] := TListColumn(Sender).Width;
+          FListStdColWidth[ColIndex].Width := TListColumn(Sender).Width;
         end;
       1:
-        FListColDef1[ColIndex - 1].Width := TListColumn(Sender).Width;
+        FListCamera[ColIndex - 1].Width := TListColumn(Sender).Width;
       2:
-        FListColDef2[ColIndex - 1].Width := TListColumn(Sender).Width;
+        FlistLocation[ColIndex - 1].Width := TListColumn(Sender).Width;
       3:
-        FListColDef3[ColIndex - 1].Width := TListColumn(Sender).Width;
+        FListAbout[ColIndex - 1].Width := TListColumn(Sender).Width;
       4:
-        FListColUsr[ColIndex - 1].Width := TListColumn(Sender).Width;
+        FListUserDef[ColIndex - 1].Width := TListColumn(Sender).Width;
     end;
   end;
 end;
@@ -2888,15 +2832,15 @@ begin
   DoDefault := ((ShellList.ViewStyle <> vsReport) or (CBoxDetails.ItemIndex = 0));
 end;
 
-procedure TFMain.ShellListAfterEnumColumns(Sender: TObject);
+procedure TFMain.ShellListAfterEnumColumns(Sender: TObject; var ColumnDefs: TArrayColRec);
 
-  procedure AdjustColumns(ColumnDefs: array of integer);
+  procedure AdjustColumns(ColumnDefs: TArrayColRec);
   var
     I, J: integer;
   begin
     J := Min(High(ColumnDefs), ShellList.Columns.Count - 1);
     for I := 0 to J do
-      ShellList.Columns[I].Width := ColumnDefs[I];
+      ShellList.Columns[I].Width := ColumnDefs[I].Width;
   end;
 
   procedure AddColumn(const ACaption: string; AWidth: integer; const AAlignment: integer = 0);
@@ -2910,49 +2854,43 @@ procedure TFMain.ShellListAfterEnumColumns(Sender: TObject);
     end;
   end;
 
-  procedure AddColumns(ColumnDefs: array of FListColDefRec); overload;
+  procedure AddColumns(ColumnDefs: TArrayColRec);
   var
     I: integer;
   begin
     with ShellList do
     begin
       Columns.Clear;
-      AddColumn(LoadResString(@StrFLName) , FListStdColWidth[0]); // Name field
+      AddColumn(StrFLName, FListStdColWidth[0].Width); // Name field
       for I := 0 to High(ColumnDefs) do
-        AddColumn(LoadResString(ColumnDefs[I].Caption), ColumnDefs[I].Width, ColumnDefs[I].AlignR);
-    end;
-  end;
-
-  procedure AddColumns(ColumnDefs: array of FListColUsrRec); overload;
-  var
-    I: integer;
-  begin
-    with ShellList do
-    begin
-      Columns.Clear;
-      AddColumn(LoadResString(@StrFLName) , FListStdColWidth[0]); // Name field
-      for I := 0 to High(ColumnDefs) do
+      begin
+        if ((ColumnDefs[I].Options and toBackup) = toBackup) then
+          continue;
         AddColumn(ColumnDefs[I].Caption, ColumnDefs[I].Width, ColumnDefs[I].AlignR);
+      end;
     end;
   end;
 
 begin
 
   case CBoxDetails.ItemIndex of
-    0:
-    begin
-      ShellList.AddDate; // Add next column, if a date. Likely Date created.
-      AdjustColumns(FListStdColWidth);
-    end;
-    1:
-      AddColumns(FListColDef1);
-    2:
-      AddColumns(FListColDef2);
-    3:
-      AddColumns(FListColDef3);
-    4:
-      AddColumns(FListColUsr);
+    0: ColumnDefs := FListStdColWidth;
+    1: ColumnDefs := FListCamera;
+    2: ColumnDefs := FlistLocation;
+    3: ColumnDefs := FListAbout;
+    4: ColumnDefs := FListUserDef;
   end;
+
+  case CBoxDetails.ItemIndex of
+    0:
+      begin
+        ShellList.AddDate;
+        AdjustColumns(ColumnDefs);
+      end;
+  else
+    AddColumns(ColumnDefs);
+  end;
+  SetupCountry(ColumnDefs, GeoSettings.CountryCodeLocation);
 
 end;
 
@@ -2999,9 +2937,8 @@ end;
 
 procedure TFMain.ShellListOwnerDataFetch(Sender: TObject; Item: TListItem; Request: TItemRequest; AFolder: TShellFolder);
 var
-  Foto: FotoRec;
   AShellList: TShellListView;
-  ETcmd, Tx, ADetail: string;
+  ADetail: string;
   Indx: integer;
   Details: TStrings;
 begin
@@ -3024,142 +2961,7 @@ begin
 
   if (Details.Count = 0) and   // Only get details once
      (TSubShellFolder.GetIsFolder(AFolder) = false) then // Dont get details for directory
-  begin
-    case CBoxDetails.ItemIndex of
-      1: // Camera settings
-        begin
-          Foto := GetMetadata(AFolder.PathName, []);
-          if (Foto.ExifIFD.HasData = false) and
-             (Foto.IFD0.HasData = false) and
-             (Foto.Supported = []) then
-          begin
-            if (GUIsettings.EnableUnsupported) then
-              ET.OpenExec(GUIsettings.Fast3(ShellList.FileExt(Item.Index)) + CameraFields,
-                          GetSelectedFile(ShellList.RelFileName(Item.Index)),
-                          Details,
-                          False)
-            else
-              Details.Add(NotSupported);
-          end
-          else
-          begin
-            Tx := Foto.IFD0.Model;
-            Details.Add(Trim(Tx));
-            Tx := Foto.ExifIFD.LensModel;
-            Details.Add(Trim(Tx));
-            Tx := Foto.ExifIFD.ExposureTime;
-            Details.Add(Tx.PadLeft(7));
-            Tx := Foto.ExifIFD.FNumber;
-            Details.Add(Tx.PadLeft(4));
-            Tx := Foto.ExifIFD.ISO;
-            Details.Add(Tx.PadLeft(5));
-            Tx := Foto.ExifIFD.ExposureCompensation;
-            Details.Add(Tx.PadLeft(4));
-            Tx := Foto.ExifIFD.FocalLength;
-            Details.Add(Tx.PadLeft(6));
-            Details.Add(Foto.ExifIFD.Flash);
-            Details.Add(Foto.ExifIFD.ExposureProgram);
-            Details.Add(Foto.IFD0.Orientation);
-          end;
-        end;
-      2: // Location info
-        begin
-          Foto := GetMetadata(AFolder.PathName, [TGetOption.gmXMP, TGetOption.gmGPS]);
-          if (Foto.ExifIFD.HasData = false) and
-             (Foto.XMP.HasData = false) and
-             (Foto.GPS.HasData = false) and
-             (Foto.Supported = []) then
-          begin
-            if (GUIsettings.EnableUnsupported) then
-            begin
-              ET.OpenExec(GUIsettings.Fast3(ShellList.FileExt(Item.Index)) + LocationFields,
-                          GetSelectedFile(ShellList.RelFileName(Item.Index)),
-                          Details,
-                          False);
-              if (Details.Count < 2) then
-                Details.Add(NotSupported)
-              else
-              begin
-                // Details[0] = DateTimeOriginal
-                // Details[1] = CreateDate
-                if (Details[0] = '-') then
-                  Details.Delete(0)
-                else
-                  Details.Delete(1);
-
-                // Now Details[1] = GPS:GPSLatitude
-                // GPS tagged?
-                if (Details[1] = '-') or
-                   (Details[1] = '0') then
-                  Details[1] := StrNo
-                else
-                  Details[1] := StrYes;
-
-                // Prefer CountryCode
-                if (GeoSettings.CountryCodeLocation) and
-                   (Trim(Details[2]) <> '-') then
-                  Details.Delete(3)   // We have a Country Code, delete the Country Name
-                else
-                  Details.Delete(2);
-              end;
-            end
-            else
-              Details.Add(NotSupported);
-          end
-          else
-          begin
-            Details.Add(Foto.ExifIFD.DateTimeOriginal);
-            if (Foto.GPS.Latitude <> '') then
-              Details.Add(StrYes)
-            else
-              Details.Add(StrNo);
-            if (GeoSettings.CountryCodeLocation) and
-               (Trim(Foto.Xmp.CountryCodeShown) <> '') then
-              Details.Add(Foto.Xmp.CountryCodeShown)
-            else
-              Details.Add(Foto.Xmp.CountryNameShown);
-            Details.Add(Foto.Xmp.ProvinceShown);
-            Details.Add(Foto.Xmp.CityShown);
-            Details.Add(Foto.Xmp.LocationShown);
-          end;
-        end;
-      3: // About photo
-        begin
-          Foto := GetMetadata(AFolder.PathName, [TGetOption.gmXMP]);
-          if (Foto.IFD0.HasData = false) and
-             (Foto.XMP.HasData = false) and
-             (Foto.Supported = []) then
-          begin
-            if (GUIsettings.EnableUnsupported) then
-              ET.OpenExec(GUIsettings.Fast3(ShellList.FileExt(Item.Index)) + AboutFields,
-                          GetSelectedFile(ShellList.RelFileName(Item.Index)),
-                          Details,
-                          False)
-            else
-              Details.Add(NotSupported);
-          end
-          else
-          begin
-            Details.Add(Foto.IFD0.Artist);
-            Details.Add(Foto.Xmp.Rating);
-            Details.Add(Foto.Xmp.PhotoType);
-            Details.Add(Foto.Xmp.Event);
-            Details.Add(Foto.Xmp.PersonInImage);
-          end;
-        end;
-      4: // User defined
-        begin
-//          GetUserDefColumns(ShellList, Item.Index, FListColUsr);
-          ETcmd := '-s3' + CRLF + '-f';
-          for Indx := 0 to High(FListColUsr) do
-            ETcmd := ETcmd + CRLF + FListColUsr[Indx].Command;
-          ET.OpenExec(GUIsettings.Fast3(ShellList.FileExt(Item.Index)) + ETcmd,
-                      GetSelectedFile(ShellList.RelFileName(Item.Index)),
-                      Details,
-                      False);
-        end;
-    end;
-  end;
+    GetFileListColumns(ShellList, ET, Item.Index, ShellList.ColumnDefs);
 
   // Column sorting works better when every column has a detail
   for Indx := Details.Count to AShellList.Columns.Count -2 do
@@ -3485,8 +3287,9 @@ begin
                 if (Pos('??', Tx) > 0) then
                   Include(NoChars, '0');
 
-                if CharInSet(ETResult[E][1], NoChars) then
-                  Tx := Tx + '='+ StrNOAst
+                if (Length(ETResult[E]) < 1) or
+                   (CharInSet(ETResult[E][1], NoChars)) then
+                 Tx := Tx + '='+ StrNOAst
                 else
                   Tx := Tx + '=' + StrYESAst;
               end

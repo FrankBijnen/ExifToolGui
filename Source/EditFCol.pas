@@ -44,7 +44,7 @@ var
 
 implementation
 
-uses Main, MainDef;
+uses Main, UnitColumnDefs;
 
 {$R *.dfm}
 
@@ -146,13 +146,13 @@ begin
   with StringGrid1 do
   begin
     I := ColCount;
-    SetLength(FListColUsr, I);
+    SetLength(FListUserDef, I);
     for N := 0 to I - 1 do
     begin
-      FListColUsr[N].Caption := Cells[N, 0];
-      FListColUsr[N].Command := Cells[N, 1];
-      FListColUsr[N].Width := ColWidths[N];
-      FListColUsr[N].AlignR := 0;
+      FListUserDef[N].Caption := Cells[N, 0];
+      FListUserDef[N].Command := Cells[N, 1];
+      FListUserDef[N].Width := ColWidths[N];
+      FListUserDef[N].AlignR := 0;
     end;
   end;
   ModalResult := mrOK;
@@ -167,15 +167,15 @@ begin
   Top := FMain.GetFormOffset(false).Y;
   Width := FMain.Width - FMain.GUIBorderWidth;
 
-  I := Length(FListColUsr);
+  I := Length(FListUserDef);
   with StringGrid1 do
   begin
     ColCount := I;
     for N := 0 to I - 1 do
     begin
-      ColWidths[N] := FListColUsr[N].Width;
-      Cells[N, 0] := FListColUsr[N].Caption;
-      Cells[N, 1] := FListColUsr[N].Command;
+      ColWidths[N] := FListUserDef[N].Width;
+      Cells[N, 0] := FListUserDef[N].Caption;
+      Cells[N, 1] := FListUserDef[N].Command;
     end;
     Button1.Enabled := (ColCount > 1);
   end;

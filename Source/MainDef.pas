@@ -2,7 +2,8 @@ unit MainDef;
 
 interface
 
-uses System.Classes, Winapi.Windows, Vcl.Dialogs, ExifTool, GEOMap, UnitLangResources, UnitScaleForm;
+uses
+  System.Classes, Winapi.Windows, Vcl.Dialogs, ExifTool, GEOMap, UnitLangResources, UnitScaleForm;
 
 const
   SHOWALL = 'Show All Files';
@@ -112,19 +113,6 @@ type
     function Fast3(const FileExt: string): string;
   end;
 
-  FListColUsrRec = record
-    Caption: string;
-    Command: string;
-    Width: integer;
-    AlignR: integer;
-  end;
-
-  FListColDefRec = record
-    Caption: PResStringRec;
-    Width: integer;
-    AlignR: integer;
-  end;
-
   QuickTagRec = record
     Caption: string;
     Command: string;
@@ -133,44 +121,6 @@ type
   end;
 
 var
-  FListStdColWidth: array of integer; // [Filename][Size][Type][Date modified] Can be extended
-
-  // Note: Default widths are in ReadGui
-  // Captions will be loaded at runtime from resourcestrings
-  FListColDef1: array [0 .. 9] of FListColDefRec =
-  (
-    (Caption: @StrFLModel; AlignR: 0),
-    (Caption: @StrFLLensModel; AlignR: 0),
-    (Caption: @StrFLExpTime; AlignR: 6),
-    (Caption: @StrFLFNumber; AlignR: 4),
-    (Caption: @StrFLISO; AlignR: 5),
-    (Caption: @StrFLExpComp; AlignR: 4),
-    (Caption: @StrFLFLength; AlignR: 8),
-    (Caption: @StrFLFlash; AlignR: 0),
-    (Caption: @StrFLExpProgram; AlignR: 0),
-    (Caption: @StrFLOrientation; AlignR: 0)
-  );
-
-  FListColDef2: array [0 .. 5] of FListColDefRec =
-  (
-    (Caption: @StrFLDateTime; AlignR: 0),
-    (Caption: @StrFLGPS; AlignR: 0),
-    (Caption: @StrFLCountry; AlignR: 0),
-    (Caption: @StrFLProvince; AlignR: 0),
-    (Caption: @StrFLCity; AlignR: 0),
-    (Caption: @StrFLLocation; AlignR: 0)
-  );
-
-  FListColDef3: array [0 .. 4] of FListColDefRec =
-  (
-    (Caption: @StrFLArtist; AlignR: 0),
-    (Caption: @StrFLRating; AlignR: 0),
-    (Caption: @StrFLType; AlignR: 0),
-    (Caption: @StrFLEvent; AlignR: 0),
-    (Caption: @StrFLPersonInImage; AlignR: 0)
-  );
-
-  FListColUsr: array of FListColUsrRec;
 
   GUIsettings: GUIsettingsRec;
   ETdirectCmdList: TStringList;
@@ -212,7 +162,7 @@ implementation
 uses System.SysUtils, System.StrUtils, System.IniFiles,
   Winapi.ShellAPI, Winapi.ShlObj,
   Vcl.Forms, Vcl.StdCtrls, Vcl.ComCtrls,
-  Main, ExifToolsGUI_Utils, ExifInfo, LogWin;
+  Main, UnitColumnDefs, ExifToolsGUI_Utils, ExifToolsGui_FileListColumns, ExifInfo, LogWin;
 
 const
   CRLF = #13#10;
@@ -223,7 +173,6 @@ const
   PrevIniVersion = 'V5';
   WorkSpaceTags = 'WorkSpaceTags';
   ETDirectCmd = 'ETdirectCmd';
-  UserDefTags = 'FListUserDefColumn';
   FormSizes = 'FormSizes';
   TagList = 'TagList';
   CustomView = 'CustomView';
@@ -425,60 +374,6 @@ begin
   CbETDirect.OnChange(CbETDirect);
 end;
 
-function ReadUserDefTags(GUIini: TMemIniFile): integer;
-var
-  Indx, UDCnt: integer;
-  Tx: string;
-  TmpItems: TStringList;
-begin
-  TmpItems := TStringList.Create;
-  try
-    GUIini.ReadSectionValues(UserDefTags, TmpItems);
-    UDCnt := TmpItems.Count;
-    result := UDCnt;
-    if (UDCnt = 0) and
-       (GUIini.SectionExists(UserDefTags) = false) then
-    begin
-      SetLength(FListColUsr, 3);
-      with FListColUsr[0] do
-      begin
-        Caption := 'DateTime';
-        Command := '-exif:DateTimeOriginal';
-        Width := 120;
-        AlignR := 0;
-      end;
-      with FListColUsr[1] do
-      begin
-        Caption := 'Rating';
-        Command := '-xmp-xmp:Rating';
-        Width := 60;
-        AlignR := 0;
-      end;
-      with FListColUsr[2] do
-      begin
-        Caption := 'Photo title';
-        Command := '-xmp-dc:Title';
-        Width := 160;
-        AlignR := 0;
-      end;
-    end
-    else
-    begin
-      SetLength(FListColUsr, UDCnt);
-      for Indx := 0 to UDCnt - 1 do
-      begin
-        Tx := TmpItems[Indx];
-        FListColUsr[Indx].Caption := NextField(Tx, '=');
-        FListColUsr[Indx].Command := NextField(Tx, ' ');
-        FListColUsr[Indx].Width := StrToIntDef(Tx, 80);
-        FListColUsr[Indx].AlignR := 0;
-      end;
-    end;
-  finally
-    TmpItems.Free;
-  end;
-end;
-
 function ReadCustomViewTags(GUIini: TMemIniFile): integer;
 begin
   CustomViewTagList := ReplaceLastChar(GUIini.ReadString(TagList, CustomView, '<'), '<', ' ');
@@ -621,28 +516,6 @@ begin
   end;
 end;
 
-// Writing the User defined fields
-procedure WriteUserDefTags(GUIini: TMemIniFile);
-var
-  Indx: integer;
-  Tx: string;
-  TmpItems: TStringList;
-begin
-  TmpItems := TStringList.Create;
-  try
-    GUIini.GetStrings(TmpItems); // Get strings written so far.
-    TmpItems.Add(Format('[%s]', [UserDefTags]));
-    for Indx := 0 to Length(FListColUsr) -1 do
-    begin
-      Tx := Format('%s=%s %d', [FListColUsr[Indx].Caption, FListColUsr[Indx].Command, FListColUsr[Indx].Width]);
-      TmpItems.Add(Tx);
-    end;
-    GUIini.SetStrings(TmpItems);
-  finally
-    TmpItems.Free;
-  end;
-end;
-
 procedure WriteTagList(GUIini: TMemIniFile; const AKey, AValue: string);
 var
   SectionIndx: integer;
@@ -737,45 +610,27 @@ begin
 
     N := 5;
     SetLength(FListStdColWidth, N);
-    FListStdColWidth[0] := ReadInteger(Ini_ETGUI, 'StdColWidth0', 200); // Filename
-    FListStdColWidth[1] := ReadInteger(Ini_ETGUI, 'StdColWidth1', 88);  // Size
-    FListStdColWidth[2] := ReadInteger(Ini_ETGUI, 'StdColWidth2', 80);  // Item Type
-    FListStdColWidth[3] := ReadInteger(Ini_ETGUI, 'StdColWidth3', 120); // Date Modified
-    FListStdColWidth[4] := ReadInteger(Ini_ETGUI, 'StdColWidth4', 120); // Date Created
+    FListStdColWidth[0].Width := ReadInteger(Ini_ETGUI, 'StdColWidth0', 200); // Filename
+    FListStdColWidth[1].Width := ReadInteger(Ini_ETGUI, 'StdColWidth1', 88);  // Size
+    FListStdColWidth[2].Width := ReadInteger(Ini_ETGUI, 'StdColWidth2', 80);  // Item Type
+    FListStdColWidth[3].Width := ReadInteger(Ini_ETGUI, 'StdColWidth3', 120); // Date Modified
+    FListStdColWidth[4].Width := ReadInteger(Ini_ETGUI, 'StdColWidth4', 120); // Date Created
 
     while (ValueExists(Ini_ETGUI, 'StdColWidth' + IntToStr(N))) do
     begin
       SetLength(FListStdColWidth, N +1); // Should be only a few
-      FListStdColWidth[N] := ReadInteger(Ini_ETGUI, 'StdColWidth' + IntToStr(N), 120);
+      FListStdColWidth[N].Width := ReadInteger(Ini_ETGUI, 'StdColWidth' + IntToStr(N), 120);
       Inc(N);
     end;
 
     // Column widths Camera settings
-    FListColDef1[0].Width := ReadInteger(Ini_ETGUI, 'Def1ColWidth0', 80);
-    FListColDef1[1].Width := ReadInteger(Ini_ETGUI, 'Def1ColWidth1', 80);
-    FListColDef1[2].Width := ReadInteger(Ini_ETGUI, 'Def1ColWidth2', 64);
-    FListColDef1[3].Width := ReadInteger(Ini_ETGUI, 'Def1ColWidth3', 64);
-    FListColDef1[4].Width := ReadInteger(Ini_ETGUI, 'Def1ColWidth4', 48);
-    FListColDef1[5].Width := ReadInteger(Ini_ETGUI, 'Def1ColWidth5', 73);
-    FListColDef1[6].Width := ReadInteger(Ini_ETGUI, 'Def1ColWidth6', 73);
-    FListColDef1[7].Width := ReadInteger(Ini_ETGUI, 'Def1ColWidth7', 56);
-    FListColDef1[8].Width := ReadInteger(Ini_ETGUI, 'Def1ColWidth8', 88);
-    FListColDef1[9].Width := ReadInteger(Ini_ETGUI, 'Def1ColWidth9', 80);
+    ReadCameraTags(GUIini);
 
     // Column widths Location info
-    FListColDef2[0].Width := ReadInteger(Ini_ETGUI, 'Def2ColWidth0', 120);
-    FListColDef2[1].Width := ReadInteger(Ini_ETGUI, 'Def2ColWidth1', 48);
-    FListColDef2[2].Width := ReadInteger(Ini_ETGUI, 'Def2ColWidth2', 80);
-    FListColDef2[3].Width := ReadInteger(Ini_ETGUI, 'Def2ColWidth3', 80);
-    FListColDef2[4].Width := ReadInteger(Ini_ETGUI, 'Def2ColWidth4', 120);
-    FListColDef2[5].Width := ReadInteger(Ini_ETGUI, 'Def2ColWidth5', 120);
-
+    ReadLocationTags(GUIini);
+    
     // Column widths About photo
-    FListColDef3[0].Width := ReadInteger(Ini_ETGUI, 'Def3ColWidth0', 120);
-    FListColDef3[1].Width := ReadInteger(Ini_ETGUI, 'Def3ColWidth1', 48);
-    FListColDef3[2].Width := ReadInteger(Ini_ETGUI, 'Def3ColWidth2', 120);
-    FListColDef3[3].Width := ReadInteger(Ini_ETGUI, 'Def3ColWidth3', 120);
-    FListColDef3[4].Width := ReadInteger(Ini_ETGUI, 'Def3ColWidth4', 120);
+    ReadAboutTags(GUIini);
 
     // When the panels have been resized, we can resize the Main Form.
     // The constraints of the panels, and or the minsize of the splitters, can prevent resizing the main form
@@ -1059,34 +914,16 @@ begin
 
         // Std (file list) col widths
         for N := 0 to Length(FListStdColWidth) -1 do
-          WriteInteger(Ini_ETGUI, 'StdColWidth' + IntToStr(N), FListStdColWidth[N]);
+          WriteInteger(Ini_ETGUI, 'StdColWidth' + IntToStr(N), FListStdColWidth[N].Width);
 
         // Column widths Camera settings
-        WriteInteger(Ini_ETGUI, 'Def1ColWidth0', FListColDef1[0].Width);
-        WriteInteger(Ini_ETGUI, 'Def1ColWidth1', FListColDef1[1].Width);
-        WriteInteger(Ini_ETGUI, 'Def1ColWidth2', FListColDef1[2].Width);
-        WriteInteger(Ini_ETGUI, 'Def1ColWidth3', FListColDef1[3].Width);
-        WriteInteger(Ini_ETGUI, 'Def1ColWidth4', FListColDef1[4].Width);
-        WriteInteger(Ini_ETGUI, 'Def1ColWidth5', FListColDef1[5].Width);
-        WriteInteger(Ini_ETGUI, 'Def1ColWidth6', FListColDef1[6].Width);
-        WriteInteger(Ini_ETGUI, 'Def1ColWidth7', FListColDef1[7].Width);
-        WriteInteger(Ini_ETGUI, 'Def1ColWidth8', FListColDef1[8].Width);
-        WriteInteger(Ini_ETGUI, 'Def1ColWidth9', FListColDef1[9].Width);
+        WriteCameraTags(GUIini);
 
         // Column widths Location info
-        WriteInteger(Ini_ETGUI, 'Def2ColWidth0', FListColDef2[0].Width);
-        WriteInteger(Ini_ETGUI, 'Def2ColWidth1', FListColDef2[1].Width);
-        WriteInteger(Ini_ETGUI, 'Def2ColWidth2', FListColDef2[2].Width);
-        WriteInteger(Ini_ETGUI, 'Def2ColWidth3', FListColDef2[3].Width);
-        WriteInteger(Ini_ETGUI, 'Def2ColWidth4', FListColDef2[4].Width);
-        WriteInteger(Ini_ETGUI, 'Def2ColWidth5', FListColDef2[5].Width);
+        WriteLocationTags(GUIini);
 
         // Column widths About photo
-        WriteInteger(Ini_ETGUI, 'Def3ColWidth0', FListColDef3[0].Width);
-        WriteInteger(Ini_ETGUI, 'Def3ColWidth1', FListColDef3[1].Width);
-        WriteInteger(Ini_ETGUI, 'Def3ColWidth2', FListColDef3[2].Width);
-        WriteInteger(Ini_ETGUI, 'Def3ColWidth3', FListColDef3[3].Width);
-        WriteInteger(Ini_ETGUI, 'Def3ColWidth4', FListColDef3[4].Width);
+        WriteAboutTags(GUIini);
 
         with GUIsettings do
         begin

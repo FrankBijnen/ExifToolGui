@@ -39,7 +39,7 @@ type
     Make, Model: string;
     PreviewOffset, PreviewSize: longint;
     OrientationValue: word; // 1=Normal, 3=180, 6=90right, 8=90left, else=Mirror
-    Orientation: string[3];
+    Orientation: string[4];
     Xresolution, Yresolution: word;
     ResolutionUnit: string[5];
     Software: string;
@@ -55,7 +55,7 @@ type
     FNumber: string[5];
     ExposureProgram: string;
     ISO: string[5];
-    DateTimeOriginal, DateTimeDigitized: string[19];
+    DateTimeOriginal, DateTimeDigitized, CreateDate: string[19];
     ExposureCompensation: string[7];
     FlashValue: word; // if (ExifIFD.Flash and 1)=1 then 'Flash=Yes'
     Flash: string[3];
@@ -84,6 +84,7 @@ type
     Altitude: string[5];
     GeoLat: string[11];         // for OSM Map
     GeoLon: string[11];         // for OSM Map
+    GpsPosition: string;        // For GPS Tagged?
     procedure Clear;
   end;
 
@@ -122,7 +123,7 @@ type
   TParseIFDProc = procedure(IFDentry: IFDentryRec) of object;
   TGetOption = (gmXMP, gmIPTC, gmGPS, gmICC);
   TGetOptions = set of TGetOption;
-  TSupportedType = (supJPEG, supTIFF);
+  TSupportedType = (supJPEG, supTIFF, supCR3);
   TSupportedTypes = set of TSupportedType;
 
   FotoRec = packed record
@@ -135,6 +136,7 @@ type
     ICC: ICCrec;
     GroupName: string;
     VarData: TVarData;
+    FieldNames: TStrings;
     Supported: TSupportedTypes;
     ErrNotOpen: boolean;
     FotoF: TBufferedFileStream;
@@ -147,10 +149,12 @@ type
     TIFFoffset, ExifIFDoffset, GPSoffset: int64;
     ICCoffset, InteropOffset, JPGfromRAWoffset: int64;
     ICCSize: word;
+    FileName: string;
     FileSize: int64;
     procedure Clear;
-    procedure SetVarData(const InVarData: TVarData);
+    procedure SetVarData(const InVarData: TVarData; InFieldNames: TStrings);
     procedure AddBag(var BagData: TMetaInfo; const ANode: TMetaInfo);
+    function GetETTagName(ATagName: string): string;
     function GetKeyName(const AKey: string): string;
     function AddVarData(const AKey: string; AValue: TMetaInfo; AllowBag: boolean = false): TMetaInfo;
 
@@ -166,6 +170,7 @@ type
     procedure ParseExifIFD(IFDentry: IFDentryRec);
     procedure ParseInterop(IFDentry: IFDentryRec);
     procedure ParseGPS(IFDentry: IFDentryRec);
+    procedure CorrectGps;
     procedure ParseICCprofile;
     procedure GetIFDentry(var IFDentry: IFDentryRec);
     procedure ParseIfd(Offset: int64; ParseProc: TParseIFDProc);
@@ -180,6 +185,7 @@ type
   end;
 
   TMetaData = class(TObject)
+    FieldNames: TStringList;
     VarData: TVarData;
     FileName: string;
     Foto: Fotorec;
@@ -190,7 +196,7 @@ type
     function FieldData(FieldName: string): string;
   end;
 
-function GetMetadata(AName: string; AGetOptions: TGetOptions; VarData: TVarData = nil): FotoRec;
+function GetMetadata(AName: string; AGetOptions: TGetOptions; VarData: TVarData = nil; FieldNames: TStrings = nil): FotoRec;
 procedure ChartFindFiles(StartDir, FileMask: string; SubDir: boolean;
                          var ETFocal, ETFnum, ETIso: TNrSortedStringList);
 
@@ -199,44 +205,54 @@ implementation
 uses
   System.StrUtils, System.Variants, Winapi.Windows, Vcl.Forms, Vcl.Dialogs,
   Main, ExifTool,
+  ExifToolsGUI_Utils,
   UnitLangResources, // Language
   Xml.VerySimple,    // XML parsing for XMP
   SDJPegTypes;       // JPEG APP types
 
 var
   Encoding: TEncoding;
-  ExifFormatSettings: TFormatSettings; // for Formatfloat -see Initialization
   GpsFormatSettings: TFormatSettings;  // for StrToFloatDef -see Initialization
-
-{$IFDEF DEBUG}
-  Filename:string;
-{$ENDIF}
 
 constructor TMetaData.Create;
 begin
   inherited Create;
   VarData := TVarData.Create;
+  FieldNames := TStringList.Create;
+  FieldNames.Sorted := true;
+  FieldNames.Duplicates := TDuplicates.dupIgnore;
 end;
 
 destructor TMetaData.Destroy;
 begin
-  if Assigned(VarData) then
-    VarData.Free;
+  VarData.Free;
+  FieldNames.Free;
 
   inherited Destroy;
 end;
 
 procedure TMetaData.ReadMeta(const AName: string; AGetOptions: TGetOptions);
 begin
-  Foto := GetMetadata(AName, AGetOptions, VarData);
+  VarData.Clear;
+  FieldNames.Clear;
+  Foto := GetMetadata(AName, AGetOptions, VarData, FieldNames);
 end;
 
 function TMetaData.FieldData(FieldName: string): string;
 var
   LowerFieldName: string;
+  P: integer;
 begin
   result := '';
+
   LowerFieldName := LowerCase(FieldName);
+  P := Pos('#', LowerFieldName);
+  if (P > 0) then
+    SetLength(LowerFieldName, P -1);
+
+  if (LeftStr(LowerFieldName, 1) = '-') then
+    LowerFieldName := Copy(LowerFieldName, 2);
+
   if (VarData.ContainsKey(LowerFieldName)) then
     result := VarData[LowerFieldName];
 end;
@@ -294,11 +310,15 @@ begin
   Self := Default(FotoRec);
 end;
 
-procedure FotoRec.SetVarData(const InVarData: TVarData);
+procedure FotoRec.SetVarData(const InVarData: TVarData; InFieldNames: TStrings);
 begin
   VarData := InVarData;
   if (Assigned(VarData)) then
     VarData.Clear;
+
+  FieldNames := InFieldNames;
+  if (Assigned(FieldNames)) then
+    FieldNames.Clear;
 end;
 
 function SwapL(L: Cardinal): Cardinal;
@@ -355,12 +375,18 @@ begin
   end;
 end;
 
+function FotoRec.GetETTagName(ATagName: string): string;
+begin
+  result := StringReplace(ATagName, 'Xmp-Iptc4xmpExt:',  'Xmp-IptcExt:',  [rfReplaceAll, rfIgnoreCase]);
+  result := StringReplace(result,   'Xmp-Iptc4xmpCore:', 'XMP-iptcCore:', [rfReplaceAll, rfIgnoreCase]);
+end;
+
 function FotoRec.GetKeyName(const AKey: string): string;
 begin
   if EndsText('-', GroupName) then
-    result := LowerCase(GroupName + AKey)
+    result := GetETTagName(GroupName + AKey)
   else
-    result := LowerCase(GroupName + ':' + AKey);
+    result := (GetETTagName(GroupName) + ':' + AKey);
 end;
 
 function FotoRec.AddVarData(const AKey: string; AValue: TMetaInfo; AllowBag: boolean = false): TMetaInfo;
@@ -370,6 +396,10 @@ begin
   if Assigned(VarData) then
   begin
     KeyName := GetKeyName(AKey);
+    if (Assigned(FieldNames)) then
+      FieldNames.Add(KeyName);
+    KeyName := LowerCase(KeyName);
+
     if (VarData.ContainsKey(KeyName)) then
     begin
       if (AllowBag) then
@@ -634,18 +664,18 @@ begin
   Sec := FloatToStrF(R, ffFixed, 7, 4);
   Delete(Sec, 1, 2);
   Tx := Tx + Sec;
+
+  // Compute decimal coordinate. For OsmMap
   Ty := Ty + ',' + Sec;
-
-  R := StrToFloatDef(Ty, 0, GpsFormatSettings) / 60;
-  Ty := FloatToStrF(Rd + R, ffFixed, 8, 6);
-  L1 := Pos(',', Ty);
-  if L1 > 0 then
-    Ty[L1] := '.';
-  if IsLat then
-    GPS.GeoLat := AddVarData('GeoLat', Ty)
-  else
-    GPS.GeoLon := AddVarData('GeoLon', Ty);
-
+  R := RD + StrToFloatDef(Ty, 0, GpsFormatSettings) / 60;
+  if (R <> 0) then
+  begin
+    Ty := FloatToStrF(R, ffFixed, 8, 6, FloatFormatSettings);
+    if IsLat then
+      GPS.GeoLat := AddVarData('GeoLat', Ty)
+    else
+      GPS.GeoLon := AddVarData('GeoLon', Ty);
+  end;
   Result := Tx;
 end;
 
@@ -728,15 +758,16 @@ begin
       $0112:
         begin
           OrientationValue := AddVarData('OrientationValue', DecodeWord(IFDentry));
-          if (OrientationValue > 0) then
-          begin
-            if (OrientationValue and 1) = 1 then
-              Orientation := StrHor
-            else
+          case (OrientationValue) of
+            1,2:
+              Orientation := StrHor;
+            3:
+              Orientation := StrRot;
+            4..8:
               Orientation := StrVer;
-          end
           else
-            Orientation := '';
+            Orientation:= '-';
+          end;
           AddVarData('Orientation', Orientation);
         end;
       $0117:
@@ -804,20 +835,30 @@ begin
       $829A:
         ExposureTime := AddVarData('ExposureTime', ConvertRational(IFDentry, false));
       $829D:
-        FNumber := AddVarData('FNumber', FloatToStrF(GetRational(IFDentry), ffFixed, 7, 1, ExifFormatSettings));
+        FNumber := AddVarData('FNumber', FormatExifDecimal(GetRational(IFDentry), 1));
       $8822:
         begin
           case DecodeWord(IFDentry) of
             0:
-              ExposureProgram := 'Undef.';
+              ExposureProgram := 'Not Defined';
             1:
-              ExposureProgram := 'M mode';
+              ExposureProgram := 'Manual';
             2:
-              ExposureProgram := 'P mode';
+              ExposureProgram := 'Program AE';
             3:
-              ExposureProgram := 'A mode';
+              ExposureProgram := 'Aperture-priority AE';
             4:
-              ExposureProgram := 'T mode';
+              ExposureProgram := 'Shutter speed priority AE';
+            5:
+              ExposureProgram := 'Creative (Slow speed)';
+            6:
+              ExposureProgram := 'Action (High speed)';
+            7:
+              ExposureProgram := 'Portrait';
+            8:
+              ExposureProgram := 'Landscape';
+            9:
+              ExposureProgram := 'Bulb';
           else
             ExposureProgram := 'Unknown';
           end;
@@ -828,7 +869,10 @@ begin
       $9003:
         DateTimeOriginal := AddVarData('DateTimeOriginal', DecodeASCII(IFDentry));
       $9004:
-        DateTimeDigitized := AddVarData('DateTimeDigitized', DecodeASCII(IFDentry));
+        begin
+          DateTimeDigitized := AddVarData('DateTimeDigitized', DecodeASCII(IFDentry));
+          CreateDate := AddVarData('CreateDate', DateTimeDigitized);
+        end;
       $9204:
         ExposureCompensation := AddVarData('ExposureCompensation', ConvertRational(IFDentry, true));
       $9209:
@@ -842,11 +886,11 @@ begin
               Flash := StrNo;
           end
           else
-            Flash := '';
+            Flash := '-';
           AddVarData('Flash', Flash);
         end;
       $920A:
-        FocalLength := AddVarData('FocalLength', FloatToStrF(GetRational(IFDentry), ffFixed, 7, 1, ExifFormatSettings));
+        FocalLength := AddVarData('FocalLength', FormatExifDecimal(GetRational(IFDentry), 1));
       $A001:
         begin
           case DecodeWord(IFDentry) of
@@ -935,6 +979,24 @@ begin
     end;
   end;
   FotoF.Seek(SavePos, TSeekOrigin.soBeginning);
+end;
+
+// For FileList
+procedure FotoRec.CorrectGps;
+begin
+  with Gps do
+  begin
+    if (LatitudeRef = 'S') and (GeoLat <> '') then
+      GeoLat := '-' + GeoLat;
+    if (LongitudeRef = 'W') and (GeoLon <> '') then
+      GeoLon := '-' + GeoLon;
+    GroupName := 'Composite';
+    if (GeoLat <> '') or
+       (GeoLon <> '') then
+      GpsPosition := AddVarData('GpsPosition', StrYes)
+    else
+      GpsPosition := AddVarData('GpsPosition', StrNo);
+  end;
 end;
 
 // ==============================================================================
@@ -1052,6 +1114,7 @@ begin
   FotoF.Read(WordData, 2);
   if IsMM then
     WordData := Swap(WordData);
+
   if (WordData = $002A) or   // $002A=TIFF
      (WordData = $0055) or   // $0055=PanasonicRW2
      (WordData = $4F52) then // $4F52=OlympusORF
@@ -1073,16 +1136,7 @@ begin
 
     if (TGetOption.gmGPS in GetOptions) and
        (GPSoffset > 0) then
-    begin
       ParseIFD(TIFFoffset + GPSoffset, ParseGPS);
-      with GPS do
-      begin
-        if (LatitudeRef = 'S') and (GeoLat <> '') then
-          GeoLat := '-' + GeoLat;
-        if (LongitudeRef = 'W') and (GeoLon <> '') then
-          GeoLon := '-' + GeoLon;
-      end;
-    end;
 
     if (TGetOption.gmIPTC in GetOptions) and
        (IPTCoffset > 0) then
@@ -1467,10 +1521,11 @@ begin
     exit;
   IsMM := false;
 
+  Include(Supported, TSupportedType.supCR3);
   FotoF.Seek(-CMT1Len, TSeekOrigin.soCurrent); //position before CMT1 to get the len
 
   FotoF.Read(TagLen, SizeOf(TagLen));
-  TagLen := SwapL(TagLen) - Sizeof(TagLen) - Sizeof(TagName);
+  TagLen := SwapL(TagLen) - SizeOf(TagLen) - SizeOf(TagName);
   FotoF.Read(TagName, SizeOf(TagName));
   EndPos := FileSize;
   while (FotoF.Position + TagLen < EndPos) do
@@ -1498,9 +1553,13 @@ begin
 
     FotoF.Seek(TIFFoffset + TagLen, TSeekOrigin.soBeginning);
     FotoF.Read(TagLen, SizeOf(TagLen));
-    TagLen := SwapL(TagLen) - Sizeof(TagLen) - Sizeof(TagName);
     FotoF.Read(TagName, SizeOf(TagName));
 
+    TagLen := SwapL(TagLen);
+    if (TagLen > (SizeOf(TagLen) + SizeOf(TagName))) then
+      TagLen := TagLen - SizeOf(TagLen) - SizeOf(TagName)
+    else
+      TagLen := EndPos;
   end;
 end;
 
@@ -1568,18 +1627,15 @@ begin
 end;
 
 // ======================================== MAIN ==============================================
-function GetMetadata(AName: string; AGetOptions: TGetOptions; VarData: TVarData = nil): FotoRec;
+function GetMetadata(AName: string; AGetOptions: TGetOptions; VarData: TVarData = nil; FieldNames: TStrings = nil): FotoRec;
 begin
   result.Clear;  // Clear all variables
+  result.FileName := AName;
+  result.SetVarData(VarData, FieldNames);
 
-  if (AName = '') or
-     not FileExists(AName) then
+  if (result.FileName = '') or
+     not FileExists(result.FileName) then
     exit;
-
-{$IFDEF DEBUG}
-  FileName := AName;
-{$ENDIF}
-  result.SetVarData(VarData);
 
   with result do
   begin
@@ -1590,7 +1646,7 @@ begin
 
     try
       //  There is no TBufferedHandleStream. So try to create, and handle the exception
-      FotoF := TBufferedFileStream.Create(AName, fmOpenRead or fmShareDenyNone);
+      FotoF := TBufferedFileStream.Create(FileName, fmOpenRead or fmShareDenyNone);
       try
         FileSize := FotoF.Size;
         if (FileSize > 31) then
@@ -1621,6 +1677,12 @@ begin
               (XMPoffset > 0) and
               (XMPsize > 0) then
             ReadXMP;
+
+          // Update Gps record.
+          if (TGetOption.gmGPS in result.GetOptions) and
+             (Gps.HasData) then
+            result.CorrectGps;
+
         end;
       finally
         FotoF.Free;
@@ -1702,9 +1764,6 @@ begin
   // for StrToFloatDef -see function DecodeGPS
   GpsFormatSettings.ThousandSeparator := '.';
   GpsFormatSettings.DecimalSeparator := ',';
-
-  ExiFFormatSettings.ThousandSeparator := ',';
-  ExiFFormatSettings.DecimalSeparator := '.';
 
   Encoding := TEncoding.GetEncoding(CP_UTF8)
 end;
