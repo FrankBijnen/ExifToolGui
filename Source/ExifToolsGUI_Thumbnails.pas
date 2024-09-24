@@ -57,7 +57,6 @@ procedure GenerateThumbs(AFilePath: string; Subdirs: boolean; AMax: longint; FOn
 function GetPidlFromName(const Name: string): PItemIDList;
 
 // Functions for CleanMgr.exe
-procedure ResetPool(var AThreadPool: TThreadPool; const Threads: integer = -1);
 function ExistsSageSet(const StateFlagId: TStateFlagId): boolean;
 function RunAsAdmin(const Handle: HWND; const Path, Params: string; Show: integer): boolean;
 
@@ -66,8 +65,6 @@ implementation
 uses Winapi.ShellAPI, System.Win.Registry, System.UITypes, System.Win.ComObj,
   ExifToolsGUI_Utils, UFrmGenerate;
 
-var
-  FThreadPool: TThreadPool;
 
   // TThumbTask. Generates Thumbnail in a separate thread.
 
@@ -311,26 +308,6 @@ begin
     end);
 end;
 
-// Create a thread pool using nr. of cores available
-procedure ResetPool(var AThreadPool: TThreadPool; const Threads: integer = -1);
-var
-  MinThreads, MaxThreads: integer;
-begin
-  if (Assigned(AThreadPool)) then
-    FreeAndNil(AThreadPool);
-  AThreadPool := TThreadPool.Create;
-
-  MinThreads := (Threads + 1) div 2;
-  MaxThreads := Threads;
-  if (Threads = -1) then
-  begin
-    MinThreads := (CPUCount + 1) div 2;
-    MaxThreads := CPUCount;
-  end;
-
-  AThreadPool.SetMinWorkerThreads(MinThreads);
-  AThreadPool.SetMaxWorkerThreads(MaxThreads);
-end;
 
 function RunAsAdmin(const Handle: HWND; const Path, Params: string; Show: integer): boolean;
 var
@@ -391,16 +368,5 @@ begin
   end;
 end;
 
-initialization
-
-begin
-  ResetPool(FThreadPool);
-end;
-
-finalization
-
-begin
-  FThreadPool.Free;
-end;
 
 end.

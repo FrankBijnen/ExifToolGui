@@ -62,7 +62,7 @@ type
     FPipeInRead, FPipeInWrite: THandle;
     FPipeOutRead, FPipeOutWrite: THandle;
     FPipeErrRead, FPipeErrWrite: THandle;
-    FETWorkDir: string;
+    FETWorkingDir: string;
     FETTempFile: string;
     FETEvent: TEvent;
     FExecNum: word;
@@ -75,17 +75,17 @@ type
     constructor Create(const Id: integer = 0);
     destructor Destroy; override;
 
-    function StayOpen(WorkDir: string): boolean;
+    function StayOpen(WorkingDir: string): boolean;
     function OpenExec(ETcmd: string; FNames: string; var ETouts, ETErrs: string; PopupOnError: boolean = true): boolean; overload;
     function OpenExec(ETcmd: string; FNames: string; ETout: TStrings; PopupOnError: boolean = true): boolean; overload;
     function OpenExec(ETcmd: string; FNames: string; PopupOnError: boolean = true): boolean; overload;
     procedure OpenExit(WaitForClose: boolean = false);
 
-    class function ExecET(ETcmd, FNames, WorkDir: string; var ETouts, ETErrs: string): boolean; overload;
-    class function ExecET(ETcmd, FNames, WorkDir: string; var ETouts: string): boolean; overload;
+    class function ExecET(ETcmd, FNames, WorkingDir: string; var ETouts, ETErrs: string): boolean; overload;
+    class function ExecET(ETcmd, FNames, WorkingDir: string; var ETouts: string): boolean; overload;
 
     procedure SetCounter(ACounterETEvent: TCounterETEvent; ACounter: integer);
-    property ETWorkDir: string read FETWorkDir;
+    property ETWorkingDir: string read FETWorkingDir;
     property ETTempFile: string read GetTempFile;
     property ExecETEvent: TExecETEvent read FExecETEvent write FExecETEvent;
     property ExecNum: word read FExecNum;
@@ -145,9 +145,9 @@ end;
 procedure TET_OptionsRec.SetFileDate(UseFileDate: boolean);
 begin
   if (UseFileDate) then
-    ETBackupMode := '-P' + CRLF
+    ETFileDate := '-P' + CRLF
   else
-    ETBackupMode := '';
+    ETFileDate := '';
 end;
 
 procedure TET_OptionsRec.SetMinorError(UseMinorError: boolean);
@@ -301,7 +301,7 @@ begin
   FId := Id;
   FETEvent := TEvent.Create(nil, true, true, ExtractFileName(Paramstr(0)));
   FExecNum := 10; // From 10 to 99
-  FETWorkDir := '';
+  FETWorkingDir := '';
   FETTempFile := '';
   FEtOutPipe := nil;
   FEtErrPipe := nil;
@@ -317,22 +317,22 @@ begin
     FEtOutPipe.Free;
   if Assigned(FEtErrPipe) then
     FEtErrPipe.Free;
-  FETWorkDir := '';
+  FETWorkingDir := '';
   FETTempFile := '';
   inherited Destroy;
 end;
 
-function TExifTool.StayOpen(WorkDir: string): boolean;
+function TExifTool.StayOpen(WorkingDir: string): boolean;
 var
   SecurityAttr: TSecurityAttributes;
   StartupInfo: TStartupInfo;
-  PWorkDir: PChar;
+  PWorkingDir: PChar;
   ETcmd: string;
 begin
   result := true;
-  if (FETWorkDir = WorkDir) then
+  if (FETWorkingDir = WorkingDir) then
     exit;
-  OpenExit; // -changing WorkDir OnTheFly requires Exit first
+  OpenExit; // -changing WorkingDir OnTheFly requires Exit first
 
   ETcmd := GUIsettings.ETOverrideDir + 'exiftool ' + GUIsettings.GetCustomConfig + ' -stay_open True -@ -';
   FillChar(FETprocessInfo, SizeOf(TProcessInformation), #0);
@@ -353,13 +353,13 @@ begin
     wShowWindow := SW_HIDE;
     dwFlags := STARTF_USESHOWWINDOW or STARTF_USESTDHANDLES;
   end;
-  if WorkDir = '' then
-    PWorkDir := nil
+  if WorkingDir = '' then
+    PWorkingDir := nil
   else
-    PWorkDir := PChar(WorkDir);
+    PWorkingDir := PChar(WorkingDir);
   if CreateProcess(nil, PChar(ETcmd), nil, nil, true,
                    CREATE_DEFAULT_ERROR_MODE or CREATE_NEW_CONSOLE or NORMAL_PRIORITY_CLASS,
-                   nil, PWorkDir,
+                   nil, PWorkingDir,
     StartupInfo, FETprocessInfo) then
   begin
     CloseHandle(FPipeInRead);
@@ -374,7 +374,7 @@ begin
       FreeAndNil(FEtErrPipe);
     FEtErrPipe := TPipeStream.Create(FPipeErrRead, SizePipeBuffer);
 
-    FETWorkDir := WorkDir;
+    FETWorkingDir := WorkingDir;
   end
   else
   begin
@@ -385,7 +385,7 @@ begin
     CloseHandle(FPipeErrRead);
     CloseHandle(FPipeErrWrite);
   end;
-  result := (FETWorkDir <> '');
+  result := (FETWorkingDir <> '');
 end;
 
 procedure TExifTool.OpenExit(WaitForClose: boolean = false);
@@ -394,7 +394,7 @@ const
 var
   BytesCount: Dword;
 begin
-  if (FETWorkDir <> '') then
+  if (FETWorkingDir <> '') then
   begin
     WriteFile(FPipeInWrite, ExitCmd[1], Length(ExitCmd), BytesCount, nil);
     FlushFileBuffers(FPipeInWrite);
@@ -407,7 +407,7 @@ begin
     CloseHandle(FPipeInWrite);
     CloseHandle(FPipeOutRead);
     CloseHandle(FPipeErrRead);
-    FETWorkDir := '';
+    FETWorkingDir := '';
   end;
 end;
 
@@ -426,7 +426,7 @@ var
 begin
   result := false;
 
-  if (FETWorkDir <> '') and
+  if (FETWorkingDir <> '') and
      (Length(ETcmd) > 1) then
   begin
     Wr := FETEvent.WaitFor(GUIsettings.ETTimeOut);
@@ -508,7 +508,7 @@ begin
   result := OpenExec(ETcmd, FNames, ETouts, ETErrs, PopupOnError);
 end;
 
-class function TExifTool.ExecET(ETcmd, FNames, WorkDir: string; var ETouts, ETErrs: string): boolean;
+class function TExifTool.ExecET(ETcmd, FNames, WorkingDir: string; var ETouts, ETErrs: string): boolean;
 var
   ReadOut: TReadPipeThread;
   ReadErr: TReadPipeThread;
@@ -521,7 +521,7 @@ var
   StatusLine: string;
   LengthReady: integer;
   Call_ET: string;
-  PWorkDir: PChar;
+  PWorkingDir: PChar;
   CanUseUtf8: boolean;
   CrWait, CrNormal: HCURSOR;
 begin
@@ -547,10 +547,10 @@ begin
       wShowWindow := SW_HIDE;
       dwFlags := STARTF_USESHOWWINDOW or STARTF_USESTDHANDLES;
     end;
-    if WorkDir = '' then
-      PWorkDir := nil
+    if WorkingDir = '' then
+      PWorkingDir := nil
     else
-      PWorkDir := PChar(WorkDir);
+      PWorkingDir := PChar(WorkingDir);
 
     CanUseUtf8 := (pos('-L ', ETcmd) = 0);
 
@@ -564,7 +564,7 @@ begin
 
     result := CreateProcess(nil, PChar(Call_ET), nil, nil, true,
                             CREATE_DEFAULT_ERROR_MODE or CREATE_NEW_CONSOLE or NORMAL_PRIORITY_CLASS,
-                            nil, PWorkDir, StartupInfo, ProcessInfo);
+                            nil, PWorkingDir, StartupInfo, ProcessInfo);
     CloseHandle(PipeOutWrite);
     CloseHandle(PipeErrWrite);
     if result then
@@ -606,11 +606,11 @@ begin
   end;
 end;
 
-class function TexifTool.ExecET(ETcmd, FNames, WorkDir: string; var ETouts: string): boolean;
+class function TexifTool.ExecET(ETcmd, FNames, WorkingDir: string; var ETouts: string): boolean;
 var
   ETErrs: string;
 begin
-  result := ExecET(ETcmd, FNames, WorkDir, ETouts, ETErrs);
+  result := ExecET(ETcmd, FNames, WorkingDir, ETouts, ETErrs);
 end;
 
 initialization

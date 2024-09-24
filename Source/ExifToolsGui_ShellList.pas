@@ -6,7 +6,7 @@ uses
   System.Classes, System.SysUtils, System.Types, System.Threading,
   Winapi.Windows, Winapi.Messages, Winapi.CommCtrl, Winapi.ShlObj,
   Vcl.Shell.ShellCtrls, Vcl.Shell.ShellConsts, Vcl.ComCtrls, Vcl.Menus, Vcl.Controls, Vcl.Graphics,
-  ExifToolsGUI_Thumbnails, ExifToolsGUI_MultiContextMenu;
+  ExifToolsGUI_Thumbnails, ExifToolsGUI_MultiContextMenu, UnitColumnDefs;
 
 // Extend ShellListview, keeping the same Type. So we dont have to register it in the IDE
 // Extended to support:
@@ -25,6 +25,7 @@ type
   TThumbGenerateEvent = procedure(Sender: TObject; Item: TListItem; Status: TThumbGenStatus; Total, Remaining: integer) of object;
   TPopulateBeforeEvent = procedure(Sender: TObject; var DoDefault: boolean) of object;
   TOwnerDataFetchEvent = procedure(Sender: TObject; Item: TListItem; Request: TItemRequest; AFolder: TShellFolder) of object;
+  TEnumColumnsEvent = procedure(Sender: TObject; var ColumnDefs: TArrayColRec) of object;
 
   TRelativeNameType = (rnDisplay, rnFile, rnSort);
   TSubShellFolder = class(TShellFolder)
@@ -50,7 +51,8 @@ type
     FSubFolders: WPARAM;
     FIncludeSubFolders: boolean;
 
-    FonColumnResized: TNotifyEvent;
+    FColumnDefs: TArrayColRec;
+    FOnColumnResized: TNotifyEvent;
     FColumnSorted: boolean;
     FSortColumn: integer;
     FSortState: THeaderSortState;
@@ -70,7 +72,7 @@ type
     FOnNotifyErrorEvent: TThumbErrorEvent;
     FOnNotifyGenerateEvent: TThumbGenerateEvent;
     FOnPopulateBeforeEvent: TPopulateBeforeEvent;
-    FOnEnumColumnsAfterEvent: TNotifyEvent;
+    FOnEnumColumnsAfterEvent: TEnumColumnsEvent;
     FOnPathChange: TNotifyEvent;
     FOnItemsLoaded: TNotifyEvent;
     FOnOwnerDataFetchEvent: TOwnerDataFetchEvent;
@@ -128,11 +130,8 @@ type
     procedure SetIconSpacing(Cx, Cy: word); overload;
     procedure SetIconSpacing(Cx, Cy: integer); overload;
     function GetThumbNail(ItemIndex, W, H: integer): TBitmap;
-//    function GetSysColumnData(ItemIndex, Column: integer): string;
-//    function GetInternalColumnData(ItemIndex: integer): TMetaData;
-//    procedure GetExifToolColumnData(ItemIndex: integer; ETCmd: string; Details: TStrings);
 
-    property OnColumnResized: TNotifyEvent read FonColumnResized write FonColumnResized;
+    property OnColumnResized: TNotifyEvent read FOnColumnResized write FOnColumnResized;
     property ColumnSorted: boolean read FColumnSorted write SetColumnSorted;
     property SortColumn: integer read FSortColumn write FSortColumn;
     property SortState: THeaderSortState read FSortState write FSortState;
@@ -143,7 +142,8 @@ type
     property OnThumbGenerate: TThumbGenerateEvent read FOnNotifyGenerateEvent write FOnNotifyGenerateEvent;
     property Generating: integer read FGenerating;
     property OnPopulateBeforeEvent: TPopulateBeforeEvent read FOnPopulateBeforeEvent write FOnPopulateBeforeEvent;
-    property OnEnumColumnsAfterEvent: TNotifyEvent read FOnEnumColumnsAfterEvent write FOnEnumColumnsAfterEvent;
+    property OnEnumColumnsAfterEvent: TEnumColumnsEvent read FOnEnumColumnsAfterEvent write FOnEnumColumnsAfterEvent;
+    property ColumnDefs: TArrayColRec read FColumnDefs write FColumnDefs;
     property OnPathChange: TNotifyEvent read FOnPathChange write FOnPathChange;
     property OnItemsLoaded: TNotifyEvent read FOnItemsLoaded write FOnItemsLoaded;
     property OnOwnerDataFetchEvent: TOwnerDataFetchEvent read FOnOwnerDataFetchEvent write FOnOwnerDataFetchEvent;
@@ -156,7 +156,8 @@ implementation
 
 uses System.Win.ComObj, System.UITypes,
      Vcl.ImgList,
-     ExifToolsGUI_Utils, ExifToolsGui_FileListColumns, UnitFilesOnClipBoard, UnitLangResources, UFrmGenerate;
+     ExifToolsGUI_Utils, ExifToolsGui_ThreadPool, ExifToolsGui_FileListColumns,
+     UnitFilesOnClipBoard, UnitLangResources, UFrmGenerate;
 
 // res file contains the ?
 
@@ -309,11 +310,11 @@ begin
   case Msg.NMHdr^.code of
     HDN_ENDTRACK:
       begin
-        if (Assigned(FonColumnResized)) then
+        if (Assigned(FOnColumnResized)) then
         begin
           ResizedColumn := pHDNotify(Msg.NMHdr)^.Item;
           Column := Columns[ResizedColumn];
-          FonColumnResized(Column);
+          FOnColumnResized(Column);
         end;
       end;
     HDN_BEGINTRACK:
@@ -331,7 +332,7 @@ end;
 
 procedure TShellListView.ColumnSort;
 var
-  ANitem: TListItem;
+//  ANitem: TListItem;
   DetailsNeeded: boolean;
   CustomSortNeeded: boolean;
 begin
@@ -344,21 +345,7 @@ begin
     DetailsNeeded := (SortColumn <> 0) and (FDoDefault = false);
 
     if (DetailsNeeded) then
-    begin
-      for ANitem in Items do // Need to get all the details of the items. This will trigger the OwnerDataFetch event!
-      begin
-        if (FIncludeSubFolders) then
-        begin
-          if boolean(SendMessage(FrmGenerate.Handle, CM_WantsToClose, 0, 0)) then
-            exit;
-          if (ANitem.Index mod FrmGenerate.ModCount = 0) then
-            SendMessage(FrmGenerate.Handle,
-                        CM_SubFolderSortProgress,
-                        ANitem.Index,
-                        LPARAM(TSubShellFolder.GetRelativeDisplayName(Folders[ANitem.Index])));
-        end;
-      end;
-    end;
+      GetAllFileListColumns(Self, FrmGenerate);
 
     // Use an anonymous method. So we can test for FDoDefault, SortColumn and SortState
     // See also method ListSortFunc in Vcl.Shell.ShellCtrls.pas
@@ -369,7 +356,7 @@ begin
 
        begin
         result := R[TSubShellFolder.GetIsFolder(Item2)] - R[TSubShellFolder.GetIsFolder(Item1)];
-        if (Result = 0) then
+        if (result = 0) then
         begin
           if (CustomSortNeeded) then
           begin
@@ -574,8 +561,9 @@ begin
     if (FDoDefault) then
       inherited;
 
+    FColumnDefs := nil;
     if Assigned(FOnEnumColumnsAfterEvent) then
-      FOnEnumColumnsAfterEvent(Self);
+      FOnEnumColumnsAfterEvent(Self, FColumnDefs);
 
     if Enabled and
        ValidDir(Path) and
@@ -1265,21 +1253,5 @@ begin
     ABitMap.Free;
   end;
 end;
-
-//function TShellListView.GetSysColumnData(ItemIndex, Column: integer): string;
-//begin
-//  result := GetSystemField(RootFolder, Folders[ItemIndex].RelativeID, Column);
-//end;
-
-//function TShellListView.GetInternalColumnData(ItemIndex: integer): TMetaData;
-//begin
-//  result := GetInternalData(Folders[ItemIndex].PathName);
-//end;
-
-//procedure TShellListView.GetExifToolColumnData(ItemIndex: integer; ETCmd: string; Details: TStrings);
-//begin
-//  GetExifToolData(FileExt(ItemIndex), ETCmd, RelFileName(ItemIndex), Details);
-//end;
-
 
 end.

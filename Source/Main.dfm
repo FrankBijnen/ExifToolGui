@@ -167,7 +167,7 @@ object FMain: TFMain
     Top = 25
     Width = 320
     Height = 536
-    ActivePage = AdvTabOSMMap
+    ActivePage = AdvTabMetadata
     Align = alRight
     DoubleBuffered = True
     ParentDoubleBuffered = False
@@ -284,6 +284,7 @@ object FMain: TFMain
         Font.Style = []
         ParentFont = False
         TabOrder = 1
+        ExplicitTop = 401
         DesignSize = (
           312
           106)
@@ -373,6 +374,7 @@ object FMain: TFMain
         OnMouseDown = MetadataListMouseDown
         OnMouseMove = MetadataListMouseMove
         OnSelectCell = MetadataListSelectCell
+        ExplicitHeight = 344
         ColWidths = (
           150
           160)
@@ -755,7 +757,7 @@ object FMain: TFMain
         object EditETdirect: TLabeledEdit
           Left = 1
           Top = 50
-          Width = 311
+          Width = 307
           Height = 23
           Hint = 
             'Spaces in data require double quotes, double quotes in data requ' +
@@ -778,7 +780,7 @@ object FMain: TFMain
           Text = ''
           OnChange = EditETdirectChange
           OnKeyDown = EditETdirectKeyDown
-          ExplicitWidth = 307
+          ExplicitWidth = 303
         end
         object CBoxETdirect: TComboBox
           Left = 1
@@ -872,7 +874,6 @@ object FMain: TFMain
         Font.Style = []
         ParentFont = False
         TabOrder = 0
-        ExplicitWidth = 366
         object SpeedBtnChartRefresh: TSpeedButton
           Left = 214
           Top = 104
@@ -971,6 +972,7 @@ object FMain: TFMain
     Top = 0
     Width = 940
     Height = 25
+    UseSystemFont = False
     ActionManager = MainActionManager
     Caption = 'ActionMainMenuBar'
     Color = clMenuBar
@@ -979,7 +981,7 @@ object FMain: TFMain
     ColorMap.BtnSelectedFont = clBlack
     ColorMap.UnusedColor = clWhite
     Font.Charset = DEFAULT_CHARSET
-    Font.Color = clWindowText
+    Font.Color = clBlack
     Font.Height = -12
     Font.Name = 'Segoe UI'
     Font.Style = []

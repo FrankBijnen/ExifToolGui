@@ -166,6 +166,7 @@ resourcestring
   StrNo                     = 'No';
   StrHor                    = 'Hor.';
   StrVer                    = 'Ver.';
+  StrRot                    = 'Rot.';
   StrERRORExifTool1         = 'ERROR: ExifTool could not be started!';
   StrERRORExifTool2         = 'To resolve this you can:';
   StrERRORExifTool3         = '- Install Exiftool in:';
@@ -211,6 +212,8 @@ resourcestring
   StrFLType                 = 'Type';
   StrFLEvent                = 'Event';
   StrFLPersonInImage        = 'PersonInImage';
+
+  StrFLPhotoTitle           = 'Photo title';
 
 implementation
 

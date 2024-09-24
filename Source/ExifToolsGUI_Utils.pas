@@ -55,8 +55,8 @@ function GetNrOfFiles(StartDir, FileMask: string; subDir: boolean): integer;
 function GetComSpec: string;
 function PasteDirectory(ADir, TargetDir: string; Cut: boolean = false): boolean;
 
-// Swap
-procedure Swap(var A, B: integer);
+// Exchange
+procedure Exchange(var A, B: integer);
 
 // String
 function NextField(var AString: string; const ADelimiter: string): string;
@@ -69,6 +69,11 @@ procedure WriteArgsFile(const ETInp, ArgsFile: string; Preamble: boolean = false
 
 // Date
 function DateDiff(ODate, NDate: TDateTime; var Increment: boolean): string;
+
+// Float
+function AdjustUsingRound(const ADecimal: string; No_Decimals: integer): string;
+function FormatExifDecimal(const ADecimal: string; No_Decimals: integer): string; overload;
+function FormatExifDecimal(const AFloat: single; No_Decimals: integer): string; overload;
 
 // Image
 function IsJpeg(Filename: string): boolean;
@@ -121,6 +126,7 @@ procedure RemoveFromContext(const AppTitle: string);
 
 // Running elevated or admin?
 var
+  FloatFormatSettings: TFormatSettings; // for StrToFloatDef -see Initialization
   IsElevated: boolean;
   IsAdminUser: boolean;
 
@@ -431,7 +437,7 @@ begin
   end;
 end;
 
-procedure Swap(var A, B: integer);
+procedure Exchange(var A, B: integer);
 var
   Temp: integer;
 begin
@@ -710,6 +716,35 @@ begin
 
 end;
 
+// Float
+function AdjustUsingRound(const ADecimal: string; No_Decimals: integer): string;
+var
+  F: double;
+begin
+  if TryStrToFloat(ADecimal, F, FloatFormatSettings) then
+  begin
+    F := RoundTo(F, -No_Decimals);
+    result := FloatToStr(F, FloatFormatSettings);
+  end;
+end;
+
+function FormatExifDecimal(const ADecimal: string; No_Decimals: integer): string;
+var
+  F: single;
+begin
+  result := ADecimal;
+  if TryStrToFloat(ADecimal, F, FloatFormatSettings) then
+  begin
+    F := RoundTo(F, -No_Decimals);
+    result := FormatExifDecimal(RoundTo(F, -No_Decimals), No_Decimals);
+  end;
+end;
+
+function FormatExifDecimal(const AFloat: single; No_Decimals: integer): string;
+begin
+  result := FloatToStrF(AFloat, ffFixed, 7, No_Decimals, FloatFormatSettings);
+end;
+
 // Image
 function IsJpeg(Filename: string): boolean;
 var
@@ -848,7 +883,7 @@ begin
   // Scaling occurs before Rotating (performs better).
   // In portrait mode swap NewW and NewH
   if Portrait then
-    Swap(NewW, NewH);
+    Exchange(NewW, NewH);
 
   IwdS.Initialize(result, NewW, NewH, WICBitmapInterpolationModeNearestNeighbor);
   result := IwdS;
@@ -1849,6 +1884,9 @@ begin
 {$ELSE}
   IsAdminUser := false;
 {$ENDIF}
+  FloatFormatSettings.ThousandSeparator := ',';
+  FloatFormatSettings.DecimalSeparator := '.';
+
 end;
 
 finalization

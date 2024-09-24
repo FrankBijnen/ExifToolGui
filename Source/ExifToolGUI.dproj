@@ -141,8 +141,11 @@
         <DCCReference Include="UnitLangResources.pas"/>
         <DCCReference Include="ExifToolsGUI_Utils.pas"/>
         <DCCReference Include="UnitFilesOnClipBoard.pas"/>
+        <DCCReference Include="UnitColumnDefs.pas"/>
         <DCCReference Include="ExifToolsGui_ValEdit.pas"/>
+        <DCCReference Include="ExifToolsGui_ThreadPool.pas"/>
         <DCCReference Include="ExifToolsGui_ShellList.pas"/>
+        <DCCReference Include="ExifToolsGui_FileListColumns.pas"/>
         <DCCReference Include="ExifToolsGui_ShellTree.pas"/>
         <DCCReference Include="ExifToolsGUI_MultiContextMenu.pas"/>
         <DCCReference Include="ExifToolsGUI_Thumbnails.pas"/>
@@ -152,7 +155,6 @@
         <DCCReference Include="ExifToolsGui_Data.pas"/>
         <DCCReference Include="ExifToolsGUI_StringList.pas"/>
         <DCCReference Include="ExifToolsGui_ComboBox.pas"/>
-        <DCCReference Include="ExifToolsGui_FileListColumns.pas"/>
         <DCCReference Include="ExifInfo.pas"/>
         <DCCReference Include="ExifTool.pas"/>
         <DCCReference Include="ExifTool_PipeStream.pas"/>
@@ -231,11 +233,9 @@
         </DCCReference>
         <DCCReference Include="UFrmTagNames.pas">
             <Form>FrmTagNames</Form>
-            <FormType>dfm</FormType>
         </DCCReference>
         <DCCReference Include="UFrmPredefinedTags.pas">
             <Form>FrmPredefinedTags</Form>
-            <FormType>dfm</FormType>
         </DCCReference>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
