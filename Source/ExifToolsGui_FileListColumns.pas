@@ -85,6 +85,8 @@ var
   FlashValue: SmallInt;
   BackupValue: string;
 begin
+  if (DetailStrings.Count <= High(ColumnDefs)) then
+    exit;
   BackupValue := '';
   for Index := High(ColumnDefs) downto 0 do // From High to Low, because of delete's
   begin
@@ -241,7 +243,7 @@ begin
 
   if (AMetaData.Foto.Supported = []) then           // Internal mode not supported, have to call ExifTool
   begin
-    if (AET.ETWorkingDir = '') then                    // Need to start ET?
+    if (AET.ETWorkingDir = '') then                 // Need to start ET?
       AET.StayOpen(AWorkingDir);
     AExt := ExtractFileExt(APath);
 

@@ -123,7 +123,7 @@ type
   TParseIFDProc = procedure(IFDentry: IFDentryRec) of object;
   TGetOption = (gmXMP, gmIPTC, gmGPS, gmICC);
   TGetOptions = set of TGetOption;
-  TSupportedType = (supJPEG, supTIFF, supCR3);
+  TSupportedType = (supJPEG, supTIFF, supCRW, supCR3);
   TSupportedTypes = set of TSupportedType;
 
   FotoRec = packed record
@@ -174,6 +174,11 @@ type
     procedure ParseICCprofile;
     procedure GetIFDentry(var IFDentry: IFDentryRec);
     procedure ParseIfd(Offset: int64; ParseProc: TParseIFDProc);
+    procedure ReadCanonVrd;
+    function GetCRWString(ALength: word): string;
+    function CanonEv(AEV: smallint): double;
+    procedure ReadCiff(AOffset, ALength: int64; Depth: integer);
+
     procedure ReadTIFF;
     procedure ReadJPEG;
     procedure ReadXMP;
@@ -203,7 +208,8 @@ procedure ChartFindFiles(StartDir, FileMask: string; SubDir: boolean;
 implementation
 
 uses
-  System.StrUtils, System.Variants, Winapi.Windows, Vcl.Forms, Vcl.Dialogs,
+  System.StrUtils, System.Variants, System.Math, System.DateUtils,
+  Winapi.Windows, Vcl.Forms, Vcl.Dialogs,
   Main, ExifTool,
   ExifToolsGUI_Utils,
   UnitLangResources, // Language
@@ -1104,9 +1110,317 @@ begin
 end;
 
 // ==============================================================================
+// Read CanonVrd, and see if there is an XMP block.
+const
+  CRWMagic          = 'HEAPCCDR';
+
+  TrailerSize       = $40;
+  CanonTrailerSize  = $18;
+  CanonVrdMagic     = 'CANON OPTIONAL DATA';
+  XMPTag            = $f600ffff;
+
+procedure FotoRec.ReadCanonVrd;
+var
+  EndCanonVrd: int64;
+  CanonVrd: array[0..19] of ansichar;
+  CanonVrdLen: integer;
+  TagData, TagLen: DWORD;
+begin
+  FotoF.Seek(-TrailerSize, TSeekOrigin.soEnd);
+  EndCanonVrd := FotoF.Position;
+  FotoF.Read(CanonVrd, SizeOf(CanonVrd));
+
+  // Have CANON OPTIONAL DATA?
+  if (CanonVrd <> CanonVrdMagic) then
+    exit;
+
+  // Length CanonVrd
+  FotoF.Read(CanonVrdLen, SizeOf(CanonVrdLen));
+  CanonVrdLen := SwapL(CanonVrdLen);
+
+  // Seek to begin of block
+  FotoF.Seek( -CanonVrdLen -CanonTrailerSize, TSeekOrigin.soCurrent);
+
+  // Loop until we find an XMP tag
+  // Note:
+  // In my testfiles I have only VRD blocks consisting of one XMP block.
+  // Dont know if the loop works.
+  FotoF.Read(TagData, 4);
+  while (TagData <> XMPTag) do  // XMPTag should also be swapped. $ffff00f6 and not $f600ffff
+  begin
+    FotoF.Read(TagLen, 4);
+    TagLen := SwapL(Taglen);
+    if ((FotoF.Position + TagLen) >= EndCanonVrd) then // End of CanonVrd?
+      exit;
+
+    FotoF.Read(TagData, 4);     // Next tag
+  end;
+
+  // We have an XMP block
+  FotoF.Read(TagLen, 4);
+  XMPsize := SwapL(Taglen);
+  XMPoffset := FotoF.Position;
+end;
+
+// CRW strings are only ANSI?
+function FotoRec.GetCRWString(ALength: word): string;
+var
+  P: array of AnsiChar;
+begin
+  SetLength(P, ALength +1);
+  FotoF.Read(P[0], ALength);
+  result := PAnsiChar(P);
+end;
+
+function FotoRec.CanonEv(AEV: smallint): double;
+var
+  Frac: WORD;
+  EV: smallint;
+  Neg: double;
+begin
+  EV := AEV;
+  if (EV < 0) then
+    Neg := -1
+  else
+    Neg := 1;
+  EV := Abs(EV);
+
+  Frac := EV and $1f;
+  Dec(EV, Frac);
+  if (Frac = $0c) then
+    result := Neg * (EV + $20 / 3) / $20
+  else if (Frac = $14) then
+    result := Neg * (EV + $40 / 3) / $20
+  else
+    result := Neg * (EV + Frac) / $20;
+end;
+
+procedure FotoRec.ReadCiff(AOffset, ALength: int64; Depth: integer);
+var
+  TBoff: int64;
+  Save: int64;
+  NRecs: SmallInt;
+  SData: SmallInt;
+  TagType, TempType: WORD;
+  TagSize: DWORD;
+  TagOffset: DWORD;
+  DWData: DWORD;
+  WData: WORD;
+  AReal: double;
+  AShutter: double;
+  MinFocal, MaxFocal: double;
+  FocalUnits: SmallInt;
+  MaxAperture: double;
+  LensInfo: string;
+
+begin
+  FotoF.Seek(AOffset + ALength -4, TSeekOrigin.soBeginning);
+  FotoF.Read(DWData, 4);
+  TBoff := DWData + AOffset;
+  FotoF.Seek(TBoff, TSeekOrigin.soBeginning);
+  FotoF.Read(NRecs, 2);
+  if ((NRecs or Depth) > 127) then
+    exit;
+
+  while (NRecs > 0) do
+  begin
+    Dec(NRecs);
+    FotoF.Read(TagType, 2);
+    FotoF.Read(TagSize, 4);
+    Save := FotoF.Position + 4;
+    FotoF.Read(TagOffset, 4);
+
+    FotoF.Seek(AOffset + TagOffset, TSeekOrigin.soBeginning);
+
+    GroupName := 'IFD0';
+    case (TagType) of
+      $0805:
+        IFD0.CopyRight := AddVarData('CopyRight', GetCRWString(TagSize));
+      $080a:
+        begin
+          IFD0.Make := AddVarData('Make', GetCRWString(TagSize));
+          FotoF.Seek(Int64(Length(IFD0.Make)) +1 -TagSize, TSeekOrigin.soCurrent);
+          IFD0.Model := AddVarData('Model', GetCRWString(TagSize));
+        end;
+      $080b:
+        begin
+          IFD0.Software := AddVarData('Software', GetCRWString(TagSize));
+        end;
+      $0810:
+        IFD0.Artist := AddVarData('Artist', GetCRWString(TagSize));
+      $1810:
+        begin
+          FotoF.Read(DWData, SizeOf(DWData)); // ImageWidth
+          FotoF.Read(DWData, SizeOf(DWData)); // ImageHeight
+          FotoF.Read(DWData, SizeOf(DWData)); // PixelAspectRatio
+          FotoF.Read(DWData, SizeOf(DWData)); // Rotation
+          case (DWData) of
+            90:
+              begin
+                IFD0.OrientationValue := AddVarData('OrientationValue', 6);
+                IFD0.Orientation := AddVarData('Orientation', StrVer);
+              end;
+            180:
+              begin
+                IFD0.OrientationValue := AddVarData('OrientationValue', 3);
+                IFD0.Orientation := AddVarData('Orientation', StrVer);
+              end;
+            270:
+              begin
+                IFD0.OrientationValue := AddVarData('OrientationValue', 5);
+                IFD0.Orientation := AddVarData('Orientation', StrVer);
+              end;
+            else
+              begin
+                IFD0.OrientationValue := AddVarData('OrientationValue', 0);
+                IFD0.Orientation := AddVarData('Orientation', StrHor);
+              end;
+          end;
+        end;
+    end;
+
+    GroupName := 'ExifIfd';
+    case (TagType) of
+      $102a:
+        begin
+          FotoF.Read(WData, SizeOf(WData)); // Len
+          FotoF.Read(WData, SizeOf(WData)); // AutoIso
+
+          FotoF.Read(WData, SizeOf(WData)); // BaseIso
+          AReal := Power(2, WData/32.0 - 4) * 50;
+          ExifIFD.ISO := AddVarData('ISO', IntToStr(Round(AReal)));
+
+          FotoF.Read(WData, SizeOf(WData)); // MeasuredEv
+          FotoF.Read(WData, SizeOf(WData)); // TargetAperture
+          FotoF.Read(SData, SizeOf(SData)); // TargetExposureTime
+
+          FotoF.Read(SData, SizeOf(SData)); // ExposureCompensation
+          ExifIFD.ExposureCompensation := AddVarData('ExposureCompensation', FormatExifDecimal(CanonEv(SData), 1));
+
+          FotoF.Read(SData, SizeOf(SData)); // WhiteBalance
+          FotoF.Read(SData, SizeOf(SData)); // SlowShutter
+          FotoF.Read(SData, SizeOf(SData)); // SequenceNumber
+          FotoF.Read(SData, SizeOf(SData)); // OpticalZoomCode
+          FotoF.Read(SData, SizeOf(SData)); // Unused
+          FotoF.Read(SData, SizeOf(SData)); // CameraTemperature
+          FotoF.Read(SData, SizeOf(SData)); // FlashGuideNumber
+          FotoF.Read(SData, SizeOf(SData)); // AFPointsInFocus
+          FotoF.Read(SData, SizeOf(SData)); // FlashExposureComp
+          FotoF.Read(SData, SizeOf(SData)); // AutoExposureBracketing
+          FotoF.Read(SData, SizeOf(SData)); // AEBBracketValue
+          FotoF.Read(SData, SizeOf(SData)); // ControlMode
+          FotoF.Read(WData, SizeOf(WData)); // FocusDistanceUpper
+          FotoF.Read(WData, SizeOf(WData)); // FocusDistanceLower
+
+          FotoF.Read(SData, SizeOf(SData)); // FNumber
+          ExifIFD.FNumber := AddVarData('FNumber', FormatExifDecimal(Exp(CanonEv(SData) * LN(2) / 2), 1));
+
+          FotoF.Read(SData, SizeOf(SData)); // ExposureTime
+          AShutter := Exp(-CanonEv(SData) * LN(2));
+          if (AShutter > 0) and
+             (AShutter < 0.25001) then
+          begin
+            AShutter := Trunc(0.5 + (1 / AShutter));
+            ExifIFD.ExposureTime := AddVarData('ExposureTime', '1/' + FormatExifDecimal(AShutter, 0));
+          end
+          else
+            ExifIFD.ExposureTime := AddVarData('ExposureTime', FormatExifDecimal(AShutter, 0));
+        end;
+      $102d:
+        begin
+          FotoF.Read(SData, SizeOf(SData)); // Len
+          FotoF.Read(SData, SizeOf(SData)); // MacroMode
+          FotoF.Read(SData, SizeOf(SData)); // SelfTimer
+          FotoF.Read(SData, SizeOf(SData)); // Quality
+
+          FotoF.Read(WData, SizeOf(WData)); // CanonFlashMode
+          ExifIFD.FlashValue := AddVarData('FlashValue', WData);
+          if (WData = 0) then
+            ExifIFD.Flash := AddVarData('Flash', StrNo)
+          else if (WData <= 16) then // Note: Doc states that -1 is undef. Unsigned => Greater than 16!
+            ExifIFD.Flash := AddVarData('Flash', StrYes);
+
+          FotoF.Read(SData, SizeOf(SData)); // ContinuousDrive
+          FotoF.Read(SData, SizeOf(SData)); // Unused
+          FotoF.Read(SData, SizeOf(SData)); // FocusMode
+          FotoF.Read(SData, SizeOf(SData)); // Unused
+          FotoF.Read(SData, SizeOf(SData)); // RecordMode
+          FotoF.Read(SData, SizeOf(SData)); // CanonImageSize
+          FotoF.Read(SData, SizeOf(SData)); // EasyMode
+          FotoF.Read(SData, SizeOf(SData)); // DigitalZoom
+          FotoF.Read(SData, SizeOf(SData)); // Contrast
+          FotoF.Read(SData, SizeOf(SData)); // Saturation
+          FotoF.Read(SData, SizeOf(SData)); // Sharpness
+          FotoF.Read(SData, SizeOf(SData)); // CameraISO
+          FotoF.Read(SData, SizeOf(SData)); // MeteringMode
+          FotoF.Read(SData, SizeOf(SData)); // FocusRange
+          FotoF.Read(SData, SizeOf(SData)); // AFPoint
+
+          FotoF.Read(SData, SizeOf(SData)); // CanonExposureMode
+          case (SData) of
+            0: ExifIFD.ExposureProgram := AddVarData('ExposureProgram', 'Easy');
+            1: ExifIFD.ExposureProgram := AddVarData('ExposureProgram', ' Program AE');
+            2: ExifIFD.ExposureProgram := AddVarData('ExposureProgram', 'Shutter speed priority AE');
+            3: ExifIFD.ExposureProgram := AddVarData('ExposureProgram', 'Aperture-priority AE');
+            4: ExifIFD.ExposureProgram := AddVarData('ExposureProgram', 'Manual');
+            5: ExifIFD.ExposureProgram := AddVarData('ExposureProgram', 'Depth-of-field AE');
+            6: ExifIFD.ExposureProgram := AddVarData('ExposureProgram', 'M-Dep');
+            7: ExifIFD.ExposureProgram := AddVarData('ExposureProgram', 'Bulb');
+            8: ExifIFD.ExposureProgram := AddVarData('ExposureProgram', 'Flexible-priority AE');
+          end;
+          FotoF.Read(WData, SizeOf(WData)); // Unused
+          FotoF.Read(WData, SizeOf(WData)); // LensType
+          FotoF.Read(WData, SizeOf(WData)); // MaxFocalLength
+          MaxFocal := WData;
+          FotoF.Read(WData, SizeOf(WData)); // MinFocalLength
+          MinFocal := WData;
+          FotoF.Read(SData, SizeOf(SData)); // FocalUnits
+          FocalUnits := SData;
+
+          FotoF.Read(SData, SizeOf(SData)); // MaxAperture
+          MaxAperture := Exp(CanonEv(SData) * LN(2) / 2);
+
+          if (MaxFocal = MinFocal) then
+            LensInfo := Format('%smm F%s', [FormatExifDecimal(MaxFocal * FocalUnits, 0),
+                                            FormatExifDecimal(MaxAperture, 1)])
+          else
+            LensInfo := Format('%s-%smm F%s', [FormatExifDecimal(MinFocal * FocalUnits, 0),
+                                               FormatExifDecimal(MaxFocal * FocalUnits, 0),
+                                               FormatExifDecimal(MaxAperture, 1)]);
+
+          ExifIFD.LensInfo := AddVarData('LensInfo', LensInfo);
+          ExifIFD.LensModel := AddVarData('LensModel', LensInfo);
+        end;
+      $5029:
+        begin
+          ExifIFD.FocalLength := AddVarData('FocalLength', FormatExifDecimal(TagSize shr 16, 1));
+        end;
+      $180e:
+        begin
+          FotoF.Read(DWData, SizeOf(DWData));
+          // All 3 the same
+          ExifIFD.DateTimeOriginal := AddVarData('DateTimeoriginal',
+                                      FormatDateTime('yyyy:mm:dd hh:nn:ss', UnixToDateTime(DWData, true)));
+          ExifIFD.DateTimeDigitized := AddVarData('DateTimeDigitized', ExifIFD.DateTimeOriginal);
+          ExifIFD.CreateDate := AddVarData('CreateDate', ExifIFD.DateTimeOriginal);
+        end;
+    end;
+
+    TempType := (TagType shr 8) + 8;
+    if ((TempType or 8) = $38) then // Subdir
+      ReadCiff(FotoF.Position, TagSize, Depth +1);
+
+    FotoF.Seek(Save, TSeekOrigin.soBeginning);
+  end;
+end;
+
 procedure FotoRec.ReadTIFF;
 var
   I: integer;
+  CRWHeader: record
+    LenHI: word;  // High order of the length. Low order has already been read.
+    Magic: array[0..7] of ansichar;
+  end;
 begin
   TIFFoffset := FotoF.Position - SizeOf(WordData);
 
@@ -1115,64 +1429,76 @@ begin
   if IsMM then
     WordData := Swap(WordData);
 
-  if (WordData = $002A) or   // $002A=TIFF
-     (WordData = $0055) or   // $0055=PanasonicRW2
-     (WordData = $4F52) then // $4F52=OlympusORF
-  begin
-    // We have a TIFF IFD
-    Include(Supported, TSupportedType.supTIFF);
-
-    FotoF.Read(DWordData, 4);
-    if IsMM then
-      DWordData := SwapL(DWordData);
-
-    ParseIfd(TIFFoffset + DWordData, ParseIFD0);
-
-    if ExifIFDoffset > 0 then
-      ParseIFD(TIFFoffset + ExifIFDoffset, ParseExifIFD);
-
-    if InteropOffset > 0 then
-      ParseIFD(TIFFoffset + InteropOffset, ParseInterop);
-
-    if (TGetOption.gmGPS in GetOptions) and
-       (GPSoffset > 0) then
-      ParseIFD(TIFFoffset + GPSoffset, ParseGPS);
-
-    if (TGetOption.gmIPTC in GetOptions) and
-       (IPTCoffset > 0) then
-    begin
-      FotoF.Seek(TIFFoffset + IPTCoffset, TSeekOrigin.soBeginning);
-      while IPTCsize > 1 do
-      begin // one padded byte possible!
-        FotoF.Read(WordData, 2);
-        Dec(IPTCsize, 2); // Skip $1C02
-        if WordData <> $021C then
-          break;
-        ParseIPTC;
-      end;
-      with IPTC do
+  case (WordData) of
+    $001A:  // $001A=CRW (Old Canon format)
       begin
-        I := length(Keywords);
-        if I > 1 then
-          SetLength(Keywords, I - 1); // delete last separator
-        if length(Keywords) = 127 then
-          Keywords[127] := '…';
-        I := length(SuppCategories);
-        if I > 1 then
-          SetLength(SuppCategories, I - 1);
-        if length(SuppCategories) = 63 then
-          SuppCategories[63] := '…';
+        FotoF.Read(CRWHeader, SizeOf(CRWHeader));
+        if (CRWHeader.Magic = CRWMagic) then
+        begin
+          Include(Supported, supCRW);
+          ReadCiff(WordData, FileSize - WordData, 0);
+          ReadCanonVrd;
+        end;
       end;
-    end;
+    $002A,  // $002A=TIFF
+    $0055,  // $0055=PanasonicRW2
+    $4F52:  // $4F52=OlympusORF
+      begin
+        // We have a TIFF IFD
+        Include(Supported, TSupportedType.supTIFF);
 
-    if (TGetOption.gmICC in GetOptions) and
-       (ICCoffset > 0) then
-    begin
-      FotoF.Seek(TIFFoffset + ICCoffset +2, TSeekOrigin.soBeginning); // Size is only word
-      FotoF.Read(ICCSize, 2);
-      ICCoffset := FotoF.Position;
-      ParseICCprofile;
-    end;
+        FotoF.Read(DWordData, 4);
+        if IsMM then
+          DWordData := SwapL(DWordData);
+
+        ParseIfd(TIFFoffset + DWordData, ParseIFD0);
+
+        if ExifIFDoffset > 0 then
+          ParseIFD(TIFFoffset + ExifIFDoffset, ParseExifIFD);
+
+        if InteropOffset > 0 then
+          ParseIFD(TIFFoffset + InteropOffset, ParseInterop);
+
+        if (TGetOption.gmGPS in GetOptions) and
+           (GPSoffset > 0) then
+          ParseIFD(TIFFoffset + GPSoffset, ParseGPS);
+
+        if (TGetOption.gmIPTC in GetOptions) and
+           (IPTCoffset > 0) then
+        begin
+          FotoF.Seek(TIFFoffset + IPTCoffset, TSeekOrigin.soBeginning);
+          while IPTCsize > 1 do
+          begin // one padded byte possible!
+            FotoF.Read(WordData, 2);
+            Dec(IPTCsize, 2); // Skip $1C02
+            if WordData <> $021C then
+              break;
+            ParseIPTC;
+          end;
+          with IPTC do
+          begin
+            I := length(Keywords);
+            if I > 1 then
+              SetLength(Keywords, I - 1); // delete last separator
+            if length(Keywords) = 127 then
+              Keywords[127] := '…';
+            I := length(SuppCategories);
+            if I > 1 then
+              SetLength(SuppCategories, I - 1);
+            if length(SuppCategories) = 63 then
+              SuppCategories[63] := '…';
+          end;
+        end;
+
+        if (TGetOption.gmICC in GetOptions) and
+           (ICCoffset > 0) then
+        begin
+          FotoF.Seek(TIFFoffset + ICCoffset +2, TSeekOrigin.soBeginning); // Size is only word
+          FotoF.Read(ICCSize, 2);
+          ICCoffset := FotoF.Position;
+          ParseICCprofile;
+        end;
+      end;
   end;
 end;
 
@@ -1223,7 +1549,7 @@ begin
 //http://ns.adobe.com/xap/1.0/#0
 //http://ns.adobe.com/xmp/extension/
         FotoF.Seek(14, TSeekOrigin.soCurrent); // Skip to xap or xmp
-        FillChar(XMPType, Sizeof(XMPType), chr(0));
+        FillChar(XMPType, SizeOf(XMPType), chr(0));
         FotoF.Read(XMPType[0], 3);
         FotoF.Seek(6, TSeekOrigin.soCurrent);  // 14 + 3 + 6 = 23 as original code.
         if (XMPType = 'xap') then
@@ -1473,7 +1799,7 @@ begin
   begin
     FotoF.Seek(0, TSeekOrigin.soBeginning);
     FotoF.Read(TagLen, SizeOf(TagLen));
-    TagLen := SwapL(TagLen) - Sizeof(TagLen) - Sizeof(TagName);
+    TagLen := SwapL(TagLen) - SizeOf(TagLen) - SizeOf(TagName);
     FotoF.Read(TagName, SizeOf(TagName));
     EndPos := FileSize;
     while (FotoF.Position + TagLen <  EndPos) do
@@ -1487,7 +1813,7 @@ begin
         FotoF.Seek(TagLen, TSeekOrigin.soCurrent);
 
       FotoF.Read(TagLen, SizeOf(TagLen));
-      TagLen := SwapL(TagLen) - Sizeof(TagLen) - Sizeof(TagName);
+      TagLen := SwapL(TagLen) - SizeOf(TagLen) - SizeOf(TagName);
       FotoF.Read(TagName, SizeOf(TagName));
 
       if (TagName = 'CMT1') then
@@ -1633,8 +1959,7 @@ begin
   result.FileName := AName;
   result.SetVarData(VarData, FieldNames);
 
-  if (result.FileName = '') or
-     not FileExists(result.FileName) then
+  if (result.FileName = '') then
     exit;
 
   with result do
@@ -1676,7 +2001,16 @@ begin
           if (TGetOption.gmXMP in result.GetOptions) and
               (XMPoffset > 0) and
               (XMPsize > 0) then
+          begin
             ReadXMP;
+            // Add a dummy GPSPosition if no GPS was found, but something is in XMP
+            if (GPS.HasData = false) and
+               (VarData.ContainsKey(LowerCase('Xmp-exif:GPSLatitude'))) then
+            begin
+              GroupName := 'Composite';
+              GPS.GpsPosition := AddVarData('GpsPosition', StrYes);
+            end;
+          end;
 
           // Update Gps record.
           if (TGetOption.gmGPS in result.GetOptions) and
