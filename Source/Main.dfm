@@ -396,7 +396,6 @@ object FMain: TFMain
         Font.Style = []
         ParentFont = False
         TabOrder = 0
-        ExplicitHeight = 418
         object EdgeBrowser1: TEdgeBrowser
           Left = 1
           Top = 1
@@ -409,7 +408,6 @@ object FMain: TFMain
           OnNavigationStarting = EdgeBrowser1NavigationStarting
           OnWebMessageReceived = EdgeBrowser1WebMessageReceived
           OnZoomFactorChanged = EdgeBrowser1ZoomFactorChanged
-          ExplicitHeight = 416
         end
       end
       object AdvPanel_MapBottom: TPanel
@@ -426,7 +424,6 @@ object FMain: TFMain
         Font.Style = []
         ParentFont = False
         TabOrder = 1
-        ExplicitTop = 475
         object SpeedBtn_Geotag: TSpeedButton
           AlignWithMargins = True
           Left = 1
@@ -757,7 +754,7 @@ object FMain: TFMain
         object EditETdirect: TLabeledEdit
           Left = 1
           Top = 50
-          Width = 307
+          Width = 303
           Height = 23
           Hint = 
             'Spaces in data require double quotes, double quotes in data requ' +
@@ -780,7 +777,7 @@ object FMain: TFMain
           Text = ''
           OnChange = EditETdirectChange
           OnKeyDown = EditETdirectKeyDown
-          ExplicitWidth = 303
+          ExplicitWidth = 299
         end
         object CBoxETdirect: TComboBox
           Left = 1
