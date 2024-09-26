@@ -16,7 +16,6 @@ const
   WorkerIntervalCheck = 250;
 
 type
-
   TGetWorkerFolderFunc = function: TShellFolder of object;
 
   TMetaDataGetController = class(TObject)
@@ -29,8 +28,8 @@ type
       FFrmGenerate: TFrmGenerate;
     protected
       function GetWorkerFolder: TShellFolder;
-    public
       procedure GetAllMetaData;
+    public
       constructor Create(AShellList: ExifToolsGui_ShellList.TShellListView; AFrmGenerate: TFrmGenerate);
       destructor Destroy; override;
   end;
@@ -39,7 +38,8 @@ type
     private
       FID: integer;
       FCurrentDir: string;
-      FColumnDefs: TArrayColRec;
+      FOptions: TFileListOptions;
+      FColumnDefs: TColumnsArray;
       FGetWorker: TGetWorkerFolderFunc;
       FFolder: TShellFolder;
       FMetaData: TMetaData;
@@ -51,18 +51,18 @@ type
       constructor Create(AID: integer;
                          AGetWorker: TGetWorkerFolderFunc;
                          ACurrentDir: string;
-                         AColumnDefs: TArrayColRec);
+                         AOptions: TFileListOptions;
+                         AColumnDefs: TColumnsArray);
       destructor Destroy; override;
       function Start: ITask;
   end;
 
-procedure SetupCountry(ColumnDefs: TArrayColRec; CountryCode: boolean);
+procedure SetupCountry(ColumnDefs: TColumnsArray; CountryCode: boolean);
 function GetSystemField(RootFolder: TShellFolder; RelativeID: PItemIDList; Column: integer): string;
 function SystemFieldIsDate(RootFolder: TShellFolder; Column: integer): boolean;
 function GetFileListColumns(AShellList: ExifToolsGui_ShellList.TShellListView;
                             ET: TExifTool;
-                            ItemIndex: integer;
-                            ColumnDefs: TArrayColRec): boolean;
+                            ItemIndex: integer): boolean;
 procedure GetAllFileListColumns(AShellList: ExifToolsGui_ShellList.TShellListView;
                                 TFrmGenerate: TFrmGenerate);
 
@@ -75,12 +75,12 @@ uses
   ExifToolsGui_ThreadPool,
   MainDef;
 
-procedure PostProcess(ColumnDefs: TArrayColRec;
+procedure PostProcess(ColumnDefs: TColumnsArray;
                       DetailStrings: TStrings;
                       ETColumns: boolean);
 var
   Index: integer;
-  ATag: TListColRec;
+  ATag: TFileListColumn;
   OrientationTag: Char;
   FlashValue: SmallInt;
   BackupValue: string;
@@ -173,7 +173,7 @@ begin
     result := true;
 end;
 
-procedure SetupCountry(ColumnDefs: TArrayColRec; CountryCode: boolean);
+procedure SetupCountry(ColumnDefs: TColumnsArray; CountryCode: boolean);
 var
   Index: integer;
 begin
@@ -206,9 +206,9 @@ begin
     end;
 end;
 
-function GetETCmd(ColumnDefs: TArrayColRec): string;
+function GetETCmd(ColumnDefs: TColumnsArray): string;
 var
-  ATag: TListColRec;
+  ATag: TFileListColumn;
 begin
   result := '-s3' + CRLF + '-f';
   for ATag in ColumnDefs do
@@ -220,65 +220,79 @@ function ProcessFolder(AFolder: TShellFolder;
                        AET: TExifTool;
                        AWorkingDir: string;
                        AETCmd: string;
-                       AColumnDefs: TArrayColRec): boolean;
+                       AOptions: TFileListOptions;
+                       AColumnDefs: TColumnsArray): boolean;
 var
   DetailStrings: TStrings;
   APath: string;
   AExt: string;
-  ATag: TListColRec;
+  ATag: TFileListColumn;
 begin
-
+  result := false;
   if (TSubShellFolder.GetIsFolder(AFolder)) then    // Dont get info for folders (directories)
-    exit(false);
+    exit;
 
   DetailStrings := AFolder.DetailStrings;           // Already have details
   if (DetailStrings.Count > 0) then
-    exit(false);
+    exit;
 
   APath := AFolder.PathName;                        // Note: This is the complete path, not the relative path.
-  AMetaData.ReadMeta(APath, [gmXMP, gmGPS]);        // Internal mode
 
-  if (AMetaData.Foto.ErrNotOpen) then               // File in use
-    exit(false);
+  if (floInternal in AOptions) then
+  begin
+    AMetaData.ReadMeta(APath, [gmXMP, gmGPS]);      // Internal mode
 
-  if (AMetaData.Foto.Supported = []) then           // Internal mode not supported, have to call ExifTool
+    if (AMetaData.Foto.ErrNotOpen) then             // File in use
+      exit;
+
+    if (AMetaData.Foto.Supported <> []) then
+    begin
+      for ATag in AColumnDefs do
+        DetailStrings.Add(AMetaData.FieldData(ATag.Command));
+      PostProcess(AColumnDefs, DetailStrings, false);   // PostProcess internal mode
+      result := true;
+    end;
+  end;
+
+  if not result and                                 // Internal mode not supported, have to call ExifTool. If allowed
+    (floExifTool in AOptions) then
   begin
     if (AET.ETWorkingDir = '') then                 // Need to start ET?
       AET.StayOpen(AWorkingDir);
     AExt := ExtractFileExt(APath);
-
     AET.OpenExec(GUIsettings.Fast3(AExt) + AETCmd,  // Get DetailStrings from EExifTool
                  APath,
                  DetailStrings,
                  False);
     PostProcess(AColumnDefs, DetailStrings, true);  // PostProcess ExifTool mode
-  end
-  else
-  begin
-    for ATag in AColumnDefs do
-      DetailStrings.Add(AMetaData.FieldData(ATag.Command));
-    PostProcess(AColumnDefs, DetailStrings, false); // PostProcess internal mode
+    result := true;
   end;
-  result := true;
+
+  if not result then
+    DetailStrings.Add(NotSupported);
 end;
 
 function GetFileListColumns(AShellList: ExifToolsGui_ShellList.TShellListView;
-                           ET: TExifTool;
-                           ItemIndex: integer;
-                           ColumnDefs: TArrayColRec): boolean;
+                            ET: TExifTool;
+                            ItemIndex: integer): boolean;
 var
   MetaData: TMetaData;
   AFolder: TShellFolder;
+  AColumnDefs: TColumnsArray;
+  AOptions: TFileListOptions;
 begin
   AFolder := AShellList.Folders[ItemIndex];
+  AOptions := AShellList.FileListOptions;
+  AColumnDefs := AShellList.ColumnDefs;
   MetaData := TMetaData.Create;
   try
     result := ProcessFolder(AFolder,
                             MetaData,
                             ET,
                             ET.ETWorkingDir, // Not used, ET will be open
-                            GetETCmd(ColumnDefs),
-                            ColumnDefs);
+                            GetETCmd(AColumnDefs),
+                            AOptions,
+                            AColumnDefs);
   finally
     MetaData.Free;
   end;
@@ -326,6 +340,7 @@ begin
     Tasks[Index] := TMetaDataGetWorker.Create(Index,
                                               GetWorkerFolder,
                                               FShellList.Path, // Working Directory
+                                              FShellList.FileListOptions,
                                               FShellList.ColumnDefs).Start;
 
   while not TTask.WaitForAll(Tasks, WorkerIntervalCheck) do
@@ -350,11 +365,13 @@ end;
 constructor TMetaDataGetWorker.Create(AID: integer;
                                       AGetWorker: TGetWorkerFolderFunc;
                                       ACurrentDir: string;
-                                      AColumnDefs: TArrayColRec);
+                                      AOptions: TFileListOptions;
+                                      AColumnDefs: TColumnsArray);
 begin
   FID := AID;
   FGetWorker := AGetWorker;
   FCurrentDir := ACurrentDir;
+  FOptions := AOptions;
   FColumnDefs := AColumnDefs;
   FMetaData := TMetaData.Create;
   FET := TExifTool.Create(FID);
@@ -384,6 +401,7 @@ begin
                          FET,
                          FCurrentDir,
                          FETCmd,
+                         FOptions,
                          FColumnDefs) then
       continue;
   end;
@@ -398,7 +416,7 @@ begin
 end;
 
 procedure GetAllFileListColumns(AShellList: ExifToolsGui_ShellList.TShellListView;
-                               TFrmGenerate: TFrmGenerate);
+                                TFrmGenerate: TFrmGenerate);
 begin
   with TMetaDataGetController.Create(AShellList, FrmGenerate) do
   begin

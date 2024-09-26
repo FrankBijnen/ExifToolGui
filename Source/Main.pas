@@ -352,7 +352,7 @@ type
     procedure ShellListCustomDrawItem(Sender: TCustomListView; Item: TListItem; State: TCustomDrawState;
       var DefaultDraw: Boolean);
     procedure ShellListBeforePopulate(Sender: TObject; var DoDefault: boolean);
-    procedure ShellListAfterEnumColumns(Sender: TObject; var ColumnDefs: TArrayColRec);
+    procedure ShellListAfterEnumColumns(Sender: TObject; var FileListOptions: TFileListOptions; var ColumnDefs: TColumnsArray);
     procedure ShellListPathChange(Sender: TObject);
     procedure ShellListItemsLoaded(Sender: TObject);
     procedure ShellListOwnerDataFetch(Sender: TObject; Item: TListItem; Request: TItemRequest; AFolder: TShellFolder);
@@ -2796,7 +2796,7 @@ procedure TFMain.ShellListColumnResized(Sender: TObject);
 var
   ColIndex: integer;
 begin
-  ColIndex := TListColumn(Sender).Index;
+  ColIndex := TListColumn(Sender).Tag;
   if (ColIndex = 0) then // Name field
     FListStdColWidth[ColIndex].Width := TListColumn(Sender).Width
   else
@@ -2832,46 +2832,54 @@ begin
   DoDefault := ((ShellList.ViewStyle <> vsReport) or (CBoxDetails.ItemIndex = 0));
 end;
 
-procedure TFMain.ShellListAfterEnumColumns(Sender: TObject; var ColumnDefs: TArrayColRec);
+procedure TFMain.ShellListAfterEnumColumns(Sender: TObject; var FileListOptions: TFileListOptions; var ColumnDefs: TColumnsArray);
 
-  procedure AdjustColumns(ColumnDefs: TArrayColRec);
+  procedure AdjustColumns(ColumnDefs: TColumnsArray);
   var
     I, J: integer;
   begin
     J := Min(High(ColumnDefs), ShellList.Columns.Count - 1);
     for I := 0 to J do
+    begin
       ShellList.Columns[I].Width := ColumnDefs[I].Width;
+      ShellList.Columns[I].Tag := I;
+    end;
   end;
 
-  procedure AddColumn(const ACaption: string; AWidth: integer; const AAlignment: integer = 0);
+  procedure AddColumn(const ACaption: string; Index, AWidth: integer; const AAlignment: integer = 0);
   begin
     with TShellListView(Sender).Columns.Add do
     begin
       Caption := ACaption;
       Width := AWidth;
+      Tag := Index;
       if (AAlignment > 0) then
         Alignment := taRightJustify;
     end;
   end;
 
-  procedure AddColumns(ColumnDefs: TArrayColRec);
+  procedure AddColumns(ColumnDefs: TColumnsArray);
   var
     I: integer;
   begin
     with ShellList do
     begin
       Columns.Clear;
-      AddColumn(StrFLName, FListStdColWidth[0].Width); // Name field
+      AddColumn(StrFLName, 0, FListStdColWidth[0].Width); // Name field
       for I := 0 to High(ColumnDefs) do
       begin
         if ((ColumnDefs[I].Options and toBackup) = toBackup) then
           continue;
-        AddColumn(ColumnDefs[I].Caption, ColumnDefs[I].Width, ColumnDefs[I].AlignR);
+        AddColumn(ColumnDefs[I].Caption, I + 1, ColumnDefs[I].Width, ColumnDefs[I].AlignR);
       end;
     end;
   end;
 
 begin
+
+  FileListOptions := [floSystem, floInternal];
+  if (GUIsettings.EnableUnsupported) then
+    Include(FileListOptions, floExifTool);
 
   case CBoxDetails.ItemIndex of
     0: ColumnDefs := FListStdColWidth;
@@ -2961,7 +2969,7 @@ begin
 
   if (Details.Count = 0) and   // Only get details once
      (TSubShellFolder.GetIsFolder(AFolder) = false) then // Dont get details for directory
-    GetFileListColumns(ShellList, ET, Item.Index, ShellList.ColumnDefs);
+    GetFileListColumns(ShellList, ET, Item.Index);
 
   // Column sorting works better when every column has a detail
   for Indx := Details.Count to AShellList.Columns.Count -2 do

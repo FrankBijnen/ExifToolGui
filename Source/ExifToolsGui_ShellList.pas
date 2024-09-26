@@ -25,7 +25,7 @@ type
   TThumbGenerateEvent = procedure(Sender: TObject; Item: TListItem; Status: TThumbGenStatus; Total, Remaining: integer) of object;
   TPopulateBeforeEvent = procedure(Sender: TObject; var DoDefault: boolean) of object;
   TOwnerDataFetchEvent = procedure(Sender: TObject; Item: TListItem; Request: TItemRequest; AFolder: TShellFolder) of object;
-  TEnumColumnsEvent = procedure(Sender: TObject; var ColumnDefs: TArrayColRec) of object;
+  TEnumColumnsEvent = procedure(Sender: TObject; var FileListOptions: TFileListOptions; var ColumnDefs: TColumnsArray) of object;
 
   TRelativeNameType = (rnDisplay, rnFile, rnSort);
   TSubShellFolder = class(TShellFolder)
@@ -51,7 +51,8 @@ type
     FSubFolders: WPARAM;
     FIncludeSubFolders: boolean;
 
-    FColumnDefs: TArrayColRec;
+    FColumnDefs: TColumnsArray;
+    FFileListOptions: TFileListOptions;
     FOnColumnResized: TNotifyEvent;
     FColumnSorted: boolean;
     FSortColumn: integer;
@@ -143,7 +144,8 @@ type
     property Generating: integer read FGenerating;
     property OnPopulateBeforeEvent: TPopulateBeforeEvent read FOnPopulateBeforeEvent write FOnPopulateBeforeEvent;
     property OnEnumColumnsAfterEvent: TEnumColumnsEvent read FOnEnumColumnsAfterEvent write FOnEnumColumnsAfterEvent;
-    property ColumnDefs: TArrayColRec read FColumnDefs write FColumnDefs;
+    property ColumnDefs: TColumnsArray read FColumnDefs write FColumnDefs;
+    property FileListOptions: TFileListOptions read FFileListOptions write FFileListOptions;
     property OnPathChange: TNotifyEvent read FOnPathChange write FOnPathChange;
     property OnItemsLoaded: TNotifyEvent read FOnItemsLoaded write FOnItemsLoaded;
     property OnOwnerDataFetchEvent: TOwnerDataFetchEvent read FOnOwnerDataFetchEvent write FOnOwnerDataFetchEvent;
@@ -308,7 +310,8 @@ begin
   inherited;
 
   case Msg.NMHdr^.code of
-    HDN_ENDTRACK:
+    HDN_ENDTRACK,
+    HDN_DIVIDERDBLCLICK:
       begin
         if (Assigned(FOnColumnResized)) then
         begin
@@ -563,7 +566,7 @@ begin
 
     FColumnDefs := nil;
     if Assigned(FOnEnumColumnsAfterEvent) then
-      FOnEnumColumnsAfterEvent(Self, FColumnDefs);
+      FOnEnumColumnsAfterEvent(Self, FFileListOptions, FColumnDefs);
 
     if Enabled and
        ValidDir(Path) and

@@ -3,6 +3,31 @@ unit ExifInfo;
 // ****************************QUICK METADATA ACCESS*************************
 // Not all formats supported. Check Value of 'Supported'
 
+(*
+
+Formats known to work:
+
+Manufacturer independent (usually)
+                Tif                      
+                Jpg                       E.G.: Nokia Lumia 920, Samsung SM-G920F, SM-G960F
+                Dng                       E.G.: Pentax K-x, K5II, K3. All DNG's Converted by Dng converter
+
+Pentax          Pef                       K100D, K-x, K5-IIs, K-3
+Nikon           Nef                       D50, D70
+Canon           Crw (partial)             EOS DIGITAL REBEL, EOS 10D
+                    Crw has no Exif.
+                    Data needed for the filelist is taken from the Canon makernotes and put in the Ifd0 ExifIfd records
+                    XMP can be read.
+                Cr2                       EOS 40D, EOS 700D, EOS 1100D
+                Cr3                       EOS R, EOS M50
+Sony            Arw                       ILCE-6000
+FujiFilm        Raf                       X-T20, FinePix S5Pro, FinePix 2400Zoom
+Olympus         Orf                       E-300
+Panasonic       Rw2                       DMC-FZ70, DMC-LX3
+Google          Jpg                       Pixel 7 Pro
+PhaseOne        Iiq                       Credo 40
+*)
+
 interface
 
 uses System.Classes, System.SysUtils, System.Generics.Collections, System.Types,

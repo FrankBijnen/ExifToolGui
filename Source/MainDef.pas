@@ -623,15 +623,6 @@ begin
       Inc(N);
     end;
 
-    // Column widths Camera settings
-    ReadCameraTags(GUIini);
-
-    // Column widths Location info
-    ReadLocationTags(GUIini);
-    
-    // Column widths About photo
-    ReadAboutTags(GUIini);
-
     // When the panels have been resized, we can resize the Main Form.
     // The constraints of the panels, and or the minsize of the splitters, can prevent resizing the main form
     N := 0;
@@ -782,8 +773,17 @@ begin
         SetCustomOptions(ReadString(Ini_Options, 'CustomOptions', ''));
       end;
 
+      // Column widths Camera settings
+      ReadCameraTags(Fmain.ShellList.Handle, GUIini);
+
+      // Column widths Location info
+      ReadLocationTags(Fmain.ShellList.Handle, GUIini);
+
+      // Column widths About photo
+      ReadAboutTags(Fmain.ShellList.Handle, GUIini);
+
       // Custom FList columns
-      ReadUserDefTags(GUIini);
+      ReadUserDefTags(Fmain.ShellList.Handle, GUIini);
 
       // --- ETdirect commands---
       ReadEtDirectCmds(CBoxETdirect, GUIini);
@@ -857,6 +857,8 @@ var
 begin
   TempIni := TMemIniFile.Create('NUL'); // Should not exist, forcing all values to default
   try
+    ResetAllColumnWidths(FMain.ShellList.Handle);
+
     ReadMainWindowSizes(TempIni);
 
     // First do Main form.
@@ -915,15 +917,6 @@ begin
         // Std (file list) col widths
         for N := 0 to Length(FListStdColWidth) -1 do
           WriteInteger(Ini_ETGUI, 'StdColWidth' + IntToStr(N), FListStdColWidth[N].Width);
-
-        // Column widths Camera settings
-        WriteCameraTags(GUIini);
-
-        // Column widths Location info
-        WriteLocationTags(GUIini);
-
-        // Column widths About photo
-        WriteAboutTags(GUIini);
 
         with GUIsettings do
         begin
@@ -990,6 +983,15 @@ begin
         WriteBool(Ini_Options, 'APIWindowsWideFile', MaAPIWindowsWideFile.Checked);
         WriteBool(Ini_Options, 'APILargeFileSupport', MaAPILargeFileSupport.Checked);
         WriteString(Ini_Options, 'CustomOptions', ET.Options.ETCustomOptions);
+
+        // Column widths Camera settings
+        WriteCameraTags(GUIini);
+
+        // Column widths Location info
+        WriteLocationTags(GUIini);
+
+        // Column widths About photo
+        WriteAboutTags(GUIini);
 
         // Write User defined fields
         WriteUserDefTags(GUIini);
@@ -1066,7 +1068,8 @@ begin
       case ThisIniTag of
         TIniTagsData.idtWorkSpace:        LoadOK := (ReadWorkSpaceTags(GuiIni) <> 0);
         TIniTagsData.idtETDirect:         LoadOK := (ReadETdirectCmds(Fmain.CBoxETdirect, GuiIni) <> 0);
-        TIniTagsData.idtUserDefined:      LoadOK := (ReadUserDefTags(GuiIni) <> 0);
+//TODO. Not only user defined?
+        TIniTagsData.idtUserDefined:      LoadOK := (ReadUserDefTags(FMain.ShellList.Handle, GuiIni) <> 0);
         TIniTagsData.idtCustomView:       LoadOK := (ReadCustomViewTags(GuiIni) <> 0);
         TIniTagsData.idtMarked:           LoadOK := (ReadMarkedTags(GuiIni) <> 0);
         TIniTagsData.idtPredefinedTags:   LoadOK := (ReadPredefinedTags(GUIini) <> 0);
