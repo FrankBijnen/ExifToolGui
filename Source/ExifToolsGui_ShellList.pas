@@ -352,13 +352,16 @@ begin
     SysSortColumn := SortColumn;
 
     // System field used with FDODefault = false. EG: Size sorts wrong as text, because 'Bytes, KB, MB'
-    SysSortColumn := Columns[SortColumn].Tag -1;
-    if (SysSortColumn > -1) and
-       (SysSortColumn <= High(ColumnDefs)) and
-       ((ColumnDefs[SysSortColumn].Options and toSys) = toSys) then
+    if (SortColumn < Columns.Count) then      // When not in vsReport mode
     begin
-      SysSortColumn := StrToIntDef(ColumnDefs[SysSortColumn].Command, 0);
-      CustomSortNeeded := false;
+      SysSortColumn := Columns[SortColumn].Tag -1;
+      if (SysSortColumn > -1) and
+         (SysSortColumn <= High(ColumnDefs)) and
+         ((ColumnDefs[SysSortColumn].Options and toSys) = toSys) then
+      begin
+        SysSortColumn := StrToIntDef(ColumnDefs[SysSortColumn].Command, 0);
+        CustomSortNeeded := false;
+      end;
     end;
 
     // Use an anonymous method. So we can test for FDoDefault, SortColumn and SortState
