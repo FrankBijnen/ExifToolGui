@@ -75,7 +75,8 @@ uses
   ExifToolsGui_ThreadPool,
   MainDef;
 
-procedure PostProcess(ColumnDefs: TColumnsArray;
+procedure PostProcess(Folder: TShellFolder;
+                      ColumnDefs: TColumnsArray;
                       DetailStrings: TStrings;
                       ETColumns: boolean);
 var
@@ -85,8 +86,10 @@ var
   FlashValue: SmallInt;
   BackupValue: string;
 begin
-  if (DetailStrings.Count <= High(ColumnDefs)) then
-    exit;
+  // Make sure every column has a DetailString. Column sorting works better.
+  for Index := DetailStrings.Count to High(ColumnDefs) do
+    DetailStrings.Add('');
+
   BackupValue := '';
   for Index := High(ColumnDefs) downto 0 do // From High to Low, because of delete's
   begin
@@ -141,9 +144,16 @@ begin
     end;
 
     // Common
+
+    // SysField ?
+    if ((ATag.Options and toSys) = toSys) then
+      DetailStrings[Index] := GetSystemField(Folder.Parent, Folder.RelativeID, StrToIntDef(ATag.Command, 0));
+
+    // Padleft?
     if (ATag.AlignR > 0) then
       DetailStrings[Index] := DetailStrings[Index].PadLeft(ATag.AlignR);
 
+    // Backup column?
     if ((ATag.Options and toBackup) = toBackup) then
     begin
       if ((DetailStrings[Index] <> '-') and (DetailStrings[Index] <> '')) then
@@ -212,7 +222,12 @@ var
 begin
   result := '-s3' + CRLF + '-f';
   for ATag in ColumnDefs do
-    result := result + CRLF + ATag.Command;
+  begin
+    if ((ATag.Options and toSys) = toSys) then
+      result := result + CRLF + GUI_SEP
+    else
+      result := result + CRLF + ATag.Command;
+  end;
 end;
 
 function ProcessFolder(AFolder: TShellFolder;
@@ -229,6 +244,7 @@ var
   ATag: TFileListColumn;
 begin
   result := false;
+
   if (TSubShellFolder.GetIsFolder(AFolder)) then    // Dont get info for folders (directories)
     exit;
 
@@ -249,9 +265,13 @@ begin
     begin
       for ATag in AColumnDefs do
         DetailStrings.Add(AMetaData.FieldData(ATag.Command));
-      PostProcess(AColumnDefs, DetailStrings, false);   // PostProcess internal mode
+      PostProcess(AFolder,                          // PostProcess internal mode
+                  AColumnDefs,
+                  DetailStrings,
+                  false);
       result := true;
     end;
+
   end;
 
   if not result and                                 // Internal mode not supported, have to call ExifTool. If allowed
@@ -264,12 +284,22 @@ begin
                  APath,
                  DetailStrings,
                  False);
-    PostProcess(AColumnDefs, DetailStrings, true);  // PostProcess ExifTool mode
+    PostProcess(AFolder,                            // PostProcess ExifTool mode
+                AColumnDefs,
+                DetailStrings,
+                true);
     result := true;
   end;
 
-  if not result then
+  if not result then                                // File type not supported
+  begin
     DetailStrings.Add(NotSupported);
+
+    PostProcess(AFolder,                            // Fill system fields
+                AColumnDefs,
+                DetailStrings,
+                false);
+  end;
 end;
 
 function GetFileListColumns(AShellList: ExifToolsGui_ShellList.TShellListView;

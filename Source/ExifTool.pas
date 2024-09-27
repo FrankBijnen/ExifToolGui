@@ -8,6 +8,8 @@ uses System.Classes, System.Types, System.SyncObjs, Winapi.Windows,
 const
   CRLF = #13#10;
 
+  GUI_SEP = '-GUI-SEP';
+
   CmdStr = '-';
   CmdDateOriginal = 'exif:DateTimeOriginal';
   CmdDateCreate = 'exif:CreateDate';

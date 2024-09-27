@@ -335,20 +335,31 @@ end;
 
 procedure TShellListView.ColumnSort;
 var
-//  ANitem: TListItem;
-  DetailsNeeded: boolean;
   CustomSortNeeded: boolean;
+  SysSortColumn: integer;
 begin
   if (FColumnSorted) then
   begin
     if (SortColumn < Columns.Count) then
       SetListHeaderSortState(Self, Columns[SortColumn], FSortState);
 
-    CustomSortNeeded := ((FDoDefault = false) and (SortColumn <> 0)) or FIncludeSubFolders;
-    DetailsNeeded := (SortColumn <> 0) and (FDoDefault = false);
-
-    if (DetailsNeeded) then
+    // Get all details?
+    if (SortColumn <> 0) and (FDoDefault = false) then
       GetAllFileListColumns(Self, FrmGenerate);
+
+    // Custom sort?
+    CustomSortNeeded := ((FDoDefault = false) and (SortColumn <> 0)) or FIncludeSubFolders;
+    SysSortColumn := SortColumn;
+
+    // System field used with FDODefault = false. EG: Size sorts wrong as text, because 'Bytes, KB, MB'
+    SysSortColumn := Columns[SortColumn].Tag -1;
+    if (SysSortColumn > -1) and
+       (SysSortColumn <= High(ColumnDefs)) and
+       ((ColumnDefs[SysSortColumn].Options and toSys) = toSys) then
+    begin
+      SysSortColumn := StrToIntDef(ColumnDefs[SysSortColumn].Command, 0);
+      CustomSortNeeded := false;
+    end;
 
     // Use an anonymous method. So we can test for FDoDefault, SortColumn and SortState
     // See also method ListSortFunc in Vcl.Shell.ShellCtrls.pas
@@ -377,7 +388,7 @@ begin
           else
           begin // Use the standard compare
             if (TShellFolder(Item1).ParentShellFolder <> nil) then
-              result := Smallint(TShellFolder(Item1).ParentShellFolder.CompareIDs(SortColumn,
+              result := Smallint(TShellFolder(Item1).ParentShellFolder.CompareIDs(SysSortColumn,
                                                                                   TShellFolder(Item1).RelativeID,
                                                                                   TShellFolder(Item2).RelativeID));
           end;
