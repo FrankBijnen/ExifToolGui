@@ -400,8 +400,6 @@ uses System.StrUtils, System.Math, System.Masks, System.Types, System.UITypes,
 
 var FStyleServices: TCustomStyleServices;
 
-const
-  GUI_SEP = '-GUI-SEP';
 
 function TFMain.GetDefWindowSizes: TRect;
 begin
@@ -2870,6 +2868,11 @@ procedure TFMain.ShellListAfterEnumColumns(Sender: TObject; var FileListOptions:
       begin
         if ((ColumnDefs[I].Options and toBackup) = toBackup) then
           continue;
+//TODO: To be done in designer
+//        if ((ColumnDefs[I].Options and toSys) = toSys) then
+//          AddColumn(GetSystemField(ShellList.RootFolder, nil, StrToIntDef(ColumnDefs[I].Command, 0)),
+//                    I + 1, ColumnDefs[I].Width, ColumnDefs[I].AlignR)
+//        else
         AddColumn(ColumnDefs[I].Caption, I + 1, ColumnDefs[I].Width, ColumnDefs[I].AlignR);
       end;
     end;
@@ -2947,7 +2950,6 @@ procedure TFMain.ShellListOwnerDataFetch(Sender: TObject; Item: TListItem; Reque
 var
   AShellList: TShellListView;
   ADetail: string;
-  Indx: integer;
   Details: TStrings;
 begin
   AShellList := TShellListView(Sender);
@@ -2970,10 +2972,6 @@ begin
   if (Details.Count = 0) and   // Only get details once
      (TSubShellFolder.GetIsFolder(AFolder) = false) then // Dont get details for directory
     GetFileListColumns(ShellList, ET, Item.Index);
-
-  // Column sorting works better when every column has a detail
-  for Indx := Details.Count to AShellList.Columns.Count -2 do
-    Details.Add('');
 
   // Now add to Listview
   for ADetail in Details do

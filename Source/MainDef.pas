@@ -303,7 +303,7 @@ begin
     if (WSCnt = 0) and
        (GUIini.SectionExists(WorkSpaceTags) = false) then
     begin
-      WSCnt :=  SetQuickTag(WSCnt, 'EXIF', '-GUI-SEP');
+      WSCnt :=  SetQuickTag(WSCnt, 'EXIF', GUI_SEP);
       WSCnt :=  SetQuickTag(WSCnt, 'Make', '-exif:Make');
       WSCnt :=  SetQuickTag(WSCnt, 'Model', '-exif:Model');
       WSCnt :=  SetQuickTag(WSCnt, 'LensModel', '-exif:LensModel');
@@ -320,7 +320,7 @@ begin
       WSCnt :=  SetQuickTag(WSCnt, 'Software', '-exif:Software');
       WSCnt :=  SetQuickTag(WSCnt, 'Geotagged?', '-Gps:GPSLatitude');
 
-      WSCnt :=  SetQuickTag(WSCnt, 'About photo', '-GUI-SEP');
+      WSCnt :=  SetQuickTag(WSCnt, 'About photo', GUI_SEP);
       WSCnt :=  SetQuickTag(WSCnt, 'Type±', '-xmp-dc:Type', '[Landscape] or [Studio+Portrait] ..');
       WSCnt :=  SetQuickTag(WSCnt, 'Rating', '-xmp-xmp:Rating', 'Integer value [ 0 ] .. [ 5 ]');
 

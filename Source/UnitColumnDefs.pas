@@ -15,6 +15,7 @@ const
   toMain    = $0010;
   toBackup  = $0020;
   toCountry = $0040;
+  toSys     = $0080;
 
   CommandCountryCode = '-XMP-iptcExt:LocationShownCountryCode';
   CommandCountryName = '-XMP-iptcExt:LocationShownCountryName';
