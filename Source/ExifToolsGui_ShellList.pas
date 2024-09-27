@@ -336,35 +336,42 @@ end;
 procedure TShellListView.ColumnSort;
 var
   CustomSortNeeded: boolean;
-  SysSortColumn: integer;
+  TempColumn: integer;
+  CompareColumn: integer;
 begin
   if (FColumnSorted) then
   begin
     if (SortColumn < Columns.Count) then
       SetListHeaderSortState(Self, Columns[SortColumn], FSortState);
 
-    // Get all details?
-    if (SortColumn <> 0) and (FDoDefault = false) then
-      GetAllFileListColumns(Self, FrmGenerate);
-
     // Custom sort?
-    CustomSortNeeded := ((FDoDefault = false) and (SortColumn <> 0)) or FIncludeSubFolders;
-    SysSortColumn := SortColumn;
+    CustomSortNeeded := ((FDoDefault = false) and (SortColumn <> 0)) or // A column from the non standard list, not name.
+                         (FIncludeSubFolders and (SortColumn = 0));     // Including subfolders, need to sort on the relative name
 
-    // System field used with FDODefault = false. EG: Size sorts wrong as text, because 'Bytes, KB, MB'
-    if (SortColumn < Columns.Count) then      // When not in vsReport mode
+
+    // Is the sort field from the non standard list a system field?
+    // Better to use the standard compare. EG: Size sorts wrong as text, because 'Bytes, KB, MB'
+    CompareColumn := SortColumn;
+    if (FDoDefault = false) and
+       (CompareColumn > 0) and
+       (CompareColumn < Columns.Count) then      // When not in vsReport mode
     begin
-      SysSortColumn := Columns[SortColumn].Tag -1;
-      if (SysSortColumn > -1) and
-         (SysSortColumn <= High(ColumnDefs)) and
-         ((ColumnDefs[SysSortColumn].Options and toSys) = toSys) then
+      TempColumn := Columns[CompareColumn].Tag -1;
+      if (TempColumn > 0) and
+         (TempColumn <= High(ColumnDefs)) and
+         ((ColumnDefs[TempColumn].Options and toSys) = toSys) then   // Yes. a system field
       begin
-        SysSortColumn := StrToIntDef(ColumnDefs[SysSortColumn].Command, 0);
+        CompareColumn := StrToIntDef(ColumnDefs[TempColumn].Command, 0);
         CustomSortNeeded := false;
       end;
     end;
 
-    // Use an anonymous method. So we can test for FDoDefault, SortColumn and SortState
+    // Need to get all details?
+    if (CustomSortNeeded) and
+       (CompareColumn <> 0) then
+      GetAllFileListColumns(Self, FrmGenerate);
+
+    // Use an anonymous method. So we can test for FDoDefault, CompareColumn and SortState
     // See also method ListSortFunc in Vcl.Shell.ShellCtrls.pas
     FoldersList.SortList(
       function(Item1, Item2: Pointer): integer
@@ -377,33 +384,33 @@ begin
         begin
           if (CustomSortNeeded) then
           begin
-            if (SortColumn = 0) then // Compare the relative name, not just the filename.
+            if (CompareColumn = 0) then // Compare the relative name, not just the filename.
               result := CompareText(TSubShellFolder.GetRelativeSortName(Item1), TSubShellFolder.GetRelativeSortName(Item2),
-                                    TLocaleOptions.loUserLocale)
+                                    TLocaleOptions.loInvariantLocale)
             else
             begin // Compare the values from DetailStrings. Always text.
-              if (SortColumn <= TShellFolder(Item1).DetailStrings.Count) and
-                 (SortColumn <= TShellFolder(Item2).DetailStrings.Count) then
-                result := CompareText(TShellFolder(Item1).Details[SortColumn], TShellFolder(Item2).Details[SortColumn],
-                                      TLocaleOptions.loUserLocale);
+              if (CompareColumn <= TShellFolder(Item1).DetailStrings.Count) and
+                 (CompareColumn <= TShellFolder(Item2).DetailStrings.Count) then
+                result := CompareText(TShellFolder(Item1).Details[CompareColumn], TShellFolder(Item2).Details[CompareColumn],
+                                      TLocaleOptions.loInvariantLocale);
             end;
           end
           else
           begin // Use the standard compare
             if (TShellFolder(Item1).ParentShellFolder <> nil) then
-              result := Smallint(TShellFolder(Item1).ParentShellFolder.CompareIDs(SysSortColumn,
+              result := Smallint(TShellFolder(Item1).ParentShellFolder.CompareIDs(CompareColumn,
                                                                                   TShellFolder(Item1).RelativeID,
                                                                                   TShellFolder(Item2).RelativeID));
           end;
         end;
 
-        // Sort on Filename (Column 0), within SortColumn
+        // Sort on Filename (Column 0), within CompareColumn
         if (result = 0) and
-           (SortColumn <> 0) then
+           (CompareColumn <> 0) then
         begin
           if (FIncludeSubFolders) then
             result := CompareText(TSubShellFolder.GetRelativeSortName(Item1), TSubShellFolder.GetRelativeSortName(Item2),
-                                  TLocaleOptions.loUserLocale)
+                                  TLocaleOptions.loInvariantLocale)
           else
             result := Smallint(TShellFolder(Item1).ParentShellFolder.CompareIDs(0,
                                                                                 TShellFolder(Item1).RelativeID,

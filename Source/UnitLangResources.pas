@@ -188,7 +188,18 @@ resourcestring
   StrRemainingThumbnails    = 'Remaining Thumbnails to generate: %d';
   StrDFilesRemaining        = '%d Files remaining';
 
+  StrStandardList           = 'Standard filelist';
+  StrCameraList             = 'Camera settings';
+  StrLocationList           = 'Location info';
+  StrAboutList              = 'About photo';
+  StrUserList               = 'User Defined';
+
   StrFLName                 = 'Name';
+  StrFLFilTyp               = 'File type';
+  StrFLSize                 = 'Size';
+  StrFLDatMod               = 'Date Modified';
+  StrFLDatCre               = 'Date Created';
+
   StrFLModel                = 'Model';
   StrFLLensModel            = 'LensModel';
   StrFLExpTime              = 'ExpTime';

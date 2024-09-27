@@ -142,7 +142,9 @@ end;
 procedure TFEditFColumn.Button5Click(Sender: TObject);
 var
   I, N: integer;
+  FListUserDef: TColumnsArray;
 begin
+  FListUserDef := GetFileListColumnDefs(FMain.CBoxDetails.ItemIndex);
   with StringGrid1 do
   begin
     I := ColCount;
@@ -155,6 +157,7 @@ begin
       FListUserDef[N].AlignR := 0;
     end;
   end;
+  SetFileListColumnDefs(FMain.CBoxDetails.ItemIndex, FListUserDef);
   ModalResult := mrOK;
 end;
 
@@ -162,18 +165,20 @@ procedure TFEditFColumn.FormShow(Sender: TObject);
 var
   I, N: integer;
   CanSelect: boolean;
+  FListUserDef: TColumnsArray;
 begin
   Left := FMain.GetFormOffset(false).X;
   Top := FMain.GetFormOffset(false).Y;
   Width := FMain.Width - FMain.GUIBorderWidth;
 
+  FListUserDef := GetFileListColumnDefs(FMain.CBoxDetails.ItemIndex);
   I := Length(FListUserDef);
   with StringGrid1 do
   begin
     ColCount := I;
     for N := 0 to I - 1 do
     begin
-      ColWidths[N] := FListUserDef[N].Width;
+      ColWidths[N] := StringGrid1.Canvas.TextWidth(FListUserDef[N].Command + 'WW');
       Cells[N, 0] := FListUserDef[N].Caption;
       Cells[N, 1] := FListUserDef[N].Command;
     end;
