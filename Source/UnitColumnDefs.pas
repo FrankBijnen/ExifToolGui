@@ -3,7 +3,7 @@ unit UnitColumnDefs;
 interface
 
 uses
-  System.Classes, System.IniFiles,
+  System.Classes, System.IniFiles, System.Generics.Collections,
   WinApi.Windows,
   UnitLangResources;
 
@@ -22,8 +22,15 @@ const
 
 type
 
-  TFileListOptions = set of (floSystem, floInternal, floExifTool);
+  TFileListOptions = set of (floSystem, floInternal, floExifTool, floUserDef);
 
+  TFileListColumnXlat = record
+    Caption: PResStringRec;
+    Command: string;
+    Width: integer;
+    AlignR: integer;
+    Options: Word;
+  end;
   TFileListColumn = record
     Caption: string;
     Command: string;
@@ -33,83 +40,115 @@ type
   end;
   TColumnsArray = array of TFileListColumn;
 
-var
-  FListStdColWidth: TColumnsArray; // [Filename][Size][Type][Date modified] Can be extended
+  TColumnSet = class(TObject)
+  private
+    FName: string;
+    FDesc: string;
+    FOptions: TFileListOptions;
+    FColumnDefs: TColumnsArray;
+  public
+    constructor Create(AName, ADesc: string; AOptions: TFileListOptions; AColumnDefs: TColumnsArray);
+    destructor Destroy; override;
+    property Name: string read FName write FName;
+    property Desc: string read FDesc write FDesc;
+    property Options: TFileListOptions read FOptions;
+    property ColumnDefs: TColumnsArray read FColumnDefs write FColumnDefs;
+  end;
+  TColumnSetList = TObjectlist<TColumnSet>;
 
-  // Note: Default widths are computed from length of caption
-  // Captions ware taken from resourcestrings
-  FListCamera: TColumnsArray;
-  FlistLocation: TColumnsArray;
-  FListAbout: TColumnsArray;
-  FListUserDef: TColumnsArray;
-
-function ReadCameraTags(LVHandle: HWND; GUIini: TMemIniFile): integer;
-procedure WriteCameraTags(GUIini: TMemIniFile);
-
-function ReadLocationTags(LVHandle: HWND; GUIini: TMemIniFile): integer;
-procedure WriteLocationTags(GUIini: TMemIniFile);
-
-function ReadAboutTags(LVHandle: HWND; GUIini: TMemIniFile): integer;
-procedure WriteAboutTags(GUIini: TMemIniFile);
-
-function ReadUserDefTags(LVHandle: HWND; GUIini: TMemIniFile): integer;
-procedure WriteUserDefTags(GUIini: TMemIniFile);
-
+function ReadFileListColumns(LVHandle: HWND; GUIini: TMemIniFile): boolean;
+procedure WriteFileListColumns(GUIini: TMemIniFile);
 procedure ResetAllColumnWidths(LVHandle: HWND);
+function GetFileListColumnDefCount: integer;
+procedure GetFileListDefs(AList: TStrings);
+function GetFileListColumnDefs(Index: integer): TColumnsArray;
+procedure SetFileListColumnDefs(Index: integer; AColumnDefs: TColumnsArray);
 
 implementation
 
 uses
-  System.SysUtils,
+  System.SysUtils, System.Math,
   Winapi.CommCtrl,
   ExifToolsGUI_Utils;
 
 const
+  // This definition is used only to store the Widths
+  // Name, Size, File type, Date modified, Date created
+  StandardTags = 'StandardColumns';
+  StandardDefaults: array [0..4] of TFileListColumnXlat =
+  (
+    (Caption: @StrFilename;      Command: '0'; Width: 200;                            Options: toSys),
+    (Caption: @StrFLFilTyp;      Command: '1'; Width: 88;                             Options: toSys),
+    (Caption: @StrFLSize;        Command: '2'; Width: 80;                             Options: toSys),
+    (Caption: @StrFLDatMod;      Command: '3'; Width: 120;                            Options: toSys),
+    (Caption: @StrFLDatCre;      Command: '4'; Width: 120;                            Options: toSys)
+  );
 
   CameraTags = 'CameraColumns';
-  CameraDefaults: array [0..9] of TFileListColumn =
+  CameraDefaults: array [0..9] of TFileListColumnXlat =
   (
-    (Caption: StrFLModel;       Command: '-IFD0:Model';                   ),
-    (Caption: StrFLLensModel;   Command: '-exifIFD:LensModel';            ),
-    (Caption: StrFLExpTime;     Command: '-exifIFD:ExposureTime';         AlignR: 6),
-    (Caption: StrFLFNumber;     Command: '-exifIFD:FNumber';              AlignR: 4),
-    (Caption: StrFLISO;         Command: '-exifIFD:ISO';                  AlignR: 5),
-    (Caption: StrFLExpComp;     Command: '-exifIFD:ExposureCompensation'; AlignR: 4; Options: toDecimal),
-    (Caption: StrFLFLength;     Command: '-exifIFD:FocalLength#';         AlignR: 8; Options: toDecimal),
-    (Caption: StrFLFlash;       Command: '-exifIFD:Flash#';                          Options: toFlash),
-    (Caption: StrFLExpProgram;  Command: '-exifIFD:ExposureProgram'),
-    (Caption: StrFLOrientation; Command: '-IFD0:Orientation#';                       Options: toHorVer)
+    (Caption: @StrFLModel;       Command: '-IFD0:Model';                   ),
+    (Caption: @StrFLLensModel;   Command: '-exifIFD:LensModel';            ),
+    (Caption: @StrFLExpTime;     Command: '-exifIFD:ExposureTime';         AlignR: 6),
+    (Caption: @StrFLFNumber;     Command: '-exifIFD:FNumber';              AlignR: 4),
+    (Caption: @StrFLISO;         Command: '-exifIFD:ISO';                  AlignR: 5),
+    (Caption: @StrFLExpComp;     Command: '-exifIFD:ExposureCompensation'; AlignR: 4; Options: toDecimal),
+    (Caption: @StrFLFLength;     Command: '-exifIFD:FocalLength#';         AlignR: 8; Options: toDecimal),
+    (Caption: @StrFLFlash;       Command: '-exifIFD:Flash#';                          Options: toFlash),
+    (Caption: @StrFLExpProgram;  Command: '-exifIFD:ExposureProgram'),
+    (Caption: @StrFLOrientation; Command: '-IFD0:Orientation#';                       Options: toHorVer)
   );
 
   LocationTags = 'LocationColumns';
-  LocationDefaults: array [0..6] of TFileListColumn =
+  LocationDefaults: array [0..6] of TFileListColumnXlat =
   (
-    (Caption: StrFLDateTime;    Command: '-ExifIFD:DateTimeOriginal';                Options: toMain),
-    (Caption: StrFLDateTime;    Command: '-QuickTime:CreateDate';                    Options: toBackup),
-    (Caption: StrFLGPS;         Command: '-Composite:GpsPosition#';                  Options: toYesNo),
-    (Caption: StrFLCountry;     Command: CommandCountryCode;                         Options: toCountry),
-    (Caption: StrFLProvince;    Command: '-XMP-iptcExt:LocationShownProvinceState'),
-    (Caption: StrFLCity;        Command: '-XMP-iptcExt:LocationShownCity'),
-    (Caption: StrFLLocation;    Command: '-XMP-iptcExt:LocationShownSublocation')
+    (Caption: @StrFLDateTime;    Command: '-ExifIFD:DateTimeOriginal';                Options: toMain),
+    (Caption: @StrFLDateTime;    Command: '-QuickTime:CreateDate';                    Options: toBackup),
+    (Caption: @StrFLGPS;         Command: '-Composite:GpsPosition#';                  Options: toYesNo),
+    (Caption: @StrFLCountry;     Command: CommandCountryCode;                         Options: toCountry),
+    (Caption: @StrFLProvince;    Command: '-XMP-iptcExt:LocationShownProvinceState'),
+    (Caption: @StrFLCity;        Command: '-XMP-iptcExt:LocationShownCity'),
+    (Caption: @StrFLLocation;    Command: '-XMP-iptcExt:LocationShownSublocation')
   );
 
   AboutTags = 'AboutColumns';
-  AboutDefaults: array [0..4] of TFileListColumn =
+  AboutDefaults: array [0..4] of TFileListColumnXlat =
   (
-    (Caption: StrFLArtist;        Command: '-IFD0:Artist'),
-    (Caption: StrFLRating;        Command: '-XMP-xmp:Rating'),
-    (Caption: StrFLType;          Command: '-XMP-dc:Type'),
-    (Caption: StrFLEvent;         Command: '-XMP-iptcExt:Event'),
-    (Caption: StrFLPersonInImage; Command: '-XMP-iptcExt:PersonInImage')
+    (Caption: @StrFLArtist;        Command: '-IFD0:Artist'),
+    (Caption: @StrFLRating;        Command: '-XMP-xmp:Rating'),
+    (Caption: @StrFLType;          Command: '-XMP-dc:Type'),
+    (Caption: @StrFLEvent;         Command: '-XMP-iptcExt:Event'),
+    (Caption: @StrFLPersonInImage; Command: '-XMP-iptcExt:PersonInImage')
   );
 
-  UserDefTags = 'UserDefColumns';
-  DefaultUserDef: array [0..2] of TFileListColumn =
+  UserDef = 'UserDef_';                   // Prefix in INI sections
+  UserDefined = 'User defined';           // internal name
+  UserDefLists = 'UserDefLists';          // List with userdefined names
+  OldUserDefTags = 'FListUserDefColumn';  // Pre 6.3.6
+  DefaultUserDef: array [0..2] of TFileListColumnXlat =
   (
-    (Caption: StrFLDateTime;    Command: '-exifIfd:DateTimeOriginal'),
-    (Caption: StrFLRating;      Command: '-xmp-xmp:Rating'),
-    (Caption: StrFLPhotoTitle;  Command: '-xmp-dc:Title')
+    (Caption: @StrFLDateTime;      Command: '-exifIfd:DateTimeOriginal'),
+    (Caption: @StrFLRating;        Command: '-xmp-xmp:Rating'),
+    (Caption: @StrFLPhotoTitle;    Command: '-xmp-dc:Title')
   );
+
+var
+  FColumnSetList: TColumnSetList;
+
+constructor TColumnSet.Create(AName, ADesc: string; AOptions: TFileListOptions; AColumnDefs: TColumnsArray);
+begin
+  inherited Create;
+  FName := AName;
+  FDesc := ADesc;
+  FOptions := AOptions;
+  FColumnDefs := AColumnDefs;
+end;
+
+destructor TColumnSet.Destroy;
+begin
+  SetLength(FName, 0);
+  inherited Destroy;
+end;
 
 function DefaultColumnWidth(LVHandle: HWND; AColumn: TFileListColumn): integer;
 begin
@@ -120,7 +159,7 @@ end;
 function ReadColumnDefs(LVHandle: HWND;
                         GUIini: TMemIniFile;
                         ASection: string;
-                        ADefaults: array of TFileListColumn): TColumnsArray;
+                        ADefaults: array of TFileListColumnXLat): TColumnsArray;
 var
   Indx, DefCnt: integer;
   Tx: string;
@@ -136,8 +175,14 @@ begin
       SetLength(result, Length(ADefaults));
       for Indx := 0 to High(ADefaults) do
       begin
-        result[Indx] := ADefaults[Indx] ;
-        result[Indx].Width := DefaultColumnWidth(LVHandle, result[Indx]);
+        result[Indx].Caption  := LoadResString(ADefaults[Indx].Caption);
+        result[Indx].Command  := ADefaults[Indx].Command;
+        if (ADefaults[Indx].Width = 0) then
+          result[Indx].Width  := DefaultColumnWidth(LVHandle, result[Indx])
+        else
+          result[Indx].Width  := ADefaults[Indx].Width;
+        result[Indx].AlignR   := ADefaults[Indx].AlignR;
+        result[Indx].Options  := ADefaults[Indx].Options;
       end;
     end
     else
@@ -146,11 +191,11 @@ begin
       for Indx := 0 to DefCnt - 1 do
       begin
         Tx := TmpItems[Indx];
-        result[Indx].Caption := NextField(Tx, '=');
-        result[Indx].Command := NextField(Tx, ' ');
-        result[Indx].Width := StrToIntDef(NextField(Tx, ','), DefaultColumnWidth(LVHandle, result[Indx]));
-        result[Indx].AlignR := StrToIntDef(NextField(Tx, ';'), 0);
-        result[Indx].Options := StrToIntDef(Tx, 0);
+        result[Indx].Caption  := NextField(Tx, '=');
+        result[Indx].Command  := NextField(Tx, ' ');
+        result[Indx].Width    := StrToIntDef(NextField(Tx, ','), DefaultColumnWidth(LVHandle, result[Indx]));
+        result[Indx].AlignR   := StrToIntDef(NextField(Tx, ';'), 0);
+        result[Indx].Options  := StrToIntDef(Tx, 0);
       end;
     end;
   finally
@@ -191,56 +236,180 @@ begin
   end;
 end;
 
-function ReadCameraTags(LVHandle: HWND; GUIini: TMemIniFile): integer;
+function ReadStandardTags(LVHandle: HWND; GUIini: TMemIniFile): TColumnsArray;
 begin
-  FListCamera := ReadColumnDefs(LVHandle, GUIini, CameraTags, CameraDefaults);
-  result := Length(FListCamera);
+  result := ReadColumnDefs(LVHandle, GUIini, StandardTags, StandardDefaults);
+  FColumnSetList.Add(TColumnSet.Create(StandardTags,
+                                       StrStandardList,
+                                       [floSystem], result));
 end;
 
-function ReadLocationTags(LVHandle: HWND; GUIini: TMemIniFile): integer;
+function ReadCameraTags(LVHandle: HWND; GUIini: TMemIniFile): TColumnsArray;
 begin
-  FlistLocation := ReadColumnDefs(LVHandle, GUIini, LocationTags, LocationDefaults);
-  result := Length(FlistLocation);
+  result := ReadColumnDefs(LVHandle, GUIini, CameraTags, CameraDefaults);
+  FColumnSetList.Add(TColumnSet.Create(CameraTags,
+                                       StrCameraList,
+                                       [floSystem, floInternal, floExifTool], result));
 end;
 
-function ReadAboutTags(LVHandle: HWND; GUIini: TMemIniFile): integer;
+function ReadLocationTags(LVHandle: HWND; GUIini: TMemIniFile): TColumnsArray;
 begin
-  FListAbout := ReadColumnDefs(LVHandle, GUIini, AboutTags, AboutDefaults);
-  result := Length(FListAbout);
+  result := ReadColumnDefs(LVHandle, GUIini, LocationTags, LocationDefaults);
+  FColumnSetList.Add(TColumnSet.Create(LocationTags,
+                                       StrLocationList,
+                                       [floSystem, floInternal, floExifTool], result));
+end;
+
+function ReadAboutTags(LVHandle: HWND; GUIini: TMemIniFile): TColumnsArray;
+begin
+  result := ReadColumnDefs(LVHandle, GUIini, AboutTags, AboutDefaults);
+  FColumnSetList.Add(TColumnSet.Create(AboutTags,
+                                       StrAboutList,
+                                       [floSystem, floInternal, floExifTool], result));
 end;
 
 function ReadUserDefTags(LVHandle: HWND; GUIini: TMemIniFile): integer;
+var
+  UserDefList: string;
+  AUserDefName: string;
+  AUserDefDesc: string;
+  AColumnDefs: TColumnsArray;
+
+  Indx: integer;
+  Tx: string;
+  TmpItems: TStringList;
+
 begin
-  FListUserDef := ReadColumnDefs(LVHandle, GUIini, UserDefTags, DefaultUserDef);
-  result := Length(FListUserDef);
+  result := 0;
+
+  // Convert Pre 6.3.6 definitions?
+  if (not GUIini.ValueExists(UserDefLists, UserDefLists)) and
+     (GUIini.SectionExists(OldUserDefTags)) then
+  begin
+    TmpItems := TStringList.Create;
+    try
+      GUIini.ReadSectionValues(OldUserDefTags, TmpItems);
+      SetLength(AColumnDefs, TmpItems.Count);
+      for Indx := 0 to High(AColumnDefs) do
+      begin
+        Tx := TmpItems[Indx];
+        AColumnDefs[Indx].Caption := NextField(Tx, '=');
+        AColumnDefs[Indx].Command := NextField(Tx, ' ');
+        AColumnDefs[Indx].Width := StrToIntDef(Tx, 80);
+        AColumnDefs[Indx].AlignR := 0;
+      end;
+      FColumnSetList.Add(TColumnSet.Create(UserDefined,
+                                           StrUserList,
+                                           [floSystem, floInternal, floExifTool, floUserDef], AColumnDefs));
+    finally
+      TmpItems.Free;
+    end;
+  end
+  else
+  begin
+    // Read all User defined lists
+    UserDefList := GUIini.ReadString(UserDefLists, UserDefLists, UserDefined + '^' + StrUserList);
+    while (UserDefList <> '') do
+    begin
+      AUserDefDesc := NextField(UserDefList, '|');
+      AUserDefName := NextField(AUserDefDesc, '^');
+      AColumnDefs := ReadColumnDefs(LVHandle, GUIini, UserDef + AUserDefName, DefaultUserDef);
+      result := result + Length(AColumnDefs);
+      FColumnSetList.Add(TColumnSet.Create(AUserDefName,
+                                           AUserDefDesc,
+                                           [floSystem, floInternal, floExifTool, floUserDef], AColumnDefs));
+    end;
+  end;
 end;
 
-procedure WriteCameraTags(GUIini: TMemIniFile);
+function ReadFileListColumns(LVHandle: HWND; GUIini: TMemIniFile): boolean;
 begin
-  WriteColumnDefs(GUIini, CameraTags, FListCamera);
+  FColumnSetList.Clear;
+  ReadStandardTags(LVHandle, GUIini);
+  ReadCameraTags(LVHandle, GUIini);
+  ReadLocationTags(LVHandle, GUIini);
+  ReadAboutTags(LVHandle, GUIini);
+  result := (ReadUserDefTags(LVHandle, GUIini) > 0);
 end;
 
-procedure WriteLocationTags(GUIini: TMemIniFile);
+procedure WriteFileListColumns(GUIini: TMemIniFile);
+var
+  AColumnSet: TColumnSet;
+  UserDefList: string;
+  ColumnSetName: string;
 begin
-  WriteColumnDefs(GUIini, LocationTags, FlistLocation);
-end;
-
-procedure WriteAboutTags(GUIini: TMemIniFile);
-begin
-  WriteColumnDefs(GUIini, AboutTags, FListAbout);
-end;
-
-procedure WriteUserDefTags(GUIini: TMemIniFile);
-begin
-  WriteColumnDefs(GUIini, UserDefTags, FListUserDef);
+  for AColumnSet in FColumnSetList do
+  begin
+    ColumnSetName := AColumnSet.Name;
+    if (floUserDef in AColumnSet.Options) then
+    begin
+      ColumnSetName := UserDef + ColumnSetName;
+      if (UserDefList <> '') then
+        UserDefList := UserDefList + '|';
+      UserDefList := UserDefList + AColumnSet.Name + '^' + AColumnSet.Desc;
+    end;
+    WriteColumnDefs(GUIini, ColumnSetName, AColumnSet.ColumnDefs);
+  end;
+  GUIini.WriteString(UserDefLists, UserDefLists, UserDefList);
 end;
 
 procedure ResetAllColumnWidths(LVHandle: HWND);
+var
+  AColumnSet: TColumnSet;
+  Index: integer;
 begin
-  ResetColumnWidths(LVHandle, FListCamera);
-  ResetColumnWidths(LVHandle, FListLocation);
-  ResetColumnWidths(LVHandle, FListAbout);
-  ResetColumnWidths(LVHandle, FListUserDef);
+  for AColumnSet in FColumnSetList do
+  begin
+    if (AColumnSet.Options = [floSystem]) then
+      for Index := 0 to Min(High(AColumnSet.ColumnDefs), High(StandardDefaults))  do
+        AColumnSet.ColumnDefs[Index].Width := StandardDefaults[Index].Width
+    else
+      ResetColumnWidths(LVHandle, AColumnSet.FColumnDefs);
+  end;
+end;
+
+function GetFileListColumnDefCount: integer;
+begin
+  result := FColumnSetList.Count;
+end;
+
+function GetFileListColumnDefs(Index: integer): TColumnsArray;
+begin
+  SetLength(result, 0);
+  if (Index > -1) and
+     (Index < FColumnSetList.Count) then
+    result := FColumnSetList[Index].ColumnDefs;
+end;
+
+procedure GetFileListDefs(AList: TStrings);
+var
+  ASet: TColumnSet;
+begin
+  Alist.BeginUpdate;
+  try
+    Alist.Clear;
+    for ASet in FColumnSetList do
+      AList.Add(Aset.Desc);
+  finally
+    Alist.EndUpdate;
+  end;
+end;
+
+procedure SetFileListColumnDefs(Index: integer; AColumnDefs: TColumnsArray);
+begin
+  if (Index > 0) and
+     (Index < FColumnSetList.Count) then
+    FColumnSetList[Index].ColumnDefs := AColumnDefs;
+end;
+
+initialization
+begin
+  FColumnSetList := TColumnSetList.Create;
+end;
+
+finalization
+begin
+  FColumnSetList.Free;
 end;
 
 end.

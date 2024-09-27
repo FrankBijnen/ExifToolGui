@@ -608,21 +608,6 @@ begin
     AdvPageMetadata.Width := ReadInteger(Ini_ETGUI, 'MetadataWidth', ScaleDesignDpi(322));
     MetadataList.ColWidths[0] := ReadInteger(Ini_ETGUI, 'MetadataTagWidth', ScaleDesignDpi(144));
 
-    N := 5;
-    SetLength(FListStdColWidth, N);
-    FListStdColWidth[0].Width := ReadInteger(Ini_ETGUI, 'StdColWidth0', 200); // Filename
-    FListStdColWidth[1].Width := ReadInteger(Ini_ETGUI, 'StdColWidth1', 88);  // Size
-    FListStdColWidth[2].Width := ReadInteger(Ini_ETGUI, 'StdColWidth2', 80);  // Item Type
-    FListStdColWidth[3].Width := ReadInteger(Ini_ETGUI, 'StdColWidth3', 120); // Date Modified
-    FListStdColWidth[4].Width := ReadInteger(Ini_ETGUI, 'StdColWidth4', 120); // Date Created
-
-    while (ValueExists(Ini_ETGUI, 'StdColWidth' + IntToStr(N))) do
-    begin
-      SetLength(FListStdColWidth, N +1); // Should be only a few
-      FListStdColWidth[N].Width := ReadInteger(Ini_ETGUI, 'StdColWidth' + IntToStr(N), 120);
-      Inc(N);
-    end;
-
     // When the panels have been resized, we can resize the Main Form.
     // The constraints of the panels, and or the minsize of the splitters, can prevent resizing the main form
     N := 0;
@@ -669,6 +654,10 @@ begin
         GUIsettings.InitialDir := DefaultDir;
 
       ReadMainWindowSizes(GUIini);
+
+      // Standard, Camera, Location, About and UserDef settings
+      ReadFileListColumns(FMain.ShellList.Handle, GUIini);
+      GetFileListDefs(FMain.CBoxDetails.Items);
 
       with GUIsettings do
       begin
@@ -772,18 +761,6 @@ begin
         SetApiLargeFileSupport(MaAPILargeFileSupport.Checked);
         SetCustomOptions(ReadString(Ini_Options, 'CustomOptions', ''));
       end;
-
-      // Column widths Camera settings
-      ReadCameraTags(Fmain.ShellList.Handle, GUIini);
-
-      // Column widths Location info
-      ReadLocationTags(Fmain.ShellList.Handle, GUIini);
-
-      // Column widths About photo
-      ReadAboutTags(Fmain.ShellList.Handle, GUIini);
-
-      // Custom FList columns
-      ReadUserDefTags(Fmain.ShellList.Handle, GUIini);
 
       // --- ETdirect commands---
       ReadEtDirectCmds(CBoxETdirect, GUIini);
@@ -914,10 +891,6 @@ begin
         // Write all form sizes to INI
         WriteAllFormSizes(GUIini);
 
-        // Std (file list) col widths
-        for N := 0 to Length(FListStdColWidth) -1 do
-          WriteInteger(Ini_ETGUI, 'StdColWidth' + IntToStr(N), FListStdColWidth[N].Width);
-
         with GUIsettings do
         begin
           WriteString(Ini_Settings, 'Language', Language);
@@ -984,20 +957,8 @@ begin
         WriteBool(Ini_Options, 'APILargeFileSupport', MaAPILargeFileSupport.Checked);
         WriteString(Ini_Options, 'CustomOptions', ET.Options.ETCustomOptions);
 
-        // Column widths Camera settings
-        WriteCameraTags(GUIini);
-
-        // Column widths Location info
-        WriteLocationTags(GUIini);
-
-        // Column widths About photo
-        WriteAboutTags(GUIini);
-
-        // Write User defined fields
-        WriteUserDefTags(GUIini);
-
-        // Write Et Direct commands
-        WriteETDirectCmds(CBoxETdirect, GuiIni);
+        // Standard, Camera, Location, About and UserDef settings
+        WriteFileListColumns(GUIini);
 
         // Workspace tags
         WriteWorkSpaceTags(GUIini);
@@ -1068,8 +1029,7 @@ begin
       case ThisIniTag of
         TIniTagsData.idtWorkSpace:        LoadOK := (ReadWorkSpaceTags(GuiIni) <> 0);
         TIniTagsData.idtETDirect:         LoadOK := (ReadETdirectCmds(Fmain.CBoxETdirect, GuiIni) <> 0);
-//TODO. Not only user defined?
-        TIniTagsData.idtUserDefined:      LoadOK := (ReadUserDefTags(FMain.ShellList.Handle, GuiIni) <> 0);
+        TIniTagsData.idtUserDefined:      LoadOK := (ReadFileListColumns(FMain.ShellList.Handle, GuiIni));
         TIniTagsData.idtCustomView:       LoadOK := (ReadCustomViewTags(GuiIni) <> 0);
         TIniTagsData.idtMarked:           LoadOK := (ReadMarkedTags(GuiIni) <> 0);
         TIniTagsData.idtPredefinedTags:   LoadOK := (ReadPredefinedTags(GUIini) <> 0);
@@ -1146,7 +1106,7 @@ begin
         case ThisIniTag of
           TIniTagsData.idtWorkSpace:      WriteWorkSpaceTags(GuiIni);
           TIniTagsData.idtETDirect:       WriteEtDirectCmds(FMain.CBoxETdirect, GuiIni);
-          TIniTagsData.idtUserDefined:    WriteUserDefTags(GuiIni);
+          TIniTagsData.idtUserDefined:    WriteFileListColumns(GuiIni);
           TIniTagsData.idtCustomView:     WriteCustomViewTags(GuiIni);
           TIniTagsData.idtPredefinedTags: WritePredefinedTags(GuiIni);
           TIniTagsData.idtMarked:         WriteMarkedTags(GuiIni);

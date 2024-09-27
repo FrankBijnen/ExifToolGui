@@ -3,8 +3,8 @@ object FEditFColumn: TFEditFColumn
   Top = 0
   BorderStyle = bsDialog
   Caption = 'Edit file columns'
-  ClientHeight = 202
-  ClientWidth = 638
+  ClientHeight = 201
+  ClientWidth = 634
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -13,14 +13,14 @@ object FEditFColumn: TFEditFColumn
   Font.Style = []
   OnShow = FormShow
   DesignSize = (
-    638
-    202)
+    634
+    201)
   TextHeight = 13
   object AdvPanel1: TPanel
     Left = 0
     Top = 0
-    Width = 502
-    Height = 183
+    Width = 494
+    Height = 182
     Align = alLeft
     Anchors = [akLeft, akTop, akRight, akBottom]
     DoubleBuffered = True
@@ -35,12 +35,12 @@ object FEditFColumn: TFEditFColumn
     ExplicitWidth = 518
     ExplicitHeight = 184
     DesignSize = (
-      502
-      183)
+      494
+      182)
     object StringGrid1: TStringGrid
       Left = 16
       Top = 7
-      Width = 477
+      Width = 469
       Height = 81
       Anchors = [akLeft, akTop, akRight]
       ColCount = 1
@@ -106,7 +106,7 @@ object FEditFColumn: TFEditFColumn
     end
   end
   object Button4: TButton
-    Left = 508
+    Left = 500
     Top = 16
     Width = 64
     Height = 25
@@ -117,7 +117,7 @@ object FEditFColumn: TFEditFColumn
     ExplicitLeft = 524
   end
   object Button5: TButton
-    Left = 508
+    Left = 500
     Top = 151
     Width = 64
     Height = 25
@@ -130,8 +130,8 @@ object FEditFColumn: TFEditFColumn
   end
   object StatusBar1: TStatusBar
     Left = 0
-    Top = 183
-    Width = 638
+    Top = 182
+    Width = 634
     Height = 19
     Panels = <>
     SimplePanel = True

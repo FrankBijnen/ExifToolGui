@@ -730,7 +730,7 @@ end;
 procedure TFMain.CBoxDetailsChange(Sender: TObject);
 begin
   with CBoxDetails do
-    SpeedBtnColumnEdit.Enabled := SpeedBtnDetails.Down and (ItemIndex = Items.Count - 1);
+    SpeedBtnColumnEdit.Enabled := SpeedBtnDetails.Down and (ItemIndex > 0);
 
   with ShellList do
   if (Enabled) then
@@ -879,7 +879,7 @@ end;
 
 procedure TFMain.MaUserDefLoadExecute(Sender: TObject);
 begin
-  if (LoadIniDialog(OpenFileDlg, TIniData.idUserDefined, CBoxDetails.ItemIndex <> 4)) then
+  if (LoadIniDialog(OpenFileDlg, TIniData.idUserDefined, false)) then
     CBoxDetails.OnChange(CBoxDetails);
 end;
 
@@ -1667,7 +1667,12 @@ var
   I, N, X: integer;
   Tx, Tk: string;
   PrevSel, PrevRow: integer;
+  FListUserDef: TColumnsArray;
 begin
+  FListUserDef := GetFileListColumnDefs(CBoxDetails.ItemIndex);
+  if (Length(FListUserDef) = 0) then
+    exit;
+
   I := Length(FListUserDef);
   SetLength(FListUserDef, I + 1);
   N := MetadataList.Row;
@@ -1695,12 +1700,9 @@ begin
   FListUserDef[I].Width := 96;
   FListUserDef[I].AlignR := 0;
 
-  with CBoxDetails do
-  begin
-    I := ItemIndex;
-    N := Items.Count - 1;
-  end;
-  if I = N then
+  SetFileListColumnDefs(CBoxDetails.ItemIndex, FListUserDef);
+
+  if CBoxDetails.ItemIndex > 0 then
   begin
     PrevSel := ShellList.Selected.Index;
     PrevRow := MetadataList.Row;
@@ -2793,30 +2795,24 @@ end;
 procedure TFMain.ShellListColumnResized(Sender: TObject);
 var
   ColIndex: integer;
+  ListIndex: integer;
 begin
   ColIndex := TListColumn(Sender).Tag;
-  if (ColIndex = 0) then // Name field
-    FListStdColWidth[ColIndex].Width := TListColumn(Sender).Width
+  if (ColIndex < 1) then  // Name Field
+    ListIndex := 0
   else
   begin
-    case CBoxDetails.ItemIndex of
-      0:
-        begin
-          if (ColIndex +1 > Length(FListStdColWidth)) then // Resize Array
-            SetLength(FListStdColWidth, ColIndex +1);
-
-          FListStdColWidth[ColIndex].Width := TListColumn(Sender).Width;
-        end;
-      1:
-        FListCamera[ColIndex - 1].Width := TListColumn(Sender).Width;
-      2:
-        FlistLocation[ColIndex - 1].Width := TListColumn(Sender).Width;
-      3:
-        FListAbout[ColIndex - 1].Width := TListColumn(Sender).Width;
-      4:
-        FListUserDef[ColIndex - 1].Width := TListColumn(Sender).Width;
-    end;
+    ListIndex := CBoxDetails.ItemIndex;
+    if (ListIndex > 0) then
+      Dec(ColIndex);
   end;
+
+  if (ListIndex > GetFileListColumnDefCount -1) then
+    exit;
+  if (ColIndex > High(GetFileListColumnDefs(ListIndex))) then
+    exit;
+
+  GetFileListColumnDefs(ListIndex)[ColIndex].Width := TListColumn(Sender).Width;
 end;
 
 procedure TFMain.ShellListCustomDrawItem(Sender: TCustomListView; Item: TListItem; State: TCustomDrawState;
@@ -2844,13 +2840,13 @@ procedure TFMain.ShellListAfterEnumColumns(Sender: TObject; var FileListOptions:
     end;
   end;
 
-  procedure AddColumn(const ACaption: string; Index, AWidth: integer; const AAlignment: integer = 0);
+  procedure AddColumn(const ACaption: string; ATag, AWidth: integer; const AAlignment: integer = 0);
   begin
     with TShellListView(Sender).Columns.Add do
     begin
       Caption := ACaption;
       Width := AWidth;
-      Tag := Index;
+      Tag := ATag;
       if (AAlignment > 0) then
         Alignment := taRightJustify;
     end;
@@ -2863,7 +2859,7 @@ procedure TFMain.ShellListAfterEnumColumns(Sender: TObject; var FileListOptions:
     with ShellList do
     begin
       Columns.Clear;
-      AddColumn(StrFLName, 0, FListStdColWidth[0].Width); // Name field
+      AddColumn(GetSystemField(ShellList.RootFolder, nil, 0), 0, GetFileListColumnDefs(0)[0].Width); // Name field
       for I := 0 to High(ColumnDefs) do
       begin
         if ((ColumnDefs[I].Options and toBackup) = toBackup) then
@@ -2873,24 +2869,18 @@ procedure TFMain.ShellListAfterEnumColumns(Sender: TObject; var FileListOptions:
 //          AddColumn(GetSystemField(ShellList.RootFolder, nil, StrToIntDef(ColumnDefs[I].Command, 0)),
 //                    I + 1, ColumnDefs[I].Width, ColumnDefs[I].AlignR)
 //        else
-        AddColumn(ColumnDefs[I].Caption, I + 1, ColumnDefs[I].Width, ColumnDefs[I].AlignR);
+        AddColumn(ColumnDefs[I].Caption, I +1, ColumnDefs[I].Width, ColumnDefs[I].AlignR);
       end;
     end;
   end;
 
 begin
-
+//TODO Handle in designer
   FileListOptions := [floSystem, floInternal];
   if (GUIsettings.EnableUnsupported) then
     Include(FileListOptions, floExifTool);
 
-  case CBoxDetails.ItemIndex of
-    0: ColumnDefs := FListStdColWidth;
-    1: ColumnDefs := FListCamera;
-    2: ColumnDefs := FlistLocation;
-    3: ColumnDefs := FListAbout;
-    4: ColumnDefs := FListUserDef;
-  end;
+  ColumnDefs := GetFileListColumnDefs(CBoxDetails.ItemIndex);
 
   case CBoxDetails.ItemIndex of
     0:
