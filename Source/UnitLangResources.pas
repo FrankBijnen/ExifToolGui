@@ -95,6 +95,7 @@ resourcestring
   StrOverwriteSFailed       = 'Overwrite %s failed.';
 
   NotSupported              = 'File type unsupported';
+  NotOpened                 = 'Unable to open';
   StrNrOfPhotos             = 'Nr of photos';
   StrFocalLength            = 'Focal length';
   StrFNumber                = 'F-Number';

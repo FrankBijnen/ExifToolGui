@@ -16,6 +16,8 @@ const
   WorkerIntervalCheck = 250;
 
 type
+  TPostProcess = (ppNotSup, ppNotOpen, ppFolder, ppInternal, ppExifTool);
+
   TGetWorkerFolderFunc = function: TShellFolder of object;
 
   TMetaDataGetController = class(TObject)
@@ -60,9 +62,9 @@ type
 procedure SetupCountry(ColumnDefs: TColumnsArray; CountryCode: boolean);
 function GetSystemField(RootFolder: TShellFolder; RelativeID: PItemIDList; Column: integer): string;
 function SystemFieldIsDate(RootFolder: TShellFolder; Column: integer): boolean;
-function GetFileListColumns(AShellList: ExifToolsGui_ShellList.TShellListView;
-                            ET: TExifTool;
-                            ItemIndex: integer): boolean;
+procedure GetFileListColumns(AShellList: ExifToolsGui_ShellList.TShellListView;
+                             ET: TExifTool;
+                             ItemIndex: integer);
 procedure GetAllFileListColumns(AShellList: ExifToolsGui_ShellList.TShellListView;
                                 TFrmGenerate: TFrmGenerate);
 
@@ -78,7 +80,7 @@ uses
 procedure PostProcess(Folder: TShellFolder;
                       ColumnDefs: TColumnsArray;
                       DetailStrings: TStrings;
-                      ETColumns: boolean);
+                      PostProcess: TPostProcess);
 var
   Index: integer;
   ATag: TFileListColumn;
@@ -86,6 +88,9 @@ var
   FlashValue: SmallInt;
   BackupValue: string;
 begin
+  if (High(ColumnDefs) < 0) then // Nothing to do
+    exit;
+
   // Make sure every column has a DetailString. Column sorting works better.
   for Index := DetailStrings.Count to High(ColumnDefs) do
     DetailStrings.Add('');
@@ -96,7 +101,7 @@ begin
     ATag := ColumnDefs[Index];
 
     // PostProcess ET
-    if (ETColumns = true) then
+    if (PostProcess = TPostProcess.ppExifTool) then
     begin
       if ((ATag.Options and toDecimal) = toDecimal) then
         DetailStrings[Index] := FormatExifDecimal(DetailStrings[Index], 1);
@@ -169,6 +174,13 @@ begin
       BackupValue := '';
     end;
   end;
+
+  case (PostProcess) of
+    TPostProcess.ppNotSup:
+      DetailStrings[0] := NotSupported;
+    TPostProcess.ppNotOpen:
+      DetailStrings[0] := NotOpened
+  end;
 end;
 
 function SystemFieldIsDate(RootFolder: TShellFolder; Column: integer): boolean;
@@ -230,81 +242,77 @@ begin
   end;
 end;
 
-function ProcessFolder(AFolder: TShellFolder;
-                       AMetaData: TMetaData;
-                       AET: TExifTool;
-                       AWorkingDir: string;
-                       AETCmd: string;
-                       AOptions: TFileListOptions;
-                       AColumnDefs: TColumnsArray): boolean;
+procedure ProcessFolder(AFolder: TShellFolder;
+                        AMetaData: TMetaData;
+                        AET: TExifTool;
+                        AWorkingDir: string;
+                        AETCmd: string;
+                        AOptions: TFileListOptions;
+                        AColumnDefs: TColumnsArray);
 var
   DetailStrings: TStrings;
   APath: string;
   AExt: string;
   ATag: TFileListColumn;
+  PostProcessMethod: TPostProcess;
 begin
-  result := false;
-
-  if (TSubShellFolder.GetIsFolder(AFolder)) then    // Dont get info for folders (directories)
-    exit;
-
-  DetailStrings := AFolder.DetailStrings;           // Already have details
+  DetailStrings := AFolder.DetailStrings;               // Already have details
   if (DetailStrings.Count > 0) then
     exit;
 
-  APath := AFolder.PathName;                        // Note: This is the complete path, not the relative path.
-
-  if (floInternal in AOptions) then
-  begin
-    AMetaData.ReadMeta(APath, [gmXMP, gmGPS]);      // Internal mode
-
-    if (AMetaData.Foto.ErrNotOpen) then             // File in use
-      exit;
-
-    if (AMetaData.Foto.Supported <> []) then
+  PostProcessMethod := TPostProcess.ppNotSup;
+  try
+    if (TSubShellFolder.GetIsFolder(AFolder)) then      // Dont get info for folders (directories)
     begin
-      for ATag in AColumnDefs do
-        DetailStrings.Add(AMetaData.FieldData(ATag.Command));
-      PostProcess(AFolder,                          // PostProcess internal mode
-                  AColumnDefs,
-                  DetailStrings,
-                  false);
-      result := true;
+      PostProcessMethod := TPostProcess.ppFolder;       // This will allow any system fields specified
+      exit;
     end;
 
-  end;
+    APath := AFolder.PathName;                          // Note: This is the complete path, not the relative path.
+                                                        //       Potential problem with Long paths.
+    if (floInternal in AOptions) then
+    begin
+      AMetaData.ReadMeta(APath, [gmXMP, gmGPS]);        // Internal mode
 
-  if not result and                                 // Internal mode not supported, have to call ExifTool. If allowed
-    (floExifTool in AOptions) then
-  begin
-    if (AET.ETWorkingDir = '') then                 // Need to start ET?
-      AET.StayOpen(AWorkingDir);
-    AExt := ExtractFileExt(APath);
-    AET.OpenExec(GUIsettings.Fast3(AExt) + AETCmd,  // Get DetailStrings from EExifTool
-                 APath,
-                 DetailStrings,
-                 False);
-    PostProcess(AFolder,                            // PostProcess ExifTool mode
+      if (AMetaData.Foto.ErrNotOpen) then               // File in use
+      begin
+        PostProcessMethod := TPostProcess.ppNotOpen;
+        exit;
+      end;
+
+      if (AMetaData.Foto.Supported <> []) then
+      begin
+        for ATag in AColumnDefs do
+          DetailStrings.Add(AMetaData.FieldData(ATag.Command));
+        PostProcessMethod := TPostProcess.ppInternal;
+      end;
+    end;
+
+    if (PostProcessMethod <> TPostProcess.ppInternal) and
+       (floExifTool in AOptions) then                   // Internal mode not supported, have to call ExifTool. If allowed
+    begin
+      if (AET.ETWorkingDir = '') then                   // Need to start ET?
+        AET.StayOpen(AWorkingDir);
+      AExt := ExtractFileExt(APath);
+
+      AET.OpenExec(GUIsettings.Fast3(AExt) + AETCmd,    // Get DetailStrings from EExifTool
+                   APath,
+                   DetailStrings,
+                   False);
+      PostProcessMethod := TPostProcess.ppExifTool;     // ExifTool requires special Post Processing
+    end;
+
+  finally
+    PostProcess(AFolder,                                // Post Process.
                 AColumnDefs,
                 DetailStrings,
-                true);
-    result := true;
-  end;
-
-  if not result then                                // File type not supported
-  begin
-    DetailStrings.Add(NotSupported);
-
-    PostProcess(AFolder,                            // Fill system fields
-                AColumnDefs,
-                DetailStrings,
-                false);
+                PostProcessMethod);
   end;
 end;
 
-function GetFileListColumns(AShellList: ExifToolsGui_ShellList.TShellListView;
-                            ET: TExifTool;
-                            ItemIndex: integer): boolean;
+procedure GetFileListColumns(AShellList: ExifToolsGui_ShellList.TShellListView;
+                             ET: TExifTool;
+                             ItemIndex: integer);
 var
   MetaData: TMetaData;
   AFolder: TShellFolder;
@@ -316,13 +324,13 @@ begin
   AColumnDefs := AShellList.ColumnDefs;
   MetaData := TMetaData.Create;
   try
-    result := ProcessFolder(AFolder,
-                            MetaData,
-                            ET,
-                            ET.ETWorkingDir, // Not used, ET will be open
-                            GetETCmd(AColumnDefs),
-                            AOptions,
-                            AColumnDefs);
+    ProcessFolder(AFolder,
+                  MetaData,
+                  ET,
+                  ET.ETWorkingDir, // Not used, ET will be open
+                  GetETCmd(AColumnDefs),
+                  AOptions,
+                  AColumnDefs);
   finally
     MetaData.Free;
   end;
@@ -426,14 +434,13 @@ begin
     if (FFolder = nil) then                           // No more work
       break;
 
-    if not ProcessFolder(FFolder,
-                         FMetaData,
-                         FET,
-                         FCurrentDir,
-                         FETCmd,
-                         FOptions,
-                         FColumnDefs) then
-      continue;
+    ProcessFolder(FFolder,
+                  FMetaData,
+                  FET,
+                  FCurrentDir,
+                  FETCmd,
+                  FOptions,
+                  FColumnDefs);
   end;
 end;
 
