@@ -2959,8 +2959,7 @@ begin
   // Get possibly cached Details
   Details := AFolder.DetailStrings;
 
-  if (Details.Count = 0) and   // Only get details once
-     (TSubShellFolder.GetIsFolder(AFolder) = false) then // Dont get details for directory
+  if (Details.Count = 0) then   // Only get details once
     GetFileListColumns(ShellList, ET, Item.Index);
 
   // Now add to Listview
