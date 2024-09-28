@@ -4,7 +4,7 @@ object FGeoSetup: TFGeoSetup
   BorderStyle = bsDialog
   Caption = 'Geotag files'
   ClientHeight = 416
-  ClientWidth = 587
+  ClientWidth = 593
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -18,12 +18,12 @@ object FGeoSetup: TFGeoSetup
   object StatusBar1: TStatusBar
     Left = 0
     Top = 397
-    Width = 587
+    Width = 593
     Height = 19
     Panels = <>
     SimplePanel = True
-    ExplicitTop = 399
-    ExplicitWidth = 595
+    ExplicitTop = 396
+    ExplicitWidth = 583
   end
   object BtnCancel: TButton
     Left = 518

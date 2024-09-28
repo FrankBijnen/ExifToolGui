@@ -4,7 +4,7 @@ object FQuickManager: TFQuickManager
   BorderStyle = bsDialog
   Caption = 'Workspace manager'
   ClientHeight = 501
-  ClientWidth = 747
+  ClientWidth = 750
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -28,6 +28,7 @@ object FQuickManager: TFQuickManager
     ParentDoubleBuffered = False
     ParentFont = False
     TabOrder = 0
+    ExplicitHeight = 481
     object StringGrid1: TStringGrid
       Left = 16
       Top = 8
@@ -138,9 +139,11 @@ object FQuickManager: TFQuickManager
   object StatusBar1: TStatusBar
     Left = 0
     Top = 482
-    Width = 747
+    Width = 750
     Height = 19
     Panels = <>
     SimplePanel = True
+    ExplicitTop = 481
+    ExplicitWidth = 743
   end
 end

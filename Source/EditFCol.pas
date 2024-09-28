@@ -3,40 +3,52 @@ unit EditFCol;
 interface
 
 uses
-  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants,
-  System.Classes, Vcl.Graphics,
-  Vcl.Controls, Vcl.Forms, UnitScaleForm, Vcl.Dialogs, Vcl.Grids, Vcl.ExtCtrls,
-  Vcl.StdCtrls, Vcl.ComCtrls, Vcl.Mask;
+  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.UITypes,
+  System.Classes, Vcl.Controls, Vcl.ExtCtrls,
+  UnitScaleForm, Vcl.StdCtrls, Vcl.Buttons, Data.DB, Datasnap.DBClient, Vcl.Grids, Vcl.DBGrids, Vcl.DBCtrls;
 
 type
   TFEditFColumn = class(TScaleForm)
-    AdvPanel1: TPanel;
-    StringGrid1: TStringGrid;
-    LabeledEdit1: TLabeledEdit;
-    LabeledEdit2: TLabeledEdit;
-    Button1: TButton;
-    Button2: TButton;
-    Button3: TButton;
-    Button4: TButton;
-    Button5: TButton;
-    StatusBar1: TStatusBar;
+    PnlBottom: TPanel;
+    BtnOk: TBitBtn;
+    BtnCancel: TBitBtn;
+    CdsColumnSet: TClientDataSet;
+    CdsFileListDef: TClientDataSet;
+    PnlRight: TPanel;
+    PnlGrids: TPanel;
+    PnlTop: TPanel;
+    DbgFileListDef: TDBGrid;
+    DbgColumnSet: TDBGrid;
+    HSplitter: TSplitter;
+    VSplitter: TSplitter;
+    PnlMiddle: TPanel;
+    DsFileListDef: TDataSource;
+    DsColumnSet: TDataSource;
+    CdsFileListDefName: TStringField;
+    CdsFileListDefDescription: TStringField;
+    CdsColumnSetFileListName: TStringField;
+    CdsColumnSetName: TStringField;
+    CdsColumnSetCommand: TStringField;
+    DBNavigator1: TDBNavigator;
+    DBNavigator2: TDBNavigator;
+    CdsFileListDefId: TIntegerField;
+    CdsFileListDefMode: TStringField;
+    CdsColumnSetOption: TStringField;
+    CdsColumnSetBackup: TStringField;
+    CdsColumnSetAlignR: TIntegerField;
+    CdsColumnSetWidth: TStringField;
     procedure FormShow(Sender: TObject);
-    procedure StringGrid1SelectCell(Sender: TObject; ACol, ARow: Integer; var CanSelect: Boolean);
-    procedure Button1Click(Sender: TObject);
-    procedure Button2Click(Sender: TObject);
-    procedure Button3Click(Sender: TObject);
-    procedure Button5Click(Sender: TObject);
+    procedure FormCreate(Sender: TObject);
+    procedure FormClose(Sender: TObject; var Action: TCloseAction);
+    procedure CdsFileListDefAfterInsert(DataSet: TDataSet);
+    procedure CdsColumnSetAfterInsert(DataSet: TDataSet);
   private
     { Private declarations }
-    procedure DisplayHint(Sender: TObject);
+  protected
+    function GetDefWindowSizes: TRect; override;
   public
     { Public declarations }
-  end;
-
-  TMyGrid = class(TStringGrid)
-  public // because DeleteColumn isn't published in TStringGrid
-    procedure DeleteColumn(AColumn: longint); override;
-    procedure InsertColumn(AColumn: longint);
+    var SelectedSet: integer;
   end;
 
 var
@@ -44,156 +56,177 @@ var
 
 implementation
 
-uses Main, UnitColumnDefs;
+uses Main, MainDef, UnitColumnDefs, ExifToolsGUI_Utils;
 
 {$R *.dfm}
 
-procedure TFEditFColumn.DisplayHint(Sender: TObject);
+function TFEditFColumn.GetDefWindowSizes: TRect;
 begin
-  StatusBar1.SimpleText := GetShortHint(Application.Hint);
+  result := Rect(108, 106, 880, 515);
 end;
 
-procedure TMyGrid.DeleteColumn(AColumn: longint);
+procedure TFEditFColumn.CdsColumnSetAfterInsert(DataSet: TDataSet);
 begin
-  inherited DeleteColumn(AColumn);
+  CdsColumnSetWidth.AsInteger := 80;
+  CdsColumnSetAlignR.AsInteger := 0;
 end;
 
-procedure TMyGrid.InsertColumn(AColumn: Integer);
+procedure TFEditFColumn.CdsFileListDefAfterInsert(DataSet: TDataSet);
+begin
+  CdsFileListDefMode.AsString := 'User';
+  CdsFileListDefId.AsInteger := CdsFileListDef.RecordCount + 1;
+end;
+
+procedure TFEditFColumn.FormClose(Sender: TObject; var Action: TCloseAction);
 var
-  I: integer;
-begin
-  I := Col;
-  while AColumn < FixedCols do
-    Inc(AColumn);
-  ColCount := ColCount + 1;
-  MoveColumn(ColCount - 1, AColumn);
-  Col := I;
-  Cols[Col].Clear;
-end;
-
-procedure TFEditFColumn.Button1Click(Sender: TObject);
-var
-  I: integer; // Delete column
+  FileListDefs: TColumnSetList;
+  AColumnSet: TColumnsArray;
+  AFileOption: TFileListOptions;
 begin
 
-  with StringGrid1 do
+  if (ModalResult = IDOK) then
   begin
-    I := LeftCol;
-    if ColCount > 1 then
-      TMyGrid(StringGrid1).DeleteColumn(Col);
-    LeftCol := I;
-    Button1.Enabled := (ColCount > 1);
-  end;
-end;
+    SelectedSet := CdsFileListDef.RecNo;
+    FileListDefs := GetFileListDefs;
+    FileListDefs.Clear;
+    try
+      CdsFileListDef.First;
 
-procedure TFEditFColumn.Button2Click(Sender: TObject);
-var
-  I: integer;
-  Tx: string; // Save changes
-begin
-  Tx := Trim(LabeledEdit1.Text);
-  LabeledEdit1.Text := Tx;
-  if Length(Tx) = 0 then
-    LabeledEdit1.SetFocus
-  else
-  begin
-    Tx := Trim(LabeledEdit2.Text);
-    LabeledEdit2.Text := Tx;
-    if (Length(Tx) < 4) or (pos('-', Tx) <> 1) or (pos(' ', Tx) > 0) then
-      LabeledEdit2.SetFocus
-    else
-      with StringGrid1 do
+      while not CdsFileListDef.Eof do
       begin
-        i := Col;
-        Cells[i, 0] := LabeledEdit1.Text;
-        Cells[i, 1] := LabeledEdit2.Text;
-      end;
-  end;
-end;
 
-procedure TFEditFColumn.Button3Click(Sender: TObject);
-var
-  I: integer;
-  Tx: string; // Add column
-begin
-  Tx := Trim(LabeledEdit1.Text);
-  LabeledEdit1.Text := Tx;
-  if Length(Tx) = 0 then
-    LabeledEdit1.SetFocus
-  else
-  begin
-    Tx := Trim(LabeledEdit2.Text);
-    LabeledEdit2.Text := Tx;
-    if (Length(Tx) < 4) or (pos('-', Tx) <> 1) or (pos(' ', Tx) > 0) then
-      LabeledEdit2.SetFocus
-    else
-      with StringGrid1 do
-      begin
-        i := Col;
-        OnSelectCell := nil;
-        TMyGrid(StringGrid1).InsertColumn(i);
-        OnSelectCell := StringGrid1SelectCell;
-        Cells[i, 0] := LabeledEdit1.Text;
-        Cells[i, 1] := LabeledEdit2.Text;
-      end;
-  end;
-end;
+        AFileOption := [floSystem];
+        if (CdsFileListDefMode.AsString = 'User') then
+          Include(AFileOption, floUserDef)
+        else
+          Include(AFileOption, floInternal);
 
-procedure TFEditFColumn.Button5Click(Sender: TObject);
-var
-  I, N: integer;
-  FListUserDef: TColumnsArray;
-begin
-  FListUserDef := GetFileListColumnDefs(FMain.CBoxDetails.ItemIndex);
-  with StringGrid1 do
-  begin
-    I := ColCount;
-    SetLength(FListUserDef, I);
-    for N := 0 to I - 1 do
-    begin
-      FListUserDef[N].Caption := Cells[N, 0];
-      FListUserDef[N].Command := Cells[N, 1];
-      FListUserDef[N].Width := ColWidths[N];
-      FListUserDef[N].AlignR := 0;
+        CdsColumnSet.First;
+        SetLength(AColumnSet, CdsColumnSet.RecordCount);
+        while not CdsColumnSet.Eof do
+        begin
+          AColumnSet[CdsColumnSet.RecNo -1].SetCaption(CdsColumnSetName.AsString);
+          AColumnSet[CdsColumnSet.RecNo -1].Command := CdsColumnSetCommand.AsString;
+          AColumnSet[CdsColumnSet.RecNo -1].Width := CdsColumnSetWidth.AsInteger;
+          AColumnSet[CdsColumnSet.RecNo -1].AlignR := CdsColumnSetAlignR.AsInteger;
+
+          AColumnSet[CdsColumnSet.RecNo -1].Options := 0;
+
+          if (CdsColumnSetOption.AsString = 'Sys') then
+            AColumnSet[CdsColumnSet.RecNo -1].Options := AColumnSet[CdsColumnSet.RecNo -1].Options + toSys;
+          if (CdsColumnSetOption.AsString = 'Decimal') then
+            AColumnSet[CdsColumnSet.RecNo -1].Options := AColumnSet[CdsColumnSet.RecNo -1].Options + toDecimal;
+          if (CdsColumnSetOption.AsString = 'YesNo') then
+            AColumnSet[CdsColumnSet.RecNo -1].Options := AColumnSet[CdsColumnSet.RecNo -1].Options + toYesNo;
+          if (CdsColumnSetOption.AsString = 'HorVer') then
+            AColumnSet[CdsColumnSet.RecNo -1].Options := AColumnSet[CdsColumnSet.RecNo -1].Options + toHorVer;
+          if (CdsColumnSetOption.AsString = 'Flash') then
+            AColumnSet[CdsColumnSet.RecNo -1].Options := AColumnSet[CdsColumnSet.RecNo -1].Options + toFlash;
+          if (CdsColumnSetOption.AsString = 'Country') then
+            AColumnSet[CdsColumnSet.RecNo -1].Options := AColumnSet[CdsColumnSet.RecNo -1].Options + toCountry;
+
+          if (CdsColumnSetBackup.AsString = 'Backup') then
+            AColumnSet[CdsColumnSet.RecNo -1].Options := AColumnSet[CdsColumnSet.RecNo -1].Options + toBackup;
+
+          CdsColumnSet.Next;
+        end;
+        FileListDefs.Add(TColumnSet.Create(CdsFileListDefName.AsString,
+                                           CdsFileListDefDescription.AsString,
+                                           AFileOption, AColumnSet));
+
+        CdsFileListDef.Next;
+      end;
+    finally
+      CdsFileListDef.Close;
+      CdsColumnSet.Close;
     end;
   end;
-  SetFileListColumnDefs(FMain.CBoxDetails.ItemIndex, FListUserDef);
-  ModalResult := mrOK;
+end;
+
+procedure TFEditFColumn.FormCreate(Sender: TObject);
+begin
+  ReadFormSizes(Self, Self.DefWindowSizes);
 end;
 
 procedure TFEditFColumn.FormShow(Sender: TObject);
 var
-  I, N: integer;
-  CanSelect: boolean;
-  FListUserDef: TColumnsArray;
+  FileListDefs: TColumnSetList;
+  AColumnSet: TColumnSet;
+  AColumn: TFileListColumn;
+  Index: integer;
+  Id: integer;
 begin
-  Left := FMain.GetFormOffset(false).X;
-  Top := FMain.GetFormOffset(false).Y;
-  Width := FMain.Width - FMain.GUIBorderWidth;
+  CdsFileListDef.Close;
+  CdsColumnSet.Close;
 
-  FListUserDef := GetFileListColumnDefs(FMain.CBoxDetails.ItemIndex);
-  I := Length(FListUserDef);
-  with StringGrid1 do
-  begin
-    ColCount := I;
-    for N := 0 to I - 1 do
+  CdsColumnSet.MasterSource := nil;
+  CdsColumnSet.MasterFields := '';
+  CdsFileListDef.DisableControls;
+  CdsColumnSet.DisableControls;
+
+  try
+    CdsFileListDef.IndexFieldNames := 'Id';
+    CdsFileListDef.CreateDataSet;
+
+    CdsColumnSet.IndexFieldNames := 'FileListName';
+    CdsColumnSet.CreateDataSet;
+
+    FileListDefs := GetFileListDefs;
+    Id := 0;
+    for AColumnSet in FileListDefs do
     begin
-      ColWidths[N] := StringGrid1.Canvas.TextWidth(FListUserDef[N].Command + 'WW');
-      Cells[N, 0] := FListUserDef[N].Caption;
-      Cells[N, 1] := FListUserDef[N].Command;
-    end;
-    Button1.Enabled := (ColCount > 1);
-  end;
-  StringGrid1SelectCell(Sender, 0, 0, CanSelect);
-  Application.OnHint := DisplayHint;
-end;
+      Inc(Id);
 
-procedure TFEditFColumn.StringGrid1SelectCell(Sender: TObject; ACol, ARow: Integer; var CanSelect: Boolean);
-begin
-  with StringGrid1 do
-  begin
-    LabeledEdit1.Text := Cells[ACol, 0];
-    LabeledEdit2.Text := Cells[ACol, 1];
+      CdsFileListDef.Insert;
+      CdsFileListDefId.AsInteger := Id;
+      CdsFileListDefName.AsString := AColumnSet.Name;
+      CdsFileListDefDescription.AsString := AColumnSet.Desc;
+      if (AColumnSet.Options = [floSystem]) then
+        CdsFileListDefMode.AsString := 'System'
+      else if (floUserDef in AColumnSet.Options) then
+        CdsFileListDefMode.AsString := 'User'
+      else
+        CdsFileListDefMode.AsString := 'Internal';
+
+      CdsFileListDefDescription.AsString := AColumnSet.Desc;
+
+      CdsFileListDef.Post;
+
+      for Index := 0 to High(AColumnSet.ColumnDefs) do
+      begin
+        AColumn := AColumnSet.ColumnDefs[Index];
+        CdsColumnSet.Insert;
+        CdsColumnSetFileListName.AsString := AColumnSet.Name;
+        CdsColumnSetName.AsString := AColumn.Caption;
+        CdsColumnSetCommand.AsString := AColumn.Command;
+        if ((AColumn.Options and toBackup) = toBackup) then
+          CdsColumnSetBackup.AsString := 'Backup';
+
+//TODO translate
+        if ((AColumn.Options and toSys) = toSys) then
+          CdsColumnSetOption.AsString := 'Sys'
+        else if ((AColumn.Options and toDecimal) = toDecimal) then
+          CdsColumnSetOption.AsString := 'Decimal'
+        else if ((AColumn.Options and toYesNo) = toYesNo) then
+          CdsColumnSetOption.AsString := 'YesNo'
+        else if ((AColumn.Options and toHorVer) = toHorVer) then
+          CdsColumnSetOption.AsString := 'HorVer'
+        else if ((AColumn.Options and toFlash) = toFlash) then
+          CdsColumnSetOption.AsString := 'Flash'
+        else if ((AColumn.Options and toCountry) = toCountry) then
+          CdsColumnSetOption.AsString := 'Country';
+        CdsColumnSetWidth.AsInteger := AColumn.Width;
+        CdsColumnSetAlignR.AsInteger := AColumn.AlignR;
+
+        CdsColumnSet.Post;
+      end;
+    end;
+  finally
+    CdsFileListDef.EnableControls;
+    CdsColumnSet.EnableControls;
+    CdsColumnSet.MasterFields := 'Name';
+    CdsColumnSet.MasterSource := DsFileListDef;
+    CdsFileListDef.RecNo := SelectedSet;
   end;
 end;
 
