@@ -106,15 +106,6 @@ begin
       if ((ATag.Options and toDecimal) = toDecimal) then
         DetailStrings[Index] := FormatExifDecimal(DetailStrings[Index], 1);
 
-      if ((ATag.Options and toYesNo) = toYesNo) then
-      begin
-        if (DetailStrings[Index] = '0') or
-           (DetailStrings[Index] = '-') then
-          DetailStrings[Index] := StrNo
-        else
-          DetailStrings[Index] := StrYes;
-      end;
-
       if ((ATag.Options and toFlash) = toFlash) then
       begin
         FlashValue := StrToIntDef(DetailStrings[Index], -1);
@@ -154,6 +145,17 @@ begin
     if ((ATag.Options and toSys) = toSys) then
       DetailStrings[Index] := GetSystemField(Folder.Parent, Folder.RelativeID, StrToIntDef(ATag.Command, 0));
 
+    // Yes/No
+    if ((ATag.Options and toYesNo) = toYesNo) then
+    begin
+      if (DetailStrings[Index] = '') or
+         (DetailStrings[Index] = '0') or
+         (DetailStrings[Index] = '-') then
+        DetailStrings[Index] := StrNo
+      else
+        DetailStrings[Index] := StrYes;
+    end;
+
     // Padleft?
     if (ATag.AlignR > 0) then
       DetailStrings[Index] := DetailStrings[Index].PadLeft(ATag.AlignR);
@@ -161,18 +163,25 @@ begin
     // Backup column?
     if ((ATag.Options and toBackup) = toBackup) then
     begin
-      if ((DetailStrings[Index] <> '-') and (DetailStrings[Index] <> '')) then
+      if ((DetailStrings[Index] <> '-') and
+          (DetailStrings[Index] <> StrNo) or
+          (DetailStrings[Index] <> '')) then
         BackupValue := DetailStrings[Index];
       DetailStrings.Delete(Index);
     end;
 
-    if ((ATag.Options and toMain) = toMain) then
+    if ((ATag.Options and toBackup) = 0) then
     begin
-      if ((DetailStrings[Index] = '-') or (DetailStrings[Index] = '')) and
-         (BackupValue <> '') then
+      if ((DetailStrings[Index] = '-') or
+          (DetailStrings[Index] = StrNo) or
+          (DetailStrings[Index] = '')) and
+          (BackupValue <> '') then
+      begin
         DetailStrings[Index] := BackupValue;
-      BackupValue := '';
+        BackupValue := '';
+      end;
     end;
+
   end;
 
   case (PostProcess) of

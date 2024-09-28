@@ -356,6 +356,7 @@ type
     procedure ShellListPathChange(Sender: TObject);
     procedure ShellListItemsLoaded(Sender: TObject);
     procedure ShellListOwnerDataFetch(Sender: TObject; Item: TListItem; Request: TItemRequest; AFolder: TShellFolder);
+    procedure ShellListUpdateSysCaptions;
     procedure ShellListColumnResized(Sender: TObject);
     procedure ShellListMouseWheel(Sender: TObject; Shift: TShiftState; WheelDelta: Integer; MousePos: TPoint; var Handled: Boolean);
     procedure CounterETEvent(Counter: integer);
@@ -564,12 +565,17 @@ end;
 
 procedure TFMain.BtnColumnEditClick(Sender: TObject);
 begin
+  FEditFColumn.SelectedSet := CBoxDetails.ItemIndex +1;
   if FEditFColumn.ShowModal = mrOK then
+  begin
+    GetFileListDefs(CBoxDetails.Items);
+    CBoxDetails.ItemIndex := FEditFColumn.SelectedSet -1;
     with ShellList do
     begin
-      ClearSelectionRefresh;
+      Refresh;
       SetFocus;
     end;
+  end;
   ShowMetadata;
 end;
 
@@ -727,10 +733,21 @@ begin
   FLogWin.Show;
 end;
 
+procedure TFMain.ShellListUpdateSysCaptions;
+var
+  Index: integer;
+  ColumnDefs: TColumnsArray;
+begin
+  ColumnDefs := GetFileListDefs[CBoxDetails.ItemIndex].ColumnDefs;
+  // Update Caption of system fields
+  for Index := 0 to High(ColumnDefs) do
+    if ((ColumnDefs[Index].Options and toSys) = toSys) then
+      ColumnDefs[Index].SetCaption(GetSystemField(ShellList.RootFolder, nil, StrToIntDef(ColumnDefs[Index].Command, 0)));
+end;
+
 procedure TFMain.CBoxDetailsChange(Sender: TObject);
 begin
-  with CBoxDetails do
-    SpeedBtnColumnEdit.Enabled := SpeedBtnDetails.Down and (ItemIndex > 0);
+  SpeedBtnColumnEdit.Enabled := SpeedBtnDetails.Down and (CBoxDetails.ItemIndex > 0);
 
   with ShellList do
   if (Enabled) then
@@ -1694,7 +1711,7 @@ begin
     Delete(Tk, 1, 2);
   Tk := TrimRight(Tk);
 
-  FListUserDef[I].Caption := Tk;
+  FListUserDef[I].SetCaption(Tk);
   Tk := TranslateTagName(Tx, Tk);
   FListUserDef[I].Command := Tx + Tk;  // ='-IFD0:Make'
   FListUserDef[I].Width := 96;
@@ -2646,6 +2663,7 @@ begin
   WrkIniDir := GetAppPath;
   if GUIsettings.UseExitDetails then
     CBoxDetailsChange(Sender);
+  ShellListUpdateSysCaptions;
 
   DontSaveIni := FindCmdLineSwitch('DontSaveIni', true);
 
@@ -2807,7 +2825,7 @@ begin
       Dec(ColIndex);
   end;
 
-  if (ListIndex > GetFileListColumnDefCount -1) then
+  if (ListIndex > GetFileListDefCount -1) then
     exit;
   if (ColIndex > High(GetFileListColumnDefs(ListIndex))) then
     exit;
@@ -2864,23 +2882,21 @@ procedure TFMain.ShellListAfterEnumColumns(Sender: TObject; var FileListOptions:
       begin
         if ((ColumnDefs[I].Options and toBackup) = toBackup) then
           continue;
-//TODO: To be done in designer
-//        if ((ColumnDefs[I].Options and toSys) = toSys) then
-//          AddColumn(GetSystemField(ShellList.RootFolder, nil, StrToIntDef(ColumnDefs[I].Command, 0)),
-//                    I + 1, ColumnDefs[I].Width, ColumnDefs[I].AlignR)
-//        else
         AddColumn(ColumnDefs[I].Caption, I +1, ColumnDefs[I].Width, ColumnDefs[I].AlignR);
       end;
     end;
   end;
 
 begin
-//TODO Handle in designer
-  FileListOptions := [floSystem, floInternal];
-  if (GUIsettings.EnableUnsupported) then
+  FileListOptions := GetFileListDefs[CBoxDetails.ItemIndex].Options;
+//TODO
+  if (floUserDef in FileListOptions) then
+     FileListOptions := FileListOptions + [floSystem, floInternal, floExifTool];
+  if (floInternal in FileListOptions) and
+     (GUIsettings.EnableUnsupported) then
     Include(FileListOptions, floExifTool);
 
-  ColumnDefs := GetFileListColumnDefs(CBoxDetails.ItemIndex);
+  ColumnDefs := GetFileListDefs[CBoxDetails.ItemIndex].ColumnDefs;
 
   case CBoxDetails.ItemIndex of
     0:

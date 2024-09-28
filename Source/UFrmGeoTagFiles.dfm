@@ -4,7 +4,7 @@ object FGeotagFiles: TFGeotagFiles
   BorderStyle = bsDialog
   Caption = 'Geotag files'
   ClientHeight = 408
-  ClientWidth = 591
+  ClientWidth = 601
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -17,12 +17,12 @@ object FGeotagFiles: TFGeotagFiles
   object StatusBar1: TStatusBar
     Left = 0
     Top = 389
-    Width = 591
+    Width = 601
     Height = 19
     Panels = <>
     SimplePanel = True
-    ExplicitTop = 391
-    ExplicitWidth = 599
+    ExplicitTop = 388
+    ExplicitWidth = 587
   end
   object BtnCancel: TButton
     Left = 514

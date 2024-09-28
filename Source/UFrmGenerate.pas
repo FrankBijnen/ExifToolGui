@@ -30,6 +30,7 @@ type
     procedure CMWantsToClose(var Message: TMessage); message CM_WantsToClose;
     procedure BtnCloseClick(Sender: TObject);
     procedure FormShow(Sender: TObject);
+    procedure FormCloseQuery(Sender: TObject; var CanClose: Boolean);
   private
     { Private declarations }
     WantsToClose: boolean;
@@ -93,6 +94,12 @@ end;
 procedure TFrmGenerate.CMWantsToClose(var Message: TMessage);
 begin
   Message.Result := NativeInt(WantsToClose);
+end;
+
+procedure TFrmGenerate.FormCloseQuery(Sender: TObject; var CanClose: Boolean);
+begin
+  BtnCloseClick(Sender);
+  CanClose := true;
 end;
 
 procedure TFrmGenerate.FormShow(Sender: TObject);

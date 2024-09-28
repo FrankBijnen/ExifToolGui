@@ -101,12 +101,12 @@ type
 
   GPSrec = packed record
     HasData: boolean;
-    LatitudeRef: string[1];     // North/South
-    Latitude: string[11];
-    LongitudeRef: string[1];    // East/West
-    Longitude: string[11];
-    AltitudeRef: string[1];     // +/-
-    Altitude: string[5];
+    GpsLatitudeRef: string[1];  // North/South
+    GpsLatitude: string[11];
+    GpsLongitudeRef: string[1]; // East/West
+    GpsLongitude: string[11];
+    GpsAltitudeRef: string[1];  // +/-
+    GpsAltitude: string[5];
     GeoLat: string[11];         // for OSM Map
     GeoLon: string[11];         // for OSM Map
     GpsPosition: string;        // For GPS Tagged?
@@ -990,23 +990,23 @@ begin
     HasData := true;
     case IFDentry.Tag of
       $01:
-        LatitudeRef := AddVarData('LatitudeRef', DecodeASCII(IFDentry));
+        GpsLatitudeRef := AddVarData('GpsLatitudeRef', DecodeASCII(IFDentry));
       $02:
-        Latitude := AddVarData('Latitude', DecodeGPS(IFDentry, true));
+        GpsLatitude := AddVarData('GpsLatitude', DecodeGPS(IFDentry, true));
       $03:
-        LongitudeRef := AddVarData('LongitudeRef', DecodeASCII(IFDentry));
+        GpsLongitudeRef := AddVarData('GpsLongitudeRef', DecodeASCII(IFDentry));
       $04:
-        Longitude := AddVarData('Longitude', DecodeGPS(IFDentry, false));
+        GpsLongitude := AddVarData('GpsLongitude', DecodeGPS(IFDentry, false));
       $05:
         begin
           if IFDentry.ValueOffs = 0 then
-            AltitudeRef := '+'
+            GpsAltitudeRef := '+'
           else
-            AltitudeRef := '-';
-          AddVarData('AltitudeRef', AltitudeRef);
+            GpsAltitudeRef := '-';
+          AddVarData('GpsAltitudeRef', GpsAltitudeRef);
         end;
       $06:
-        Altitude := AddVarData('Altitude', IntToStr(DecodeRational(IFDentry)) + 'm');
+        GpsAltitude := AddVarData('GpsAltitude', IntToStr(DecodeRational(IFDentry)) + 'm');
     end;
   end;
   FotoF.Seek(SavePos, TSeekOrigin.soBeginning);
@@ -1017,9 +1017,9 @@ procedure FotoRec.CorrectGps;
 begin
   with Gps do
   begin
-    if (LatitudeRef = 'S') and (GeoLat <> '') then
+    if (GpsLatitudeRef = 'S') and (GeoLat <> '') then
       GeoLat := '-' + GeoLat;
-    if (LongitudeRef = 'W') and (GeoLon <> '') then
+    if (GpsLongitudeRef = 'W') and (GeoLon <> '') then
       GeoLon := '-' + GeoLon;
     GroupName := 'Composite';
     if (GeoLat <> '') or

@@ -5,20 +5,21 @@ object FrmGenerate: TFrmGenerate
   BorderStyle = bsToolWindow
   Caption = 'Generating thumbnails'
   ClientHeight = 50
-  ClientWidth = 565
+  ClientWidth = 747
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
   Font.Height = -12
   Font.Name = 'Segoe UI'
   Font.Style = []
+  OnCloseQuery = FormCloseQuery
   OnShow = FormShow
   TextHeight = 15
   object LblGenerate: TLabel
     AlignWithMargins = True
     Left = 20
     Top = 0
-    Width = 542
+    Width = 724
     Height = 17
     Margins.Left = 20
     Margins.Top = 0
@@ -31,20 +32,20 @@ object FrmGenerate: TFrmGenerate
   object PnlBottom: TPanel
     Left = 0
     Top = 20
-    Width = 565
+    Width = 747
     Height = 30
     Align = alBottom
     TabOrder = 0
     ExplicitTop = 8
-    ExplicitWidth = 557
+    ExplicitWidth = 739
     object PbProgress: TProgressBar
       Left = 107
       Top = 1
-      Width = 457
+      Width = 639
       Height = 28
       Align = alClient
       TabOrder = 0
-      ExplicitWidth = 449
+      ExplicitWidth = 631
     end
     object BtnClose: TBitBtn
       Left = 1

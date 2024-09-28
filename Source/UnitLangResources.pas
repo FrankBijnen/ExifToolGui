@@ -195,12 +195,6 @@ resourcestring
   StrAboutList              = 'About photo';
   StrUserList               = 'User Defined';
 
-  StrFLName                 = 'Name';
-  StrFLFilTyp               = 'File type';
-  StrFLSize                 = 'Size';
-  StrFLDatMod               = 'Date Modified';
-  StrFLDatCre               = 'Date Created';
-
   StrFLModel                = 'Model';
   StrFLLensModel            = 'LensModel';
   StrFLExpTime              = 'ExpTime';

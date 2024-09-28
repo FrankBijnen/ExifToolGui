@@ -30,7 +30,7 @@ object FrmStyle: TFrmStyle
       389
       29)
     object BtnOk: TBitBtn
-      Left = 199
+      Left = 209
       Top = 2
       Width = 85
       Height = 25
@@ -59,7 +59,7 @@ object FrmStyle: TFrmStyle
       OnClick = BtnOkClick
     end
     object BtnCancel: TBitBtn
-      Left = 290
+      Left = 300
       Top = 2
       Width = 85
       Height = 25

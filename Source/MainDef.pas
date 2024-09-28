@@ -658,6 +658,7 @@ begin
       // Standard, Camera, Location, About and UserDef settings
       ReadFileListColumns(FMain.ShellList.Handle, GUIini);
       GetFileListDefs(FMain.CBoxDetails.Items);
+      FMain.CBoxDetails.ItemIndex := 0;
 
       with GUIsettings do
       begin
