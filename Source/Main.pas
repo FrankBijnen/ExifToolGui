@@ -352,11 +352,10 @@ type
     procedure ShellListCustomDrawItem(Sender: TCustomListView; Item: TListItem; State: TCustomDrawState;
       var DefaultDraw: Boolean);
     procedure ShellListBeforePopulate(Sender: TObject; var DoDefault: boolean);
-    procedure ShellListAfterEnumColumns(Sender: TObject; var FileListOptions: TFileListOptions; var ColumnDefs: TColumnsArray);
+    procedure ShellListAfterEnumColumns(Sender: TObject; var ReadModeOptions: TReadModeOptions; var ColumnDefs: TColumnsArray);
     procedure ShellListPathChange(Sender: TObject);
     procedure ShellListItemsLoaded(Sender: TObject);
     procedure ShellListOwnerDataFetch(Sender: TObject; Item: TListItem; Request: TItemRequest; AFolder: TShellFolder);
-    procedure ShellListUpdateSysCaptions;
     procedure ShellListColumnResized(Sender: TObject);
     procedure ShellListMouseWheel(Sender: TObject; Shift: TShiftState; WheelDelta: Integer; MousePos: TPoint; var Handled: Boolean);
     procedure CounterETEvent(Counter: integer);
@@ -392,6 +391,7 @@ uses System.StrUtils, System.Math, System.Masks, System.Types, System.UITypes,
   Vcl.ClipBrd, Winapi.ShlObj, Winapi.ShellAPI, Winapi.CommCtrl, Vcl.Shell.ShellConsts, Vcl.Themes, Vcl.Styles,
   ExifTool, ExifInfo, ExifToolsGui_LossLess, ExifTool_PipeStream, ExifToolsGui_Data, ExifToolsGUI_MultiContextMenu,
   ExifToolsGUI_StringList, ExifToolsGui_FileListColumns,
+  UDmFileLists,
   MainDef, LogWin, Preferences, EditFFilter, EditFCol, UFrmStyle, UFrmAbout, UFrmCheckVersions,
   QuickMngr, DateTimeShift, DateTimeEqual, CopyMeta, RemoveMeta, Geotag, Geomap, CopyMetaSingle, FileDateTime,
   UFrmGenericExtract, UFrmGenericImport, UFrmLossLessRotate, UFrmGeoTagFiles, UFrmGeoSetup,
@@ -565,11 +565,12 @@ end;
 
 procedure TFMain.BtnColumnEditClick(Sender: TObject);
 begin
-  FEditFColumn.SelectedSet := CBoxDetails.ItemIndex +1;
+  DmFileLists.SelectedSet := CBoxDetails.ItemIndex +1;
   if FEditFColumn.ShowModal = mrOK then
   begin
+    UpdateSysCaptions(ShellList.RootFolder);
     GetFileListDefs(CBoxDetails.Items);
-    CBoxDetails.ItemIndex := FEditFColumn.SelectedSet -1;
+    CBoxDetails.ItemIndex := DmFileLists.SelectedSet -1;
     with ShellList do
     begin
       Refresh;
@@ -731,18 +732,6 @@ end;
 procedure TFMain.BtnShowLogClick(Sender: TObject);
 begin
   FLogWin.Show;
-end;
-
-procedure TFMain.ShellListUpdateSysCaptions;
-var
-  Index: integer;
-  ColumnDefs: TColumnsArray;
-begin
-  ColumnDefs := GetFileListDefs[CBoxDetails.ItemIndex].ColumnDefs;
-  // Update Caption of system fields
-  for Index := 0 to High(ColumnDefs) do
-    if ((ColumnDefs[Index].Options and toSys) = toSys) then
-      ColumnDefs[Index].SetCaption(GetSystemField(ShellList.RootFolder, nil, StrToIntDef(ColumnDefs[Index].Command, 0)));
 end;
 
 procedure TFMain.CBoxDetailsChange(Sender: TObject);
@@ -2663,7 +2652,6 @@ begin
   WrkIniDir := GetAppPath;
   if GUIsettings.UseExitDetails then
     CBoxDetailsChange(Sender);
-  ShellListUpdateSysCaptions;
 
   DontSaveIni := FindCmdLineSwitch('DontSaveIni', true);
 
@@ -2844,7 +2832,7 @@ begin
   DoDefault := ((ShellList.ViewStyle <> vsReport) or (CBoxDetails.ItemIndex = 0));
 end;
 
-procedure TFMain.ShellListAfterEnumColumns(Sender: TObject; var FileListOptions: TFileListOptions; var ColumnDefs: TColumnsArray);
+procedure TFMain.ShellListAfterEnumColumns(Sender: TObject; var ReadModeOptions: TReadModeOptions; var ColumnDefs: TColumnsArray);
 
   procedure AdjustColumns(ColumnDefs: TColumnsArray);
   var
@@ -2877,7 +2865,7 @@ procedure TFMain.ShellListAfterEnumColumns(Sender: TObject; var FileListOptions:
     with ShellList do
     begin
       Columns.Clear;
-      AddColumn(GetSystemField(ShellList.RootFolder, nil, 0), 0, GetFileListColumnDefs(0)[0].Width); // Name field
+      AddColumn(TSubShellFolder.GetSystemField(ShellList.RootFolder, nil, 0), 0, GetFileListColumnDefs(0)[0].Width); // Name field
       for I := 0 to High(ColumnDefs) do
       begin
         if ((ColumnDefs[I].Options and toBackup) = toBackup) then
@@ -2888,13 +2876,11 @@ procedure TFMain.ShellListAfterEnumColumns(Sender: TObject; var FileListOptions:
   end;
 
 begin
-  FileListOptions := GetFileListDefs[CBoxDetails.ItemIndex].Options;
-//TODO
-  if (floUserDef in FileListOptions) then
-     FileListOptions := FileListOptions + [floSystem, floInternal, floExifTool];
-  if (floInternal in FileListOptions) and
+//Check
+  ReadModeOptions := GetFileListDefs[CBoxDetails.ItemIndex].ReadMode;
+  if (GetFileListDefs[CBoxDetails.ItemIndex].Options = TFileListOptions.floInternal) and
      (GUIsettings.EnableUnsupported) then
-    Include(FileListOptions, floExifTool);
+    Include(ReadModeOptions, rmExifTool);
 
   ColumnDefs := GetFileListDefs[CBoxDetails.ItemIndex].ColumnDefs;
 
@@ -2907,6 +2893,10 @@ begin
   else
     AddColumns(ColumnDefs);
   end;
+
+  // Update Sys and Country Columns
+  UpdateSysCaptions(ShellList.RootFolder);
+
   SetupCountry(ColumnDefs, GeoSettings.CountryCodeLocation);
 
 end;

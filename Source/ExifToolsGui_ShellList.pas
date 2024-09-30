@@ -25,7 +25,7 @@ type
   TThumbGenerateEvent = procedure(Sender: TObject; Item: TListItem; Status: TThumbGenStatus; Total, Remaining: integer) of object;
   TPopulateBeforeEvent = procedure(Sender: TObject; var DoDefault: boolean) of object;
   TOwnerDataFetchEvent = procedure(Sender: TObject; Item: TListItem; Request: TItemRequest; AFolder: TShellFolder) of object;
-  TEnumColumnsEvent = procedure(Sender: TObject; var FileListOptions: TFileListOptions; var ColumnDefs: TColumnsArray) of object;
+  TEnumColumnsEvent = procedure(Sender: TObject; var FileListOptions: TReadModeOptions; var ColumnDefs: TColumnsArray) of object;
 
   TRelativeNameType = (rnDisplay, rnFile, rnSort);
   TSubShellFolder = class(TShellFolder)
@@ -40,6 +40,8 @@ type
     class function GetRelativeDisplayName(Folder: TShellFolder): string;
     class function GetRelativeFileName(Folder: TShellFolder): string;
     class function GetRelativeSortName(Folder: TShellFolder): string;
+    class function SystemFieldIsDate(RootFolder: TShellFolder; Column: integer): boolean;
+    class function GetSystemField(RootFolder: TShellFolder; RelativeID: PItemIDList; Column: integer): string;
   end;
 
   TShellListView = class(Vcl.Shell.ShellCtrls.TShellListView, IShellCommandVerbExifTool)
@@ -52,7 +54,7 @@ type
     FIncludeSubFolders: boolean;
 
     FColumnDefs: TColumnsArray;
-    FFileListOptions: TFileListOptions;
+    FReadModeOptions: TReadModeOptions;
     FOnColumnResized: TNotifyEvent;
     FColumnSorted: boolean;
     FSortColumn: integer;
@@ -145,7 +147,7 @@ type
     property OnPopulateBeforeEvent: TPopulateBeforeEvent read FOnPopulateBeforeEvent write FOnPopulateBeforeEvent;
     property OnEnumColumnsAfterEvent: TEnumColumnsEvent read FOnEnumColumnsAfterEvent write FOnEnumColumnsAfterEvent;
     property ColumnDefs: TColumnsArray read FColumnDefs write FColumnDefs;
-    property FileListOptions: TFileListOptions read FFileListOptions write FFileListOptions;
+    property ReadModeOptions: TReadModeOptions read FReadModeOptions write FReadModeOptions;
     property OnPathChange: TNotifyEvent read FOnPathChange write FOnPathChange;
     property OnItemsLoaded: TNotifyEvent read FOnItemsLoaded write FOnItemsLoaded;
     property OnOwnerDataFetchEvent: TOwnerDataFetchEvent read FOnOwnerDataFetchEvent write FOnOwnerDataFetchEvent;
@@ -299,6 +301,36 @@ class function TSubShellFolder.GetRelativeSortName(Folder: TShellFolder): string
 begin
   result := TSubShellFolder.GetRelativeName(Folder, TRelativeNameType.rnSort);
 end;
+
+class function TSubShellFolder.SystemFieldIsDate(RootFolder: TShellFolder; Column: integer): boolean;
+var
+  ColFlags: LongWord;
+begin
+  result := false;
+  if Assigned(RootFolder) and
+     Assigned(RootFolder.ShellFolder2) and
+     (RootFolder.ShellFolder2.GetDefaultColumnState(Column, ColFlags) = S_OK) and
+     ((ColFlags and SHCOLSTATE_TYPE_DATE) = SHCOLSTATE_TYPE_DATE) then
+    result := true;
+end;
+
+class function TSubShellFolder.GetSystemField(RootFolder: TShellFolder; RelativeID: PItemIDList; Column: integer): string;
+var
+  SD: TShellDetails;
+begin
+  result := '';
+  if Assigned(RootFolder) and
+     Assigned(RootFolder.ShellFolder2) and
+     (RootFolder.ShellFolder2.GetDetailsOf(RelativeID, Column, SD) = S_OK) then
+    case SD.str.uType of
+      STRRET_CSTR:
+        SetString(Result, SD.str.cStr, lStrLenA(SD.str.cStr));
+      STRRET_WSTR:
+        if Assigned(SD.str.pOleStr) then
+          Result := SD.str.pOleStr;
+    end;
+end;
+//
 
 { TShellListView }
 
@@ -569,8 +601,8 @@ var
   Column: integer;
 begin
   Column := Columns.Count;
-  if (SystemFieldIsDate(RootFolder, Column)) then
-    Columns.Add.Caption := GetSystemField(RootFolder, nil, Column); // Nil gets fieldname
+  if (TSubShellFolder.SystemFieldIsDate(RootFolder, Column)) then
+    Columns.Add.Caption := TSubShellFolder.GetSystemField(RootFolder, nil, Column); // Nil gets fieldname
 end;
 
 procedure TShellListView.EnumColumns;
@@ -587,7 +619,7 @@ begin
 
     FColumnDefs := nil;
     if Assigned(FOnEnumColumnsAfterEvent) then
-      FOnEnumColumnsAfterEvent(Self, FFileListOptions, FColumnDefs);
+      FOnEnumColumnsAfterEvent(Self, FReadModeOptions, FColumnDefs);
 
     if Enabled and
        ValidDir(Path) and
