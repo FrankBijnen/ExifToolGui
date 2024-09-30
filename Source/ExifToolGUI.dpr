@@ -22,6 +22,7 @@ uses
   Vcl.Forms,
   Vcl.Themes,
   Vcl.Styles,
+  MidasLib,
   MainDef in 'MainDef.pas',
   UnitLangResources in 'UnitLangResources.pas',
   ExifToolsGUI_Utils in 'ExifToolsGUI_Utils.pas',
@@ -69,7 +70,8 @@ uses
   UFrmGenerate in 'UFrmGenerate.pas' {FrmGenerate},
   UFrmCheckVersions in 'UFrmCheckVersions.pas' {FrmCheckVersions},
   UFrmTagNames in 'UFrmTagNames.pas' {FrmTagNames},
-  UFrmPredefinedTags in 'UFrmPredefinedTags.pas' {FrmPredefinedTags};
+  UFrmPredefinedTags in 'UFrmPredefinedTags.pas' {FrmPredefinedTags},
+  UDmFileLists in 'UDmFileLists.pas' {DmFileLists: TDataModule};
 
 {$R *.res}
 
@@ -119,5 +121,6 @@ begin
   Application.CreateForm(TFGeoSetup, FGeoSetup);
   Application.CreateForm(TFrmTagNames, FrmTagNames);
   Application.CreateForm(TFrmPredefinedTags, FrmPredefinedTags);
+  Application.CreateForm(TDmFileLists, DmFileLists);
   Application.Run;
 end.

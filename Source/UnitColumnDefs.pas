@@ -5,6 +5,7 @@ interface
 uses
   System.Classes, System.IniFiles, System.Generics.Collections,
   WinApi.Windows,
+  Vcl.Shell.ShellCtrls,
   UnitLangResources;
 
 const
@@ -21,7 +22,9 @@ const
 
 type
 
-  TFileListOptions = set of (floSystem, floInternal, floExifTool, floUserDef);
+  TFileListOptions = (floSystem, floInternal, floUserDef);
+  TReadModeOption = (rmInternal = $0001, rmExifTool = $0002);
+  TReadModeOptions = set of TReadModeOption;
 
   TFileListColumn = record
     Command: string;
@@ -41,13 +44,24 @@ type
     FName: string;
     FDesc: string;
     FOptions: TFileListOptions;
+    FReadMode: TReadModeOptions;
     FColumnDefs: TColumnsArray;
+    function GetReadModeInt: integer;
   public
-    constructor Create(AName, ADesc: string; AOptions: TFileListOptions; AColumnDefs: TColumnsArray);
+    constructor Create(AName, ADesc: string;
+                       AOptions: TFileListOptions;
+                       AReadMode: TReadModeOptions;
+                       AColumnDefs: TColumnsArray); overload;
+    constructor Create(AName, ADesc: string;
+                       AOptions: TFileListOptions;
+                       AReadMode: integer;
+                       AColumnDefs: TColumnsArray); overload;
     destructor Destroy; override;
     property Name: string read FName write FName;
     property Desc: string read FDesc write FDesc;
     property Options: TFileListOptions read FOptions;
+    property ReadMode: TReadModeOptions read FReadMode;
+    property ReadModeInt: integer read GetReadModeInt;
     property ColumnDefs: TColumnsArray read FColumnDefs write FColumnDefs;
   end;
   TColumnSetList = TObjectlist<TColumnSet>;
@@ -60,15 +74,18 @@ procedure GetFileListDefs(AList: TStrings); overload;
 function GetFileListDefs: TColumnSetList; overload;
 function GetFileListColumnDefs(Index: integer): TColumnsArray;
 procedure SetFileListColumnDefs(Index: integer; AColumnDefs: TColumnsArray);
+procedure UpdateSysCaptions(ARootFolder: TShellFolder);
 
 implementation
 
 uses
   System.SysUtils, System.Math,
   Winapi.CommCtrl,
-  ExifToolsGUI_Utils;
+  ExifToolsGui_ShellList, ExifToolsGUI_Utils;
 
 const
+  ReadMode = 'ReadMode';
+
   // This definition is used only to store the Widths
   StandardTags = 'StandardColumns';
   StandardDefaults: array [0..4] of TFileListColumn =
@@ -136,19 +153,48 @@ begin
   StrPLCopy(Caption, ACaption, SizeOf(Caption) -1);
 end;
 
-constructor TColumnSet.Create(AName, ADesc: string; AOptions: TFileListOptions; AColumnDefs: TColumnsArray);
+constructor TColumnSet.Create(AName, ADesc: string;
+                              AOptions: TFileListOptions;
+                              AReadMode: TReadModeOptions;
+                              AColumnDefs: TColumnsArray);
 begin
   inherited Create;
   FName := AName;
   FDesc := ADesc;
   FOptions := AOptions;
+  FReadMode := AReadMode;
   FColumnDefs := AColumnDefs;
 end;
+
+constructor TColumnSet.Create(AName, ADesc: string;
+                              AOptions: TFileListOptions;
+                              AReadMode: integer;
+                              AColumnDefs: TColumnsArray);
+var
+  FReadMode: TReadModeOptions;
+begin
+  FReadMode := [];
+  if ((AReadMode and Ord(rmInternal)) <> 0) then
+    Include(FReadMode, rmInternal);
+  if ((AReadMode and Ord(rmExifTool)) <> 0) then
+    Include(FReadMode, rmExifTool);
+  Create(AName, ADesc, AOptions, FReadMode, AColumnDefs);
+end;
+
 
 destructor TColumnSet.Destroy;
 begin
   SetLength(FName, 0);
   inherited Destroy;
+end;
+
+function TColumnSet.GetReadModeInt: integer;
+begin
+  result := 0;
+  if (rmInternal in FReadMode) then
+    Inc(result, Ord(rmInternal));
+  if (rmExifTool in FReadMode) then
+    Inc(result, Ord(rmExifTool));
 end;
 
 function DefaultColumnWidth(LVHandle: HWND; AColumn: TFileListColumn): integer;
@@ -157,10 +203,38 @@ begin
   result := ListView_GetStringWidth(LVHandle, PWideChar(AColumn.Caption + 'WW'));
 end;
 
+function ReadReadModeDefs(ALine: string): TReadModeOptions;
+var
+  ReadModeInt: integer;
+begin
+  result := [];
+  ReadModeInt := Pos('=', ALine);
+  ReadModeInt := StrToIntDef(Copy(ALine, ReadModeInt +1), 0);
+
+  if ((ReadModeInt and Ord(rmInternal)) <> 0) then
+    include(Result, rmInternal);
+  if ((ReadModeInt and Ord(rmExifTool)) <> 0) then
+    include(Result, rmExifTool);
+end;
+
+procedure WriteReadModeDefs(TmpItems: TStrings;
+                            AReadMode: TReadModeOptions);
+var
+  ReadModeInt: integer;
+begin
+  ReadModeInt := 0;
+  if (rmInternal in AReadMode) then
+    Inc(ReadModeInt, Ord(rmInternal));
+  if (rmExifTool in AReadMode) then
+    Inc(ReadModeInt, Ord(rmExifTool));
+  TmpItems.Add(Format('%s=%d', [ReadMode, ReadModeInt]));
+end;
+
 function ReadColumnDefs(LVHandle: HWND;
                         GUIini: TMemIniFile;
                         ASection: string;
-                        ADefaults: array of TFileListColumn): TColumnsArray;
+                        ADefaults: array of TFileListColumn;
+                        var OReadMode: TReadModeOptions): TColumnsArray;
 var
   Indx, DefCnt: integer;
   Tx: string;
@@ -188,10 +262,12 @@ begin
     end
     else
     begin
+      OReadMode := ReadReadModeDefs(TmpItems[0]);
+      Dec(DefCnt);
       SetLength(result, DefCnt);
       for Indx := 0 to DefCnt - 1 do
       begin
-        Tx := TmpItems[Indx];
+        Tx := TmpItems[Indx +1];
         result[Indx].SetCaption(NextField(Tx, '='));
         result[Indx].Command  := NextField(Tx, ' ');
         result[Indx].Width    := StrToIntDef(NextField(Tx, ','), DefaultColumnWidth(LVHandle, result[Indx]));
@@ -212,7 +288,7 @@ begin
     ColumnDefs[Indx].Width := DefaultColumnWidth(LVHandle, ColumnDefs[Indx]);
 end;
 
-procedure WriteColumnDefs(GUIini: TMemIniFile; ASection: string; ColumnDefs: TColumnsArray);
+procedure WriteColumnDefs(GUIini: TMemIniFile; ASection: string; AReadMode: TReadModeOptions; ColumnDefs: TColumnsArray);
 var
   Indx: integer;
   Tx: string;
@@ -222,6 +298,8 @@ begin
   try
     GUIini.GetStrings(TmpItems); // Get strings written so far.
     TmpItems.Add(Format('[%s]', [ASection]));
+    WriteReadModeDefs(TmpItems, AReadMode);
+
     for Indx := 0 to High(ColumnDefs) do
     begin
       Tx := Format('%s=%s %d,%d;%d', [ColumnDefs[Indx].Caption,
@@ -238,35 +316,55 @@ begin
 end;
 
 function ReadStandardTags(LVHandle: HWND; GUIini: TMemIniFile): TColumnsArray;
+var
+  ReadMode: TReadModeOptions;
 begin
-  result := ReadColumnDefs(LVHandle, GUIini, StandardTags, StandardDefaults);
+  ReadMode := [];
+  result := ReadColumnDefs(LVHandle, GUIini, StandardTags, StandardDefaults, ReadMode);
   FColumnSetList.Add(TColumnSet.Create(StandardTags,
                                        StrStandardList,
-                                       [floSystem], result));
+                                       floSystem,
+                                       ReadMode,
+                                       result));
 end;
 
 function ReadCameraTags(LVHandle: HWND; GUIini: TMemIniFile): TColumnsArray;
+var
+  ReadMode: TReadModeOptions;
 begin
-  result := ReadColumnDefs(LVHandle, GUIini, CameraTags, CameraDefaults);
+  ReadMode := [rmInternal];
+  result := ReadColumnDefs(LVHandle, GUIini, CameraTags, CameraDefaults, ReadMode);
   FColumnSetList.Add(TColumnSet.Create(CameraTags,
                                        StrCameraList,
-                                       [floSystem, floInternal], result));
+                                       floInternal,
+                                       ReadMode,
+                                       result));
 end;
 
 function ReadLocationTags(LVHandle: HWND; GUIini: TMemIniFile): TColumnsArray;
+var
+  ReadMode: TReadModeOptions;
 begin
-  result := ReadColumnDefs(LVHandle, GUIini, LocationTags, LocationDefaults);
+  ReadMode := [rmInternal];
+  result := ReadColumnDefs(LVHandle, GUIini, LocationTags, LocationDefaults, ReadMode);
   FColumnSetList.Add(TColumnSet.Create(LocationTags,
                                        StrLocationList,
-                                       [floSystem, floInternal], result));
+                                       floInternal,
+                                       ReadMode,
+                                       result));
 end;
 
 function ReadAboutTags(LVHandle: HWND; GUIini: TMemIniFile): TColumnsArray;
+var
+  ReadMode: TReadModeOptions;
 begin
-  result := ReadColumnDefs(LVHandle, GUIini, AboutTags, AboutDefaults);
+  ReadMode := [rmInternal];
+  result := ReadColumnDefs(LVHandle, GUIini, AboutTags, AboutDefaults, ReadMode);
   FColumnSetList.Add(TColumnSet.Create(AboutTags,
                                        StrAboutList,
-                                       [floSystem, floInternal], result));
+                                       floInternal,
+                                       ReadMode,
+                                       result));
 end;
 
 function ReadUserDefTags(LVHandle: HWND; GUIini: TMemIniFile): integer;
@@ -275,6 +373,7 @@ var
   AUserDefName: string;
   AUserDefDesc: string;
   AColumnDefs: TColumnsArray;
+  ReadMode: TReadModeOptions;
 
   Indx: integer;
   Tx: string;
@@ -301,7 +400,9 @@ begin
       end;
       FColumnSetList.Add(TColumnSet.Create(UserDefined,
                                            StrUserList,
-                                           [floUserDef], AColumnDefs));
+                                           floUserDef,
+                                           [rmExifTool], // Default Pre 6.3.6
+                                           AColumnDefs));
     finally
       TmpItems.Free;
     end;
@@ -314,11 +415,14 @@ begin
     begin
       AUserDefDesc := NextField(UserDefList, '|');
       AUserDefName := NextField(AUserDefDesc, '^');
-      AColumnDefs := ReadColumnDefs(LVHandle, GUIini, UserDef + AUserDefName, DefaultUserDef);
+      ReadMode := [rmExifTool];
+      AColumnDefs := ReadColumnDefs(LVHandle, GUIini, UserDef + AUserDefName, DefaultUserDef, ReadMode);
       result := result + Length(AColumnDefs);
       FColumnSetList.Add(TColumnSet.Create(AUserDefName,
                                            AUserDefDesc,
-                                           [floUserDef], AColumnDefs));
+                                           floUserDef,
+                                           ReadMode,
+                                           AColumnDefs));
     end;
   end;
 end;
@@ -346,7 +450,7 @@ begin
   for AColumnSet in FColumnSetList do
   begin
     ColumnSetName := AColumnSet.Name;
-    if (floUserDef in AColumnSet.Options) then
+    if (AColumnSet.Options = floUserDef) then
     begin
       ColumnSetName := UserDef + ColumnSetName;
       if (UserDefList <> '') then
@@ -357,6 +461,8 @@ begin
         OldUserDefSaved := true;
         for Index := 0 to High(AColumnSet.ColumnDefs) do
         begin
+          if ((AColumnSet.ColumnDefs[Index].Options and toSys) = toSys) then
+            continue;
           OldUserDef := AColumnSet.ColumnDefs[Index].Caption;
           GUIini.WriteString(OldUserDefTags,
                              OldUserDef,
@@ -364,7 +470,7 @@ begin
         end;
       end;
     end;
-    WriteColumnDefs(GUIini, ColumnSetName, AColumnSet.ColumnDefs);
+    WriteColumnDefs(GUIini, ColumnSetName, AColumnSet.ReadMode, AColumnSet.ColumnDefs);
   end;
   GUIini.WriteString(UserDefLists, UserDefLists, UserDefList);
 end;
@@ -376,7 +482,7 @@ var
 begin
   for AColumnSet in FColumnSetList do
   begin
-    if (AColumnSet.Options = [floSystem]) then
+    if (AColumnSet.Options = floSystem) then
       for Index := 0 to Min(High(AColumnSet.ColumnDefs), High(StandardDefaults))  do
         AColumnSet.ColumnDefs[Index].Width := StandardDefaults[Index].Width
     else
@@ -421,6 +527,22 @@ begin
   if (Index > 0) and
      (Index < FColumnSetList.Count) then
     FColumnSetList[Index].ColumnDefs := AColumnDefs;
+end;
+
+procedure UpdateSysCaptions(ARootFolder: TShellFolder);
+var
+  FileDef: integer;
+  Index: integer;
+  ColumnDefs: TColumnsArray;
+begin
+  for FileDef := 0 to GetFileListDefCount -1 do
+  begin
+    ColumnDefs := GetFileListDefs[FileDef].ColumnDefs;
+    // Update Caption of system fields
+    for Index := 0 to High(ColumnDefs) do
+      if ((ColumnDefs[Index].Options and toSys) = toSys) then
+        ColumnDefs[Index].SetCaption(TSubShellFolder.GetSystemField(ARootFolder, nil, StrToIntDef(ColumnDefs[Index].Command, 0)));
+  end;
 end;
 
 initialization
