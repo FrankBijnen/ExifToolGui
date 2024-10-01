@@ -19,6 +19,10 @@
   * implied. See the License for the specific language governing      *
   * rights and limitations under the License.                         *
 }
+
+// Changed for ExifToolGUI
+// - Add utf16
+
 unit Xml.VerySimple;
 
 interface
@@ -498,6 +502,12 @@ begin
   else
   if AnsiSameText(Encoding, 'utf-8') then
     Reader := TXmlStreamReader.Create(Stream, TEncoding.UTF8, False, BufferSize)
+//ExifToolGUI Add utf16
+  else if AnsiSameText(Encoding, 'utf-16') then
+    Reader := TXmlStreamReader.Create(Stream, TEncoding.Unicode, False, BufferSize)
+  else if AnsiSameText(Encoding, 'utf-16be') then
+    Reader := TXmlStreamReader.Create(Stream, TEncoding.BigEndianUnicode, False, BufferSize)
+//ExifToolGUI_x
   else
     Reader := TXmlStreamReader.Create(Stream, TEncoding.ANSI, False, BufferSize);
   try

@@ -1,4 +1,5 @@
 unit ExifInfo;
+{.DEFINE DEBUG_XMP}
 
 // ****************************QUICK METADATA ACCESS*************************
 // Not all formats supported. Check Value of 'Supported'
@@ -170,19 +171,23 @@ type
     IsMM: boolean;
     WordData: word;
     DWordData: dword;
-    XMPoffset, XMPsize, IPTCsize, IPTCoffset: int64;
+    XMPoffset: array of int64;
+    XMPsize: array of int64;
+    IPTCsize, IPTCoffset: int64;
     TIFFoffset, ExifIFDoffset, GPSoffset: int64;
     ICCoffset, InteropOffset, JPGfromRAWoffset: int64;
     ICCSize: word;
     FileName: string;
     FileSize: int64;
     procedure Clear;
+    procedure AddXmpBlock(AnOffset, ASize: int64);
     procedure SetVarData(const InVarData: TVarData; InFieldNames: TStrings);
     procedure AddBag(var BagData: TMetaInfo; const ANode: TMetaInfo);
     function GetETTagName(ATagName: string): string;
     function GetKeyName(const AKey: string): string;
     function AddVarData(const AKey: string; AValue: TMetaInfo; AllowBag: boolean = false): TMetaInfo;
 
+    procedure AdvanceNulls(Count: integer);
     function DecodeASCII(IFDentry: IFDentryRec; MaxLen: integer = 255): string;
     function DecodeWord(IFDentry: IFDentryRec): word;
     function DecodeRational(IFDentry: IFDentryRec): word;
@@ -199,6 +204,7 @@ type
     procedure ParseICCprofile;
     procedure GetIFDentry(var IFDentry: IFDentryRec);
     procedure ParseIfd(Offset: int64; ParseProc: TParseIFDProc);
+    procedure ParseXMPBlock(TmpStream: TMemoryStream);
     procedure ReadCanonVrd;
     function GetCRWString(ALength: word): string;
     function CanonEv(AEV: smallint): double;
@@ -339,6 +345,14 @@ begin
   ICC.Clear;
 
   Self := Default(FotoRec);
+  SetLength(XmpSize, 0);
+  SetLength(XMPoffset, 0);
+end;
+
+procedure FotoRec.AddXmpBlock(AnOffset, ASize: int64);
+begin
+  XMPoffset := XMPoffset + [AnOffset];
+  XmpSize := XmpSize + [ASize];
 end;
 
 procedure FotoRec.SetVarData(const InVarData: TVarData; InFieldNames: TStrings);
@@ -453,6 +467,19 @@ begin
   end
   else
     result := AValue;
+end;
+
+procedure FotoRec.AdvanceNulls(Count: integer);
+var
+  Cnt: integer;
+  AppByte: byte;
+begin
+  for Cnt := 1 to Count do
+  begin
+    AppByte := $ff;
+    while (AppByte <> $00) do
+      FotoF.Read(AppByte, SizeOf(AppByte));
+  end;
 end;
 
 function FotoRec.DecodeASCII(IFDentry: IFDentryRec; MaxLen: integer = 255): string;
@@ -826,10 +853,7 @@ begin
       $013B:
         Artist := AddVarData('Artist', DecodeASCII(IFDentry, 64));
       $02BC:
-        begin
-          XMPsize := IFDentry.TypeCount;
-          XMPoffset := IFDentry.ValueOffs + TIFFoffset;
-        end;
+          AddXmpBlock(IFDentry.ValueOffs + TIFFoffset, IFDentry.TypeCount);
       $8298:
         Copyright := AddVarData('Copyright', DecodeASCII(IFDentry, 64));
       $83BB:
@@ -1183,8 +1207,7 @@ begin
 
   // We have an XMP block
   FotoF.Read(TagLen, 4);
-  XMPsize := SwapL(Taglen);
-  XMPoffset := FotoF.Position;
+  AddXmpBlock(FotoF.Position, SwapL(Taglen));
 end;
 
 // CRW strings are only ANSI?
@@ -1530,12 +1553,17 @@ end;
 // ==============================================================================
 procedure FotoRec.ReadJPEG;
 var
-  APPsize: word;
+  APPSize: WORD;
+  XXmpGUID: array[0..31] of AnsiChar;
+  XXmpFullLength: DWORD;
+  XXmpChunkOffset: DWORD;
   APPmarkNext: int64;
+  SaveAppPos: int64;
   APPmark, APPType: Byte;
   Tx: string[15];
   XMPType: array[0..2] of AnsiChar; // xap, or xmp
   I: integer;
+
 begin
   while (true) do // Loop thru all markers.
   begin
@@ -1550,9 +1578,10 @@ begin
     // We at least have something
     Include(Supported, TSupportedType.supJPEG);
 
-    FotoF.Read(APPsize, 2);
-    APPsize := Swap(APPsize);
-    APPmarkNext := FotoF.Position + APPsize - 2;
+    SaveAppPos := FotoF.Position;
+    FotoF.Read(APPSize, 2);
+    APPSize := Swap(APPSize);
+    APPmarkNext := FotoF.Position + APPSize - 2;
     if (APPmarkNext >= FileSize) then // Past file?
       break;
 
@@ -1570,17 +1599,20 @@ begin
       end
       else if Tx = 'http' then
       begin
-// Only XMP type 'xap' wanted. xmp has no usable info for us. (Google Pixel 7 Pro for example)
-//http://ns.adobe.com/xap/1.0/#0
-//http://ns.adobe.com/xmp/extension/
+//Read XMP block. Can be extended
         FotoF.Seek(14, TSeekOrigin.soCurrent); // Skip to xap or xmp
         FillChar(XMPType, SizeOf(XMPType), chr(0));
         FotoF.Read(XMPType[0], 3);
-        FotoF.Seek(6, TSeekOrigin.soCurrent);  // 14 + 3 + 6 = 23 as original code.
-        if (XMPType = 'xap') then
-        begin
-          XMPoffset := FotoF.Position;         // Point to '<?xpacket...'
-          XMPsize := APPsize - 31;
+        AdvanceNulls(1);
+        if (XMPType = 'xap') then             //http://ns.adobe.com/xap/1.0/ #0
+          AddXmpBlock(FotoF.Position, APPSize - (FotoF.Position - SaveAppPos))
+        else if (XMPType = 'xmp') then        //http://ns.adobe.com/xmp/extension/ #0 GUID FullLength ChunkOffset
+        begin                                 //1234567890123456789012345678901234 +1  +32    +4            +4    = 75
+// Xxmp Variables are 'future-use'
+          FotoF.Read(XXmpGUID, SizeOf(XXmpGUID));
+          FotoF.Read(XXmpFullLength, SizeOf(XXmpFullLength));
+          FotoF.Read(XXmpChunkOffset, SizeOf(XXmpChunkOffset));
+          AddXmpBlock(FotoF.Position, APPSize - (FotoF.Position - SaveAppPos));
         end;
       end;
     end;
@@ -1594,7 +1626,7 @@ begin
       if Tx = 'ICC_PROFILE' then
       begin
         ICCoffset := FotoF.Position +4;
-        ICCSize := APPsize;
+        ICCSize := APPSize;
         ParseICCprofile;
       end;
     end;
@@ -1645,7 +1677,7 @@ end;
 
 // ==============================================================================
 const
-  XMPEncoding         = 'utf-8';
+  XMPMINSIZE          = 25;
   XMPMETA             = 'x:xmpmeta';
   RDF                 = 'rdf:RDF';
 
@@ -1656,12 +1688,98 @@ begin
     result := result.ChildNodes.Find(RDF);
 end;
 
-procedure FotoRec.ReadXMP;
-var Bytes: TBytes;
-    Xml: TXmlVerySimple;
-    RDF, RDFDesc: TXmlNode;
-    RDFDescNodes: TXmlNodeList;
-    TmpStream: TMemoryStream;
+procedure FotoRec.ParseXMPBlock(TmpStream: TMemoryStream);
+var
+  Xml: TXmlVerySimple;
+  RDF, RDFDesc: TXmlNode;
+  RDFDescNodes: TXmlNodeList;
+
+(*
+Possible encodings in XMP. Sadly the UTF32 encodings are not supported.
+utf8    ef bb bf
+utf16be fe ff
+utf16le ff fe
+utf32be 00 00 fe ff
+utf32le ff fe 00 00
+*)
+
+  function DetectEncoding: string;
+  const
+    XMPEncoding_utf8    = 'utf-8';
+    XMPEncoding_utf16   = 'utf-16';
+    XMPEncoding_utf16be = 'utf-16be';
+    XPacketMagic        = '<?xpacket begin=';
+
+    UTF8_BOM:     array[0..3] of byte = ($ef, $bb, $bf, $00);
+    UTF16BE_BOM:  array[0..3] of byte = ($fe, $ff, $00, $00);
+    UTF16LE_BOM:  array[0..3] of byte = ($ff, $fe, $00, $00);
+  var
+    BOM: array[0..3] of byte;
+    Quote: byte;
+    AByte: PByte;
+    Index: integer;
+
+    // Scan for XPacket
+    function ReadXpacket: boolean;
+    var
+      XPacket: array[0..15] of AnsiChar;
+    begin
+      AByte := PByte(TmpStream.Memory);
+      Index := 0;
+      while (Index <= High(XPacket)) do
+      begin
+        while (Abyte^ = 0) do
+          Inc(AByte);
+        XPacket[Index] := AnsiChar(Abyte^);
+        Inc(Index);
+        Inc(AByte);
+      end;
+
+      result := (XPacket = XPacketMagic);
+    end;
+
+    // Scan for ' or "
+    function ScanQuote: boolean;
+    begin
+      while (Abyte^ = 0) do
+        Inc(AByte);
+      Quote := AByte^;
+      result := (Quote = $22) or
+                (Quote = $27);
+    end;
+
+    // Get the BOM
+    procedure ReadBOM;
+    begin
+      // Read max 4 Bytes, until quote.
+      FillChar(BOM, SizeOf(BOM), 0);
+      Index := 0;
+      Inc(AByte);
+      while (Index < High(BOM)) and
+            (AByte^ <> Quote) do
+      begin
+        BOM[Index] := AByte^;
+        Inc(Index);
+        Inc(AByte);
+      end;
+    end;
+
+  begin
+    result := XMPEncoding_utf8; // UTF8 is default!
+
+    if not ReadXpacket then
+      exit;
+
+    if not ScanQuote then
+      exit;
+
+    ReadBom;
+
+    if CompareMem(@BOM, @UTF16BE_BOM, SizeOf(BOM)) then
+      exit(XMPEncoding_utf16be);
+    if CompareMem(@BOM, @UTF16LE_BOM, SizeOf(BOM)) then
+      exit(XMPEncoding_utf16);
+  end;
 
   procedure Add2Xmp(const AKey, AValue: string; const isList: boolean);
   var
@@ -1769,35 +1887,71 @@ var Bytes: TBytes;
   end;
 
 begin
-  FotoF.Seek(XMPoffset, TSeekOrigin.soBeginning);
-  Setlength(Bytes, XMPsize);
-  FotoF.Read(Bytes[0], XMPsize);
-
-  TmpStream := TMemoryStream.Create;
-  TmpStream.WriteData(Bytes, XMPsize);
-  if (TmpStream = nil) then
-    exit;
-
   Xml:= TXmlVerySimple.Create;
   try
     TmpStream.Position := 0;
-    Xml.Encoding := XMPEncoding;
+    Xml.Encoding := DetectEncoding;
     try
       Xml.LoadFromStream(TmpStream);
-    except
-      exit;
+    except on E:Exception do
+      begin
+{$IFDEF DEBUG_XMP}
+        allocconsole;
+        writeln('File:', FileName, ' Error:', e.Message);
+{$ENDIF}
+        exit;
+      end;
     end;
+
     RDF := GetRDF(Xml);
     if (RDF = nil) then
       exit;
+
     RDFDescNodes := RDF.ChildNodes;
-    Xmp.HasData := (RDFDescNodes.Count > 0);
+    Xmp.HasData := Xmp.HasData or (RDFDescNodes.Count > 0);
 
     // Recurse thru all subnodes, and look in attributes and node names
     for RDFDesc in RDFDescNodes do
       LevelDeeper(RDFDesc);
   finally
     Xml.Free;
+  end;
+end;
+
+procedure FotoRec.ReadXMP;
+var
+  Index: integer;
+  Bytes: TBytes;
+  TmpStream: TMemoryStream;
+begin
+  TmpStream := TMemoryStream.Create;
+  try
+    for Index := 0 to High(XMPoffset) do
+    begin
+      FotoF.Seek(XMPoffset[Index], TSeekOrigin.soBeginning);
+      Setlength(Bytes, XMPsize[Index]);
+      FotoF.Read(Bytes[0], XMPsize[Index]);
+      TmpStream.WriteData(Bytes, XMPsize[Index]);
+      if (Index = 0) and
+         (TmpStream.Size > XMPMINSIZE)then // Process standard XMP
+      begin
+{$IFDEF DEBUG_XMP}
+        TmpStream.SaveToFile(ChangeFileExt(Self.FileName, '_XML'));
+{$ENDIF}
+        ParseXMPBlock(TmpStream);
+        TmpStream.Clear;
+      end;
+    end;
+
+    if (TmpStream.Size > XMPMINSIZE) then  // Process Extended XMP
+    begin
+{$IFDEF DEBUG_XMP}
+      TmpStream.SaveToFile(ChangeFileExt(Self.FileName, '_XML_EXT'));
+{$ENDIF}
+      ParseXMPBlock(TmpStream);
+    end;
+
+  finally
     TmpStream.Free;
   end;
 end;
@@ -1896,10 +2050,7 @@ begin
       FotoF.Seek(-SizeOf(WordData), TSeekOrigin.soCurrent);
       FotoF.Read(XmpMagic, SizeOf(XmpMagic));
       if XmpMagic = #$be + #$7a + #$cf + #$cb then
-      begin
-        XMPsize := TagLen - UuidLen;
-        XMPoffset := UuidLen + TIFFoffset;
-      end;
+        AddXmpBlock(UuidLen + TIFFoffset, TagLen - UuidLen);
     end;
 
     FotoF.Seek(TIFFoffset + TagLen, TSeekOrigin.soBeginning);
@@ -2024,8 +2175,8 @@ begin
               ReadJPEG;
           end;
           if (TGetOption.gmXMP in result.GetOptions) and
-              (XMPoffset > 0) and
-              (XMPsize > 0) then
+              (Length(XMPoffset) > 0) and
+              (Length(XMPsize) > 0) then
           begin
             ReadXMP;
             // Add a dummy GPSPosition if no GPS was found, but something is in XMP
