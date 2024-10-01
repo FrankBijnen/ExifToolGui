@@ -2876,7 +2876,7 @@ procedure TFMain.ShellListAfterEnumColumns(Sender: TObject; var ReadModeOptions:
   end;
 
 begin
-//Check
+//TODO: Decide if we want the option in Preferences
   ReadModeOptions := GetFileListDefs[CBoxDetails.ItemIndex].ReadMode;
   if (GetFileListDefs[CBoxDetails.ItemIndex].Options = TFileListOptions.floInternal) and
      (GUIsettings.EnableUnsupported) then
