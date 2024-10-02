@@ -31,6 +31,7 @@ type
     Width: integer;
     AlignR: integer;
     Options: Word;
+    function GetSysColumn: integer;
     procedure SetCaption(ACaption: string);
     case integer of
       0: (Caption: array[0..255] of WideChar);
@@ -147,6 +148,20 @@ const
 
 var
   FColumnSetList: TColumnSetList;
+
+function TFileListColumn.GetSysColumn: integer;
+var
+  P: integer;
+begin
+  result := -1;
+  if ((Options and toSys) = toSys) then
+  begin
+    P := Pos(':', Command);
+    if (P < 1) then
+      P := Length(Command) +1;
+    result := StrToIntDef(Copy(Command, 1, P -1), -1);
+  end;
+end;
 
 procedure TFileListColumn.SetCaption(ACaption: string);
 begin
@@ -541,7 +556,7 @@ begin
     // Update Caption of system fields
     for Index := 0 to High(ColumnDefs) do
       if ((ColumnDefs[Index].Options and toSys) = toSys) then
-        ColumnDefs[Index].SetCaption(TSubShellFolder.GetSystemField(ARootFolder, nil, StrToIntDef(ColumnDefs[Index].Command, 0)));
+        ColumnDefs[Index].SetCaption(TSubShellFolder.GetSystemField(ARootFolder, nil, ColumnDefs[Index].GetSysColumn));
   end;
 end;
 

@@ -3,9 +3,14 @@ unit UDmFileLists;
 interface
 
 uses
-  System.SysUtils, System.Classes, Data.DB, Datasnap.DBClient;
+  System.SysUtils, System.Classes, System.Generics.Collections,
+  vcl.Shell.ShellCtrls,
+  Data.DB, Datasnap.DBClient,
+  ExifToolsGui_ShellList;
 
 type
+  TSampleData = TDictionary<string, string>;
+
   TDmFileLists = class(TDataModule)
     DsFileListDef: TDataSource;
     CdsFileListDef: TClientDataSet;
@@ -33,31 +38,61 @@ type
     CdsColumnSetBackup: TIntegerField;
     CdsColumnSetBackupLookUp: TStringField;
     CdsOption: TClientDataSet;
-    IntegerField1: TIntegerField;
-    StringField1: TStringField;
+    CdsOptionKey: TIntegerField;
+    CdsOptionDesc: TStringField;
     CdsColumnSetOptionLookUp: TStringField;
-    procedure CdsColumnSetAfterInsert(DataSet: TDataSet);
+    CdsColumnSetSampleValue: TStringField;
+    CdsTagNames: TClientDataSet;
+    CdsTagNamesTagName: TStringField;
+    DsTagNames: TDataSource;
+    CdsColumnSetCommandLookup: TStringField;
+    CdsTagNamesSampleValue: TStringField;
     procedure CdsColumnSetBeforeInsert(DataSet: TDataSet);
+    procedure CdsColumnSetAfterInsert(DataSet: TDataSet);
     procedure CdsFileListDefAfterInsert(DataSet: TDataSet);
     procedure DataModuleCreate(Sender: TObject);
+    procedure CdsColumnSetCalcFields(DataSet: TDataSet);
+    procedure DataModuleDestroy(Sender: TObject);
+    procedure CdsTagNamesFilterRecord(DataSet: TDataSet; var Accept: Boolean);
+    procedure CdsTagNamesCalcFields(DataSet: TDataSet);
+    procedure CdsFileListDefBeforeScroll(DataSet: TDataSet);
+    procedure CdsColumnSetCommandValidate(Sender: TField);
   private
     { Private declarations }
-    var ColumnSeq: Double;
+    ColumnSeq: Double;
+    FListName: string;
+    FListReadMode: integer;
+    FSample: TShellFolder;
+    FSampleValues: TSampleData;
+    FSystemTagNames: TStringlist;
+    FOnFileListChanged: TNotifyEvent;
+    FOnFilterTag: TFilterRecordEvent;
+    procedure PrepTagNames;
+    procedure AddTagName(ATagName: string);
+    procedure CalcSampleValue(DataSet: TDataSet; Command, Sample: string);
+
+    procedure GetSampleValues(AListName: string; AListReadMode: integer);
     procedure SetupLookUps;
   public
     { Public declarations }
-    var SelectedSet: integer;
-    procedure LoadFromColumnSets;
+    SelectedSet: integer;
+    procedure LoadFromColumnSets(ASample: TShellFolder);
     procedure SaveToColumnSets;
+    property OnFileListChanged: TNotifyEvent read FOnFileListChanged write FOnFileListChanged;
+    property OnFilterTag: TFilterRecordEvent read FOnFilterTag write FOnFilterTag;
   end;
 
 var
   DmFileLists: TDmFileLists;
 
 implementation
+
 {%CLASSGROUP 'Vcl.Controls.TControl'}
 
-uses UnitColumnDefs;
+uses
+  System.StrUtils, System.Variants,
+  Winapi.Windows,
+  UnitColumnDefs, ExifInfo, ExifTool, ExifToolsGUI_Utils;
 
 {$R *.dfm}
 
@@ -83,6 +118,7 @@ begin
   CdsColumnSetWidth.AsInteger := 80;
   CdsColumnSetAlignR.AsInteger := 0;
   CdsColumnSetSeq.AsFloat := ColumnSeq;
+  CdsColumnSetOption.AsInteger := 0;
 end;
 
 procedure TDmFileLists.CdsColumnSetBeforeInsert(DataSet: TDataSet);
@@ -103,6 +139,41 @@ begin
   end;
 end;
 
+procedure TDmFileLists.CalcSampleValue(DataSet: TDataSet; Command, Sample: string);
+var
+  LowerCommand: string;
+  SampleValue: string;
+begin
+  if not (Dataset.State in [dsCalcFields, dsInsert, dsEdit]) then
+    exit;
+  if (Dataset.ControlsDisabled) then
+    exit;
+  GetSampleValues(CdsFileListDef.FieldByName('Name').AsString,
+                  CdsFileListDef.FieldByName('ReadMode').AsInteger);
+
+  LowerCommand := LowerCase(Dataset.FieldByName(Command).AsString);
+  if (FSampleValues.TryGetValue(LowerCommand, SampleValue)) then
+    Dataset.FieldByName(Sample).AsString := SampleValue
+  else
+    Dataset.FieldByName(Sample).AsString := '-';
+end;
+
+procedure TDmFileLists.CdsColumnSetCalcFields(DataSet: TDataSet);
+begin
+  CalcSampleValue(DataSet, 'Command', 'SampleValue');
+end;
+
+procedure TDmFileLists.CdsColumnSetCommandValidate(Sender: TField);
+begin
+  if (LeftStr(Sender.AsString, 1) <> '-') then
+  begin
+    CdsColumnSetOption.AsInteger := Ord(toSys);
+    CdsColumnSetName.AsString := FSystemTagNames.Values[Sender.AsString];
+  end
+  else
+    CdsColumnSetOption.AsInteger := (CdsColumnSetOption.AsInteger and ($ffff - Ord(toSys)));
+end;
+
 procedure TDmFileLists.CdsFileListDefAfterInsert(DataSet: TDataSet);
 begin
   CdsFileListDefType.AsString := ListUser;
@@ -110,10 +181,118 @@ begin
   CdsFileListDefId.AsInteger := CdsFileListDef.RecordCount + 1;
 end;
 
+procedure TDmFileLists.CdsFileListDefBeforeScroll(DataSet: TDataSet);
+begin
+  if Assigned(FOnFileListChanged) then
+    FOnFileListChanged(Self);
+end;
+
+procedure TDmFileLists.CdsTagNamesCalcFields(DataSet: TDataSet);
+begin
+  CalcSampleValue(DataSet, 'TagName', 'SampleValue');
+end;
+
+procedure TDmFileLists.CdsTagNamesFilterRecord(DataSet: TDataSet; var Accept: Boolean);
+begin
+  if Assigned(FOnFilterTag) then
+    FOnFilterTag(Dataset, Accept);
+end;
 
 procedure TDmFileLists.DataModuleCreate(Sender: TObject);
 begin
+  FSampleValues := TSampleData.Create;
+  FSystemTagNames := TStringList.Create;
   SetupLookUps;
+end;
+
+procedure TDmFileLists.DataModuleDestroy(Sender: TObject);
+begin
+  FSampleValues.Free;
+  FSystemTagNames.Free;
+end;
+
+procedure TDmFileLists.PrepTagNames;
+begin
+  CdsTagNames.Close;
+  CdsTagNames.IndexFieldnames := 'TagName';
+  CdsTagNames.CreateDataSet;
+end;
+
+procedure TDmFileLists.AddTagName(ATagName: string);
+begin
+  if VarIsNull(CdsTagNames.Lookup('TagName', ATagName, 'TagName')) then
+    CdsTagNames.AppendRecord([ATagName]);
+end;
+
+procedure TDmFileLists.GetSampleValues(AListName: string; AListReadMode: integer);
+var
+  MetaData: TMetaData;
+  Index: integer;
+  ETLine: string;
+  GroupName: string;
+  TagName: string;
+  Sample: string;
+  ETcmd: string;
+  ETOut: TStringList;
+begin
+  if (FListName = AListName) and
+     (FListReadMode = AListReadMode) then
+    exit;
+
+  FListName := AListName;
+  FListReadMode := AListReadMode;
+
+  PrepTagNames;
+  CdsTagNames.DisableControls;
+  FSampleValues.Clear;
+
+  try
+    for Index := 0 to FSystemTagNames.Count -1 do
+    begin
+      TagName := FSystemTagNames.KeyNames[Index];
+      Sample  := TSubShellFolder.GetSystemField(FSample.Parent, FSample.RelativeID, Index);
+      FSampleValues.Add(TagName, Sample);
+      AddTagName(TagName);
+    end;
+    case FListReadMode of
+      0:;   // Limit to System Fields
+      1:    // Limit to Internal fields
+        begin
+          MetaData := TMetaData.Create;
+          try
+            MetaData.ReadMeta(FSample.PathName, [gmXMP, gmGPS]);
+            for TagName in MetaData.FieldNames do
+            begin
+              FSampleValues.Add(LowerCase('-' + TagName), MetaData.FieldData(TagName));
+              AddTagName('-' + TagName);
+            end;
+          finally
+            MetaData.Free;
+          end;
+        end
+      else
+      begin
+        ETOut := TStringList.Create;
+        try
+          ETCmd := '-G1' + CRLF + '-s';
+          ET.OpenExec(Etcmd, FSample.PathName, EtOut);
+          for Index := 0 to ETOut.Count -1 do
+          begin
+            ETLine    := ETOut[Index];
+            GroupName := NextField(ETLine, '[');             // Strip Leading [
+            GroupName := NextField(ETLine, ']');             // Group name
+            TagName   := Trim(NextField(ETLine, ':'));       // Tag Name
+            FSampleValues.Add(LowerCase('-' + GroupName + ':' + TagName), Trim(ETLine));
+            AddTagName('-' + GroupName + ':' + TagName);
+          end;
+        finally
+          ETOut.Free;
+        end;
+      end;
+    end;
+  finally
+    CdsTagNames.EnableControls;
+  end;
 end;
 
 procedure TDmFileLists.SetupLookUps;
@@ -209,7 +388,7 @@ begin
   end;
 end;
 
-procedure TDmFileLists.LoadFromColumnSets;
+procedure TDmFileLists.LoadFromColumnSets(ASample: TShellFolder);
 var
   FileListDefs: TColumnSetList;
   AColumnSet: TColumnSet;
@@ -217,6 +396,11 @@ var
   Index: integer;
   Id: integer;
 begin
+  FSample := ASample;
+  TSubShellFolder.AllFastSystemFields(ASample.Parent, FSystemTagNames);
+  FListName := '';
+  FListReadMode := -1;
+
   CdsFileListDef.Close;
   CdsColumnSet.Close;
 
@@ -226,13 +410,16 @@ begin
   CdsColumnSet.DisableControls;
 
   try
+    PrepTagNames;
+
+    FileListDefs := GetFileListDefs;
+
     CdsFileListDef.IndexFieldNames := 'Id';
     CdsFileListDef.CreateDataSet;
 
     CdsColumnSet.IndexFieldNames := 'FileListName;Seq';
     CdsColumnSet.CreateDataSet;
 
-    FileListDefs := GetFileListDefs;
     Id := 0;
     for AColumnSet in FileListDefs do
     begin

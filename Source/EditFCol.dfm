@@ -1,47 +1,56 @@
 object FEditFColumn: TFEditFColumn
   Left = 0
   Top = 0
-  BorderStyle = bsSizeToolWin
   Caption = 'Edit file columns'
-  ClientHeight = 508
-  ClientWidth = 829
+  ClientHeight = 512
+  ClientWidth = 1230
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
   Font.Height = -11
   Font.Name = 'Tahoma'
   Font.Style = []
+  KeyPreview = True
   OnClose = FormClose
   OnCreate = FormCreate
-  OnShow = FormShow
   TextHeight = 13
   object PnlGrids: TPanel
     Left = 0
     Top = 0
-    Width = 829
-    Height = 479
+    Width = 1230
+    Height = 483
     Align = alClient
     TabOrder = 1
-    ExplicitWidth = 921
-    ExplicitHeight = 462
+    ExplicitWidth = 1226
+    ExplicitHeight = 482
     object HSplitter: TSplitter
       Left = 1
       Top = 200
-      Width = 827
+      Width = 1228
       Height = 5
       Cursor = crVSplit
       Align = alTop
       ExplicitTop = 211
       ExplicitWidth = 653
     end
+    object VSplitter: TSplitter
+      Left = 876
+      Top = 235
+      Width = 5
+      Height = 247
+      Align = alRight
+      Visible = False
+      ExplicitLeft = 503
+      ExplicitTop = 241
+    end
     object PnlTop: TPanel
       Left = 1
       Top = 1
-      Width = 827
+      Width = 1228
       Height = 30
       Align = alTop
       TabOrder = 0
-      ExplicitWidth = 919
+      ExplicitWidth = 1224
       object DBNavigator1: TDBNavigator
         Left = 10
         Top = 2
@@ -55,7 +64,7 @@ object FEditFColumn: TFEditFColumn
     object DbgFileListDef: TDBGrid
       Left = 1
       Top = 31
-      Width = 827
+      Width = 1228
       Height = 169
       Align = alTop
       DataSource = DmFileLists.DsFileListDef
@@ -66,6 +75,7 @@ object FEditFColumn: TFEditFColumn
       TitleFont.Height = -11
       TitleFont.Name = 'Tahoma'
       TitleFont.Style = []
+      OnKeyUp = DbGridKeyUp
       Columns = <
         item
           Expanded = False
@@ -93,8 +103,8 @@ object FEditFColumn: TFEditFColumn
     object DbgColumnSet: TDBGrid
       Left = 1
       Top = 235
-      Width = 827
-      Height = 243
+      Width = 875
+      Height = 247
       Align = alClient
       DataSource = DmFileLists.DsColumnSet
       Options = [dgEditing, dgAlwaysShowEditor, dgTitles, dgIndicator, dgColumnResize, dgColLines, dgRowLines, dgTabs, dgAlwaysShowSelection, dgConfirmDelete, dgTitleClick, dgTitleHotTrack]
@@ -104,24 +114,28 @@ object FEditFColumn: TFEditFColumn
       TitleFont.Height = -11
       TitleFont.Name = 'Tahoma'
       TitleFont.Style = []
+      OnEditButtonClick = DbgColumnSetEditButtonClick
+      OnKeyUp = DbGridKeyUp
       Columns = <
         item
           Expanded = False
           FieldName = 'Caption'
-          Width = 158
+          Width = 191
           Visible = True
         end
         item
+          ButtonStyle = cbsEllipsis
+          DropDownRows = 30
           Expanded = False
           FieldName = 'Command'
-          Width = 263
+          Width = 186
           Visible = True
         end
         item
           Expanded = False
           FieldName = 'OptionLookUp'
           Title.Caption = 'Option'
-          Width = 94
+          Width = 83
           Visible = True
         end
         item
@@ -135,18 +149,24 @@ object FEditFColumn: TFEditFColumn
           Expanded = False
           FieldName = 'BackupLookUp'
           Title.Caption = 'Backup'
-          Width = 75
+          Width = 59
+          Visible = True
+        end
+        item
+          Expanded = False
+          FieldName = 'SampleValue'
+          Width = 252
           Visible = True
         end>
     end
     object PnlMiddle: TPanel
       Left = 1
       Top = 205
-      Width = 827
+      Width = 1228
       Height = 30
       Align = alTop
       TabOrder = 3
-      ExplicitWidth = 919
+      ExplicitWidth = 1224
       object DBNavigator2: TDBNavigator
         Left = 10
         Top = 2
@@ -157,23 +177,87 @@ object FEditFColumn: TFEditFColumn
         TabOrder = 0
       end
     end
+    object PnlDetail: TPanel
+      Left = 881
+      Top = 235
+      Width = 348
+      Height = 247
+      Align = alRight
+      TabOrder = 4
+      Visible = False
+      object DbgTagNames: TDBGrid
+        Left = 1
+        Top = 42
+        Width = 346
+        Height = 204
+        Align = alClient
+        DataSource = DmFileLists.DsTagNames
+        TabOrder = 0
+        TitleFont.Charset = DEFAULT_CHARSET
+        TitleFont.Color = clWindowText
+        TitleFont.Height = -11
+        TitleFont.Name = 'Tahoma'
+        TitleFont.Style = []
+        OnDblClick = DbgTagNamesDblClick
+        Columns = <
+          item
+            Expanded = False
+            FieldName = 'TagName'
+            Width = 125
+            Visible = True
+          end
+          item
+            Expanded = False
+            FieldName = 'SampleValue'
+            Width = 180
+            Visible = True
+          end>
+      end
+      object PnlEdSearch: TPanel
+        Left = 1
+        Top = 1
+        Width = 346
+        Height = 41
+        Align = alTop
+        TabOrder = 1
+        ExplicitLeft = 30
+        ExplicitTop = 18
+        ExplicitWidth = 185
+        object EdSearchTag: TLabeledEdit
+          Left = 1
+          Top = 19
+          Width = 344
+          Height = 21
+          Align = alBottom
+          EditLabel.Width = 83
+          EditLabel.Height = 13
+          EditLabel.Caption = 'Search Tag name'
+          TabOrder = 0
+          Text = ''
+          OnKeyUp = EdSearchTagKeyUp
+          ExplicitLeft = 5
+          ExplicitTop = 14
+          ExplicitWidth = 287
+        end
+      end
+    end
   end
   object PnlBottom: TPanel
     Left = 0
-    Top = 479
-    Width = 829
+    Top = 483
+    Width = 1230
     Height = 29
     Align = alBottom
     TabOrder = 0
-    ExplicitTop = 462
-    ExplicitWidth = 921
+    ExplicitTop = 482
+    ExplicitWidth = 1226
     DesignSize = (
-      829
+      1230
       29)
     object BtnOk: TBitBtn
-      Left = 595
+      Left = 1013
       Top = 2
-      Width = 85
+      Width = 87
       Height = 25
       Anchors = [akRight, akBottom]
       Caption = 'OK'
@@ -198,12 +282,12 @@ object FEditFColumn: TFEditFColumn
       ModalResult = 1
       NumGlyphs = 2
       TabOrder = 0
-      ExplicitLeft = 687
+      ExplicitLeft = 1009
     end
     object BtnCancel: TBitBtn
-      Left = 686
+      Left = 1104
       Top = 2
-      Width = 85
+      Width = 87
       Height = 25
       Anchors = [akRight, akBottom]
       Cancel = True
@@ -228,7 +312,7 @@ object FEditFColumn: TFEditFColumn
       ModalResult = 2
       NumGlyphs = 2
       TabOrder = 1
-      ExplicitLeft = 778
+      ExplicitLeft = 1100
     end
   end
 end

@@ -141,7 +141,9 @@ begin
 
     // SysField ?
     if ((ATag.Options and toSys) = toSys) then
-      DetailStrings[Index] := TSubShellFolder.GetSystemField(Folder.Parent, Folder.RelativeID, StrToIntDef(ATag.Command, 0));
+      DetailStrings[Index] := TSubShellFolder.GetSystemField(Folder.Parent,
+                                                             Folder.RelativeID,
+                                                             ATag.GetSysColumn);
 
     // Yes/No
     if ((ATag.Options and toYesNo) = toYesNo) then
@@ -162,7 +164,7 @@ begin
     if ((ATag.Options and toBackup) = toBackup) then
     begin
       if ((DetailStrings[Index] <> '-') and
-          (DetailStrings[Index] <> StrNo) or
+          (DetailStrings[Index] <> StrNo) and
           (DetailStrings[Index] <> '')) then
         BackupValue := DetailStrings[Index];
       DetailStrings.Delete(Index);
@@ -189,6 +191,7 @@ begin
       DetailStrings[0] := NotOpened
   end;
 end;
+
 procedure SetupCountry(ColumnDefs: TColumnsArray; CountryCode: boolean);
 var
   Index: integer;
