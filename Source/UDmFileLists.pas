@@ -228,6 +228,7 @@ procedure TDmFileLists.GetSampleValues(AListName: string; AListReadMode: integer
 var
   MetaData: TMetaData;
   Index: integer;
+  KeyName: string;
   ETLine: string;
   GroupName: string;
   TagName: string;
@@ -263,8 +264,11 @@ begin
             MetaData.ReadMeta(FSample.PathName, [gmXMP, gmGPS]);
             for TagName in MetaData.FieldNames do
             begin
-              FSampleValues.Add(LowerCase('-' + TagName), MetaData.FieldData(TagName));
-              AddTagName('-' + TagName);
+              KeyName := '-' + TagName;
+              if (FSampleValues.ContainsKey(LowerCase(KeyName))) then
+                continue;
+              FSampleValues.Add(LowerCase(KeyName), MetaData.FieldData(TagName));
+              AddTagName(KeyName);
             end;
           finally
             MetaData.Free;
@@ -272,6 +276,8 @@ begin
         end
       else
       begin
+        if (TSubShellFolder.GetIsFolder(FSample)) then
+          exit;
         ETOut := TStringList.Create;
         try
           ETCmd := '-G1' + CRLF + '-s';
@@ -282,8 +288,11 @@ begin
             GroupName := NextField(ETLine, '[');             // Strip Leading [
             GroupName := NextField(ETLine, ']');             // Group name
             TagName   := Trim(NextField(ETLine, ':'));       // Tag Name
-            FSampleValues.Add(LowerCase('-' + GroupName + ':' + TagName), Trim(ETLine));
-            AddTagName('-' + GroupName + ':' + TagName);
+            KeyName := '-' + GroupName + ':' + TagName;
+            if (FSampleValues.ContainsKey(LowerCase(KeyName))) then
+              continue;
+            FSampleValues.Add(LowerCase(KeyName), Trim(ETLine));
+            AddTagName(KeyName);
           end;
         finally
           ETOut.Free;
