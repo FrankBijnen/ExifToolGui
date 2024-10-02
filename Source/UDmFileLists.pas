@@ -164,6 +164,8 @@ begin
 end;
 
 procedure TDmFileLists.CdsColumnSetCommandValidate(Sender: TField);
+var
+  P: integer;
 begin
   if (LeftStr(Sender.AsString, 1) <> '-') then
   begin
@@ -171,7 +173,15 @@ begin
     CdsColumnSetName.AsString := FSystemTagNames.Values[Sender.AsString];
   end
   else
+  begin
     CdsColumnSetOption.AsInteger := (CdsColumnSetOption.AsInteger and ($ffff - Ord(toSys)));
+    if (CdsColumnSetName.AsString = '') then
+    begin
+      P := Pos(':', Sender.AsString);
+      if (P > 0) then
+        CdsColumnSetName.AsString := Copy(Sender.AsString, P +  1);
+    end;
+  end;
 end;
 
 procedure TDmFileLists.CdsFileListDefAfterInsert(DataSet: TDataSet);
