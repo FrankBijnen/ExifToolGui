@@ -1,7 +1,8 @@
 object DmFileLists: TDmFileLists
   OnCreate = DataModuleCreate
-  Height = 341
-  Width = 458
+  OnDestroy = DataModuleDestroy
+  Height = 371
+  Width = 470
   object DsFileListDef: TDataSource
     DataSet = CdsFileListDef
     Left = 217
@@ -17,6 +18,7 @@ object DmFileLists: TDmFileLists
       end>
     Params = <>
     AfterInsert = CdsFileListDefAfterInsert
+    BeforeScroll = CdsFileListDefBeforeScroll
     Left = 82
     Top = 32
     object CdsFileListDefId: TIntegerField
@@ -62,6 +64,7 @@ object DmFileLists: TDmFileLists
     Params = <>
     BeforeInsert = CdsColumnSetBeforeInsert
     AfterInsert = CdsColumnSetAfterInsert
+    OnCalcFields = CdsColumnSetCalcFields
     Left = 82
     Top = 116
     object CdsColumnSetFileListName: TStringField
@@ -78,6 +81,7 @@ object DmFileLists: TDmFileLists
     object CdsColumnSetCommand: TStringField
       DisplayWidth = 64
       FieldName = 'Command'
+      OnValidate = CdsColumnSetCommandValidate
       Size = 255
     end
     object CdsColumnSetBackup: TIntegerField
@@ -115,6 +119,21 @@ object DmFileLists: TDmFileLists
       KeyFields = 'Option'
       Lookup = True
     end
+    object CdsColumnSetSampleValue: TStringField
+      FieldKind = fkCalculated
+      FieldName = 'SampleValue'
+      Size = 64
+      Calculated = True
+    end
+    object CdsColumnSetCommandLookup: TStringField
+      FieldKind = fkLookup
+      FieldName = 'CommandLookup'
+      LookupDataSet = CdsTagNames
+      LookupKeyFields = 'TagName'
+      LookupResultField = 'TagName'
+      KeyFields = 'Command'
+      Lookup = True
+    end
   end
   object CdsReadMode: TClientDataSet
     Aggregates = <>
@@ -146,13 +165,39 @@ object DmFileLists: TDmFileLists
     Aggregates = <>
     IndexFieldNames = 'Key'
     Params = <>
-    Left = 352
-    Top = 208
-    object IntegerField1: TIntegerField
+    Left = 349
+    Top = 205
+    object CdsOptionKey: TIntegerField
       FieldName = 'Key'
     end
-    object StringField1: TStringField
+    object CdsOptionDesc: TStringField
       FieldName = 'Desc'
     end
+  end
+  object CdsTagNames: TClientDataSet
+    Aggregates = <>
+    FieldDefs = <>
+    IndexDefs = <>
+    Params = <>
+    StoreDefs = True
+    OnCalcFields = CdsTagNamesCalcFields
+    OnFilterRecord = CdsTagNamesFilterRecord
+    Left = 78
+    Top = 285
+    object CdsTagNamesTagName: TStringField
+      FieldName = 'TagName'
+      Size = 64
+    end
+    object CdsTagNamesSampleValue: TStringField
+      FieldKind = fkCalculated
+      FieldName = 'SampleValue'
+      Size = 64
+      Calculated = True
+    end
+  end
+  object DsTagNames: TDataSource
+    DataSet = CdsTagNames
+    Left = 219
+    Top = 294
   end
 end

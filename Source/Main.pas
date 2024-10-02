@@ -566,6 +566,7 @@ end;
 procedure TFMain.BtnColumnEditClick(Sender: TObject);
 begin
   DmFileLists.SelectedSet := CBoxDetails.ItemIndex +1;
+  FEditFColumn.PrepareShow(ShellList.GetSelectedFolder(-1));
   if FEditFColumn.ShowModal = mrOK then
   begin
     UpdateSysCaptions(ShellList.RootFolder);

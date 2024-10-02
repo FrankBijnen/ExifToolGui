@@ -40,6 +40,7 @@ type
     class function GetRelativeDisplayName(Folder: TShellFolder): string;
     class function GetRelativeFileName(Folder: TShellFolder): string;
     class function GetRelativeSortName(Folder: TShellFolder): string;
+    class procedure AllFastSystemFields(RootFolder: TShellFolder; FieldList: TStrings);
     class function SystemFieldIsDate(RootFolder: TShellFolder; Column: integer): boolean;
     class function GetSystemField(RootFolder: TShellFolder; RelativeID: PItemIDList; Column: integer): string;
   end;
@@ -302,6 +303,30 @@ begin
   result := TSubShellFolder.GetRelativeName(Folder, TRelativeNameType.rnSort);
 end;
 
+class procedure TSubShellFolder.AllFastSystemFields(RootFolder: TShellFolder; FieldList: TStrings);
+var
+  HasField: boolean;
+  Column: integer;
+  ColFlags: LongWord;
+begin
+  FieldList.Clear;
+  if Assigned(RootFolder) and
+     Assigned(RootFolder.Parent) and
+     Assigned(RootFolder.ShellFolder2) then
+  begin
+    Column := 0;
+    HasField := true;
+    while HasField do
+    begin
+      HasField := (RootFolder.ShellFolder2.GetDefaultColumnState(Column, ColFlags) = S_OK) and
+                  ((ColFlags and SHCOLSTATE_SLOW) = 0);
+      if (HasField) then
+        FieldList.AddPair(IntToStr(Column), TSubShellFolder.GetSystemField(RootFolder, nil, Column));
+      Inc(Column);
+    end;
+  end;
+end;
+
 class function TSubShellFolder.SystemFieldIsDate(RootFolder: TShellFolder; Column: integer): boolean;
 var
   ColFlags: LongWord;
@@ -330,7 +355,6 @@ begin
           Result := SD.str.pOleStr;
     end;
 end;
-//
 
 { TShellListView }
 
