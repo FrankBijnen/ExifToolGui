@@ -237,6 +237,10 @@
         <DCCReference Include="UFrmPredefinedTags.pas">
             <Form>FrmPredefinedTags</Form>
         </DCCReference>
+        <DCCReference Include="UDmFileLists.pas">
+            <Form>DmFileLists</Form>
+            <DesignClass>TDataModule</DesignClass>
+        </DCCReference>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>
