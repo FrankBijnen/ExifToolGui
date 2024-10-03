@@ -78,6 +78,7 @@ type
     SelectedSet: integer;
     procedure LoadFromColumnSets(ASample: TShellFolder);
     procedure SaveToColumnSets;
+    procedure AddAllXmpTags;
     property OnFileListChanged: TNotifyEvent read FOnFileListChanged write FOnFileListChanged;
     property OnFilterTag: TFilterRecordEvent read FOnFilterTag write FOnFilterTag;
   end;
@@ -245,18 +246,25 @@ var
   Sample: string;
   ETcmd: string;
   ETOut: TStringList;
+  AllInternalFields: TStringList;
 begin
   if (FListName = AListName) and
      (FListReadMode = AListReadMode) then
     exit;
-
   FListName := AListName;
   FListReadMode := AListReadMode;
 
+  // Clear
   PrepTagNames;
-  CdsTagNames.DisableControls;
   FSampleValues.Clear;
 
+  if not Assigned(FSample) then   // Need a ShellFolder
+    exit;
+
+  // Get Captions for 'fast' system fields
+  TSubShellFolder.AllFastSystemFields(FSample.Parent, FSystemTagNames);
+
+  CdsTagNames.DisableControls;
   try
     for Index := 0 to FSystemTagNames.Count -1 do
     begin
@@ -265,10 +273,25 @@ begin
       FSampleValues.Add(TagName, Sample);
       AddTagName(TagName);
     end;
+
     case FListReadMode of
       0:;   // Limit to System Fields
       1,3:  // Limit to Internal fields
         begin
+          // Load all internal fields
+          AllInternalFields := TStringList.Create;
+          try
+            TMetaData.AllInternalFields(AllInternalFields);
+            for TagName in AllInternalFields do
+            begin
+              KeyName := '-' + TagName;
+              AddTagName(KeyName);
+            end;
+          finally
+            AllInternalFields.Free;
+          end;
+
+          // Load sample values found in file. Can be XMP!
           MetaData := TMetaData.Create;
           try
             MetaData.ReadMeta(FSample.PathName, [gmXMP, gmGPS]);
@@ -283,6 +306,7 @@ begin
           finally
             MetaData.Free;
           end;
+
         end
       else
       begin
@@ -311,6 +335,43 @@ begin
     end;
   finally
     CdsTagNames.EnableControls;
+  end;
+end;
+
+procedure TDmFileLists.AddAllXmpTags;
+var
+  GroupNames: TStringList;
+  TagNames: TStringList;
+  GroupName: string;
+  TagName: string;
+  CrWait, CrNormal: HCURSOR;
+begin
+  CrWait := LoadCursor(0, IDC_WAIT);
+  CrNormal := SetCursor(CrWait);
+
+  GroupNames := TStringList.Create;
+  TagNames := TStringList.Create;
+
+  CdsTagNames.DisableControls;
+  CdsTagNames.Filtered := false;
+
+  try
+    FillGroupsInStrings('', GroupNames, '1');
+    for GroupName in GroupNames do
+    begin
+      if (StartsText('Xmp-', GroupName)) then
+      begin
+        FillTagsInStrings('', TagNames, '1', GroupName, false);
+        for TagName in TagNames do
+          AddTagName('-' + GroupName + ':' + TagName);
+      end;
+    end;
+  finally
+    GroupNames.Free;
+    TagNames.Free;
+    CdsTagNames.EnableControls;
+    CdsTagNames.First;
+    SetCursor(CrNormal);
   end;
 end;
 
@@ -421,7 +482,7 @@ var
   Id: integer;
 begin
   FSample := ASample;
-  TSubShellFolder.AllFastSystemFields(ASample.Parent, FSystemTagNames);
+
   FListName := '';
   FListReadMode := -1;
 

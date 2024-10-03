@@ -366,9 +366,13 @@ begin
   begin
     if boolean(SendMessage(FFrmGenerate.Handle, CM_WantsToClose, 0, 0)) then
     begin
-      for Index := 0 to High(Tasks) do
-        Tasks[Index].Cancel;
-      break;
+      System.TMonitor.Enter(FShellList.FoldersList);
+      try
+        FCurrentIndex := FItemCount +1; // Pretend all work done
+      finally
+        System.TMonitor.Exit(FShellList.FoldersList);
+      end;
+      continue;
     end;
 
     if (FCurrentIndex < FItemCount) then

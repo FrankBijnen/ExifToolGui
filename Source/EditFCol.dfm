@@ -185,11 +185,13 @@ object FEditFColumn: TFEditFColumn
       Align = alRight
       TabOrder = 4
       Visible = False
+      ExplicitLeft = 877
+      ExplicitHeight = 246
       object DbgTagNames: TDBGrid
         Left = 1
-        Top = 42
+        Top = 46
         Width = 346
-        Height = 204
+        Height = 200
         Align = alClient
         DataSource = DmFileLists.DsTagNames
         TabOrder = 0
@@ -217,15 +219,15 @@ object FEditFColumn: TFEditFColumn
         Left = 1
         Top = 1
         Width = 346
-        Height = 41
+        Height = 45
         Align = alTop
         TabOrder = 1
-        ExplicitLeft = 30
-        ExplicitTop = 18
-        ExplicitWidth = 185
+        DesignSize = (
+          346
+          45)
         object EdSearchTag: TLabeledEdit
           Left = 1
-          Top = 19
+          Top = 23
           Width = 344
           Height = 21
           Align = alBottom
@@ -235,9 +237,17 @@ object FEditFColumn: TFEditFColumn
           TabOrder = 0
           Text = ''
           OnKeyUp = EdSearchTagKeyUp
-          ExplicitLeft = 5
-          ExplicitTop = 14
-          ExplicitWidth = 287
+          ExplicitTop = 19
+        end
+        object BtnLoadXMP: TButton
+          Left = 263
+          Top = 1
+          Width = 82
+          Height = 22
+          Anchors = [akTop, akRight]
+          Caption = 'Load XMP Tags'
+          TabOrder = 1
+          OnClick = BtnLoadXMPClick
         end
       end
     end
@@ -255,7 +265,7 @@ object FEditFColumn: TFEditFColumn
       1230
       29)
     object BtnOk: TBitBtn
-      Left = 1013
+      Left = 1009
       Top = 2
       Width = 87
       Height = 25
@@ -282,10 +292,10 @@ object FEditFColumn: TFEditFColumn
       ModalResult = 1
       NumGlyphs = 2
       TabOrder = 0
-      ExplicitLeft = 1009
+      ExplicitLeft = 1005
     end
     object BtnCancel: TBitBtn
-      Left = 1104
+      Left = 1100
       Top = 2
       Width = 87
       Height = 25
@@ -312,7 +322,7 @@ object FEditFColumn: TFEditFColumn
       ModalResult = 2
       NumGlyphs = 2
       TabOrder = 1
-      ExplicitLeft = 1100
+      ExplicitLeft = 1096
     end
   end
 end

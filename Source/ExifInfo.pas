@@ -230,6 +230,7 @@ type
     destructor Destroy; override;
     procedure ReadMeta(const AName: string; AGetOptions: TGetOptions);
     function FieldData(FieldName: string): string;
+    class procedure AllInternalFields(FieldList: TStrings);
   end;
 
 function GetMetadata(AName: string; AGetOptions: TGetOptions; VarData: TVarData = nil; FieldNames: TStrings = nil): FotoRec;
@@ -292,6 +293,88 @@ begin
 
   if (VarData.ContainsKey(LowerFieldName)) then
     result := VarData[LowerFieldName];
+end;
+
+class procedure TMetaData.AllInternalFields(FieldList: TStrings);
+begin
+  with FieldList do
+  begin
+    Clear;
+    Add('Composite:GpsPosition');
+
+    Add('ExifIfd:ColorSpace');
+    Add('ExifIfd:CreateDate');
+    Add('ExifIfd:DateTimeDigitized');
+    Add('ExifIfd:DateTimeOriginal');
+    Add('ExifIfd:ExposureCompensation');
+    Add('ExifIfd:ExposureProgram');
+    Add('ExifIfd:ExposureTime');
+    Add('ExifIfd:FLin35mm');
+    Add('ExifIfd:FNumber');
+    Add('ExifIfd:Flash');
+    Add('ExifIfd:FlashValue');
+    Add('ExifIfd:FocalLength');
+    Add('ExifIfd:ISO');
+    Add('ExifIfd:LensInfo');
+    Add('ExifIfd:LensMake');
+    Add('ExifIfd:LensModel');
+
+    Add('Gps:GeoLat');
+    Add('Gps:GeoLon');
+    Add('Gps:GpsAltitude');
+    Add('Gps:GpsAltitudeRef');
+    Add('Gps:GpsLatitude');
+    Add('Gps:GpsLatitudeRef');
+    Add('Gps:GpsLongitude');
+    Add('Gps:GpsLongitudeRef');
+
+    Add('ICCProfileProfile:CMMType');
+    Add('ICCProfileProfile:Class');
+    Add('ICCProfileProfile:ColorSpaceData');
+    Add('ICCProfileProfile:DeviceManufacturer');
+    Add('ICCProfileProfile:PrimaryPlatform');
+    Add('ICCProfileProfile:ProfileConnectionSpace');
+    Add('ICCProfileProfile:ProfileCreator');
+    Add('ICCProfileProfile:ProfileDescription');
+
+    Add('IFD0:Artist');
+    Add('IFD0:CopyRight');
+    Add('IFD0:Make');
+    Add('IFD0:Model');
+    Add('IFD0:Orientation');
+    Add('IFD0:OrientationValue');
+    Add('IFD0:Software');
+    Add('Ifd0:Artist');
+    Add('Ifd0:Copyright');
+    Add('Ifd0:DateTimeModify');
+    Add('Ifd0:Make');
+    Add('Ifd0:Model');
+    Add('Ifd0:Orientation');
+    Add('Ifd0:OrientationValue');
+    Add('Ifd0:PreviewSize');
+    Add('Ifd0:ResolutionUnit');
+    Add('Ifd0:Software');
+    Add('Ifd0:Xresolution');
+    Add('Ifd0:Yresolution');
+
+    Add('InterOp:InteropIndex');
+
+    Add('Iptc:By_line');
+    Add('Iptc:By_lineTitle');
+    Add('Iptc:Caption_Abstract');
+    Add('Iptc:Category');
+    Add('Iptc:City');
+    Add('Iptc:CopyrightNotice');
+    Add('Iptc:Country');
+    Add('Iptc:Headline');
+    Add('Iptc:Keywords');
+    Add('Iptc:ObjectName');
+    Add('Iptc:Province_State');
+    Add('Iptc:Sub_location');
+    Add('Iptc:SuppCategories');
+    Add('Iptc:Writer_Editor');
+  end;
+
 end;
 
 procedure XMPrec.Clear;
