@@ -36,6 +36,7 @@ type
     UseSample: string;
   public
     { Public declarations }
+    procedure EnableExclude(Enable: boolean);
     procedure SetSample(ASample: string);
     function PreferredFamily: string;
     function SelectedTag(AllowExclude: boolean = false): string;
@@ -102,9 +103,15 @@ begin
   RadTagValuesClick(RadTagValues);
 end;
 
+procedure TFrmTagNames.EnableExclude(Enable: boolean);
+begin
+  ChkExclude.Visible := Enable;
+end;
+
 procedure TFrmTagNames.SetSample(ASample: string);
 begin
   FSample := ASample;
+  EnableExclude(true); // Default visible
 end;
 
 function TFrmTagNames.PreferredFamily: string;

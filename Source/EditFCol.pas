@@ -27,18 +27,23 @@ type
     DbgTagNames: TDBGrid;
     PnlEdSearch: TPanel;
     EdSearchTag: TLabeledEdit;
+    BtnLoadXMP: TButton;
     procedure FormCreate(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure DbGridKeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
     procedure EdSearchTagKeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
     procedure DbgTagNamesDblClick(Sender: TObject);
     procedure DbgColumnSetEditButtonClick(Sender: TObject);
+    procedure BtnLoadXMPClick(Sender: TObject);
   private
     { Private declarations }
-  protected
-    function GetDefWindowSizes: TRect; override;
+    FSample: TShellFolder;
+    procedure TagNameLookup;
+    procedure EndTagNameLookup(Value: string);
     procedure FileListChanged(Sender: Tobject);
     procedure TagNamesFilterRecord(DataSet: TDataSet; var Accept: Boolean);
+  protected
+    function GetDefWindowSizes: TRect; override;
   public
     { Public declarations }
     procedure PrepareShow(ASample: TShellFolder);
@@ -54,6 +59,7 @@ implementation
 uses
   System.StrUtils,
   UDmFileLists,
+  UFrmTagNames,
   MainDef, UnitColumnDefs;
 
 function TFEditFColumn.GetDefWindowSizes: TRect;
@@ -61,13 +67,51 @@ begin
   result := Rect(108, 106, 880, 640);
 end;
 
-procedure TFEditFColumn.DbgTagNamesDblClick(Sender: TObject);
+procedure TFEditFColumn.TagNameLookup;
+begin
+  case DmFileLists.CdsFileListDefReadMode.AsInteger of
+    0,1,3:  // System, Internal, +ExifTool
+      begin
+        // Update search string
+        EdSearchTag.Text := DbgColumnSet.SelectedField.AsString;
+        DmFileLists.CdsTagNames.Filtered := false;
+        DmFileLists.CdsTagNames.Filtered := (EdSearchTag.Text <> '');
+
+        PnlDetail.Visible := true;
+        VSplitter.Visible := true;
+        EdSearchTag.SetFocus;
+        DmFileLists.CdsTagNames.Locate('TagName',
+                                       DmFileLists.CdsColumnSetCommand.AsString,
+                                       [TLocateOption.loCaseInsensitive, TLocateOption.loPartialKey]);
+      end;
+    2:    // ExifTool
+      begin
+        if (Assigned(FSample)) then
+          FrmTagNames.SetSample(FSample.PathName);
+        FrmTagNames.EnableExclude(false);
+        if (FrmTagNames.ShowModal = IDOK) then
+          EndTagNameLookup('-' + FrmTagNames.SelectedTag(false));
+      end;
+  end;
+end;
+
+procedure TFEditFColumn.EndTagNameLookup(Value: string);
 begin
   if not (DmFileLists.CdsColumnSet.State in [dsInsert, dsEdit]) then
     DmFileLists.CdsColumnSet.Edit;
-  DmFileLists.CdsColumnSetCommand.AsString := DmFileLists.CdsTagNamesTagName.AsString;
+  DmFileLists.CdsColumnSetCommand.AsString := Value;
   PnlDetail.Visible := false;
   VSplitter.Visible := false;
+end;
+
+procedure TFEditFColumn.DbgTagNamesDblClick(Sender: TObject);
+begin
+  EndTagNameLookup(DmFileLists.CdsTagNamesTagName.AsString);
+end;
+
+procedure TFEditFColumn.BtnLoadXMPClick(Sender: TObject);
+begin
+  DmFileLists.AddAllXmpTags;
 end;
 
 procedure TFEditFColumn.DbgColumnSetEditButtonClick(Sender: TObject);
@@ -75,18 +119,7 @@ begin
   // Get Latest values
   DmFileLists.CdsColumnSet.Edit;
   DmFileLists.CdsColumnSet.UpdateRecord;
-
-  // Update search string
-  EdSearchTag.Text := TDBGrid(Sender).SelectedField.AsString;
-  DmFileLists.CdsTagNames.Filtered := false;
-  DmFileLists.CdsTagNames.Filtered := (EdSearchTag.Text <> '');
-
-  PnlDetail.Visible := true;
-  VSplitter.Visible := true;
-  EdSearchTag.SetFocus;
-  DmFileLists.CdsTagNames.Locate('TagName',
-                                 DmFileLists.CdsColumnSetCommand.AsString,
-                                 [TLocateOption.loCaseInsensitive, TLocateOption.loPartialKey]);
+  TagNameLookup;
 end;
 
 procedure TFEditFColumn.DbGridKeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
@@ -129,12 +162,10 @@ end;
 
 procedure TFEditFColumn.PrepareShow(ASample: TShellFolder);
 begin
-  DmFileLists.LoadFromColumnSets(ASample);
+  FSample := ASample;
+  DmFileLists.LoadFromColumnSets(FSample);
   DmFileLists.OnFilterTag := TagNamesFilterRecord;
   DmFileLists.OnFileListChanged := FileListChanged;
-//TODO: Need Log?
-//  FShowLogWindow := FLogWin.Showing;
-//  FLogWin.Close;
 end;
 
 end.

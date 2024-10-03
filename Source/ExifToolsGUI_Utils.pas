@@ -95,8 +95,13 @@ procedure StyledDrawListviewItem(FstyleServices: TCustomStyleServices;
                                  State: TCustomDrawState);
 
 // Tag names
-function GetTags(ETResult: TStringList; CmbTags: TComboBox): TTagInfoList;
+function GetTags(ETResult: TStringList; Tags: TStrings): TTagInfoList;
+procedure FillGroupsInStrings(SelectedFile: string; Groups: TStrings; const Family: string);
 procedure FillGroupsInCombo(SelectedFile: string; CmbTags: TComboBox; const Family: string);
+procedure FillTagsInStrings(SelectedFile: string;
+                            Tags: TStrings;
+                            const Family, GroupName: string;
+                            Sort: boolean = true);
 procedure FillTagsInCombo(SelectedFile: string; CmbTags: TComboBox; const Family, GroupName: string);
 procedure DrawItemTagName(Control: TWinControl; Index: Integer; Rect: TRect; State: TOwnerDrawState);
 procedure SetTagItem(const AnItem: TlistItem; ACaption: string = '');
@@ -1092,16 +1097,14 @@ begin
   end;
 end;
 
-function GetTags(ETResult: TStringList; CmbTags: TComboBox): TTagInfoList;
+function GetTags(ETResult: TStringList; Tags: TStrings): TTagInfoList;
 var
   Aline: string;
   AResult: string;
   ATagInfo: TTagInfo;
   First: boolean;
-  ThisWidth: integer;
 begin
   result := TTagInfoList.Create;
-  CmbTags.Tag := -1;
   First := true;
   for Aline in ETResult do
   begin
@@ -1120,29 +1123,25 @@ begin
       TagName    := Trim(NextField(AResult, ':'));
       TagValue   := Trim(AResult);
 
-      ThisWidth  := CmbTags.Canvas.TextWidth(GroupName + ':' + TagName + '|');
-      if (ThisWidth > CmbTags.Tag) then
-        CmbTags.Tag := ThisWidth;
-
       result.Add(ATagInfo);
     end;
   end;
 end;
 
-procedure FillGroupsInCombo(SelectedFile: string; CmbTags: TComboBox; const Family: string);
+procedure FillGroupsInStrings(SelectedFile: string; Groups: TStrings; const Family: string);
 var
   Indx: integer;
   ETCmd, AGroupLine: string;
   ETResult, ETUnSorted: TStringList;
   ANItem: string;
 begin
-  CmbTags.Items.BeginUpdate;
+  Groups.BeginUpdate;
   ETResult := TStringList.Create;
   try
-    CmbTags.Items.Clear;
+    Groups.Clear;
     if (SelectedFile <> '') then
     begin
-      CmbTags.Items.Add('All');
+      Groups.Add('All');
       ETUnSorted := TStringList.Create;
       try
         ETResult.Sorted := true;
@@ -1173,18 +1172,25 @@ begin
       begin
         ANItem := NextField(AGroupLine, ' ');
         if (Trim(ANItem) <> '') then
-          CmbTags.Items.Add(ANItem);
+          Groups.Add(ANItem);
       end;
-
     end;
   finally
     ETResult.Free;
-    CmbTags.Items.EndUpdate;
-    CmbTags.Text := CmbTags.Items[0];
+    Groups.EndUpdate;
   end;
 end;
 
-procedure FillTagsInCombo(SelectedFile: string; CmbTags: TComboBox; const Family, GroupName: string);
+procedure FillGroupsInCombo(SelectedFile: string; CmbTags: TComboBox; const Family: string);
+begin
+  FillGroupsInStrings(SelectedFile, CmbTags.Items, Family);
+  CmbTags.Text := CmbTags.Items[0];
+end;
+
+procedure FillTagsInStrings(SelectedFile: string;
+                            Tags: TStrings;
+                            const Family, GroupName: string;
+                            Sort: boolean = true);
 var
   Indx: integer;
   ETCmd, AGroupLine: string;
@@ -1194,21 +1200,25 @@ var
   ATagInfo: TTagInfo;
 begin
   ETResult := TStringList.Create;
-  CmbTags.Items.BeginUpdate;
+  Tags.BeginUpdate;
   try
-    CmbTags.Items.Clear;
+    Tags.Clear;
     if (SelectedFile <> '') then
     begin
-      ETCmd := '-sort' + CRLF + '-s1' + CRLF + '-a' + CRLF + '-G' + Family + CRLF + '-' + Groupname + ':All';
+      if Sort then
+        ETCmd := '-sort' + CRLF
+      else
+        ETCmd := '';
+      ETCmd := ETCmd + '-s1' + CRLF + '-a' + CRLF + '-G' + Family + CRLF + '-' + Groupname + ':All';
       ET.OpenExec(ETcmd, SelectedFile, ETResult);
-      ATagInfoList := GetTags(ETResult, CmbTags);
+      ATagInfoList := GetTags(ETResult, Tags);
       try
         for ATagInfo in ATagInfoList do
         begin
           ANItem := ATagInfo.GroupName + ':' + ATagInfo.TagName;
           if (ATagInfo.TagValue <> '') then
             ANItem := ANItem + '|' + ATagInfo.TagValue;
-          CmbTags.Items.Add(ANItem);
+          Tags.Add(ANItem);
         end;
       finally
         ATagInfoList.Free;
@@ -1218,7 +1228,7 @@ begin
     begin
       ETCmd := '-listw' + CRLF + '-' + Groupname + ':All';
       ET.OpenExec(ETcmd, '', ETResult);
-      CmbTags.Items.Add('All');
+      Tags.Add('All');
       for Indx := 1 to ETResult.Count -1 do
       begin
         AGroupLine := ETResult[Indx];
@@ -1226,16 +1236,42 @@ begin
         begin
           ANItem := NextField(AGroupLine, ' ');
           if (Trim(ANItem) <> '') then
-            CmbTags.Items.Add(ANItem);
+            Tags.Add(ANItem);
         end;
       end;
-      CmbTags.Tag := CmbTags.Width;
     end;
 
   finally
     ETResult.Free;
-    CmbTags.Items.EndUpdate;
-    CmbTags.Text := CmbTags.Items[0];
+    Tags.EndUpdate;
+  end;
+end;
+
+procedure FillTagsInCombo(SelectedFile: string; CmbTags: TComboBox; const Family, GroupName: string);
+var
+  ThisWidth: integer;
+  P: integer;
+  ALine: string;
+begin
+  FillTagsInStrings(SelectedFile, CmbTags.Items, Family, GroupName);
+// Setup ComboBox
+  CmbTags.Text := CmbTags.Items[0];
+  CmbTags.Tag := CmbTags.Width;     // No Sample data, take complete width
+
+  // Compute Width of largest group + Tagname and store that in Tag.
+  if (SelectedFile <> '') then
+  begin
+    CmbTags.Tag := 0;
+    for ALine in CmbTags.Items do
+    begin
+      P := Pos('|', Aline);
+      if (P > 0) then
+      begin
+        ThisWidth := CmbTags.Canvas.TextWidth(LeftStr(ALine, P +1));
+        if (ThisWidth > CmbTags.Tag) then
+          CmbTags.Tag := ThisWidth;
+      end;
+    end;
   end;
 end;
 

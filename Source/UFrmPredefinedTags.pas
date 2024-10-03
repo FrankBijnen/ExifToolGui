@@ -355,6 +355,7 @@ var
   AnItem: TListItem;
 begin
   FrmTagNames.SetSample(Sample);
+  FrmTagNames.EnableExclude(true);
   if (FrmTagNames.ShowModal = IDOK) then
   begin
     // Insert after the currently selected item
