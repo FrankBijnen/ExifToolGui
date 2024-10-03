@@ -353,6 +353,7 @@ var
   Index: integer;
   Tasks: array of ITask;
 begin
+  FCurrentIndex := 0;
   SetLength(Tasks, FThreads);
   for Index := 0 to High(Tasks) do
     Tasks[Index] := TMetaDataGetWorker.Create(Index,
@@ -410,17 +411,31 @@ begin
     if (IsCanceled) then
       break;
 
-    FFolder := FGetWorker;
+    try
+      FFolder := FGetWorker;
+    except on E:Exception do
+      begin
+        DebugMsg(['DoGetMeta GetWorker', E.Message]);
+        FFolder := nil;
+      end;
+    end;
+
     if (FFolder = nil) then                           // No more work
       break;
 
-    ProcessFolder(FFolder,
-                  FMetaData,
-                  FET,
-                  FCurrentDir,
-                  FETCmd,
-                  FOptions,
-                  FColumnDefs);
+    try
+      ProcessFolder(FFolder,
+                    FMetaData,
+                    FET,
+                    FCurrentDir,
+                    FETCmd,
+                    FOptions,
+                    FColumnDefs);
+    except on E:Exception do
+      begin
+        DebugMsg(['DoGetMeta ProcessFolder', FFolder.PathName, E.Message]);
+      end;
+    end;
   end;
 end;
 

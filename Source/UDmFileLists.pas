@@ -267,7 +267,7 @@ begin
     end;
     case FListReadMode of
       0:;   // Limit to System Fields
-      1:    // Limit to Internal fields
+      1,3:  // Limit to Internal fields
         begin
           MetaData := TMetaData.Create;
           try
@@ -360,6 +360,11 @@ var
   AColumnSet: TColumnsArray;
   AFileOption: TFileListOptions;
 begin
+  if (CdsFileListDef.State in [dsEdit, dsInsert]) then
+    CdsFileListDef.Post;
+  if (CdsColumnSet.State in [dsEdit, dsInsert]) then
+    CdsColumnSet.Post;
+
   CdsFileListDef.DisableControls;
   CdsColumnSet.DisableControls;
 
