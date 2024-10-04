@@ -134,7 +134,7 @@
         <DelphiCompile Include="$(MainSource)">
             <MainSource>MainSource</MainSource>
         </DelphiCompile>
-        <RcCompile Include="ExifToolsGui_Data.rc">
+        <RcCompile Include="Resources\ExifToolsGui_Data.rc">
             <Form>ExifToolsGui_Data.res</Form>
         </RcCompile>
         <DCCReference Include="MainDef.pas"/>

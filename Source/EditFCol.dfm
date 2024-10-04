@@ -237,7 +237,6 @@ object FEditFColumn: TFEditFColumn
           TabOrder = 0
           Text = ''
           OnKeyUp = EdSearchTagKeyUp
-          ExplicitTop = 19
         end
         object BtnLoadXMP: TButton
           Left = 263
@@ -247,6 +246,7 @@ object FEditFColumn: TFEditFColumn
           Anchors = [akTop, akRight]
           Caption = 'Load XMP Tags'
           TabOrder = 1
+          Visible = False
           OnClick = BtnLoadXMPClick
         end
       end
@@ -265,7 +265,7 @@ object FEditFColumn: TFEditFColumn
       1230
       29)
     object BtnOk: TBitBtn
-      Left = 1009
+      Left = 1005
       Top = 2
       Width = 87
       Height = 25
@@ -292,10 +292,10 @@ object FEditFColumn: TFEditFColumn
       ModalResult = 1
       NumGlyphs = 2
       TabOrder = 0
-      ExplicitLeft = 1005
+      ExplicitLeft = 1001
     end
     object BtnCancel: TBitBtn
-      Left = 1100
+      Left = 1096
       Top = 2
       Width = 87
       Height = 25
@@ -322,7 +322,7 @@ object FEditFColumn: TFEditFColumn
       ModalResult = 2
       NumGlyphs = 2
       TabOrder = 1
-      ExplicitLeft = 1096
+      ExplicitLeft = 1092
     end
   end
 end

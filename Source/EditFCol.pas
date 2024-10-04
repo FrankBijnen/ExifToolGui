@@ -111,7 +111,8 @@ end;
 
 procedure TFEditFColumn.BtnLoadXMPClick(Sender: TObject);
 begin
-  DmFileLists.AddAllXmpTags;
+// Create txt file with XMP tags
+  DmFileLists.WriteAllXmpTags;
 end;
 
 procedure TFEditFColumn.DbgColumnSetEditButtonClick(Sender: TObject);
