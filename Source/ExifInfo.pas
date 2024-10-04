@@ -947,7 +947,7 @@ begin
     FotoF.Read(Endian, SizeOf(Endian));
     IsMM := (Endian = $4D4D);
 
-    if (Maker = 'PENTAX') or
+    if (Maker = 'PENTAX ') or
        (Maker = 'AOC') then
     begin
       MakerNotes.MakerType := TMakerNotes.Pentax;
@@ -1034,6 +1034,9 @@ begin
         ICCoffset := IFDentry.ValueOffs;
       $8825:
         GPSoffset := IFDentry.ValueOffs;
+      $C634,
+      $927C: // MakerNotes
+        MakerNotesOffset := IFDentry.ValueOffs;
     end;
   end;
   FotoF.Seek(SavePos, TSeekOrigin.soBeginning);
@@ -1134,6 +1137,7 @@ begin
         LensMake := AddExifIFDData('LensMake', DecodeASCII(IFDentry, 23));
       $A434:
         LensModel := AddExifIFDData('LensModel', DecodeASCII(IFDentry, 47));
+      $C634,
       $927C: // MakerNotes
         MakerNotesOffset := IFDentry.ValueOffs;
     end;
