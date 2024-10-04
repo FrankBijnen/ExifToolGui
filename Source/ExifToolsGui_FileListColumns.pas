@@ -176,10 +176,8 @@ begin
           (DetailStrings[Index] = StrNo) or
           (DetailStrings[Index] = '')) and
           (BackupValue <> '') then
-      begin
         DetailStrings[Index] := BackupValue;
-        BackupValue := '';
-      end;
+      BackupValue := '';
     end;
 
   end;

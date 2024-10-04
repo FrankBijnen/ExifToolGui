@@ -68,7 +68,7 @@ type
     FOnFileListChanged: TNotifyEvent;
     FOnFilterTag: TFilterRecordEvent;
     procedure PrepTagNames;
-    procedure AddTagName(ATagName: string);
+    procedure AddTagName(ATagName: string; CheckExist: boolean);
     procedure CalcSampleValue(DataSet: TDataSet; Command, Sample: string);
 
     procedure GetSampleValues(AListName: string; AListReadMode: integer);
@@ -78,7 +78,7 @@ type
     SelectedSet: integer;
     procedure LoadFromColumnSets(ASample: TShellFolder);
     procedure SaveToColumnSets;
-    procedure AddAllXmpTags;
+    procedure WriteAllXmpTags;
     property OnFileListChanged: TNotifyEvent read FOnFileListChanged write FOnFileListChanged;
     property OnFilterTag: TFilterRecordEvent read FOnFilterTag write FOnFilterTag;
   end;
@@ -229,9 +229,10 @@ begin
   CdsTagNames.CreateDataSet;
 end;
 
-procedure TDmFileLists.AddTagName(ATagName: string);
+procedure TDmFileLists.AddTagName(ATagName: string; CheckExist: boolean);
 begin
-  if VarIsNull(CdsTagNames.Lookup('TagName', ATagName, 'TagName')) then
+  if not CheckExist or
+     VarIsNull(CdsTagNames.Lookup('TagName', ATagName, 'TagName')) then
     CdsTagNames.AppendRecord([ATagName]);
 end;
 
@@ -246,7 +247,6 @@ var
   Sample: string;
   ETcmd: string;
   ETOut: TStringList;
-  AllInternalFields: TStringList;
 begin
   if (FListName = AListName) and
      (FListReadMode = AListReadMode) then
@@ -271,7 +271,7 @@ begin
       TagName := FSystemTagNames.KeyNames[Index];
       Sample  := TSubShellFolder.GetSystemField(FSample.Parent, FSample.RelativeID, Index);
       FSampleValues.Add(TagName, Sample);
-      AddTagName(TagName);
+      AddTagName(TagName, false);
     end;
 
     case FListReadMode of
@@ -279,16 +279,10 @@ begin
       1,3:  // Limit to Internal fields
         begin
           // Load all internal fields
-          AllInternalFields := TStringList.Create;
-          try
-            TMetaData.AllInternalFields(AllInternalFields);
-            for TagName in AllInternalFields do
-            begin
-              KeyName := '-' + TagName;
-              AddTagName(KeyName);
-            end;
-          finally
-            AllInternalFields.Free;
+          for TagName in TMetaData.AllInternalFields do
+          begin
+            KeyName := '-' + TagName;
+            AddTagName(KeyName, false);
           end;
 
           // Load sample values found in file. Can be XMP!
@@ -301,7 +295,7 @@ begin
               if (FSampleValues.ContainsKey(LowerCase(KeyName))) then
                 continue;
               FSampleValues.Add(LowerCase(KeyName), MetaData.FieldData(TagName));
-              AddTagName(KeyName);
+              AddTagName(KeyName, true);
             end;
           finally
             MetaData.Free;
@@ -326,7 +320,7 @@ begin
             if (FSampleValues.ContainsKey(LowerCase(KeyName))) then
               continue;
             FSampleValues.Add(LowerCase(KeyName), Trim(ETLine));
-            AddTagName(KeyName);
+            AddTagName(KeyName, true);
           end;
         finally
           ETOut.Free;
@@ -338,12 +332,13 @@ begin
   end;
 end;
 
-procedure TDmFileLists.AddAllXmpTags;
+procedure TDmFileLists.WriteAllXmpTags;
 var
   GroupNames: TStringList;
   TagNames: TStringList;
   GroupName: string;
   TagName: string;
+  F:TExtFile;
   CrWait, CrNormal: HCURSOR;
 begin
   CrWait := LoadCursor(0, IDC_WAIT);
@@ -352,25 +347,24 @@ begin
   GroupNames := TStringList.Create;
   TagNames := TStringList.Create;
 
-  CdsTagNames.DisableControls;
-  CdsTagNames.Filtered := false;
-
   try
     FillGroupsInStrings('', GroupNames, '1');
+    AssignFile(F, IncludeTrailingPathDelimiter(GetAppPath) +  'Xmp_Tags.txt');
+    Rewrite(F);
+
     for GroupName in GroupNames do
     begin
       if (StartsText('Xmp-', GroupName)) then
       begin
         FillTagsInStrings('', TagNames, '1', GroupName, false);
         for TagName in TagNames do
-          AddTagName('-' + GroupName + ':' + TagName);
+          Writeln(F, GroupName + ':' + TagName);
       end;
     end;
+    CloseFile(F);
   finally
     GroupNames.Free;
     TagNames.Free;
-    CdsTagNames.EnableControls;
-    CdsTagNames.First;
     SetCursor(CrNormal);
   end;
 end;

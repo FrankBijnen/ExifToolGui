@@ -35,6 +35,7 @@ uses System.Classes, System.SysUtils, System.Generics.Collections, System.Types,
      Vcl.StdCtrls, ExifToolsGUI_StringList;
 
 type
+  TMakerNotes = (None, Cr2, Pentax);
   TMetaInfo = variant;
   TVarData = TObjectDictionary<string, TMetaInfo>;
 
@@ -114,9 +115,11 @@ type
     procedure Clear;
   end;
 
-  MakernotesRec = packed record
+  MakerNotesRec = packed record
     HasData: boolean;
-    LensFocalRange: string[11]; // i.e."17-55"
+    MakerType: TMakerNotes;
+    PentaxLensId: string;
+    LensType: string;
     procedure Clear;
   end;
 
@@ -158,9 +161,9 @@ type
     InteropIFD: InteropIFDrec;
     GPS: GPSrec;
     IPTC: IPTCrec;
+    MakerNotes: MakerNotesRec;
     XMP: XMPrec;
     ICC: ICCrec;
-    GroupName: string;
     VarData: TVarData;
     FieldNames: TStrings;
     Supported: TSupportedTypes;
@@ -177,6 +180,7 @@ type
     TIFFoffset, ExifIFDoffset, GPSoffset: int64;
     ICCoffset, InteropOffset, JPGfromRAWoffset: int64;
     ICCSize: word;
+    MakerNotesOffset: int64;
     FileName: string;
     FileSize: int64;
     procedure Clear;
@@ -184,10 +188,20 @@ type
     procedure SetVarData(const InVarData: TVarData; InFieldNames: TStrings);
     procedure AddBag(var BagData: TMetaInfo; const ANode: TMetaInfo);
     function GetETTagName(ATagName: string): string;
-    function GetKeyName(const AKey: string): string;
-    function AddVarData(const AKey: string; AValue: TMetaInfo; AllowBag: boolean = false): TMetaInfo;
+    function GetKeyName(const AGroup, AKey: string): string;
+    function AddVarData(const AGroup, AKey: string; AValue: TMetaInfo; AllowBag: boolean): TMetaInfo;
 
-    procedure AdvanceNulls(Count: integer);
+    function AddGpsData(const AKey: string; AValue: TMetaInfo): TMetaInfo;
+    function AddIptcData(const AKey: string; AValue: TMetaInfo; AllowBag: boolean = false): TMetaInfo;
+    function AddMakerNotesData(const AKey: string; AValue: TMetaInfo): TMetaInfo;
+    function AddIfd0Data(const AKey: string; AValue: TMetaInfo): TMetaInfo;
+    function AddExifIFDData(const AKey: string; AValue: TMetaInfo): TMetaInfo;
+    function AddInterOpData(const AKey: string; AValue: TMetaInfo): TMetaInfo;
+    function AddCompositeData(const AKey: string; AValue: TMetaInfo): TMetaInfo;
+    function AddICCProfileData(const AKey: string; AValue: TMetaInfo): TMetaInfo;
+    function AddXmp_Data(const AKey: string; AValue: TMetaInfo): TMetaInfo;
+
+    function AdvanceNull:string;
     function DecodeASCII(IFDentry: IFDentryRec; MaxLen: integer = 255): string;
     function DecodeWord(IFDentry: IFDentryRec): word;
     function DecodeRational(IFDentry: IFDentryRec): word;
@@ -196,11 +210,15 @@ type
     function GetRational(IFDentry: IFDentryRec): single;
     function DecodeGPS(IFDentry: IFDentryRec; IsLat: boolean): string;
     procedure ParseIPTC;
+    procedure ParsePentaxMaker(IFDentry: IFDentryRec);
+    procedure ParseCanonMaker(IFDentry: IFDentryRec);
+    procedure ParseMakerNotes(Offset: int64);
     procedure ParseIFD0(IFDentry: IFDentryRec);
     procedure ParseExifIFD(IFDentry: IFDentryRec);
     procedure ParseInterop(IFDentry: IFDentryRec);
     procedure ParseGPS(IFDentry: IFDentryRec);
     procedure CorrectGps;
+    procedure GetLensModelFromMakerNotes;
     procedure ParseICCprofile;
     procedure GetIFDentry(var IFDentry: IFDentryRec);
     procedure ParseIfd(Offset: int64; ParseProc: TParseIFDProc);
@@ -230,7 +248,8 @@ type
     destructor Destroy; override;
     procedure ReadMeta(const AName: string; AGetOptions: TGetOptions);
     function FieldData(FieldName: string): string;
-    class procedure AllInternalFields(FieldList: TStrings);
+    class function AllInternalFields: TStrings;
+    class function PentaxLenses: TStrings;
   end;
 
 function GetMetadata(AName: string; AGetOptions: TGetOptions; VarData: TVarData = nil; FieldNames: TStrings = nil): FotoRec;
@@ -251,6 +270,8 @@ uses
 var
   Encoding: TEncoding;
   GpsFormatSettings: TFormatSettings;  // for StrToFloatDef -see Initialization
+  FAllInterFields: TStringList;
+  FPentaxLenses: TStringList;
 
 constructor TMetaData.Create;
 begin
@@ -295,86 +316,36 @@ begin
     result := VarData[LowerFieldName];
 end;
 
-class procedure TMetaData.AllInternalFields(FieldList: TStrings);
+procedure LoadResourceList(Resource: string; List: TStringList);
+var
+  ResStream: TResourceStream;
 begin
-  with FieldList do
-  begin
-    Clear;
-    Add('Composite:GpsPosition');
-
-    Add('ExifIfd:ColorSpace');
-    Add('ExifIfd:CreateDate');
-    Add('ExifIfd:DateTimeDigitized');
-    Add('ExifIfd:DateTimeOriginal');
-    Add('ExifIfd:ExposureCompensation');
-    Add('ExifIfd:ExposureProgram');
-    Add('ExifIfd:ExposureTime');
-    Add('ExifIfd:FLin35mm');
-    Add('ExifIfd:FNumber');
-    Add('ExifIfd:Flash');
-    Add('ExifIfd:FlashValue');
-    Add('ExifIfd:FocalLength');
-    Add('ExifIfd:ISO');
-    Add('ExifIfd:LensInfo');
-    Add('ExifIfd:LensMake');
-    Add('ExifIfd:LensModel');
-
-    Add('Gps:GeoLat');
-    Add('Gps:GeoLon');
-    Add('Gps:GpsAltitude');
-    Add('Gps:GpsAltitudeRef');
-    Add('Gps:GpsLatitude');
-    Add('Gps:GpsLatitudeRef');
-    Add('Gps:GpsLongitude');
-    Add('Gps:GpsLongitudeRef');
-
-    Add('ICCProfileProfile:CMMType');
-    Add('ICCProfileProfile:Class');
-    Add('ICCProfileProfile:ColorSpaceData');
-    Add('ICCProfileProfile:DeviceManufacturer');
-    Add('ICCProfileProfile:PrimaryPlatform');
-    Add('ICCProfileProfile:ProfileConnectionSpace');
-    Add('ICCProfileProfile:ProfileCreator');
-    Add('ICCProfileProfile:ProfileDescription');
-
-    Add('IFD0:Artist');
-    Add('IFD0:CopyRight');
-    Add('IFD0:Make');
-    Add('IFD0:Model');
-    Add('IFD0:Orientation');
-    Add('IFD0:OrientationValue');
-    Add('IFD0:Software');
-    Add('Ifd0:Artist');
-    Add('Ifd0:Copyright');
-    Add('Ifd0:DateTimeModify');
-    Add('Ifd0:Make');
-    Add('Ifd0:Model');
-    Add('Ifd0:Orientation');
-    Add('Ifd0:OrientationValue');
-    Add('Ifd0:PreviewSize');
-    Add('Ifd0:ResolutionUnit');
-    Add('Ifd0:Software');
-    Add('Ifd0:Xresolution');
-    Add('Ifd0:Yresolution');
-
-    Add('InterOp:InteropIndex');
-
-    Add('Iptc:By_line');
-    Add('Iptc:By_lineTitle');
-    Add('Iptc:Caption_Abstract');
-    Add('Iptc:Category');
-    Add('Iptc:City');
-    Add('Iptc:CopyrightNotice');
-    Add('Iptc:Country');
-    Add('Iptc:Headline');
-    Add('Iptc:Keywords');
-    Add('Iptc:ObjectName');
-    Add('Iptc:Province_State');
-    Add('Iptc:Sub_location');
-    Add('Iptc:SuppCategories');
-    Add('Iptc:Writer_Editor');
+  ResStream := TResourceStream.Create(hInstance, Resource, RT_RCDATA);
+  try
+    List.LoadFromStream(ResStream);
+  finally
+    ResStream.Free;
   end;
+end;
 
+class function TMetaData.AllInternalFields: TStrings;
+begin
+  if not Assigned(FAllInterFields) then
+  begin
+    FAllInterFields := TStringList.Create;
+    LoadResourceList('AllInternalFields', FAllInterFields);
+  end;
+  result := FAllInterFields;
+end;
+
+class function TMetaData.PentaxLenses: TStrings;
+begin
+  if not Assigned(FPentaxLenses) then
+  begin
+    FPentaxLenses := TStringList.Create;
+    LoadResourceList('PentaxLenses', FPentaxLenses);
+  end;
+  result := FPentaxLenses;
 end;
 
 procedure XMPrec.Clear;
@@ -382,9 +353,9 @@ begin
   Self := Default(XMPrec);
 end;
 
-procedure MakernotesRec.Clear;
+procedure MakerNotesRec.Clear;
 begin
-  Self := Default(MakernotesRec);
+  Self := Default(MakerNotesRec);
 end;
 
 procedure GPSrec.Clear;
@@ -422,6 +393,7 @@ begin
   IFD0.Clear;
   ExifIFD.Clear;
   InteropIFD.Clear;
+  MakerNotes.Clear;
   GPS.Clear;
   IPTC.Clear;
   XMP.Clear;
@@ -509,21 +481,21 @@ begin
   result := StringReplace(result,   'Xmp-Iptc4xmpCore:', 'XMP-iptcCore:', [rfReplaceAll, rfIgnoreCase]);
 end;
 
-function FotoRec.GetKeyName(const AKey: string): string;
+function FotoRec.GetKeyName(const AGroup, AKey: string): string;
 begin
-  if EndsText('-', GroupName) then
-    result := GetETTagName(GroupName + AKey)
+  if EndsText('-', AGroup) then
+    result := GetETTagName(AGroup + AKey)
   else
-    result := (GetETTagName(GroupName) + ':' + AKey);
+    result := (GetETTagName(AGroup) + ':' + AKey);
 end;
 
-function FotoRec.AddVarData(const AKey: string; AValue: TMetaInfo; AllowBag: boolean = false): TMetaInfo;
+function FotoRec.AddVarData(const AGroup, AKey: string; AValue: TMetaInfo; AllowBag: boolean): TMetaInfo;
 var
   KeyName: string;
 begin
   if Assigned(VarData) then
   begin
-    KeyName := GetKeyName(AKey);
+    KeyName := GetKeyName(AGroup, AKey);
     if (Assigned(FieldNames)) then
       FieldNames.Add(KeyName);
     KeyName := LowerCase(KeyName);
@@ -552,16 +524,63 @@ begin
     result := AValue;
 end;
 
-procedure FotoRec.AdvanceNulls(Count: integer);
+function FotoRec.AddGpsData(const AKey: string; AValue: TMetaInfo): TMetaInfo;
+begin
+  result := AddVarData('GPS', AKey, AValue, false);
+end;
+
+function FotoRec.AddIptcData(const AKey: string; AValue: TMetaInfo; AllowBag: boolean = false): TMetaInfo;
+begin
+  result := AddVarData('IPTC', AKey, AValue, AllowBag);
+end;
+
+function FotoRec.AddMakerNotesData(const AKey: string; AValue: TMetaInfo): TMetaInfo;
+begin
+  result := AddVarData('MakerNotes', AKey, AValue, false);
+end;
+
+function FotoRec.AddIfd0Data(const AKey: string; AValue: TMetaInfo): TMetaInfo;
+begin
+  result := AddVarData('IFD0', AKey, AValue, false);
+end;
+
+function FotoRec.AddExifIFDData(const AKey: string; AValue: TMetaInfo): TMetaInfo;
+begin
+  result := AddVarData('ExifIFD', AKey, AValue, false);
+end;
+
+function FotoRec.AddInterOpData(const AKey: string; AValue: TMetaInfo): TMetaInfo;
+begin
+  result := AddVarData('InteropIFD', AKey, AValue, false);
+end;
+
+function FotoRec.AddCompositeData(const AKey: string; AValue: TMetaInfo): TMetaInfo;
+begin
+  result := AddVarData('Composite', AKey, AValue, false);
+end;
+
+function FotoRec.AddICCProfileData(const AKey: string; AValue: TMetaInfo): TMetaInfo;
+begin
+  result := AddVarData('ICC_Profile', AKey, AValue, false);
+end;
+
+function FotoRec.AddXmp_Data(const AKey: string; AValue: TMetaInfo): TMetaInfo;
+begin
+  result := AddVarData('XMP-', AKey, AValue, true);
+end;
+
+function FotoRec.AdvanceNull: string;
 var
-  Cnt: integer;
   AppByte: byte;
 begin
-  for Cnt := 1 to Count do
+  result := '';
+  while true do
   begin
-    AppByte := $ff;
-    while (AppByte <> $00) do
-      FotoF.Read(AppByte, SizeOf(AppByte));
+    if (FotoF.Read(AppByte, SizeOf(AppByte)) = 0) then
+      break;
+    if (AppByte = $00) then
+      break;
+    result := result + Chr(AppByte);
   end;
 end;
 
@@ -757,7 +776,6 @@ var
   Tx, Ty: string[11];
   Sec: string[7]; // Tx=Deg°Min.Sec, Ty=Deg.min°
 begin
-  GroupName := 'Gps';
   FotoF.Seek(TIFFoffset + IFDentry.ValueOffs, TSeekOrigin.soBeginning);
   FotoF.Read(L1, 4);
   FotoF.Read(L2, 4); // =Deg
@@ -813,9 +831,9 @@ begin
   begin
     Ty := FloatToStrF(R, ffFixed, 8, 6, FloatFormatSettings);
     if IsLat then
-      GPS.GeoLat := AddVarData('GeoLat', Ty)
+      GPS.GeoLat := AddGpsData('GeoLat', Ty)
     else
-      GPS.GeoLon := AddVarData('GeoLon', Ty);
+      GPS.GeoLon := AddGpsData('GeoLon', Ty);
   end;
   Result := Tx;
 end;
@@ -830,7 +848,6 @@ var
   Bytes: Tbytes;
 
 begin
-  GroupName := 'Iptc';
   FotoF.Read(IPTCtagID, 1);
   FotoF.Read(IPTCtagSz, 2);
   IPTCtagSz := Swap(IPTCtagSz);
@@ -846,35 +863,99 @@ begin
     HasData := true;
     case IPTCtagID of
       5:
-        ObjectName := AddVarData('ObjectName', StripLen(Tx, 32));
+        ObjectName := AddIptcData('ObjectName', StripLen(Tx, 32));
       15:
-        Category := AddVarData('Category', StripLen(Tx, 3));
+        Category := AddIptcData('Category', StripLen(Tx, 3));
       20:
-        SuppCategories := AddVarData('SuppCategories', Tx, true);
+        SuppCategories := AddIptcData('SuppCategories', Tx, true);
       25:
-        Keywords := AddVarData('Keywords', Tx, true);
+        Keywords := AddIptcData('Keywords', Tx, true);
       80:
-        By_line := AddVarData('By_line', StripLen(Tx, 32));
+        By_line := AddIptcData('By_line', StripLen(Tx, 32));
       85:
-        By_lineTitle := AddVarData('By_lineTitle', StripLen(Tx, 32));
+        By_lineTitle := AddIptcData('By_lineTitle', StripLen(Tx, 32));
       90:
-        City := AddVarData('City', StripLen(Tx, 31));
+        City := AddIptcData('City', StripLen(Tx, 31));
       92:
-        Sub_location := AddVarData('Sub_location', StripLen(Tx, 31));
+        Sub_location := AddIptcData('Sub_location', StripLen(Tx, 31));
       95:
-        Province_State := AddVarData('Province_State', StripLen(Tx, 31));
+        Province_State := AddIptcData('Province_State', StripLen(Tx, 31));
       101:
-        Country := AddVarData('Country', StripLen(Tx, 31));
+        Country := AddIptcData('Country', StripLen(Tx, 31));
       105:
-        Headline := AddVarData('Headline', StripLen(Tx, 64));
+        Headline := AddIptcData('Headline', StripLen(Tx, 64));
       116:
-        CopyrightNotice := AddVarData('CopyrightNotice', StripLen(Tx, 64));
+        CopyrightNotice := AddIptcData('CopyrightNotice', StripLen(Tx, 64));
       120:
-        Caption_Abstract := AddVarData('Caption_Abstract', StripLen(Tx, 128));
+        Caption_Abstract := AddIptcData('Caption_Abstract', StripLen(Tx, 128));
       122:
-        Writer_Editor := AddVarData('Writer_Editor', StripLen(Tx, 32));
+        Writer_Editor := AddIptcData('Writer_Editor', StripLen(Tx, 32));
     end;
   end;
+end;
+
+procedure FotoRec.ParsePentaxMaker(IFDentry: IFDentryRec);
+var
+  SavePos: int64;
+  PentaxId: Word;
+begin
+  SavePos := FotoF.Position;
+  with MakerNotes do
+  begin
+    HasData := true;
+    case IFDentry.Tag of
+      $3f:
+        begin
+          PentaxId := DecodeWord(IFDentry);
+          PentaxLensId := AddMakerNotesData('PentaxLensId', Format('%d %d', [Hi(PentaxId), Lo(PentaxId)]));
+        end;
+    end;
+  end;
+  FotoF.Seek(SavePos, TSeekOrigin.soBeginning);
+end;
+
+procedure FotoRec.ParseCanonMaker(IFDentry: IFDentryRec);
+var
+  SavePos: int64;
+begin
+  SavePos := FotoF.Position;
+  with MakerNotes do
+  begin
+    HasData := true;
+    case IFDentry.Tag of
+      $95: LensType := AddMakerNotesData('LensType', DecodeASCII(IFDentry, 64));
+    end;
+  end;
+  FotoF.Seek(SavePos, TSeekOrigin.soBeginning);
+end;
+
+procedure FotoRec.ParseMakerNotes(Offset: int64);
+var
+  SavePos: int64;
+  Maker: string;
+  SaveMM: boolean;
+  Endian: word;
+begin
+  SavePos := FotoF.Position;
+  FotoF.Seek(Offset, TSeekOrigin.soBeginning);
+  if (MakerNotes.MakerType = TMakerNotes.Cr2) then
+    ParseIfd(Offset, ParseCanonMaker)
+  else
+  begin
+    Maker := AdvanceNull;
+    SaveMM := IsMM;
+    FotoF.Read(Endian, SizeOf(Endian));
+    IsMM := (Endian = $4D4D);
+
+    if (Maker = 'PENTAX') or
+       (Maker = 'AOC') then
+    begin
+      MakerNotes.MakerType := TMakerNotes.Pentax;
+      ParseIfd(FotoF.Position, ParsePentaxMaker);
+    end;
+    IsMM := SaveMM;
+  end;
+  FotoF.Seek(SavePos, TSeekOrigin.soBeginning);
 end;
 
 // ------------------------------------------------------------------------------
@@ -882,7 +963,6 @@ procedure FotoRec.ParseIFD0(IFDentry: IFDentryRec);
 var
   SavePos: int64;
 begin
-  GroupName := 'Ifd0';
   SavePos := FotoF.Position;
   with IFD0 do
   begin
@@ -891,14 +971,14 @@ begin
       $002E:
         JPGfromRAWoffset := IFDentry.ValueOffs; // Panasonic RW2
       $010F:
-        Make := AddVarData('Make', DecodeASCII(IFDentry, 64));
+        Make := AddIfd0Data('Make', DecodeASCII(IFDentry, 64));
       $0110:
-        Model := AddVarData('Model', DecodeASCII(IFDentry, 64));
+        Model := AddIfd0Data('Model', DecodeASCII(IFDentry, 64));
       $0111:
         PreviewOffset := IFDentry.ValueOffs;
       $0112:
         begin
-          OrientationValue := AddVarData('OrientationValue', DecodeWord(IFDentry));
+          OrientationValue := AddIfd0Data('OrientationValue', DecodeWord(IFDentry));
           case (OrientationValue) of
             1,2:
               Orientation := StrHor;
@@ -909,14 +989,14 @@ begin
           else
             Orientation:= '-';
           end;
-          AddVarData('Orientation', Orientation);
+          AddIfd0Data('Orientation', Orientation);
         end;
       $0117:
-        PreviewSize := AddVarData('PreviewSize', IFDentry.ValueOffs);
+        PreviewSize := AddIfd0Data('PreviewSize', IFDentry.ValueOffs);
       $011A:
-        Xresolution := AddVarData('Xresolution', DecodeRational(IFDentry));
+        Xresolution := AddIfd0Data('Xresolution', DecodeRational(IFDentry));
       $011B:
-        Yresolution := AddVarData('Yresolution', DecodeRational(IFDentry));
+        Yresolution := AddIfd0Data('Yresolution', DecodeRational(IFDentry));
       $0128:
         begin
           case DecodeWord(IFDentry) of
@@ -927,18 +1007,18 @@ begin
           else
             ResolutionUnit := '-';
           end;
-          AddVarData('ResolutionUnit', ResolutionUnit);
+          AddIfd0Data('ResolutionUnit', ResolutionUnit);
         end;
       $0131:
-        Software := AddVarData('Software', DecodeASCII(IFDentry, 64));
+        Software := AddIfd0Data('Software', DecodeASCII(IFDentry, 64));
       $0132:
-        DateTimeModify := AddVarData('DateTimeModify', DecodeASCII(IFDentry));
+        DateTimeModify := AddIfd0Data('DateTimeModify', DecodeASCII(IFDentry));
       $013B:
-        Artist := AddVarData('Artist', DecodeASCII(IFDentry, 64));
+        Artist := AddIfd0Data('Artist', DecodeASCII(IFDentry, 64));
       $02BC:
           AddXmpBlock(IFDentry.ValueOffs + TIFFoffset, IFDentry.TypeCount);
       $8298:
-        Copyright := AddVarData('Copyright', DecodeASCII(IFDentry, 64));
+        Copyright := AddIfd0Data('Copyright', DecodeASCII(IFDentry, 64));
       $83BB:
         begin
           if IFDentry.FieldType = 1 then
@@ -964,16 +1044,15 @@ procedure FotoRec.ParseExifIFD(IFDentry: IFDentryRec);
 var
   SavePos: int64;
 begin
-  GroupName := 'ExifIfd';
   SavePos := FotoF.Position;
   with ExifIFD do
   begin
     HasData := true;
     case IFDentry.Tag of
       $829A:
-        ExposureTime := AddVarData('ExposureTime', ConvertRational(IFDentry, false));
+        ExposureTime := AddExifIFDData('ExposureTime', ConvertRational(IFDentry, false));
       $829D:
-        FNumber := AddVarData('FNumber', FormatExifDecimal(GetRational(IFDentry), 1));
+        FNumber := AddExifIFDData('FNumber', FormatExifDecimal(GetRational(IFDentry), 1));
       $8822:
         begin
           case DecodeWord(IFDentry) of
@@ -1000,22 +1079,22 @@ begin
           else
             ExposureProgram := 'Unknown';
           end;
-          AddVarData('ExposureProgram', ExposureProgram);
+          AddExifIFDData('ExposureProgram', ExposureProgram);
         end;
       $8827:
-        ISO := AddVarData('ISO', IntToStr(DecodeWord(IFDentry)));
+        ISO := AddExifIFDData('ISO', IntToStr(DecodeWord(IFDentry)));
       $9003:
-        DateTimeOriginal := AddVarData('DateTimeOriginal', DecodeASCII(IFDentry));
+        DateTimeOriginal := AddExifIFDData('DateTimeOriginal', DecodeASCII(IFDentry));
       $9004:
         begin
-          DateTimeDigitized := AddVarData('DateTimeDigitized', DecodeASCII(IFDentry));
-          CreateDate := AddVarData('CreateDate', DateTimeDigitized);
+          DateTimeDigitized := AddExifIFDData('DateTimeDigitized', DecodeASCII(IFDentry));
+          CreateDate := AddExifIFDData('CreateDate', DateTimeDigitized);
         end;
       $9204:
-        ExposureCompensation := AddVarData('ExposureCompensation', ConvertRational(IFDentry, true));
+        ExposureCompensation := AddExifIFDData('ExposureCompensation', ConvertRational(IFDentry, true));
       $9209:
         begin
-          FlashValue := AddVarData('FlashValue', DecodeWord(IFDentry) or $FF00); // $FFnn=tag exist indicator
+          FlashValue := AddExifIFDData('FlashValue', DecodeWord(IFDentry) or $FF00); // $FFnn=tag exist indicator
           if (FlashValue and $FF00) <> 0 then
           begin
             if (FlashValue and 1) = 1 then
@@ -1025,10 +1104,10 @@ begin
           end
           else
             Flash := '-';
-          AddVarData('Flash', Flash);
+          AddExifIFDData('Flash', Flash);
         end;
       $920A:
-        FocalLength := AddVarData('FocalLength', FormatExifDecimal(GetRational(IFDentry), 1));
+        FocalLength := AddExifIFDData('FocalLength', FormatExifDecimal(GetRational(IFDentry), 1));
       $A001:
         begin
           case DecodeWord(IFDentry) of
@@ -1043,18 +1122,20 @@ begin
             $FFFF:
               ColorSpace := 'Uncalibrated';
           end;
-          AddVarData('ColorSpace', ColorSpace);
+          AddExifIFDData('ColorSpace', ColorSpace);
         end;
       $A005:
         InteropOffset := IFDentry.ValueOffs;
       $A405:
-        FLin35mm := AddVarData('FLin35mm', IntToStr(DecodeWord(IFDentry)));
+        FLin35mm := AddExifIFDData('FLin35mm', IntToStr(DecodeWord(IFDentry)));
       $A432:
-        LensInfo := AddVarData('LensInfo', DecodeExifLens(IFDentry));
+        LensInfo := AddExifIFDData('LensInfo', DecodeExifLens(IFDentry));
       $A433:
-        LensMake := AddVarData('LensMake', DecodeASCII(IFDentry, 23));
+        LensMake := AddExifIFDData('LensMake', DecodeASCII(IFDentry, 23));
       $A434:
-        LensModel := AddVarData('LensModel', DecodeASCII(IFDentry, 47));
+        LensModel := AddExifIFDData('LensModel', DecodeASCII(IFDentry, 47));
+      $927C: // MakerNotes
+        MakerNotesOffset := IFDentry.ValueOffs;
     end;
   end;
   FotoF.Seek(SavePos, TSeekOrigin.soBeginning);
@@ -1065,7 +1146,6 @@ procedure FotoRec.ParseInterop(IFDentry: IFDentryRec);
 var
   SavePos: int64;
 begin
-  GroupName := 'InterOp';
   SavePos := FotoF.Position;
   with InteropIFD do
   begin
@@ -1078,7 +1158,7 @@ begin
             InteropIndex := 'R03=Adobe'
           else if InteropIndex = 'R98' then
             InteropIndex := 'R98=sRGB';
-          AddVarData('InteropIndex', InteropIndex);
+          AddInterOpData('InteropIndex', InteropIndex);
         end;
     end;
   end;
@@ -1090,30 +1170,29 @@ procedure FotoRec.ParseGPS(IFDentry: IFDentryRec);
 var
   SavePos: int64;
 begin
-  GroupName := 'Gps';
   SavePos := FotoF.Position;
   with GPS do
   begin
     HasData := true;
     case IFDentry.Tag of
       $01:
-        GpsLatitudeRef := AddVarData('GpsLatitudeRef', DecodeASCII(IFDentry));
+        GpsLatitudeRef := AddGpsData('GpsLatitudeRef', DecodeASCII(IFDentry));
       $02:
-        GpsLatitude := AddVarData('GpsLatitude', DecodeGPS(IFDentry, true));
+        GpsLatitude := AddGpsData('GpsLatitude', DecodeGPS(IFDentry, true));
       $03:
-        GpsLongitudeRef := AddVarData('GpsLongitudeRef', DecodeASCII(IFDentry));
+        GpsLongitudeRef := AddGpsData('GpsLongitudeRef', DecodeASCII(IFDentry));
       $04:
-        GpsLongitude := AddVarData('GpsLongitude', DecodeGPS(IFDentry, false));
+        GpsLongitude := AddGpsData('GpsLongitude', DecodeGPS(IFDentry, false));
       $05:
         begin
           if IFDentry.ValueOffs = 0 then
             GpsAltitudeRef := '+'
           else
             GpsAltitudeRef := '-';
-          AddVarData('GpsAltitudeRef', GpsAltitudeRef);
+          AddGpsData('GpsAltitudeRef', GpsAltitudeRef);
         end;
       $06:
-        GpsAltitude := AddVarData('GpsAltitude', IntToStr(DecodeRational(IFDentry)) + 'm');
+        GpsAltitude := AddGpsData('GpsAltitude', IntToStr(DecodeRational(IFDentry)) + 'm');
     end;
   end;
   FotoF.Seek(SavePos, TSeekOrigin.soBeginning);
@@ -1128,13 +1207,26 @@ begin
       GeoLat := '-' + GeoLat;
     if (GpsLongitudeRef = 'W') and (GeoLon <> '') then
       GeoLon := '-' + GeoLon;
-    GroupName := 'Composite';
     if (GeoLat <> '') or
        (GeoLon <> '') then
-      GpsPosition := AddVarData('GpsPosition', StrYes)
+      GpsPosition := AddCompositeData('GpsPosition', StrYes)
     else
-      GpsPosition := AddVarData('GpsPosition', StrNo);
+      GpsPosition := AddCompositeData('GpsPosition', StrNo);
   end;
+end;
+
+// Get lens type from Maker notes
+procedure FotoRec.GetLensModelFromMakerNotes;
+begin
+  case MakerNotes.MakerType of
+    TMakerNotes.Pentax:
+      begin
+        MakerNotes.LensType := AddMakerNotesData('LensType', TMetaData.PentaxLenses.Values[MakerNotes.PentaxLensId]);
+      end;
+  end;
+  if (ExifIFD.LensModel = '') and
+     (MakerNotes.LensType <> '') then
+    ExifIFD.LensModel := AddExifIFDData('LensModel', MakerNotes.LensType);
 end;
 
 // ==============================================================================
@@ -1146,41 +1238,40 @@ var
   XWord: word;
   Tx: string[31];
 begin
-  GroupName := 'ICCProfile';
   FotoF.Seek(ICCoffset, TSeekOrigin.soBeginning);
 
   ICC.HasData := true;
   FotoF.Read(ICC.ProfileCMMType[1], 4);
   ICC.ProfileCMMType[0] := #4;
-  AddVarData('ProfileCMMType', ICC.ProfileCMMType);
+  AddICCProfileData('ProfileCMMType', ICC.ProfileCMMType);
 
   FotoF.Read(Tx[1], 4); // skip ProfileVersion
   FotoF.Read(ICC.ProfileClass[1], 4);
   ICC.ProfileClass[0] := #4;
-  AddVarData('ProfileClass', ICC.ProfileClass);
+  AddICCProfileData('ProfileClass', ICC.ProfileClass);
 
   FotoF.Read(ICC.ColorSpaceData[1], 4);
   ICC.ColorSpaceData[0] := #4;
-  AddVarData('ColorSpaceData', ICC.ColorSpaceData);
+  AddICCProfileData('ColorSpaceData', ICC.ColorSpaceData);
 
   FotoF.Read(ICC.ProfileConnectionSpace[1], 4);
   ICC.ProfileConnectionSpace[0] := #4;
-  AddVarData('ProfileConnectionSpace', ICC.ProfileConnectionSpace);
+  AddICCProfileData('ProfileConnectionSpace', ICC.ProfileConnectionSpace);
 
   FotoF.Read(Tx[1], 16); // skip ProfileDateTime & ProfileFileSignature
   FotoF.Read(ICC.PrimaryPlatform[1], 4);
   ICC.PrimaryPlatform[0] := #4;
-  AddVarData('PrimaryPlatform', ICC.PrimaryPlatform);
+  AddICCProfileData('PrimaryPlatform', ICC.PrimaryPlatform);
 
   FotoF.Read(Tx[1], 4); // skip CMMFlags
   FotoF.Read(ICC.DeviceManufacturer[1], 4);
   ICC.DeviceManufacturer[0] := #4;
-  AddVarData('DeviceManufacturer', ICC.DeviceManufacturer);
+  AddICCProfileData('DeviceManufacturer', ICC.DeviceManufacturer);
 
   FotoF.Read(Tx[1], 28); // skip DeviceModel... goto ProfileCreator
   FotoF.Read(ICC.ProfileCreator[1], 4);
   ICC.ProfileCreator[0] := #4;
-  AddVarData('ProfileCreator', ICC.ProfileCreator);
+  AddICCProfileData('ProfileCreator', ICC.ProfileCreator);
 
   Remain := (ICCoffset + ICCSize) - FotoF.Position; // End of the ICC profile
   Tx := '????';
@@ -1206,7 +1297,7 @@ begin
     FotoF.Read(ICC.ProfileDescription[1], XWord);
     ICC.ProfileDescription[0] := AnsiChar(XWord);
   end;
-  AddVarData('ProfileDescription', ICC.ProfileDescription);
+  AddICCProfileData('ProfileDescription', ICC.ProfileDescription);
 end;
 
 procedure FotoRec.GetIFDentry(var IFDentry: IFDentryRec);
@@ -1363,22 +1454,19 @@ begin
 
     FotoF.Seek(AOffset + TagOffset, TSeekOrigin.soBeginning);
 
-    GroupName := 'IFD0';
     case (TagType) of
       $0805:
-        IFD0.CopyRight := AddVarData('CopyRight', GetCRWString(TagSize));
+        IFD0.CopyRight := AddIfd0Data('CopyRight', GetCRWString(TagSize));
       $080a:
         begin
-          IFD0.Make := AddVarData('Make', GetCRWString(TagSize));
+          IFD0.Make := AddIfd0Data('Make', GetCRWString(TagSize));
           FotoF.Seek(Int64(Length(IFD0.Make)) +1 -TagSize, TSeekOrigin.soCurrent);
-          IFD0.Model := AddVarData('Model', GetCRWString(TagSize));
+          IFD0.Model := AddIfd0Data('Model', GetCRWString(TagSize));
         end;
       $080b:
-        begin
-          IFD0.Software := AddVarData('Software', GetCRWString(TagSize));
-        end;
+          IFD0.Software := AddIfd0Data('Software', GetCRWString(TagSize));
       $0810:
-        IFD0.Artist := AddVarData('Artist', GetCRWString(TagSize));
+        IFD0.Artist := AddIfd0Data('Artist', GetCRWString(TagSize));
       $1810:
         begin
           FotoF.Read(DWData, SizeOf(DWData)); // ImageWidth
@@ -1388,29 +1476,28 @@ begin
           case (DWData) of
             90:
               begin
-                IFD0.OrientationValue := AddVarData('OrientationValue', 6);
-                IFD0.Orientation := AddVarData('Orientation', StrVer);
+                IFD0.OrientationValue := AddIfd0Data('OrientationValue', 6);
+                IFD0.Orientation := AddIfd0Data('Orientation', StrVer);
               end;
             180:
               begin
-                IFD0.OrientationValue := AddVarData('OrientationValue', 3);
-                IFD0.Orientation := AddVarData('Orientation', StrVer);
+                IFD0.OrientationValue := AddIfd0Data('OrientationValue', 3);
+                IFD0.Orientation := AddIfd0Data('Orientation', StrVer);
               end;
             270:
               begin
-                IFD0.OrientationValue := AddVarData('OrientationValue', 5);
-                IFD0.Orientation := AddVarData('Orientation', StrVer);
+                IFD0.OrientationValue := AddIfd0Data('OrientationValue', 5);
+                IFD0.Orientation := AddIfd0Data('Orientation', StrVer);
               end;
             else
               begin
-                IFD0.OrientationValue := AddVarData('OrientationValue', 0);
-                IFD0.Orientation := AddVarData('Orientation', StrHor);
+                IFD0.OrientationValue := AddIfd0Data('OrientationValue', 0);
+                IFD0.Orientation := AddIfd0Data('Orientation', StrHor);
               end;
           end;
         end;
     end;
 
-    GroupName := 'ExifIfd';
     case (TagType) of
       $102a:
         begin
@@ -1419,14 +1506,14 @@ begin
 
           FotoF.Read(WData, SizeOf(WData)); // BaseIso
           AReal := Power(2, WData/32.0 - 4) * 50;
-          ExifIFD.ISO := AddVarData('ISO', IntToStr(Round(AReal)));
+          ExifIFD.ISO := AddExifIFDData('ISO', IntToStr(Round(AReal)));
 
           FotoF.Read(WData, SizeOf(WData)); // MeasuredEv
           FotoF.Read(WData, SizeOf(WData)); // TargetAperture
           FotoF.Read(SData, SizeOf(SData)); // TargetExposureTime
 
           FotoF.Read(SData, SizeOf(SData)); // ExposureCompensation
-          ExifIFD.ExposureCompensation := AddVarData('ExposureCompensation', FormatExifDecimal(CanonEv(SData), 1));
+          ExifIFD.ExposureCompensation := AddExifIFDData('ExposureCompensation', FormatExifDecimal(CanonEv(SData), 1));
 
           FotoF.Read(SData, SizeOf(SData)); // WhiteBalance
           FotoF.Read(SData, SizeOf(SData)); // SlowShutter
@@ -1444,7 +1531,7 @@ begin
           FotoF.Read(WData, SizeOf(WData)); // FocusDistanceLower
 
           FotoF.Read(SData, SizeOf(SData)); // FNumber
-          ExifIFD.FNumber := AddVarData('FNumber', FormatExifDecimal(Exp(CanonEv(SData) * LN(2) / 2), 1));
+          ExifIFD.FNumber := AddExifIFDData('FNumber', FormatExifDecimal(Exp(CanonEv(SData) * LN(2) / 2), 1));
 
           FotoF.Read(SData, SizeOf(SData)); // ExposureTime
           AShutter := Exp(-CanonEv(SData) * LN(2));
@@ -1452,10 +1539,10 @@ begin
              (AShutter < 0.25001) then
           begin
             AShutter := Trunc(0.5 + (1 / AShutter));
-            ExifIFD.ExposureTime := AddVarData('ExposureTime', '1/' + FormatExifDecimal(AShutter, 0));
+            ExifIFD.ExposureTime := AddExifIFDData('ExposureTime', '1/' + FormatExifDecimal(AShutter, 0));
           end
           else
-            ExifIFD.ExposureTime := AddVarData('ExposureTime', FormatExifDecimal(AShutter, 0));
+            ExifIFD.ExposureTime := AddExifIFDData('ExposureTime', FormatExifDecimal(AShutter, 0));
         end;
       $102d:
         begin
@@ -1465,11 +1552,11 @@ begin
           FotoF.Read(SData, SizeOf(SData)); // Quality
 
           FotoF.Read(WData, SizeOf(WData)); // CanonFlashMode
-          ExifIFD.FlashValue := AddVarData('FlashValue', WData);
+          ExifIFD.FlashValue := AddExifIFDData('FlashValue', WData);
           if (WData = 0) then
-            ExifIFD.Flash := AddVarData('Flash', StrNo)
+            ExifIFD.Flash := AddExifIFDData('Flash', StrNo)
           else if (WData <= 16) then // Note: Doc states that -1 is undef. Unsigned => Greater than 16!
-            ExifIFD.Flash := AddVarData('Flash', StrYes);
+            ExifIFD.Flash := AddExifIFDData('Flash', StrYes);
 
           FotoF.Read(SData, SizeOf(SData)); // ContinuousDrive
           FotoF.Read(SData, SizeOf(SData)); // Unused
@@ -1489,15 +1576,15 @@ begin
 
           FotoF.Read(SData, SizeOf(SData)); // CanonExposureMode
           case (SData) of
-            0: ExifIFD.ExposureProgram := AddVarData('ExposureProgram', 'Easy');
-            1: ExifIFD.ExposureProgram := AddVarData('ExposureProgram', ' Program AE');
-            2: ExifIFD.ExposureProgram := AddVarData('ExposureProgram', 'Shutter speed priority AE');
-            3: ExifIFD.ExposureProgram := AddVarData('ExposureProgram', 'Aperture-priority AE');
-            4: ExifIFD.ExposureProgram := AddVarData('ExposureProgram', 'Manual');
-            5: ExifIFD.ExposureProgram := AddVarData('ExposureProgram', 'Depth-of-field AE');
-            6: ExifIFD.ExposureProgram := AddVarData('ExposureProgram', 'M-Dep');
-            7: ExifIFD.ExposureProgram := AddVarData('ExposureProgram', 'Bulb');
-            8: ExifIFD.ExposureProgram := AddVarData('ExposureProgram', 'Flexible-priority AE');
+            0: ExifIFD.ExposureProgram := AddExifIFDData('ExposureProgram', 'Easy');
+            1: ExifIFD.ExposureProgram := AddExifIFDData('ExposureProgram', ' Program AE');
+            2: ExifIFD.ExposureProgram := AddExifIFDData('ExposureProgram', 'Shutter speed priority AE');
+            3: ExifIFD.ExposureProgram := AddExifIFDData('ExposureProgram', 'Aperture-priority AE');
+            4: ExifIFD.ExposureProgram := AddExifIFDData('ExposureProgram', 'Manual');
+            5: ExifIFD.ExposureProgram := AddExifIFDData('ExposureProgram', 'Depth-of-field AE');
+            6: ExifIFD.ExposureProgram := AddExifIFDData('ExposureProgram', 'M-Dep');
+            7: ExifIFD.ExposureProgram := AddExifIFDData('ExposureProgram', 'Bulb');
+            8: ExifIFD.ExposureProgram := AddExifIFDData('ExposureProgram', 'Flexible-priority AE');
           end;
           FotoF.Read(WData, SizeOf(WData)); // Unused
           FotoF.Read(WData, SizeOf(WData)); // LensType
@@ -1519,21 +1606,19 @@ begin
                                                FormatExifDecimal(MaxFocal * FocalUnits, 0),
                                                FormatExifDecimal(MaxAperture, 1)]);
 
-          ExifIFD.LensInfo := AddVarData('LensInfo', LensInfo);
-          ExifIFD.LensModel := AddVarData('LensModel', LensInfo);
+          ExifIFD.LensInfo := AddExifIFDData('LensInfo', LensInfo);
+          ExifIFD.LensModel := AddExifIFDData('LensModel', LensInfo);
         end;
       $5029:
-        begin
-          ExifIFD.FocalLength := AddVarData('FocalLength', FormatExifDecimal(TagSize shr 16, 1));
-        end;
+          ExifIFD.FocalLength := AddExifIFDData('FocalLength', FormatExifDecimal(TagSize shr 16, 1));
       $180e:
         begin
           FotoF.Read(DWData, SizeOf(DWData));
           // All 3 the same
-          ExifIFD.DateTimeOriginal := AddVarData('DateTimeoriginal',
-                                      FormatDateTime('yyyy:mm:dd hh:nn:ss', UnixToDateTime(DWData, true)));
-          ExifIFD.DateTimeDigitized := AddVarData('DateTimeDigitized', ExifIFD.DateTimeOriginal);
-          ExifIFD.CreateDate := AddVarData('CreateDate', ExifIFD.DateTimeOriginal);
+          ExifIFD.DateTimeOriginal    := AddExifIFDData('DateTimeoriginal',
+                                                         FormatDateTime('yyyy:mm:dd hh:nn:ss', UnixToDateTime(DWData, true)));
+          ExifIFD.DateTimeDigitized   := AddExifIFDData('DateTimeDigitized', ExifIFD.DateTimeOriginal);
+          ExifIFD.CreateDate          := AddExifIFDData('CreateDate', ExifIFD.DateTimeOriginal);
         end;
     end;
 
@@ -1546,8 +1631,11 @@ begin
 end;
 
 procedure FotoRec.ReadTIFF;
+const
+  CR2Magic:  array[0..3] of byte = ($43, $52, $02, $00);
 var
   I: integer;
+  CR2Header: array[0..3] of byte;
   CRWHeader: record
     LenHI: word;  // High order of the length. Low order has already been read.
     Magic: array[0..7] of ansichar;
@@ -1581,11 +1669,17 @@ begin
         FotoF.Read(DWordData, 4);
         if IsMM then
           DWordData := SwapL(DWordData);
+        FotoF.Read(CR2Header, SizeOf(CR2Header));
+        if (CompareMem(@CR2Header, @CR2Magic, SizeOf(CR2Header))) then
+          MakerNotes.MakerType := TMakerNotes.Cr2;
 
         ParseIfd(TIFFoffset + DWordData, ParseIFD0);
 
         if ExifIFDoffset > 0 then
           ParseIFD(TIFFoffset + ExifIFDoffset, ParseExifIFD);
+
+        if MakerNotesOffset > 0 then
+          ParseMakerNotes(TIFFoffset + MakerNotesOffset);
 
         if InteropOffset > 0 then
           ParseIFD(TIFFoffset + InteropOffset, ParseInterop);
@@ -1686,7 +1780,7 @@ begin
         FotoF.Seek(14, TSeekOrigin.soCurrent); // Skip to xap or xmp
         FillChar(XMPType, SizeOf(XMPType), chr(0));
         FotoF.Read(XMPType[0], 3);
-        AdvanceNulls(1);
+        AdvanceNull;
         if (XMPType = 'xap') then             //http://ns.adobe.com/xap/1.0/ #0
           AddXmpBlock(FotoF.Position, APPSize - (FotoF.Position - SaveAppPos))
         else if (XMPType = 'xmp') then        //http://ns.adobe.com/xmp/extension/ #0 GUID FullLength ChunkOffset
@@ -1869,14 +1963,12 @@ utf32le ff fe 00 00
     UnEscaped: string;
     MetaInfo: variant;
   begin
-    GroupName := 'Xmp-';
-
     // ExifTool escapes (needlessly) ' and " in XML.
     // VerySimpleXML does not UnEscape '&#39;' .
     UnEscaped := StringReplace(AValue, '&#39;', '''', [rfReplaceAll]);
 
     // For XMP add every node found.
-    MetaInfo := AddVarData(AKey, AValue, true);
+    MetaInfo := AddXmp_Data(AKey, AValue);
 
     // Only Fill the record if needed
     if (StartsText('Iptc4xmpExt:LocationShownCountryCode', AKey)) then
@@ -2265,10 +2357,7 @@ begin
             // Add a dummy GPSPosition if no GPS was found, but something is in XMP
             if (GPS.HasData = false) and
                (VarData.ContainsKey(LowerCase('Xmp-exif:GPSLatitude'))) then
-            begin
-              GroupName := 'Composite';
-              GPS.GpsPosition := AddVarData('GpsPosition', StrYes);
-            end;
+              GPS.GpsPosition := AddCompositeData('GpsPosition', StrYes);
           end;
 
           // Update Gps record.
@@ -2276,6 +2365,9 @@ begin
              (Gps.HasData) then
             result.CorrectGps;
 
+          // Update Lenses in Makernotes
+          if (MakerNotes.HasData) then
+            result.GetLensModelFromMakerNotes;
         end;
       finally
         FotoF.Free;
@@ -2358,13 +2450,15 @@ begin
   GpsFormatSettings.ThousandSeparator := '.';
   GpsFormatSettings.DecimalSeparator := ',';
 
-  Encoding := TEncoding.GetEncoding(CP_UTF8)
+  Encoding := TEncoding.GetEncoding(CP_UTF8);
 end;
 
 finalization
 
 begin
   Encoding.Free;
+  FAllInterFields.Free;
+  FPentaxLenses.Free;
 end;
 
 end.

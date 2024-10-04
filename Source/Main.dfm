@@ -871,7 +871,6 @@ object FMain: TFMain
         Font.Style = []
         ParentFont = False
         TabOrder = 0
-        ExplicitWidth = 366
         object SpeedBtnChartRefresh: TSpeedButton
           Left = 214
           Top = 104
