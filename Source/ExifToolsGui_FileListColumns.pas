@@ -229,6 +229,8 @@ procedure ProcessFolder(AFolder: TShellFolder;
                         AColumnDefs: TColumnsArray);
 var
   DetailStrings: TStrings;
+  ETOuts: string;
+  ETErr: string;
   APath: string;
   AExt: string;
   ATag: TFileListColumn;
@@ -275,8 +277,14 @@ begin
 
       AET.OpenExec(GUIsettings.Fast3(AExt) + AETCmd,    // Get DetailStrings from EExifTool
                    APath,
-                   DetailStrings,
+                   ETOuts,
+                   ETErr,
                    False);
+      DetailStrings.Text := ETOuts;
+{$IFDEF DEBUG}
+      if (ETErr <> '') then
+        DebugMsg(['ProcessFolder', APath, ETErr]);
+{$ENDIF}
       PostProcessMethod := TPostProcess.ppExifTool;     // ExifTool requires special Post Processing
     end;
 

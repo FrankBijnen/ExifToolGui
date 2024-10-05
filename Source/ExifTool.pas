@@ -66,7 +66,6 @@ type
     FPipeErrRead, FPipeErrWrite: THandle;
     FETWorkingDir: string;
     FETTempFile: string;
-    FETEvent: TEvent;
     FExecNum: word;
     FCounter: TET_Counter;
     function GetCounter: TET_Counter;
@@ -301,7 +300,6 @@ begin
   inherited Create;
 
   FId := Id;
-  FETEvent := TEvent.Create(nil, true, true, ExtractFileName(Paramstr(0)));
   FExecNum := 10; // From 10 to 99
   FETWorkingDir := '';
   FETTempFile := '';
@@ -313,7 +311,6 @@ end;
 destructor TExifTool.Destroy;
 begin
   OpenExit(true);
-  FETEvent.Free;
 
   if Assigned(FEtOutPipe) then
     FEtOutPipe.Free;
@@ -423,7 +420,6 @@ var
   Call_ET: AnsiString; // Needs to be AnsiString. Only holds the -@ <argsfilename>
   BytesCount: Dword;
   CanUseUtf8: boolean;
-  Wr: TWaitResult;
   CrWait, CrNormal: HCURSOR;
 begin
   result := false;
@@ -431,19 +427,10 @@ begin
   if (FETWorkingDir <> '') and
      (Length(ETcmd) > 1) then
   begin
-    Wr := FETEvent.WaitFor(GUIsettings.ETTimeOut);
-    if (Wr <> wrSignaled) then
-    begin
-      FETEvent.SetEvent;
-      result := false;
-      ETouts := '';
-      ETErrs := StrTimeOutWaitingFor + CRLF;
-      exit;
-    end;
-    FETEvent.ReSetEvent;
-
     CrWait := LoadCursor(0, IDC_WAIT);
     CrNormal := SetCursor(CrWait);
+
+    TMonitor.Enter(Self);
     try
       // Create TempFile with commands and filenames
       if pos('||', ETcmd) > 0 then
@@ -489,8 +476,8 @@ begin
       SetLength(ETouts, Length(ETouts) - LengthReady);
       result := true;
     finally
+      TMonitor.Exit(Self);
       SetCursor(CrNormal);
-      FETEvent.SetEvent;
     end;
   end;
 end;
