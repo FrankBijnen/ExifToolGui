@@ -297,6 +297,8 @@ var
   AColumnDefs: TColumnsArray;
   AOptions: TReadModeOptions;
 begin
+  DebugMsg(['GetFileListColumns', ItemIndex]);
+
   AFolder := AShellList.Folders[ItemIndex];
   AOptions := AShellList.ReadModeOptions;
   AColumnDefs := AShellList.ColumnDefs;
@@ -451,11 +453,24 @@ end;
 
 procedure GetAllFileListColumns(AShellList: ExifToolsGui_ShellList.TShellListView;
                                 TFrmGenerate: TFrmGenerate);
+var
+  SaveEnabled: boolean;
+  Controller: TMetaDataGetController;
 begin
-  with TMetaDataGetController.Create(AShellList, FrmGenerate) do
-  begin
-    GetAllMetaData;
-    Free;
+  SaveEnabled := AShellList.Enabled;
+  AShellList.Enabled := false;
+
+  DebugMsg(['Shelllist disabled']);
+
+  Controller := TMetaDataGetController.Create(AShellList, FrmGenerate);
+  try
+    Controller.GetAllMetaData;
+  finally
+    Controller.Free;
+    AShellList.Enabled := SaveEnabled;
+
+    DebugMsg(['Shelllist enabled']);
+
   end;
 end;
 
