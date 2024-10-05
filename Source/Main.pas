@@ -574,7 +574,7 @@ begin
     CBoxDetails.ItemIndex := DmFileLists.SelectedSet -1;
     with ShellList do
     begin
-      Refresh;
+      ClearSelectionRefresh;
       SetFocus;
     end;
   end;
@@ -2304,6 +2304,10 @@ end;
 
 procedure TFMain.ShowPreview;
 var
+{$IFDEF DEBUG}
+  MetaData: TMetaData;
+  Tag: string;
+{$ENDIF}
   Foto: FotoRec;
   Rotate: integer;
   FPath: string;
@@ -2332,6 +2336,18 @@ begin
           8:
             Rotate := 270;
         end;
+ {$IFDEF DEBUG}
+        MetaData := TMetaData.Create;
+        try
+          MetaData.ReadMeta(FPath, [gmXMP, gmGPS]);
+          DebugMsg(['***', FPath, '***']);
+          for Tag in MetaData.FieldNames do
+            DebugMsg([Tag, MetaData.FieldData(Tag)]);
+          DebugMsg(['=====================================']);
+        finally
+        MetaData.Free;
+        end;
+ {$ENDIF}
       end;
       ABitMap := GetBitmapFromWic(WicPreview(FPath, Rotate, RotateImg.Width, RotateImg.Height));
       if (ABitMap <> nil) then
@@ -2972,6 +2988,7 @@ begin
   // Now add to Listview
   for ADetail in Details do
     Item.SubItems.Append(ADetail);
+
 end;
 
 procedure TFMain.ShellListDeletion(Sender: TObject; Item: TListItem);
