@@ -573,6 +573,7 @@ begin
     GetFileListDefs(CBoxDetails.Items);
     CBoxDetails.ItemIndex := DmFileLists.SelectedSet -1;
     with ShellList do
+    if Enabled then
     begin
       ClearSelectionRefresh;
       SetFocus;
