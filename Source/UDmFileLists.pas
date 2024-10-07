@@ -144,6 +144,7 @@ procedure TDmFileLists.CalcSampleValue(DataSet: TDataSet; Command, Sample: strin
 var
   LowerCommand: string;
   SampleValue: string;
+  P: integer;
 begin
   if not (Dataset.State in [dsCalcFields, dsInsert, dsEdit]) then
     exit;
@@ -153,6 +154,11 @@ begin
                   CdsFileListDef.FieldByName('ReadMode').AsInteger);
 
   LowerCommand := LowerCase(Dataset.FieldByName(Command).AsString);
+
+  P := Pos('#', LowerCommand);
+  if (P > 1) then
+    SetLength(LowerCommand, P -1);
+
   if (FSampleValues.TryGetValue(LowerCommand, SampleValue)) then
     Dataset.FieldByName(Sample).AsString := SampleValue
   else

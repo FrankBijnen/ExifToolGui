@@ -35,15 +35,18 @@ uses System.Classes, System.SysUtils, System.Generics.Collections, System.Types,
      Vcl.StdCtrls, ExifToolsGUI_StringList;
 
 type
-  TMakerNotes = (None, Cr2, Pentax);
+  TMakerNotes = (None, Cr2, Pentax, Nikon);
   TMetaInfo = variant;
   TVarData = TObjectDictionary<string, TMetaInfo>;
 
   IFDentryRec = packed record
     Tag: word;
     FieldType: word;
-    TypeCount: longint;
-    ValueOffs: longint;
+    TypeCount: integer;
+    case integer of
+    0: (ValueOffs: integer);
+    1: (ValueWord1: Word;
+        ValueWord2: Word);
   end;
 
   IPTCrec = packed record
@@ -64,7 +67,7 @@ type
   IFD0rec = packed record
     HasData: boolean;
     Make, Model: string;
-    PreviewOffset, PreviewSize: longint;
+    PreviewOffset, PreviewSize: integer;
     OrientationValue: word; // 1=Normal, 3=180, 6=90right, 8=90left, else=Mirror
     Orientation: string[4];
     Xresolution, Yresolution: word;
@@ -101,8 +104,19 @@ type
     procedure Clear;
   end;
 
+  TGPS_Coord = record
+    D: double;
+    M: double;
+    S: double;
+    procedure Clear;
+    function GpsDecimal(Negative: boolean): string;
+    function GpsDegrees: string;
+  end;
+
   GPSrec = packed record
     HasData: boolean;
+    LatCoords: TGPS_Coord;
+    LonCoords: TGPS_Coord;
     GpsLatitudeRef: string[1];  // North/South
     GpsLatitude: string[11];
     GpsLongitudeRef: string[1]; // East/West
@@ -120,6 +134,7 @@ type
     MakerType: TMakerNotes;
     PentaxLensId: string;
     LensType: string;
+    NikonBase: int64;
     procedure Clear;
   end;
 
@@ -206,19 +221,21 @@ type
     function DecodeWord(IFDentry: IFDentryRec): word;
     function DecodeRational(IFDentry: IFDentryRec): word;
     function DecodeExifLens(IFDentry: IFDentryRec): string;
+    function DecodeNikonLens(IFDentry: IFDentryRec): string;
     function ConvertRational(IFDentry: IFDentryRec; Signed: boolean): string;
     function GetRational(IFDentry: IFDentryRec): single;
-    function DecodeGPS(IFDentry: IFDentryRec; IsLat: boolean): string;
+    function DecodeGPS(IFDentry: IFDentryRec): TGPS_Coord;
     procedure ParseIPTC;
     procedure ParsePentaxMaker(IFDentry: IFDentryRec);
     procedure ParseCanonMaker(IFDentry: IFDentryRec);
+    procedure ParseNikonMaker(IFDentry: IFDentryRec);
     procedure ParseMakerNotes(Offset: int64);
     procedure ParseIFD0(IFDentry: IFDentryRec);
     procedure ParseExifIFD(IFDentry: IFDentryRec);
     procedure ParseInterop(IFDentry: IFDentryRec);
     procedure ParseGPS(IFDentry: IFDentryRec);
-    procedure CorrectGps;
-    procedure GetLensModelFromMakerNotes;
+    procedure FormatGps;
+    function CoordAsDec(ACoord: string): string;
     procedure ParseICCprofile;
     procedure GetIFDentry(var IFDentry: IFDentryRec);
     procedure ParseIfd(Offset: int64; ParseProc: TParseIFDProc);
@@ -272,6 +289,10 @@ var
   GpsFormatSettings: TFormatSettings;  // for StrToFloatDef -see Initialization
   FAllInterFields: TStringList;
   FPentaxLenses: TStringList;
+
+const
+  LensSpecsZoom  = '%s-%smm f/%s-%s';
+  LensSpecsPrime = '%smm f/%s';
 
 constructor TMetaData.Create;
 begin
@@ -358,8 +379,32 @@ begin
   Self := Default(MakerNotesRec);
 end;
 
+procedure TGPS_Coord.Clear;
+begin
+  Self := Default(TGPS_Coord);
+end;
+
+function TGPS_Coord.GpsDecimal(Negative: boolean): string;
+var
+  Dec: Double;
+begin
+  result := '';
+  Dec := D + (M / 60) + (S / 60 / 60);
+  if (Negative) then
+    Dec := Dec * -1;
+  if (Dec <> 0) then // return empty string if no coordinates
+    result := FloatToStrF(Dec, ffFixed, 8, 6, FloatFormatSettings);
+end;
+
+function TGPS_Coord.GpsDegrees: string;
+begin
+  result := Format('%s°%s', [FormatExifDecimal(D, 0), FormatExifDecimal(M + (S / 60), 4)]);
+end;
+
 procedure GPSrec.Clear;
 begin
+  LatCoords.Clear;
+  LonCoords.Clear;
   Self := Default(GPSrec);
 end;
 
@@ -588,7 +633,7 @@ function FotoRec.DecodeASCII(IFDentry: IFDentryRec; MaxLen: integer = 255): stri
 var
   Bytes: TBytes;
   W1: word;
-  L1: longint;
+  L1: integer;
 begin
   W1 := IFDentry.TypeCount - 1; // last byte is #0
   SetLength(Bytes, W1);
@@ -614,20 +659,16 @@ begin
 end;
 
 function FotoRec.DecodeWord(IFDentry: IFDentryRec): word;
-var
-  L1: longint;
 begin
-  L1 := IFDentry.ValueOffs;
   if IsMM then
-    L1 := SwapL(L1);
-  Result := L1;
-  if IsMM then
-    Result := Swap(Result);
+    result := IFDentry.ValueWord2
+  else
+    result := IFDentry.ValueWord1;
 end;
 
 function FotoRec.DecodeRational(IFDentry: IFDentryRec): word;
 var
-  L1, L2: longint;
+  L1, L2: integer;
 begin
   FotoF.Seek(TIFFoffset + IFDentry.ValueOffs, TSeekOrigin.soBeginning);
   FotoF.Read(L1, 4);
@@ -645,7 +686,7 @@ end;
 
 function FotoRec.DecodeExifLens(IFDentry: IFDentryRec): string;
 var
-  L1, L2, L3, L4: longint;
+  L1, L2, L3, L4: integer;
   Digits: integer;
   Tx: string[23];
 begin
@@ -698,9 +739,47 @@ begin
   Result := StringReplace(Tx, ',', '.', [rfReplaceAll]);
 end;
 
+function FotoRec.DecodeNikonLens(IFDentry: IFDentryRec): string;
+var
+  R1, R2, R3, R4: Double;
+
+  function ReadDouble: Double;
+  var
+    L1, L2: integer;
+  begin
+    result := 0;
+    FotoF.Read(L1, SizeOf(L1));
+    if IsMM then
+      L1 := SwapL(L1);
+    FotoF.Read(L2, SizeOf(L2));
+    if IsMM then
+      L2 := SwapL(L2);
+    if (L2 <> 0) then
+      result := L1 / L2;
+   end;
+
+begin
+  with MakerNotes do
+  begin
+    FotoF.Seek(NikonBase + IFDentry.ValueOffs, TSeekOrigin.soBeginning);
+    R1 := ReadDouble;
+    R2 := ReadDouble;
+    R3 := ReadDouble;
+    R4 := ReadDouble;
+    if (R1 = R2) then
+      result := Format(LensSpecsPrime, [FloatToStrF(R1, ffFixed, 7, 0, FloatFormatSettings),
+                                        FloatToStrF(R3, ffFixed, 7, 1, FloatFormatSettings)])
+    else
+      result := Format(LensSpecsZoom, [FloatToStrF(R1, ffFixed, 7, 0, FloatFormatSettings),
+                                       FloatToStrF(R2, ffFixed, 7, 0, FloatFormatSettings),
+                                       FloatToStrF(R3, ffFixed, 7, 1, FloatFormatSettings),
+                                       FloatToStrF(R4, ffFixed, 7, 1, FloatFormatSettings)]);
+  end;
+end;
+
 function FotoRec.ConvertRational(IFDentry: IFDentryRec; Signed: boolean): string;
 var
-  L1, L2: longint;
+  L1, L2: integer;
   Tx: string[15];
 begin
   FotoF.Seek(TIFFoffset + IFDentry.ValueOffs, TSeekOrigin.soBeginning);
@@ -753,7 +832,7 @@ end;
 
 function FotoRec.GetRational(IFDentry: IFDentryRec): single;
 var
-  L1, L2: longint;
+  L1, L2: integer;
 begin
   FotoF.Seek(TIFFoffset + IFDentry.ValueOffs, TSeekOrigin.soBeginning);
   FotoF.Read(L1, 4);
@@ -769,73 +848,31 @@ begin
     Result := L1 / L2;
 end;
 
-function FotoRec.DecodeGPS(IFDentry: IFDentryRec; IsLat: boolean): string;
-var
-  R, Rd: double;
-  L1, L2: longint;
-  Tx, Ty: string[11];
-  Sec: string[7]; // Tx=Deg°Min.Sec, Ty=Deg.min°
+function FotoRec.DecodeGPS(IFDentry: IFDentryRec): TGPS_Coord;
+
+  function ReadRational: double;
+  var
+    L1, L2: integer;
+  begin
+    FotoF.Read(L1, SizeOf(L1));
+    FotoF.Read(L2, SizeOf(L2));
+    if IsMM then
+    begin
+      L1 := SwapL(L1);
+      L2 := SwapL(L2);
+    end;
+    if L2 > 0 then
+      result := L1 / L2
+    else
+      result := 0;
+  end;
+
 begin
   FotoF.Seek(TIFFoffset + IFDentry.ValueOffs, TSeekOrigin.soBeginning);
-  FotoF.Read(L1, 4);
-  FotoF.Read(L2, 4); // =Deg
-  if IsMM then
-  begin
-    L1 := SwapL(L1);
-    L2 := SwapL(L2);
-  end;
-  if L2 > 0 then
-    Tx := IntToStr(L1 div L2) + '°'
-  else
-    Tx := '0°';
-  if L2 > 0 then
-    Rd := L1 div L2
-  else
-    Rd := 0; // <-DecDeg
 
-  FotoF.Read(L1, 4);
-  FotoF.Read(L2, 4); // =Min
-  if IsMM then
-  begin
-    L1 := SwapL(L1);
-    L2 := SwapL(L2);
-  end;
-  if L2 > 0 then
-    Tx := Tx + IntToStr(L1 div L2) + '.'
-  else
-    Tx := Tx + '0.';
-  if L2 > 0 then
-    Ty := IntToStr(L1 div L2)
-  else
-    Ty := '0'; // <-DecMin
-
-  FotoF.Read(L1, 4);
-  FotoF.Read(L2, 4); // =Sec
-  if IsMM then
-  begin
-    L1 := SwapL(L1);
-    L2 := SwapL(L2);
-  end;
-  if L2 > 0 then
-    R := L1 / L2 / 60
-  else
-    R := 0;
-  Sec := FloatToStrF(R, ffFixed, 7, 4);
-  Delete(Sec, 1, 2);
-  Tx := Tx + Sec;
-
-  // Compute decimal coordinate. For OsmMap
-  Ty := Ty + ',' + Sec;
-  R := RD + StrToFloatDef(Ty, 0, GpsFormatSettings) / 60;
-  if (R <> 0) then
-  begin
-    Ty := FloatToStrF(R, ffFixed, 8, 6, FloatFormatSettings);
-    if IsLat then
-      GPS.GeoLat := AddGpsData('GeoLat', Ty)
-    else
-      GPS.GeoLon := AddGpsData('GeoLon', Ty);
-  end;
-  Result := Tx;
+  result.D := ReadRational;
+  result.M := ReadRational;
+  result.S := ReadRational;
 end;
 
 // =================================PARSING======================================
@@ -906,9 +943,13 @@ begin
     case IFDentry.Tag of
       $3f:
         begin
-          PentaxId := DecodeWord(IFDentry);
+          if IsMM then
+            PentaxId := IFDentry.ValueWord2
+          else
+            PentaxId := Swap(IFDentry.ValueWord1);
           PentaxLensId := AddMakerNotesData('PentaxLensId', Format('%d %d', [Hi(PentaxId), Lo(PentaxId)]));
-        end;
+          MakerNotes.LensType := AddMakerNotesData('LensType', TMetaData.PentaxLenses.Values[PentaxLensId]);
+      end;
     end;
   end;
   FotoF.Seek(SavePos, TSeekOrigin.soBeginning);
@@ -929,12 +970,29 @@ begin
   FotoF.Seek(SavePos, TSeekOrigin.soBeginning);
 end;
 
+procedure FotoRec.ParseNikonMaker(IFDentry: IFDentryRec);
+var
+  SavePos: int64;
+begin
+  SavePos := FotoF.Position;
+  with MakerNotes do
+  begin
+    HasData := true;
+    case IFDentry.Tag of
+      $84: LensType := AddMakerNotesData('LensType', DecodeNikonLens(IFDentry));
+    end;
+  end;
+  FotoF.Seek(SavePos, TSeekOrigin.soBeginning);
+end;
+
+
 procedure FotoRec.ParseMakerNotes(Offset: int64);
 var
   SavePos: int64;
   Maker: string;
   SaveMM: boolean;
   Endian: word;
+  AWord: word;
 begin
   SavePos := FotoF.Position;
   FotoF.Seek(Offset, TSeekOrigin.soBeginning);
@@ -942,18 +1000,35 @@ begin
     ParseIfd(Offset, ParseCanonMaker)
   else
   begin
-    Maker := AdvanceNull;
     SaveMM := IsMM;
-    FotoF.Read(Endian, SizeOf(Endian));
-    IsMM := (Endian = $4D4D);
-
-    if (Maker = 'PENTAX ') or
-       (Maker = 'AOC') then
-    begin
-      MakerNotes.MakerType := TMakerNotes.Pentax;
-      ParseIfd(FotoF.Position, ParsePentaxMaker);
+    try
+      Maker := AdvanceNull;
+      if (Maker = 'Nikon') then
+      begin
+        FotoF.Read(AWord, SizeOf(AWord));
+        if (AWord = $1002) then
+        begin
+          FotoF.Seek($2, TSeekOrigin.soCurrent);
+          MakerNotes.NikonBase := FotoF.Position;
+          FotoF.Read(Endian, SizeOf(Endian));
+          IsMM := (Endian = $4D4D);
+          FotoF.Seek($6, TSeekOrigin.soCurrent);
+          MakerNotes.MakerType := TMakerNotes.Nikon;
+          ParseIfd(FotoF.Position, ParseNikonMaker);
+        end;
+      end
+      else
+      if (Maker = 'PENTAX ') or
+         (Maker = 'AOC') then
+      begin
+        FotoF.Read(Endian, SizeOf(Endian));
+        IsMM := (Endian = $4D4D);
+        MakerNotes.MakerType := TMakerNotes.Pentax;
+        ParseIfd(FotoF.Position, ParsePentaxMaker);
+      end;
+    finally
+      IsMM := SaveMM;
     end;
-    IsMM := SaveMM;
   end;
   FotoF.Seek(SavePos, TSeekOrigin.soBeginning);
 end;
@@ -1182,11 +1257,11 @@ begin
       $01:
         GpsLatitudeRef := AddGpsData('GpsLatitudeRef', DecodeASCII(IFDentry));
       $02:
-        GpsLatitude := AddGpsData('GpsLatitude', DecodeGPS(IFDentry, true));
+        LatCoords := DecodeGPS(IFDentry);
       $03:
         GpsLongitudeRef := AddGpsData('GpsLongitudeRef', DecodeASCII(IFDentry));
       $04:
-        GpsLongitude := AddGpsData('GpsLongitude', DecodeGPS(IFDentry, false));
+        LonCoords := DecodeGPS(IFDentry);
       $05:
         begin
           if IFDentry.ValueOffs = 0 then
@@ -1202,35 +1277,58 @@ begin
   FotoF.Seek(SavePos, TSeekOrigin.soBeginning);
 end;
 
-// For FileList
-procedure FotoRec.CorrectGps;
+// Format GPS coordinates
+procedure FotoRec.FormatGps;
 begin
   with Gps do
   begin
-    if (GpsLatitudeRef = 'S') and (GeoLat <> '') then
-      GeoLat := '-' + GeoLat;
-    if (GpsLongitudeRef = 'W') and (GeoLon <> '') then
-      GeoLon := '-' + GeoLon;
+    GpsLatitude := AddGpsData('GpsLatitude', LatCoords.GpsDegrees);
+    GeoLat := AddGpsData('GeoLat',  LatCoords.GpsDecimal(StartsText('S', GpsLatitudeRef)));
+
+    GpsLongitude := AddGpsData('GpsLaGpsLongitudetitude', LonCoords.GpsDegrees);
+    GeoLon := AddGpsData('GeoLon',  LonCoords.GpsDecimal(StartsText('W', GpsLongitudeRef)));
+
     if (GeoLat <> '') or
        (GeoLon <> '') then
-      GpsPosition := AddCompositeData('GpsPosition', StrYes)
-    else
-      GpsPosition := AddCompositeData('GpsPosition', StrNo);
+      GpsPosition := AddCompositeData('GpsPosition', Format('%s, %s', [GeoLat, GeoLon]));
   end;
 end;
 
-// Get lens type from Maker notes
-procedure FotoRec.GetLensModelFromMakerNotes;
+function FotoRec.CoordAsDec(ACoord: string): string;
+var
+  D, M: Double;
+  Piece, Coord: string;
+  Sign: integer;
+  Index: integer;
 begin
-  case MakerNotes.MakerType of
-    TMakerNotes.Pentax:
-      begin
-        MakerNotes.LensType := AddMakerNotesData('LensType', TMetaData.PentaxLenses.Values[MakerNotes.PentaxLensId]);
-      end;
+  result := ACoord;
+  Sign := 1;
+  Coord := ACoord;
+
+  Piece := NextField(Coord, ',');
+  if not TryStrToFloat(Piece, D) then
+    exit;
+  Piece := '';
+  for Index := 1 to Length(Coord) do
+  begin
+    case Coord[Index] of
+      'N', 'W':
+        begin
+          Sign := 1;
+          break;
+        end;
+      'S', 'E':
+        begin
+          Sign := -1;
+          break;
+        end;
+      else
+        Piece := Piece + Coord[Index];
+    end;
   end;
-  if (ExifIFD.LensModel = '') and
-     (MakerNotes.LensType <> '') then
-    ExifIFD.LensModel := AddExifIFDData('LensModel', MakerNotes.LensType);
+  if not TryStrToFloat(Piece, M, FloatFormatSettings) then
+    exit;
+  result := FormatExifDecimal(D + (M /60) * Sign, 6);
 end;
 
 // ==============================================================================
@@ -1603,11 +1701,12 @@ begin
           MaxAperture := Exp(CanonEv(SData) * LN(2) / 2);
 
           if (MaxFocal = MinFocal) then
-            LensInfo := Format('%smm F%s', [FormatExifDecimal(MaxFocal * FocalUnits, 0),
-                                            FormatExifDecimal(MaxAperture, 1)])
+            LensInfo := Format(LensSpecsPrime, [FormatExifDecimal(MaxFocal * FocalUnits, 0),
+                                                FormatExifDecimal(MaxAperture, 1)])
           else
-            LensInfo := Format('%s-%smm F%s', [FormatExifDecimal(MinFocal * FocalUnits, 0),
+            LensInfo := Format(LensSpecsZoom, [FormatExifDecimal(MinFocal * FocalUnits, 0),
                                                FormatExifDecimal(MaxFocal * FocalUnits, 0),
+                                               FormatExifDecimal(MaxAperture, 1),
                                                FormatExifDecimal(MaxAperture, 1)]);
 
           ExifIFD.LensInfo := AddExifIFDData('LensInfo', LensInfo);
@@ -2309,6 +2408,8 @@ end;
 
 // ======================================== MAIN ==============================================
 function GetMetadata(AName: string; AGetOptions: TGetOptions; VarData: TVarData = nil; FieldNames: TStrings = nil): FotoRec;
+var
+  Lat, Lon: variant;
 begin
   result.Clear;  // Clear all variables
   result.FileName := AName;
@@ -2360,18 +2461,19 @@ begin
             ReadXMP;
             // Add a dummy GPSPosition if no GPS was found, but something is in XMP
             if (GPS.HasData = false) and
-               (VarData.ContainsKey(LowerCase('Xmp-exif:GPSLatitude'))) then
-              GPS.GpsPosition := AddCompositeData('GpsPosition', StrYes);
+                (Assigned(VarData)) then
+            begin
+              if (VarData.TryGetValue(LowerCase('Xmp-exif:GPSLatitude'), Lat)) and
+                 (VarData.TryGetValue(LowerCase('Xmp-exif:GPSLongitude'), Lon)) then
+                GPS.GpsPosition := AddCompositeData('GpsPosition', Format('%s, %s', [CoordAsDec(Lat), CoordAsDec(Lon)]));
+            end;
           end;
 
           // Update Gps record.
           if (TGetOption.gmGPS in result.GetOptions) and
              (Gps.HasData) then
-            result.CorrectGps;
+            result.FormatGps;
 
-          // Update Lenses in Makernotes
-          if (MakerNotes.HasData) then
-            result.GetLensModelFromMakerNotes;
         end;
       finally
         FotoF.Free;
