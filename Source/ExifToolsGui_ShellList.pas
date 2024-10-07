@@ -134,6 +134,7 @@ type
     procedure SetIconSpacing(Cx, Cy: word); overload;
     procedure SetIconSpacing(Cx, Cy: integer); overload;
     function GetThumbNail(ItemIndex, W, H: integer): TBitmap;
+    procedure SetFocus; override;
 
     property OnColumnResized: TNotifyEvent read FOnColumnResized write FOnColumnResized;
     property ColumnSorted: boolean read FColumnSorted write SetColumnSorted;
@@ -1275,6 +1276,13 @@ begin
     FBkColor := Value;
   if (Value <> FThumbNails.BkColor) then
     FThumbNails.BkColor := Value;
+end;
+
+procedure TShellListView.SetFocus;
+begin
+// Avoid cannot focus a disabled or invisible window
+  if Enabled then
+    inherited SetFocus;
 end;
 
 function TShellListView.GetThumbNail(ItemIndex, W, H: integer): TBitmap;
