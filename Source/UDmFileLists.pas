@@ -245,7 +245,8 @@ begin
   if not (CheckEmptyField(Dataset.FieldByName('Description'))) then
     Abort;
 
-  if NameExists(Dataset.FieldByName('Name').AsString) then
+  if (DataSet.State in [dsInsert]) and
+     NameExists(Dataset.FieldByName('Name').AsString) then
   begin
     MessageDlgEx(Format('%s Exists', [Dataset.FieldByName('Name').AsString]), '', TMsgDlgType.mtError, [TMsgDlgBtn.mbOK]);
     Abort;
