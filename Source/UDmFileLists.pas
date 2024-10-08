@@ -47,6 +47,7 @@ type
     DsTagNames: TDataSource;
     CdsColumnSetCommandLookup: TStringField;
     CdsTagNamesSampleValue: TStringField;
+    CdsFileListDefOptions: TIntegerField;
     procedure CdsColumnSetBeforeInsert(DataSet: TDataSet);
     procedure CdsColumnSetAfterInsert(DataSet: TDataSet);
     procedure CdsFileListDefAfterInsert(DataSet: TDataSet);
@@ -55,8 +56,12 @@ type
     procedure DataModuleDestroy(Sender: TObject);
     procedure CdsTagNamesFilterRecord(DataSet: TDataSet; var Accept: Boolean);
     procedure CdsTagNamesCalcFields(DataSet: TDataSet);
-    procedure CdsFileListDefBeforeScroll(DataSet: TDataSet);
     procedure CdsColumnSetCommandValidate(Sender: TField);
+    procedure CdsFileListDefAfterScroll(DataSet: TDataSet);
+    procedure CdsFileListDefBeforePost(DataSet: TDataSet);
+    procedure CdsFileListDefBeforeDelete(DataSet: TDataSet);
+    procedure CdsFileListDefAfterPost(DataSet: TDataSet);
+    procedure CdsFileListDefBeforeInsert(DataSet: TDataSet);
   private
     { Private declarations }
     ColumnSeq: Double;
@@ -65,8 +70,10 @@ type
     FSample: TShellFolder;
     FSampleValues: TSampleData;
     FSystemTagNames: TStringlist;
-    FOnFileListChanged: TNotifyEvent;
+    FOnSetEditMode: TNotifyEvent;
     FOnFilterTag: TFilterRecordEvent;
+    procedure DoSetEditMode;
+    function CheckEmptyField(Sender: TField): boolean;
     procedure PrepTagNames;
     procedure AddTagName(ATagName: string; CheckExist: boolean);
     procedure CalcSampleValue(DataSet: TDataSet; Command, Sample: string);
@@ -79,7 +86,8 @@ type
     procedure LoadFromColumnSets(ASample: TShellFolder);
     procedure SaveToColumnSets;
     procedure WriteAllXmpTags;
-    property OnFileListChanged: TNotifyEvent read FOnFileListChanged write FOnFileListChanged;
+    procedure Duplicate(OldId: integer; NewName, NewDesc: string);
+    property OnSetEditMode: TNotifyEvent read FOnSetEditMode write FOnSetEditMode;
     property OnFilterTag: TFilterRecordEvent read FOnFilterTag write FOnFilterTag;
   end;
 
@@ -91,7 +99,7 @@ implementation
 {%CLASSGROUP 'Vcl.Controls.TControl'}
 
 uses
-  System.StrUtils, System.Variants,
+  System.StrUtils, System.Variants, System.UITypes,
   Winapi.Windows,
   UnitColumnDefs, ExifInfo, ExifTool, ExifToolsGUI_Utils;
 
@@ -113,6 +121,13 @@ const
   OptionHorVer  = 'Hor/Ver';
   OptionFlash   = 'Flash';
   OptionCountry = 'Country';
+
+function TDmFileLists.CheckEmptyField(Sender: TField): boolean;
+begin
+  result := (Sender.AsString <> '');
+  if (not result) then
+    MessageDlgEx(Format('%s is Mandatory', [Sender.FieldName]), '', TMsgDlgType.mtError, [TMsgDlgBtn.mbOK]);
+end;
 
 procedure TDmFileLists.CdsColumnSetAfterInsert(DataSet: TDataSet);
 begin
@@ -191,17 +206,49 @@ begin
   end;
 end;
 
+procedure TDmFileLists.DoSetEditMode;
+begin
+  if (CdsFileListDef.ControlsDisabled) then
+    exit;
+  if Assigned(FOnSetEditMode) then
+    FOnSetEditMode(Self);
+end;
+
 procedure TDmFileLists.CdsFileListDefAfterInsert(DataSet: TDataSet);
 begin
   CdsFileListDefType.AsString := ListUser;
+  CdsFileListDefOptions.AsInteger := Ord(floUserDef);
   CdsFileListDefReadMode.AsInteger := Ord(rmInternal);
-  CdsFileListDefId.AsInteger := CdsFileListDef.RecordCount + 1;
+  CdsFileListDefId.AsInteger := CdsFileListDef.RecordCount;
 end;
 
-procedure TDmFileLists.CdsFileListDefBeforeScroll(DataSet: TDataSet);
+procedure TDmFileLists.CdsFileListDefAfterPost(DataSet: TDataSet);
 begin
-  if Assigned(FOnFileListChanged) then
-    FOnFileListChanged(Self);
+  DoSetEditMode;
+end;
+
+procedure TDmFileLists.CdsFileListDefAfterScroll(DataSet: TDataSet);
+begin
+  DoSetEditMode;
+end;
+
+procedure TDmFileLists.CdsFileListDefBeforeInsert(DataSet: TDataSet);
+begin
+  DoSetEditMode;
+end;
+
+procedure TDmFileLists.CdsFileListDefBeforePost(DataSet: TDataSet);
+begin
+  if not (CheckEmptyField(Dataset.FieldByName('Name'))) then
+    Abort;
+  if not (CheckEmptyField(Dataset.FieldByName('Description'))) then
+    Abort;
+end;
+
+procedure TDmFileLists.CdsFileListDefBeforeDelete(DataSet: TDataSet);
+begin
+  if CdsFileListDef.ReadOnly then
+    Abort;
 end;
 
 procedure TDmFileLists.CdsTagNamesCalcFields(DataSet: TDataSet);
@@ -266,9 +313,6 @@ begin
 
   if not Assigned(FSample) then   // Need a ShellFolder
     exit;
-
-  // Get Captions for 'fast' system fields
-  TSubShellFolder.AllFastSystemFields(FSample.Parent, FSystemTagNames);
 
   CdsTagNames.DisableControls;
   try
@@ -375,6 +419,44 @@ begin
   end;
 end;
 
+procedure TDmFileLists.Duplicate(OldId: integer; NewName, NewDesc: string);
+var
+  Orig: TColumnsArray;
+  Acolumn: TFileListColumn;
+  Index: integer;
+begin
+  CdsFileListDef.DisableControls;
+  CdsColumnSet.DisableControls;
+  CdsFileListDef.ReadOnly := false;
+  CdsColumnSet.ReadOnly := false;
+  try
+    CdsFileListDef.Insert;
+    CdsFileListDefName.AsString := NewName;
+    CdsFileListDefDescription.AsString := NewDesc;
+    CdsFileListDef.Post;
+    Orig := GetFileListColumnDefs(OldId);
+    ColumnSeq := 0;
+    for Index := 0 to High(Orig) do
+    begin
+      AColumn := Orig[Index];
+      ColumnSeq := ColumnSeq + 1;
+      CdsColumnSet.Insert;
+      CdsColumnSetFileListName.AsString   := NewName;
+      CdsColumnSetName.AsString           := AColumn.Caption;
+      CdsColumnSetCommand.AsString        := AColumn.Command;
+      CdsColumnSetOption.AsInteger        := Ord(AColumn.Options) and $00ff;
+      CdsColumnSetBackup.AsInteger        := Ord(AColumn.Options) and $ff00;
+      CdsColumnSetWidth.AsInteger         := AColumn.Width;
+      CdsColumnSetAlignR.AsInteger        := AColumn.AlignR;
+      CdsColumnSet.Post;
+    end;
+  finally
+    CdsFileListDef.EnableControls;
+    CdsColumnSet.EnableControls;
+    DoSetEditMode;
+  end;
+end;
+
 procedure TDmFileLists.SetupLookUps;
 
   procedure PrepLookUP(ADS: TClientDataSet);
@@ -419,7 +501,6 @@ procedure TDmFileLists.SaveToColumnSets;
 var
   FileListDefs: TColumnSetList;
   AColumnSet: TColumnsArray;
-  AFileOption: TFileListOptions;
 begin
   if (CdsFileListDef.State in [dsEdit, dsInsert]) then
     CdsFileListDef.Post;
@@ -437,12 +518,6 @@ begin
 
     while not CdsFileListDef.Eof do
     begin
-      AFileOption := floSystem;
-      if (SameText(CdsFileListDefType.AsString, ListInternal)) then
-        AFileOption := floInternal
-      else if (SameText(CdsFileListDefType.AsString, ListUser)) then
-        AFileOption := floUserDef;
-
       CdsColumnSet.SetRange([CdsFileListDefName.AsString], [CdsFileListDefName.AsString]);
       CdsColumnSet.First; // Not needed
       SetLength(AColumnSet, CdsColumnSet.RecordCount);
@@ -460,7 +535,7 @@ begin
       end;
       FileListDefs.Add(TColumnSet.Create(CdsFileListDefName.AsString,
                                          CdsFileListDefDescription.AsString,
-                                         AFileOption,
+                                         TFileListOptions(CdsFileListDefOptions.AsInteger),
                                          CdsFileListDefReadMode.AsInteger,
                                          AColumnSet));
       CdsFileListDef.Next;
@@ -493,8 +568,12 @@ begin
   CdsColumnSet.MasterFields := '';
   CdsFileListDef.DisableControls;
   CdsColumnSet.DisableControls;
-
+  CdsFileListDef.ReadOnly := false;
   try
+    // Get Captions for 'fast' system fields
+    TSubShellFolder.AllFastSystemFields(FSample.Parent, FSystemTagNames);
+
+    //
     PrepTagNames;
 
     FileListDefs := GetFileListDefs;
@@ -508,12 +587,11 @@ begin
     Id := 0;
     for AColumnSet in FileListDefs do
     begin
-      Inc(Id);
-
       CdsFileListDef.Insert;
       CdsFileListDefId.AsInteger := Id;
       CdsFileListDefName.AsString := AColumnSet.Name;
       CdsFileListDefDescription.AsString := AColumnSet.Desc;
+      CdsFileListDefOptions.AsInteger := Ord(AColumnSet.Options);
       case (AColumnSet.Options) of
         TFileListOptions.floSystem:
           CdsFileListDefType.AsString := ListSystem;
@@ -541,6 +619,8 @@ begin
         CdsColumnSetAlignR.AsInteger        := AColumn.AlignR;
         CdsColumnSet.Post;
       end;
+
+      Inc(Id);
     end;
   finally
     CdsFileListDef.EnableControls;
