@@ -3,7 +3,7 @@ object FEditFColumn: TFEditFColumn
   Top = 0
   Caption = 'Edit file columns'
   ClientHeight = 512
-  ClientWidth = 1157
+  ClientWidth = 1066
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -18,16 +18,16 @@ object FEditFColumn: TFEditFColumn
   object PnlGrids: TPanel
     Left = 0
     Top = 0
-    Width = 1157
+    Width = 1066
     Height = 483
     Align = alClient
     TabOrder = 1
-    ExplicitWidth = 1226
+    ExplicitWidth = 1153
     ExplicitHeight = 482
     object HSplitter: TSplitter
       Left = 1
       Top = 200
-      Width = 1155
+      Width = 1064
       Height = 5
       Cursor = crVSplit
       Align = alTop
@@ -35,7 +35,7 @@ object FEditFColumn: TFEditFColumn
       ExplicitWidth = 653
     end
     object VSplitter: TSplitter
-      Left = 803
+      Left = 712
       Top = 235
       Width = 5
       Height = 247
@@ -47,11 +47,11 @@ object FEditFColumn: TFEditFColumn
     object PnlTop: TPanel
       Left = 1
       Top = 1
-      Width = 1155
+      Width = 1064
       Height = 30
       Align = alTop
       TabOrder = 0
-      ExplicitWidth = 1224
+      ExplicitWidth = 1151
       object SpbAddPred: TSpeedButton
         Left = 2
         Top = 3
@@ -105,7 +105,7 @@ object FEditFColumn: TFEditFColumn
     object DbgFileListDef: TDBGrid
       Left = 1
       Top = 31
-      Width = 1155
+      Width = 1064
       Height = 169
       Align = alTop
       DataSource = DmFileLists.DsFileListDef
@@ -143,14 +143,13 @@ object FEditFColumn: TFEditFColumn
           Expanded = False
           FieldName = 'ReadModeLookup'
           Title.Caption = 'ReadMode'
-          Width = 64
           Visible = True
         end>
     end
     object DbgColumnSet: TDBGrid
       Left = 1
       Top = 235
-      Width = 802
+      Width = 711
       Height = 247
       Align = alClient
       DataSource = DmFileLists.DsColumnSet
@@ -167,7 +166,7 @@ object FEditFColumn: TFEditFColumn
         item
           Expanded = False
           FieldName = 'Caption'
-          Width = 191
+          Width = 155
           Visible = True
         end
         item
@@ -175,7 +174,7 @@ object FEditFColumn: TFEditFColumn
           DropDownRows = 30
           Expanded = False
           FieldName = 'Command'
-          Width = 186
+          Width = 179
           Visible = True
         end
         item
@@ -196,24 +195,24 @@ object FEditFColumn: TFEditFColumn
           Expanded = False
           FieldName = 'BackupLookUp'
           Title.Caption = 'Backup'
-          Width = 59
+          Width = 49
           Visible = True
         end
         item
           Expanded = False
           FieldName = 'SampleValue'
-          Width = 252
+          Width = 149
           Visible = True
         end>
     end
     object PnlMiddle: TPanel
       Left = 1
       Top = 205
-      Width = 1155
+      Width = 1064
       Height = 30
       Align = alTop
       TabOrder = 3
-      ExplicitWidth = 1224
+      ExplicitWidth = 1151
       object SpbAddTag: TSpeedButton
         Left = 2
         Top = 3
@@ -249,14 +248,14 @@ object FEditFColumn: TFEditFColumn
       end
     end
     object PnlDetail: TPanel
-      Left = 808
+      Left = 717
       Top = 235
       Width = 348
       Height = 247
       Align = alRight
       TabOrder = 4
       Visible = False
-      ExplicitLeft = 877
+      ExplicitLeft = 804
       ExplicitHeight = 246
       object DbgTagNames: TDBGrid
         Left = 1
@@ -342,17 +341,17 @@ object FEditFColumn: TFEditFColumn
   object PnlBottom: TPanel
     Left = 0
     Top = 483
-    Width = 1157
+    Width = 1066
     Height = 29
     Align = alBottom
     TabOrder = 0
     ExplicitTop = 482
-    ExplicitWidth = 1226
+    ExplicitWidth = 1153
     DesignSize = (
-      1157
+      1066
       29)
     object BtnOk: TBitBtn
-      Left = 920
+      Left = 883
       Top = 2
       Width = 87
       Height = 25
@@ -379,10 +378,10 @@ object FEditFColumn: TFEditFColumn
       ModalResult = 1
       NumGlyphs = 2
       TabOrder = 0
-      ExplicitLeft = 989
+      ExplicitLeft = 974
     end
     object BtnCancel: TBitBtn
-      Left = 1011
+      Left = 974
       Top = 2
       Width = 87
       Height = 25
@@ -409,7 +408,7 @@ object FEditFColumn: TFEditFColumn
       ModalResult = 2
       NumGlyphs = 2
       TabOrder = 1
-      ExplicitLeft = 1080
+      ExplicitLeft = 1065
     end
   end
 end

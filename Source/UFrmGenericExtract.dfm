@@ -22,7 +22,7 @@ object FGenericExtract: TFGenericExtract
     Panels = <>
     SimplePanel = True
     ExplicitTop = 332
-    ExplicitWidth = 578
+    ExplicitWidth = 584
   end
   object AdvPanel1: TPanel
     Left = 0
@@ -122,18 +122,18 @@ object FGenericExtract: TFGenericExtract
     end
   end
   object BtnCancel: TButton
-    Left = 514
+    Left = 503
     Top = 16
-    Width = 69
+    Width = 78
     Height = 25
     Caption = 'Cancel'
     ModalResult = 2
     TabOrder = 1
   end
   object BtnExecute: TButton
-    Left = 514
+    Left = 503
     Top = 302
-    Width = 69
+    Width = 78
     Height = 25
     Caption = 'Execute'
     Default = True

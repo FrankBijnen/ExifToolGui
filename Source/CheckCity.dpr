@@ -5,7 +5,7 @@ uses
   CheckCity1 in 'CheckCity1.pas' {FrmCheckCity};
 
 {$R *.res}
-{$R 'ExifToolsGui_Data.res' 'ExifToolsGui_Data.rc'}
+{$R 'ExifToolsGui_Strings.res' 'ExifToolsGui_Strings.rc'}
 
 begin
   Application.Initialize;

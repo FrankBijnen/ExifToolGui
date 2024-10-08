@@ -287,6 +287,7 @@ begin
   CdsTagNames.Close;
   CdsTagNames.IndexFieldnames := 'TagName';
   CdsTagNames.CreateDataSet;
+  CdsTagNames.LogChanges := false;
 end;
 
 procedure TDmFileLists.AddTagName(ATagName: string; CheckExist: boolean);
@@ -471,6 +472,7 @@ procedure TDmFileLists.SetupLookUps;
     ADS.Close;
     ADS.IndexFieldNames := 'Key';
     ADS.CreateDataSet;
+    ADS.LogChanges := false;
   end;
 
   procedure AddLookUP(ADS: TClientDataSet; AKey: integer; AValue: string);
@@ -602,9 +604,11 @@ begin
 
     CdsFileListDef.IndexFieldNames := 'Id';
     CdsFileListDef.CreateDataSet;
+    CdsFileListDef.LogChanges := false;
 
     CdsColumnSet.IndexFieldNames := 'FileListName;Seq';
     CdsColumnSet.CreateDataSet;
+    CdsColumnSet.LogChanges := false;
 
     Id := 0;
     for AColumnSet in FileListDefs do

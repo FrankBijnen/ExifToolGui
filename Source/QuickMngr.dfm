@@ -4,7 +4,7 @@ object FQuickManager: TFQuickManager
   BorderStyle = bsDialog
   Caption = 'Workspace manager'
   ClientHeight = 501
-  ClientWidth = 750
+  ClientWidth = 771
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -118,18 +118,18 @@ object FQuickManager: TFQuickManager
     end
   end
   object Button4: TButton
-    Left = 679
+    Left = 675
     Top = 419
-    Width = 65
+    Width = 83
     Height = 25
     Caption = 'Cancel'
     ModalResult = 2
     TabOrder = 1
   end
   object Button5: TButton
-    Left = 679
+    Left = 675
     Top = 456
-    Width = 65
+    Width = 83
     Height = 25
     Caption = 'Save'
     Default = True
@@ -139,11 +139,11 @@ object FQuickManager: TFQuickManager
   object StatusBar1: TStatusBar
     Left = 0
     Top = 482
-    Width = 750
+    Width = 771
     Height = 19
     Panels = <>
     SimplePanel = True
     ExplicitTop = 481
-    ExplicitWidth = 743
+    ExplicitWidth = 746
   end
 end

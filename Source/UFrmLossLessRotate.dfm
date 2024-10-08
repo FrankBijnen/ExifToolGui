@@ -22,7 +22,7 @@ object FLossLessRotate: TFLossLessRotate
     Panels = <>
     SimplePanel = True
     ExplicitTop = 377
-    ExplicitWidth = 580
+    ExplicitWidth = 589
   end
   object AdvPanel1: TPanel
     Left = 0
@@ -147,18 +147,18 @@ object FLossLessRotate: TFLossLessRotate
     end
   end
   object BtnCancel: TButton
-    Left = 518
-    Top = 14
-    Width = 69
+    Left = 504
+    Top = 15
+    Width = 81
     Height = 25
     Caption = 'Cancel'
     ModalResult = 2
     TabOrder = 1
   end
   object BtnExecute: TButton
-    Left = 518
+    Left = 504
     Top = 346
-    Width = 69
+    Width = 81
     Height = 25
     Caption = 'Execute'
     Default = True
