@@ -4,7 +4,7 @@ object FrmAbout: TFrmAbout
   BorderIcons = []
   BorderStyle = bsToolWindow
   Caption = 'About'
-  ClientHeight = 269
+  ClientHeight = 284
   ClientWidth = 409
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
@@ -156,7 +156,7 @@ object FrmAbout: TFrmAbout
   end
   object Panel1: TPanel
     Left = 0
-    Top = 240
+    Top = 255
     Width = 409
     Height = 29
     Align = alBottom
@@ -167,7 +167,7 @@ object FrmAbout: TFrmAbout
       409
       29)
     object BtnOk: TBitBtn
-      Left = 319
+      Left = 311
       Top = 2
       Width = 85
       Height = 25
@@ -175,6 +175,7 @@ object FrmAbout: TFrmAbout
       Kind = bkClose
       NumGlyphs = 2
       TabOrder = 0
+      ExplicitLeft = 303
     end
   end
 end

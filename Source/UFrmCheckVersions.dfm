@@ -4,8 +4,8 @@ object FrmCheckVersions: TFrmCheckVersions
   BorderIcons = []
   BorderStyle = bsToolWindow
   Caption = 'Check versions'
-  ClientHeight = 253
-  ClientWidth = 675
+  ClientHeight = 255
+  ClientWidth = 678
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -63,13 +63,13 @@ object FrmCheckVersions: TFrmCheckVersions
   end
   object Panel1: TPanel
     Left = 0
-    Top = 224
-    Width = 675
+    Top = 226
+    Width = 678
     Height = 29
     Align = alBottom
     TabOrder = 0
     ExplicitTop = 200
-    ExplicitWidth = 658
+    ExplicitWidth = 659
     object BtnClose: TBitBtn
       Left = 585
       Top = 0

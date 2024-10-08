@@ -37,8 +37,10 @@ var
 
 implementation
 
-uses Main, MainDef, ExifTool, ExifToolsGUI_Utils, ShellAPI, UnitLangResources, ExifToolsGui_Versions, ExifToolsGui_Data,
-     Vcl.Themes;
+uses
+  Main, MainDef, ExifTool, ExifToolsGUI_Utils, ShellAPI, UnitLangResources, ExifToolsGui_Versions,
+  ExifToolsGui_ResourceStrings,
+  Vcl.Themes;
 
 {$R *.dfm}
 

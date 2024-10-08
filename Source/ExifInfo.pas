@@ -354,7 +354,7 @@ begin
   if not Assigned(FAllInterFields) then
   begin
     FAllInterFields := TStringList.Create;
-    LoadResourceList('AllInternalFields', FAllInterFields);
+    LoadResourceList('ETD_AllInternalFields' , FAllInterFields);
   end;
   result := FAllInterFields;
 end;
@@ -364,7 +364,7 @@ begin
   if not Assigned(FPentaxLenses) then
   begin
     FPentaxLenses := TStringList.Create;
-    LoadResourceList('PentaxLenses', FPentaxLenses);
+    LoadResourceList('ETD_PentaxLenses', FPentaxLenses);
   end;
   result := FPentaxLenses;
 end;
