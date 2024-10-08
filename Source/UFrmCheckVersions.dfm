@@ -68,11 +68,11 @@ object FrmCheckVersions: TFrmCheckVersions
     Height = 29
     Align = alBottom
     TabOrder = 0
-    ExplicitTop = 200
-    ExplicitWidth = 659
+    ExplicitTop = 214
+    ExplicitWidth = 670
     object BtnClose: TBitBtn
       Left = 585
-      Top = 0
+      Top = 2
       Width = 85
       Height = 25
       Kind = bkClose
@@ -80,7 +80,7 @@ object FrmCheckVersions: TFrmCheckVersions
       TabOrder = 0
     end
     object BtnOpenUrl: TBitBtn
-      Left = 468
+      Left = 476
       Top = 2
       Width = 100
       Height = 25

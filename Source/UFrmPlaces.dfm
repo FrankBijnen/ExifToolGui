@@ -29,7 +29,7 @@ object FrmPlaces: TFrmPlaces
       636
       29)
     object BtnOk: TBitBtn
-      Left = 364
+      Left = 369
       Top = 1
       Width = 85
       Height = 25
@@ -58,7 +58,7 @@ object FrmPlaces: TFrmPlaces
       TabOrder = 0
     end
     object BtnCancel: TBitBtn
-      Left = 452
+      Left = 457
       Top = 1
       Width = 85
       Height = 25
@@ -87,7 +87,7 @@ object FrmPlaces: TFrmPlaces
       TabOrder = 1
     end
     object BtnRetry: TBitBtn
-      Left = 540
+      Left = 545
       Top = 1
       Width = 85
       Height = 25

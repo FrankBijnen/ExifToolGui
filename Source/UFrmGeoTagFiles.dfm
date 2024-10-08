@@ -22,21 +22,21 @@ object FGeotagFiles: TFGeotagFiles
     Panels = <>
     SimplePanel = True
     ExplicitTop = 388
-    ExplicitWidth = 587
+    ExplicitWidth = 597
   end
   object BtnCancel: TButton
-    Left = 514
+    Left = 513
     Top = 32
-    Width = 80
+    Width = 83
     Height = 25
     Caption = 'Cancel'
     ModalResult = 2
     TabOrder = 0
   end
   object BtnExecute: TButton
-    Left = 513
+    Left = 514
     Top = 357
-    Width = 80
+    Width = 83
     Height = 25
     Caption = 'Execute'
     Default = True
@@ -120,9 +120,9 @@ object FGeotagFiles: TFGeotagFiles
     end
   end
   object BtnSetupGeoCode: TButton
-    Left = 513
+    Left = 514
     Top = 309
-    Width = 80
+    Width = 83
     Height = 25
     Caption = 'Setup Geo'
     TabOrder = 4

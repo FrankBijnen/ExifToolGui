@@ -4,7 +4,7 @@ object FPreferences: TFPreferences
   BorderStyle = bsDialog
   Caption = 'Preferences'
   ClientHeight = 414
-  ClientWidth = 686
+  ClientWidth = 704
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -16,7 +16,7 @@ object FPreferences: TFPreferences
   object BtnCancel: TButton
     Left = 615
     Top = 329
-    Width = 67
+    Width = 80
     Height = 25
     Caption = 'Cancel'
     ModalResult = 2
@@ -25,7 +25,7 @@ object FPreferences: TFPreferences
   object BtnSave: TButton
     Left = 615
     Top = 375
-    Width = 67
+    Width = 80
     Height = 25
     Caption = 'Save'
     Default = True
@@ -43,6 +43,7 @@ object FPreferences: TFPreferences
     DoubleBuffered = True
     ParentDoubleBuffered = False
     TabOrder = 0
+    ExplicitHeight = 413
     object AdvTabGeneral: TTabSheet
       Caption = 'General'
       object Label1: TLabel

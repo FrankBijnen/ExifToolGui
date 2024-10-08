@@ -14,9 +14,9 @@ object FGeotag: TFGeotag
   OnShow = FormShow
   TextHeight = 13
   object Label1: TLabel
-    Left = 565
+    Left = 560
     Top = 285
-    Width = 90
+    Width = 96
     Height = 13
     AutoSize = False
     Caption = 'Label1'
@@ -29,7 +29,7 @@ object FGeotag: TFGeotag
     Panels = <>
     SimplePanel = True
     ExplicitTop = 334
-    ExplicitWidth = 645
+    ExplicitWidth = 659
   end
   object AdvPanel1: TPanel
     Left = 0
@@ -176,18 +176,18 @@ object FGeotag: TFGeotag
     end
   end
   object Button1: TButton
-    Left = 565
+    Left = 560
     Top = 23
-    Width = 90
+    Width = 96
     Height = 25
     Caption = 'Cancel'
     ModalResult = 2
     TabOrder = 2
   end
   object Button2: TButton
-    Left = 565
+    Left = 560
     Top = 304
-    Width = 90
+    Width = 96
     Height = 25
     Caption = 'Execute'
     Default = True
@@ -195,18 +195,18 @@ object FGeotag: TFGeotag
     OnClick = Button2Click
   end
   object BtnSetupGeoCode: TButton
-    Left = 565
+    Left = 560
     Top = 254
-    Width = 90
+    Width = 96
     Height = 25
     Caption = 'Setup Geo'
     TabOrder = 4
     OnClick = BtnSetupGeoCodeClick
   end
   object BtnOnMap: TButton
-    Left = 565
+    Left = 560
     Top = 213
-    Width = 90
+    Width = 96
     Height = 25
     Caption = 'Show on Map'
     TabOrder = 5

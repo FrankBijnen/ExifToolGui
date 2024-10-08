@@ -22,7 +22,7 @@ object FGenericImport: TFGenericImport
     Panels = <>
     SimplePanel = True
     ExplicitTop = 323
-    ExplicitWidth = 578
+    ExplicitWidth = 586
   end
   object AdvPanel1: TPanel
     Left = 0
@@ -114,18 +114,18 @@ object FGenericImport: TFGenericImport
     end
   end
   object BtnCancel: TButton
-    Left = 515
+    Left = 503
     Top = 14
-    Width = 69
+    Width = 80
     Height = 25
     Caption = 'Cancel'
     ModalResult = 2
     TabOrder = 1
   end
   object BtnExecute: TButton
-    Left = 515
+    Left = 503
     Top = 287
-    Width = 69
+    Width = 80
     Height = 25
     Caption = 'Execute'
     Default = True

@@ -36,7 +36,7 @@ object FrmPredefinedTags: TFrmPredefinedTags
       694
       29)
     object BtnOk: TBitBtn
-      Left = 508
+      Left = 513
       Top = 2
       Width = 85
       Height = 25
@@ -65,7 +65,7 @@ object FrmPredefinedTags: TFrmPredefinedTags
       TabOrder = 0
     end
     object BtnCancel: TBitBtn
-      Left = 599
+      Left = 604
       Top = 2
       Width = 85
       Height = 25
