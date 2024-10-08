@@ -564,11 +564,13 @@ begin
   CdsFileListDef.Close;
   CdsColumnSet.Close;
 
+  CdsFileListDef.DisableControls;
+  CdsFileListDef.ReadOnly := false;
+
   CdsColumnSet.MasterSource := nil;
   CdsColumnSet.MasterFields := '';
-  CdsFileListDef.DisableControls;
   CdsColumnSet.DisableControls;
-  CdsFileListDef.ReadOnly := false;
+  CdsColumnSet.ReadOnly := false;
   try
     // Get Captions for 'fast' system fields
     TSubShellFolder.AllFastSystemFields(FSample.Parent, FSystemTagNames);
@@ -627,6 +629,8 @@ begin
     CdsColumnSet.EnableControls;
     CdsColumnSet.MasterFields := 'Name';
     CdsColumnSet.MasterSource := DsFileListDef;
+    if (SelectedSet > CdsFileListDef.RecordCount) then
+      SelectedSet := CdsFileListDef.RecordCount;
     CdsFileListDef.RecNo := SelectedSet;
   end;
 end;
