@@ -17,10 +17,14 @@ object DmFileLists: TDmFileLists
         Visible = False
       end>
     Params = <>
+    BeforeInsert = CdsFileListDefBeforeInsert
     AfterInsert = CdsFileListDefAfterInsert
-    BeforeScroll = CdsFileListDefBeforeScroll
+    BeforePost = CdsFileListDefBeforePost
+    AfterPost = CdsFileListDefAfterPost
+    BeforeDelete = CdsFileListDefBeforeDelete
+    AfterScroll = CdsFileListDefAfterScroll
     Left = 82
-    Top = 32
+    Top = 31
     object CdsFileListDefId: TIntegerField
       FieldName = 'Id'
       Visible = False
@@ -52,6 +56,9 @@ object DmFileLists: TDmFileLists
       KeyFields = 'ReadMode'
       Lookup = True
     end
+    object CdsFileListDefOptions: TIntegerField
+      FieldName = 'Options'
+    end
   end
   object DsColumnSet: TDataSource
     DataSet = CdsColumnSet
@@ -65,7 +72,7 @@ object DmFileLists: TDmFileLists
     BeforeInsert = CdsColumnSetBeforeInsert
     AfterInsert = CdsColumnSetAfterInsert
     OnCalcFields = CdsColumnSetCalcFields
-    Left = 82
+    Left = 81
     Top = 116
     object CdsColumnSetFileListName: TStringField
       DisplayWidth = 25

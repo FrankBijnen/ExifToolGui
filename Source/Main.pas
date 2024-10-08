@@ -738,8 +738,6 @@ end;
 
 procedure TFMain.CBoxDetailsChange(Sender: TObject);
 begin
-  SpeedBtnColumnEdit.Enabled := SpeedBtnDetails.Down and (CBoxDetails.ItemIndex > 0);
-
   with ShellList do
   if (Enabled) then
   begin
@@ -2617,7 +2615,6 @@ var
   Param: string;
   Lat, Lon: string;
   Index: integer;
-  I: integer;
   PathFromParm: boolean;
 begin
 
@@ -2665,8 +2662,6 @@ begin
     CBoxDetails.Enabled := false;
   end;
 
-  I := CBoxDetails.Items.Count - 1;
-  SpeedBtnColumnEdit.Enabled := (CBoxDetails.ItemIndex = I);
   WrkIniDir := GetAppPath;
   if GUIsettings.UseExitDetails then
     CBoxDetailsChange(Sender);

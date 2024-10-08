@@ -1,5 +1,5 @@
 unit ExifInfo;
-{.DEFINE DEBUG_XMP}
+{.$DEFINE DEBUG_XMP}
 
 // ****************************QUICK METADATA ACCESS*************************
 // Not all formats supported. Check Value of 'Supported'

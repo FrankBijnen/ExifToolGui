@@ -20,14 +20,22 @@ type
     DbgColumnSet: TDBGrid;
     HSplitter: TSplitter;
     PnlMiddle: TPanel;
-    DBNavigator1: TDBNavigator;
-    DBNavigator2: TDBNavigator;
+    DBNavFileList: TDBNavigator;
+    DBNavColumnSet: TDBNavigator;
     PnlDetail: TPanel;
     VSplitter: TSplitter;
     DbgTagNames: TDBGrid;
     PnlEdSearch: TPanel;
     EdSearchTag: TLabeledEdit;
     BtnLoadXMP: TButton;
+    SpbAddPred: TSpeedButton;
+    SpbDelPred: TSpeedButton;
+    SpbEditPred: TSpeedButton;
+    SpbAddTag: TSpeedButton;
+    SpbDelTag: TSpeedButton;
+    SpbEditTag: TSpeedButton;
+    SpbDuplicate: TSpeedButton;
+    SpbDefaults: TSpeedButton;
     procedure FormCreate(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure DbGridKeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
@@ -35,12 +43,21 @@ type
     procedure DbgTagNamesDblClick(Sender: TObject);
     procedure DbgColumnSetEditButtonClick(Sender: TObject);
     procedure BtnLoadXMPClick(Sender: TObject);
+    procedure SpbAddPredClick(Sender: TObject);
+    procedure SpbDelPredClick(Sender: TObject);
+    procedure SpbEditPredClick(Sender: TObject);
+    procedure SpbAddTagClick(Sender: TObject);
+    procedure SpbDelTagClick(Sender: TObject);
+    procedure SpbEditTagClick(Sender: TObject);
+    procedure SpbDefaultsClick(Sender: TObject);
+    procedure SpbDuplicateClick(Sender: TObject);
   private
     { Private declarations }
     FSample: TShellFolder;
+    procedure CreateDefaults;
     procedure TagNameLookup;
     procedure EndTagNameLookup(Value: string);
-    procedure FileListChanged(Sender: Tobject);
+    procedure OnSetEditMode(Sender: Tobject);
     procedure TagNamesFilterRecord(DataSet: TDataSet; var Accept: Boolean);
   protected
     function GetDefWindowSizes: TRect; override;
@@ -57,14 +74,27 @@ implementation
 {$R *.dfm}
 
 uses
-  System.StrUtils,
-  UDmFileLists,
-  UFrmTagNames,
-  MainDef, UnitColumnDefs;
+  System.StrUtils, System.IniFiles, System.SysUtils,
+  Vcl.Dialogs,
+  UDmFileLists, UFrmTagNames,
+  Main, ExifToolsGUI_Utils, MainDef, UnitColumnDefs, UnitLangResources;
 
 function TFEditFColumn.GetDefWindowSizes: TRect;
 begin
   result := Rect(108, 106, 880, 640);
+end;
+
+procedure TFEditFColumn.CreateDefaults;
+var
+  GUIini: TMemIniFile;
+begin
+  GUIini := TMemIniFile.Create('NUL', TEncoding.UTF8);
+  try
+    ReadFileListColumns(FMain.ShellList.Handle, GUIini);
+    DmFileLists.LoadFromColumnSets(FSample);
+  finally
+    GUIini.Free;
+  end;
 end;
 
 procedure TFEditFColumn.TagNameLookup;
@@ -117,6 +147,8 @@ end;
 
 procedure TFEditFColumn.DbgColumnSetEditButtonClick(Sender: TObject);
 begin
+  if DmFileLists.CdsColumnSet.ReadOnly then
+    exit;
   // Get Latest values
   DmFileLists.CdsColumnSet.Edit;
   DmFileLists.CdsColumnSet.UpdateRecord;
@@ -144,10 +176,62 @@ begin
   Accept := ContainsText(DataSet.FieldByName('TagName').AsString, EdSearchTag.Text);
 end;
 
-procedure TFEditFColumn.FileListChanged(Sender: Tobject);
+procedure TFEditFColumn.OnSetEditMode(Sender: Tobject);
 begin
-  PnlDetail.Visible := false;
-  VSplitter.Visible := false;
+  case (TFileListOptions(DmFileLists.CdsFileListDefOptions.AsInteger)) of
+    TFileListOptions.floSystem:
+      begin
+        DmFileLists.CdsFileListDef.ReadOnly := true;
+        DbgFileListDef.ReadOnly := true;
+
+        SpbDelPred.Enabled := false;
+        SpbEditPred.Enabled := false;
+
+        DmFileLists.CdsColumnSet.ReadOnly := true;
+        DbgColumnSet.ReadOnly := true;
+
+        SpbAddTag.Enabled := false;
+        SpbDelTag.Enabled := false;
+        SpbEditTag.Enabled := false;
+      end;
+    TFileListOptions.floInternal:
+      begin
+        DmFileLists.CdsFileListDef.ReadOnly := false;
+        DbgFileListDef.ReadOnly := false;
+        SpbDelPred.Enabled := false;
+        SpbEditPred.Enabled := true;
+        DbgFileListDef.Columns[0].ReadOnly := true;
+        DbgFileListDef.Columns[1].ReadOnly := true;
+        DbgFileListDef.Columns[2].ReadOnly := true;
+        DbgFileListDef.Columns[3].ReadOnly := false;
+
+        DmFileLists.CdsColumnSet.ReadOnly := false;
+        DbgColumnSet.ReadOnly := false;
+        SpbAddTag.Enabled := true;
+        SpbDelTag.Enabled := true;
+        SpbEditTag.Enabled := true;
+      end;
+    TFileListOptions.floUserDef:
+      begin
+        DmFileLists.CdsFileListDef.ReadOnly := false;
+        DbgFileListDef.ReadOnly := false;
+        SpbDelPred.Enabled := true;
+        SpbEditPred.Enabled := true;
+        DbgFileListDef.Columns[0].ReadOnly := not (DmFileLists.CdsFileListDef.State in [dsInsert]);
+        // Readonly is not recognized
+        DbgFileListDef.SelectedIndex := 1;
+        DbgFileListDef.SelectedIndex := 0;
+        DbgFileListDef.Columns[1].ReadOnly := false;
+        DbgFileListDef.Columns[2].ReadOnly := true;
+        DbgFileListDef.Columns[3].ReadOnly := false;
+
+        DmFileLists.CdsColumnSet.ReadOnly := false;
+        DbgColumnSet.ReadOnly := false;
+        SpbAddTag.Enabled := true;
+        SpbDelTag.Enabled := true;
+        SpbEditTag.Enabled := true;
+      end;
+  end;
 end;
 
 procedure TFEditFColumn.FormClose(Sender: TObject; var Action: TCloseAction);
@@ -166,7 +250,56 @@ begin
   FSample := ASample;
   DmFileLists.LoadFromColumnSets(FSample);
   DmFileLists.OnFilterTag := TagNamesFilterRecord;
-  DmFileLists.OnFileListChanged := FileListChanged;
+  DmFileLists.OnSetEditMode := OnSetEditMode;
+end;
+
+procedure TFEditFColumn.SpbAddPredClick(Sender: TObject);
+begin
+  DmFileLists.CdsFileListDef.Last;
+  DmFileLists.CdsFileListDef.Append;
+end;
+
+procedure TFEditFColumn.SpbDefaultsClick(Sender: TObject);
+begin
+  if (MessageDlgEx(StrDeleteCustom, '', TMsgDlgType.mtConfirmation, [TMsgDlgBtn.mbOK, TMsgDlgBtn.mbCancel]) = IdCancel) then
+    exit;
+
+  CreateDefaults;
+end;
+
+procedure TFEditFColumn.SpbDelPredClick(Sender: TObject);
+begin
+  DmFileLists.CdsFileListDef.Delete;
+end;
+
+procedure TFEditFColumn.SpbEditPredClick(Sender: TObject);
+begin
+  DmFileLists.CdsFileListDef.Edit;
+end;
+
+procedure TFEditFColumn.SpbAddTagClick(Sender: TObject);
+begin
+  DmFileLists.CdsColumnSet.Insert;
+end;
+
+procedure TFEditFColumn.SpbDelTagClick(Sender: TObject);
+begin
+  DmFileLists.CdsColumnSet.Delete;
+end;
+
+procedure TFEditFColumn.SpbDuplicateClick(Sender: TObject);
+var
+  NewName: array[0..1] of string;
+begin
+  NewName[0] := DmFileLists.CdsFileListDefName.AsString + '_Copy';
+  NewName[1] := DmFileLists.CdsFileListDefDescription.AsString + '_Copy';
+  if (InputQuery('New Filelist', ['Name', 'Description'], NewName)) then
+    DmFileLists.Duplicate(DmFileLists.CdsFileListDefId.AsInteger, NewName[0], NewName[1]);
+end;
+
+procedure TFEditFColumn.SpbEditTagClick(Sender: TObject);
+begin
+  DmFileLists.CdsColumnSet.Edit;
 end;
 
 end.

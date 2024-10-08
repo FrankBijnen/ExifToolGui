@@ -51,13 +51,53 @@ object FEditFColumn: TFEditFColumn
       Align = alTop
       TabOrder = 0
       ExplicitWidth = 1224
-      object DBNavigator1: TDBNavigator
-        Left = 10
-        Top = 2
-        Width = 216
+      object SpbAddPred: TSpeedButton
+        Left = 2
+        Top = 3
+        Width = 100
+        Height = 25
+        Caption = 'Add'
+        OnClick = SpbAddPredClick
+      end
+      object SpbDelPred: TSpeedButton
+        Left = 104
+        Top = 3
+        Width = 100
+        Height = 25
+        Caption = 'Delete'
+        OnClick = SpbDelPredClick
+      end
+      object SpbEditPred: TSpeedButton
+        Left = 206
+        Top = 3
+        Width = 100
+        Height = 25
+        Caption = 'Edit'
+        OnClick = SpbEditPredClick
+      end
+      object SpbDuplicate: TSpeedButton
+        Left = 308
+        Top = 3
+        Width = 100
+        Height = 25
+        Caption = 'Duplicate'
+        OnClick = SpbDuplicateClick
+      end
+      object SpbDefaults: TSpeedButton
+        Left = 411
+        Top = 3
+        Width = 100
+        Height = 25
+        Caption = 'Defaults'
+        OnClick = SpbDefaultsClick
+      end
+      object DBNavFileList: TDBNavigator
+        Left = 516
+        Top = 3
+        Width = 176
         Height = 25
         DataSource = DmFileLists.DsFileListDef
-        VisibleButtons = [nbPrior, nbNext, nbInsert, nbDelete, nbPost, nbCancel]
+        VisibleButtons = [nbPrior, nbNext, nbPost, nbCancel]
         TabOrder = 0
       end
     end
@@ -77,6 +117,11 @@ object FEditFColumn: TFEditFColumn
       TitleFont.Style = []
       OnKeyUp = DbGridKeyUp
       Columns = <
+        item
+          Expanded = False
+          FieldName = 'Name'
+          Visible = True
+        end
         item
           Expanded = False
           FieldName = 'Description'
@@ -167,13 +212,37 @@ object FEditFColumn: TFEditFColumn
       Align = alTop
       TabOrder = 3
       ExplicitWidth = 1224
-      object DBNavigator2: TDBNavigator
-        Left = 10
-        Top = 2
-        Width = 216
+      object SpbAddTag: TSpeedButton
+        Left = 2
+        Top = 3
+        Width = 100
+        Height = 25
+        Caption = 'Add'
+        OnClick = SpbAddTagClick
+      end
+      object SpbDelTag: TSpeedButton
+        Left = 104
+        Top = 3
+        Width = 100
+        Height = 25
+        Caption = 'Delete'
+        OnClick = SpbDelTagClick
+      end
+      object SpbEditTag: TSpeedButton
+        Left = 206
+        Top = 3
+        Width = 100
+        Height = 25
+        Caption = 'Edit'
+        OnClick = SpbEditTagClick
+      end
+      object DBNavColumnSet: TDBNavigator
+        Left = 310
+        Top = 3
+        Width = 176
         Height = 25
         DataSource = DmFileLists.DsColumnSet
-        VisibleButtons = [nbPrior, nbNext, nbInsert, nbDelete, nbPost, nbCancel]
+        VisibleButtons = [nbPrior, nbNext, nbPost, nbCancel]
         TabOrder = 0
       end
     end
@@ -265,7 +334,7 @@ object FEditFColumn: TFEditFColumn
       1230
       29)
     object BtnOk: TBitBtn
-      Left = 1005
+      Left = 1001
       Top = 2
       Width = 87
       Height = 25
@@ -292,10 +361,10 @@ object FEditFColumn: TFEditFColumn
       ModalResult = 1
       NumGlyphs = 2
       TabOrder = 0
-      ExplicitLeft = 1001
+      ExplicitLeft = 997
     end
     object BtnCancel: TBitBtn
-      Left = 1096
+      Left = 1092
       Top = 2
       Width = 87
       Height = 25
@@ -322,7 +391,7 @@ object FEditFColumn: TFEditFColumn
       ModalResult = 2
       NumGlyphs = 2
       TabOrder = 1
-      ExplicitLeft = 1092
+      ExplicitLeft = 1088
     end
   end
 end
