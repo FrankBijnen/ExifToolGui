@@ -26,8 +26,6 @@ type
     VSplitter: TSplitter;
     DbgTagNames: TDBGrid;
     PnlEdSearch: TPanel;
-    EdSearchTag: TLabeledEdit;
-    BtnLoadXMP: TButton;
     SpbAddPred: TSpeedButton;
     SpbDelPred: TSpeedButton;
     SpbEditPred: TSpeedButton;
@@ -36,13 +34,16 @@ type
     SpbEditTag: TSpeedButton;
     SpbDuplicate: TSpeedButton;
     SpbDefaults: TSpeedButton;
+    BtnApplyTag: TButton;
+    PnlSearch: TPanel;
+    EdSearchTag: TEdit;
+    LblSearchTag: TLabel;
     procedure FormCreate(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure DbGridKeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
     procedure EdSearchTagKeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
     procedure DbgTagNamesDblClick(Sender: TObject);
     procedure DbgColumnSetEditButtonClick(Sender: TObject);
-    procedure BtnLoadXMPClick(Sender: TObject);
     procedure SpbAddPredClick(Sender: TObject);
     procedure SpbDelPredClick(Sender: TObject);
     procedure SpbEditPredClick(Sender: TObject);
@@ -51,10 +52,13 @@ type
     procedure SpbEditTagClick(Sender: TObject);
     procedure SpbDefaultsClick(Sender: TObject);
     procedure SpbDuplicateClick(Sender: TObject);
+    procedure FormShow(Sender: TObject);
+    procedure BtnApplyTagClick(Sender: TObject);
   private
     { Private declarations }
     FSample: TShellFolder;
     procedure CreateDefaults;
+    procedure SetDetail(Visible: boolean);
     procedure TagNameLookup;
     procedure EndTagNameLookup(Value: string);
     procedure OnSetEditMode(Sender: Tobject);
@@ -84,6 +88,11 @@ begin
   result := Rect(108, 106, 880, 640);
 end;
 
+procedure TFEditFColumn.BtnApplyTagClick(Sender: TObject);
+begin
+  EndTagNameLookup(DmFileLists.CdsTagNamesTagName.AsString);
+end;
+
 procedure TFEditFColumn.CreateDefaults;
 var
   GUIini: TMemIniFile;
@@ -97,6 +106,12 @@ begin
   end;
 end;
 
+procedure TFEditFColumn.SetDetail(Visible: boolean);
+begin
+  PnlDetail.Visible := Visible;
+  VSplitter.Visible := Visible;
+end;
+
 procedure TFEditFColumn.TagNameLookup;
 begin
   case DmFileLists.CdsFileListDefReadMode.AsInteger of
@@ -107,8 +122,7 @@ begin
         DmFileLists.CdsTagNames.Filtered := false;
         DmFileLists.CdsTagNames.Filtered := (EdSearchTag.Text <> '');
 
-        PnlDetail.Visible := true;
-        VSplitter.Visible := true;
+        SetDetail(true);
         EdSearchTag.SetFocus;
         DmFileLists.CdsTagNames.Locate('TagName',
                                        DmFileLists.CdsColumnSetCommand.AsString,
@@ -130,19 +144,12 @@ begin
   if not (DmFileLists.CdsColumnSet.State in [dsInsert, dsEdit]) then
     DmFileLists.CdsColumnSet.Edit;
   DmFileLists.CdsColumnSetCommand.AsString := Value;
-  PnlDetail.Visible := false;
-  VSplitter.Visible := false;
+  SetDetail(false);
 end;
 
 procedure TFEditFColumn.DbgTagNamesDblClick(Sender: TObject);
 begin
   EndTagNameLookup(DmFileLists.CdsTagNamesTagName.AsString);
-end;
-
-procedure TFEditFColumn.BtnLoadXMPClick(Sender: TObject);
-begin
-// Create txt file with XMP tags
-  DmFileLists.WriteAllXmpTags;
 end;
 
 procedure TFEditFColumn.DbgColumnSetEditButtonClick(Sender: TObject);
@@ -178,6 +185,7 @@ end;
 
 procedure TFEditFColumn.OnSetEditMode(Sender: Tobject);
 begin
+  SetDetail(DmFileLists.CdsColumnSet.State in [dsEdit, dsInsert]);
   case (TFileListOptions(DmFileLists.CdsFileListDefOptions.AsInteger)) of
     TFileListOptions.floSystem:
       begin
@@ -245,6 +253,11 @@ begin
   ReadFormSizes(Self, Self.DefWindowSizes);
 end;
 
+procedure TFEditFColumn.FormShow(Sender: TObject);
+begin
+  SetDetail(false);
+end;
+
 procedure TFEditFColumn.PrepareShow(ASample: TShellFolder);
 begin
   FSample := ASample;
@@ -280,6 +293,7 @@ end;
 procedure TFEditFColumn.SpbAddTagClick(Sender: TObject);
 begin
   DmFileLists.CdsColumnSet.Insert;
+  TagNameLookup;
 end;
 
 procedure TFEditFColumn.SpbDelTagClick(Sender: TObject);

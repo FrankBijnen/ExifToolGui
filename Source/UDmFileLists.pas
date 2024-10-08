@@ -83,6 +83,7 @@ type
   public
     { Public declarations }
     SelectedSet: integer;
+    function NameExists(Name: string): boolean;
     procedure LoadFromColumnSets(ASample: TShellFolder);
     procedure SaveToColumnSets;
     procedure WriteAllXmpTags;
@@ -243,6 +244,12 @@ begin
     Abort;
   if not (CheckEmptyField(Dataset.FieldByName('Description'))) then
     Abort;
+
+  if NameExists(Dataset.FieldByName('Name').AsString) then
+  begin
+    MessageDlgEx(Format('%s Exists', [Dataset.FieldByName('Name').AsString]), '', TMsgDlgType.mtError, [TMsgDlgBtn.mbOK]);
+    Abort;
+  end;
 end;
 
 procedure TDmFileLists.CdsFileListDefBeforeDelete(DataSet: TDataSet);
@@ -545,6 +552,19 @@ begin
     CdsColumnSet.Close;
     CdsFileListDef.EnableControls;
     CdsColumnSet.EnableControls;
+  end;
+end;
+
+function TDmFileLists.NameExists(Name: string): boolean;
+var
+  ACds: TClientDataSet;
+begin
+  ACds := TClientDataSet.Create(Self);
+  try
+    ACds.CloneCursor(CdsFileListDef, true, false);
+    result := ACds.Locate('Name', Name, [TLocateOption.loCaseInsensitive]);
+  finally
+    ACds.Free;
   end;
 end;
 

@@ -13,6 +13,7 @@ object FEditFColumn: TFEditFColumn
   KeyPreview = True
   OnClose = FormClose
   OnCreate = FormCreate
+  OnShow = FormShow
   TextHeight = 13
   object PnlGrids: TPanel
     Left = 0
@@ -258,9 +259,9 @@ object FEditFColumn: TFEditFColumn
       ExplicitHeight = 246
       object DbgTagNames: TDBGrid
         Left = 1
-        Top = 46
+        Top = 25
         Width = 346
-        Height = 200
+        Height = 221
         Align = alClient
         DataSource = DmFileLists.DsTagNames
         TabOrder = 0
@@ -288,35 +289,61 @@ object FEditFColumn: TFEditFColumn
         Left = 1
         Top = 1
         Width = 346
-        Height = 45
+        Height = 24
         Align = alTop
         TabOrder = 1
-        DesignSize = (
-          346
-          45)
-        object EdSearchTag: TLabeledEdit
-          Left = 1
-          Top = 23
-          Width = 344
-          Height = 21
-          Align = alBottom
-          EditLabel.Width = 83
-          EditLabel.Height = 13
-          EditLabel.Caption = 'Search Tag name'
-          TabOrder = 0
-          Text = ''
-          OnKeyUp = EdSearchTagKeyUp
-        end
-        object BtnLoadXMP: TButton
-          Left = 263
+        object BtnApplyTag: TButton
+          Left = 270
           Top = 1
-          Width = 82
+          Width = 75
           Height = 22
-          Anchors = [akTop, akRight]
-          Caption = 'Load XMP Tags'
+          Align = alRight
+          Caption = 'Apply'
+          TabOrder = 0
+          OnClick = BtnApplyTagClick
+          ExplicitLeft = 0
+          ExplicitTop = 5
+          ExplicitHeight = 31
+        end
+        object PnlSearch: TPanel
+          Left = 1
+          Top = 1
+          Width = 269
+          Height = 22
+          Align = alClient
+          Alignment = taLeftJustify
           TabOrder = 1
-          Visible = False
-          OnClick = BtnLoadXMPClick
+          ExplicitLeft = 75
+          ExplicitTop = 5
+          ExplicitHeight = 43
+          object LblSearchTag: TLabel
+            AlignWithMargins = True
+            Left = 11
+            Top = 4
+            Width = 85
+            Height = 14
+            Margins.Left = 10
+            Margins.Right = 5
+            Align = alLeft
+            Caption = 'Search tag name:'
+            Layout = tlCenter
+            ExplicitLeft = 1
+            ExplicitTop = 1
+            ExplicitHeight = 13
+          end
+          object EdSearchTag: TEdit
+            Left = 101
+            Top = 1
+            Width = 167
+            Height = 20
+            Align = alClient
+            TabOrder = 0
+            Text = 'EdSearchTag'
+            OnKeyUp = EdSearchTagKeyUp
+            ExplicitLeft = 64
+            ExplicitWidth = 204
+            ExplicitHeight = 29
+          end
         end
       end
     end
@@ -334,7 +361,7 @@ object FEditFColumn: TFEditFColumn
       1230
       29)
     object BtnOk: TBitBtn
-      Left = 1001
+      Left = 997
       Top = 2
       Width = 87
       Height = 25
@@ -361,10 +388,10 @@ object FEditFColumn: TFEditFColumn
       ModalResult = 1
       NumGlyphs = 2
       TabOrder = 0
-      ExplicitLeft = 997
+      ExplicitLeft = 993
     end
     object BtnCancel: TBitBtn
-      Left = 1092
+      Left = 1088
       Top = 2
       Width = 87
       Height = 25
@@ -391,7 +418,7 @@ object FEditFColumn: TFEditFColumn
       ModalResult = 2
       NumGlyphs = 2
       TabOrder = 1
-      ExplicitLeft = 1088
+      ExplicitLeft = 1084
     end
   end
 end
