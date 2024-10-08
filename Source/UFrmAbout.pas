@@ -34,7 +34,7 @@ var
 
 implementation
 
-uses Main, ExifTool, ExifToolsGUI_Utils, ExifToolsGui_Data, ExifToolsGui_LossLess, ShellAPI, UnitLangResources;
+uses Main, ExifTool, ExifToolsGUI_Utils, ExifToolsGui_ResourceStrings, ExifToolsGui_LossLess, ShellAPI, UnitLangResources;
 
 {$R *.dfm}
 

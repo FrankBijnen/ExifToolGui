@@ -197,7 +197,7 @@ uses
   System.Variants, System.JSON,  System.NetEncoding, System.Math, System.StrUtils, System.DateUtils,
   Winapi.Windows, Vcl.Dialogs,
   REST.Types, REST.Client, REST.Utils,
-  UFrmPlaces, UFrmGeoSearch, ExifToolsGUI_Utils, ExifToolsGui_Data, ExifTool, UnitLangResources;
+  UFrmPlaces, UFrmGeoSearch, ExifToolsGUI_Utils, ExifToolsGui_ResourceStrings, ExifTool, UnitLangResources;
 
 var
   LastQuery: TDateTime;

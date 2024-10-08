@@ -8,7 +8,8 @@ program ExifToolGUI;
 // Allows for overriding the default language, without writing to the registry.
 // CommandLine example: /OverrideLanguage=NLD
 
-{$R 'ExifToolsGui_Data.res' 'Resources\ExifToolsGui_Data.rc'}
+{$R 'ExifToolsGui_Strings.res' 'Resources\ExifToolsGui_Strings.rc'}
+{$R 'ExifToolsGui_Files.res' 'Resources\ExifToolsGui_Files.rc'}
 
 uses
   {$IFDEF STACKTRACE}
@@ -24,6 +25,7 @@ uses
   Vcl.Styles,
   MidasLib,
   MainDef in 'MainDef.pas',
+  ExifToolsGui_ResourceStrings in 'ExifToolsGui_ResourceStrings.pas',
   UnitLangResources in 'UnitLangResources.pas',
   ExifToolsGUI_Utils in 'ExifToolsGUI_Utils.pas',
   UnitFilesOnClipBoard in 'UnitFilesOnClipBoard.pas',
@@ -38,7 +40,6 @@ uses
   ExifToolsGui_LossLess in 'ExifToolsGui_LossLess.pas',
   ExifToolsGUI_OpenPicture in 'ExifToolsGUI_OpenPicture.pas',
   ExifToolsGui_Versions in 'ExifToolsGui_Versions.pas',
-  ExifToolsGui_Data in 'ExifToolsGui_Data.pas',
   ExifToolsGUI_StringList in 'ExifToolsGUI_StringList.pas',
   ExifToolsGui_ComboBox in 'ExifToolsGui_ComboBox.pas',
   ExifInfo in 'ExifInfo.pas',

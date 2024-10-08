@@ -3,8 +3,8 @@ object FCopyMetadata: TFCopyMetadata
   Top = 0
   BorderStyle = bsSizeToolWin
   Caption = 'Copy metadata options'
-  ClientHeight = 461
-  ClientWidth = 456
+  ClientHeight = 464
+  ClientWidth = 465
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -18,17 +18,19 @@ object FCopyMetadata: TFCopyMetadata
   TextHeight = 13
   object StatusBar1: TStatusBar
     Left = 0
-    Top = 442
-    Width = 456
+    Top = 445
+    Width = 465
     Height = 19
     Panels = <>
     SimplePanel = True
+    ExplicitTop = 430
+    ExplicitWidth = 448
   end
   object AdvPanel1: TPanel
     Left = 0
     Top = 0
-    Width = 344
-    Height = 442
+    Width = 348
+    Height = 445
     Hint = 'Above data might not be desired to be copied.'
     Align = alClient
     DoubleBuffered = True
@@ -40,10 +42,12 @@ object FCopyMetadata: TFCopyMetadata
     ParentDoubleBuffered = False
     ParentFont = False
     TabOrder = 0
+    ExplicitWidth = 336
+    ExplicitHeight = 430
     object Label2: TLabel
       Left = 1
       Top = 1
-      Width = 350
+      Width = 346
       Height = 40
       Align = alTop
       Alignment = taCenter
@@ -61,8 +65,8 @@ object FCopyMetadata: TFCopyMetadata
     end
     object Label3: TLabel
       Left = 1
-      Top = 413
-      Width = 350
+      Top = 404
+      Width = 346
       Height = 40
       Align = alBottom
       Alignment = taCenter
@@ -77,8 +81,8 @@ object FCopyMetadata: TFCopyMetadata
       AlignWithMargins = True
       Left = 11
       Top = 75
-      Width = 337
-      Height = 335
+      Width = 333
+      Height = 326
       Margins.Left = 10
       Align = alClient
       Checkboxes = True
@@ -93,21 +97,21 @@ object FCopyMetadata: TFCopyMetadata
       TabOrder = 1
       ViewStyle = vsReport
       OnCustomDrawItem = LvTagNamesCustomDrawItem
-      ExplicitWidth = 329
-      ExplicitHeight = 323
+      ExplicitWidth = 321
+      ExplicitHeight = 311
     end
     object PnlButtons: TPanel
       AlignWithMargins = True
       Left = 11
       Top = 44
-      Width = 337
+      Width = 333
       Height = 25
       Margins.Left = 10
       Align = alTop
       TabOrder = 0
-      ExplicitWidth = 329
+      ExplicitWidth = 321
       object SpbPredefined: TSpeedButton
-        Left = 241
+        Left = 237
         Top = 1
         Width = 95
         Height = 23
@@ -121,35 +125,37 @@ object FCopyMetadata: TFCopyMetadata
       object CmbPredefined: TComboBox
         Left = 1
         Top = 1
-        Width = 240
+        Width = 236
         Height = 22
         Align = alClient
         TabOrder = 0
         Text = 'CmbPredefined'
         OnChange = CmbPredefinedChange
+        ExplicitWidth = 224
       end
     end
   end
   object PnlRight: TPanel
-    Left = 344
+    Left = 348
     Top = 0
-    Width = 112
-    Height = 442
+    Width = 117
+    Height = 445
     Align = alRight
     BevelOuter = bvNone
     TabOrder = 2
     DesignSize = (
-      112
-      442)
+      117
+      445)
     object Label1: TLabel
-      Left = 0
-      Top = 364
+      Left = 5
+      Top = 367
       Width = 110
       Height = 25
       Alignment = taCenter
       Anchors = [akRight, akBottom]
       AutoSize = False
       Caption = 'Label1'
+      ExplicitLeft = 0
       ExplicitTop = 374
     end
     object BtnCancel: TButton
@@ -162,18 +168,20 @@ object FCopyMetadata: TFCopyMetadata
       TabOrder = 0
     end
     object BtnPreview: TButton
-      Left = 0
-      Top = 328
+      Left = 5
+      Top = 331
       Width = 110
       Height = 25
       Anchors = [akRight, akBottom]
       Caption = 'Preview'
       TabOrder = 1
       OnClick = BtnPreviewClick
+      ExplicitLeft = 0
+      ExplicitTop = 316
     end
     object BtnExecute: TButton
-      Left = 0
-      Top = 400
+      Left = 5
+      Top = 403
       Width = 110
       Height = 25
       Anchors = [akRight, akBottom]
@@ -181,6 +189,8 @@ object FCopyMetadata: TFCopyMetadata
       Default = True
       ModalResult = 1
       TabOrder = 2
+      ExplicitLeft = 0
+      ExplicitTop = 388
     end
   end
   object PopupMenuLv: TPopupMenu

@@ -134,10 +134,14 @@
         <DelphiCompile Include="$(MainSource)">
             <MainSource>MainSource</MainSource>
         </DelphiCompile>
-        <RcCompile Include="Resources\ExifToolsGui_Data.rc">
-            <Form>ExifToolsGui_Data.res</Form>
+        <RcCompile Include="Resources\ExifToolsGui_Strings.rc">
+            <Form>ExifToolsGui_Strings.res</Form>
+        </RcCompile>
+        <RcCompile Include="Resources\ExifToolsGui_Files.rc">
+            <Form>ExifToolsGui_Files.res</Form>
         </RcCompile>
         <DCCReference Include="MainDef.pas"/>
+        <DCCReference Include="ExifToolsGui_ResourceStrings.pas"/>
         <DCCReference Include="UnitLangResources.pas"/>
         <DCCReference Include="ExifToolsGUI_Utils.pas"/>
         <DCCReference Include="UnitFilesOnClipBoard.pas"/>
@@ -152,7 +156,6 @@
         <DCCReference Include="ExifToolsGui_LossLess.pas"/>
         <DCCReference Include="ExifToolsGUI_OpenPicture.pas"/>
         <DCCReference Include="ExifToolsGui_Versions.pas"/>
-        <DCCReference Include="ExifToolsGui_Data.pas"/>
         <DCCReference Include="ExifToolsGUI_StringList.pas"/>
         <DCCReference Include="ExifToolsGui_ComboBox.pas"/>
         <DCCReference Include="ExifInfo.pas"/>

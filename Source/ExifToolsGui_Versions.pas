@@ -17,7 +17,7 @@ uses
   System.JSON, System.UITypes,
   Winapi.Windows,
   REST.Types, REST.Client, REST.Utils,
-  ExifToolsGui_Utils, ExifToolsGui_Data, UnitLangResources;
+  ExifToolsGui_Utils, ExifToolsGui_ResourceStrings, UnitLangResources;
 
 function ExecuteRest(const RESTRequest: TRESTRequest): boolean; overload;
 begin
