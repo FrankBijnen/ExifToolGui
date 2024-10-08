@@ -509,14 +509,17 @@ end;
 
 procedure FotoRec.AddBag(var BagData: TMetaInfo; const ANode: TMetaInfo);
 begin
-  if (VarType(BagData) <> varString) then // Should only be allowed for strings!
-    BagData := ANode
-  else
-  begin
-    if (BagData = '') then
-      BagData := ANode
+  case VarType(BagData) of
+    varString,
+    varUString:
+      begin
+        if (BagData = '') then
+          BagData := ANode
+        else
+          BagData := BagData + FotoKeySep + ANode;
+      end
     else
-      BagData := BagData + FotoKeySep + ANode;
+      BagData := ANode;
   end;
 end;
 
