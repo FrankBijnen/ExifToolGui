@@ -7,25 +7,25 @@ unit ExifToolsGui_Data;
 interface
 
 const
-  ETD_Latest_Gui    = 0;
-  ETD_Latest_PH     = 1;
-  ETD_Latest_OBetz  = 2;
+  ETD_Latest_Gui    = 10;
+  ETD_Latest_PH     = 11;
+  ETD_Latest_OBetz  = 12;
 
-  ETD_Credits_GUI   = 5;
-  ETD_Credits_ET    = 6;
-  ETD_GNUGPL        = 7;
+  ETD_Credits_GUI   = 15;
+  ETD_Credits_ET    = 16;
+  ETD_GNUGPL        = 17;
 
-  ETD_Home_Gui      = 10;
-  ETD_Home_PH       = 11;
-  ETD_Home_OBetz    = 12;
+  ETD_Home_Gui      = 20;
+  ETD_Home_PH       = 21;
+  ETD_Home_OBetz    = 22;
 
-  ETD_Online_Doc    = 20;
-  ETD_Edge_Dll      = 21;
-  ETD_Edge_Runtime  = 22;
-  ETD_Reqs          = 23;
+  ETD_Online_Doc    = 30;
+  ETD_Edge_Dll      = 31;
+  ETD_Edge_Runtime  = 32;
+  ETD_Reqs          = 33;
 
-  ETD_GeoCode       = 30;
-  ETD_OverPass      = 31;
+  ETD_GeoCode       = 40;
+  ETD_OverPass      = 41;
 
 function ReadResourceId(const Id: integer): string;
 

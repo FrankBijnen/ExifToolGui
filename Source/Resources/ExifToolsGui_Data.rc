@@ -1,22 +1,25 @@
-#define ETD_Latest_Gui    0
-#define ETD_Latest_PH     1
-#define ETD_Latest_OBetz  2
+AllInternalFields  RCDATA AllInternalFields.txt
+PentaxLenses       RCDATA PentaxLenses.txt
 
-#define ETD_Credits_GUI   5
-#define ETD_Credits_ET    6
-#define ETD_GNUGPL        7
+#define ETD_Latest_Gui    10
+#define ETD_Latest_PH     11
+#define ETD_Latest_OBetz  12
 
-#define ETD_Home_Gui     10
-#define ETD_Home_PH      11
-#define ETD_Home_OBetz   12
+#define ETD_Credits_GUI   15
+#define ETD_Credits_ET    16
+#define ETD_GNUGPL        17
 
-#define ETD_Online_Doc   20
-#define ETD_Edge_Dll     21
-#define ETD_Edge_Runtime 22
-#define ETD_Reqs         23
+#define ETD_Home_Gui      20
+#define ETD_Home_PH       21
+#define ETD_Home_OBetz    22
 
-#define ETD_GeoCode      30
-#define ETD_OverPass     31
+#define ETD_Online_Doc    30
+#define ETD_Edge_Dll      31
+#define ETD_Edge_Runtime  32
+#define ETD_Reqs          33
+
+#define ETD_GeoCode       40
+#define ETD_OverPass      41
 
 STRINGTABLE
 {
@@ -48,5 +51,3 @@ STRINGTABLE
     ETD_OverPass,       "https://overpass-api.de/api"
 }
 
-AllInternalFields  RCDATA AllInternalFields.txt
-PentaxLenses       RCDATA PentaxLenses.txt
