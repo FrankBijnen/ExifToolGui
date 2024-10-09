@@ -253,7 +253,8 @@ begin
   if not (CheckEmptyField(Dataset.FieldByName('Name'))) then
     Abort;
 
-  if NameExists(Dataset.FieldByName('Name').AsString) then
+  if (Dataset.State in [dsInsert]) and
+     NameExists(Dataset.FieldByName('Name').AsString) then
   begin
     ShowFieldExists(Dataset.FieldByName('Name').AsString);
     Abort;
