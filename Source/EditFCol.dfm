@@ -3,7 +3,7 @@ object FEditFColumn: TFEditFColumn
   Top = 0
   Caption = 'Edit file columns'
   ClientHeight = 512
-  ClientWidth = 1066
+  ClientWidth = 1044
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -18,16 +18,16 @@ object FEditFColumn: TFEditFColumn
   object PnlGrids: TPanel
     Left = 0
     Top = 0
-    Width = 1066
+    Width = 1044
     Height = 483
     Align = alClient
     TabOrder = 1
-    ExplicitWidth = 1153
+    ExplicitWidth = 1040
     ExplicitHeight = 482
     object HSplitter: TSplitter
       Left = 1
       Top = 200
-      Width = 1064
+      Width = 1042
       Height = 5
       Cursor = crVSplit
       Align = alTop
@@ -35,7 +35,7 @@ object FEditFColumn: TFEditFColumn
       ExplicitWidth = 653
     end
     object VSplitter: TSplitter
-      Left = 712
+      Left = 690
       Top = 235
       Width = 5
       Height = 247
@@ -47,11 +47,11 @@ object FEditFColumn: TFEditFColumn
     object PnlTop: TPanel
       Left = 1
       Top = 1
-      Width = 1064
+      Width = 1042
       Height = 30
       Align = alTop
       TabOrder = 0
-      ExplicitWidth = 1151
+      ExplicitWidth = 1038
       object SpbAddPred: TSpeedButton
         Left = 2
         Top = 3
@@ -105,7 +105,7 @@ object FEditFColumn: TFEditFColumn
     object DbgFileListDef: TDBGrid
       Left = 1
       Top = 31
-      Width = 1064
+      Width = 1042
       Height = 169
       Align = alTop
       DataSource = DmFileLists.DsFileListDef
@@ -121,12 +121,7 @@ object FEditFColumn: TFEditFColumn
         item
           Expanded = False
           FieldName = 'Name'
-          Visible = True
-        end
-        item
-          Expanded = False
-          FieldName = 'Description'
-          Width = 313
+          Width = 182
           Visible = True
         end
         item
@@ -144,12 +139,18 @@ object FEditFColumn: TFEditFColumn
           FieldName = 'ReadModeLookup'
           Title.Caption = 'ReadMode'
           Visible = True
+        end
+        item
+          Expanded = False
+          FieldName = 'Id'
+          ReadOnly = True
+          Visible = True
         end>
     end
     object DbgColumnSet: TDBGrid
       Left = 1
       Top = 235
-      Width = 711
+      Width = 689
       Height = 247
       Align = alClient
       DataSource = DmFileLists.DsColumnSet
@@ -166,7 +167,7 @@ object FEditFColumn: TFEditFColumn
         item
           Expanded = False
           FieldName = 'Caption'
-          Width = 155
+          Width = 149
           Visible = True
         end
         item
@@ -181,38 +182,38 @@ object FEditFColumn: TFEditFColumn
           Expanded = False
           FieldName = 'OptionLookUp'
           Title.Caption = 'Option'
-          Width = 83
+          Width = 66
           Visible = True
         end
         item
           Expanded = False
           FieldName = 'AlignR'
           Title.Caption = 'Align Right'
-          Width = 63
+          Width = 59
           Visible = True
         end
         item
           Expanded = False
           FieldName = 'BackupLookUp'
           Title.Caption = 'Backup'
-          Width = 49
+          Width = 43
           Visible = True
         end
         item
           Expanded = False
           FieldName = 'SampleValue'
-          Width = 149
+          Width = 137
           Visible = True
         end>
     end
     object PnlMiddle: TPanel
       Left = 1
       Top = 205
-      Width = 1064
+      Width = 1042
       Height = 30
       Align = alTop
       TabOrder = 3
-      ExplicitWidth = 1151
+      ExplicitWidth = 1038
       object SpbAddTag: TSpeedButton
         Left = 2
         Top = 3
@@ -248,20 +249,20 @@ object FEditFColumn: TFEditFColumn
       end
     end
     object PnlDetail: TPanel
-      Left = 717
+      Left = 695
       Top = 235
       Width = 348
       Height = 247
       Align = alRight
       TabOrder = 4
       Visible = False
-      ExplicitLeft = 804
+      ExplicitLeft = 691
       ExplicitHeight = 246
       object DbgTagNames: TDBGrid
         Left = 1
-        Top = 25
+        Top = 66
         Width = 346
-        Height = 221
+        Height = 180
         Align = alClient
         DataSource = DmFileLists.DsTagNames
         TabOrder = 0
@@ -287,11 +288,12 @@ object FEditFColumn: TFEditFColumn
       end
       object PnlEdSearch: TPanel
         Left = 1
-        Top = 1
+        Top = 42
         Width = 346
         Height = 24
         Align = alTop
         TabOrder = 1
+        ExplicitTop = 1
         object BtnApplyTag: TButton
           Left = 270
           Top = 1
@@ -332,26 +334,41 @@ object FEditFColumn: TFEditFColumn
             TabOrder = 0
             Text = 'EdSearchTag'
             OnKeyUp = EdSearchTagKeyUp
-            ExplicitHeight = 21
+            ExplicitWidth = 122
           end
         end
+      end
+      object RadTagValues: TRadioGroup
+        Left = 1
+        Top = 1
+        Width = 346
+        Height = 41
+        Align = alTop
+        Caption = 'Tag selection'
+        Columns = 2
+        ItemIndex = 0
+        Items.Strings = (
+          'From sample'
+          'All internal tags')
+        TabOrder = 2
+        OnClick = RadTagValuesClick
       end
     end
   end
   object PnlBottom: TPanel
     Left = 0
     Top = 483
-    Width = 1066
+    Width = 1044
     Height = 29
     Align = alBottom
     TabOrder = 0
     ExplicitTop = 482
-    ExplicitWidth = 1153
+    ExplicitWidth = 1040
     DesignSize = (
-      1066
+      1044
       29)
     object BtnOk: TBitBtn
-      Left = 883
+      Left = 845
       Top = 2
       Width = 87
       Height = 25
@@ -378,10 +395,10 @@ object FEditFColumn: TFEditFColumn
       ModalResult = 1
       NumGlyphs = 2
       TabOrder = 0
-      ExplicitLeft = 974
+      ExplicitLeft = 841
     end
     object BtnCancel: TBitBtn
-      Left = 974
+      Left = 936
       Top = 2
       Width = 87
       Height = 25
@@ -408,7 +425,7 @@ object FEditFColumn: TFEditFColumn
       ModalResult = 2
       NumGlyphs = 2
       TabOrder = 1
-      ExplicitLeft = 1065
+      ExplicitLeft = 932
     end
   end
 end

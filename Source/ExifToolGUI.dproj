@@ -161,6 +161,10 @@
         <DCCReference Include="ExifInfo.pas"/>
         <DCCReference Include="ExifTool.pas"/>
         <DCCReference Include="ExifTool_PipeStream.pas"/>
+        <DCCReference Include="UDmFileLists.pas">
+            <Form>DmFileLists</Form>
+            <DesignClass>TDataModule</DesignClass>
+        </DCCReference>
         <DCCReference Include="Main.pas">
             <Form>FMain</Form>
         </DCCReference>
@@ -239,10 +243,6 @@
         </DCCReference>
         <DCCReference Include="UFrmPredefinedTags.pas">
             <Form>FrmPredefinedTags</Form>
-        </DCCReference>
-        <DCCReference Include="UDmFileLists.pas">
-            <Form>DmFileLists</Form>
-            <DesignClass>TDataModule</DesignClass>
         </DCCReference>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
