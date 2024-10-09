@@ -293,7 +293,6 @@ object FEditFColumn: TFEditFColumn
         Height = 24
         Align = alTop
         TabOrder = 1
-        ExplicitTop = 1
         object BtnApplyTag: TButton
           Left = 270
           Top = 1
@@ -334,7 +333,7 @@ object FEditFColumn: TFEditFColumn
             TabOrder = 0
             Text = 'EdSearchTag'
             OnKeyUp = EdSearchTagKeyUp
-            ExplicitWidth = 122
+            ExplicitHeight = 21
           end
         end
       end
@@ -368,7 +367,7 @@ object FEditFColumn: TFEditFColumn
       1044
       29)
     object BtnOk: TBitBtn
-      Left = 845
+      Left = 837
       Top = 2
       Width = 87
       Height = 25
@@ -395,10 +394,10 @@ object FEditFColumn: TFEditFColumn
       ModalResult = 1
       NumGlyphs = 2
       TabOrder = 0
-      ExplicitLeft = 841
+      ExplicitLeft = 833
     end
     object BtnCancel: TBitBtn
-      Left = 936
+      Left = 928
       Top = 2
       Width = 87
       Height = 25
@@ -425,7 +424,7 @@ object FEditFColumn: TFEditFColumn
       ModalResult = 2
       NumGlyphs = 2
       TabOrder = 1
-      ExplicitLeft = 932
+      ExplicitLeft = 924
     end
   end
 end

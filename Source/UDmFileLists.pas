@@ -294,6 +294,7 @@ end;
 procedure TDmFileLists.PrepTagNames;
 begin
   CdsTagNames.Close;
+  CdsTagNames.Filtered := false;
   CdsTagNames.IndexFieldnames := 'TagName';
   CdsTagNames.CreateDataSet;
   CdsTagNames.LogChanges := false;
@@ -318,6 +319,7 @@ var
   ETcmd: string;
   ETOut: TStringList;
 begin
+  // Already have the tagnames?
   if (FListName = AListName) and
      (FListReadMode = AListReadMode) then
     exit;
@@ -654,14 +656,17 @@ begin
       Inc(Id);
     end;
   finally
-    CdsFileListDef.EnableControls;
-    CdsColumnSet.EnableControls;
-    CdsColumnSet.MasterFields := 'Id';
-    CdsColumnSet.MasterSource := DsFileListDef;
     if (SelectedSet > CdsFileListDef.RecordCount) then
       SelectedSet := CdsFileListDef.RecordCount;
     CdsFileListDef.RecNo := SelectedSet;
-    DoSetEditMode;
+
+    CdsColumnSet.MasterFields := 'Id';
+    CdsColumnSet.MasterSource := DsFileListDef;
+
+    CdsFileListDef.EnableControls;
+    CdsColumnSet.EnableControls;
+
+    DoSetEditMode;  // Now filter tagnames
   end;
 end;
 
