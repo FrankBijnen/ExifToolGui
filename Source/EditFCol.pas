@@ -119,17 +119,23 @@ procedure TFEditFColumn.SetDetail(Visible: boolean);
 begin
   PnlDetail.Visible := Visible;
   VSplitter.Visible := Visible;
+  if (Visible) then
+    SetFilter;
 end;
 
 procedure TFEditFColumn.TagNameLookup;
+var
+  SearchString: string;
 begin
   case DmFileLists.CdsFileListDefReadMode.AsInteger of
     0,1,3:  // System, Internal, +ExifTool
       begin
         // Update search string
-        EdSearchTag.Text := DbgColumnSet.SelectedField.AsString;
-        DmFileLists.CdsTagNames.Filtered := false;
-        DmFileLists.CdsTagNames.Filtered := (EdSearchTag.Text <> '');
+        SearchString := DbgColumnSet.SelectedField.AsString;
+        if (RightStr(SearchString, 1) = '#') then
+          SetLength(SearchString, Length(SearchString) -1);
+        EdSearchTag.Text := SearchString;
+        SetFilter;
 
         SetDetail(true);
         EdSearchTag.SetFocus;
