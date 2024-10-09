@@ -291,8 +291,10 @@ var
   FPentaxLenses: TStringList;
 
 const
-  LensSpecsZoom  = '%s-%smm f/%s-%s';
-  LensSpecsPrime = '%smm f/%s';
+  LensSpecsZoom         = '%s-%smm f/%s-%s';
+  LensSpecsPrime        = '%smm f/%s';
+  ETD_AllInternalFields = 'ETD_AllInternalFields';
+  ETD_PentaxLenses      = 'ETD_PentaxLenses';
 
 constructor TMetaData.Create;
 begin
@@ -354,7 +356,7 @@ begin
   if not Assigned(FAllInterFields) then
   begin
     FAllInterFields := TStringList.Create;
-    LoadResourceList('ETD_AllInternalFields' , FAllInterFields);
+    LoadResourceList(ETD_AllInternalFields , FAllInterFields);
   end;
   result := FAllInterFields;
 end;
@@ -364,7 +366,7 @@ begin
   if not Assigned(FPentaxLenses) then
   begin
     FPentaxLenses := TStringList.Create;
-    LoadResourceList('ETD_PentaxLenses', FPentaxLenses);
+    LoadResourceList(ETD_PentaxLenses, FPentaxLenses);
   end;
   result := FPentaxLenses;
 end;
