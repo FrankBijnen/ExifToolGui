@@ -38,6 +38,7 @@ type
     PnlSearch: TPanel;
     EdSearchTag: TEdit;
     LblSearchTag: TLabel;
+    RadTagValues: TRadioGroup;
     procedure FormCreate(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure DbGridKeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
@@ -54,6 +55,8 @@ type
     procedure SpbDuplicateClick(Sender: TObject);
     procedure FormShow(Sender: TObject);
     procedure BtnApplyTagClick(Sender: TObject);
+    procedure ChkValuesClick(Sender: TObject);
+    procedure RadTagValuesClick(Sender: TObject);
   private
     { Private declarations }
     FSample: TShellFolder;
@@ -62,6 +65,7 @@ type
     procedure TagNameLookup;
     procedure EndTagNameLookup(Value: string);
     procedure OnSetEditMode(Sender: Tobject);
+    procedure SetFilter;
     procedure TagNamesFilterRecord(DataSet: TDataSet; var Accept: Boolean);
   protected
     function GetDefWindowSizes: TRect; override;
@@ -91,6 +95,11 @@ end;
 procedure TFEditFColumn.BtnApplyTagClick(Sender: TObject);
 begin
   EndTagNameLookup(DmFileLists.CdsTagNamesTagName.AsString);
+end;
+
+procedure TFEditFColumn.ChkValuesClick(Sender: TObject);
+begin
+  SetFilter;
 end;
 
 procedure TFEditFColumn.CreateDefaults;
@@ -169,18 +178,29 @@ begin
     ModalResult := mrCancel;
 end;
 
-procedure TFEditFColumn.EdSearchTagKeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
+procedure TFEditFColumn.SetFilter;
 begin
   with DmFileLists do
   begin
     CdsTagNames.Filtered := false;
-    CdsTagNames.Filtered := (EdSearchTag.Text <> '');
+    CdsTagNames.Filtered := (EdSearchTag.Text <> '') or (RadTagValues.ItemIndex = 0);
   end;
 end;
 
-procedure TFEditFColumn.TagNamesFilterRecord(DataSet: TDataSet; var Accept: Boolean);
+procedure TFEditFColumn.EdSearchTagKeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
 begin
-  Accept := ContainsText(DataSet.FieldByName('TagName').AsString, EdSearchTag.Text);
+  SetFilter;
+end;
+
+procedure TFEditFColumn.TagNamesFilterRecord(DataSet: TDataSet; var Accept: Boolean);
+var
+  SampleValue: string;
+begin
+  Accept := (RadTagValues.ItemIndex = 1) or
+    DmFileLists.GetSampleValue(DataSet.FieldByName('TagName').AsString, SampleValue);
+  Accept := Accept and
+              ((EdSearchTag.Text = '') or
+                ContainsText(DataSet.FieldByName('TagName').AsString, EdSearchTag.Text));
 end;
 
 procedure TFEditFColumn.OnSetEditMode(Sender: Tobject);
@@ -209,9 +229,7 @@ begin
         SpbDelPred.Enabled := false;
         SpbEditPred.Enabled := true;
         DbgFileListDef.Columns[0].ReadOnly := true;
-        DbgFileListDef.Columns[1].ReadOnly := true;
-        DbgFileListDef.Columns[2].ReadOnly := true;
-        DbgFileListDef.Columns[3].ReadOnly := false;
+        DbgFileListDef.Columns[2].ReadOnly := false;
 
         DmFileLists.CdsColumnSet.ReadOnly := false;
         DbgColumnSet.ReadOnly := false;
@@ -225,13 +243,8 @@ begin
         DbgFileListDef.ReadOnly := false;
         SpbDelPred.Enabled := true;
         SpbEditPred.Enabled := true;
-        DbgFileListDef.Columns[0].ReadOnly := not (DmFileLists.CdsFileListDef.State in [dsInsert]);
-        // Readonly is not recognized
-        DbgFileListDef.SelectedIndex := 1;
-        DbgFileListDef.SelectedIndex := 0;
-        DbgFileListDef.Columns[1].ReadOnly := false;
-        DbgFileListDef.Columns[2].ReadOnly := true;
-        DbgFileListDef.Columns[3].ReadOnly := false;
+        DbgFileListDef.Columns[0].ReadOnly := false;
+        DbgFileListDef.Columns[2].ReadOnly := false;
 
         DmFileLists.CdsColumnSet.ReadOnly := false;
         DbgColumnSet.ReadOnly := false;
@@ -251,6 +264,8 @@ end;
 procedure TFEditFColumn.FormCreate(Sender: TObject);
 begin
   ReadFormSizes(Self, Self.DefWindowSizes);
+  DmFileLists.OnSetEditMode := OnSetEditMode;
+  DmFileLists.OnFilterTag := TagNamesFilterRecord;
 end;
 
 procedure TFEditFColumn.FormShow(Sender: TObject);
@@ -262,8 +277,11 @@ procedure TFEditFColumn.PrepareShow(ASample: TShellFolder);
 begin
   FSample := ASample;
   DmFileLists.LoadFromColumnSets(FSample);
-  DmFileLists.OnFilterTag := TagNamesFilterRecord;
-  DmFileLists.OnSetEditMode := OnSetEditMode;
+end;
+
+procedure TFEditFColumn.RadTagValuesClick(Sender: TObject);
+begin
+  SetFilter;
 end;
 
 procedure TFEditFColumn.SpbAddPredClick(Sender: TObject);
@@ -303,12 +321,20 @@ end;
 
 procedure TFEditFColumn.SpbDuplicateClick(Sender: TObject);
 var
-  NewName: array[0..1] of string;
+  NewName: string;
 begin
-  NewName[0] := DmFileLists.CdsFileListDefName.AsString + '_Copy';
-  NewName[1] := DmFileLists.CdsFileListDefDescription.AsString + '_Copy';
-  if (InputQuery('New Filelist', ['Name', 'Description'], NewName)) then
-    DmFileLists.Duplicate(DmFileLists.CdsFileListDefId.AsInteger, NewName[0], NewName[1]);
+  NewName := DmFileLists.CdsFileListDefName.AsString + '_Copy';
+  repeat
+    if not (InputQuery('New Filelist', ['Name'], NewName)) then
+      break;
+    if DmFileLists.NameExists(NewName) then
+    begin
+      DmFileLists.ShowFieldExists(NewName);
+      continue;
+    end;
+    DmFileLists.Duplicate(DmFileLists.CdsFileListDefId.AsInteger, NewName);
+    break;
+  until false;
 end;
 
 procedure TFEditFColumn.SpbEditTagClick(Sender: TObject);

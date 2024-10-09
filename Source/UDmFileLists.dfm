@@ -24,7 +24,7 @@ object DmFileLists: TDmFileLists
     BeforeDelete = CdsFileListDefBeforeDelete
     AfterScroll = CdsFileListDefAfterScroll
     Left = 82
-    Top = 31
+    Top = 30
     object CdsFileListDefId: TIntegerField
       FieldName = 'Id'
       Visible = False
@@ -33,11 +33,6 @@ object DmFileLists: TDmFileLists
       DisplayWidth = 25
       FieldName = 'Name'
       Size = 64
-    end
-    object CdsFileListDefDescription: TStringField
-      DisplayWidth = 50
-      FieldName = 'Description'
-      Size = 255
     end
     object CdsFileListDefType: TStringField
       DisplayWidth = 10
@@ -67,20 +62,17 @@ object DmFileLists: TDmFileLists
   end
   object CdsColumnSet: TClientDataSet
     Aggregates = <>
-    IndexFieldNames = 'FileListName;Seq'
+    IndexFieldNames = 'Id;Seq'
     Params = <>
     BeforeInsert = CdsColumnSetBeforeInsert
     AfterInsert = CdsColumnSetAfterInsert
     OnCalcFields = CdsColumnSetCalcFields
     Left = 81
     Top = 116
-    object CdsColumnSetFileListName: TStringField
-      DisplayWidth = 25
-      FieldName = 'FileListName'
-      Visible = False
-      Size = 64
+    object CdsColumnSetId: TIntegerField
+      FieldName = 'Id'
     end
-    object CdsColumnSetName: TStringField
+    object CdsColumnSetCaption: TStringField
       DisplayWidth = 50
       FieldName = 'Caption'
       Size = 255
@@ -204,7 +196,7 @@ object DmFileLists: TDmFileLists
   end
   object DsTagNames: TDataSource
     DataSet = CdsTagNames
-    Left = 219
-    Top = 294
+    Left = 218
+    Top = 292
   end
 end

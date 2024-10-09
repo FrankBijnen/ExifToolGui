@@ -43,23 +43,22 @@ type
   TColumnSet = class(TObject)
   private
     FName: string;
-    FDesc: string;
     FOptions: TFileListOptions;
     FReadMode: TReadModeOptions;
     FColumnDefs: TColumnsArray;
     function GetReadModeInt: integer;
   public
-    constructor Create(AName, ADesc: string;
+    constructor Create(AName: string;
                        AOptions: TFileListOptions;
                        AReadMode: TReadModeOptions;
                        AColumnDefs: TColumnsArray); overload;
-    constructor Create(AName, ADesc: string;
+    constructor Create(AName: string;
                        AOptions: TFileListOptions;
                        AReadMode: integer;
                        AColumnDefs: TColumnsArray); overload;
     destructor Destroy; override;
+
     property Name: string read FName write FName;
-    property Desc: string read FDesc write FDesc;
     property Options: TFileListOptions read FOptions;
     property ReadMode: TReadModeOptions read FReadMode;
     property ReadModeInt: integer read GetReadModeInt;
@@ -85,10 +84,12 @@ uses
   ExifToolsGui_ShellList, ExifToolsGUI_Utils;
 
 const
-  ReadMode = 'ReadMode';
+  ReadMode  = 'ReadMode';
+  StdColDef = 'StdColDef_';
+  UsrColDef = 'UsrColDef_';
 
   // This definition is used only to store the Widths
-  StandardTags = 'StandardColumns';
+  StandardId = '0';
   StandardDefaults: array [0..4] of TFileListColumn =
   (
     (Command: '0';                              Width: 200; Options: toSys),  // Name
@@ -98,7 +99,7 @@ const
     (Command: '4';                              Width: 120; Options: toSys)   // Date created
   );
 
-  CameraTags = 'CameraColumns';
+  CameraId = '1';
   CameraDefaults: array [0..9] of TFileListColumn =
   (
     (Command: '-IFD0:Model';                                                    XlatedCaption: @StrFLModel),
@@ -113,7 +114,7 @@ const
     (Command: '-IFD0:Orientation#';                         Options: toHorVer;  XlatedCaption: @StrFLOrientation)
   );
 
-  LocationTags = 'LocationColumns';
+  LocationId = '2';
   LocationDefaults: array [0..6] of TFileListColumn =
   (
     (Command: '-ExifIFD:DateTimeOriginal';                                      XlatedCaption: @StrFLDateTime),
@@ -125,7 +126,7 @@ const
     (Command: '-XMP-iptcExt:LocationShownSublocation';                          XlatedCaption: @StrFLLocation)
   );
 
-  AboutTags = 'AboutColumns';
+  AboutId = '3';
   AboutDefaults: array [0..4] of TFileListColumn =
   (
     (Command: '-IFD0:Artist';                                                   XlatedCaption: @StrFLArtist),
@@ -135,8 +136,6 @@ const
     (Command: '-XMP-iptcExt:PersonInImage';                                     XlatedCaption: @StrFLPersonInImage)
   );
 
-  UserDef = 'UserDef_';                   // Prefix in INI sections
-  UserDefined = 'User defined';           // internal name
   UserDefLists = 'UserDefLists';          // List with userdefined names
   OldUserDefTags = 'FListUserDefColumn';  // Pre 6.3.6
   DefaultUserDef: array [0..2] of TFileListColumn =
@@ -168,20 +167,19 @@ begin
   StrPLCopy(Caption, ACaption, SizeOf(Caption) -1);
 end;
 
-constructor TColumnSet.Create(AName, ADesc: string;
+constructor TColumnSet.Create(AName: string;
                               AOptions: TFileListOptions;
                               AReadMode: TReadModeOptions;
                               AColumnDefs: TColumnsArray);
 begin
   inherited Create;
   FName := AName;
-  FDesc := ADesc;
   FOptions := AOptions;
   FReadMode := AReadMode;
   FColumnDefs := AColumnDefs;
 end;
 
-constructor TColumnSet.Create(AName, ADesc: string;
+constructor TColumnSet.Create(AName: string;
                               AOptions: TFileListOptions;
                               AReadMode: integer;
                               AColumnDefs: TColumnsArray);
@@ -193,9 +191,8 @@ begin
     Include(FReadMode, rmInternal);
   if ((AReadMode and Ord(rmExifTool)) <> 0) then
     Include(FReadMode, rmExifTool);
-  Create(AName, ADesc, AOptions, FReadMode, AColumnDefs);
+  Create(AName, AOptions, FReadMode, AColumnDefs);
 end;
-
 
 destructor TColumnSet.Destroy;
 begin
@@ -335,9 +332,8 @@ var
   ReadMode: TReadModeOptions;
 begin
   ReadMode := [];
-  result := ReadColumnDefs(LVHandle, GUIini, StandardTags, StandardDefaults, ReadMode);
-  FColumnSetList.Add(TColumnSet.Create(StandardTags,
-                                       StrStandardList,
+  result := ReadColumnDefs(LVHandle, GUIini, StdColDef + StandardId, StandardDefaults, ReadMode);
+  FColumnSetList.Add(TColumnSet.Create(StrStandardList,
                                        floSystem,
                                        ReadMode,
                                        result));
@@ -348,9 +344,8 @@ var
   ReadMode: TReadModeOptions;
 begin
   ReadMode := [rmInternal];
-  result := ReadColumnDefs(LVHandle, GUIini, CameraTags, CameraDefaults, ReadMode);
-  FColumnSetList.Add(TColumnSet.Create(CameraTags,
-                                       StrCameraList,
+  result := ReadColumnDefs(LVHandle, GUIini, StdColDef + CameraId, CameraDefaults, ReadMode);
+  FColumnSetList.Add(TColumnSet.Create(StrCameraList,
                                        floInternal,
                                        ReadMode,
                                        result));
@@ -361,9 +356,8 @@ var
   ReadMode: TReadModeOptions;
 begin
   ReadMode := [rmInternal];
-  result := ReadColumnDefs(LVHandle, GUIini, LocationTags, LocationDefaults, ReadMode);
-  FColumnSetList.Add(TColumnSet.Create(LocationTags,
-                                       StrLocationList,
+  result := ReadColumnDefs(LVHandle, GUIini, StdColDef + LocationId, LocationDefaults, ReadMode);
+  FColumnSetList.Add(TColumnSet.Create(StrLocationList,
                                        floInternal,
                                        ReadMode,
                                        result));
@@ -374,9 +368,8 @@ var
   ReadMode: TReadModeOptions;
 begin
   ReadMode := [rmInternal];
-  result := ReadColumnDefs(LVHandle, GUIini, AboutTags, AboutDefaults, ReadMode);
-  FColumnSetList.Add(TColumnSet.Create(AboutTags,
-                                       StrAboutList,
+  result := ReadColumnDefs(LVHandle, GUIini, StdColDef + AboutId, AboutDefaults, ReadMode);
+  FColumnSetList.Add(TColumnSet.Create(StrAboutList,
                                        floInternal,
                                        ReadMode,
                                        result));
@@ -384,21 +377,18 @@ end;
 
 function ReadUserDefTags(LVHandle: HWND; GUIini: TMemIniFile): integer;
 var
-  UserDefList: string;
+  UserDefList: TStringList;
   AUserDefName: string;
-  AUserDefDesc: string;
   AColumnDefs: TColumnsArray;
   ReadMode: TReadModeOptions;
-
   Indx: integer;
   Tx: string;
   TmpItems: TStringList;
-
 begin
   result := 0;
 
   // Convert Pre 6.3.6 definitions?
-  if (not GUIini.ValueExists(UserDefLists, UserDefLists)) and
+  if (not GUIini.SectionExists(UserDefLists)) and
      (GUIini.SectionExists(OldUserDefTags)) then
   begin
     TmpItems := TStringList.Create;
@@ -413,8 +403,7 @@ begin
         AColumnDefs[Indx].Width := StrToIntDef(Tx, 80);
         AColumnDefs[Indx].AlignR := 0;
       end;
-      FColumnSetList.Add(TColumnSet.Create(UserDefined,
-                                           StrUserList,
+      FColumnSetList.Add(TColumnSet.Create(StrUserList,
                                            floUserDef,
                                            [rmExifTool], // Default Pre 6.3.6
                                            AColumnDefs));
@@ -425,19 +414,24 @@ begin
   else
   begin
     // Read all User defined lists
-    UserDefList := GUIini.ReadString(UserDefLists, UserDefLists, UserDefined + '^' + StrUserList);
-    while (UserDefList <> '') do
-    begin
-      AUserDefDesc := NextField(UserDefList, '|');
-      AUserDefName := NextField(AUserDefDesc, '^');
-      ReadMode := [rmExifTool];
-      AColumnDefs := ReadColumnDefs(LVHandle, GUIini, UserDef + AUserDefName, DefaultUserDef, ReadMode);
-      result := result + Length(AColumnDefs);
-      FColumnSetList.Add(TColumnSet.Create(AUserDefName,
-                                           AUserDefDesc,
-                                           floUserDef,
-                                           ReadMode,
-                                           AColumnDefs));
+    UserDefList := TStringList.Create;
+    try
+      GUIini.ReadSectionValues(UserDefLists, UserDefList);
+      if (UserDefList.Count = 0) then
+        UserDefList.AddPair('0', StrUserList);
+      for Indx := 0 to UserDefList.Count -1 do
+      begin
+        AUserDefName := UserDefList.ValueFromIndex[Indx];
+        ReadMode := [rmExifTool];
+        AColumnDefs := ReadColumnDefs(LVHandle, GUIini, UsrColDef + UserDefList.KeyNames[Indx], DefaultUserDef, ReadMode);
+        result := result + Length(AColumnDefs);
+        FColumnSetList.Add(TColumnSet.Create(AUserDefName,
+                                             floUserDef,
+                                             ReadMode,
+                                             AColumnDefs));
+      end;
+    finally
+      UserDefList.Free;
     end;
   end;
 end;
@@ -455,39 +449,45 @@ end;
 procedure WriteFileListColumns(GUIini: TMemIniFile);
 var
   OldUserDefSaved: boolean;
+  ColumnIndex: integer;
   Index: integer;
   AColumnSet: TColumnSet;
-  UserDefList: string;
-  ColumnSetName: string;
+  UserDefList: TStringList;
   OldUserDef: string;
+  ColDefName: string;
 begin
-  OldUserDefSaved := false;
-  for AColumnSet in FColumnSetList do
-  begin
-    ColumnSetName := AColumnSet.Name;
-    if (AColumnSet.Options = floUserDef) then
+  UserDefList := TStringList.Create;
+  try
+    OldUserDefSaved := false;
+    for ColumnIndex := 0 to FColumnSetList.Count -1 do
     begin
-      ColumnSetName := UserDef + ColumnSetName;
-      if (UserDefList <> '') then
-        UserDefList := UserDefList + '|';
-      UserDefList := UserDefList + AColumnSet.Name + '^' + AColumnSet.Desc;
-      if (OldUserDefSaved = false) then
+      AColumnSet := FColumnSetList[ColumnIndex];
+      ColDefName := Format('%s%d', [StdColDef, ColumnIndex]);
+      if (AColumnSet.Options = floUserDef) then
       begin
-        OldUserDefSaved := true;
-        for Index := 0 to High(AColumnSet.ColumnDefs) do
+        ColDefName := Format('%s%d', [UsrColDef, UserDefList.Count]);
+        UserDefList.Add(AColumnSet.Name);
+        if (OldUserDefSaved = false) then
         begin
-          if ((AColumnSet.ColumnDefs[Index].Options and toSys) = toSys) then
-            continue;
-          OldUserDef := AColumnSet.ColumnDefs[Index].Caption;
-          GUIini.WriteString(OldUserDefTags,
-                             OldUserDef,
-                             Format('%s %d', [AColumnSet.ColumnDefs[Index].Command, AColumnSet.ColumnDefs[Index].Width]));
+          OldUserDefSaved := true;
+          for Index := 0 to High(AColumnSet.ColumnDefs) do
+          begin
+            if ((AColumnSet.ColumnDefs[Index].Options and toSys) = toSys) then
+              continue;
+            OldUserDef := AColumnSet.ColumnDefs[Index].Caption;
+            GUIini.WriteString(OldUserDefTags,
+                               OldUserDef,
+                               Format('%s %d', [AColumnSet.ColumnDefs[Index].Command, AColumnSet.ColumnDefs[Index].Width]));
+          end;
         end;
       end;
+      WriteColumnDefs(GUIini, ColDefName, AColumnSet.ReadMode, AColumnSet.ColumnDefs);
     end;
-    WriteColumnDefs(GUIini, ColumnSetName, AColumnSet.ReadMode, AColumnSet.ColumnDefs);
+    for Index := 0 to UserDefList.Count -1 do
+      GUIini.WriteString(UserDefLists, Format('%d', [Index]), UserDefList[Index]);
+  finally
+    UserDefList.Free;
   end;
-  GUIini.WriteString(UserDefLists, UserDefLists, UserDefList);
 end;
 
 procedure ResetAllColumnWidths(LVHandle: HWND);
@@ -526,7 +526,7 @@ begin
   try
     Alist.Clear;
     for ASet in FColumnSetList do
-      AList.Add(Aset.Desc);
+      AList.Add(Aset.Name);
   finally
     Alist.EndUpdate;
   end;

@@ -45,6 +45,7 @@ uses
   ExifInfo in 'ExifInfo.pas',
   ExifTool in 'ExifTool.pas',
   ExifTool_PipeStream in 'ExifTool_PipeStream.pas',
+  UDmFileLists in 'UDmFileLists.pas' {DmFileLists: TDataModule},
   Main in 'Main.pas' {FMain},
   LogWin in 'LogWin.pas' {FLogWin},
   Preferences in 'Preferences.pas' {FPreferences},
@@ -71,8 +72,7 @@ uses
   UFrmGenerate in 'UFrmGenerate.pas' {FrmGenerate},
   UFrmCheckVersions in 'UFrmCheckVersions.pas' {FrmCheckVersions},
   UFrmTagNames in 'UFrmTagNames.pas' {FrmTagNames},
-  UFrmPredefinedTags in 'UFrmPredefinedTags.pas' {FrmPredefinedTags},
-  UDmFileLists in 'UDmFileLists.pas' {DmFileLists: TDataModule};
+  UFrmPredefinedTags in 'UFrmPredefinedTags.pas' {FrmPredefinedTags};
 
 {$R *.res}
 
@@ -96,6 +96,7 @@ begin
   Application.Initialize;
   Application.MainFormOnTaskbar := True;
 
+  Application.CreateForm(TDmFileLists, DmFileLists);
   Application.CreateForm(TFMain, FMain);
   Application.CreateForm(TFLogWin, FLogWin);
   Application.CreateForm(TFPreferences, FPreferences);
@@ -122,6 +123,5 @@ begin
   Application.CreateForm(TFGeoSetup, FGeoSetup);
   Application.CreateForm(TFrmTagNames, FrmTagNames);
   Application.CreateForm(TFrmPredefinedTags, FrmPredefinedTags);
-  Application.CreateForm(TDmFileLists, DmFileLists);
   Application.Run;
 end.

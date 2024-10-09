@@ -3,7 +3,7 @@ unit UDmFileLists;
 interface
 
 uses
-  System.SysUtils, System.Classes, System.Generics.Collections,
+  System.SysUtils, System.Classes, System.Generics.Collections, System.UITypes,
   vcl.Shell.ShellCtrls,
   Data.DB, Datasnap.DBClient,
   ExifToolsGui_ShellList;
@@ -16,14 +16,12 @@ type
     CdsFileListDef: TClientDataSet;
     CdsFileListDefId: TIntegerField;
     CdsFileListDefName: TStringField;
-    CdsFileListDefDescription: TStringField;
     CdsFileListDefType: TStringField;
     CdsFileListDefReadMode: TIntegerField;
     CdsFileListDefReadModeLookup: TStringField;
     DsColumnSet: TDataSource;
     CdsColumnSet: TClientDataSet;
-    CdsColumnSetFileListName: TStringField;
-    CdsColumnSetName: TStringField;
+    CdsColumnSetCaption: TStringField;
     CdsColumnSetCommand: TStringField;
     CdsColumnSetOption: TStringField;
     CdsColumnSetAlignR: TIntegerField;
@@ -48,6 +46,7 @@ type
     CdsColumnSetCommandLookup: TStringField;
     CdsTagNamesSampleValue: TStringField;
     CdsFileListDefOptions: TIntegerField;
+    CdsColumnSetId: TIntegerField;
     procedure CdsColumnSetBeforeInsert(DataSet: TDataSet);
     procedure CdsColumnSetAfterInsert(DataSet: TDataSet);
     procedure CdsFileListDefAfterInsert(DataSet: TDataSet);
@@ -77,17 +76,18 @@ type
     procedure PrepTagNames;
     procedure AddTagName(ATagName: string; CheckExist: boolean);
     procedure CalcSampleValue(DataSet: TDataSet; Command, Sample: string);
-
     procedure GetSampleValues(AListName: string; AListReadMode: integer);
     procedure SetupLookUps;
   public
     { Public declarations }
     SelectedSet: integer;
+    function GetSampleValue(Command: string; var Value: string): boolean;
+    function ShowFieldExists(AField: string; AButtons: TMsgDlgButtons = [TMsgDlgBtn.mbOK]): integer;
     function NameExists(Name: string): boolean;
     procedure LoadFromColumnSets(ASample: TShellFolder);
     procedure SaveToColumnSets;
     procedure WriteAllXmpTags;
-    procedure Duplicate(OldId: integer; NewName, NewDesc: string);
+    procedure Duplicate(OldId: integer; NewName: string);
     property OnSetEditMode: TNotifyEvent read FOnSetEditMode write FOnSetEditMode;
     property OnFilterTag: TFilterRecordEvent read FOnFilterTag write FOnFilterTag;
   end;
@@ -100,7 +100,7 @@ implementation
 {%CLASSGROUP 'Vcl.Controls.TControl'}
 
 uses
-  System.StrUtils, System.Variants, System.UITypes,
+  System.StrUtils, System.Variants,
   Winapi.Windows,
   UnitColumnDefs, ExifInfo, ExifTool, ExifToolsGUI_Utils;
 
@@ -158,9 +158,7 @@ end;
 
 procedure TDmFileLists.CalcSampleValue(DataSet: TDataSet; Command, Sample: string);
 var
-  LowerCommand: string;
   SampleValue: string;
-  P: integer;
 begin
   if not (Dataset.State in [dsCalcFields, dsInsert, dsEdit]) then
     exit;
@@ -169,13 +167,7 @@ begin
   GetSampleValues(CdsFileListDef.FieldByName('Name').AsString,
                   CdsFileListDef.FieldByName('ReadMode').AsInteger);
 
-  LowerCommand := LowerCase(Dataset.FieldByName(Command).AsString);
-
-  P := Pos('#', LowerCommand);
-  if (P > 1) then
-    SetLength(LowerCommand, P -1);
-
-  if (FSampleValues.TryGetValue(LowerCommand, SampleValue)) then
+  if GetSampleValue(Dataset.FieldByName(Command).AsString, SampleValue) then
     Dataset.FieldByName(Sample).AsString := SampleValue
   else
     Dataset.FieldByName(Sample).AsString := '-';
@@ -193,16 +185,16 @@ begin
   if (LeftStr(Sender.AsString, 1) <> '-') then
   begin
     CdsColumnSetOption.AsInteger := Ord(toSys);
-    CdsColumnSetName.AsString := FSystemTagNames.Values[Sender.AsString];
+    CdsColumnSetCaption.AsString := FSystemTagNames.Values[Sender.AsString];
   end
   else
   begin
     CdsColumnSetOption.AsInteger := (CdsColumnSetOption.AsInteger and ($ffff - Ord(toSys)));
-    if (CdsColumnSetName.AsString = '') then
+    if (CdsColumnSetCaption.AsString = '') then
     begin
       P := Pos(':', Sender.AsString);
       if (P > 0) then
-        CdsColumnSetName.AsString := Copy(Sender.AsString, P +  1);
+        CdsColumnSetCaption.AsString := Copy(Sender.AsString, P +  1);
     end;
   end;
 end;
@@ -238,17 +230,32 @@ begin
   DoSetEditMode;
 end;
 
+function TDmFileLists.GetSampleValue(Command: string; var Value: string): boolean;
+var
+  P: integer;
+  LowerCommand: string;
+begin
+  LowerCommand := LowerCase(Command);
+  P := Pos('#', LowerCommand);
+  if (P > 1) then
+    SetLength(LowerCommand, P -1);
+
+  result := FSampleValues.TryGetValue(LowerCommand, Value);
+end;
+
+function TDmFileLists.ShowFieldExists(AField: string; AButtons: TMsgDlgButtons = [TMsgDlgBtn.mbOK]): integer;
+begin
+  result := MessageDlgEx(Format('%s Exists', [AField]), '', TMsgDlgType.mtError, AButtons);
+end;
+
 procedure TDmFileLists.CdsFileListDefBeforePost(DataSet: TDataSet);
 begin
   if not (CheckEmptyField(Dataset.FieldByName('Name'))) then
     Abort;
-  if not (CheckEmptyField(Dataset.FieldByName('Description'))) then
-    Abort;
 
-  if (DataSet.State in [dsInsert]) and
-     NameExists(Dataset.FieldByName('Name').AsString) then
+  if NameExists(Dataset.FieldByName('Name').AsString) then
   begin
-    MessageDlgEx(Format('%s Exists', [Dataset.FieldByName('Name').AsString]), '', TMsgDlgType.mtError, [TMsgDlgBtn.mbOK]);
+    ShowFieldExists(Dataset.FieldByName('Name').AsString);
     Abort;
   end;
 end;
@@ -391,6 +398,7 @@ begin
   end;
 end;
 
+// Create txt file to include in resource
 procedure TDmFileLists.WriteAllXmpTags;
 var
   GroupNames: TStringList;
@@ -428,7 +436,7 @@ begin
   end;
 end;
 
-procedure TDmFileLists.Duplicate(OldId: integer; NewName, NewDesc: string);
+procedure TDmFileLists.Duplicate(OldId: integer; NewName: string);
 var
   Orig: TColumnsArray;
   Acolumn: TFileListColumn;
@@ -441,7 +449,6 @@ begin
   try
     CdsFileListDef.Insert;
     CdsFileListDefName.AsString := NewName;
-    CdsFileListDefDescription.AsString := NewDesc;
     CdsFileListDef.Post;
     Orig := GetFileListColumnDefs(OldId);
     ColumnSeq := 0;
@@ -450,8 +457,7 @@ begin
       AColumn := Orig[Index];
       ColumnSeq := ColumnSeq + 1;
       CdsColumnSet.Insert;
-      CdsColumnSetFileListName.AsString   := NewName;
-      CdsColumnSetName.AsString           := AColumn.Caption;
+      CdsColumnSetCaption.AsString        := AColumn.Caption;
       CdsColumnSetCommand.AsString        := AColumn.Command;
       CdsColumnSetOption.AsInteger        := Ord(AColumn.Options) and $00ff;
       CdsColumnSetBackup.AsInteger        := Ord(AColumn.Options) and $ff00;
@@ -528,12 +534,12 @@ begin
 
     while not CdsFileListDef.Eof do
     begin
-      CdsColumnSet.SetRange([CdsFileListDefName.AsString], [CdsFileListDefName.AsString]);
+      CdsColumnSet.SetRange([CdsFileListDefId.AsInteger], [CdsFileListDefId.AsInteger]);
       CdsColumnSet.First; // Not needed
       SetLength(AColumnSet, CdsColumnSet.RecordCount);
       while not CdsColumnSet.Eof do
       begin
-        AColumnSet[CdsColumnSet.RecNo -1].SetCaption(CdsColumnSetName.AsString);
+        AColumnSet[CdsColumnSet.RecNo -1].SetCaption(CdsColumnSetCaption.AsString);
         AColumnSet[CdsColumnSet.RecNo -1].Command := CdsColumnSetCommand.AsString;
         AColumnSet[CdsColumnSet.RecNo -1].Width   := CdsColumnSetWidth.AsInteger;
         AColumnSet[CdsColumnSet.RecNo -1].AlignR  := CdsColumnSetAlignR.AsInteger;
@@ -544,7 +550,6 @@ begin
         CdsColumnSet.Next;
       end;
       FileListDefs.Add(TColumnSet.Create(CdsFileListDefName.AsString,
-                                         CdsFileListDefDescription.AsString,
                                          TFileListOptions(CdsFileListDefOptions.AsInteger),
                                          CdsFileListDefReadMode.AsInteger,
                                          AColumnSet));
@@ -607,7 +612,7 @@ begin
     CdsFileListDef.CreateDataSet;
     CdsFileListDef.LogChanges := false;
 
-    CdsColumnSet.IndexFieldNames := 'FileListName;Seq';
+    CdsColumnSet.IndexFieldNames := 'Id;Seq';
     CdsColumnSet.CreateDataSet;
     CdsColumnSet.LogChanges := false;
 
@@ -617,7 +622,6 @@ begin
       CdsFileListDef.Insert;
       CdsFileListDefId.AsInteger := Id;
       CdsFileListDefName.AsString := AColumnSet.Name;
-      CdsFileListDefDescription.AsString := AColumnSet.Desc;
       CdsFileListDefOptions.AsInteger := Ord(AColumnSet.Options);
       case (AColumnSet.Options) of
         TFileListOptions.floSystem:
@@ -628,7 +632,6 @@ begin
           CdsFileListDefType.AsString := ListUser;
       end;
       CdsFileListDefReadMode.AsInteger := AColumnSet.ReadModeInt;
-      CdsFileListDefDescription.AsString := AColumnSet.Desc;
       CdsFileListDef.Post;
 
       ColumnSeq := 0;
@@ -637,8 +640,8 @@ begin
         AColumn := AColumnSet.ColumnDefs[Index];
         ColumnSeq := ColumnSeq + 1;
         CdsColumnSet.Insert;
-        CdsColumnSetFileListName.AsString   := AColumnSet.Name;
-        CdsColumnSetName.AsString           := AColumn.Caption;
+        CdsColumnSetId.AsInteger            := Id;
+        CdsColumnSetCaption.AsString        := AColumn.Caption;
         CdsColumnSetCommand.AsString        := AColumn.Command;
         CdsColumnSetOption.AsInteger        := Ord(AColumn.Options) and $00ff;
         CdsColumnSetBackup.AsInteger        := Ord(AColumn.Options) and $ff00;
@@ -652,11 +655,12 @@ begin
   finally
     CdsFileListDef.EnableControls;
     CdsColumnSet.EnableControls;
-    CdsColumnSet.MasterFields := 'Name';
+    CdsColumnSet.MasterFields := 'Id';
     CdsColumnSet.MasterSource := DsFileListDef;
     if (SelectedSet > CdsFileListDef.RecordCount) then
       SelectedSet := CdsFileListDef.RecordCount;
     CdsFileListDef.RecNo := SelectedSet;
+    DoSetEditMode;
   end;
 end;
 
