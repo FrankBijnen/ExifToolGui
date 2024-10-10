@@ -173,6 +173,9 @@ const
   HOURGLASS = 'HOURGLASS';
   HOURGLASS_TRANSPARENT = $ff00ff;
 
+  Arrow_Up = #$25b2;
+  Arrow_Down = #$25bc;
+
 { Listview Sort }
 
 function GetListHeaderSortState(HeaderLView: TCustomListView; Column: TListColumn): THeaderSortState;
@@ -205,12 +208,16 @@ begin
   case Value of
     hssAscending:
       begin
-        Column.Caption := Column.Caption + ' ' + #$25b2; // Add an arrow to the caption. Using styles doesn't show the arrows in the header
+        // Add an arrow to the caption. Using styles doesn't show the arrows in the header
+        if (Column.Caption[Length(Column.Caption)] <> Arrow_Up) then
+          Column.Caption := Column.Caption + ' ' + Arrow_Up;
         Item.fmt := Item.fmt or HDF_SORTUP;
       end;
     hssDescending:
       begin
-        Column.Caption := Column.Caption + ' ' + #$25bc; // Add an arrow to the caption.
+        // Add an arrow to the caption.
+        if (Column.Caption[Length(Column.Caption)] <> Arrow_Down) then
+          Column.Caption := Column.Caption + ' ' + Arrow_Down;
         Item.fmt := Item.fmt or HDF_SORTDOWN;
       end;
   end;
@@ -374,6 +381,13 @@ begin
         begin
           ResizedColumn := pHDNotify(Msg.NMHdr)^.Item;
           Column := Columns[ResizedColumn];
+
+          // HeaderSortState gets reset when resizing. Restore from Caption
+          if (Column.Caption[Length(Column.Caption)] = Arrow_Up) then
+            SetListHeaderSortState(Self, Column, hssAscending)
+          else if (Column.Caption[Length(Column.Caption)] = Arrow_Down) then
+            SetListHeaderSortState(Self, Column, hssDescending);
+
           FOnColumnResized(Column);
         end;
       end;
