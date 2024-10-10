@@ -70,7 +70,6 @@ type
     CheckBox10: TCheckBox;
     EdCommand: TLabeledEdit;
     MemoWin11: TMemo;
-    CheckBox11: TCheckBox;
     GrpConfig: TGroupBox;
     EdETCustomConfig: TEdit;
     BtnEtCustomConfig: TButton;
@@ -165,7 +164,6 @@ begin
   GUIsettings.DblClickUpdTags := CheckBox5.Checked;
   GUIsettings.ShowFolders := CheckBox6.Checked;
   GUIsettings.ShowHidden := CheckBox8.Checked;
-  GUIsettings.EnableUnsupported := CheckBox11.Checked;
   GUIsettings.ShowBreadCrumb := CheckBox7.Checked;
   GUIsettings.MinimizeToTray := CheckBox9.Checked;
   GUIsettings.SingleInstanceApp := CheckBox10.Checked;
@@ -350,7 +348,6 @@ begin
   CheckBox5.Checked := GUIsettings.DblClickUpdTags;
   CheckBox6.Checked := GUIsettings.ShowFolders;
   CheckBox8.Checked := GUIsettings.ShowHidden;
-  CheckBox11.Checked := GUIsettings.EnableUnsupported;
   CheckBox8.Enabled := IsAdminUser or IsElevated;
   CheckBox7.Checked := GUIsettings.ShowBreadCrumb;
   CheckBox9.Checked := GUIsettings.MinimizeToTray;

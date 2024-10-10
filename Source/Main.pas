@@ -2889,12 +2889,7 @@ procedure TFMain.ShellListAfterEnumColumns(Sender: TObject; var ReadModeOptions:
   end;
 
 begin
-//TODO: Decide if we want the option in Preferences
   ReadModeOptions := GetFileListDefs[CBoxDetails.ItemIndex].ReadMode;
-  if (GetFileListDefs[CBoxDetails.ItemIndex].Options = TFileListOptions.floInternal) and
-     (GUIsettings.EnableUnsupported) then
-    Include(ReadModeOptions, rmExifTool);
-
   ColumnDefs := GetFileListDefs[CBoxDetails.ItemIndex].ColumnDefs;
 
   case CBoxDetails.ItemIndex of

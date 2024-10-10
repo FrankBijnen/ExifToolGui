@@ -103,7 +103,7 @@ type
     Fast3FileTypes: string;
     ShowFolders: boolean;
     ShowHidden: boolean;
-    EnableUnsupported: boolean;
+    EnableUnsupported: boolean; // Deprecated.
     ShowBreadCrumb: boolean;
     MinimizeToTray: boolean;
     SingleInstanceApp: boolean;
@@ -655,11 +655,6 @@ begin
 
       ReadMainWindowSizes(GUIini);
 
-      // Standard, Camera, Location, About and UserDef settings
-      ReadFileListColumns(FMain.ShellList.Handle, GUIini);
-      GetFileListDefs(FMain.CBoxDetails.Items);
-      FMain.CBoxDetails.ItemIndex := 0;
-
       with GUIsettings do
       begin
         Language := ReadString(Ini_Settings, 'Language', '');
@@ -729,11 +724,12 @@ begin
         TryStrToInt(ReadString(Ini_Settings, 'CLFocal', '$FFDAB6'), CLFocal);
         TryStrToInt(ReadString(Ini_Settings, 'CLISO', '$D0D0D0'), CLISO);
         // Fast3FileTypes. Used for filelist and metadata panel. Only editable in INI file
-        Fast3FileTypes := ReadString(Ini_Settings, 'Fast3FileTypes','*.GPX|*.KML');
+        Fast3FileTypes := ReadString(Ini_Settings, 'Fast3FileTypes', '*.GPX|*.KML');
 
         ShowFolders := ReadBool(Ini_Settings, 'ShowFolders', false);
         ShowHidden := ReadBool(Ini_Settings, 'ShowHidden', false);
-        EnableUnsupported := ReadBool(Ini_Settings, 'EnableUnsupported', false);
+        EnableUnsupported := GUIini.ReadBool(Ini_Settings, 'EnableUnsupported', false);
+
         ShowBreadCrumb := ReadBool(Ini_Settings, 'ShowBreadCrumb', true);
         MinimizeToTray := ReadBool(Ini_Settings, 'MinimizeToTray', false);
         SingleInstanceApp := ReadBool(Ini_Settings, 'SingleInstanceApp', false);
@@ -762,6 +758,11 @@ begin
         SetApiLargeFileSupport(MaAPILargeFileSupport.Checked);
         SetCustomOptions(ReadString(Ini_Options, 'CustomOptions', ''));
       end;
+
+      // Standard, Camera, Location, About and UserDef settings
+      ReadFileListColumns(FMain.ShellList.Handle, GUIini);
+      GetFileListDefs(FMain.CBoxDetails.Items);
+      FMain.CBoxDetails.ItemIndex := 0;
 
       // --- ETdirect commands---
       ReadEtDirectCmds(CBoxETdirect, GUIini);
@@ -894,6 +895,8 @@ begin
 
         with GUIsettings do
         begin
+          EnableUnsupported := UnsupportedEnabled;
+
           WriteString(Ini_Settings, 'Language', Language);
           WriteBool(Ini_Settings, 'AutoRotatePreview', AutoRotatePreview);
           I := CBoxFileFilter.Items.Count - 1;
