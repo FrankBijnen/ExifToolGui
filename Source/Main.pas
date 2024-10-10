@@ -1537,7 +1537,7 @@ end;
 
 procedure TFMain.OnlineDocumentation1Click(Sender: TObject);
 begin
-  ShellExecute(0, 'Open', PWideChar(ReadResourceId(ETD_Online_Doc)), '', '', SW_SHOWNORMAL);
+  ShellExecute(0, 'Open', PWideChar(StringResource(ETD_Online_Doc)), '', '', SW_SHOWNORMAL);
 end;
 
 procedure TFMain.QuickPopUpMenuPopup(Sender: TObject);
@@ -2052,17 +2052,17 @@ begin
       if (MessageDlgEx(StrTheWebView2Loaderd + #10 +
                        StrShowOnlineHelp,
                        '', TMsgDlgType.mtError, [TMsgDlgBtn.mbYes, TMsgDlgBtn.mbNo]) = ID_YES) then
-        Url := ReadResourceId(ETD_Edge_Dll);
+        Url := StringResource(ETD_Edge_Dll);
     end
     else
     begin
       if (MessageDlgEx(StrUnableToStartEdge +#10 +
                        StrShowOnlineHelp,
                        '', TMsgDlgType.mtError, [TMsgDlgBtn.mbYes, TMsgDlgBtn.mbNo]) = ID_YES) then
-        Url := ReadResourceId(ETD_Edge_Runtime);
+        Url := StringResource(ETD_Edge_Runtime);
     end;
     if (Url <> '') then
-      ShellExecute(0, 'Open', PWideChar(ReadResourceId(ETD_Online_Doc)  + Url), '', '', SW_SHOWNORMAL);
+      ShellExecute(0, 'Open', PWideChar(StringResource(ETD_Online_Doc)  + Url), '', '', SW_SHOWNORMAL);
   end;
 
 end;
@@ -3125,7 +3125,7 @@ begin
         StrERRORExifTool9 + #10 + #10 +
         StrShowOnlineHelp, '',
         TMsgDlgType.mtError, [TMsgDlgBtn.mbYes, TMsgDlgBtn.mbNo]) = ID_YES) then
-      ShellExecute(0, 'Open', PWideChar(ReadResourceId(ETD_Online_Doc) + ReadResourceId(ETD_Reqs)), '', '', SW_SHOWNORMAL);
+      ShellExecute(0, 'Open', PWideChar(StringResource(ETD_Online_Doc) + StringResource(ETD_Reqs)), '', '', SW_SHOWNORMAL);
 
 end;
 

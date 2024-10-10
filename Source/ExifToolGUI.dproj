@@ -134,9 +134,6 @@
         <DelphiCompile Include="$(MainSource)">
             <MainSource>MainSource</MainSource>
         </DelphiCompile>
-        <RcCompile Include="Resources\ExifToolsGui_Strings.rc">
-            <Form>ExifToolsGui_Strings.res</Form>
-        </RcCompile>
         <RcCompile Include="Resources\ExifToolsGui_Files.rc">
             <Form>ExifToolsGui_Files.res</Form>
         </RcCompile>

@@ -82,11 +82,11 @@ begin
   result := '';
   case (ETGuiProduct) of
     TETGuiProduct.etGUI:
-      URL := ReadResourceId(ETD_Latest_Gui);
+      URL := StringResource(ETD_Latest_Gui);
     TETGuiProduct.etPH:
-      URL := ReadResourceId(ETD_Latest_PH);
+      URL := StringResource(ETD_Latest_PH);
     TETGuiProduct.etOBetz:
-      URL := ReadResourceId(ETD_Latest_OBetz);
+      URL := StringResource(ETD_Latest_OBetz);
   end;
   result := ExecuteRest(ETGuiProduct, URL);
 end;

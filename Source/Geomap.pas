@@ -1653,11 +1653,11 @@ procedure ReadGeoCodeSettings(GUIini: TMemIniFile);
 begin
   GeoSettings.GetCoordProvider := TGeoCodeProvider(GUIini.ReadInteger(Geo_Settings, 'GetCoordProvider', 0));
   GeoSettings.GetPlaceProvider := TGeoCodeProvider(GUIini.ReadInteger(Geo_Settings, 'GetPlaceProvider', 1));
-  GeoSettings.GeoCodeUrl := GUIini.ReadString(Geo_Settings, 'GeoCodeUrl', ReadResourceId(ETD_GeoCode));
+  GeoSettings.GeoCodeUrl := GUIini.ReadString(Geo_Settings, 'GeoCodeUrl', StringResource(ETD_GeoCode));
   GeoSettings.GeoCodeApiKey := GUIini.ReadString(Geo_Settings, 'GeoCodeApiKey', '');
 
   GeoSettings.ThrottleGeoCode := GUIini.ReadInteger(Geo_Settings, 'ThrottleGeoCode', 1000);
-  GeoSettings.OverPassUrl := GUIini.ReadString(Geo_Settings, 'OverPassUrl', ReadResourceId(ETD_OverPass));
+  GeoSettings.OverPassUrl := GUIini.ReadString(Geo_Settings, 'OverPassUrl', StringResource(ETD_OverPass));
 
   GeoSettings.SetGeoLocation500(GUIini.ReadString(Geo_Settings, 'GeoLocation500Dir', ''));
 

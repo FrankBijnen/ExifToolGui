@@ -7,41 +7,54 @@ unit ExifToolsGui_ResourceStrings;
 interface
 
 const
-  ETD_Latest_Gui        = 101;
-  ETD_Latest_PH         = 102;
-  ETD_Latest_OBetz      = 103;
+  ETD_ResourceStrings   = 'ETD_ResourceStrings';
+  ETD_Latest_Gui        = 'ETD_Latest_Gui';
+  ETD_Latest_PH         = 'ETD_Latest_PH';
+  ETD_Latest_OBetz      = 'ETD_Latest_OBetz';
 
-  ETD_Credits_GUI       = 105;
-  ETD_Credits_ET        = 106;
-  ETD_GNUGPL            = 107;
+  ETD_Credits_GUI       = 'ETD_Credits_GUI';
+  ETD_Credits_ET        = 'ETD_Credits_ET';
+  ETD_GNUGPL            = 'ETD_GNUGPL';
 
-  ETD_Home_Gui          = 110;
-  ETD_Home_PH           = 111;
-  ETD_Home_OBetz        = 112;
+  ETD_Home_Gui          = 'ETD_Home_Gui';
+  ETD_Home_PH           = 'ETD_Home_PH';
+  ETD_Home_OBetz        = 'ETD_Home_OBetz';
 
-  ETD_Online_Doc        = 120;
-  ETD_Edge_Dll          = 121;
-  ETD_Edge_Runtime      = 122;
-  ETD_Reqs              = 123;
+  ETD_Online_Doc        = 'ETD_Online_Doc';
+  ETD_Edge_Dll          = 'ETD_Edge_Dll';
+  ETD_Edge_Runtime      = 'ETD_Edge_Runtime';
+  ETD_Reqs              = 'ETD_Reqs';
 
-  ETD_GeoCode           = 130;
-  ETD_OverPass          = 131;
+  ETD_GeoCode           = 'ETD_GeoCode';
+  ETD_OverPass          = 'ETD_OverPass';
 
-function ReadResourceId(const Id: integer): string;
+function StringResource(const Id: string): string;
 
 implementation
 
-uses Winapi.Windows;
+uses
+  System.Classes,
+  Winapi.Windows,
+  ExifToolsGUI_Utils;
 
-function ReadResourceId(const Id: integer): string;
 var
- Buffer: array [0..4096] of char;
- Len: integer;
+  ResourceStringList: TStringList;
+
+function StringResource(const Id: string): string;
 begin
-  result:= '';
-  Len := LoadString(HInstance, Id, Buffer, SizeOf(Buffer));
-  if Len <> 0 then
-    result:= Buffer;
+  if not Assigned(ResourceStringList) then
+  begin
+    ResourceStringList := TStringList.Create;
+    LoadResourceList(ETD_ResourceStrings, ResourceStringList);
+  end;
+  result := ResourceStringList.Values[Id];
+end;
+
+initialization
+
+finalization
+begin
+  ResourceStringList.Free;
 end;
 
 end.

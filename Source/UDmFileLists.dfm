@@ -24,7 +24,7 @@ object DmFileLists: TDmFileLists
     BeforeDelete = CdsFileListDefBeforeDelete
     AfterScroll = CdsFileListDefAfterScroll
     Left = 82
-    Top = 30
+    Top = 28
     object CdsFileListDefId: TIntegerField
       FieldName = 'Id'
       Visible = False
@@ -41,6 +41,7 @@ object DmFileLists: TDmFileLists
     end
     object CdsFileListDefReadMode: TIntegerField
       FieldName = 'ReadMode'
+      OnChange = CdsFileListDefReadModeChange
     end
     object CdsFileListDefReadModeLookup: TStringField
       FieldKind = fkLookup

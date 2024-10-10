@@ -339,18 +339,6 @@ begin
     result := VarData[LowerFieldName];
 end;
 
-procedure LoadResourceList(Resource: string; List: TStringList);
-var
-  ResStream: TResourceStream;
-begin
-  ResStream := TResourceStream.Create(hInstance, Resource, RT_RCDATA);
-  try
-    List.LoadFromStream(ResStream);
-  finally
-    ResStream.Free;
-  end;
-end;
-
 class function TMetaData.AllInternalFields: TStrings;
 begin
   if not Assigned(FAllInterFields) then

@@ -129,6 +129,9 @@ function ContextInstalled(const AppTitle: string): string;
 procedure Add2Context(const AppTitle, Description: string);
 procedure RemoveFromContext(const AppTitle: string);
 
+// Resource
+procedure LoadResourceList(Resource: string; List: TStringList);
+
 // Running elevated or admin?
 var
   FloatFormatSettings: TFormatSettings; // for StrToFloatDef -see Initialization
@@ -1899,6 +1902,18 @@ begin
     Reg.DeleteKey(ETGContextKey + AppTitle);
   finally
     Reg.Free
+  end;
+end;
+
+procedure LoadResourceList(Resource: string; List: TStringList);
+var
+  ResStream: TResourceStream;
+begin
+  ResStream := TResourceStream.Create(hInstance, Resource, RT_RCDATA);
+  try
+    List.LoadFromStream(ResStream);
+  finally
+    ResStream.Free;
   end;
 end;
 
