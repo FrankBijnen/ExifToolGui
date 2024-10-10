@@ -609,7 +609,8 @@ begin
   CdsColumnSet.ReadOnly := false;
   try
     // Get Captions for 'fast' system fields
-    TSubShellFolder.AllFastSystemFields(FSample.Parent, FSystemTagNames);
+    if Assigned(FSample) then
+      TSubShellFolder.AllFastSystemFields(FSample.Parent, FSystemTagNames);
 
     //
     PrepTagNames;

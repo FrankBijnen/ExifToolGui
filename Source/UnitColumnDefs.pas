@@ -75,13 +75,14 @@ function GetFileListDefs: TColumnSetList; overload;
 function GetFileListColumnDefs(Index: integer): TColumnsArray;
 procedure SetFileListColumnDefs(Index: integer; AColumnDefs: TColumnsArray);
 procedure UpdateSysCaptions(ARootFolder: TShellFolder);
+function UnsupportedEnabled: boolean;
 
 implementation
 
 uses
   System.SysUtils, System.Math,
   Winapi.CommCtrl,
-  ExifToolsGui_ShellList, ExifToolsGUI_Utils;
+  ExifToolsGui_ShellList, ExifToolsGUI_Utils, MainDef;
 
 const
   ReadMode  = 'ReadMode';
@@ -147,6 +148,13 @@ const
 
 var
   FColumnSetList: TColumnSetList;
+
+function DefInternalMode: TReadModeOptions;
+begin
+  result := [TReadModeOption.rmInternal];
+  if (GUIsettings.EnableUnsupported) then
+    Include(Result, TReadModeOption.rmExifTool);
+end;
 
 function TFileListColumn.GetSysColumn: integer;
 var
@@ -343,7 +351,7 @@ function ReadCameraTags(LVHandle: HWND; GUIini: TMemIniFile): TColumnsArray;
 var
   ReadMode: TReadModeOptions;
 begin
-  ReadMode := [rmInternal];
+  ReadMode := DefInternalMode;
   result := ReadColumnDefs(LVHandle, GUIini, StdColDef + CameraId, CameraDefaults, ReadMode);
   FColumnSetList.Add(TColumnSet.Create(StrCameraList,
                                        floInternal,
@@ -355,7 +363,7 @@ function ReadLocationTags(LVHandle: HWND; GUIini: TMemIniFile): TColumnsArray;
 var
   ReadMode: TReadModeOptions;
 begin
-  ReadMode := [rmInternal];
+  ReadMode := DefInternalMode;
   result := ReadColumnDefs(LVHandle, GUIini, StdColDef + LocationId, LocationDefaults, ReadMode);
   FColumnSetList.Add(TColumnSet.Create(StrLocationList,
                                        floInternal,
@@ -367,7 +375,7 @@ function ReadAboutTags(LVHandle: HWND; GUIini: TMemIniFile): TColumnsArray;
 var
   ReadMode: TReadModeOptions;
 begin
-  ReadMode := [rmInternal];
+  ReadMode := DefInternalMode;
   result := ReadColumnDefs(LVHandle, GUIini, StdColDef + AboutId, AboutDefaults, ReadMode);
   FColumnSetList.Add(TColumnSet.Create(StrAboutList,
                                        floInternal,
@@ -553,11 +561,21 @@ begin
   for FileDef := 0 to GetFileListDefCount -1 do
   begin
     ColumnDefs := GetFileListDefs[FileDef].ColumnDefs;
-    // Update Caption of system fields
     for Index := 0 to High(ColumnDefs) do
       if ((ColumnDefs[Index].Options and toSys) = toSys) then
         ColumnDefs[Index].SetCaption(TSubShellFolder.GetSystemField(ARootFolder, nil, ColumnDefs[Index].GetSysColumn));
   end;
+end;
+
+function UnsupportedEnabled: boolean;
+var
+  AColumnSet: TColumnSet;
+begin
+  result := false;
+  for AColumnSet in FColumnSetList do
+    if (AColumnSet.Options <> floUserDef) and
+       (rmExifTool in AColumnSet.ReadMode) then
+      exit(true);
 end;
 
 initialization

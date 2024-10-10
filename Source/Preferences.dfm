@@ -38,7 +38,7 @@ object FPreferences: TFPreferences
     Top = 0
     Width = 606
     Height = 414
-    ActivePage = AdvTabGeneral
+    ActivePage = AdvTabOther
     Align = alLeft
     DoubleBuffered = True
     ParentDoubleBuffered = False
@@ -859,7 +859,7 @@ object FPreferences: TFPreferences
       Caption = 'Other'
       object Label5: TLabel
         Left = 103
-        Top = 284
+        Top = 258
         Width = 478
         Height = 13
         AutoSize = False
@@ -920,7 +920,7 @@ object FPreferences: TFPreferences
       end
       object HintPause: TEdit
         Left = 16
-        Top = 281
+        Top = 255
         Width = 66
         Height = 21
         TabOrder = 8
@@ -928,7 +928,7 @@ object FPreferences: TFPreferences
       end
       object UpDHintPause: TUpDown
         Left = 82
-        Top = 281
+        Top = 255
         Width = 16
         Height = 21
         Associate = HintPause
@@ -954,21 +954,13 @@ object FPreferences: TFPreferences
           'ired)'
         TabOrder = 6
       end
-      object CheckBox11: TCheckBox
-        Left = 16
-        Top = 253
-        Width = 565
-        Height = 17
-        Caption = '-Filelist: Use ExifTool for unsupported file types. (Slower)'
-        TabOrder = 10
-      end
       object GrpConfig: TGroupBox
         Left = 16
         Top = 136
         Width = 562
         Height = 42
         Caption = 'Exiftool config (-config CFGFILE)'
-        TabOrder = 11
+        TabOrder = 10
         object EdETCustomConfig: TEdit
           Left = 141
           Top = 15
