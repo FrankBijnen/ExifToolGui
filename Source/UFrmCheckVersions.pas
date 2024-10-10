@@ -72,9 +72,9 @@ begin
   LvVersions.Items.BeginUpdate;
   try
     LvVersions.Items.Clear;
-    AddItem(0, 0, ReadResourceId(ETD_Home_Gui));
-    AddItem(1, 1, ReadResourceId(ETD_Home_PH));
-    AddItem(1, 0, ReadResourceId(ETD_Home_OBetz));
+    AddItem(0, 0, StringResource(ETD_Home_Gui));
+    AddItem(1, 1, StringResource(ETD_Home_PH));
+    AddItem(1, 0, StringResource(ETD_Home_OBetz));
   finally
     LvVersions.Items.EndUpdate;
   end;

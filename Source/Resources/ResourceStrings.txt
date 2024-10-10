@@ -1,0 +1,15 @@
+ETD_Latest_Gui=https://api.github.com/repos/FrankBijnen/ExifToolGui/releases/latest
+ETD_Latest_PH=https://exiftool.org/ver.txt
+ETD_Latest_OBetz=https://oliverbetz.de/cms/files/Artikel/ExifTool-for-Windows/exiftool_latest_version.txt
+ETD_Credits_GUI=by Bogdan Hrastnik\nAdapted for RAD11 by Frank B
+ETD_Credits_ET=ExifTool by Phil Harvey
+ETD_GNUGPL=http://www.gnu.org/copyleft/gpl.html
+ETD_Home_Gui=https://github.com/FrankBijnen/ExifToolGui
+ETD_Home_PH=https://exiftool.org
+ETD_Home_OBetz=https://oliverbetz.de/pages/Artikel/ExifTool-for-Windows
+ETD_Online_Doc=https://github.com/FrankBijnen/ExifToolGui/blob/main/Docs/ExifToolGUI_V6.md
+ETD_Edge_Dll=/#m_edge_dll
+ETD_Edge_Runtime=/#m_edge_runtime
+ETD_Reqs=/#m_reqs_exiftool
+ETD_GeoCode=https://geocode.maps.co
+ETD_OverPass=https://overpass-api.de/api

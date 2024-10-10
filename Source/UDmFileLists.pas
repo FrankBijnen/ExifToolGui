@@ -61,10 +61,10 @@ type
     procedure CdsFileListDefBeforeDelete(DataSet: TDataSet);
     procedure CdsFileListDefAfterPost(DataSet: TDataSet);
     procedure CdsFileListDefBeforeInsert(DataSet: TDataSet);
+    procedure CdsFileListDefReadModeChange(Sender: TField);
   private
     { Private declarations }
     ColumnSeq: Double;
-    FListName: string;
     FListReadMode: integer;
     FSample: TShellFolder;
     FSampleValues: TSampleData;
@@ -76,7 +76,7 @@ type
     procedure PrepTagNames;
     procedure AddTagName(ATagName: string; CheckExist: boolean);
     procedure CalcSampleValue(DataSet: TDataSet; Command, Sample: string);
-    procedure GetSampleValues(AListName: string; AListReadMode: integer);
+    procedure GetSampleValues(AListReadMode: integer);
     procedure SetupLookUps;
   public
     { Public declarations }
@@ -164,8 +164,8 @@ begin
     exit;
   if (Dataset.ControlsDisabled) then
     exit;
-  GetSampleValues(CdsFileListDef.FieldByName('Name').AsString,
-                  CdsFileListDef.FieldByName('ReadMode').AsInteger);
+
+  GetSampleValues(CdsFileListDef.FieldByName('ReadMode').AsInteger);
 
   if GetSampleValue(Dataset.FieldByName(Command).AsString, SampleValue) then
     Dataset.FieldByName(Sample).AsString := SampleValue
@@ -261,6 +261,13 @@ begin
   end;
 end;
 
+procedure TDmFileLists.CdsFileListDefReadModeChange(Sender: TField);
+begin
+  if (CdsFileListDef.ControlsDisabled) then
+    exit;
+  GetSampleValues(Sender.AsInteger);
+end;
+
 procedure TDmFileLists.CdsFileListDefBeforeDelete(DataSet: TDataSet);
 begin
   if CdsFileListDef.ReadOnly then
@@ -307,7 +314,7 @@ begin
     CdsTagNames.AppendRecord([ATagName]);
 end;
 
-procedure TDmFileLists.GetSampleValues(AListName: string; AListReadMode: integer);
+procedure TDmFileLists.GetSampleValues(AListReadMode: integer);
 var
   MetaData: TMetaData;
   Index: integer;
@@ -319,11 +326,10 @@ var
   ETcmd: string;
   ETOut: TStringList;
 begin
+
   // Already have the tagnames?
-  if (FListName = AListName) and
-     (FListReadMode = AListReadMode) then
+  if (FListReadMode = AListReadMode) then
     exit;
-  FListName := AListName;
   FListReadMode := AListReadMode;
 
   // Clear
@@ -589,7 +595,6 @@ var
 begin
   FSample := ASample;
 
-  FListName := '';
   FListReadMode := -1;
 
   CdsFileListDef.Close;
@@ -660,11 +665,11 @@ begin
       SelectedSet := CdsFileListDef.RecordCount;
     CdsFileListDef.RecNo := SelectedSet;
 
-    CdsColumnSet.MasterFields := 'Id';
-    CdsColumnSet.MasterSource := DsFileListDef;
-
     CdsFileListDef.EnableControls;
     CdsColumnSet.EnableControls;
+
+    CdsColumnSet.MasterFields := 'Id';
+    CdsColumnSet.MasterSource := DsFileListDef;
 
     DoSetEditMode;  // Now filter tagnames
   end;

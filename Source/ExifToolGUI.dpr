@@ -8,7 +8,6 @@ program ExifToolGUI;
 // Allows for overriding the default language, without writing to the registry.
 // CommandLine example: /OverrideLanguage=NLD
 
-{$R 'ExifToolsGui_Strings.res' 'Resources\ExifToolsGui_Strings.rc'}
 {$R 'ExifToolsGui_Files.res' 'Resources\ExifToolsGui_Files.rc'}
 
 uses

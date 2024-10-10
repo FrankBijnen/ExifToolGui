@@ -52,11 +52,11 @@ begin
 
   // Setup captions dynamically.
   LblVersion.Caption      := GetFileVersionNumberPlatForm(Application.ExeName) + #10 +
-                              ReadResourceId(ETD_Credits_GUI);
-  LblSource.Caption       := ReadResourceId(ETD_Home_Gui);
-  LblExifToolHome.Caption := ReadResourceId(ETD_Home_PH);
-  LblExifTool.Caption     := ReadResourceId(ETD_Credits_ET);
-  LblGNUGPL.Caption       := ReadResourceId(ETD_GNUGPL);
+                              StringResource(ETD_Credits_GUI);
+  LblSource.Caption       := StringResource(ETD_Home_Gui);
+  LblExifToolHome.Caption := StringResource(ETD_Home_PH);
+  LblExifTool.Caption     := StringResource(ETD_Credits_ET);
+  LblGNUGPL.Caption       := StringResource(ETD_GNUGPL);
 
   if TExifTool.ExecET('-ver', '', '', Output) then
     LblExifTool.Caption := LblExifTool.Caption + ' ' + Output

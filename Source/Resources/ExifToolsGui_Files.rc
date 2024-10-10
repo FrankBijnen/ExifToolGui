@@ -1,2 +1,3 @@
+ETD_ResourceStrings    RCDATA "ResourceStrings.txt"
 ETD_AllInternalFields  RCDATA "AllInternalFields.txt"
 ETD_PentaxLenses       RCDATA "PentaxLenses.txt"
