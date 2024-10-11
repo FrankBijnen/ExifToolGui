@@ -3,7 +3,7 @@ unit MainDef;
 interface
 
 uses
-  System.Classes, Winapi.Windows, Vcl.Dialogs, ExifTool, GEOMap, UnitLangResources, UnitScaleForm;
+  System.Classes, Winapi.Windows, Vcl.Dialogs, Vcl.ComCtrls, ExifTool, GEOMap, UnitLangResources, UnitScaleForm;
 
 const
   SHOWALL = 'Show All Files';
@@ -65,6 +65,9 @@ const
     'Xmp-crs:All ' +
     'Xmp-exif:All ';
 
+  DefThumbNailSizes: array of integer = [96, 128, 160, 256, 512];
+  ThumbNailPix = 'pix';
+
   DefSelExcludeCopyTags = '';
 
 type
@@ -80,10 +83,12 @@ type
     DefStartupDir: string;
     DefExportUse: boolean;
     DefExportDir: string;
-    ThumbSize: integer;
+    UseExitDetails: boolean;
     ThumbAutoGenerate: boolean;
     ThumbCleanSet: string[4];
-    UseExitDetails: boolean;
+    DetailsSel: integer;
+    FileFilters: string;
+    FilterSel: integer;
     AutoIncLine: boolean;
     DblClickUpdTags: boolean;
     EnableGMap: boolean;
@@ -108,6 +113,8 @@ type
     MinimizeToTray: boolean;
     SingleInstanceApp: boolean;
     ShowBalloon: boolean;
+    function FileFilter: string;
+    function SaveFileFilter: string;
     function CanShowHidden: boolean;
     function GetCustomConfig: string;
     function Fast3(const FileExt: string): string;
@@ -161,7 +168,7 @@ implementation
 
 uses System.SysUtils, System.StrUtils, System.IniFiles,
   Winapi.ShellAPI, Winapi.ShlObj,
-  Vcl.Forms, Vcl.StdCtrls, Vcl.ComCtrls,
+  Vcl.Forms, Vcl.StdCtrls,
   Main, UnitColumnDefs, ExifToolsGUI_Utils, ExifToolsGui_FileListColumns, ExifInfo, LogWin;
 
 const
@@ -246,6 +253,31 @@ begin
     exit(PrevPath);
 
   // If we get here, the default result is returned.
+end;
+
+function GUIsettingsRec.FileFilter: string;
+begin
+  result := SHOWALL;
+  with TStringList.Create do
+  begin
+    Text := FileFilters;
+    if (FilterSel < Count) then
+      result := Strings[FilterSel];
+    Free;
+  end;
+end;
+
+function GUIsettingsRec.SaveFileFilter: string;
+begin
+  with TStringList.Create do
+  begin
+    Text := FileFilters;
+    if (Count > 0) then
+      Delete(0);
+    result := StringReplace(Text,   #13, '', [rfReplaceAll]);
+    result := StringReplace(result, #10, '|', [rfReplaceAll]);
+    Free;
+  end;
 end;
 
 function GUIsettingsRec.CanShowHidden: boolean;
@@ -634,8 +666,7 @@ end;
 
 procedure ReadGUIini;
 var
-  Indx: integer;
-  Tx, DefaultDir: string;
+  DefaultDir: string;
   TmpItems: TStringList;
 begin
   try
@@ -660,18 +691,11 @@ begin
         Language := ReadString(Ini_Settings, 'Language', '');
         ET.Options.SetLangDef(Language);
         AutoRotatePreview := ReadBool(Ini_Settings, 'AutoRotatePreview', false);
-        Tx := ReadString(Ini_Settings, 'FileFilters', '*.JPG|*.CR2|*.JPG;*.CR2|*.JPG;*.DNG|*.JPG;*.PEF');
-        CBoxFileFilter.Items.Text := SHOWALL;
-        repeat
-          Indx := pos('|', Tx);
-          if Indx > 0 then
-          begin
-            CBoxFileFilter.Items.Append(LeftStr(Tx, Indx - 1));
-            Delete(Tx, 1, Indx);
-          end
-          else
-            CBoxFileFilter.Items.Append(Tx);
-        until Indx = 0;
+        FileFilters := SHOWALL + #10 +
+                                  StringReplace(ReadString(Ini_Settings,
+                                                'FileFilters', '*.JPG|*.CR2|*.JPG;*.CR2|*.JPG;*.DNG|*.JPG;*.PEF'),
+                                     '|', #10, [rfReplaceAll]);
+        FilterSel := 0; // Default Show all
         DefStartupUse := ReadBool(Ini_Settings, 'DefStartupUse', false);
         DefStartupDir := ReadString(Ini_Settings, 'DefStartupDir', 'c:\');
         if DefStartupUse and ValidDir(DefStartupDir) then
@@ -682,22 +706,7 @@ begin
         GUIsettings.ETTimeOut := ReadInteger(Ini_Settings, 'ETTimeOut', 5000);
         DefExportUse := ReadBool(Ini_Settings, 'DefExportUse', false);
         DefExportDir := ReadString(Ini_Settings, 'DefExportDir', '');
-        ThumbSize := ReadInteger(Ini_Settings, 'ThumbsSize', 0);
-        case ThumbSize of
-          0:
-            Indx := 96;
-          1:
-            Indx := 128;
-          2:
-            Indx := 160;
-          3:
-            Indx := 256;
-          4:
-            Indx := 512;
-        else
-          Indx := 96;
-        end;
-        FMain.ShellList.ThumbNailSize := Indx;
+        FMain.ShellList.ThumbNailSize := ReadInteger(Ini_Settings, 'ThumbsSize', 96);
         ThumbAutoGenerate := ReadBool(Ini_Settings, 'ThumbAutoGenerate', True);
         FMain.ShellList.ThumbAutoGenerate := ThumbAutoGenerate;
         ThumbCleanSet := ReadString(Ini_Settings, 'ThumbCleanSet', '0000');
@@ -710,8 +719,13 @@ begin
         UseExitDetails := ReadBool(Ini_Settings, 'UseExitDetails', false);
         if UseExitDetails then
         begin
-          FMain.CBoxDetails.ItemIndex := ReadInteger(Ini_Settings, 'DetailsSel', 0);
-          FMain.SpeedBtnDetails.Down := ReadBool(Ini_Settings, 'DetailsDown', True);
+          DetailsSel := ReadInteger(Ini_Settings, 'DetailsSel', 0);
+          FMain.ShellList.ViewStyle := TviewStyle(ReadInteger(Ini_Settings, 'ViewStyle', 3));
+        end
+        else
+        begin
+          DetailsSel := 0;
+          FMain.ShellList.ViewStyle := TViewStyle.vsReport;
         end;
         AutoIncLine := ReadBool(Ini_Settings, 'AutoIncLine', True);
         DblClickUpdTags := ReadBool(Ini_Settings, 'DblClickUpdTags', False);
@@ -761,8 +775,6 @@ begin
 
       // Standard, Camera, Location, About and UserDef settings
       ReadFileListColumns(FMain.ShellList.Handle, GUIini);
-      GetFileListDefs(FMain.CBoxDetails.Items);
-      FMain.CBoxDetails.ItemIndex := 0;
 
       // --- ETdirect commands---
       ReadEtDirectCmds(CBoxETdirect, GUIini);
@@ -867,9 +879,6 @@ begin
 end;
 
 function SaveGUIini: boolean;
-var
-  I, N: integer;
-  Tx: string;
 begin
   result := true;
   if (DontSaveIni) then
@@ -899,18 +908,8 @@ begin
 
           WriteString(Ini_Settings, 'Language', Language);
           WriteBool(Ini_Settings, 'AutoRotatePreview', AutoRotatePreview);
-          I := CBoxFileFilter.Items.Count - 1;
-          Tx := '';
-          if I > 0 then
-          begin
-            for N := 1 to I do
-            begin
-              Tx := Tx + CBoxFileFilter.Items[N];
-              if N < I then
-                Tx := Tx + '|';
-            end;
-          end;
-          WriteString(Ini_Settings, 'FileFilters', Tx);
+          WriteString(Ini_Settings, 'FileFilters', SaveFileFilter);
+          WriteInteger(Ini_Settings, 'FilterSel', FilterSel);
           WriteBool(Ini_Settings, 'DefStartupUse', DefStartupUse);
           WriteString(Ini_Settings, 'DefStartupDir', DefStartupDir);
           WriteString(Ini_Settings, 'ETOverrideDir', ETOverrideDir);
@@ -919,7 +918,7 @@ begin
           WriteInteger(Ini_Settings, 'ETTimeOut', ETTimeOut);
           WriteBool(Ini_Settings, 'DefExportUse', DefExportUse);
           WriteString(Ini_Settings, 'DefExportDir', DefExportDir);
-          WriteInteger(Ini_Settings, 'ThumbsSize', ThumbSize);
+          WriteInteger(Ini_Settings, 'ThumbsSize', FMain.ShellList.ThumbNailSize);
           WriteBool(Ini_Settings, 'ThumbAutoGenerate', ThumbAutoGenerate);
           WriteString(Ini_Settings, 'ThumbCleanSet', ThumbCleanSet);
 
@@ -928,8 +927,8 @@ begin
           WriteString(Ini_Settings, 'GUIStyle', GuiStyle);
 
           WriteBool(Ini_Settings, 'UseExitDetails', UseExitDetails);
-          WriteInteger(Ini_Settings, 'DetailsSel', FMain.CBoxDetails.ItemIndex);
-          WriteBool(Ini_Settings, 'DetailsDown', FMain.SpeedBtnDetails.Down);
+          WriteInteger(Ini_Settings, 'DetailsSel', DetailsSel);
+          WriteInteger(Ini_Settings, 'ViewStyle', Ord(Fmain.ShellList.ViewStyle));
           WriteBool(Ini_Settings, 'AutoIncLine', AutoIncLine);
           WriteBool(Ini_Settings, 'DblClickUpdTags', DblClickUpdTags);
           WriteInteger(Ini_Settings, 'ETdirDefCmd', ETdirDefCmd);

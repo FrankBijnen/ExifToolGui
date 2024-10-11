@@ -62,21 +62,15 @@ type
     Splitter1: TSplitter;
     Splitter2: TSplitter;
     Splitter3: TSplitter;
-    SpeedBtnDetails: TSpeedButton;
-    CBoxDetails: TComboBox;
     EditETdirect: TLabeledEdit;
     SpeedBtn_ETdirect: TSpeedButton;
     CBoxETdirect: TComboBox;
     SpeedBtn_ETedit: TSpeedButton;
     EditETcmdName: TLabeledEdit;
-    CBoxFileFilter: TComboBox;
     SpeedBtnQuick: TSpeedButton;
     MemoQuick: TMemo;
     SpeedBtnLarge: TSpeedButton;
     EditQuick: TEdit;
-    SpeedBtnFListRefresh: TSpeedButton;
-    SpeedBtnFilterEdit: TSpeedButton;
-    SpeedBtnColumnEdit: TSpeedButton;
     SpeedBtnShowLog: TSpeedButton;
     SpeedBtnQuickSave: TSpeedButton;
     SpeedBtnETdirectDel: TSpeedButton;
@@ -188,13 +182,19 @@ type
     MaPredefinedSave: TAction;
     MaPredefinedLoad: TAction;
     AdvPanelBrowser: TPanel;
+    ToolBar1: TToolBar;
+    TbFlRefresh: TToolButton;
+    TbFlView: TToolButton;
+    ImageCollectionFileList: TImageCollection;
+    VirtualImageListFileList: TVirtualImageList;
+    FileListViewMenu: TPopupMenu;
+    TbFlFilter: TToolButton;
+    FileListFilterMenu: TPopupMenu;
     procedure ShellListClick(Sender: TObject);
     procedure ShellListKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
     procedure SpeedBtnExifClick(Sender: TObject);
-    procedure CBoxDetailsChange(Sender: TObject);
     procedure ShellListAddItem(Sender: TObject; AFolder: TShellFolder; var CanAdd: boolean);
     procedure FormShow(Sender: TObject);
-    procedure SpeedBtnDetailsClick(Sender: TObject);
     procedure RotateImgResize(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure EditETdirectKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
@@ -206,8 +206,6 @@ type
     procedure BtnETdirectDelClick(Sender: TObject);
     procedure BtnETdirectReplaceClick(Sender: TObject);
     procedure BtnETdirectAddClick(Sender: TObject);
-    procedure BtnFListRefreshClick(Sender: TObject);
-    procedure CBoxFileFilterChange(Sender: TObject);
     procedure MetadataListDrawCell(Sender: TObject; ACol, ARow: integer; Rect: TRect; State: TGridDrawState);
     procedure MetadataListSelectCell(Sender: TObject; ACol, ARow: integer; var CanSelect: boolean);
     procedure MetadataListKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
@@ -219,9 +217,6 @@ type
     procedure EditQuickKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
     procedure BtnQuickSaveClick(Sender: TObject);
     procedure MPreferencesClick(Sender: TObject);
-    procedure BtnFilterEditClick(Sender: TObject);
-    procedure CBoxFileFilterKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
-    procedure BtnColumnEditClick(Sender: TObject);
     procedure BtnShowLogClick(Sender: TObject);
     procedure ShellListDeletion(Sender: TObject; Item: TListItem);
     procedure MDontBackupClick(Sender: TObject);
@@ -316,6 +311,12 @@ type
     procedure FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
     procedure ShellTreeKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
     procedure ShellListKeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
+    procedure TbFlRefreshClick(Sender: TObject);
+    procedure StyledDraw(Sender: TObject; ACanvas: TCanvas; ARect: TRect; Selected: Boolean);
+    procedure Small1MeasureItem(Sender: TObject; ACanvas: TCanvas; var Width, Height: Integer);
+    procedure FileListViewMenuPopup(Sender: TObject);
+    procedure SpeedBtnFilterEditClick(Sender: TObject);
+    procedure FileListFilterMenuPopup(Sender: TObject);
   private
     { Private declarations }
     ETBarSeriesFocal: TBarSeries;
@@ -361,6 +362,13 @@ type
     procedure CounterETEvent(Counter: integer);
     procedure ResetRootShowAll;
     function SyncShellTree: TTreenode;
+    procedure ViewPopupDrawItem(Sender: TObject; ACanvas: TCanvas; ARect: TRect; Selected: Boolean);
+    procedure ViewPopupClick(Sender: TObject);
+    procedure FilterPopupDrawItem(Sender: TObject; ACanvas: TCanvas; ARect: TRect; Selected: Boolean);
+    procedure FilterPopupClick(Sender: TObject);
+    procedure EditFileLists(Sender: TObject);
+    procedure EditFileFilter(Sender: TObject);
+
   protected
     function GetDefWindowSizes: TRect; override;
   public
@@ -468,7 +476,7 @@ procedure TFMain.ResetRootShowAll;
 begin
   ShellList.Enabled := false;
   try
-    CBoxFileFilter.ItemIndex := 0;
+    GUIsettings.FilterSel := 0;
     ShellList.IncludeSubFolders := false;
     ShellList.Refresh;
   finally
@@ -563,20 +571,19 @@ begin
   ETChart.LeftAxis.Increment := LeftInc;
 end;
 
-procedure TFMain.BtnColumnEditClick(Sender: TObject);
+procedure TFMain.EditFileLists(Sender: TObject);
 begin
-  DmFileLists.SelectedSet := CBoxDetails.ItemIndex +1;
+  DmFileLists.SelectedSet := GUIsettings.DetailsSel +1;
   FEditFColumn.PrepareShow(ShellList.GetSelectedFolder(-1)); // If SelectedFolder = nil, no sample values, but it should work.
   if FEditFColumn.ShowModal = mrOK then
   begin
     UpdateSysCaptions(ShellList.RootFolder);
-    GetFileListDefs(CBoxDetails.Items);
-    CBoxDetails.ItemIndex := DmFileLists.SelectedSet -1;
-    with ShellList do
-    if Enabled then
+    GUIsettings.DetailsSel := DmFileLists.SelectedSet -1;
+    TbFlView.Caption := GetFileListDefs[GUIsettings.DetailsSel].Name;
+    if (ShellList.Enabled) then
     begin
-      Refresh;
-      SetFocus;
+      ShellList.Refresh;
+      ShellList.SetFocus;
     end;
   end;
   ShowMetadata;
@@ -620,30 +627,13 @@ begin
   CBoxETdirectChange(Sender);
 end;
 
-procedure TFMain.BtnFilterEditClick(Sender: TObject);
-var
-  I, N, X: integer;
+procedure TFMain.EditFileFilter(Sender: TObject);
 begin
   if FEditFFilter.ShowModal = mrOK then
-    with CBoxFileFilter do
-    begin
-      X := ItemIndex;
-      OnChange := nil;
-      I := FEditFFilter.ListBox1.Items.Count - 1;
-      Items.Clear;
-      for N := 0 to I do
-        Items.Append(FEditFFilter.ListBox1.Items[N]);
-      OnChange := CBoxFileFilterChange;
-      ItemIndex := 0;
-      if X <> 0 then
-        CBoxFileFilterChange(Sender);
-    end;
-end;
-
-procedure TFMain.BtnFListRefreshClick(Sender: TObject);
-begin
-  ShellList.Refresh;
-  ShellList.SetFocus;
+  begin
+    Shelllist.IncludeSubFolders := ContainsText(GUIsettings.FileFilter, '/s');
+    ShellList.Refresh;
+  end;
 end;
 
 procedure TFMain.BtnQuickSaveClick(Sender: TObject);
@@ -734,19 +724,6 @@ end;
 procedure TFMain.BtnShowLogClick(Sender: TObject);
 begin
   FLogWin.Show;
-end;
-
-procedure TFMain.CBoxDetailsChange(Sender: TObject);
-begin
-  with ShellList do
-  if (Enabled) then
-  begin
-    SortColumn := 0;
-    SortState := THeaderSortState.hssNone;
-    Refresh;
-    ShellListItemsLoaded(ShellList);
-    SetFocus;
-  end;
 end;
 
 procedure TFMain.GenericExtractPreviewsClick(Sender: TObject);
@@ -886,7 +863,7 @@ end;
 procedure TFMain.MaUserDefLoadExecute(Sender: TObject);
 begin
   if (LoadIniDialog(OpenFileDlg, TIniData.idUserDefined, false)) then
-    CBoxDetails.OnChange(CBoxDetails);
+    EditFileLists(Sender)
 end;
 
 procedure TFMain.MaUserDefSaveExecute(Sender: TObject);
@@ -1236,7 +1213,7 @@ begin
 
   ET.OpenExec(ETcmd, GetSelectedFiles, ETout, ETerr);
   if XDir = '' then
-    BtnFListRefreshClick(Sender);
+    TbFlRefreshClick(Sender);
 end;
 
 procedure TFMain.MFileDateFromExifClick(Sender: TObject);
@@ -1555,7 +1532,8 @@ begin
   QuickPopUp_AddCustomAct.Visible := not(SpeedBtnQuick.Down or SpeedBtnCustom.Down or IsSep);
   QuickPopUp_DelCustomAct.Visible := SpeedBtnCustom.Down and not(IsSep);
   QuickPopUp_AddDetailsUserAct.Visible := not IsSep and
-                                         (SpeedBtnExif.Down or SpeedBtnXmp.Down or SpeedBtnIptc.Down or SpeedBtnALL.Down);
+                                          (GetFileListDefs[GUIsettings.DetailsSel].Options = floUserDef) and
+                                          (SpeedBtnExif.Down or SpeedBtnXmp.Down or SpeedBtnIptc.Down or SpeedBtnALL.Down);
   QuickPopUp_MarkTagAct.Visible := not(SpeedBtnQuick.Down or SpeedBtnCustom.Down or IsSep);
   QuickPopUp_DelQuickAct.Visible := not(IsSep) and SpeedBtnQuick.Down;
   QuickPopUp_FillQuickAct.Visible := QuickPopUp_DelQuickAct.Visible;
@@ -1567,6 +1545,12 @@ begin
   case (AButtonID) of
     0: Tray_ResetwindowsizeClick(Sender);
   end;
+end;
+
+procedure TFMain.TbFlRefreshClick(Sender: TObject);
+begin
+  ShellList.Refresh;
+  ShellList.SetFocus;
 end;
 
 function TFMain.TranslateTagName(xMeta, xName: string): string;
@@ -1675,10 +1659,9 @@ var
   PrevSel, PrevRow: integer;
   FListUserDef: TColumnsArray;
 begin
-  FListUserDef := GetFileListColumnDefs(CBoxDetails.ItemIndex);
-  if (Length(FListUserDef) = 0) then
+  if (GetFileListDefs[GUIsettings.DetailsSel].Options <> floUserDef) then
     exit;
-
+  FListUserDef := GetFileListColumnDefs(GUIsettings.DetailsSel);
   I := Length(FListUserDef);
   SetLength(FListUserDef, I + 1);
   N := MetadataList.Row;
@@ -1706,19 +1689,20 @@ begin
   FListUserDef[I].Width := 96;
   FListUserDef[I].AlignR := 0;
 
-  SetFileListColumnDefs(CBoxDetails.ItemIndex, FListUserDef);
+  SetFileListColumnDefs(GUIsettings.DetailsSel, FListUserDef);
 
-  if CBoxDetails.ItemIndex > 0 then
+  if GUIsettings.DetailsSel > 0 then
   begin
     PrevSel := ShellList.Selected.Index;
     PrevRow := MetadataList.Row;
     try
       ShellList.Refresh;
     finally
-      ShellList.Refresh;
+      ShellList.ClearSelection;
       ShellList.Items[PrevSel].Selected := true;
       ShellListClick(ShellList);
-      MetadataList.Row := PrevRow;
+      if (PrevRow < MetadataList.RowCount) then
+        MetadataList.Row := PrevRow;
     end;
   end;
 end;
@@ -2361,6 +2345,78 @@ begin
   end;
 end;
 
+procedure TFMain.Small1MeasureItem(Sender: TObject; ACanvas: TCanvas; var Width, Height: Integer);
+begin
+  Height := 1;
+end;
+
+procedure TFMain.ViewPopupDrawItem(Sender: TObject; ACanvas: TCanvas; ARect: TRect; Selected: Boolean);
+begin
+  StyledDrawMenuItem(Sender as TMenuItem, ACanvas, ARect, Selected,
+                     FStyleServices, GUIsettings.GuiStyle <> cSystemStyleName, VirtualImageListFileList);
+end;
+
+procedure TFMain.ViewPopupClick(Sender: TObject);
+var
+  SavedPath: string;
+begin
+  with TMenuItem(Sender) do
+  begin
+    if (Tag < 0) then
+    begin
+      if (GroupIndex = 3) then
+        EditFileLists(Sender);
+      exit;
+    end;
+    TbFlView.Caption := Caption;
+    SavedPath := ShellTree.Path;
+    ShellList.Enabled := false;
+    try
+      Shelllist.ViewStyle := vsReport;
+      ShellList.SortColumn := 0;
+      ShellList.SortState := THeaderSortState.hssNone;
+      if (GroupIndex = 1) then
+      begin
+        ShellList.ThumbNailSize := Tag;
+        ShellList.ViewStyle := vsIcon;
+      end
+      else
+      begin
+        GUIsettings.DetailsSel := Tag;
+      end;
+    finally
+      ShellTree.Path := SavedPath;
+      ShellList.Enabled := true;
+      ShellList.Refresh;
+      ShellList.SetFocus;
+    end;
+  end;
+end;
+
+procedure TFMain.FilterPopupDrawItem(Sender: TObject; ACanvas: TCanvas; ARect: TRect; Selected: Boolean);
+begin
+  StyledDrawMenuItem(Sender as TMenuItem, ACanvas, ARect, Selected,
+                     FStyleServices, GUIsettings.GuiStyle <> cSystemStyleName, VirtualImageListFileList);
+end;
+
+procedure TFMain.FilterPopupClick(Sender: TObject);
+begin
+  with TMenuItem(Sender) do
+  begin
+    if (Tag < 0) then
+    begin
+      EditFileFilter(Sender);
+      exit;
+    end;
+    TbFlFilter.Caption := Caption;
+    GUIsettings.FilterSel := Tag;
+    Shelllist.IncludeSubFolders := ContainsText(GUIsettings.FileFilter, '/s');
+    ShellList.Refresh;
+    ShellList.SetFocus;
+  end;
+end;
+
+
 procedure TFMain.AdvPagePreviewResize(Sender: TObject);
 begin
   ShowPreview;
@@ -2387,30 +2443,6 @@ begin
     EditETdirect.SetFocus;
 end;
 
-procedure TFMain.CBoxFileFilterChange(Sender: TObject);
-var
-  Indx: integer;
-begin
-  Indx := CBoxFileFilter.ItemIndex;
-  if (Indx >= 0) then
-  begin
-    SpeedBtnFilterEdit.Enabled := (Indx <> 0);
-    Shelllist.IncludeSubFolders := ContainsText(CBoxFileFilter.Text, '/s');
-    ShellList.Refresh;
-    ShellList.SetFocus;
-  end;
-end;
-
-procedure TFMain.CBoxFileFilterKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
-begin
-  if Key = VK_Return then
-  begin
-    CBoxFileFilter.Text := trim(CBoxFileFilter.Text);
-    ShellList.Refresh;
-    ShellList.SetFocus;
-  end;
-end;
-
 procedure TFMain.AlignStatusBar;
 begin
   StatusBar.Panels[0].Width := AdvPageBrowse.Width + Splitter1.Width;
@@ -2435,6 +2467,111 @@ begin
 
     TrayIcon.Visible := true;
   end;
+end;
+
+procedure TFMain.FileListFilterMenuPopup(Sender: TObject);
+var
+  P: TPopupMenu;
+  Filters: TStringList;
+  Index: integer;
+
+  function NewMenuItem(ACaption: string;
+                       ATag: integer;
+                       AGroup: integer;
+                       AImageIndex: integer;
+                       ACheck: boolean = false): TMenuItem;
+  begin
+    result := TMenuItem.Create(P);
+    result.Caption := ACaption;
+    result.Tag := ATag;
+    result.GroupIndex := AGroup;
+    result.ImageIndex := AImageIndex;
+    if (ATag > -1) then
+    begin
+      result.AutoCheck := true;
+      result.RadioItem := true;
+    end;
+    result.Checked := ACheck;
+    result.OnDrawItem := FilterPopupDrawItem;
+    result.OnClick := FilterPopupClick;
+    P.Items.Add(result);
+  end;
+
+begin
+  if (ShellList.Enabled = false) then
+    exit;
+
+  P := Sender as TPopupMenu;
+  P.Items.Clear;
+  Filters := TStringList.Create;
+  Filters.Text := GUIsettings.FileFilters;
+  try
+    for Index := 0 to Filters.Count -1 do
+      NewMenuItem(Filters[Index], Index, 1, 4, (GUIsettings.FilterSel = Index));
+
+    NewMenuItem('-',             -1, 0, -1);
+    NewMenuItem('Configure',     -1, 1, 2);
+  finally
+    Filters.free;
+  end;
+end;
+
+procedure TFMain.FileListViewMenuPopup(Sender: TObject);
+var
+  P: TPopupMenu;
+  Index: integer;
+  ThumbSize: integer;
+  FileListDefs: TColumnSetList;
+  AColumnSet: TColumnSet;
+
+  function NewMenuItem(ACaption: string;
+                       ATag: integer;
+                       AGroup: integer;
+                       AImageIndex: integer;
+                       ACheck: boolean = false): TMenuItem;
+  begin
+    result := TMenuItem.Create(P);
+    result.Caption := ACaption;
+    result.Tag := ATag;
+    result.GroupIndex := AGroup;
+    result.ImageIndex := AImageIndex;
+    if (ATag > -1) then
+    begin
+      result.AutoCheck := true;
+      result.RadioItem := true;
+    end;
+    result.Checked := ACheck;
+    result.OnDrawItem := ViewPopupDrawItem;
+    result.OnClick := ViewPopupClick;
+    P.Items.Add(result);
+  end;
+
+begin
+  if (ShellList.Enabled = false) then
+    exit;
+
+  P := Sender as TPopupMenu;
+  P.Items.Clear;
+  NewMenuItem('Thumbnails',   -1, 1, -1);
+  NewMenuItem('-',            -1, 0, -1);
+  for ThumbSize in DefThumbNailSizes do
+    NewMenuItem(IntToStr(ThumbSize) + ThumbNailPix,
+                ThumbSize, 1, 0,
+                (ShellList.ViewStyle = vsIcon) and (ShellList.ThumbNailSize = ThumbSize));
+  NewMenuItem('-',            -1, 0, -1);
+  NewMenuItem('Details',      -1, 2, -1);
+  NewMenuItem('-',            -1, 0, -1);
+
+  FileListDefs := GetFileListDefs;
+  Index := 0;
+  for AColumnSet in FileListDefs do
+  begin
+    NewMenuItem(AColumnSet.Name,       Index, 2, 1, (ShellList.ViewStyle = vsReport) and (GUIsettings.DetailsSel = Index));
+    Inc(Index);
+  end;
+
+  NewMenuItem('-',             -1, 0, -1);
+  NewMenuItem('Configure',     -1, 3, 2);
 end;
 
 procedure TFMain.FormAfterMonitorDpiChanged(Sender: TObject; OldDPI, NewDPI: Integer);
@@ -2533,11 +2670,18 @@ begin
   ShellList.OnCustomDrawItem := ShellListCustomDrawItem;
   ShellList.IncludeSubFolders := false;
 
+  // set View and Filter buttons
+  if (ShellList.ViewStyle = vsIcon) then
+    TbFlView.Caption := IntToStr(ShellList.ThumbNailSize) + ThumbNailPix
+  else if (GUIsettings.DetailsSel < GetFileListDefs.Count) then
+    TbFlView.Caption := GetFileListDefs[GUIsettings.DetailsSel].Name;
+
+  TbFlFilter.Caption := GUIsettings.FileFilter;
+
   // Metadatalist Ctrl handler
   MetadataList.OnCtrlKeyDown := MetadataListCtrlKeyDown;
   MetadataList.ProportionalVScroll := true;
 
-  CBoxFileFilter.Text := SHOWALL;
   ET.ExecETEvent := ExecETEvent_Done;
   Geomap.ExecRestEvent := ExecRestEvent_Done;
 end;
@@ -2656,16 +2800,7 @@ begin
   // Init Chart
   AdvRadioGroup2Click(Sender);
 
-  if not SpeedBtnDetails.Down then
-  begin
-    ShellList.ViewStyle := vsIcon;
-    CBoxDetails.Enabled := false;
-  end;
-
   WrkIniDir := GetAppPath;
-  if GUIsettings.UseExitDetails then
-    CBoxDetailsChange(Sender);
-
   DontSaveIni := FindCmdLineSwitch('DontSaveIni', true);
 
   // The shellList is initally disabled. Now enable and refresh
@@ -2773,9 +2908,9 @@ begin
 
   Application.ProcessMessages;
   FolderName := ExtractFileName(AFolder.PathName);
-  if (CBoxFileFilter.Text <> SHOWALL) then
+  if (GUIsettings.FileFilter <> SHOWALL) then
   begin
-    Filter := CBoxFileFilter.Text;
+    Filter := GUIsettings.FileFilter;
     FilterMatches := TSubShellFolder.GetIsFolder(AFolder);
     while (FilterMatches = false) and (Filter <> '') do
     begin
@@ -2821,7 +2956,7 @@ begin
     ListIndex := 0
   else
   begin
-    ListIndex := CBoxDetails.ItemIndex;
+    ListIndex := GUIsettings.DetailsSel;
     if (ListIndex > 0) then
       Dec(ColIndex);
   end;
@@ -2842,7 +2977,7 @@ end;
 
 procedure TFMain.ShellListBeforePopulate(Sender: TObject; var DoDefault: boolean);
 begin
-  DoDefault := ((ShellList.ViewStyle <> vsReport) or (CBoxDetails.ItemIndex = 0));
+  DoDefault := ((ShellList.ViewStyle <> vsReport) or (GUIsettings.DetailsSel = 0));
 end;
 
 procedure TFMain.ShellListAfterEnumColumns(Sender: TObject; var ReadModeOptions: TReadModeOptions; var ColumnDefs: TColumnsArray);
@@ -2889,10 +3024,10 @@ procedure TFMain.ShellListAfterEnumColumns(Sender: TObject; var ReadModeOptions:
   end;
 
 begin
-  ReadModeOptions := GetFileListDefs[CBoxDetails.ItemIndex].ReadMode;
-  ColumnDefs := GetFileListDefs[CBoxDetails.ItemIndex].ColumnDefs;
+  ReadModeOptions := GetFileListDefs[GUIsettings.DetailsSel].ReadMode;
+  ColumnDefs := GetFileListDefs[GUIsettings.DetailsSel].ColumnDefs;
 
-  case CBoxDetails.ItemIndex of
+  case GUIsettings.DetailsSel of
     0:
       begin
         ShellList.AddDate;
@@ -3122,6 +3257,12 @@ begin
         TMsgDlgType.mtError, [TMsgDlgBtn.mbYes, TMsgDlgBtn.mbNo]) = ID_YES) then
       ShellExecute(0, 'Open', PWideChar(StringResource(ETD_Online_Doc) + StringResource(ETD_Reqs)), '', '', SW_SHOWNORMAL);
 
+end;
+
+procedure TFMain.StyledDraw(Sender: TObject; ACanvas: TCanvas; ARect: TRect; Selected: Boolean);
+begin
+  StyledDrawMenuItem(Sender as TMenuItem, ACanvas, ARect, Selected,
+                     FStyleServices, GUIsettings.GuiStyle <> cSystemStyleName, VirtualImageListFileList);
 end;
 
 procedure TFMain.EnableMenuItems;
@@ -3463,34 +3604,16 @@ begin
   AdvRadioGroup2Click(Sender);
 end;
 
-procedure TFMain.SpeedBtnDetailsClick(Sender: TObject);
-var
-  SavedPath: string;
-begin
-  SpeedBtnDetails.Enabled := false;
-  try
-    with ShellList do
-    begin
-      SavedPath := ShellTreeView.Path;
-      Enabled := false;
-      if SpeedBtnDetails.Down then
-        ViewStyle := vsReport
-      else
-        ViewStyle := vsIcon;
-      Enabled := true;
-      ShellTreeView.Path := SavedPath;
-    end;
-  finally
-    SpeedBtnDetails.Enabled := true;
-    CBoxDetails.Enabled := SpeedBtnDetails.Down;
-  end;
-end;
-
 procedure TFMain.SpeedBtnExifClick(Sender: TObject);
 begin
   AdvPanelMetaBottom.Visible := SpeedBtnQuick.Down;
   SpeedBtnQuickSave.Enabled := false;
   ShowMetadata;
+end;
+
+procedure TFMain.SpeedBtnFilterEditClick(Sender: TObject);
+begin
+  EditFileFilter(Sender);
 end;
 
 procedure TFMain.SpeedBtnLargeClick(Sender: TObject);

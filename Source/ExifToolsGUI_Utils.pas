@@ -9,7 +9,7 @@ uses Winapi.ShlObj, Winapi.ActiveX, Winapi.Wincodec, Winapi.Windows, Winapi.Mess
   System.Classes, System.SysUtils, System.Variants, System.StrUtils, System.Math, System.Threading,
   System.Generics.Collections,
   Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, Vcl.ComCtrls, Vcl.Shell.ShellCtrls, Vcl.Graphics, Vcl.Themes,
-  Vcl.Controls,
+  Vcl.Controls, Vcl.Menus, Vcl.VirtualImageList,
   Geomap;
 
 type
@@ -35,9 +35,6 @@ procedure DebugMsg(const Msg: array of variant);
 // Version
 function GetFileVersionNumber(FName: string): string;
 function GetFileVersionNumberPlatForm(FName: string): string;
-
-// Shell
-function GetIShellFolder(IFolder: IShellFolder; PIDL: PItemIDList): IShellFolder;
 
 // FileSystem
 function ValidDir(ADir: string): boolean;
@@ -93,6 +90,8 @@ procedure StyledDrawListviewItem(FstyleServices: TCustomStyleServices;
                                  ListView: TCustomListView;
                                  Item: TlistItem;
                                  State: TCustomDrawState);
+procedure StyledDrawMenuItem(const AnItem: TMenuItem; const ACanvas: TCanvas; ARect: TRect; Selected: Boolean;
+                             FStyleServices: TCustomStyleServices; AllowTransParent: boolean; AnImageList: TVirtualImageList);
 
 // Tag names
 function GetTags(ETResult: TStringList; Tags: TStrings): TTagInfoList;
@@ -230,14 +229,6 @@ begin
     ' 64 Bits'
 {$ENDIF}
   ;
-end;
-
-// ShellFolder
-function GetIShellFolder(IFolder: IShellFolder; PIDL: PItemIDList): IShellFolder;
-begin
-  result := nil;
-  if Assigned(IFolder) then
-    IFolder.BindToObject(PIDL, nil, IID_IShellFolder, Pointer(Result));
 end;
 
 // Directories
@@ -1098,6 +1089,76 @@ begin
       ListView.Canvas.FillRect(Item.DisplayRect(drBounds));
     end;
   end;
+end;
+
+procedure StyledDrawMenuItem(const AnItem: TMenuItem; const ACanvas: TCanvas; ARect: TRect; Selected: Boolean;
+                             FStyleServices: TCustomStyleServices; AllowTransParent: boolean; AnImageList: TVirtualImageList);
+var
+  R: TRect;
+  RadioWidth: integer;
+  MenuHeight: integer;
+  Offset: integer;
+  ImgWidth: integer;
+
+const
+  MARGIN = 5;
+
+begin
+  R := ARect;
+  RadioWidth := GetSystemMetrics(SM_CXMENUCHECK) div 2;
+  MenuHeight := ARect.Height;
+  Offset := (MenuHeight - RadioWidth) div 2;
+
+  // Draw a kind of radio button ourselves.
+  if AnItem.Checked then
+  begin
+    R.Top := R.Top + Offset;
+    R.Left := R.Left + Offset;
+    R.Height := RadioWidth;
+    R.Width := RadioWidth;
+    ACanvas.Brush.Color := ACanvas.Pen.Color;
+    ACanvas.Ellipse(R);
+    R := ARect;           // restore Rect
+  end;
+
+  // Inflate left position even for unchecked items, to keep text left alignement
+  R.Left := R.Left + MenuHeight + MARGIN;
+
+  // Draw image if available
+  ImgWidth := 0;
+  if (Assigned(AnImageList)) then
+  begin
+    ImgWidth := AnImageList.Width;
+    if (AnItem.ImageIndex <> -1) then
+      AnImageList.Draw(ACanvas, R.Left, R.Top + 2, AnItem.ImageIndex);
+  end;
+
+  // Draw caption
+  R.Left := R.Left + ImgWidth + MARGIN;
+  if Assigned(FStyleServices) then
+  begin
+    if (Selected) then
+      ACanvas.Font.Color := FStyleServices.GetStyleFontColor(sfPopupMenuItemTextSelected)
+    else
+      ACanvas.Font.Color := FStyleServices.GetStyleFontColor(sfPopupMenuItemTextNormal);
+  end
+  else
+  begin
+    if (Selected) then
+      ACanvas.Font.Color := clHighlightText
+    else
+      ACanvas.Font.Color := clMenuText;
+  end;
+
+  if AllowTransParent then
+    SetBkMode(ACanvas.Handle, TRANSPARENT);
+
+  if (AnItem.ImageIndex < 0) and
+     (AnItem.Checked = false) then
+    DrawText(ACanvas.Handle, PChar(AnItem.Caption), Length(AnItem.Caption), ARect, DT_SINGLELINE or DT_CENTER or DT_VCENTER)
+  else
+    DrawText(ACanvas.Handle, PChar(AnItem.Caption), Length(AnItem.Caption), R, DT_SINGLELINE or DT_LEFT or DT_VCENTER);
+
 end;
 
 function GetTags(ETResult: TStringList; Tags: TStrings): TTagInfoList;

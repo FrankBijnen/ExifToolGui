@@ -70,8 +70,7 @@ function ReadFileListColumns(LVHandle: HWND; GUIini: TMemIniFile): boolean;
 procedure WriteFileListColumns(GUIini: TMemIniFile);
 procedure ResetAllColumnWidths(LVHandle: HWND);
 function GetFileListDefCount: integer;
-procedure GetFileListDefs(AList: TStrings); overload;
-function GetFileListDefs: TColumnSetList; overload;
+function GetFileListDefs: TColumnSetList;
 function GetFileListColumnDefs(Index: integer): TColumnsArray;
 procedure SetFileListColumnDefs(Index: integer; AColumnDefs: TColumnsArray);
 procedure UpdateSysCaptions(ARootFolder: TShellFolder);
@@ -524,20 +523,6 @@ begin
   if (Index > -1) and
      (Index < FColumnSetList.Count) then
     result := FColumnSetList[Index].ColumnDefs;
-end;
-
-procedure GetFileListDefs(AList: TStrings);
-var
-  ASet: TColumnSet;
-begin
-  Alist.BeginUpdate;
-  try
-    Alist.Clear;
-    for ASet in FColumnSetList do
-      AList.Add(Aset.Name);
-  finally
-    Alist.EndUpdate;
-  end;
 end;
 
 function GetFileListDefs: TColumnSetList;
