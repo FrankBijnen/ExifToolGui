@@ -579,6 +579,7 @@ begin
   begin
     UpdateSysCaptions(ShellList.RootFolder);
     GUIsettings.DetailsSel := DmFileLists.SelectedSet -1;
+    ShellList.ViewStyle := TViewStyle.vsReport;
     TbFlView.Caption := GetFileListDefs[GUIsettings.DetailsSel].Name;
     if (ShellList.Enabled) then
     begin
