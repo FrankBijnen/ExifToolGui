@@ -116,7 +116,8 @@ type
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
     procedure Invalidate; override;
-    procedure ClearSelectionRefresh;
+    procedure Refresh;
+
     procedure AddDate; // Adds next columns if it is a Date.
     function Path: string;
     function GetSelectedFolder(ItemIndex: integer): TShellFolder;
@@ -572,7 +573,7 @@ begin
 
   if SameText(Verb, SCmdVerbPaste) then
   begin
-    ClearSelectionRefresh;
+    ClearSelection;
     RefreshTreeViewAfterContext;
   end;
 
@@ -625,14 +626,11 @@ begin
     Folders[Indx].ViewHandle := Handle;
 end;
 
-procedure TShellListView.ClearSelectionRefresh;
-var
-  Indx: integer;
+procedure TShellListView.Refresh;
 begin
-  // Prevent calling OwnerDataFetch
-  for Indx := 0 to Items.Count -1 do
-    ListView_SetItemState(Handle, Indx, 0, LVIS_SELECTED);
-  Refresh;
+  ClearSelection;
+
+  inherited Refresh;
 end;
 
 procedure TShellListView.AddDate;
