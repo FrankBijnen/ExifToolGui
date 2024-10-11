@@ -38,7 +38,7 @@ object FPreferences: TFPreferences
     Top = 0
     Width = 606
     Height = 414
-    ActivePage = AdvTabOther
+    ActivePage = AdvTabSheetThumbs
     Align = alLeft
     DoubleBuffered = True
     ParentDoubleBuffered = False
@@ -165,11 +165,11 @@ object FPreferences: TFPreferences
       ImageIndex = 2
       object GpxCleanThumbNails: TGroupBox
         Left = 20
-        Top = 151
+        Top = 102
         Width = 547
         Height = 115
         Caption = 'Cleanup Thumbnails (Admin required)'
-        TabOrder = 5
+        TabOrder = 4
         object Label2: TLabel
           Left = 290
           Top = 35
@@ -179,33 +179,17 @@ object FPreferences: TFPreferences
           Layout = tlCenter
         end
       end
-      object RadioGroup3: TRadioGroup
-        Left = 20
-        Top = 3
-        Width = 539
-        Height = 40
-        Caption = 'Thumbnails size'
-        Columns = 5
-        ItemIndex = 0
-        Items.Strings = (
-          '-96pix'
-          '-128pix'
-          '-160pix'
-          '-256pix'
-          '-512pix')
-        TabOrder = 0
-      end
       object ChkThumbAutoGenerate: TCheckBox
         Left = 20
-        Top = 62
+        Top = 12
         Width = 539
         Height = 17
         Caption = 'Generate thumbnails as needed'
-        TabOrder = 1
+        TabOrder = 0
       end
       object BtnSetupClean: TBitBtn
         Left = 37
-        Top = 181
+        Top = 131
         Width = 250
         Height = 25
         Caption = 'Setup Disk cleanup for thumbnails'
@@ -276,12 +260,12 @@ object FPreferences: TFPreferences
           6464646464646464646464646464646464646464646464646464646464646464
           6464646464646464646464646464646464646464646464646464646464646464
           6464646464646464646464646464646464646464646464646464}
-        TabOrder = 2
+        TabOrder = 1
         OnClick = BtnSetupCleanClick
       end
       object EdThumbCleanset: TMaskEdit
         Left = 361
-        Top = 183
+        Top = 133
         Width = 51
         Height = 21
         Hint = 
@@ -291,12 +275,12 @@ object FPreferences: TFPreferences
         MaxLength = 4
         ParentShowHint = False
         ShowHint = True
-        TabOrder = 3
+        TabOrder = 2
         Text = '    '
       end
       object BtnClean: TBitBtn
         Left = 37
-        Top = 224
+        Top = 174
         Width = 250
         Height = 25
         Caption = 'Cleanup thumbnails'
@@ -367,12 +351,12 @@ object FPreferences: TFPreferences
           3030303030303030303030303030303030303030303030303030303030303030
           3030303030303030303030303030303030303030303030303030303030303030
           3030303030303030303030303030303030303030303030303030}
-        TabOrder = 4
+        TabOrder = 3
         OnClick = BtnCleanClick
       end
       object BtnGenThumbs: TBitBtn
         Left = 20
-        Top = 105
+        Top = 55
         Width = 250
         Height = 25
         Hint = 
@@ -448,7 +432,7 @@ object FPreferences: TFPreferences
           7777777777777777777777777777777777777777777777777777}
         ParentShowHint = False
         ShowHint = True
-        TabOrder = 6
+        TabOrder = 5
         OnClick = BtnGenThumbsClick
       end
     end

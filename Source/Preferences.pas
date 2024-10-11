@@ -32,7 +32,6 @@ type
     EdETOverride: TEdit;
     BtnETOverride: TButton;
     AdvTabSheetThumbs: TTabSheet;
-    RadioGroup3: TRadioGroup;
     ChkThumbAutoGenerate: TCheckBox;
     BtnSetupClean: TBitBtn;
     EdThumbCleanset: TMaskEdit;
@@ -139,20 +138,6 @@ begin
     ETCustomConfig := EdETCustomConfig.Text;
   end;
   ET.Options.SetSeparator(LabeledEdit1.Text);
-
-  case RadioGroup3.ItemIndex of
-    0:
-      FMain.ShellList.ThumbNailSize := 96;
-    1:
-      FMain.ShellList.ThumbNailSize := 128;
-    2:
-      FMain.ShellList.ThumbNailSize := 160;
-    3:
-      FMain.ShellList.ThumbNailSize := 256;
-    4:
-      FMain.ShellList.ThumbNailSize := 512;
-  end;
-  GUIsettings.ThumbSize := RadioGroup3.ItemIndex;
 
   FMain.ShellList.ThumbAutoGenerate := ChkThumbAutoGenerate.Checked;
   GUIsettings.ThumbAutoGenerate := ChkThumbAutoGenerate.Checked;
@@ -338,7 +323,6 @@ begin
   end;
   LabeledEdit1.Text := ET.Options.GetSeparator;
 
-  RadioGroup3.ItemIndex := GUIsettings.ThumbSize;
   ChkThumbAutoGenerate.Checked := GUIsettings.ThumbAutoGenerate;
   EdThumbCleanset.Text := GUIsettings.ThumbCleanSet;
 

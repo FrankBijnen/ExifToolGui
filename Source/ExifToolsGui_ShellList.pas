@@ -226,6 +226,12 @@ begin
 end;
 
 { TSubShellFolder }
+function GetIShellFolder(IFolder: IShellFolder; PIDL: PItemIDList): IShellFolder;
+begin
+  result := nil;
+  if Assigned(IFolder) then
+    IFolder.BindToObject(PIDL, nil, IID_IShellFolder, Pointer(Result));
+end;
 
 destructor TSubShellFolder.Destroy;
 begin
