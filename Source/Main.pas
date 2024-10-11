@@ -470,7 +470,7 @@ begin
   try
     CBoxFileFilter.ItemIndex := 0;
     ShellList.IncludeSubFolders := false;
-    ShellList.ClearSelectionRefresh;
+    ShellList.Refresh;
   finally
     ShellList.Enabled := true;
   end;
@@ -575,7 +575,7 @@ begin
     with ShellList do
     if Enabled then
     begin
-      ClearSelectionRefresh;
+      Refresh;
       SetFocus;
     end;
   end;
@@ -642,7 +642,7 @@ end;
 
 procedure TFMain.BtnFListRefreshClick(Sender: TObject);
 begin
-  ShellList.ClearSelectionRefresh;
+  ShellList.Refresh;
   ShellList.SetFocus;
 end;
 
@@ -743,7 +743,7 @@ begin
   begin
     SortColumn := 0;
     SortState := THeaderSortState.hssNone;
-    ClearSelectionRefresh;
+    Refresh;
     ShellListItemsLoaded(ShellList);
     SetFocus;
   end;
@@ -1086,7 +1086,7 @@ procedure TFMain.MetadataListCtrlKeyDown(Sender: TObject; var Key: Word; Shift: 
       exit;
 
     // Select only the item, and make that visible
-    ShellList.ClearSelection;
+    ShellList.Refresh;
     ShellList.Items[New].Selected := true;
     ShellList.Items[New].MakeVisible(false);
 
@@ -1179,7 +1179,7 @@ procedure TFMain.MExifDateTimeshiftClick(Sender: TObject);
 begin
   if FDateTimeShift.ShowModal = mrOK then
   begin
-    ShellList.ClearSelectionRefresh;
+    ShellList.Refresh;
     ShowMetadata;
   end;
 end;
@@ -1259,7 +1259,7 @@ end;
 procedure TFMain.MFileNameDateTimeClick(Sender: TObject);
 begin
   if (FFileDateTime.ShowModal = idOK) then
-    ShellList.ClearSelectionRefresh;
+    ShellList.Refresh;
 end;
 
 procedure TFMain.MIgnoreErrorsClick(Sender: TObject);
@@ -1470,7 +1470,7 @@ begin
     ET.OpenExit(true); // Force restart of ExifTool. CustomConfig could have changed
     EnableMenus(ET.StayOpen(ShellList.Path)); // Recheck Exiftool.exe.
     ShellListSetFolders;
-    ShellList.ClearSelectionRefresh;
+    ShellList.Refresh;
     ShowMetadata;
   end;
 end;
@@ -1715,7 +1715,7 @@ begin
     try
       ShellList.Refresh;
     finally
-      ShellList.ClearSelection;
+      ShellList.Refresh;
       ShellList.Items[PrevSel].Selected := true;
       ShellListClick(ShellList);
       MetadataList.Row := PrevRow;
@@ -2396,7 +2396,7 @@ begin
   begin
     SpeedBtnFilterEdit.Enabled := (Indx <> 0);
     Shelllist.IncludeSubFolders := ContainsText(CBoxFileFilter.Text, '/s');
-    ShellList.ClearSelectionRefresh;
+    ShellList.Refresh;
     ShellList.SetFocus;
   end;
 end;
@@ -2406,7 +2406,7 @@ begin
   if Key = VK_Return then
   begin
     CBoxFileFilter.Text := trim(CBoxFileFilter.Text);
-    ShellList.ClearSelectionRefresh;
+    ShellList.Refresh;
     ShellList.SetFocus;
   end;
 end;
@@ -2592,7 +2592,7 @@ begin
     begin
       ShellTree.Path := ExtractFileDir(FName);
       FName := ExtractFileName(FName);
-      ShellList.ClearSelection;
+      ShellList.Refresh;
       for Index := 0 to ShellList.Items.Count -1 do
       begin
         if ShellList.RelFileName(Index) = FName then
@@ -3018,7 +3018,7 @@ procedure TFMain.ShellListKeyDown(Sender: TObject; var Key: Word; Shift: TShiftS
         DoContextMenuVerb(ShellList.Folders[Index], SCmdVerbDelete);
       end;
 
-      ShellList.ClearSelectionRefresh;
+      ShellList.Refresh;
       if (CurIndex < 0) then
         CurIndex := 0;
       if (CurIndex > ShellList.Items.Count -1) then
@@ -3202,7 +3202,7 @@ procedure TFMain.Tray_ResetwindowsizeClick(Sender: TObject);
 begin
   RestoreGUI;
   ResetWindowSizes;
-  ShellList.ClearSelectionRefresh;
+  ShellList.Refresh;
   Realign;
 end;
 
