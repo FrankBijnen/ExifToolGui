@@ -16,17 +16,19 @@ type
 
 implementation
 
-uses System.SysUtils;
+uses
+  System.SysUtils,
+  ExifToolsGUI_Utils;
 
-// Sort on stringlist with possibly integer in key.
+// Sort on stringlist with possibly decimals/integers in key.
 function SortOnKey(List: TStringList; Index1, Index2: Integer): Integer;
 var
-  L1, l2: integer;
+  L1, l2: Double;
 begin
   result := 0;
-  if (TryStrToInt(List.KeyNames[Index1], L1)) and
-     (TryStrToInt(List.KeyNames[Index2], L2)) then
-  begin // Compare integers
+  if (TryStrToFloat(List.KeyNames[Index1], L1, FloatFormatSettings)) and
+     (TryStrToFloat(List.KeyNames[Index2], L2, FloatFormatSettings)) then
+  begin // Compare decimals
     if (L1 < L2) then
       result := -1
     else if (L1 > L2) then
