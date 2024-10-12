@@ -2428,9 +2428,9 @@ begin
       EditFileFilter(Sender);
       exit;
     end;
-    SetCaptionAndImage;
     GUIsettings.FilterSel := Tag;
     Shelllist.IncludeSubFolders := ContainsText(GUIsettings.FileFilter, '/s');
+    SetCaptionAndImage;
     ShellList.Refresh;
     ShellList.SetFocus;
   end;
