@@ -41,7 +41,6 @@ type
     RadTagValues: TRadioGroup;
     procedure FormCreate(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
-    procedure DbGridKeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
     procedure EdSearchTagKeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
     procedure DbgTagNamesDblClick(Sender: TObject);
     procedure DbgColumnSetEditButtonClick(Sender: TObject);
@@ -175,13 +174,6 @@ begin
   DmFileLists.CdsColumnSet.Edit;
   DmFileLists.CdsColumnSet.UpdateRecord;
   TagNameLookup;
-end;
-
-procedure TFEditFColumn.DbGridKeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
-begin
-//TODO: Decide
-  if (Key = VK_ESCAPE) then
-    ModalResult := mrCancel;
 end;
 
 procedure TFEditFColumn.SetFilter;

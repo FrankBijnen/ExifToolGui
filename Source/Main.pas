@@ -2370,6 +2370,7 @@ begin
       exit;
     end;
     TbFlView.Caption := Caption;
+    TbFlView.ImageIndex := ImageIndex;
     SavedPath := ShellTree.Path;
     ShellList.Enabled := false;
     try
@@ -2410,13 +2411,13 @@ begin
       exit;
     end;
     TbFlFilter.Caption := Caption;
+    TbFlFilter.ImageIndex := ImageIndex;
     GUIsettings.FilterSel := Tag;
     Shelllist.IncludeSubFolders := ContainsText(GUIsettings.FileFilter, '/s');
     ShellList.Refresh;
     ShellList.SetFocus;
   end;
 end;
-
 
 procedure TFMain.AdvPagePreviewResize(Sender: TObject);
 begin
@@ -2508,10 +2509,10 @@ begin
   Filters.Text := GUIsettings.FileFilters;
   try
     for Index := 0 to Filters.Count -1 do
-      NewMenuItem(Filters[Index], Index, 1, 4, (GUIsettings.FilterSel = Index));
+      NewMenuItem(Filters[Index], Index, 1, Img_Filter, (GUIsettings.FilterSel = Index));
 
-    NewMenuItem('-',             -1, 0, -1);
-    NewMenuItem('Configure',     -1, 1, 2);
+    NewMenuItem('-',             -1, 0, Img_None);
+    NewMenuItem('Configure',     -1, 1, Img_Configure);
   finally
     Filters.free;
   end;
@@ -2521,6 +2522,7 @@ procedure TFMain.FileListViewMenuPopup(Sender: TObject);
 var
   P: TPopupMenu;
   Index: integer;
+  ImageIndex: integer;
   ThumbSize: integer;
   FileListDefs: TColumnSetList;
   AColumnSet: TColumnSet;
@@ -2553,26 +2555,30 @@ begin
 
   P := Sender as TPopupMenu;
   P.Items.Clear;
-  NewMenuItem('Thumbnails',   -1, 1, -1);
-  NewMenuItem('-',            -1, 0, -1);
+  ImageIndex := Img_Thumb;
+  NewMenuItem('Thumbnails',   -1, 1, Img_None);
+  NewMenuItem('-',            -1, 0, Img_None);
+
   for ThumbSize in DefThumbNailSizes do
     NewMenuItem(IntToStr(ThumbSize) + ThumbNailPix,
-                ThumbSize, 1, 0,
+                ThumbSize, 1, ImageIndex,
                 (ShellList.ViewStyle = vsIcon) and (ShellList.ThumbNailSize = ThumbSize));
-  NewMenuItem('-',            -1, 0, -1);
-  NewMenuItem('Details',      -1, 2, -1);
-  NewMenuItem('-',            -1, 0, -1);
+  NewMenuItem('-',            -1, 0, Img_None);
+  NewMenuItem('Details',      -1, 2, Img_None);
+  NewMenuItem('-',            -1, 0, Img_None);
 
   FileListDefs := GetFileListDefs;
   Index := 0;
   for AColumnSet in FileListDefs do
   begin
-    NewMenuItem(AColumnSet.Name,       Index, 2, 1, (ShellList.ViewStyle = vsReport) and (GUIsettings.DetailsSel = Index));
+    if (ImageIndex < Img_LastDetail) then
+      Inc(ImageIndex);
+    NewMenuItem(AColumnSet.Name,       Index, 2, ImageIndex, (ShellList.ViewStyle = vsReport) and (GUIsettings.DetailsSel = Index));
     Inc(Index);
   end;
 
-  NewMenuItem('-',             -1, 0, -1);
-  NewMenuItem('Configure',     -1, 3, 2);
+  NewMenuItem('-',             -1, 0, Img_None);
+  NewMenuItem('Configure',     -1, 3, Img_Configure);
 end;
 
 procedure TFMain.FormAfterMonitorDpiChanged(Sender: TObject; OldDPI, NewDPI: Integer);
@@ -2673,9 +2679,15 @@ begin
 
   // set View and Filter buttons
   if (ShellList.ViewStyle = vsIcon) then
-    TbFlView.Caption := IntToStr(ShellList.ThumbNailSize) + ThumbNailPix
+  begin
+    TbFlView.Caption := IntToStr(ShellList.ThumbNailSize) + ThumbNailPix;
+    TbFlView.ImageIndex := Img_Thumb;
+  end
   else if (GUIsettings.DetailsSel < GetFileListDefs.Count) then
+  begin
     TbFlView.Caption := GetFileListDefs[GUIsettings.DetailsSel].Name;
+    TbFlView.ImageIndex := Min(Img_FirstDetail + GUIsettings.DetailsSel, Img_LastDetail);
+  end;
 
   TbFlFilter.Caption := GUIsettings.FileFilter;
 

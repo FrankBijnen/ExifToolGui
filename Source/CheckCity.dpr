@@ -1,5 +1,7 @@
 program CheckCity;
 
+{$R 'ExifToolsGui_Files.res' 'Resources\ExifToolsGui_Files.rc'}
+
 uses
   Vcl.Forms,
   CheckCity1 in 'CheckCity1.pas' {FrmCheckCity};

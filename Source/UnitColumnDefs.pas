@@ -20,6 +20,14 @@ const
   CommandCountryCode = '-XMP-iptcExt:LocationShownCountryCode';
   CommandCountryName = '-XMP-iptcExt:LocationShownCountryName';
 
+// Icons for Filtering and Configuring
+  Img_None = -1;
+  Img_Thumb = 1;
+  Img_FirstDetail = 2;
+  Img_LastDetail = 11;
+  Img_Filter = 12;
+  Img_Configure = 13;
+
 type
 
   TFileListOptions = (floSystem, floInternal, floUserDef);
