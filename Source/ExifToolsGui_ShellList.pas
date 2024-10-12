@@ -116,6 +116,7 @@ type
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
     procedure Invalidate; override;
+    procedure ClearSelection; override;
     procedure Refresh;
 
     procedure AddDate; // Adds next columns if it is a Date.
@@ -630,6 +631,15 @@ begin
 
   for Indx := 0 to Items.Count - 1 do
     Folders[Indx].ViewHandle := Handle;
+end;
+
+// Prevent Calling OwnerData fetch
+procedure TShellListView.ClearSelection;
+var
+  Indx: integer;
+begin
+  for Indx := 0 to Items.Count -1 do
+    ListView_SetItemState(Handle, Indx, 0, LVIS_SELECTED);
 end;
 
 procedure TShellListView.Refresh;
