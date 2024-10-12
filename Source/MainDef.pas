@@ -692,10 +692,11 @@ begin
         ET.Options.SetLangDef(Language);
         AutoRotatePreview := ReadBool(Ini_Settings, 'AutoRotatePreview', false);
         FileFilters := SHOWALL + #10 +
-                                  StringReplace(ReadString(Ini_Settings,
-                                                'FileFilters', '*.JPG|*.CR2|*.JPG;*.CR2|*.JPG;*.DNG|*.JPG;*.PEF'),
+                       StringReplace(ReadString(Ini_Settings, 'FileFilters', '*.JPG|*.CR2|*.JPG;*.CR2|*.JPG;*.DNG|*.JPG;*.PEF'),
                                      '|', #10, [rfReplaceAll]);
-        FilterSel := 0; // Default Show all
+//TODO Decide
+//        FilterSel := ReadInteger(Ini_Settings, 'FilterSel', 0); // Restore last
+        FilterSel := 0; // Default to Show All
         DefStartupUse := ReadBool(Ini_Settings, 'DefStartupUse', false);
         DefStartupDir := ReadString(Ini_Settings, 'DefStartupDir', 'c:\');
         if DefStartupUse and ValidDir(DefStartupDir) then

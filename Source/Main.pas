@@ -362,6 +362,7 @@ type
     procedure CounterETEvent(Counter: integer);
     procedure ResetRootShowAll;
     function SyncShellTree: TTreenode;
+    procedure SetCaptionAndImage;
     procedure ViewPopupDrawItem(Sender: TObject; ACanvas: TCanvas; ARect: TRect; Selected: Boolean);
     procedure ViewPopupClick(Sender: TObject);
     procedure FilterPopupDrawItem(Sender: TObject; ACanvas: TCanvas; ARect: TRect; Selected: Boolean);
@@ -580,7 +581,7 @@ begin
     UpdateSysCaptions(ShellList.RootFolder);
     GUIsettings.DetailsSel := DmFileLists.SelectedSet -1;
     ShellList.ViewStyle := TViewStyle.vsReport;
-    TbFlView.Caption := GetFileListDefs[GUIsettings.DetailsSel].Name;
+    SetCaptionAndImage;
     if (ShellList.Enabled) then
     begin
       ShellList.Refresh;
@@ -628,10 +629,27 @@ begin
   CBoxETdirectChange(Sender);
 end;
 
+// set View and Filter buttons
+procedure TFMain.SetCaptionAndImage;
+begin
+  if (ShellList.ViewStyle = vsIcon) then
+  begin
+    TbFlView.Caption := IntToStr(ShellList.ThumbNailSize) + ThumbNailPix;
+    TbFlView.ImageIndex := Img_Thumb;
+  end
+  else if (GUIsettings.DetailsSel < GetFileListDefs.Count) then
+  begin
+    TbFlView.Caption := GetFileListDefs[GUIsettings.DetailsSel].Name;
+    TbFlView.ImageIndex := Min(Img_FirstDetail + GUIsettings.DetailsSel, Img_LastDetail);
+  end;
+  TbFlFilter.Caption := GUIsettings.FileFilter;
+end;
+
 procedure TFMain.EditFileFilter(Sender: TObject);
 begin
   if FEditFFilter.ShowModal = mrOK then
   begin
+    SetCaptionAndImage;
     Shelllist.IncludeSubFolders := ContainsText(GUIsettings.FileFilter, '/s');
     ShellList.Refresh;
   end;
@@ -1090,7 +1108,6 @@ begin
       end;
     end;
 end;
-
 
 procedure TFMain.MetadataListMouseDown(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: integer);
 var
@@ -2199,6 +2216,7 @@ begin
   StatusBar.Panels[1].Text := '';
   if (Key = #13) then
   begin
+    Key := #0;
     NewRow := MetadataList.Row;
     while (NewRow < Metadatalist.RowCount -1) do
     begin
@@ -2675,21 +2693,9 @@ begin
   // Enable Column sorting if Sorted = true. Disables Sorted.
   ShellList.ColumnSorted := ShellList.Sorted;
   ShellList.OnCustomDrawItem := ShellListCustomDrawItem;
-  ShellList.IncludeSubFolders := false;
+  Shelllist.IncludeSubFolders := ContainsText(GUIsettings.FileFilter, '/s');
 
-  // set View and Filter buttons
-  if (ShellList.ViewStyle = vsIcon) then
-  begin
-    TbFlView.Caption := IntToStr(ShellList.ThumbNailSize) + ThumbNailPix;
-    TbFlView.ImageIndex := Img_Thumb;
-  end
-  else if (GUIsettings.DetailsSel < GetFileListDefs.Count) then
-  begin
-    TbFlView.Caption := GetFileListDefs[GUIsettings.DetailsSel].Name;
-    TbFlView.ImageIndex := Min(Img_FirstDetail + GUIsettings.DetailsSel, Img_LastDetail);
-  end;
-
-  TbFlFilter.Caption := GUIsettings.FileFilter;
+  SetCaptionAndImage;
 
   // Metadatalist Ctrl handler
   MetadataList.OnCtrlKeyDown := MetadataListCtrlKeyDown;

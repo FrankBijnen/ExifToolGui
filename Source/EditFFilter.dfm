@@ -3,8 +3,8 @@ object FEditFFilter: TFEditFFilter
   Top = 0
   BorderStyle = bsDialog
   Caption = 'Edit file filters'
-  ClientHeight = 336
-  ClientWidth = 499
+  ClientHeight = 375
+  ClientWidth = 374
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -16,9 +16,9 @@ object FEditFFilter: TFEditFFilter
   object AdvPanel1: TPanel
     Left = 0
     Top = 0
-    Width = 383
-    Height = 336
-    Align = alLeft
+    Width = 374
+    Height = 345
+    Align = alClient
     DoubleBuffered = True
     Font.Charset = DEFAULT_CHARSET
     Font.Color = clWindowText
@@ -28,8 +28,7 @@ object FEditFFilter: TFEditFFilter
     ParentDoubleBuffered = False
     ParentFont = False
     TabOrder = 0
-    ExplicitLeft = -1
-    ExplicitTop = -1
+    ExplicitTop = -4
     object EdFilter: TEdit
       Left = 9
       Top = 37
@@ -55,6 +54,7 @@ object FEditFFilter: TFEditFFilter
       ItemHeight = 13
       TabOrder = 4
       OnClick = LbFilterClick
+      OnDblClick = BtnOkClick
     end
     object BtnUp: TButton
       Left = 333
@@ -105,23 +105,32 @@ object FEditFFilter: TFEditFFilter
       OnClick = BtnUpdateClick
     end
   end
-  object BtnCancel: TButton
-    Left = 396
-    Top = 254
-    Width = 93
-    Height = 25
-    Caption = 'Cancel'
-    ModalResult = 2
+  object Panel1: TPanel
+    Left = 0
+    Top = 345
+    Width = 374
+    Height = 30
+    Align = alBottom
     TabOrder = 1
-  end
-  object BtnSave: TButton
-    Left = 396
-    Top = 301
-    Width = 93
-    Height = 25
-    Caption = 'Save'
-    Default = True
-    TabOrder = 2
-    OnClick = BtnSaveClick
+    ExplicitWidth = 373
+    object BtnCancel: TBitBtn
+      Left = 292
+      Top = 2
+      Width = 75
+      Height = 25
+      Kind = bkCancel
+      NumGlyphs = 2
+      TabOrder = 0
+    end
+    object BtnOK: TBitBtn
+      Left = 211
+      Top = 2
+      Width = 75
+      Height = 25
+      Kind = bkOK
+      NumGlyphs = 2
+      TabOrder = 1
+      OnClick = BtnOkClick
+    end
   end
 end

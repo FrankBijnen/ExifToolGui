@@ -6,7 +6,7 @@ uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants,
   System.Classes, Vcl.Graphics,
   Vcl.Controls, UnitScaleForm, Vcl.Dialogs, Vcl.StdCtrls, Vcl.ExtCtrls,
-  Vcl.ComCtrls;
+  Vcl.ComCtrls, Vcl.Buttons;
 
 type
   TFEditFFilter = class(TScaleForm)
@@ -14,19 +14,20 @@ type
     EdFilter: TEdit;
     BtnAdd: TButton;
     LbFilter: TListBox;
-    BtnCancel: TButton;
-    BtnSave: TButton;
     BtnUp: TButton;
     BtnDown: TButton;
     BtnDel: TButton;
     BtnUpdate: TButton;
+    Panel1: TPanel;
+    BtnCancel: TBitBtn;
+    BtnOK: TBitBtn;
     procedure FormShow(Sender: TObject);
     procedure EdFilterChange(Sender: TObject);
     procedure BtnAddClick(Sender: TObject);
     procedure LbFilterClick(Sender: TObject);
     procedure BtnDelClick(Sender: TObject);
     procedure BtnUpClick(Sender: TObject);
-    procedure BtnSaveClick(Sender: TObject);
+    procedure BtnOkClick(Sender: TObject);
     procedure BtnUpdateClick(Sender: TObject);
   private
     { Private declarations }
@@ -63,7 +64,7 @@ begin
   end;
 end;
 
-procedure TFEditFFilter.BtnSaveClick(Sender: TObject);
+procedure TFEditFFilter.BtnOkClick(Sender: TObject);
 begin
   GUIsettings.FilterSel := LbFilter.ItemIndex;
   GUIsettings.FileFilters := LbFilter.Items.Text;
