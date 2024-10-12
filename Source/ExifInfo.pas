@@ -2502,15 +2502,18 @@ begin
       begin
         if (ExifIFD.HasData) then
         begin
-
+//TODO Add param?
           // focal length:
-          ETFocal.IncValue(ExifIFD.FocalLength);
+          if (ExifIFD.FocalLength <> '0.0') then
+            ETFocal.IncValue(ExifIFD.FocalLength);
 
           // aperture:
-          ETFnum.IncValue(ExifIFD.FNumber);
+          if (ExifIFD.FNumber <> '0.0') then
+            ETFnum.IncValue(ExifIFD.FNumber);
 
           // ISO:
-          ETIso.IncValue(ExifIFD.ISO);
+          if (ExifIFD.ISO <> '0') then
+            ETIso.IncValue(ExifIFD.ISO);
         end;
       end;
       IsFound := FindNext(SR) = 0;
