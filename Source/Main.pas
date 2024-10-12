@@ -643,6 +643,7 @@ begin
     TbFlView.ImageIndex := Min(Img_FirstDetail + GUIsettings.DetailsSel, Img_LastDetail);
   end;
   TbFlFilter.Caption := GUIsettings.FileFilter;
+  TbFlFilter.ImageIndex := Img_Filter;
 end;
 
 procedure TFMain.EditFileFilter(Sender: TObject);
@@ -2387,8 +2388,6 @@ begin
         EditFileLists(Sender);
       exit;
     end;
-    TbFlView.Caption := Caption;
-    TbFlView.ImageIndex := ImageIndex;
     SavedPath := ShellTree.Path;
     ShellList.Enabled := false;
     try
@@ -2404,6 +2403,7 @@ begin
       begin
         GUIsettings.DetailsSel := Tag;
       end;
+      SetCaptionAndImage;
     finally
       ShellTree.Path := SavedPath;
       ShellList.Enabled := true;
@@ -2428,8 +2428,7 @@ begin
       EditFileFilter(Sender);
       exit;
     end;
-    TbFlFilter.Caption := Caption;
-    TbFlFilter.ImageIndex := ImageIndex;
+    SetCaptionAndImage;
     GUIsettings.FilterSel := Tag;
     Shelllist.IncludeSubFolders := ContainsText(GUIsettings.FileFilter, '/s');
     ShellList.Refresh;
