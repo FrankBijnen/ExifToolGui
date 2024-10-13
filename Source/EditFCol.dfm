@@ -2,8 +2,8 @@ object FEditFColumn: TFEditFColumn
   Left = 0
   Top = 0
   Caption = 'Edit file columns'
-  ClientHeight = 511
-  ClientWidth = 1040
+  ClientHeight = 546
+  ClientWidth = 961
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -18,14 +18,16 @@ object FEditFColumn: TFEditFColumn
   object PnlGrids: TPanel
     Left = 0
     Top = 0
-    Width = 1040
-    Height = 482
+    Width = 961
+    Height = 517
     Align = alClient
     TabOrder = 1
+    ExplicitWidth = 1036
+    ExplicitHeight = 481
     object HSplitter: TSplitter
       Left = 1
-      Top = 200
-      Width = 1042
+      Top = 231
+      Width = 959
       Height = 5
       Cursor = crVSplit
       Align = alTop
@@ -33,25 +35,26 @@ object FEditFColumn: TFEditFColumn
       ExplicitWidth = 653
     end
     object VSplitter: TSplitter
-      Left = 690
-      Top = 235
+      Left = 607
+      Top = 266
       Width = 5
-      Height = 247
+      Height = 250
       Align = alRight
       Visible = False
       ExplicitLeft = 503
       ExplicitTop = 241
+      ExplicitHeight = 247
     end
     object PnlTop: TPanel
       Left = 1
       Top = 1
-      Width = 1042
+      Width = 959
       Height = 30
       Align = alTop
       TabOrder = 0
-      ExplicitWidth = 1038
+      ExplicitWidth = 1034
       object SpbAddPred: TSpeedButton
-        Left = 2
+        Left = 61
         Top = 3
         Width = 100
         Height = 25
@@ -59,7 +62,7 @@ object FEditFColumn: TFEditFColumn
         OnClick = SpbAddPredClick
       end
       object SpbDelPred: TSpeedButton
-        Left = 104
+        Left = 163
         Top = 3
         Width = 100
         Height = 25
@@ -67,7 +70,7 @@ object FEditFColumn: TFEditFColumn
         OnClick = SpbDelPredClick
       end
       object SpbEditPred: TSpeedButton
-        Left = 206
+        Left = 265
         Top = 3
         Width = 100
         Height = 25
@@ -75,7 +78,7 @@ object FEditFColumn: TFEditFColumn
         OnClick = SpbEditPredClick
       end
       object SpbDuplicate: TSpeedButton
-        Left = 308
+        Left = 367
         Top = 3
         Width = 100
         Height = 25
@@ -83,7 +86,7 @@ object FEditFColumn: TFEditFColumn
         OnClick = SpbDuplicateClick
       end
       object SpbDefaults: TSpeedButton
-        Left = 411
+        Left = 470
         Top = 3
         Width = 100
         Height = 25
@@ -91,64 +94,110 @@ object FEditFColumn: TFEditFColumn
         OnClick = SpbDefaultsClick
       end
       object DBNavFileList: TDBNavigator
-        Left = 516
+        Left = 1
         Top = 3
-        Width = 176
+        Width = 40
         Height = 25
         DataSource = DmFileLists.DsFileListDef
-        VisibleButtons = [nbPrior, nbNext, nbPost, nbCancel]
+        VisibleButtons = [nbPost, nbCancel]
         TabOrder = 0
       end
     end
-    object DbgFileListDef: TDBGrid
+    object PnlFileListDef: TPanel
       Left = 1
       Top = 31
-      Width = 1042
-      Height = 169
+      Width = 959
+      Height = 200
       Align = alTop
-      DataSource = DmFileLists.DsFileListDef
-      Options = [dgEditing, dgAlwaysShowEditor, dgTitles, dgIndicator, dgColumnResize, dgColLines, dgRowLines, dgTabs, dgAlwaysShowSelection, dgConfirmDelete, dgTitleClick, dgTitleHotTrack]
       TabOrder = 1
-      TitleFont.Charset = DEFAULT_CHARSET
-      TitleFont.Color = clWindowText
-      TitleFont.Height = -11
-      TitleFont.Name = 'Tahoma'
-      TitleFont.Style = []
-      Columns = <
-        item
-          Expanded = False
-          FieldName = 'Name'
-          Width = 182
-          Visible = True
+      ExplicitWidth = 1038
+      object DbgFileListDef: TDBGrid
+        Left = 41
+        Top = 1
+        Width = 917
+        Height = 198
+        Align = alClient
+        DataSource = DmFileLists.DsFileListDef
+        Options = [dgEditing, dgAlwaysShowEditor, dgTitles, dgIndicator, dgColumnResize, dgColLines, dgRowLines, dgTabs, dgAlwaysShowSelection, dgConfirmDelete, dgTitleClick, dgTitleHotTrack]
+        TabOrder = 0
+        TitleFont.Charset = DEFAULT_CHARSET
+        TitleFont.Color = clWindowText
+        TitleFont.Height = -11
+        TitleFont.Name = 'Tahoma'
+        TitleFont.Style = []
+        Columns = <
+          item
+            Expanded = False
+            FieldName = 'Name'
+            Width = 182
+            Visible = True
+          end
+          item
+            Expanded = False
+            FieldName = 'Type'
+            PickList.Strings = (
+              'Internal'
+              'ExifTool')
+            ReadOnly = True
+            Width = 96
+            Visible = True
+          end
+          item
+            Expanded = False
+            FieldName = 'ReadModeLookup'
+            Title.Caption = 'ReadMode'
+            Visible = True
+          end
+          item
+            Expanded = False
+            FieldName = 'Sort'
+            Visible = True
+          end>
+      end
+      object PnlSortFile: TPanel
+        Left = 1
+        Top = 1
+        Width = 40
+        Height = 198
+        Align = alLeft
+        TabOrder = 1
+        object BtnFileUp: TButton
+          Left = 7
+          Top = 5
+          Width = 25
+          Height = 52
+          Caption = '5'
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clWindowText
+          Font.Height = -15
+          Font.Name = 'Webdings'
+          Font.Style = []
+          ParentFont = False
+          TabOrder = 0
+          OnClick = BtnFileUpClick
         end
-        item
-          Expanded = False
-          FieldName = 'Type'
-          PickList.Strings = (
-            'Internal'
-            'ExifTool')
-          ReadOnly = True
-          Width = 96
-          Visible = True
+        object BtnFileDown: TButton
+          Left = 7
+          Top = 66
+          Width = 25
+          Height = 57
+          Caption = '6'
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clWindowText
+          Font.Height = -15
+          Font.Name = 'Webdings'
+          Font.Style = []
+          ParentFont = False
+          TabOrder = 1
+          OnClick = BtnFileDownClick
         end
-        item
-          Expanded = False
-          FieldName = 'ReadModeLookup'
-          Title.Caption = 'ReadMode'
-          Visible = True
-        end
-        item
-          Expanded = False
-          FieldName = 'Id'
-          ReadOnly = True
-          Visible = True
-        end>
+      end
     end
     object DbgColumnSet: TDBGrid
-      Left = 1
-      Top = 235
-      Width = 689
-      Height = 247
+      Left = 41
+      Top = 266
+      Width = 566
+      Height = 250
       Align = alClient
       DataSource = DmFileLists.DsColumnSet
       Options = [dgEditing, dgAlwaysShowEditor, dgTitles, dgIndicator, dgColumnResize, dgColLines, dgRowLines, dgTabs, dgAlwaysShowSelection, dgConfirmDelete, dgTitleClick, dgTitleHotTrack]
@@ -200,18 +249,24 @@ object FEditFColumn: TFEditFColumn
           FieldName = 'SampleValue'
           Width = 137
           Visible = True
+        end
+        item
+          Expanded = False
+          FieldName = 'Sort'
+          Visible = True
         end>
     end
     object PnlMiddle: TPanel
       Left = 1
-      Top = 205
-      Width = 1042
+      Top = 236
+      Width = 959
       Height = 30
       Align = alTop
       TabOrder = 3
-      ExplicitWidth = 1038
+      ExplicitTop = 77
+      ExplicitWidth = 1034
       object SpbAddTag: TSpeedButton
-        Left = 2
+        Left = 55
         Top = 3
         Width = 100
         Height = 25
@@ -219,7 +274,7 @@ object FEditFColumn: TFEditFColumn
         OnClick = SpbAddTagClick
       end
       object SpbDelTag: TSpeedButton
-        Left = 104
+        Left = 157
         Top = 3
         Width = 100
         Height = 25
@@ -227,7 +282,7 @@ object FEditFColumn: TFEditFColumn
         OnClick = SpbDelTagClick
       end
       object SpbEditTag: TSpeedButton
-        Left = 206
+        Left = 259
         Top = 3
         Width = 100
         Height = 25
@@ -235,30 +290,31 @@ object FEditFColumn: TFEditFColumn
         OnClick = SpbEditTagClick
       end
       object DBNavColumnSet: TDBNavigator
-        Left = 310
+        Left = 1
         Top = 3
-        Width = 176
+        Width = 40
         Height = 25
         DataSource = DmFileLists.DsColumnSet
-        VisibleButtons = [nbPrior, nbNext, nbPost, nbCancel]
+        VisibleButtons = [nbPost, nbCancel]
         TabOrder = 0
       end
     end
     object PnlDetail: TPanel
-      Left = 695
-      Top = 235
+      Left = 612
+      Top = 266
       Width = 348
-      Height = 247
+      Height = 250
       Align = alRight
       TabOrder = 4
       Visible = False
-      ExplicitLeft = 691
-      ExplicitHeight = 246
+      ExplicitLeft = 687
+      ExplicitTop = 107
+      ExplicitHeight = 373
       object DbgTagNames: TDBGrid
         Left = 1
         Top = 66
         Width = 346
-        Height = 180
+        Height = 183
         Align = alClient
         DataSource = DmFileLists.DsTagNames
         TabOrder = 0
@@ -312,12 +368,13 @@ object FEditFColumn: TFEditFColumn
             Left = 11
             Top = 4
             Width = 85
-            Height = 13
+            Height = 14
             Margins.Left = 10
             Margins.Right = 5
             Align = alLeft
             Caption = 'Search tag name:'
             Layout = tlCenter
+            ExplicitHeight = 13
           end
           object EdSearchTag: TEdit
             Left = 101
@@ -348,19 +405,59 @@ object FEditFColumn: TFEditFColumn
         OnClick = RadTagValuesClick
       end
     end
+    object PnlSortColumn: TPanel
+      Left = 1
+      Top = 266
+      Width = 40
+      Height = 250
+      Align = alLeft
+      TabOrder = 5
+      object BtnColumnUp: TButton
+        Left = 7
+        Top = 6
+        Width = 25
+        Height = 52
+        Caption = '5'
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clWindowText
+        Font.Height = -15
+        Font.Name = 'Webdings'
+        Font.Style = []
+        ParentFont = False
+        TabOrder = 0
+        OnClick = BtnColumnUpClick
+      end
+      object BtnColumnDown: TButton
+        Left = 7
+        Top = 82
+        Width = 25
+        Height = 57
+        Caption = '6'
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clWindowText
+        Font.Height = -15
+        Font.Name = 'Webdings'
+        Font.Style = []
+        ParentFont = False
+        TabOrder = 1
+        OnClick = BtnColumnDownClick
+      end
+    end
   end
   object PnlBottom: TPanel
     Left = 0
-    Top = 482
-    Width = 1040
+    Top = 517
+    Width = 961
     Height = 29
     Align = alBottom
     TabOrder = 0
+    ExplicitTop = 481
+    ExplicitWidth = 1036
     DesignSize = (
-      1040
+      961
       29)
     object BtnOk: TBitBtn
-      Left = 829
+      Left = 742
       Top = 2
       Width = 87
       Height = 25
@@ -387,10 +484,10 @@ object FEditFColumn: TFEditFColumn
       ModalResult = 1
       NumGlyphs = 2
       TabOrder = 0
-      ExplicitLeft = 833
+      ExplicitLeft = 817
     end
     object BtnCancel: TBitBtn
-      Left = 920
+      Left = 833
       Top = 2
       Width = 87
       Height = 25
@@ -417,7 +514,7 @@ object FEditFColumn: TFEditFColumn
       ModalResult = 2
       NumGlyphs = 2
       TabOrder = 1
-      ExplicitLeft = 924
+      ExplicitLeft = 908
     end
   end
 end

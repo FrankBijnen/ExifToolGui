@@ -29,6 +29,9 @@ object DmFileLists: TDmFileLists
       FieldName = 'Id'
       Visible = False
     end
+    object CdsFileListDefSort: TIntegerField
+      FieldName = 'Sort'
+    end
     object CdsFileListDefName: TStringField
       DisplayWidth = 25
       FieldName = 'Name'
@@ -65,7 +68,6 @@ object DmFileLists: TDmFileLists
     Aggregates = <>
     IndexFieldNames = 'Id;Seq'
     Params = <>
-    BeforeInsert = CdsColumnSetBeforeInsert
     AfterInsert = CdsColumnSetAfterInsert
     OnCalcFields = CdsColumnSetCalcFields
     Left = 81
@@ -98,8 +100,8 @@ object DmFileLists: TDmFileLists
     object CdsColumnSetWidth: TStringField
       FieldName = 'Width'
     end
-    object CdsColumnSetSeq: TFloatField
-      FieldName = 'Seq'
+    object CdsColumnSetSort: TIntegerField
+      FieldName = 'Sort'
     end
     object CdsColumnSetBackupLookUp: TStringField
       FieldKind = fkLookup
