@@ -2,8 +2,8 @@ object FEditFColumn: TFEditFColumn
   Left = 0
   Top = 0
   Caption = 'Edit file columns'
-  ClientHeight = 546
-  ClientWidth = 961
+  ClientHeight = 562
+  ClientWidth = 1068
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -18,16 +18,16 @@ object FEditFColumn: TFEditFColumn
   object PnlGrids: TPanel
     Left = 0
     Top = 0
-    Width = 961
-    Height = 517
+    Width = 1068
+    Height = 533
     Align = alClient
     TabOrder = 1
-    ExplicitWidth = 1036
-    ExplicitHeight = 481
+    ExplicitWidth = 957
+    ExplicitHeight = 516
     object HSplitter: TSplitter
       Left = 1
       Top = 231
-      Width = 959
+      Width = 1066
       Height = 5
       Cursor = crVSplit
       Align = alTop
@@ -35,10 +35,10 @@ object FEditFColumn: TFEditFColumn
       ExplicitWidth = 653
     end
     object VSplitter: TSplitter
-      Left = 607
+      Left = 714
       Top = 266
       Width = 5
-      Height = 250
+      Height = 266
       Align = alRight
       Visible = False
       ExplicitLeft = 503
@@ -48,11 +48,11 @@ object FEditFColumn: TFEditFColumn
     object PnlTop: TPanel
       Left = 1
       Top = 1
-      Width = 959
+      Width = 1066
       Height = 30
       Align = alTop
       TabOrder = 0
-      ExplicitWidth = 1034
+      ExplicitWidth = 955
       object SpbAddPred: TSpeedButton
         Left = 61
         Top = 3
@@ -106,15 +106,15 @@ object FEditFColumn: TFEditFColumn
     object PnlFileListDef: TPanel
       Left = 1
       Top = 31
-      Width = 959
+      Width = 1066
       Height = 200
       Align = alTop
       TabOrder = 1
-      ExplicitWidth = 1038
+      ExplicitWidth = 955
       object DbgFileListDef: TDBGrid
         Left = 41
         Top = 1
-        Width = 917
+        Width = 1024
         Height = 198
         Align = alClient
         DataSource = DmFileLists.DsFileListDef
@@ -151,7 +151,7 @@ object FEditFColumn: TFEditFColumn
           item
             Expanded = False
             FieldName = 'Sort'
-            Visible = True
+            Visible = False
           end>
       end
       object PnlSortFile: TPanel
@@ -196,8 +196,8 @@ object FEditFColumn: TFEditFColumn
     object DbgColumnSet: TDBGrid
       Left = 41
       Top = 266
-      Width = 566
-      Height = 250
+      Width = 673
+      Height = 266
       Align = alClient
       DataSource = DmFileLists.DsColumnSet
       Options = [dgEditing, dgAlwaysShowEditor, dgTitles, dgIndicator, dgColumnResize, dgColLines, dgRowLines, dgTabs, dgAlwaysShowSelection, dgConfirmDelete, dgTitleClick, dgTitleHotTrack]
@@ -253,18 +253,17 @@ object FEditFColumn: TFEditFColumn
         item
           Expanded = False
           FieldName = 'Sort'
-          Visible = True
+          Visible = False
         end>
     end
     object PnlMiddle: TPanel
       Left = 1
       Top = 236
-      Width = 959
+      Width = 1066
       Height = 30
       Align = alTop
       TabOrder = 3
-      ExplicitTop = 77
-      ExplicitWidth = 1034
+      ExplicitWidth = 955
       object SpbAddTag: TSpeedButton
         Left = 55
         Top = 3
@@ -300,21 +299,20 @@ object FEditFColumn: TFEditFColumn
       end
     end
     object PnlDetail: TPanel
-      Left = 612
+      Left = 719
       Top = 266
       Width = 348
-      Height = 250
+      Height = 266
       Align = alRight
       TabOrder = 4
       Visible = False
-      ExplicitLeft = 687
-      ExplicitTop = 107
-      ExplicitHeight = 373
+      ExplicitLeft = 608
+      ExplicitHeight = 249
       object DbgTagNames: TDBGrid
         Left = 1
         Top = 66
         Width = 346
-        Height = 183
+        Height = 199
         Align = alClient
         DataSource = DmFileLists.DsTagNames
         TabOrder = 0
@@ -409,9 +407,10 @@ object FEditFColumn: TFEditFColumn
       Left = 1
       Top = 266
       Width = 40
-      Height = 250
+      Height = 266
       Align = alLeft
       TabOrder = 5
+      ExplicitHeight = 249
       object BtnColumnUp: TButton
         Left = 7
         Top = 6
@@ -446,18 +445,18 @@ object FEditFColumn: TFEditFColumn
   end
   object PnlBottom: TPanel
     Left = 0
-    Top = 517
-    Width = 961
+    Top = 533
+    Width = 1068
     Height = 29
     Align = alBottom
     TabOrder = 0
-    ExplicitTop = 481
-    ExplicitWidth = 1036
+    ExplicitTop = 516
+    ExplicitWidth = 957
     DesignSize = (
-      961
+      1068
       29)
     object BtnOk: TBitBtn
-      Left = 742
+      Left = 845
       Top = 2
       Width = 87
       Height = 25
@@ -484,10 +483,10 @@ object FEditFColumn: TFEditFColumn
       ModalResult = 1
       NumGlyphs = 2
       TabOrder = 0
-      ExplicitLeft = 817
+      ExplicitLeft = 734
     end
     object BtnCancel: TBitBtn
-      Left = 833
+      Left = 936
       Top = 2
       Width = 87
       Height = 25
@@ -514,7 +513,7 @@ object FEditFColumn: TFEditFColumn
       ModalResult = 2
       NumGlyphs = 2
       TabOrder = 1
-      ExplicitLeft = 908
+      ExplicitLeft = 825
     end
   end
 end
