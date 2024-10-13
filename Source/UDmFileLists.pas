@@ -26,7 +26,6 @@ type
     CdsColumnSetOption: TStringField;
     CdsColumnSetAlignR: TIntegerField;
     CdsColumnSetWidth: TStringField;
-    CdsColumnSetSeq: TFloatField;
     CdsReadMode: TClientDataSet;
     CdsReadModeKey: TIntegerField;
     CdsReadModeDesc: TStringField;
@@ -47,7 +46,8 @@ type
     CdsTagNamesSampleValue: TStringField;
     CdsFileListDefOptions: TIntegerField;
     CdsColumnSetId: TIntegerField;
-    procedure CdsColumnSetBeforeInsert(DataSet: TDataSet);
+    CdsFileListDefSort: TIntegerField;
+    CdsColumnSetSort: TIntegerField;
     procedure CdsColumnSetAfterInsert(DataSet: TDataSet);
     procedure CdsFileListDefAfterInsert(DataSet: TDataSet);
     procedure DataModuleCreate(Sender: TObject);
@@ -64,7 +64,6 @@ type
     procedure CdsFileListDefReadModeChange(Sender: TField);
   private
     { Private declarations }
-    ColumnSeq: Double;
     FListReadMode: integer;
     FSample: TShellFolder;
     FSampleValues: TSampleData;
@@ -88,6 +87,8 @@ type
     procedure SaveToColumnSets;
     procedure WriteAllXmpTags;
     procedure Duplicate(OldId: integer; NewName: string);
+    procedure MoveUp(Dataset: TDataset);
+    procedure MoveDown(Dataset: TDataset);
     property OnSetEditMode: TNotifyEvent read FOnSetEditMode write FOnSetEditMode;
     property OnFilterTag: TFilterRecordEvent read FOnFilterTag write FOnFilterTag;
   end;
@@ -134,26 +135,8 @@ procedure TDmFileLists.CdsColumnSetAfterInsert(DataSet: TDataSet);
 begin
   CdsColumnSetWidth.AsInteger := 80;
   CdsColumnSetAlignR.AsInteger := 0;
-  CdsColumnSetSeq.AsFloat := ColumnSeq;
+  CdsColumnSetSort.AsInteger := CdsColumnSet.RecordCount;
   CdsColumnSetOption.AsInteger := 0;
-end;
-
-procedure TDmFileLists.CdsColumnSetBeforeInsert(DataSet: TDataSet);
-begin
-  if (CdsColumnSet.MasterSource = nil) then
-    exit;
-
-  if (CdsColumnSet.RecNo = 1) then
-    ColumnSeq := CdsColumnSetSeq.AsFloat - 0.01
-  else if (CdsColumnSet.RecNo = CdsColumnSet.RecordCount) then
-    ColumnSeq := CdsColumnSetSeq.AsFloat + 0.01
-  else
-  begin
-    CdsColumnSet.Prior;
-    ColumnSeq := CdsColumnSetSeq.AsFloat;
-    CdsColumnSet.Next;
-    ColumnSeq := ColumnSeq + ((CdsColumnSetSeq.AsFloat - ColumnSeq) / 2);
-  end;
 end;
 
 procedure TDmFileLists.CalcSampleValue(DataSet: TDataSet; Command, Sample: string);
@@ -450,21 +433,27 @@ var
   Orig: TColumnsArray;
   Acolumn: TFileListColumn;
   Index: integer;
+  SavedMasterSource: TDataSource;
 begin
+  SaveToColumnSets;
+  LoadFromColumnSets(FSample);
+
   CdsFileListDef.DisableControls;
   CdsColumnSet.DisableControls;
+  SavedMasterSource := CdsColumnSet.MasterSource;
   CdsFileListDef.ReadOnly := false;
   CdsColumnSet.ReadOnly := false;
   try
     CdsFileListDef.Insert;
     CdsFileListDefName.AsString := NewName;
+    CdsFileListDefSort.AsInteger := CdsFileListDef.RecordCount;
     CdsFileListDef.Post;
+    CdsColumnSet.SetRange([CdsFileListDefId.AsInteger], [CdsFileListDefId.AsInteger]);
+
     Orig := GetFileListColumnDefs(OldId);
-    ColumnSeq := 0;
     for Index := 0 to High(Orig) do
     begin
       AColumn := Orig[Index];
-      ColumnSeq := ColumnSeq + 1;
       CdsColumnSet.Insert;
       CdsColumnSetCaption.AsString        := AColumn.Caption;
       CdsColumnSetCommand.AsString        := AColumn.Command;
@@ -475,9 +464,86 @@ begin
       CdsColumnSet.Post;
     end;
   finally
+    CdsColumnSet.CancelRange;
+    CdsColumnSet.MasterSource := SavedMasterSource;
+
     CdsFileListDef.EnableControls;
     CdsColumnSet.EnableControls;
     DoSetEditMode;
+  end;
+end;
+
+procedure TDmFileLists.MoveUp(Dataset: TDataSet);
+var
+  OrigSort, PriorSort: integer;
+  MyBook: TBookmark;
+begin
+  Dataset.DisableControls;
+  MyBook := Dataset.GetBookmark;
+  try
+    // Cant move
+    if (Dataset.RecordCount < 2) or
+      (Dataset.Bof) then
+      exit;
+
+    // Sort column Orig
+    OrigSort := Dataset.FieldByName('Sort').AsInteger;
+    if (OrigSort < 1) then
+      exit;
+
+    // Edit Prior line
+    Dataset.Prior;
+    Dataset.Edit;
+    PriorSort := Dataset.FieldByName('Sort').AsInteger; // Save Sort Prior
+    Dataset.FieldByName('Sort').AsInteger := OrigSort;
+    Dataset.Post;
+
+    // Reposition to Orig line, and update with PriorSort
+    Dataset.GotoBookmark(MyBook);
+    Dataset.Edit;
+    Dataset.FieldByName('Sort').AsInteger := PriorSort;
+    Dataset.Post;
+
+  finally
+    Dataset.EnableControls;
+    Dataset.FreeBookmark(MyBook);
+  end;
+end;
+
+procedure TDmFileLists.MoveDown(Dataset: TDataSet);
+var
+  OrigSort, NextSort: integer;
+  MyBook: TBookmark;
+begin
+  Dataset.DisableControls;
+  MyBook := Dataset.GetBookmark;
+  try
+    // Cant move
+    if (Dataset.RecordCount < 2) or
+      (Dataset.Eof) then
+      exit;
+
+    // Sort column Orig
+    OrigSort := Dataset.FieldByName('Sort').AsInteger;
+    if (OrigSort < 0) then
+      exit;
+
+    // Edit Next line
+    Dataset.Next;
+    Dataset.Edit;
+    NextSort := Dataset.FieldByName('Sort').AsInteger; // Save Sort Next
+    Dataset.FieldByName('Sort').AsInteger := OrigSort;
+    Dataset.Post;
+
+    // Reposition to orig line, and update with NextSort
+    Dataset.GotoBookmark(MyBook);
+    Dataset.Edit;
+    Dataset.FieldByName('Sort').AsInteger := NextSort;
+    Dataset.Post;
+
+  finally
+    Dataset.EnableControls;
+    Dataset.FreeBookmark(MyBook);
   end;
 end;
 
@@ -592,6 +658,7 @@ var
   AColumn: TFileListColumn;
   Index: integer;
   Id: integer;
+  Sort: integer;
 begin
   FSample := ASample;
 
@@ -605,6 +672,7 @@ begin
 
   CdsColumnSet.MasterSource := nil;
   CdsColumnSet.MasterFields := '';
+
   CdsColumnSet.DisableControls;
   CdsColumnSet.ReadOnly := false;
   try
@@ -621,16 +689,17 @@ begin
     CdsFileListDef.CreateDataSet;
     CdsFileListDef.LogChanges := false;
 
-    CdsColumnSet.IndexFieldNames := 'Id;Seq';
+    CdsColumnSet.IndexFieldNames := 'Id;Sort';
     CdsColumnSet.CreateDataSet;
     CdsColumnSet.LogChanges := false;
 
     Id := 0;
+    Sort := -10;
     for AColumnSet in FileListDefs do
     begin
       CdsFileListDef.Insert;
-      CdsFileListDefId.AsInteger := Id;
-      CdsFileListDefName.AsString := AColumnSet.Name;
+      CdsFileListDefId.AsInteger    := Id;
+      CdsFileListDefName.AsString   := AColumnSet.Name;
       CdsFileListDefOptions.AsInteger := Ord(AColumnSet.Options);
       case (AColumnSet.Options) of
         TFileListOptions.floSystem:
@@ -638,16 +707,20 @@ begin
         TFileListOptions.floInternal:
           CdsFileListDefType.AsString := ListInternal;
         else
+        begin
           CdsFileListDefType.AsString := ListUser;
+          if (Sort < 0) then
+            Sort := 0;
+        end;
       end;
       CdsFileListDefReadMode.AsInteger := AColumnSet.ReadModeInt;
+      CdsFileListDefSort.AsInteger  := Sort;
       CdsFileListDef.Post;
+      CdsColumnSet.SetRange([CdsFileListDefId.AsInteger], [CdsFileListDefId.AsInteger]);
 
-      ColumnSeq := 0;
       for Index := 0 to High(AColumnSet.ColumnDefs) do
       begin
         AColumn := AColumnSet.ColumnDefs[Index];
-        ColumnSeq := ColumnSeq + 1;
         CdsColumnSet.Insert;
         CdsColumnSetId.AsInteger            := Id;
         CdsColumnSetCaption.AsString        := AColumn.Caption;
@@ -660,6 +733,7 @@ begin
       end;
 
       Inc(Id);
+      Inc(Sort);
     end;
   finally
     if (SelectedSet > CdsFileListDef.RecordCount) then
@@ -671,6 +745,7 @@ begin
 
     CdsColumnSet.MasterFields := 'Id';
     CdsColumnSet.MasterSource := DsFileListDef;
+    CdsFileListDef.IndexFieldNames := 'Sort';
 
     DoSetEditMode;  // Now filter tagnames
   end;

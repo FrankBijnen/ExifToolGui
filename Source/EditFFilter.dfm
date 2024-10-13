@@ -4,7 +4,7 @@ object FEditFFilter: TFEditFFilter
   BorderStyle = bsDialog
   Caption = 'Edit file filters'
   ClientHeight = 375
-  ClientWidth = 374
+  ClientWidth = 368
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -16,7 +16,7 @@ object FEditFFilter: TFEditFFilter
   object AdvPanel1: TPanel
     Left = 0
     Top = 0
-    Width = 374
+    Width = 368
     Height = 345
     Align = alClient
     DoubleBuffered = True
@@ -28,9 +28,10 @@ object FEditFFilter: TFEditFFilter
     ParentDoubleBuffered = False
     ParentFont = False
     TabOrder = 0
-    ExplicitTop = -4
+    ExplicitWidth = 370
+    ExplicitHeight = 344
     object EdFilter: TEdit
-      Left = 9
+      Left = 39
       Top = 37
       Width = 319
       Height = 21
@@ -38,7 +39,7 @@ object FEditFFilter: TFEditFFilter
       OnChange = EdFilterChange
     end
     object BtnAdd: TButton
-      Left = 8
+      Left = 38
       Top = 6
       Width = 100
       Height = 25
@@ -47,7 +48,7 @@ object FEditFFilter: TFEditFFilter
       OnClick = BtnAddClick
     end
     object LbFilter: TListBox
-      Left = 8
+      Left = 38
       Top = 64
       Width = 319
       Height = 262
@@ -57,9 +58,9 @@ object FEditFFilter: TFEditFFilter
       OnDblClick = BtnOkClick
     end
     object BtnUp: TButton
-      Left = 333
-      Top = 80
-      Width = 19
+      Left = 7
+      Top = 67
+      Width = 25
       Height = 52
       Caption = '5'
       Font.Charset = DEFAULT_CHARSET
@@ -72,9 +73,9 @@ object FEditFFilter: TFEditFFilter
       OnClick = BtnUpClick
     end
     object BtnDown: TButton
-      Left = 333
-      Top = 156
-      Width = 19
+      Left = 7
+      Top = 143
+      Width = 25
       Height = 57
       Caption = '6'
       Font.Charset = DEFAULT_CHARSET
@@ -87,7 +88,7 @@ object FEditFFilter: TFEditFFilter
       OnClick = BtnUpClick
     end
     object BtnDel: TButton
-      Left = 227
+      Left = 257
       Top = 6
       Width = 100
       Height = 25
@@ -96,7 +97,7 @@ object FEditFFilter: TFEditFFilter
       OnClick = BtnDelClick
     end
     object BtnUpdate: TButton
-      Left = 117
+      Left = 147
       Top = 6
       Width = 100
       Height = 25
@@ -108,13 +109,14 @@ object FEditFFilter: TFEditFFilter
   object Panel1: TPanel
     Left = 0
     Top = 345
-    Width = 374
+    Width = 368
     Height = 30
     Align = alBottom
     TabOrder = 1
-    ExplicitWidth = 373
+    ExplicitTop = 344
+    ExplicitWidth = 370
     object BtnCancel: TBitBtn
-      Left = 292
+      Left = 282
       Top = 2
       Width = 75
       Height = 25
@@ -123,7 +125,7 @@ object FEditFFilter: TFEditFFilter
       TabOrder = 0
     end
     object BtnOK: TBitBtn
-      Left = 211
+      Left = 201
       Top = 2
       Width = 75
       Height = 25

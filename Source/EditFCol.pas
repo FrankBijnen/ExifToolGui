@@ -39,6 +39,13 @@ type
     EdSearchTag: TEdit;
     LblSearchTag: TLabel;
     RadTagValues: TRadioGroup;
+    PnlFileListDef: TPanel;
+    PnlSortFile: TPanel;
+    PnlSortColumn: TPanel;
+    BtnFileUp: TButton;
+    BtnFileDown: TButton;
+    BtnColumnUp: TButton;
+    BtnColumnDown: TButton;
     procedure FormCreate(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure EdSearchTagKeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
@@ -56,6 +63,10 @@ type
     procedure BtnApplyTagClick(Sender: TObject);
     procedure ChkValuesClick(Sender: TObject);
     procedure RadTagValuesClick(Sender: TObject);
+    procedure BtnFileUpClick(Sender: TObject);
+    procedure BtnColumnUpClick(Sender: TObject);
+    procedure BtnFileDownClick(Sender: TObject);
+    procedure BtnColumnDownClick(Sender: TObject);
   private
     { Private declarations }
     FSample: TShellFolder;
@@ -94,6 +105,26 @@ end;
 procedure TFEditFColumn.BtnApplyTagClick(Sender: TObject);
 begin
   EndTagNameLookup(DmFileLists.CdsTagNamesTagName.AsString);
+end;
+
+procedure TFEditFColumn.BtnColumnDownClick(Sender: TObject);
+begin
+  DmFileLists.MoveDown(DmFileLists.CdsColumnSet);
+end;
+
+procedure TFEditFColumn.BtnColumnUpClick(Sender: TObject);
+begin
+  DmFileLists.MoveUp(DmFileLists.CdsColumnSet);
+end;
+
+procedure TFEditFColumn.BtnFileDownClick(Sender: TObject);
+begin
+  DmFileLists.MoveDown(DmFileLists.CdsFileListDef);
+end;
+
+procedure TFEditFColumn.BtnFileUpClick(Sender: TObject);
+begin
+  DmFileLists.MoveUp(DmFileLists.CdsFileListDef);
 end;
 
 procedure TFEditFColumn.ChkValuesClick(Sender: TObject);
@@ -323,7 +354,7 @@ var
 begin
   NewName := DmFileLists.CdsFileListDefName.AsString + '_Copy';
   repeat
-    if not (InputQuery('New Filelist', ['Name'], NewName)) then
+    if not (InputQuery('Existing definitions will be saved first!', ['New Name'], NewName)) then
       break;
     if DmFileLists.NameExists(NewName) then
     begin
