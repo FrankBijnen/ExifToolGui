@@ -190,6 +190,9 @@ type
     FileListViewMenu: TPopupMenu;
     TbFlFilter: TToolButton;
     FileListFilterMenu: TPopupMenu;
+    TbFlExport: TToolButton;
+    ExportMenu: TPopupMenu;
+    Csv1: TMenuItem;
     procedure ShellListClick(Sender: TObject);
     procedure ShellListKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
     procedure SpeedBtnExifClick(Sender: TObject);
@@ -317,6 +320,7 @@ type
     procedure FileListViewMenuPopup(Sender: TObject);
     procedure SpeedBtnFilterEditClick(Sender: TObject);
     procedure FileListFilterMenuPopup(Sender: TObject);
+    procedure Csv1Click(Sender: TObject);
   private
     { Private declarations }
     ETBarSeriesFocal: TBarSeries;
@@ -403,7 +407,7 @@ uses System.StrUtils, System.Math, System.Masks, System.Types, System.UITypes,
   UDmFileLists,
   MainDef, LogWin, Preferences, EditFFilter, EditFCol, UFrmStyle, UFrmAbout, UFrmCheckVersions,
   QuickMngr, DateTimeShift, DateTimeEqual, CopyMeta, RemoveMeta, Geotag, Geomap, CopyMetaSingle, FileDateTime,
-  UFrmGenericExtract, UFrmGenericImport, UFrmLossLessRotate, UFrmGeoTagFiles, UFrmGeoSetup,
+  UFrmGenericExtract, UFrmGenericImport, UFrmLossLessRotate, UFrmGeoTagFiles, UFrmGeoSetup, UFrmGenerate,
   UnitLangResources;
 
 {$R *.dfm}
@@ -3186,7 +3190,16 @@ procedure TFMain.ShellListKeyDown(Sender: TObject; var Key: Word; Shift: TShiftS
 
 begin
   if (Key = Ord('A')) and (ssCTRL in Shift) then // Ctrl+A
+  begin
+    FrmGenerate.Show;
+    SendMessage(FrmGenerate.Handle, CM_SubFolderSort, ShellList.Items.Count, LPARAM(ShellList.Path));
+    try
+      GetAllFileListColumns(ShellList, FrmGenerate);
+    finally
+      FrmGenerate.Close;
+    end;
     ShellList.SelectAll;
+  end;
   if (Key = Ord('C')) and (ssCTRL in Shift) then // Ctrl+C
     ShellList.FileNamesToClipboard;
   if (Key = Ord('X')) and (ssCTRL in Shift) then // Ctrl+X
@@ -3794,6 +3807,55 @@ procedure TFMain.CounterETEvent(Counter: integer);
 begin
   StatusBar.Panels[1].Text := Format(StrDFilesRemaining, [Counter]);
   StatusBar.Update;
+end;
+
+procedure TFMain.Csv1Click(Sender: TObject);
+var
+  Writer: TTextWriter;
+  Lst: TStringList;
+  Index: integer;
+begin
+  with SaveFileDlg do
+  begin
+    DefaultExt := 'csv';
+    if GUIsettings.DefExportUse then
+      InitialDir := GUIsettings.DefExportDir
+    else
+      InitialDir := WrkIniDir;
+    Filter := 'Csv file|*.csv';
+    Title := 'Export';
+    if not Execute then
+      exit;
+
+    Writer := TStreamWriter.Create(FileName, false, TEncoding.UTF8);
+    try
+      Lst := TStringList.Create;
+      try
+        Lst.QuoteChar := '"';
+        Lst.Delimiter := ';';
+
+        for Index := 0  to ShellList.Columns.Count -1 do
+          Lst.AddStrings(ShellList.Columns[Index].Caption);
+        Writer.WriteLine(Lst.DelimitedText);
+
+        for Index := 0 to ShellList.Items.Count -1 do
+        begin
+          if (ListView_GetItemState(ShellList.Handle, Index, LVIS_SELECTED) = LVIS_SELECTED) and
+             (TSubShellFolder.GetIsFolder(ShellList.Folders[Index]) = false) then
+          begin
+            Lst.Clear;
+            Lst.AddStrings(TSubShellFolder.GetRelativeDisplayName(ShellList.Folders[Index]));
+            Lst.AddStrings(ShellList.Folders[Index].DetailStrings);
+            Writer.WriteLine(Lst.DelimitedText);
+          end;
+        end;
+      finally
+        lst.Free;
+      end;
+    finally
+      Writer.Free;
+    end;
+  end;
 end;
 
 end.

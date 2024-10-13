@@ -72,7 +72,7 @@ end;
 
 procedure TFrmGenerate.CMSubFolderSort(var Message: TMessage);
 begin
-  Caption := Format(StrSortingSubFolder, [Message.WParam, string(Message.LParam)]);
+  Caption := Format(StrLoadingSubFolder, [Message.WParam, string(Message.LParam)]);
   PbProgress.Position := 0;
   PbProgress.Max := Message.WParam;
 end;
