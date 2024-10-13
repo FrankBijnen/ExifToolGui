@@ -3361,7 +3361,6 @@ procedure TFMain.Tray_ResetwindowsizeClick(Sender: TObject);
 begin
   RestoreGUI;
   ResetWindowSizes;
-  ShellList.Refresh;
   Realign;
 end;
 

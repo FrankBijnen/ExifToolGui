@@ -99,7 +99,7 @@ uses
 
 function TFEditFColumn.GetDefWindowSizes: TRect;
 begin
-  result := Rect(108, 106, 880, 640);
+  result := Rect(108, 106, 1080, 600);
 end;
 
 procedure TFEditFColumn.BtnApplyTagClick(Sender: TObject);
