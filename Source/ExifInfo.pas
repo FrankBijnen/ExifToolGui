@@ -646,8 +646,13 @@ begin
   if (Encoding.GetCharCount(Bytes) > 0) then
   begin
     result := Encoding.GetString(Bytes);
-    if (result[1] = #0) then
-      result := '-'; // in case tag is defined and empty
+    L1 := Pos(#0, result);
+    case L1 of
+      0:;
+      1: result := '-'; // in case tag is defined and empty
+      else
+         SetLength(result, L1 -1);
+    end;
   end;
 end;
 
