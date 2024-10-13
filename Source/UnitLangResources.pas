@@ -63,7 +63,7 @@ resourcestring
 
   StrGeneratingDThumbn      = 'Generating %d thumbnails for: %s';
   StrScanningSubFolder      = 'Total folder scanned: %d';
-  StrSortingSubFolder       = 'Sorting %d sub items of: %s';
+  StrLoadingSubFolder       = 'Loading %d sub items of: %s';
   StrIconsSubFolder         = 'Loading %d Thumbnails in subfolders of: %s';
   StrWaitingForActive       = 'Waiting for active tasks to complete';
 
