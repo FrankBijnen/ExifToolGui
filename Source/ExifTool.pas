@@ -59,17 +59,19 @@ type
     FExecETEvent: TExecETEvent;
     FOptionsRec: TET_OptionsRec;
     FETprocessInfo: TProcessInformation;
-    FEtOutPipe: TPipeStream;
-    FEtErrPipe: TPipeStream;
+    FETOutPipe: TPipeStream;
+    FETErrPipe: TPipeStream;
     FPipeInRead, FPipeInWrite: THandle;
     FPipeOutRead, FPipeOutWrite: THandle;
     FPipeErrRead, FPipeErrWrite: THandle;
     FETWorkingDir: string;
     FETTempFile: string;
+    FRecordingFile: string;
     FExecNum: word;
     FCounter: TET_Counter;
     function GetCounter: TET_Counter;
     function GetTempFile: string;
+    procedure SetRecordingFile(AFile: string);
   protected
     procedure AddExecNum(var FinalCmd: string);
   public
@@ -92,6 +94,7 @@ type
     property ExecNum: word read FExecNum;
     property Options: TET_OptionsRec read FOptionsRec;
     property Counter: TET_Counter read GetCounter;
+    property RecordingFile: string read FRecordingFile write SetRecordingFile;
   end;
 
 var
@@ -100,7 +103,7 @@ var
 implementation
 
 uses
-  System.SysUtils,
+  System.SysUtils, System.IOUtils,
   Main, MainDef, ExifToolsGUI_Utils,
   UnitLangResources;
 
@@ -302,9 +305,10 @@ begin
   FId := Id;
   FExecNum := 10; // From 10 to 99
   FETWorkingDir := '';
+  FRecordingFile := '';
   FETTempFile := '';
-  FEtOutPipe := nil;
-  FEtErrPipe := nil;
+  FETOutPipe := nil;
+  FETErrPipe := nil;
   SetCounter(nil, 0);
 end;
 
@@ -312,13 +316,24 @@ destructor TExifTool.Destroy;
 begin
   OpenExit(true);
 
-  if Assigned(FEtOutPipe) then
-    FEtOutPipe.Free;
-  if Assigned(FEtErrPipe) then
-    FEtErrPipe.Free;
+  if Assigned(FETOutPipe) then
+    FETOutPipe.Free;
+  if Assigned(FETErrPipe) then
+    FETErrPipe.Free;
   FETWorkingDir := '';
   FETTempFile := '';
+  FRecordingFile := '';
   inherited Destroy;
+end;
+
+procedure TExifTool.SetRecordingFile(AFile: string);
+begin
+  if (FRecordingFile <> AFile) then
+  begin
+    FRecordingFile := AFile;
+    if (FRecordingFile <> '') then
+      DeleteFile(FRecordingFile);
+  end;
 end;
 
 function TExifTool.StayOpen(WorkingDir: string): boolean;
@@ -365,13 +380,13 @@ begin
     CloseHandle(FPipeOutWrite);
     CloseHandle(FPipeErrWrite);
 
-    if Assigned(FEtOutPipe) then
-      FreeAndNil(FEtOutPipe);
-    FEtOutPipe := TPipeStream.Create(FPipeOutRead, SizePipeBuffer);
+    if Assigned(FETOutPipe) then
+      FreeAndNil(FETOutPipe);
+    FETOutPipe := TPipeStream.Create(FPipeOutRead, SizePipeBuffer);
 
-    if Assigned(FEtErrPipe) then
-      FreeAndNil(FEtErrPipe);
-    FEtErrPipe := TPipeStream.Create(FPipeErrRead, SizePipeBuffer);
+    if Assigned(FETErrPipe) then
+      FreeAndNil(FETErrPipe);
+    FETErrPipe := TPipeStream.Create(FPipeErrRead, SizePipeBuffer);
 
     FETWorkingDir := WorkingDir;
   end
@@ -451,9 +466,9 @@ begin
       FlushFileBuffers(FPipeInWrite);
 
       // Read StdOut and stdErr
-      FEtOutPipe.SetCounter(Counter);
-      ReadOut := TSOReadPipeThread.Create(FEtOutPipe, FExecNum);
-      ReadErr := TSOReadPipeThread.Create(FEtErrPipe, FExecNum);
+      FETOutPipe.SetCounter(Counter);
+      ReadOut := TSOReadPipeThread.Create(FETOutPipe, FExecNum);
+      ReadErr := TSOReadPipeThread.Create(FETErrPipe, FExecNum);
       try
         ReadOut.WaitFor;
         ReadErr.WaitFor;
@@ -462,11 +477,11 @@ begin
         ReadOut.Free;
         ReadErr.Free;
       end;
-      ETouts := FEtOutPipe.AnalyseResult(StatusLine, LengthReady);
-      FEtOutPipe.Clear;
+      ETouts := FETOutPipe.AnalyseResult(StatusLine, LengthReady);
+      FETOutPipe.Clear;
 
-      ETErrs := FEtErrPipe.AnalyseError;
-      FEtErrPipe.Clear;
+      ETErrs := FETErrPipe.AnalyseError;
+      FETErrPipe.Clear;
 
       // Callback for Logging
       if Assigned(ExecETEvent) then
@@ -474,6 +489,12 @@ begin
 
       // Return result without {readyxx}#13#10
       SetLength(ETouts, Length(ETouts) - LengthReady);
+
+      // Record?
+      if (PopupOnError) and
+         (FRecordingFile <> '') then
+        TFile.AppendAllText(FRecordingFile, ETouts, TEncoding.UTF8);
+
       result := true;
     finally
       TMonitor.Exit(Self);
