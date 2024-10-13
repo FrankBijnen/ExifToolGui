@@ -45,7 +45,6 @@ type
     AdvTabMetadata: TTabSheet;
     AdvPageFilelist: TPageControl;
     AdvTabFilelist: TTabSheet;
-    AdvPanelFileTop: TPanel;
     AdvPanelETdirect: TPanel;
     AdvPanelMetaTop: TPanel;
     AdvPanelMetaBottom: TPanel;
@@ -182,7 +181,7 @@ type
     MaPredefinedSave: TAction;
     MaPredefinedLoad: TAction;
     AdvPanelBrowser: TPanel;
-    ToolBar1: TToolBar;
+    TbFileList: TToolBar;
     TbFlRefresh: TToolButton;
     TbFlView: TToolButton;
     ImageCollectionFileList: TImageCollection;
@@ -193,6 +192,8 @@ type
     TbFlExport: TToolButton;
     ExportMenu: TPopupMenu;
     Csv1: TMenuItem;
+    SpbRecord: TSpeedButton;
+    Json1: TMenuItem;
     procedure ShellListClick(Sender: TObject);
     procedure ShellListKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
     procedure SpeedBtnExifClick(Sender: TObject);
@@ -321,6 +322,8 @@ type
     procedure SpeedBtnFilterEditClick(Sender: TObject);
     procedure FileListFilterMenuPopup(Sender: TObject);
     procedure Csv1Click(Sender: TObject);
+    procedure SpbRecordClick(Sender: TObject);
+    procedure Json1Click(Sender: TObject);
   private
     { Private declarations }
     ETBarSeriesFocal: TBarSeries;
@@ -639,14 +642,17 @@ begin
   if (ShellList.ViewStyle = vsIcon) then
   begin
     TbFlView.Caption := IntToStr(ShellList.ThumbNailSize) + ThumbNailPix;
+    TbFlView.Hint := IntToStr(ShellList.ThumbNailSize) + ThumbNailPix;
     TbFlView.ImageIndex := Img_Thumb;
   end
   else if (GUIsettings.DetailsSel < GetFileListDefs.Count) then
   begin
     TbFlView.Caption := GetFileListDefs[GUIsettings.DetailsSel].Name;
+    TbFlView.Hint := GetFileListDefs[GUIsettings.DetailsSel].Name;
     TbFlView.ImageIndex := Min(Img_FirstDetail + GUIsettings.DetailsSel, Img_LastDetail);
   end;
   TbFlFilter.Caption := GUIsettings.FileFilter;
+  TbFlFilter.Hint := GUIsettings.FileFilter;
   TbFlFilter.ImageIndex := Img_Filter;
 end;
 
@@ -1451,6 +1457,22 @@ begin
     RefreshSelected(Sender);
     ShowMetadata;
     ShowPreview;
+  end;
+end;
+
+procedure TFMain.Json1Click(Sender: TObject);
+begin
+  with SaveFileDlg do
+  begin
+    DefaultExt := 'json';
+    if GUIsettings.DefExportUse then
+      InitialDir := GUIsettings.DefExportDir
+    else
+      InitialDir := WrkIniDir;
+    Filter := 'Json file|*.json';
+    Title := 'Export';
+    if Execute then
+      ExportToJson(ShellList, FileName);
   end;
 end;
 
@@ -3272,7 +3294,7 @@ begin
 
   AdvPageMetadata.Enabled := Enable;
   AdvPanelETdirect.Enabled := Enable;
-  AdvPanelFileTop.Enabled := Enable;
+  TbFileList.Enabled := Enable;
 
   if not Enable then
     if (MessageDlgEx(StrERRORExifTool1 + #10 +  #10 +
@@ -3573,6 +3595,32 @@ begin
 end;
 
 // ==============================================================================
+procedure TFMain.SpbRecordClick(Sender: TObject);
+begin
+  if (ET.RecordingFile <> '') then
+    ET.RecordingFile := ''
+  else
+  begin
+    with SaveFileDlg do
+    begin
+      InitialDir := ShellList.Path;
+      DefaultExt := 'txt';
+      Filter := 'Txt file (*.txt)|*.txt|' +
+                'Csv file (*.csv)|*.csv|' +
+                'Html file (*.html)|*.html|' +
+                'Any file (*.*)|*.*';
+      Title := 'Record ExifTool output';
+
+      if (Execute) then
+        ET.RecordingFile := FileName;
+    end;
+  end;
+  if (ET.RecordingFile = '') then
+    TSpeedButton(Sender).ImageIndex := 15
+  else
+    TSpeedButton(Sender).ImageIndex := 16;
+end;
+
 procedure TFMain.Spb_ForwardClick(Sender: TObject);
 begin
   EdgeBrowser1.GoForward;
@@ -3810,10 +3858,6 @@ begin
 end;
 
 procedure TFMain.Csv1Click(Sender: TObject);
-var
-  Writer: TTextWriter;
-  Lst: TStringList;
-  Index: integer;
 begin
   with SaveFileDlg do
   begin
@@ -3824,37 +3868,8 @@ begin
       InitialDir := WrkIniDir;
     Filter := 'Csv file|*.csv';
     Title := 'Export';
-    if not Execute then
-      exit;
-
-    Writer := TStreamWriter.Create(FileName, false, TEncoding.UTF8);
-    try
-      Lst := TStringList.Create;
-      try
-        Lst.QuoteChar := '"';
-        Lst.Delimiter := ';';
-
-        for Index := 0  to ShellList.Columns.Count -1 do
-          Lst.AddStrings(ShellList.Columns[Index].Caption);
-        Writer.WriteLine(Lst.DelimitedText);
-
-        for Index := 0 to ShellList.Items.Count -1 do
-        begin
-          if (ListView_GetItemState(ShellList.Handle, Index, LVIS_SELECTED) = LVIS_SELECTED) and
-             (TSubShellFolder.GetIsFolder(ShellList.Folders[Index]) = false) then
-          begin
-            Lst.Clear;
-            Lst.AddStrings(TSubShellFolder.GetRelativeDisplayName(ShellList.Folders[Index]));
-            Lst.AddStrings(ShellList.Folders[Index].DetailStrings);
-            Writer.WriteLine(Lst.DelimitedText);
-          end;
-        end;
-      finally
-        lst.Free;
-      end;
-    finally
-      Writer.Free;
-    end;
+    if Execute then
+      ExportToCsv(ShellList, FileName);
   end;
 end;
 

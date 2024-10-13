@@ -65,12 +65,15 @@ procedure GetFileListColumns(AShellList: ExifToolsGui_ShellList.TShellListView;
                              ItemIndex: integer);
 procedure GetAllFileListColumns(AShellList: ExifToolsGui_ShellList.TShellListView;
                                 TFrmGenerate: TFrmGenerate);
-
+procedure ExportToCsv(AShellList: ExifToolsGui_ShellList.TShellListView;
+                      FileName: string);
+procedure ExportToJson(AShellList: ExifToolsGui_ShellList.TShellListView;
+                      FileName: string);
 implementation
 
 uses
-  System.SysUtils,
-  Winapi.Windows,
+  System.SysUtils, System.JSON,
+  Winapi.Windows, Winapi.CommCtrl,
   ExifToolsGUI_Utils,
   ExifToolsGui_ThreadPool,
   MainDef;
@@ -479,6 +482,89 @@ begin
 
     DebugMsg(['Shelllist enabled']);
 
+  end;
+end;
+
+procedure ExportToCsv(AShellList: ExifToolsGui_ShellList.TShellListView;
+                      FileName: string);
+var
+  Writer: TTextWriter;
+  Lst: TStringList;
+  Index: integer;
+begin
+  Writer := TStreamWriter.Create(FileName, false, TEncoding.UTF8);
+  try
+    Lst := TStringList.Create;
+    try
+      Lst.QuoteChar := '"';
+      Lst.Delimiter := ';';
+
+      for Index := 0  to AShellList.Columns.Count -1 do
+        Lst.AddStrings(AShellList.Columns[Index].Caption);
+      Writer.WriteLine(Lst.DelimitedText);
+
+      for Index := 0 to AShellList.Items.Count -1 do
+      begin
+        if (ListView_GetItemState(AShellList.Handle, Index, LVIS_SELECTED) = LVIS_SELECTED) and
+           (TSubShellFolder.GetIsFolder(AShellList.Folders[Index]) = false) then
+        begin
+          Lst.Clear;
+          Lst.AddStrings(TSubShellFolder.GetRelativeDisplayName(AShellList.Folders[Index]));
+          Lst.AddStrings(AShellList.Folders[Index].DetailStrings);
+          Writer.WriteLine(Lst.DelimitedText);
+        end;
+      end;
+    finally
+      lst.Free;
+    end;
+  finally
+    Writer.Free;
+  end;
+end;
+
+procedure ExportToJson(AShellList: ExifToolsGui_ShellList.TShellListView;
+                      FileName: string);
+var
+  Writer: TTextWriter;
+  JSONObj: TJSONObject;
+  Index: integer;
+  Column: integer;
+  First: boolean;
+begin
+  Writer := TStreamWriter.Create(FileName, false, TEncoding.UTF8);
+  try
+    Writer.WriteLine('[');
+    First := true;
+    for Index := 0 to AShellList.Items.Count -1 do
+    begin
+      if (ListView_GetItemState(AShellList.Handle, Index, LVIS_SELECTED) = LVIS_SELECTED) and
+           (TSubShellFolder.GetIsFolder(AShellList.Folders[Index]) = false) then
+      begin
+        JSONObj := TJSONObject.Create;
+        try
+          for Column := 0 to AShellList.Columns.Count -1 do
+          begin
+            if (Column = 0) then
+              JSONObj.AddPair(AShellList.Columns[Column].Caption,
+                              TSubShellFolder.GetRelativeDisplayName(AShellList.Folders[Index]))
+            else
+              JSONObj.AddPair(AShellList.Columns[Column].Caption,
+                              AShellList.Folders[Index].DetailStrings[Column -1]);
+          end;
+          if not First then
+            Writer.WriteLine(',')
+          else
+            First := false;
+          Writer.Write(JSONObj.ToString);
+        finally
+          JSONObj.Free;
+        end;
+      end;
+    end;
+    Writer.WriteLine;
+    Writer.WriteLine(']');
+  finally
+    Writer.Free;
   end;
 end;
 
