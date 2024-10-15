@@ -32,7 +32,7 @@ object DmFileLists: TDmFileLists
     object CdsFileListDefSort: TIntegerField
       FieldName = 'Sort'
     end
-    object CdsFileListDefName: TStringField
+    object CdsFileListDefName: TWideStringField
       DisplayWidth = 25
       FieldName = 'Name'
       Size = 64
@@ -75,7 +75,7 @@ object DmFileLists: TDmFileLists
     object CdsColumnSetId: TIntegerField
       FieldName = 'Id'
     end
-    object CdsColumnSetCaption: TStringField
+    object CdsColumnSetCaption: TWideStringField
       DisplayWidth = 50
       FieldName = 'Caption'
       Size = 255
