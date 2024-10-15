@@ -123,7 +123,8 @@ begin
     SetMinorError(false);
     SetGpsFormat(true);
     SetShowNumber(false);
-    ETCharset := '-CHARSET' + CRLF + 'FILENAME=UTF8' + CRLF + '-CHARSET' + CRLF + 'UTF8'; // UTF8 it is. No choice
+//    ETCharset := '-CHARSET' + CRLF + 'FILENAME=UTF8' + CRLF + '-CHARSET' + CRLF + 'UTF8'; // UTF8 it is. No choice
+    ETCharset := '-CHARSET' + CRLF + 'FILENAME=UTF8'; // UTF8 it is. No choice  (CHARSET UTF8 is Default PH)
     SetVerbose(0);
     SetGeoDir('');
     SetCustomOptions('');

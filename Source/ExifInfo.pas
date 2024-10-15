@@ -14,7 +14,7 @@ Manufacturer independent (usually)
                 Dng                       E.G.: Pentax K-x, K5II, K3. All DNG's Converted by Dng converter
 
 Pentax          Pef                       K100D, K-x, K5-IIs, K-3
-Nikon           Nef                       D50, D70
+Nikon           Nef                       D5, D50, D70
 Canon           Crw (partial)             EOS DIGITAL REBEL, EOS 10D
                     Crw has no Exif.
                     Data needed for the filelist is taken from the Canon makernotes and put in the Ifd0 ExifIfd records
