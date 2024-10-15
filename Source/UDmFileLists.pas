@@ -15,13 +15,13 @@ type
     DsFileListDef: TDataSource;
     CdsFileListDef: TClientDataSet;
     CdsFileListDefId: TIntegerField;
-    CdsFileListDefName: TStringField;
+    CdsFileListDefName: TWideStringField;
     CdsFileListDefType: TStringField;
     CdsFileListDefReadMode: TIntegerField;
     CdsFileListDefReadModeLookup: TStringField;
     DsColumnSet: TDataSource;
     CdsColumnSet: TClientDataSet;
-    CdsColumnSetCaption: TStringField;
+    CdsColumnSetCaption: TWideStringField;
     CdsColumnSetCommand: TStringField;
     CdsColumnSetOption: TStringField;
     CdsColumnSetAlignR: TIntegerField;
@@ -196,6 +196,7 @@ begin
   CdsFileListDefOptions.AsInteger := Ord(floUserDef);
   CdsFileListDefReadMode.AsInteger := Ord(rmInternal);
   CdsFileListDefId.AsInteger := CdsFileListDef.RecordCount;
+  CdsFileListDefSort.AsInteger := CdsFileListDef.RecordCount;
 end;
 
 procedure TDmFileLists.CdsFileListDefAfterPost(DataSet: TDataSet);
