@@ -1556,7 +1556,7 @@ begin
 
     case (TagType) of
       $0805:
-        IFD0.CopyRight := AddIfd0Data('CopyRight', GetCRWString(TagSize));
+        IFD0.Copyright := AddIfd0Data('Copyright', GetCRWString(TagSize));
       $080a:
         begin
           IFD0.Make := AddIfd0Data('Make', GetCRWString(TagSize));
