@@ -151,6 +151,7 @@ type
     function GetIconSize: integer;
   protected
     function GetButtonColor(const ARectState: TRectState): TColor;
+    function GetButtonTextColor(const ASelected: boolean = false): TColor;
     function GetPenColor(const ASelected: boolean = false): TColor;
     function GetBackColor(const ASelected: boolean = false): TColor;
     function GetBorderColor: TColor;
@@ -602,7 +603,7 @@ begin
   end;
 end;
 
-function TCustomBreadcrumbBar.GetPenColor(const ASelected: boolean = false): TColor;
+function TCustomBreadcrumbBar.GetButtonTextColor(const ASelected: boolean = false): TColor;
 begin
   if Assigned(FStyleServices) then
   begin
@@ -610,6 +611,24 @@ begin
       result := FStyleServices.GetStyleFontColor(TStyleFont.sfButtonTextFocused)
     else
       result := FStyleServices.GetStyleFontColor(TStyleFont.sfButtonTextNormal);
+  end
+  else
+  begin
+    if (ASelected) then
+      result := clHighlight
+    else
+      result := clBlack;
+  end;
+end;
+
+function TCustomBreadcrumbBar.GetPenColor(const ASelected: boolean = false): TColor;
+begin
+  if Assigned(FStyleServices) then
+  begin
+    if (ASelected) then
+      result := FStyleServices.GetStyleFontColor(TStyleFont.sfListItemTextSelected)
+    else
+      result := FStyleServices.GetStyleFontColor(TStyleFont.sfListItemTextNormal);
   end
   else
   begin
@@ -710,8 +729,7 @@ begin
     inc(FBreadcrumbRects[i].Right, DpiScale(SEP_PADDING));
 
 // Background breadcrumb
-//    Canvas.Brush.Color := GetButtonColor(FBreadcrumbStates[i]);
-    Canvas.Brush.Color := GetBackColor(FBreadcrumbStates[i]  <> rsNormal);
+    Canvas.Brush.Color := GetButtonColor(FBreadcrumbStates[i]);
     Canvas.Brush.Style := bsSolid;
     FillRect(Canvas.Handle,
       FBreadcrumbRects[i],
@@ -724,7 +742,7 @@ begin
 
 // Text breadcrumb
     Canvas.Brush.Style := bsClear;
-    Canvas.Font.Color := GetPenColor(FBreadcrumbStates[i] <> rsNormal);
+    Canvas.Font.Color := GetButtonTextColor(FBreadcrumbStates[i] <> rsNormal);
 
     DrawText(Canvas.Handle,
       PChar(S),
