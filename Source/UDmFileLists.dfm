@@ -121,7 +121,7 @@ object DmFileLists: TDmFileLists
       KeyFields = 'Option'
       Lookup = True
     end
-    object CdsColumnSetSampleValue: TStringField
+    object CdsColumnSetSampleValue: TWideStringField
       FieldKind = fkCalculated
       FieldName = 'SampleValue'
       Size = 64
@@ -190,7 +190,7 @@ object DmFileLists: TDmFileLists
       FieldName = 'TagName'
       Size = 64
     end
-    object CdsTagNamesSampleValue: TStringField
+    object CdsTagNamesSampleValue: TWideStringField
       FieldKind = fkCalculated
       FieldName = 'SampleValue'
       Size = 64

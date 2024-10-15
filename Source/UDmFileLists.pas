@@ -38,12 +38,12 @@ type
     CdsOptionKey: TIntegerField;
     CdsOptionDesc: TStringField;
     CdsColumnSetOptionLookUp: TStringField;
-    CdsColumnSetSampleValue: TStringField;
+    CdsColumnSetSampleValue: TWideStringField;
     CdsTagNames: TClientDataSet;
     CdsTagNamesTagName: TStringField;
     DsTagNames: TDataSource;
     CdsColumnSetCommandLookup: TStringField;
-    CdsTagNamesSampleValue: TStringField;
+    CdsTagNamesSampleValue: TWideStringField;
     CdsFileListDefOptions: TIntegerField;
     CdsColumnSetId: TIntegerField;
     CdsFileListDefSort: TIntegerField;
