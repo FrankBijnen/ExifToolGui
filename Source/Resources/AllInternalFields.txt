@@ -32,7 +32,6 @@ ICC_Profile:ProfileConnectionSpace
 ICC_Profile:ProfileCreator
 ICC_Profile:ProfileDescription
 IFD0:Artist
-IFD0:CopyRight
 IFD0:Copyright
 IFD0:DateTimeModify
 IFD0:Make
