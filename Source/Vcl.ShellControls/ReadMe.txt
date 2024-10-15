@@ -29,6 +29,24 @@ Due to the Copyright statement I can't distribute that source, but the Community
     property FoldersList: TList read FFolders;
 //ExifTool_x     
 
+Fix for a memory leak that shows clearly when selecting many files (2500+) combined with column sorting.
+
+5) in 'function StrRetToString', after 'if Assigned(StrRet.pOleStr) then' replace
+
+     Result := StrRet.pOleStr
+
+with this block
+
+//ExifTool
+//        Result := StrRet.pOleStr
+      begin
+        Result := StrRet.pOleStr;
+        CoTaskMemFree(StrRet.pOleStr);
+      end
+//ExifTool_X
+
+Note: For documentation purposes the original line is kept, but commented. 
+
 - Open the ShellControls.groupproj in Delphi, Compile and Install the 32 Bits version. The 64 Bits also works, but is not needed for ExifToolGUI.
 
 Notes:
