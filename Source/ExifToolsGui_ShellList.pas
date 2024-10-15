@@ -103,7 +103,6 @@ type
     procedure GetThumbNails; virtual;
     procedure DoContextPopup(MousePos: TPoint; var Handled: boolean); override;
     procedure Edit(const Item: TLVItem); override;
-    procedure PopulateSubDirs(FRootFolder, FRelativeFolder: TSubShellFolder); overload;
     procedure Populate; override;
     function OwnerDataFetch(Item: TListItem; Request: TItemRequest): boolean; override;
 
@@ -128,7 +127,7 @@ type
     procedure ColumnClick(Column: TListColumn);
     procedure FileNamesToClipboard(Cut: boolean = false);
     procedure PasteFilesFromClipboard;
-    procedure PopulateSubDirs(FRootFolder: TSubShellFolder); overload;
+    procedure PopulateSubDirs(FRelativeFolder: TSubShellFolder);
     procedure ExecuteCommandExif(Verb: string; var Handled: boolean);
     procedure CommandCompletedExif(Verb: String; Succeeded: Boolean);
     procedure ShellListOnGenerateReady(Sender: TObject);
@@ -163,7 +162,7 @@ type
 implementation
 
 uses System.Win.ComObj, System.UITypes,
-     Vcl.ImgList,
+     Vcl.ImgList, Winapi.ActiveX,
      ExifToolsGUI_Utils, ExifToolsGui_ThreadPool, ExifToolsGui_FileListColumns,
      UnitFilesOnClipBoard, UnitLangResources, UFrmGenerate;
 
@@ -368,7 +367,10 @@ begin
         SetString(Result, SD.str.cStr, lStrLenA(SD.str.cStr));
       STRRET_WSTR:
         if Assigned(SD.str.pOleStr) then
+        begin
           Result := SD.str.pOleStr;
+          CoTaskMemFree(SD.str.pOleStr);
+        end
     end;
 end;
 
@@ -414,93 +416,100 @@ end;
 
 procedure TShellListView.ColumnSort;
 var
-  CustomSortNeeded: boolean;
+  LocalCustomSortNeeded: boolean;
+  LocalDescending: boolean;
+  LocalIncludeSubFolders: boolean;
+  LocalCompareColumn: integer;
   TempColumn: integer;
-  CompareColumn: integer;
 begin
-  if (FColumnSorted) then
+  // Need to sort on column?
+  if (ColumnSorted = false) then
+    exit;
+
+  // When Including subfolders the file is display as a relative path. Requires special sorting.
+  LocalIncludeSubFolders := IncludeSubFolders;
+
+  // Sorting column
+  if (SortColumn < Columns.Count) then
+    SetListHeaderSortState(Self, Columns[SortColumn], FSortState);
+  LocalDescending := (SortState = THeaderSortState.hssDescending);
+
+  // Custom sort?
+  LocalCustomSortNeeded := ((FDoDefault = false) and (SortColumn <> 0)) or  // A column from the non standard list, not name.
+                            (LocalIncludeSubFolders and (SortColumn = 0));  // Including subfolders, need to sort on the relative name
+
+  // Is the sort field from the non standard list a system field?
+  // Better to use the standard compare. EG: Size sorts wrong as text, because 'Bytes, KB, MB'
+  LocalCompareColumn := SortColumn;
+  if (FDoDefault = false) and
+     (LocalCompareColumn > 0) and
+     (LocalCompareColumn < Columns.Count) then      // When not in vsReport mode
   begin
-    if (SortColumn < Columns.Count) then
-      SetListHeaderSortState(Self, Columns[SortColumn], FSortState);
-
-    // Custom sort?
-    CustomSortNeeded := ((FDoDefault = false) and (SortColumn <> 0)) or // A column from the non standard list, not name.
-                         (FIncludeSubFolders and (SortColumn = 0));     // Including subfolders, need to sort on the relative name
-
-
-    // Is the sort field from the non standard list a system field?
-    // Better to use the standard compare. EG: Size sorts wrong as text, because 'Bytes, KB, MB'
-    CompareColumn := SortColumn;
-    if (FDoDefault = false) and
-       (CompareColumn > 0) and
-       (CompareColumn < Columns.Count) then      // When not in vsReport mode
+    TempColumn := Columns[LocalCompareColumn].Tag -1;
+    if (TempColumn > 0) and
+       (TempColumn <= High(ColumnDefs)) and
+       ((ColumnDefs[TempColumn].Options and toSys) = toSys) then   // Yes, a system field
     begin
-      TempColumn := Columns[CompareColumn].Tag -1;
-      if (TempColumn > 0) and
-         (TempColumn <= High(ColumnDefs)) and
-         ((ColumnDefs[TempColumn].Options and toSys) = toSys) then   // Yes. a system field
-      begin
-        CompareColumn := StrToIntDef(ColumnDefs[TempColumn].Command, 0);
-        CustomSortNeeded := false;
-      end;
+      LocalCompareColumn := StrToIntDef(ColumnDefs[TempColumn].Command, 0);
+      LocalCustomSortNeeded := false;
     end;
+  end;
 
-    // Need to get all details?
-    if (CustomSortNeeded) and
-       (CompareColumn <> 0) then
-      GetAllFileListColumns(Self, FrmGenerate);
+  // Need to get all details? GetAllFileListColumns uses multi-threading to get the data.
+  if (LocalCustomSortNeeded) and
+     (LocalCompareColumn <> 0) then
+    GetAllFileListColumns(Self, FrmGenerate);
 
-    // Use an anonymous method. So we can test for FDoDefault, CompareColumn and SortState
-    // See also method ListSortFunc in Vcl.Shell.ShellCtrls.pas
-    FoldersList.SortList(
-      function(Item1, Item2: Pointer): integer
-      const
-        R: array [boolean] of Byte = (0, 1);
-
-       begin
-        result := R[TSubShellFolder.GetIsFolder(Item2)] - R[TSubShellFolder.GetIsFolder(Item1)];
-        if (result = 0) then
+  // Use an anonymous method. So we can test for FDoDefault, CompareColumn and SortState
+  // Use only 'local variables' within this procedure
+  // See also method ListSortFunc in Vcl.Shell.ShellCtrls.pas
+  FoldersList.SortList(
+    function(Item1, Item2: Pointer): integer
+    const
+      R: array [boolean] of Byte = (0, 1);
+    begin
+      result := R[TSubShellFolder.GetIsFolder(Item2)] - R[TSubShellFolder.GetIsFolder(Item1)];
+      if (result = 0) then
+      begin
+        if (LocalCustomSortNeeded) then
         begin
-          if (CustomSortNeeded) then
-          begin
-            if (CompareColumn = 0) then // Compare the relative name, not just the filename.
-              result := CompareText(TSubShellFolder.GetRelativeSortName(Item1), TSubShellFolder.GetRelativeSortName(Item2),
-                                    TLocaleOptions.loInvariantLocale)
-            else
-            begin // Compare the values from DetailStrings. Always text.
-              if (CompareColumn <= TShellFolder(Item1).DetailStrings.Count) and
-                 (CompareColumn <= TShellFolder(Item2).DetailStrings.Count) then
-                result := CompareText(TShellFolder(Item1).Details[CompareColumn], TShellFolder(Item2).Details[CompareColumn],
-                                      TLocaleOptions.loInvariantLocale);
-            end;
-          end
-          else
-          begin // Use the standard compare
-            if (TShellFolder(Item1).ParentShellFolder <> nil) then
-              result := Smallint(TShellFolder(Item1).ParentShellFolder.CompareIDs(CompareColumn,
-                                                                                  TShellFolder(Item1).RelativeID,
-                                                                                  TShellFolder(Item2).RelativeID));
-          end;
-        end;
-
-        // Sort on Filename (Column 0), within CompareColumn
-        if (result = 0) and
-           (CompareColumn <> 0) then
-        begin
-          if (FIncludeSubFolders) then
+          if (LocalCompareColumn = 0) then // Compare the relative name, not just the filename.
             result := CompareText(TSubShellFolder.GetRelativeSortName(Item1), TSubShellFolder.GetRelativeSortName(Item2),
                                   TLocaleOptions.loInvariantLocale)
           else
-            result := Smallint(TShellFolder(Item1).ParentShellFolder.CompareIDs(0,
+          begin // Compare the values from DetailStrings. Always text.
+            if (LocalCompareColumn <= TShellFolder(Item1).DetailStrings.Count) and
+               (LocalCompareColumn <= TShellFolder(Item2).DetailStrings.Count) then
+              result := CompareText(TShellFolder(Item1).Details[LocalCompareColumn], TShellFolder(Item2).Details[LocalCompareColumn],
+                                    TLocaleOptions.loInvariantLocale);
+          end;
+        end
+        else
+        begin // Use the standard compare
+          if (TShellFolder(Item1).ParentShellFolder <> nil) then
+            result := Smallint(TShellFolder(Item1).ParentShellFolder.CompareIDs(LocalCompareColumn,
                                                                                 TShellFolder(Item1).RelativeID,
                                                                                 TShellFolder(Item2).RelativeID));
         end;
+      end;
 
-        // Reverse order
-        if (SortState = THeaderSortState.hssDescending) then
-          result := result * -1;
-      end);
-  end;
+      // Sort on Filename (Column 0), within CompareColumn
+      if (result = 0) and
+         (LocalCompareColumn <> 0) then
+      begin
+        if (LocalIncludeSubFolders) then
+          result := CompareText(TSubShellFolder.GetRelativeSortName(Item1), TSubShellFolder.GetRelativeSortName(Item2),
+                                TLocaleOptions.loInvariantLocale)
+        else
+          result := Smallint(TShellFolder(Item1).ParentShellFolder.CompareIDs(0,
+                                                                              TShellFolder(Item1).RelativeID,
+                                                                              TShellFolder(Item2).RelativeID));
+      end;
+
+      // Reverse order
+      if (LocalDescending) then
+        result := result * -1;
+    end);
 end;
 
 // Copy files to clipboard
@@ -659,13 +668,9 @@ begin
 end;
 
 procedure TShellListView.EnumColumns;
-var
-  MustLockWindow: boolean;
 begin
-  MustLockWindow := (not FDoDefault) or
-                    (FColumnSorted);
-  if (MustLockWindow) then
-    SendMessage(Handle, WM_SETREDRAW, 0, 0);
+  SendMessage(Handle, WM_SETREDRAW, 0, 0);
+
   try
     if (FDoDefault) then
       inherited;
@@ -704,11 +709,8 @@ begin
 
     end;
   finally
-    if (MustLockWindow) then
-    begin
-      SendMessage(Handle, WM_SETREDRAW, 1, 0);
-      Invalidate; // Creates new window handle!
-    end;
+    SendMessage(Handle, WM_SETREDRAW, 1, 0);
+    Invalidate; // Creates new window handle!
   end;
 end;
 
@@ -837,14 +839,14 @@ begin
     ShellTreeView.Refresh(ShellTreeView.Selected);
 end;
 
-procedure TShellListView.PopulateSubDirs(FRootFolder, FRelativeFolder: TSubShellFolder);
+procedure TShellListView.PopulateSubDirs(FRelativeFolder: TSubShellFolder);
 var
   ID: PItemIDList;
   EnumList: IEnumIDList;
   NumIDs: LongWord;
   HR: HResult;
   CanAdd: Boolean;
-  NewFolder: IShellFolder;
+  NewShellFolder: IShellFolder;
   NewRelativeFolder: TSubShellFolder;
 begin
   if (FRelativeFolder.ShellFolder = nil) then
@@ -861,19 +863,20 @@ begin
   begin
     if boolean(SendMessage(FrmGenerate.Handle, CM_WantsToClose, 0, 0)) then
       exit;
+    NewShellFolder := GetIShellFolder(FRelativeFolder.ShellFolder, ID);
+    NewRelativeFolder := TSubShellFolder.Create(FRelativeFolder, ID, NewShellFolder);
+    CoTaskMemFree(ID);
 
-    NewFolder := GetIShellFolder(FRelativeFolder.ShellFolder, ID);
-    NewRelativeFolder := TSubShellFolder.Create(FRelativeFolder, ID, NewFolder);
-    NewRelativeFolder.FRelativePath := FRelativeFolder.FRelativePath;
     if (TSubShellFolder.GetIsFolder(NewRelativeFolder)) then
     begin
-      NewRelativeFolder.FRelativePath := IncludeTrailingPathDelimiter(NewRelativeFolder.FRelativePath) +
+      NewRelativeFolder.FRelativePath := IncludeTrailingPathDelimiter(FRelativeFolder.FRelativePath) +
                                          TSubShellFolder.GetName(NewRelativeFolder, TRelativeNameType.rnFile);
-
-      PopulateSubDirs(FRootFolder, NewRelativeFolder);
+      PopulateSubDirs(NewRelativeFolder);
       FHiddenFolders.Add(NewRelativeFolder); // We dont want subfoldernames visible. But keep a reference, so we can free them
       Continue;
     end;
+
+    NewRelativeFolder.FRelativePath := FRelativeFolder.FRelativePath;
 
     CanAdd := True;
     if Assigned(OnAddFolder) then OnAddFolder(Self, NewRelativeFolder, CanAdd);
@@ -883,11 +886,6 @@ begin
     else
       NewRelativeFolder.Free;
   end;
-end;
-
-procedure TShellListView.PopulateSubDirs(FRootFolder: TSubShellFolder);
-begin
-  PopulateSubDirs(FRootFolder, FRootFolder);
 end;
 
 procedure TShellListView.Populate;
