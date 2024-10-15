@@ -627,7 +627,7 @@ begin
     if (ASelected) then
       result := FStyleServices.GetSystemColor(clHighlight)
     else
-      result := FStyleServices.GetStyleColor(TStyleColor.scWindow);
+      result := FStyleServices.GetSystemColor(clWindow);
   end
   else
   begin
