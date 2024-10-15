@@ -607,9 +607,9 @@ begin
   if Assigned(FStyleServices) then
   begin
     if (ASelected) then
-      result := FStyleServices.GetStyleFontColor(TStyleFont.sfListItemTextSelected)
+      result := FStyleServices.GetStyleFontColor(TStyleFont.sfButtonTextFocused)
     else
-      result := FStyleServices.GetStyleFontColor(TStyleFont.sfListItemTextNormal);
+      result := FStyleServices.GetStyleFontColor(TStyleFont.sfButtonTextNormal);
   end
   else
   begin
@@ -710,7 +710,8 @@ begin
     inc(FBreadcrumbRects[i].Right, DpiScale(SEP_PADDING));
 
 // Background breadcrumb
-    Canvas.Brush.Color := GetButtonColor(FBreadcrumbStates[i]);
+//    Canvas.Brush.Color := GetButtonColor(FBreadcrumbStates[i]);
+    Canvas.Brush.Color := GetBackColor(FBreadcrumbStates[i]  <> rsNormal);
     Canvas.Brush.Style := bsSolid;
     FillRect(Canvas.Handle,
       FBreadcrumbRects[i],
