@@ -194,6 +194,10 @@ type
     Csv1: TMenuItem;
     SpbRecord: TSpeedButton;
     Json1: TMenuItem;
+    TbFlSelect: TToolButton;
+    SelectMenu: TPopupMenu;
+    Selectall2: TMenuItem;
+    Selectnone2: TMenuItem;
     procedure ShellListClick(Sender: TObject);
     procedure ShellListKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
     procedure SpeedBtnExifClick(Sender: TObject);
@@ -324,6 +328,10 @@ type
     procedure Csv1Click(Sender: TObject);
     procedure SpbRecordClick(Sender: TObject);
     procedure Json1Click(Sender: TObject);
+    procedure Selectall1Click(Sender: TObject);
+    procedure Selectnone1Click(Sender: TObject);
+    procedure Selectall2Click(Sender: TObject);
+    procedure Selectnone2Click(Sender: TObject);
   private
     { Private declarations }
     ETBarSeriesFocal: TBarSeries;
@@ -340,6 +348,7 @@ type
     procedure ShowPreview;
     procedure RestoreGUI;
     procedure ShellListSetFolders;
+    procedure SelectAll;
     procedure EnableMenus(Enable: boolean);
     procedure EnableMenuItems;
 
@@ -486,6 +495,7 @@ begin
   try
     GUIsettings.FilterSel := 0;
     ShellList.IncludeSubFolders := false;
+    SetCaptionAndImage;
     ShellList.Refresh;
   finally
     ShellList.Enabled := true;
@@ -1468,7 +1478,7 @@ begin
     if GUIsettings.DefExportUse then
       InitialDir := GUIsettings.DefExportDir
     else
-      InitialDir := WrkIniDir;
+      InitialDir := ShellList.Path;
     Filter := 'Json file|*.json';
     Title := 'Export';
     if Execute then
@@ -2488,6 +2498,16 @@ begin
     EditETdirect.SetFocus;
 end;
 
+procedure TFMain.Selectnone1Click(Sender: TObject);
+begin
+  ShellList.ClearSelection;
+end;
+
+procedure TFMain.Selectnone2Click(Sender: TObject);
+begin
+  ShellList.ClearSelection;
+end;
+
 procedure TFMain.AlignStatusBar;
 begin
   StatusBar.Panels[0].Width := AdvPageBrowse.Width + Splitter1.Width;
@@ -2537,7 +2557,8 @@ var
       result.RadioItem := true;
     end;
     result.Checked := ACheck;
-    result.OnDrawItem := FilterPopupDrawItem;
+    if (GUIsettings.GuiStyle <> cSystemStyleName) then
+      result.OnDrawItem := FilterPopupDrawItem;
     result.OnClick := FilterPopupClick;
     P.Items.Add(result);
   end;
@@ -2587,7 +2608,8 @@ var
       result.RadioItem := true;
     end;
     result.Checked := ACheck;
-    result.OnDrawItem := ViewPopupDrawItem;
+    if (GUIsettings.GuiStyle <> cSystemStyleName) then
+      result.OnDrawItem := ViewPopupDrawItem;
     result.OnClick := ViewPopupClick;
     P.Items.Add(result);
   end;
@@ -3212,16 +3234,7 @@ procedure TFMain.ShellListKeyDown(Sender: TObject; var Key: Word; Shift: TShiftS
 
 begin
   if (Key = Ord('A')) and (ssCTRL in Shift) then // Ctrl+A
-  begin
-    FrmGenerate.Show;
-    SendMessage(FrmGenerate.Handle, CM_SubFolderSort, ShellList.Items.Count, LPARAM(ShellList.Path));
-    try
-      GetAllFileListColumns(ShellList, FrmGenerate);
-    finally
-      FrmGenerate.Close;
-    end;
-    ShellList.SelectAll;
-  end;
+    SelectAll;
   if (Key = Ord('C')) and (ssCTRL in Shift) then // Ctrl+C
     ShellList.FileNamesToClipboard;
   if (Key = Ord('X')) and (ssCTRL in Shift) then // Ctrl+X
@@ -3410,6 +3423,28 @@ procedure TFMain.ShellTreeAfterContext(Sender: TObject);
 begin
   if (ValidDir(ShellList.Path)) then
     ET.StayOpen(ShellList.Path);
+end;
+
+procedure TFMain.SelectAll;
+begin
+  FrmGenerate.Show;
+  SendMessage(FrmGenerate.Handle, CM_SubFolderSort, ShellList.Items.Count, LPARAM(ShellList.Path));
+  try
+    GetAllFileListColumns(ShellList, FrmGenerate);
+  finally
+    FrmGenerate.Close;
+  end;
+  ShellList.SelectAll;
+end;
+
+procedure TFMain.Selectall1Click(Sender: TObject);
+begin
+  SelectAll;
+end;
+
+procedure TFMain.Selectall2Click(Sender: TObject);
+begin
+  SelectAll;
 end;
 
 procedure TFMain.SetCaption(AnItem: string = '');
@@ -3835,6 +3870,8 @@ begin
   if Assigned(FStyleServices) then
     GUIColorWindow := FStyleServices.GetStyleColor(scWindow);
   BreadcrumbBar.Style := GUIsettings.GuiStyle;
+  BreadcrumbBar.Color := GUIColorWindow;
+
   ShellList.BkColor := GUIColorWindow;
 end;
 
@@ -3865,7 +3902,7 @@ begin
     if GUIsettings.DefExportUse then
       InitialDir := GUIsettings.DefExportDir
     else
-      InitialDir := WrkIniDir;
+      InitialDir := ShellList.Path;
     Filter := 'Csv file|*.csv';
     Title := 'Export';
     if Execute then
@@ -3874,3 +3911,4 @@ begin
 end;
 
 end.
+
