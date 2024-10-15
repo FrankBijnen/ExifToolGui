@@ -672,6 +672,9 @@ begin
   SendMessage(Handle, WM_SETREDRAW, 0, 0);
 
   try
+    Selected := nil;
+    ItemFocused := nil;
+    ClearSelection;
     if (FDoDefault) then
       inherited;
 

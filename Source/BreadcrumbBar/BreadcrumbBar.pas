@@ -76,6 +76,7 @@ type
   protected
     procedure Click; override;
     procedure DoExit; override;
+    procedure WMKeyUp(var Msg: TMessage); message WM_KEYUP;
     procedure DoClose;
     function GetCallerText: string;
     procedure DoGetDataObject(Control: TWinControl; Index: Integer; var DataObject: TObject);
@@ -376,12 +377,14 @@ end;
 procedure TCustomBreadcrumbBar.ArrowItemClick(Sender: TObject);
 begin
   if Assigned(FOnBreadcrumbListItemClick) then
+  begin
     if Sender is TMenuItem then
       with Sender as TMenuItem do
         FOnBreadcrumbListItemClick(Self, Tag shr 16, Word(Tag));
     if Sender is TPopupListbox then
       with Sender as TPopupListbox do
         FOnBreadcrumbListItemClick(Self, BreadCrumbIndex, ItemIndex);
+  end;
 end;
 
 function TCustomBreadcrumbBar.MakeDefaultText: string;
@@ -695,7 +698,7 @@ begin
 
   // Draw background, with a border
   r := ClientRect;
-  Canvas.Brush.Color := GetBackColor;
+  Canvas.Brush.Color := Color;
   Canvas.FillRect(r);
 
   Canvas.Pen.Color := GetBorderColor;
@@ -865,7 +868,8 @@ begin
 
   if Assigned(FOnSelect) then
     FOnSelect(Self);
-  DoClose;
+
+  ClosePopup;
 end;
 
 procedure TPopupListbox.DoExit;
@@ -873,6 +877,19 @@ begin
   inherited;
 
   DoClose;
+end;
+
+procedure TPopupListbox.WMKeyUp(var Msg: TMessage);
+begin
+  case Msg.WParam of
+    VK_ESCAPE:
+      begin
+        ClosePopup;
+        Msg.Result := 0;
+      end;
+  end;
+
+  inherited;
 end;
 
 procedure TPopupListbox.DoClose;
@@ -1013,7 +1030,7 @@ end;
 procedure TPopupListBox.ClosePopup;
 begin
   if Assigned(Parent) then
-    SendMessage(Self.Handle, CM_EXIT, 0, 0);
+    PostMessage(Self.Handle, CM_EXIT, 0, 0);
 end;
 
 { TDirBreadcrumbBar }
