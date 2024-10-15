@@ -112,7 +112,7 @@ const
   (
     (Command: '-IFD0:Model';                                                    XlatedCaption: @StrFLModel),
     (Command: '-exifIFD:LensModel';                                             XlatedCaption: @StrFLLensModel),
-    (Command: '-exifIFD:ExposureTime';          AlignR: 6;                      XlatedCaption: @StrFLExpTime),
+    (Command: '-exifIFD:ExposureTime';          AlignR: 7;                      XlatedCaption: @StrFLExpTime),
     (Command: '-exifIFD:FNumber';               AlignR: 4;                      XlatedCaption: @StrFLFNumber),
     (Command: '-exifIFD:ISO';                   AlignR: 5;                      XlatedCaption: @StrFLISO),
     (Command: '-exifIFD:ExposureCompensation';  AlignR: 4;  Options: toDecimal; XlatedCaption: @StrFLExpComp),
