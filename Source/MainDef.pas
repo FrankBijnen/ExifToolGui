@@ -964,6 +964,9 @@ begin
         // Standard, Camera, Location, About and UserDef settings
         WriteFileListColumns(GUIini);
 
+        // Write Et Direct commands
+        WriteETDirectCmds(CBoxETdirect, GuiIni);
+
         // Workspace tags
         WriteWorkSpaceTags(GUIini);
 

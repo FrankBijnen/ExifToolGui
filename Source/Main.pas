@@ -1943,7 +1943,6 @@ end;
 
 procedure TFMain.ExecETEvent_Done(ExecNum: word; EtCmds, EtOuts, EtErrs, StatusLine: string; PopupOnError: boolean);
 var
-  Indx: Integer;
   ErrStatus: string;
 begin
   with FLogWin do
@@ -1965,40 +1964,26 @@ begin
     if (Showing) and
        ((ChkShowAll.Checked) or (ErrStatus <> '-')) then
     begin
-      Indx := NextLogId;
-      FExecs[Indx] := Format(StrExecuteDSUpdat, [ExecNum, TimeToStr(now), ErrStatus]);
-      FCmds[Indx] := EtCmds;
-      FEtOuts[Indx] := EtOuts;
-      FEtErrs[Indx] := EtErrs;
-
-      LBExecs.Items.Assign(Fexecs);
-      LBExecs.ItemIndex := Indx;
-      LBExecsClick(LBExecs);
+      AddToLog(Format(StrExecuteDSUpdat, [ExecNum, TimeToStr(now), ErrStatus]),
+               EtCmds, EtOuts, EtErrs);
     end;
   end;
 end;
 
 procedure TFmain.ExecRestEvent_Done(Url, Response: string; Succes: boolean);
 var
-  Indx: integer;
   ErrStatus: string;
 begin
   with FLogWin do
   begin
     if (Showing) then
     begin
-      Indx := NextLogId;
       if (Succes) then
         ErrStatus := StrOk
       else
         ErrStatus := StrNOTOk;
-      FExecs[Indx] := Format(StrRestRequestSUpd, [TimeToStr(now), ErrStatus]);
-      FCmds[Indx] := Url;
-      FEtOuts[Indx] := Response;
-
-      LBExecs.Items.Assign(Fexecs);
-      LBExecs.ItemIndex := Indx;
-      LBExecsClick(LBExecs);
+      AddToLog(Format(StrRestRequestSUpd, [TimeToStr(now), ErrStatus]),
+               Url, Response);
     end;
   end;
 end;
