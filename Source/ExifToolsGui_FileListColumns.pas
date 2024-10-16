@@ -308,8 +308,6 @@ var
   AColumnDefs: TColumnsArray;
   AOptions: TReadModeOptions;
 begin
-  DebugMsg(['GetFileListColumns', ItemIndex]);
-
   AFolder := AShellList.Folders[ItemIndex];
   AOptions := AShellList.ReadModeOptions;
   AColumnDefs := AShellList.ColumnDefs;
@@ -470,18 +468,12 @@ var
 begin
   SaveEnabled := AShellList.Enabled;
   AShellList.Enabled := false;
-
-  DebugMsg(['Shelllist disabled']);
-
   Controller := TMetaDataGetController.Create(AShellList, FrmGenerate);
   try
     Controller.GetAllMetaData;
   finally
     Controller.Free;
     AShellList.Enabled := SaveEnabled;
-
-    DebugMsg(['Shelllist enabled']);
-
   end;
 end;
 

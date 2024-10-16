@@ -62,6 +62,10 @@ function ReplaceLastChar(const AString: string; AFrom, ATo: Char): string;
 function EndsWithCRLF(const AString: string): string;
 function ArgsFromDirectCmd(const CmdIn: string): string;
 function DirectCmdFromArgs(const ArgsIn: string): string;
+function EscapeArgsForCmd(const Cmd: string): string;
+function EscapeArgsForPS(const Cmd: string): string;
+function DirectCmdFromArgsCMD(const ArgsIn: string): string;
+function DirectCmdFromArgsPS(const ArgsIn: string): string;
 procedure WriteArgsFile(const ETInp, ArgsFile: string; Preamble: boolean = false);
 
 // Date
@@ -467,12 +471,18 @@ begin
 end;
 
 function QuotedArg(FileName: string): string;
+var
+  PEqual: integer;
 begin
   Result := FileName;
   if (Pos(' ', Result) > 0) or
      (Pos('>', Result) > 0) or
      (Pos('<', Result) > 0) then
-    Result := '"' + Result + '"';
+  begin
+    PEqual := Pos('=', FileName);
+    Insert('"', Result, PEqual +1);
+    Result := Result + '"';
+  end;
 end;
 
 function ReplaceLastChar(const AString: string; AFrom, ATo: Char): string;
@@ -540,6 +550,37 @@ begin
     ArgsInList.Free;
   end;
 end;
+
+function DirectCmdFromArgsCMD(const ArgsIn: string): string;
+begin
+  result := DirectCmdFromArgs(ArgsIn);
+  result := StringReplace(result, '%', '%%', [rfReplaceAll]);
+end;
+
+function DirectCmdFromArgsPS(const ArgsIn: string): string;
+begin
+  result := DirectCmdFromArgs(ArgsIn);
+  result := StringReplace(result, '{', '`{', [rfReplaceAll]);
+  result := StringReplace(result, '}', '`}', [rfReplaceAll]);
+  result := StringReplace(result, '\"', '\`"', [rfReplaceAll]);
+end;
+
+function EscapeArgsForCmd(const Cmd: string): string;
+begin
+  // https://www.robvanderwoude.com/escapechars.php
+  result := StringReplace(Cmd,    '%', '%%', [rfReplaceAll]);
+  result := StringReplace(result, '^', '^^', [rfReplaceAll]);
+  result := StringReplace(result, '&', '^&', [rfReplaceAll]);
+  result := StringReplace(result, '<', '^<', [rfReplaceAll]);
+  result := StringReplace(result, '>', '^>', [rfReplaceAll]);
+  result := StringReplace(result, '|', '^|', [rfReplaceAll]);
+end;
+
+function EscapeArgsForPS(const Cmd: string): string;
+begin
+  result := StringReplace(Cmd, '"', '""', [rfReplaceAll]);
+end;
+
 
 function CreateTempHandle(TempFile: string): THandle;
 begin

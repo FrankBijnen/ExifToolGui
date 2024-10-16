@@ -32,6 +32,10 @@ type
     BtnCmd: TButton;
     SaveDialogCmd: TSaveDialog;
     RadShowCmds: TRadioGroup;
+    TabRestRequest: TTabSheet;
+    PnlUrl: TPanel;
+    BtnUrl: TButton;
+    MemoUrl: TMemo;
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure LBExecsClick(Sender: TObject);
@@ -40,22 +44,26 @@ type
     procedure BtnPowerShellClick(Sender: TObject);
     procedure BtnCmdClick(Sender: TObject);
     procedure RadShowCmdsClick(Sender: TObject);
+    procedure BtnUrlClick(Sender: TObject);
   private
     { Private declarations }
     LogId: Integer;
     AnsiWarned: boolean;
-    function EscapeForCmd(const Cmd: string): string;
-    function IsArgs: boolean;
-  protected
-    function GetDefWindowSizes: TRect; override;
-  public
-    { Public declarations }
     FExecs: TStringList;
     FCmds: TStringList;
     FEtOuts: TStringList;
     FEtErrs: TStringList;
-
+    procedure SetMemoCmdsOrUrls;
+    function IsArgs: boolean;
+    procedure AddToLog(const AExec, ACmd, AOut, AErr: string; Index: integer; IsArgs: boolean); overload;
     function NextLogId: integer;
+    procedure WarnAnsi;
+  protected
+    function GetDefWindowSizes: TRect; override;
+  public
+    { Public declarations }
+    procedure AddToLog(const AExec, ACmd, AOut, AErr: string); overload;
+    procedure AddToLog(const AExec, ACmd, AOut: string); overload;
   end;
 
 var
@@ -65,70 +73,96 @@ implementation
 
 uses Main, MainDef, ExifToolsGUI_Utils, Winapi.ShellAPI, UnitLangResources;
 
-
 {$R *.dfm}
+
+const
+  MaxLogLines = 10;
 
 function TFLogWin.GetDefWindowSizes: TRect;
 begin
-  result := Rect(108, 106, 580, 580);
+  result := Rect(108, 106, 800, 640);
 end;
 
 function TFLogWin.IsArgs: boolean;
 begin
   result := true;
-  if (LBExecs.ItemIndex >= 0 ) then
-    result := (Pos(#10, FCmds[LBExecs.ItemIndex]) > 0);
+  if (LBExecs.ItemIndex < 0) or
+     (LBExecs.ItemIndex > FExecs.Count -1) then
+    exit;
+
+  result := boolean(FExecs.Objects[LBExecs.ItemIndex]);
 end;
 
 function TFLogWin.NextLogId: integer;
 begin
   inc(LogId);
-  if (LogId > 9) then
+  if (LogId > (MaxLogLines -1)) then
     LogId := 0;
   result := LogId;
 end;
 
-procedure TFLogWin.RadShowCmdsClick(Sender: TObject);
+procedure TFLogWin.AddToLog(const AExec, ACmd, AOut, AErr: string; Index: integer; IsArgs: boolean);
 begin
-  if (LBExecs.ItemIndex < 0) then
+  FExecs.Objects[Index] := Pointer(IsArgs);
+  FExecs[Index] := AExec;
+  FCmds[Index] := ACmd;
+  FEtOuts[Index] := AOut;
+  FEtErrs[Index] := AErr;
+
+  LBExecs.Items.Assign(Fexecs);
+  LBExecs.ItemIndex := Index;
+  LBExecsClick(LBExecs);
+end;
+
+// Url
+procedure TFLogWin.AddToLog(const AExec, ACmd, AOut: string);
+begin
+  AddToLog(AExec, ACmd, AOut, '', NextLogId, false);
+end;
+
+// Args
+procedure TFLogWin.AddToLog(const AExec, ACmd, AOut, AErr: string);
+begin
+  AddToLog(AExec, ACmd, AOut, AErr, NextLogId, true);
+end;
+
+procedure TFLogWin.SetMemoCmdsOrUrls;
+begin
+  TabRestRequest.TabVisible := not IsArgs;
+  TabCommands.TabVisible :=  IsArgs;
+
+  if (LBExecs.ItemIndex < 0) or
+     (LBExecs.ItemIndex > FCmds.Count -1) then
     exit;
-  case RadShowCmds.ItemIndex of
-    0:
-      begin
-        MemoCmds.WordWrap := false;
-        BtnCmd.Enabled := true;
-        if IsArgs then
-          MemoCmds.Text := FCmds[LBExecs.ItemIndex]
-        else
-          MemoCmds.Text := ArgsFromDirectCmd(FCmds[LBExecs.ItemIndex]);
-      end;
-    1:
-      begin
-        if not AnsiWarned then
-        begin
-          AnsiWarned := true;
-          ShowMessage(StrThisMethodOnlyAnsi);
-        end;
-        MemoCmds.WordWrap := true;
-        BtnCmd.Enabled := true;
-        if not IsArgs then
-          MemoCmds.Text := FCmds[LBExecs.ItemIndex]
-        else
-          MemoCmds.Text := DirectCmdFromArgs(FCmds[LBExecs.ItemIndex]);
-      end;
+
+  if (IsArgs) then
+  begin
+    case RadShowCmds.ItemIndex of
+      0: MemoCmds.Text := FCmds[LBExecs.ItemIndex];
+      1: MemoCmds.Text := DirectCmdFromArgs(FCmds[LBExecs.ItemIndex])
+    end;
+  end
+  else
+    MemoUrl.Text := FCmds[LBExecs.ItemIndex];
+end;
+
+procedure TFLogWin.WarnAnsi;
+begin
+  if (RadShowCmds.ItemIndex = 1) and
+     not AnsiWarned then
+  begin
+    AnsiWarned := true;
+    ShowMessage(StrThisMethodOnlyAnsi);
   end;
 end;
 
-function TFLogWin.EscapeForCmd(const Cmd: string): string;
+procedure TFLogWin.RadShowCmdsClick(Sender: TObject);
 begin
-  // Need some escaping.
-  // https://www.robvanderwoude.com/escapechars.php
-  result := StringReplace(Cmd,    '%', '%%', [rfReplaceAll]);
-  result := StringReplace(result, '^', '^^', [rfReplaceAll]);
-  result := StringReplace(result, '&', '^&', [rfReplaceAll]);
-  result := StringReplace(result, '<', '^<', [rfReplaceAll]);
-  result := StringReplace(result, '>', '^>', [rfReplaceAll]);
-  result := StringReplace(result, '|', '^|', [rfReplaceAll]);
+  case RadShowCmds.ItemIndex of
+    0: MemoCmds.WordWrap := false;
+    1: MemoCmds.WordWrap := true;
+  end;
+  SetMemoCmdsOrUrls;
 end;
 
 procedure TFLogWin.BtnCmdClick(Sender: TObject);
@@ -136,6 +170,7 @@ var
    CmdList: TStringList;
    ACmd: string;
 begin
+  WarnAnsi;
   SaveDialogCmd.FileName := '';
   SaveDialogCmd.InitialDir := Fmain.ShellList.Path;
   if not SaveDialogCmd.Execute then
@@ -151,7 +186,7 @@ begin
       CmdList.Add('(');
       CmdList.Add('echo #### Generated by ExifToolGui #####');
       for ACmd in MemoCmds.Lines do // Need WordWrap set to false for this.
-        CmdList.Add(Format('echo %s', [EscapeForCmd(ACmd)]));
+        CmdList.Add(Format('echo %s', [EscapeArgsForCmd(ACmd)]));
       CmdList.Add(') > %ARGS%');
       CmdList.Add('exiftool ' + GUIsettings.GetCustomConfig + ' -@ %ARGS%');
       {$IFDEF DEBUG}
@@ -161,7 +196,8 @@ begin
       {$ENDIF}
     end
     else
-      CmdList.Add('exiftool ' + GUIsettings.GetCustomConfig + ' ' + StringReplace(MemoCmds.Text, '%', '%%', [rfReplaceAll]));
+      CmdList.Add('exiftool ' + GUIsettings.GetCustomConfig + ' ' +
+                  DirectCmdFromArgsCmd(FCmds[LBExecs.ItemIndex]));
 
     CmdList.Add('pause');
     WriteArgsFile(CmdList.Text, SaveDialogCmd.FileName);
@@ -185,6 +221,7 @@ var
    PSList: TStringList;
    ACmd: string;
 begin
+  WarnAnsi;
   SaveDialogPS.FileName := '';
   SaveDialogPS.InitialDir := Fmain.ShellList.Path;
   if not SaveDialogPS.Execute then
@@ -225,16 +262,15 @@ begin
       PSList.Add('}');
       PSList.Add('Set-Content -Encoding UTF8 -Path $args -Value "#### Generated by ExifToolGui #####"');
       for ACmd in MemoCmds.Lines do // Need WordWrap set to false for this.
-        PSList.Add(Format('Add-Content -Path $args -Value "%s"', [ACmd]));
+        PSList.Add(Format('Add-Content -Path $args -Value "%s"', [EscapeArgsForPS(ACmd)]));
       PSList.Add('#echo4 triggers NativeCommand exception. ==>> 2>&1 | %{"$_"} <<= redirects Stderr to Stdout');
       PSList.Add('exiftool ' + GUIsettings.GetCustomConfig + ' -@ $args 2>&1 | %{"$_"}');
       PSList.Add('Remove-Item -Path $args');
     end
     else
-    begin
-      ACmd := StringReplace(StringReplace(MemoCmds.Text, '}', '`}', [rfReplaceAll]), '{', '`{', [rfReplaceAll]);
-      PSList.Add('exiftool ' + GUIsettings.GetCustomConfig + ' ' + ACmd + ' 2>&1 | %{"$_"}');
-    end;
+      PSList.Add('exiftool ' + GUIsettings.GetCustomConfig + ' ' +
+                 DirectCmdFromArgsPS(FCmds[LBExecs.ItemIndex]) +
+                 ' 2>&1 | %{"$_"}');
 
     PSList.Add('pause');
     WriteArgsFile(PSList.Text, SaveDialogPS.FileName, (RadShowCmds.ItemIndex = 0));
@@ -247,22 +283,27 @@ begin
                           PWideChar(Fmain.ShellList.Path), SW_SHOWNORMAL);
 end;
 
+procedure TFLogWin.BtnUrlClick(Sender: TObject);
+begin
+  ShellExecute(0, 'Open', PWideChar(MemoUrl.Text), '', '', SW_SHOWNORMAL);
+end;
+
 procedure TFLogWin.FormCreate(Sender: TObject);
 begin
   ReadFormSizes(Self, Self.DefWindowSizes);
 
-// Note to fill the stringlists with 10 empty lines
+// Note to fill the stringlists with MaxLogLines (=10) empty lines
   FExecs := TStringList.Create;
-  FExecs.Text := StringOfChar(#10,10);
+  FExecs.Text := StringOfChar(#10, MaxLogLines);
 
   FCmds := TStringList.Create;
-  Fcmds.Text := StringOfChar(#10,10);
+  Fcmds.Text := StringOfChar(#10, MaxLogLines);
 
   FEtOuts := TStringList.Create;
-  FEtOuts.Text := StringOfChar(#10,10);
+  FEtOuts.Text := StringOfChar(#10, MaxLogLines);
 
   FEtErrs := TStringList.Create;
-  FEtErrs.Text := StringOfChar(#10,10);
+  FEtErrs.Text := StringOfChar(#10, MaxLogLines);
 
   LogId := -1;
   ChkShowAll.Checked := false;
@@ -280,17 +321,15 @@ end;
 procedure TFLogWin.FormShow(Sender: TObject);
 begin
   LBExecs.Items.Assign(FExecs);
+  SetMemoCmdsOrUrls;
 end;
 
 procedure TFLogWin.LBExecsClick(Sender: TObject);
 begin
   if (LBExecs.ItemIndex < 0) then
     exit;
-  MemoCmds.Text := FCmds[LBExecs.ItemIndex];
-  if (IsArgs) then
-    RadShowCmds.ItemIndex := 0
-  else
-    RadShowCmds.ItemIndex := 1;
+
+  SetMemoCmdsOrUrls;
   MemoOuts.Text := FEtOuts[LBExecs.ItemIndex];
   MemoErrs.Text := FEtErrs[LBExecs.ItemIndex];
 end;
@@ -304,3 +343,4 @@ begin
 end;
 
 end.
+
