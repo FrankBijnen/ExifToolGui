@@ -28,6 +28,8 @@ object FDateTimeShift: TFDateTimeShift
     Height = 19
     Panels = <>
     SimplePanel = True
+    ExplicitTop = 223
+    ExplicitWidth = 573
   end
   object AdvPanel1: TPanel
     Left = 0
@@ -44,7 +46,7 @@ object FDateTimeShift: TFDateTimeShift
     ParentDoubleBuffered = False
     ParentFont = False
     TabOrder = 1
-    ExplicitHeight = 225
+    ExplicitHeight = 223
     object Label2: TLabel
       Left = 5
       Top = 119
@@ -61,7 +63,7 @@ object FDateTimeShift: TFDateTimeShift
       Height = 14
       Alignment = taRightJustify
       AutoSize = False
-      Caption = '*DateTime result:'
+      Caption = 'DateTime result:'
     end
     object LblDebug: TLabel
       Left = 10
@@ -86,9 +88,9 @@ object FDateTimeShift: TFDateTimeShift
       Top = 10
       Width = 142
       Height = 22
-      EditLabel.Width = 105
+      EditLabel.Width = 98
       EditLabel.Height = 22
-      EditLabel.Caption = '*DateTime original:'
+      EditLabel.Caption = 'DateTime original:'
       LabelPosition = lpLeft
       ReadOnly = True
       TabOrder = 0

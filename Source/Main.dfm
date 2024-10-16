@@ -576,6 +576,7 @@ object FMain: TFMain
         List = True
         AllowTextButtons = True
         TabOrder = 0
+        ExplicitWidth = 358
         object TbFlRefresh: TToolButton
           Left = 0
           Top = 0
