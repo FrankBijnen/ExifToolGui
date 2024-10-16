@@ -247,7 +247,7 @@ begin
   try
     if (TSubShellFolder.GetIsFolder(AFolder)) then      // Dont get info for folders (directories)
     begin
-      PostProcessMethod := TPostProcess.ppFolder;       // This will allow any system fields specified
+      PostProcessMethod := TPostProcess.ppFolder;
       exit;
     end;
 
@@ -292,10 +292,11 @@ begin
     end;
 
   finally
-    PostProcess(AFolder,                                // Post Process.
-                AColumnDefs,
-                DetailStrings,
-                PostProcessMethod);
+    if (PostProcessMethod <> TPostProcess.ppFolder) then
+      PostProcess(AFolder,                              // Post Process.
+                  AColumnDefs,
+                  DetailStrings,
+                  PostProcessMethod);
   end;
 end;
 
