@@ -595,7 +595,7 @@ begin
   FEditFColumn.PrepareShow(ShellList.GetSelectedFolder(-1)); // If SelectedFolder = nil, no sample values, but it should work.
   if FEditFColumn.ShowModal = mrOK then
   begin
-    UpdateSysCaptions(ShellList.RootFolder);
+    UpdateSysColumns(ShellList.RootFolder);
     GUIsettings.DetailsSel := DmFileLists.SelectedSet -1;
     ShellList.ViewStyle := TViewStyle.vsReport;
     SetCaptionAndImage;
@@ -3089,7 +3089,7 @@ begin
   end;
 
   // Update Sys and Country Columns
-  UpdateSysCaptions(ShellList.RootFolder);
+  UpdateSysColumns(ShellList.RootFolder);
 
   SetupCountry(ColumnDefs, GeoSettings.CountryCodeLocation);
 
@@ -3411,15 +3411,20 @@ begin
 end;
 
 procedure TFMain.SelectAll;
+var
+  ClosedByUser: boolean;
 begin
   FrmGenerate.Show;
   SendMessage(FrmGenerate.Handle, CM_SubFolderSort, ShellList.Items.Count, LPARAM(ShellList.Path));
   try
     GetAllFileListColumns(ShellList, FrmGenerate);
   finally
+    ClosedByUser := boolean(SendMessage(FrmGenerate.Handle, CM_WantsToClose, 0, 0));
     FrmGenerate.Close;
   end;
-  ShellList.SelectAll;
+
+  if not ClosedByUser then
+    ShellList.SelectAll;
 end;
 
 procedure TFMain.Selectall1Click(Sender: TObject);

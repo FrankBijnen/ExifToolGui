@@ -144,9 +144,9 @@ begin
 
     // SysField ?
     if ((ATag.Options and toSys) = toSys) then
-      DetailStrings[Index] := TSubShellFolder.GetSystemField(Folder.Parent,
-                                                             Folder.RelativeID,
-                                                             ATag.GetSysColumn);
+      DetailStrings[Index] := TSubShellFolder.GetSystemField_MT(Folder.Parent,
+                                                                Folder.RelativeID,
+                                                                ATag.SysColumn);
 
     // Yes/No
     if ((ATag.Options and toYesNo) = toYesNo) then
@@ -292,11 +292,10 @@ begin
     end;
 
   finally
-    if (PostProcessMethod <> TPostProcess.ppFolder) then
-      PostProcess(AFolder,                              // Post Process.
-                  AColumnDefs,
-                  DetailStrings,
-                  PostProcessMethod);
+    PostProcess(AFolder,                                // Post Process.
+                AColumnDefs,
+                DetailStrings,
+                PostProcessMethod);
   end;
 end;
 
@@ -311,7 +310,10 @@ var
 begin
   AFolder := AShellList.Folders[ItemIndex];
   AOptions := AShellList.ReadModeOptions;
+  if (AOptions = []) then // rmSystem
+    exit;
   AColumnDefs := AShellList.ColumnDefs;
+
   MetaData := TMetaData.Create;
   try
     ProcessFolder(AFolder,
@@ -467,6 +469,8 @@ var
   SaveEnabled: boolean;
   Controller: TMetaDataGetController;
 begin
+  if (AShellList.ReadModeOptions = []) then
+    exit;
   SaveEnabled := AShellList.Enabled;
   AShellList.Enabled := false;
   Controller := TMetaDataGetController.Create(AShellList, FrmGenerate);

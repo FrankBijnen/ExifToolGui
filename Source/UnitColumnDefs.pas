@@ -38,6 +38,7 @@ type
     Command: string;
     Width: integer;
     AlignR: integer;
+    SysColumn: integer;
     Options: Word;
     function GetSysColumn: integer;
     procedure SetCaption(ACaption: string);
@@ -45,7 +46,6 @@ type
       0: (Caption: array[0..255] of WideChar);
       1: (XlatedCaption: PResStringRec);
   end;
-
   TColumnsArray = array of TFileListColumn;
 
   TColumnSet = class(TObject)
@@ -55,11 +55,11 @@ type
     FReadMode: TReadModeOptions;
     FColumnDefs: TColumnsArray;
     function GetReadModeInt: integer;
-  public
     constructor Create(AName: string;
                        AOptions: TFileListOptions;
                        AReadMode: TReadModeOptions;
                        AColumnDefs: TColumnsArray); overload;
+  public
     constructor Create(AName: string;
                        AOptions: TFileListOptions;
                        AReadMode: integer;
@@ -81,7 +81,7 @@ function GetFileListDefCount: integer;
 function GetFileListDefs: TColumnSetList;
 function GetFileListColumnDefs(Index: integer): TColumnsArray;
 procedure SetFileListColumnDefs(Index: integer; AColumnDefs: TColumnsArray);
-procedure UpdateSysCaptions(ARootFolder: TShellFolder);
+procedure UpdateSysColumns(ARootFolder: TShellFolder);
 function UnsupportedEnabled: boolean;
 
 implementation
@@ -100,11 +100,11 @@ const
   StandardId = '0';
   StandardDefaults: array [0..4] of TFileListColumn =
   (
-    (Command: '0';                              Width: 200; Options: toSys),  // Name
-    (Command: '1';                              Width: 88;  Options: toSys),  // Size
-    (Command: '2';                              Width: 80;  Options: toSys),  // File type
-    (Command: '3';                              Width: 120; Options: toSys),  // Date modified
-    (Command: '4';                              Width: 120; Options: toSys)   // Date created
+    (Command: '0';                              Width: 200; Options: toSys),            // Name
+    (Command: '1';                              Width: 88;  Options: toSys),            // Size
+    (Command: '2';                              Width: 80;  Options: toSys),            // File type
+    (Command: '3';                              Width: 120; Options: toSys),            // Date modified
+    (Command: '4';                              Width: 120; Options: toSys)             // Date created
   );
 
   CameraId = '1';
@@ -545,7 +545,7 @@ begin
     FColumnSetList[Index].ColumnDefs := AColumnDefs;
 end;
 
-procedure UpdateSysCaptions(ARootFolder: TShellFolder);
+procedure UpdateSysColumns(ARootFolder: TShellFolder);
 var
   FileDef: integer;
   Index: integer;
@@ -555,8 +555,13 @@ begin
   begin
     ColumnDefs := GetFileListDefs[FileDef].ColumnDefs;
     for Index := 0 to High(ColumnDefs) do
+    begin
       if ((ColumnDefs[Index].Options and toSys) = toSys) then
-        ColumnDefs[Index].SetCaption(TSubShellFolder.GetSystemField(ARootFolder, nil, ColumnDefs[Index].GetSysColumn));
+      begin
+        ColumnDefs[Index].SysColumn := ColumnDefs[Index].GetSysColumn;
+        ColumnDefs[Index].SetCaption(TSubShellFolder.GetSystemField(ARootFolder.Parent, nil, ColumnDefs[Index].SysColumn));
+      end;
+    end;
   end;
 end;
 
