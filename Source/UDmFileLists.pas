@@ -84,6 +84,7 @@ type
     function ShowFieldExists(AField: string; AButtons: TMsgDlgButtons = [TMsgDlgBtn.mbOK]): integer;
     function NameExists(Name: string): boolean;
     procedure LoadFromColumnSets(ASample: TShellFolder);
+    procedure ValidateSystem;
     procedure SaveToColumnSets;
     procedure WriteAllXmpTags;
     procedure Duplicate(OldId: integer; NewName: string);
@@ -589,6 +590,27 @@ begin
   AddLookUP(CdsOption, toCountry,   OptionCountry);
 end;
 
+procedure TDmFileLists.ValidateSystem;
+var
+  HasSystem: boolean;
+begin
+  HasSystem := false;
+  CdsFileListDef.First;
+  while not CdsFileListDef.Eof do
+  begin
+    if (CdsFileListDefReadMode.AsInteger = Ord(floSystem)) then
+    begin
+      if HasSystem then
+        raise Exception.Create('Only 1 readmode system allowed')
+      else
+        HasSystem := true;
+    end;
+    CdsFileListDef.Next;
+  end;
+  if not HasSystem then
+    raise Exception.Create('Need 1 readmode system');
+end;
+
 procedure TDmFileLists.SaveToColumnSets;
 var
   FileListDefs: TColumnSetList;
@@ -599,15 +621,17 @@ begin
   if (CdsColumnSet.State in [dsEdit, dsInsert]) then
     CdsColumnSet.Post;
 
+  ValidateSystem;
+
   CdsFileListDef.DisableControls;
   CdsColumnSet.DisableControls;
 
-  SelectedSet := CdsFileListDef.RecNo;
-  FileListDefs := GetFileListDefs;
-  FileListDefs.Clear;
   try
-    CdsFileListDef.First;
+    SelectedSet := CdsFileListDef.RecNo;
+    FileListDefs := GetFileListDefs;
+    FileListDefs.Clear;
 
+    CdsFileListDef.First;
     while not CdsFileListDef.Eof do
     begin
       CdsColumnSet.SetRange([CdsFileListDefId.AsInteger], [CdsFileListDefId.AsInteger]);
@@ -681,7 +705,6 @@ begin
     if Assigned(FSample) then
       TSubShellFolder.AllFastSystemFields(FSample.Parent, FSystemTagNames);
 
-    //
     PrepTagNames;
 
     FileListDefs := GetFileListDefs;

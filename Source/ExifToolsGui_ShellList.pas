@@ -43,6 +43,8 @@ type
     class procedure AllFastSystemFields(RootFolder: TShellFolder; FieldList: TStrings);
     class function SystemFieldIsDate(RootFolder: TShellFolder; Column: integer): boolean;
     class function GetSystemField(RootFolder: TShellFolder; RelativeID: PItemIDList; Column: integer): string;
+    class function GetSystemField_MT(RootFolder: TShellFolder; RelativeID: PItemIDList; Column: integer): string;
+    class function GetSystemFieldEx(RootFolder: TShellFolder; RelativeID: PItemIDList; Column: integer): string;
   end;
 
   TShellListView = class(Vcl.Shell.ShellCtrls.TShellListView, IShellCommandVerbExifTool)
@@ -116,6 +118,7 @@ type
     destructor Destroy; override;
     procedure Invalidate; override;
     procedure ClearSelection; override;
+    procedure SelectAll; override;
     procedure Refresh;
 
     procedure AddDate; // Adds next columns if it is a Date.
@@ -362,6 +365,7 @@ begin
   if Assigned(RootFolder) and
      Assigned(RootFolder.ShellFolder2) and
      (RootFolder.ShellFolder2.GetDetailsOf(RelativeID, Column, SD) = S_OK) then
+  begin
     case SD.str.uType of
       STRRET_CSTR:
         SetString(Result, SD.str.cStr, lStrLenA(SD.str.cStr));
@@ -370,8 +374,36 @@ begin
         begin
           Result := SD.str.pOleStr;
           CoTaskMemFree(SD.str.pOleStr);
-        end
+        end;
     end;
+  end;
+end;
+
+class function TSubShellFolder.GetSystemField_MT(RootFolder: TShellFolder; RelativeID: PItemIDList; Column: integer): string;
+begin
+  TMonitor.Enter(RootFolder);
+  try
+    result := TSubShellFolder.GetSystemField(RootFolder, RelativeID, Column);
+  finally
+    TMonitor.Exit(RootFolder);
+  end;
+end;
+
+class function TSubShellFolder.GetSystemFieldEx(RootFolder: TShellFolder; RelativeID: PItemIDList; Column: integer): string;
+var
+  pscid: TShColumnID;
+  pv: OleVariant;
+begin
+  result := '';
+  if Assigned(RootFolder) and
+     Assigned(RootFolder.ShellFolder2) then
+  begin
+    if (RootFolder.ShellFolder2.MapColumnToSCID(Column, pscid) = S_OK) then
+    begin
+      RootFolder.ShellFolder2.GetDetailsEx(RelativeID, pscid, @pv);
+      result := pv;
+    end;
+  end;
 end;
 
 { TShellListView }
@@ -649,6 +681,14 @@ var
 begin
   for Indx := 0 to Items.Count -1 do
     ListView_SetItemState(Handle, Indx, 0, LVIS_SELECTED);
+end;
+
+procedure TShellListView.SelectAll;
+var
+  Indx: integer;
+begin
+  for Indx := 0 to Items.Count -1 do
+    ListView_SetItemState(Handle, Indx, LVIS_SELECTED, LVIS_SELECTED);
 end;
 
 procedure TShellListView.Refresh;
