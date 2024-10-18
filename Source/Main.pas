@@ -902,13 +902,13 @@ end;
 
 procedure TFMain.MaUserDefLoadExecute(Sender: TObject);
 begin
-  if (LoadIniDialog(OpenFileDlg, TIniData.idUserDefined, false)) then
+  if (LoadIniDialog(OpenFileDlg, TIniData.idFileLists, false)) then
     EditFileLists(Sender)
 end;
 
 procedure TFMain.MaUserDefSaveExecute(Sender: TObject);
 begin
-  SaveIniDialog(SaveFileDlg, TIniData.idUserDefined, true);
+  SaveIniDialog(SaveFileDlg, TIniData.idFileLists, true);
 end;
 
 procedure TFMain.MaCustomViewLoadExecute(Sender: TObject);
@@ -2560,7 +2560,7 @@ begin
       NewMenuItem(Filters[Index], Index, 1, Img_Filter, (GUIsettings.FilterSel = Index));
 
     NewMenuItem('-',             -1, 0, Img_None);
-    NewMenuItem('Configure',     -1, 1, Img_Configure);
+    NewMenuItem(strConfigure,    -1, 1, Img_Configure);
   finally
     Filters.free;
   end;
@@ -2605,7 +2605,7 @@ begin
   P := Sender as TPopupMenu;
   P.Items.Clear;
   ImageIndex := Img_Thumb;
-  NewMenuItem('Thumbnails',   -1, 1, Img_None);
+  NewMenuItem(StrThumbnails,  -1, 1, Img_None);
   NewMenuItem('-',            -1, 0, Img_None);
 
   for ThumbSize in DefThumbNailSizes do
@@ -2613,7 +2613,7 @@ begin
                 ThumbSize, 1, ImageIndex,
                 (ShellList.ViewStyle = vsIcon) and (ShellList.ThumbNailSize = ThumbSize));
   NewMenuItem('-',            -1, 0, Img_None);
-  NewMenuItem('Details',      -1, 2, Img_None);
+  NewMenuItem(StrDetails,     -1, 2, Img_None);
   NewMenuItem('-',            -1, 0, Img_None);
 
   FileListDefs := GetFileListDefs;
@@ -2627,7 +2627,7 @@ begin
   end;
 
   NewMenuItem('-',             -1, 0, Img_None);
-  NewMenuItem('Configure',     -1, 3, Img_Configure);
+  NewMenuItem(strConfigure,    -1, 3, Img_Configure);
 end;
 
 procedure TFMain.FormAfterMonitorDpiChanged(Sender: TObject; OldDPI, NewDPI: Integer);
@@ -2958,7 +2958,7 @@ begin
 
   Application.ProcessMessages;
   FolderName := ExtractFileName(AFolder.PathName);
-  if (GUIsettings.FileFilter <> SHOWALL) then
+  if (GUIsettings.FileFilter <> StrShowAllFiles) then
   begin
     Filter := GUIsettings.FileFilter;
     FilterMatches := TSubShellFolder.GetIsFolder(AFolder);

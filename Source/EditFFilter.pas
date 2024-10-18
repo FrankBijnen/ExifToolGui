@@ -40,7 +40,7 @@ var
 
 implementation
 
-uses Main, MainDef, ExifToolsGUI_Utils;
+uses Main, MainDef, ExifToolsGUI_Utils, UnitLangResources;
 
 {$R *.dfm}
 
@@ -129,7 +129,7 @@ begin
   if LbFilter.ItemIndex > 0 then
     EdFilter.Text := LbFilter.Items[LbFilter.ItemIndex]
   else
-    EdFilter.Text := SHOWALL;
+    EdFilter.Text := StrShowAllFiles;
   EdFilter.OnChange := EdFilterChange;
 end;
 

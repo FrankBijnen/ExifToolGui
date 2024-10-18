@@ -2,9 +2,9 @@ object FEditFFilter: TFEditFFilter
   Left = 0
   Top = 0
   BorderStyle = bsDialog
-  Caption = 'Edit file filters'
-  ClientHeight = 375
-  ClientWidth = 368
+  Caption = 'Configure file filters'
+  ClientHeight = 374
+  ClientWidth = 364
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -16,8 +16,8 @@ object FEditFFilter: TFEditFFilter
   object AdvPanel1: TPanel
     Left = 0
     Top = 0
-    Width = 368
-    Height = 345
+    Width = 364
+    Height = 344
     Align = alClient
     DoubleBuffered = True
     Font.Charset = DEFAULT_CHARSET
@@ -28,8 +28,6 @@ object FEditFFilter: TFEditFFilter
     ParentDoubleBuffered = False
     ParentFont = False
     TabOrder = 0
-    ExplicitWidth = 370
-    ExplicitHeight = 344
     object EdFilter: TEdit
       Left = 39
       Top = 37
@@ -108,13 +106,11 @@ object FEditFFilter: TFEditFFilter
   end
   object Panel1: TPanel
     Left = 0
-    Top = 345
-    Width = 368
+    Top = 344
+    Width = 364
     Height = 30
     Align = alBottom
     TabOrder = 1
-    ExplicitTop = 344
-    ExplicitWidth = 370
     object BtnCancel: TBitBtn
       Left = 282
       Top = 2

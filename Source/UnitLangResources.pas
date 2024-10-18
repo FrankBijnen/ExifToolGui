@@ -10,8 +10,6 @@ resourcestring
   StrIncrement              = 'Increment';
   StrDecrement              = 'Decrement';
 
-  StrTimeOutWaitingFor      = 'Time out waiting for Event';
-
   SrCmdVerbRefresh          = 'Refresh';
   SrCmdVerbGenThumbs        = 'Generate Thumbnails';
   SrCmdVerbGenThumbsSub     = 'Generate Thumbnails (Incl Subdirs)';
@@ -133,7 +131,7 @@ resourcestring
 
   StrWorkspace              = 'Workspace';
   StrETDirect               = 'ExifTool direct';
-  StrUserDef                = 'User defined';
+  StrFileLists              = 'File lists';
   StrCustomView             = 'Custom view';
   StrPredefinedTags         = 'Predefined tags (Marked, Remove/Copy Metadata)';
 
@@ -189,7 +187,7 @@ resourcestring
   StrRemainingThumbnails    = 'Remaining Thumbnails to generate: %d';
   StrDFilesRemaining        = '%d Files remaining';
 
-  StrStandardList           = 'Standard filelist';
+  StrStandardList           = 'Standard file list';
   StrCameraList             = 'Camera settings';
   StrLocationList           = 'Location info';
   StrAboutList              = 'About photo';
@@ -220,6 +218,15 @@ resourcestring
   StrFLPersonInImage        = 'PersonInImage';
 
   StrFLPhotoTitle           = 'Photo title';
+
+  StrShowAllFiles           = 'Show All Files';
+
+  StrThumbNails             = 'Thumbnails';
+  StrDetails                = 'Details';
+  strConfigure              = 'Configure';
+  StrExistSavedFirst        = 'Existing definitions will be saved first!';
+  StrNewName                = 'New Name';
+  StrCopy                   = 'Copy';
 
 implementation
 

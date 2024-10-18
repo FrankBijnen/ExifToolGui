@@ -74,8 +74,8 @@ type
   end;
   TColumnSetList = TObjectlist<TColumnSet>;
 
-function ReadFileListColumns(LVHandle: HWND; GUIini: TMemIniFile): boolean;
-procedure WriteFileListColumns(GUIini: TMemIniFile);
+function ReadFileLists(LVHandle: HWND; GUIini: TMemIniFile): boolean;
+procedure WriteFileLists(GUIini: TMemIniFile);
 procedure ResetAllColumnWidths(LVHandle: HWND);
 function GetFileListDefCount: integer;
 function GetFileListDefs: TColumnSetList;
@@ -451,7 +451,7 @@ begin
   end;
 end;
 
-function ReadFileListColumns(LVHandle: HWND; GUIini: TMemIniFile): boolean;
+function ReadFileLists(LVHandle: HWND; GUIini: TMemIniFile): boolean;
 begin
   FColumnSetList.Clear;
   ReadStandardTags(LVHandle, GUIini);
@@ -461,7 +461,7 @@ begin
   result := (ReadUserDefTags(LVHandle, GUIini) > 0);
 end;
 
-procedure WriteFileListColumns(GUIini: TMemIniFile);
+procedure WriteFileLists(GUIini: TMemIniFile);
 var
   OldUserDefSaved: boolean;
   ColumnIndex: integer;

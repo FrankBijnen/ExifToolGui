@@ -1,7 +1,6 @@
 unit ExifToolsGui_ResourceStrings;
 
-// Note. The resources created here will show up in Better translation manager,
-//       But translation will not succeed, because ReadResourceId does not use the language DLL's.
+// Note. The resources created here will not show up in Better translation manager.
 //       This is by intention!
 
 interface

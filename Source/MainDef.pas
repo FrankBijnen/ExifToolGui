@@ -6,7 +6,6 @@ uses
   System.Classes, Winapi.Windows, Vcl.Dialogs, Vcl.ComCtrls, ExifTool, GEOMap, UnitLangResources, UnitScaleForm;
 
 const
-  SHOWALL = 'Show All Files';
 
   DefRemoveTags =
     'Exif:All ' +
@@ -71,10 +70,10 @@ const
   DefSelExcludeCopyTags = '';
 
 type
-  TIniTagsData = (idtWorkSpace, idtETDirect, idtUserDefined, idtCustomView, idtPredefinedTags,
+  TIniTagsData = (idtWorkSpace, idtETDirect, idtFileLists, idtCustomView, idtPredefinedTags,
                   idtMarked, idtRemoveTags, idtCopySingleTags, idtCopyTags);
 
-  TIniData = (idWorkSpace, idETDirect, idUserDefined, idCustomView, idPredefinedTags);
+  TIniData = (idWorkSpace, idETDirect, idFileLists, idCustomView, idPredefinedTags);
 
   GUIsettingsRec = record
     Language: string[7];
@@ -257,7 +256,7 @@ end;
 
 function GUIsettingsRec.FileFilter: string;
 begin
-  result := SHOWALL;
+  result := StrShowAllFiles;
   with TStringList.Create do
   begin
     Text := FileFilters;
@@ -691,7 +690,7 @@ begin
         Language := ReadString(Ini_Settings, 'Language', '');
         ET.Options.SetLangDef(Language);
         AutoRotatePreview := ReadBool(Ini_Settings, 'AutoRotatePreview', false);
-        FileFilters := SHOWALL + #10 +
+        FileFilters := StrShowAllFiles + #10 +
                        StringReplace(ReadString(Ini_Settings, 'FileFilters', '*.JPG|*.CR2|*.JPG;*.CR2|*.JPG;*.DNG|*.JPG;*.PEF'),
                                      '|', #10, [rfReplaceAll]);
 //TODO Decide
@@ -775,7 +774,7 @@ begin
       end;
 
       // Standard, Camera, Location, About and UserDef settings
-      ReadFileListColumns(FMain.ShellList.Handle, GUIini);
+      ReadFileLists(FMain.ShellList.Handle, GUIini);
 
       // --- ETdirect commands---
       ReadEtDirectCmds(CBoxETdirect, GUIini);
@@ -962,7 +961,7 @@ begin
         WriteString(Ini_Options, 'CustomOptions', ET.Options.ETCustomOptions);
 
         // Standard, Camera, Location, About and UserDef settings
-        WriteFileListColumns(GUIini);
+        WriteFileLists(GUIini);
 
         // Write Et Direct commands
         WriteETDirectCmds(CBoxETdirect, GuiIni);
@@ -1011,8 +1010,8 @@ begin
       result := StrWorkspace;
     TIniData.idETDirect:
       result := StrETDirect;
-    TIniData.idUserDefined:
-      result := StrUserDef;
+    TIniData.idFileLists:
+      result := StrFileLists;
     TIniData.idCustomView:
       result := StrCustomView;
     TIniData.idPredefinedTags:
@@ -1036,7 +1035,7 @@ begin
       case ThisIniTag of
         TIniTagsData.idtWorkSpace:        LoadOK := (ReadWorkSpaceTags(GuiIni) <> 0);
         TIniTagsData.idtETDirect:         LoadOK := (ReadETdirectCmds(Fmain.CBoxETdirect, GuiIni) <> 0);
-        TIniTagsData.idtUserDefined:      LoadOK := (ReadFileListColumns(FMain.ShellList.Handle, GuiIni));
+        TIniTagsData.idtFileLists:        LoadOK := (ReadFileLists(FMain.ShellList.Handle, GuiIni));
         TIniTagsData.idtCustomView:       LoadOK := (ReadCustomViewTags(GuiIni) <> 0);
         TIniTagsData.idtMarked:           LoadOK := (ReadMarkedTags(GuiIni) <> 0);
         TIniTagsData.idtPredefinedTags:   LoadOK := (ReadPredefinedTags(GUIini) <> 0);
@@ -1074,8 +1073,8 @@ begin
           IniLoaded := LoadIni(FileName, [TIniTagsData.idtWorkSpace]);
         TIniData.idETDirect:
           IniLoaded := LoadIni(FileName, [TIniTagsData.idtETDirect]);
-        TIniData.idUserDefined:
-          IniLoaded := LoadIni(FileName, [TIniTagsData.idtUserDefined]);
+        TIniData.idFileLists:
+          IniLoaded := LoadIni(FileName, [TIniTagsData.idtFileLists]);
         TIniData.idCustomView:
           IniLoaded := LoadIni(FileName, [TIniTagsData.idtCustomView]);
         TIniData.idPredefinedTags:
@@ -1113,7 +1112,7 @@ begin
         case ThisIniTag of
           TIniTagsData.idtWorkSpace:      WriteWorkSpaceTags(GuiIni);
           TIniTagsData.idtETDirect:       WriteEtDirectCmds(FMain.CBoxETdirect, GuiIni);
-          TIniTagsData.idtUserDefined:    WriteFileListColumns(GuiIni);
+          TIniTagsData.idtFileLists:      WriteFileLists(GuiIni);
           TIniTagsData.idtCustomView:     WriteCustomViewTags(GuiIni);
           TIniTagsData.idtPredefinedTags: WritePredefinedTags(GuiIni);
           TIniTagsData.idtMarked:         WriteMarkedTags(GuiIni);
@@ -1166,8 +1165,8 @@ begin
           IniSaved := SaveIni(FileName, [TIniTagsData.idtWorkSpace]);
         TIniData.idETDirect:
           IniSaved := SaveIni(FileName, [TIniTagsData.idtETDirect]);
-        TIniData.idUserDefined:
-          IniSaved := SaveIni(FileName, [TIniTagsData.idtUserDefined]);
+        TIniData.idFileLists:
+          IniSaved := SaveIni(FileName, [TIniTagsData.idtFileLists]);
         TIniData.idCustomView:
           IniSaved := SaveIni(FileName, [TIniTagsData.idtCustomView]);
         TIniData.idPredefinedTags:
