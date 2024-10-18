@@ -478,7 +478,7 @@ begin
      (LocalCompareColumn < Columns.Count) then      // When not in vsReport mode
   begin
     TempColumn := Columns[LocalCompareColumn].Tag -1;
-    if (TempColumn > 0) and
+    if (TempColumn >= 0) and
        (TempColumn <= High(ColumnDefs)) and
        ((ColumnDefs[TempColumn].Options and toSys) = toSys) then   // Yes, a system field
     begin
