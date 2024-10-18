@@ -32,13 +32,19 @@ type
     procedure ChkExcludeClick(Sender: TObject);
   private
     { Private declarations }
+    FSearchString: string;
     FSample: string;
     UseSample: string;
+    procedure SplitSearchString(var Family: integer;
+                                var GroupName, TagName: string);
+    procedure LookupSearchString;
+
   public
     { Public declarations }
     procedure EnableExclude(Enable: boolean);
     procedure SetSample(ASample: string);
     function PreferredFamily: string;
+    procedure SetSearchString(ASearchString: string);
     function SelectedTag(AllowExclude: boolean = false): string;
   end;
 
@@ -48,9 +54,56 @@ var
 implementation
 
 uses
+  System.StrUtils,
   ExifToolsGUI_Utils, UnitLangResources, Main;
 
 {$R *.dfm}
+
+procedure TFrmTagNames.SplitSearchString(var Family: integer;
+                                         var GroupName, TagName: string);
+var
+  P: integer;
+begin
+  Family := 1;
+  GroupName := '';
+  TagName := '';
+  P := Pos(':', FSearchString);
+  if (P > 0) then
+  begin
+    GroupName := Copy(FSearchString, 1, P -1);
+    if (UseSample = '') then
+      TagName := Copy(FSearchString, P +1)
+    else
+      TagName := FSearchString;
+  end;
+end;
+
+procedure TFrmTagNames.LookupSearchString;
+var
+  Family: integer;
+  Index: integer;
+  GroupName, TagName: string;
+begin
+  SplitSearchString(Family, GroupName, TagName);
+  if (GroupName <> '') and
+     (TagName <> '') then
+  begin
+    CmbFamily.ItemIndex := Family;
+    CmbGroupName.ItemIndex := CmbGroupName.Items.IndexOf(GroupName);
+    CmbGroupNameChange(CmbGroupName);
+
+    CmbTagName.Text := TagName;
+    for Index := 0 to CmbTagName.Items.Count -1 do
+    begin
+      if (StartsText(TagName, CmbTagName.Items[Index])) then
+      begin
+        CmbTagName.ItemIndex := Index;
+        break;
+      end;
+    end;
+    CmbTagNameChange(CmbTagName);
+  end;
+end;
 
 procedure TFrmTagNames.ChkExcludeClick(Sender: TObject);
 var
@@ -100,6 +153,9 @@ begin
   Left := FMain.GetFormOffset.X;
   Top := FMain.GetFormOffset.Y;
 
+  if (FSearchString <> '') and
+     (FSample <> '') then
+    RadTagValues.ItemIndex := 0;
   RadTagValuesClick(RadTagValues);
 end;
 
@@ -111,6 +167,7 @@ end;
 procedure TFrmTagNames.SetSample(ASample: string);
 begin
   FSample := ASample;
+  FSearchString := ''; // Default no searching
   EnableExclude(true); // Default visible
 end;
 
@@ -159,8 +216,18 @@ begin
   end;
 
   FillGroupsInCombo(UseSample, CmbGroupName, PreferredFamily);
-  CmbGroupNameChange(Sender);
-  CmbTagNameChange(Sender);
+  if (FSearchString = '') then
+  begin
+    CmbGroupNameChange(Sender);
+    CmbTagNameChange(Sender);
+  end
+  else
+    LookupSearchString;
+end;
+
+procedure TFrmTagNames.SetSearchString(ASearchString: string);
+begin
+  FSearchString := ASearchString;
 end;
 
 function TFrmTagNames.SelectedTag(AllowExclude: boolean = false): string;
