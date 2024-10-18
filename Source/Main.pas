@@ -3145,6 +3145,7 @@ begin
   AShellList := TShellListView(Sender);
   if not ShellList.Enabled then
     exit;
+
   if (AShellList.ViewStyle <> vsReport) then
     exit;
 
@@ -3154,7 +3155,7 @@ begin
 
   // The Item.ImageIndex (for small icons) should always be set
   if (irImage in Request) then
-    Item.ImageIndex := AFolder.ImageIndex(AShellList.ViewStyle = vsIcon);
+    Item.ImageIndex := AFolder.ImageIndex(false);
 
   // Get possibly cached Details
   Details := AFolder.DetailStrings;
