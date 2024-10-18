@@ -74,9 +74,16 @@ implementation
 uses
   System.SysUtils, System.JSON,
   Winapi.Windows, Winapi.CommCtrl,
+  Vcl.ComCtrls,
   ExifToolsGUI_Utils,
   ExifToolsGui_ThreadPool,
   MainDef;
+
+function DetailsNeeded(AShellList: ExifToolsGui_ShellList.TShellListView): boolean;
+begin
+  result := (AShellList.ViewStyle = TViewStyle.vsReport) and
+            (AShellList.ReadModeOptions <> []);
+end;
 
 procedure PostProcess(Folder: TShellFolder;
                       ColumnDefs: TColumnsArray;
@@ -308,10 +315,11 @@ var
   AColumnDefs: TColumnsArray;
   AOptions: TReadModeOptions;
 begin
+  if not DetailsNeeded(AShellList) then
+    exit;
+
   AFolder := AShellList.Folders[ItemIndex];
   AOptions := AShellList.ReadModeOptions;
-  if (AOptions = []) then // rmSystem
-    exit;
   AColumnDefs := AShellList.ColumnDefs;
 
   MetaData := TMetaData.Create;
@@ -469,8 +477,9 @@ var
   SaveEnabled: boolean;
   Controller: TMetaDataGetController;
 begin
-  if (AShellList.ReadModeOptions = []) then
+  if not DetailsNeeded(AShellList) then
     exit;
+
   SaveEnabled := AShellList.Enabled;
   AShellList.Enabled := false;
   Controller := TMetaDataGetController.Create(AShellList, FrmGenerate);
