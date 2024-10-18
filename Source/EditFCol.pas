@@ -138,7 +138,7 @@ var
 begin
   GUIini := TMemIniFile.Create('NUL', TEncoding.UTF8);
   try
-    ReadFileListColumns(FMain.ShellList.Handle, GUIini);
+    ReadFileLists(FMain.ShellList.Handle, GUIini);
     DmFileLists.LoadFromColumnSets(FSample);
   finally
     GUIini.Free;
@@ -358,9 +358,9 @@ procedure TFEditFColumn.SpbDuplicateClick(Sender: TObject);
 var
   NewName: string;
 begin
-  NewName := DmFileLists.CdsFileListDefName.AsString + '_Copy';
+  NewName := DmFileLists.CdsFileListDefName.AsString + '_' + StrCopy;
   repeat
-    if not (InputQuery('Existing definitions will be saved first!', ['New Name'], NewName)) then
+    if not (InputQuery(StrExistSavedFirst, [StrNewName], NewName)) then
       break;
     if DmFileLists.NameExists(NewName) then
     begin

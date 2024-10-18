@@ -1,7 +1,7 @@
 object FEditFColumn: TFEditFColumn
   Left = 0
   Top = 0
-  Caption = 'Edit file columns'
+  Caption = 'Configure file lists'
   ClientHeight = 562
   ClientWidth = 1068
   Color = clBtnFace
@@ -145,7 +145,7 @@ object FEditFColumn: TFEditFColumn
           item
             Expanded = False
             FieldName = 'ReadModeLookup'
-            Title.Caption = 'ReadMode'
+            Title.Caption = 'Read Mode'
             Visible = True
           end
           item
@@ -247,6 +247,7 @@ object FEditFColumn: TFEditFColumn
         item
           Expanded = False
           FieldName = 'SampleValue'
+          Title.Caption = 'Sample Value'
           Width = 137
           Visible = True
         end
@@ -326,12 +327,14 @@ object FEditFColumn: TFEditFColumn
           item
             Expanded = False
             FieldName = 'TagName'
+            Title.Caption = 'Tag Name'
             Width = 125
             Visible = True
           end
           item
             Expanded = False
             FieldName = 'SampleValue'
+            Title.Caption = 'Sample Value'
             Width = 180
             Visible = True
           end>
@@ -456,7 +459,7 @@ object FEditFColumn: TFEditFColumn
       1068
       29)
     object BtnOk: TBitBtn
-      Left = 841
+      Left = 878
       Top = 2
       Width = 87
       Height = 25
@@ -483,10 +486,10 @@ object FEditFColumn: TFEditFColumn
       ModalResult = 1
       NumGlyphs = 2
       TabOrder = 0
-      ExplicitLeft = 837
+      ExplicitLeft = 874
     end
     object BtnCancel: TBitBtn
-      Left = 932
+      Left = 969
       Top = 2
       Width = 87
       Height = 25
@@ -513,7 +516,7 @@ object FEditFColumn: TFEditFColumn
       ModalResult = 2
       NumGlyphs = 2
       TabOrder = 1
-      ExplicitLeft = 928
+      ExplicitLeft = 965
     end
   end
 end

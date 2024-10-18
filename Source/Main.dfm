@@ -562,7 +562,7 @@ object FMain: TFMain
     ExplicitWidth = 366
     ExplicitHeight = 535
     object AdvTabFilelist: TTabSheet
-      Caption = 'Filelist'
+      Caption = 'File list'
       object TbFileList: TToolBar
         Left = 0
         Top = 0
@@ -1058,7 +1058,7 @@ object FMain: TFMain
                     Action = MaUserDefSave
                     Caption = '&Save...'
                   end>
-                Caption = '&User defined fields definition file'
+                Caption = '&File lists definition file'
                 UsageCount = 1
               end
               item
@@ -1307,7 +1307,7 @@ object FMain: TFMain
           end>
         ActionBar = ActionMainMenuBar
       end>
-    Left = 164
+    Left = 163
     Top = 50
     StyleName = 'Platform Default'
     object MaExportMetaTXT: TAction
@@ -1589,12 +1589,12 @@ object FMain: TFMain
       OnExecute = MaEtDirectSaveExecute
     end
     object MaUserDefLoad: TAction
-      Category = 'Program_UserDef'
+      Category = 'Program_FileLists'
       Caption = 'Load..'
       OnExecute = MaUserDefLoadExecute
     end
     object MaUserDefSave: TAction
-      Category = 'Program_UserDef'
+      Category = 'Program_FileLists'
       Caption = 'Save...'
       OnExecute = MaUserDefSaveExecute
     end
@@ -1664,7 +1664,7 @@ object FMain: TFMain
       OnClick = QuickPopUp_DelCustomClick
     end
     object QuickPopUp_AddDetailsUserAct: TMenuItem
-      Caption = 'Add tag to Filelist Details'
+      Caption = 'Add tag to File list Details'
       ImageIndex = 6
       ImageName = 'QuickPopUp_AddDetailsUser'
       OnClick = QuickPopUp_AddDetailsUserClick
