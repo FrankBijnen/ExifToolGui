@@ -157,13 +157,16 @@ procedure TFEditFColumn.TagNameLookup;
 var
   SearchString: string;
 begin
+  // Update search string
+  SearchString := DbgColumnSet.SelectedField.AsString;
+  if (LeftStr(SearchString, 1) = '-') then
+    SearchString := Copy(SearchString, 2);
+  if (RightStr(SearchString, 1) = '#') then
+    SetLength(SearchString, Length(SearchString) -1);
+
   case DmFileLists.CdsFileListDefReadMode.AsInteger of
     0,1,3:  // System, Internal, +ExifTool
       begin
-        // Update search string
-        SearchString := DbgColumnSet.SelectedField.AsString;
-        if (RightStr(SearchString, 1) = '#') then
-          SetLength(SearchString, Length(SearchString) -1);
         EdSearchTag.Text := SearchString;
         SetFilter;
 
@@ -176,7 +179,10 @@ begin
     2:    // ExifTool
       begin
         if (Assigned(FSample)) then
-          FrmTagNames.SetSample(FSample.PathName);
+          FrmTagNames.SetSample(FSample.PathName)
+        else
+          FrmTagNames.SetSample('');
+        FrmTagNames.SetSearchString(SearchString);
         FrmTagNames.EnableExclude(false);
         if (FrmTagNames.ShowModal = IDOK) then
           EndTagNameLookup('-' + FrmTagNames.SelectedTag(false));

@@ -1093,7 +1093,7 @@ begin
   ETResult := TStringList.Create;
   try
     ETcmd := '-s1' + CRLF + '-a' + CRLF + '-G1' + CRLF + '-Preview:All';
-    ET.OpenExec(ETcmd, SelectedFile, ETResult);
+    ET.OpenExec(ETcmd, SelectedFile, ETResult, false);
     LvPreviews.Items.Clear;
     APreviewList := GetPreviews(ETResult, AMaxPos);
     try
@@ -1252,7 +1252,7 @@ begin
         ETResult.Sorted := true;
         ETResult.Duplicates := TDuplicates.dupIgnore;
         ETCmd := '-sort' + CRLF + '-s1' + CRLF + '-G' + Family;
-        ET.OpenExec(ETcmd, SelectedFile, ETUnSorted);
+        ET.OpenExec(ETcmd, SelectedFile, ETUnSorted, false);
         for Indx := 0 to ETUnSorted.Count -1 do
         begin
           AGroupLine  := ETUnSorted[Indx];
@@ -1315,7 +1315,7 @@ begin
       else
         ETCmd := '';
       ETCmd := ETCmd + '-s1' + CRLF + '-a' + CRLF + '-G' + Family + CRLF + '-' + Groupname + ':All';
-      ET.OpenExec(ETcmd, SelectedFile, ETResult);
+      ET.OpenExec(ETcmd, SelectedFile, ETResult, false);
       ATagInfoList := GetTags(ETResult, Tags);
       try
         for ATagInfo in ATagInfoList do
@@ -1332,7 +1332,7 @@ begin
     else
     begin
       ETCmd := '-listw' + CRLF + '-' + Groupname + ':All';
-      ET.OpenExec(ETcmd, '', ETResult);
+      ET.OpenExec(ETcmd, '', ETResult, false);
       Tags.Add('All');
       for Indx := 1 to ETResult.Count -1 do
       begin

@@ -295,7 +295,7 @@ end;
 procedure TDmFileLists.AddTagName(ATagName: string; CheckExist: boolean);
 begin
   if not CheckExist or
-     VarIsNull(CdsTagNames.Lookup('TagName', ATagName, 'TagName')) then
+     (CdsTagNames.Locate('TagName', ATagName, [TLocateOption.loCaseInsensitive]) = false) then
     CdsTagNames.AppendRecord([ATagName]);
 end;
 
@@ -593,22 +593,31 @@ end;
 procedure TDmFileLists.ValidateSystem;
 var
   HasSystem: boolean;
+  MyBook: TbookMark;
 begin
   HasSystem := false;
-  CdsFileListDef.First;
-  while not CdsFileListDef.Eof do
-  begin
-    if (CdsFileListDefReadMode.AsInteger = Ord(floSystem)) then
+  CdsFileListDef.DisableControls;
+  MyBook := CdsFileListDef.GetBookmark;
+  try
+    CdsFileListDef.First;
+    while not CdsFileListDef.Eof do
     begin
-      if HasSystem then
-        raise Exception.Create('Only 1 readmode system allowed')
-      else
-        HasSystem := true;
+      if (CdsFileListDefReadMode.AsInteger = Ord(floSystem)) then
+      begin
+        if HasSystem then
+          raise Exception.Create('Only 1 readmode system allowed')
+        else
+          HasSystem := true;
+      end;
+      CdsFileListDef.Next;
     end;
-    CdsFileListDef.Next;
+    if not HasSystem then
+      raise Exception.Create('Need 1 readmode system');
+  finally
+    CdsFileListDef.GotoBookmark(MyBook);
+    CdsFileListDef.FreeBookmark(MyBook);
+    CdsFileListDef.EnableControls;
   end;
-  if not HasSystem then
-    raise Exception.Create('Need 1 readmode system');
 end;
 
 procedure TDmFileLists.SaveToColumnSets;

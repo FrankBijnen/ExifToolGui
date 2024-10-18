@@ -22,8 +22,8 @@ object FEditFColumn: TFEditFColumn
     Height = 533
     Align = alClient
     TabOrder = 1
-    ExplicitWidth = 957
-    ExplicitHeight = 516
+    ExplicitWidth = 1064
+    ExplicitHeight = 532
     object HSplitter: TSplitter
       Left = 1
       Top = 231
@@ -52,7 +52,7 @@ object FEditFColumn: TFEditFColumn
       Height = 30
       Align = alTop
       TabOrder = 0
-      ExplicitWidth = 955
+      ExplicitWidth = 1062
       object SpbAddPred: TSpeedButton
         Left = 61
         Top = 3
@@ -110,7 +110,7 @@ object FEditFColumn: TFEditFColumn
       Height = 200
       Align = alTop
       TabOrder = 1
-      ExplicitWidth = 955
+      ExplicitWidth = 1062
       object DbgFileListDef: TDBGrid
         Left = 41
         Top = 1
@@ -263,7 +263,7 @@ object FEditFColumn: TFEditFColumn
       Height = 30
       Align = alTop
       TabOrder = 3
-      ExplicitWidth = 955
+      ExplicitWidth = 1062
       object SpbAddTag: TSpeedButton
         Left = 55
         Top = 3
@@ -306,8 +306,8 @@ object FEditFColumn: TFEditFColumn
       Align = alRight
       TabOrder = 4
       Visible = False
-      ExplicitLeft = 608
-      ExplicitHeight = 249
+      ExplicitLeft = 715
+      ExplicitHeight = 265
       object DbgTagNames: TDBGrid
         Left = 1
         Top = 66
@@ -410,7 +410,7 @@ object FEditFColumn: TFEditFColumn
       Height = 266
       Align = alLeft
       TabOrder = 5
-      ExplicitHeight = 249
+      ExplicitHeight = 265
       object BtnColumnUp: TButton
         Left = 7
         Top = 6
@@ -450,13 +450,13 @@ object FEditFColumn: TFEditFColumn
     Height = 29
     Align = alBottom
     TabOrder = 0
-    ExplicitTop = 516
-    ExplicitWidth = 957
+    ExplicitTop = 532
+    ExplicitWidth = 1064
     DesignSize = (
       1068
       29)
     object BtnOk: TBitBtn
-      Left = 845
+      Left = 841
       Top = 2
       Width = 87
       Height = 25
@@ -483,10 +483,10 @@ object FEditFColumn: TFEditFColumn
       ModalResult = 1
       NumGlyphs = 2
       TabOrder = 0
-      ExplicitLeft = 734
+      ExplicitLeft = 837
     end
     object BtnCancel: TBitBtn
-      Left = 936
+      Left = 932
       Top = 2
       Width = 87
       Height = 25
@@ -513,7 +513,7 @@ object FEditFColumn: TFEditFColumn
       ModalResult = 2
       NumGlyphs = 2
       TabOrder = 1
-      ExplicitLeft = 825
+      ExplicitLeft = 928
     end
   end
 end
