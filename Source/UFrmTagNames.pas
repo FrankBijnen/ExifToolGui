@@ -35,10 +35,8 @@ type
     FSearchString: string;
     FSample: string;
     UseSample: string;
-    procedure SplitSearchString(var Family: integer;
-                                var GroupName, TagName: string);
+    procedure GuessGroupAndTagName(var GroupName, TagName: string);
     procedure LookupSearchString;
-
   public
     { Public declarations }
     procedure EnableExclude(Enable: boolean);
@@ -55,43 +53,74 @@ implementation
 
 uses
   System.StrUtils,
-  ExifToolsGUI_Utils, UnitLangResources, Main;
+  ExifTool, ExifToolsGUI_Utils, UnitLangResources, Main;
 
 {$R *.dfm}
 
-procedure TFrmTagNames.SplitSearchString(var Family: integer;
-                                         var GroupName, TagName: string);
+procedure TFrmTagNames.GuessGroupAndTagName(var GroupName, TagName: string);
 var
   P: integer;
+  ETCmd, ETOut: string;
+  ETOuts: TStringList;
 begin
-  Family := 1;
   GroupName := '';
-  TagName := '';
+  TagName := FSearchString;
   P := Pos(':', FSearchString);
   if (P > 0) then
   begin
     GroupName := Copy(FSearchString, 1, P -1);
     if (UseSample = '') then
-      TagName := Copy(FSearchString, P +1)
-    else
-      TagName := FSearchString;
+    begin
+      TagName := Copy(FSearchString, P +1);
+      if (TagName = '') then
+        TagName := 'All';
+    end;
+    exit;
+  end;
+  if (UseSample = '') then // No, Get the Group and Tag from the sample
+    exit;
+
+  ETOuts := TStringList.Create;
+  try
+    ETCmd := '-s' + CRLF + '-G1' + CRLF + '-f' + CRLF + '-' + TagName + '*';
+    ET.OpenExec(ETCmd, UseSample, ETOuts, false);
+    if (ETOuts.Count > 0) then
+    begin
+      ETOut := ETOuts[0];
+      GroupName   := NextField(ETOut, '[');                         // Strip Leading [
+      GroupName   := NextField(ETOut, ']');                         // Group name
+      TagName     := GroupName + ':' + Trim(NextField(ETOut, ':')); // Group + Tag Name
+    end;
+  finally
+    ETOuts.Free;
   end;
 end;
 
 procedure TFrmTagNames.LookupSearchString;
 var
-  Family: integer;
   Index: integer;
   GroupName, TagName: string;
 begin
-  SplitSearchString(Family, GroupName, TagName);
+  CmbFamily.ItemIndex := 1; // Allways 1
+  CmbFamilyChange(CmbFamily);
+
+  GuessGroupAndTagName(GroupName, TagName);
+
   if (GroupName <> '') and
      (TagName <> '') then
   begin
-    CmbFamily.ItemIndex := Family;
-    CmbGroupName.ItemIndex := CmbGroupName.Items.IndexOf(GroupName);
+    CmbGroupName.Text := GroupName;
+    for Index := 0 to CmbGroupName.Items.Count -1 do
+    begin
+      if (StartsText(GroupName, CmbGroupName.Items[Index])) then
+      begin
+        CmbGroupName.ItemIndex := Index;
+        break;
+      end;
+    end;
     CmbGroupNameChange(CmbGroupName);
 
+    CmbTagName.ItemIndex := -1;
     CmbTagName.Text := TagName;
     for Index := 0 to CmbTagName.Items.Count -1 do
     begin
@@ -103,6 +132,7 @@ begin
     end;
     CmbTagNameChange(CmbTagName);
   end;
+
 end;
 
 procedure TFrmTagNames.ChkExcludeClick(Sender: TObject);
@@ -153,9 +183,10 @@ begin
   Left := FMain.GetFormOffset.X;
   Top := FMain.GetFormOffset.Y;
 
-  if (FSearchString <> '') and
-     (FSample <> '') then
-    RadTagValues.ItemIndex := 0;
+  if (FSample <> '') then
+    RadTagValues.ItemIndex := 0
+  else
+    RadTagValues.ItemIndex := 1;
   RadTagValuesClick(RadTagValues);
 end;
 

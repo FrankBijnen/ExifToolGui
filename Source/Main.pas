@@ -1586,9 +1586,8 @@ begin
   QuickPopUp_AddQuickAct.Visible := not(SpeedBtnQuick.Down or SpeedBtnCustom.Down or IsSep);
   QuickPopUp_AddCustomAct.Visible := not(SpeedBtnQuick.Down or SpeedBtnCustom.Down or IsSep);
   QuickPopUp_DelCustomAct.Visible := SpeedBtnCustom.Down and not(IsSep);
-  QuickPopUp_AddDetailsUserAct.Visible := not IsSep and
-                                          (GetFileListDefs[GUIsettings.DetailsSel].Options = floUserDef) and
-                                          (SpeedBtnExif.Down or SpeedBtnXmp.Down or SpeedBtnIptc.Down or SpeedBtnALL.Down);
+  QuickPopUp_AddDetailsUserAct.Visible := not(SpeedBtnQuick.Down or SpeedBtnCustom.Down or IsSep) and
+                                          (GetFileListDefs[GUIsettings.DetailsSel].Options = floUserDef);
   QuickPopUp_MarkTagAct.Visible := not(SpeedBtnQuick.Down or SpeedBtnCustom.Down or IsSep);
   QuickPopUp_DelQuickAct.Visible := not(IsSep) and SpeedBtnQuick.Down;
   QuickPopUp_FillQuickAct.Visible := QuickPopUp_DelQuickAct.Visible;
