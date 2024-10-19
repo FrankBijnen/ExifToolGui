@@ -908,8 +908,9 @@ begin
       exit;
     NewShellFolder := GetIShellFolder(FRelativeFolder.ShellFolder, ID);
     NewRelativeFolder := TSubShellFolder.Create(FRelativeFolder, ID, NewShellFolder);
+    // Avoid memory leaks
     CoTaskMemFree(ID);
-
+    //
     if (TSubShellFolder.GetIsFolder(NewRelativeFolder)) then
     begin
       NewRelativeFolder.FRelativePath := IncludeTrailingPathDelimiter(FRelativeFolder.FRelativePath) +

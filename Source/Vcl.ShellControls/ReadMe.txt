@@ -29,21 +29,29 @@ Due to the Copyright statement I can't distribute that source, but the Community
     property FoldersList: TList read FFolders;
 //ExifTool_x     
 
-Fix for a memory leak that shows clearly when selecting many files (2500+) combined with column sorting.
+Fixes for memory leaks that show clearly when selecting many files (2500+) combined with column sorting.
 
-5) in 'function StrRetToString', after 'if Assigned(StrRet.pOleStr) then' replace
+5) In 'function StrRetToString', after 'if Assigned(StrRet.pOleStr) then' replace
 
      Result := StrRet.pOleStr
 
 with this block
 
-//ExifTool
+//ExifTool_Leak
 //        Result := StrRet.pOleStr
       begin
         Result := StrRet.pOleStr;
         CoTaskMemFree(StrRet.pOleStr);
       end
-//ExifTool_X
+//ExifTool_Leak_X
+
+6) In 'procedure TCustomShellListView.Populate;', after 'AFolder := TShellFolder.Create(FRootFolder, ID, NewFolder);'
+
+add this block
+
+//ExifTool_Leak
+        CoTaskMemFree(ID);
+//ExifTool_Leak_X
 
 Note: For documentation purposes the original line is kept, but commented. 
 
