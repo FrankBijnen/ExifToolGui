@@ -3,7 +3,7 @@ object FFileDateTime: TFFileDateTime
   Top = 0
   BorderStyle = bsDialog
   Caption = 'Rename files'
-  ClientHeight = 470
+  ClientHeight = 493
   ClientWidth = 710
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
@@ -16,19 +16,19 @@ object FFileDateTime: TFFileDateTime
   TextHeight = 13
   object StatusBar1: TStatusBar
     Left = 0
-    Top = 451
+    Top = 474
     Width = 710
     Height = 19
     Panels = <>
     SimplePanel = True
-    ExplicitTop = 452
-    ExplicitWidth = 599
+    ExplicitTop = 450
+    ExplicitWidth = 706
   end
   object AdvPanel1: TPanel
     Left = 0
     Top = 0
     Width = 631
-    Height = 451
+    Height = 474
     Align = alLeft
     DoubleBuffered = True
     Font.Charset = DEFAULT_CHARSET
@@ -39,12 +39,12 @@ object FFileDateTime: TFFileDateTime
     ParentDoubleBuffered = False
     ParentFont = False
     TabOrder = 1
-    ExplicitHeight = 453
+    ExplicitHeight = 450
     object AdvPanel2: TPanel
       Left = 16
       Top = 16
       Width = 600
-      Height = 302
+      Height = 367
       Hint = 'Note: No backup files are created when renaming!'
       BevelOuter = bvLowered
       Font.Charset = DEFAULT_CHARSET
@@ -70,9 +70,9 @@ object FFileDateTime: TFFileDateTime
       end
       object RadioGroup2: TRadioGroup
         Left = 16
-        Top = 72
+        Top = 63
         Width = 324
-        Height = 97
+        Height = 90
         Caption = 'New Filename starts/ends with'
         ItemIndex = 0
         Items.Strings = (
@@ -83,9 +83,9 @@ object FFileDateTime: TFFileDateTime
       end
       object RadioGroup3: TRadioGroup
         Left = 16
-        Top = 175
+        Top = 155
         Width = 324
-        Height = 73
+        Height = 65
         Caption = 'Change Filename'
         ItemIndex = 0
         Items.Strings = (
@@ -96,9 +96,9 @@ object FFileDateTime: TFFileDateTime
       end
       object RadioGroup4: TRadioGroup
         Left = 357
-        Top = 176
-        Width = 208
-        Height = 73
+        Top = 155
+        Width = 223
+        Height = 65
         Caption = 'Save existing Filename to'
         ItemIndex = 0
         Items.Strings = (
@@ -108,7 +108,7 @@ object FFileDateTime: TFFileDateTime
       end
       object CheckBox1: TCheckBox
         Left = 357
-        Top = 85
+        Top = 73
         Width = 208
         Height = 17
         Caption = '-set separator in Date field'
@@ -117,7 +117,7 @@ object FFileDateTime: TFFileDateTime
       end
       object CheckBox2: TCheckBox
         Left = 357
-        Top = 108
+        Top = 96
         Width = 208
         Height = 17
         Caption = '-set separator in Time field'
@@ -126,17 +126,17 @@ object FFileDateTime: TFFileDateTime
       end
       object Edit1: TEdit
         Left = 115
-        Top = 220
+        Top = 191
         Width = 206
         Height = 22
         Color = clBtnFace
         MaxLength = 64
         TabOrder = 6
-        OnChange = Edit1Change
+        OnChange = EdPreviewChange
       end
       object Button2: TButton
-        Left = 490
-        Top = 263
+        Left = 505
+        Top = 335
         Width = 75
         Height = 25
         Caption = 'Rename'
@@ -145,28 +145,116 @@ object FFileDateTime: TFFileDateTime
       end
       object ChkDateFirst: TCheckBox
         Left = 16
-        Top = 254
+        Top = 223
         Width = 324
         Height = 17
         Caption = '-DateTime first'
         TabOrder = 8
         OnClick = CheckBox1Click
       end
-      object ChkSequence: TCheckBox
+      object RadDuplicates: TRadioGroup
         Left = 16
-        Top = 277
-        Width = 324
-        Height = 17
-        Caption = '-Unique filenames (%-c)'
+        Top = 246
+        Width = 564
+        Height = 82
+        Caption = 'Action on duplicate filename'
+        ItemIndex = 1
+        Items.Strings = (
+          'None (Show error)'
+          'Use standard sequence %-c'
+          'Use custom sequence')
         TabOrder = 9
-        OnClick = CheckBox1Click
+        OnClick = RadDuplicatesClick
+      end
+      object PnlCustomSeq: TPanel
+        Left = 378
+        Top = 298
+        Width = 196
+        Height = 28
+        TabOrder = 10
+        object EdSeqPref: TEdit
+          Left = 3
+          Top = 2
+          Width = 26
+          Height = 22
+          TabOrder = 0
+          Text = '-('
+          OnChange = EdPreviewChange
+        end
+        object EdSeqPerc: TEdit
+          Left = 31
+          Top = 2
+          Width = 18
+          Height = 22
+          Enabled = False
+          ReadOnly = True
+          TabOrder = 1
+          Text = '%'
+        end
+        object NbSeqStart: TNumberBox
+          Left = 55
+          Top = 2
+          Width = 34
+          Height = 22
+          MaxLength = 4
+          TabOrder = 2
+          OnChange = EdPreviewChange
+        end
+        object UdSeqStart: TUpDown
+          Left = 89
+          Top = 2
+          Width = 16
+          Height = 22
+          Associate = NbSeqStart
+          TabOrder = 3
+        end
+        object EdSeqColon: TEdit
+          Left = 107
+          Top = 2
+          Width = 16
+          Height = 22
+          Enabled = False
+          ReadOnly = True
+          TabOrder = 4
+          Text = ':'
+        end
+        object NbSeqWidth: TNumberBox
+          Left = 124
+          Top = 2
+          Width = 22
+          Height = 22
+          MinValue = 1.000000000000000000
+          MaxValue = 5.000000000000000000
+          MaxLength = 1
+          TabOrder = 5
+          Value = 4.000000000000000000
+          OnChange = EdPreviewChange
+        end
+        object UdWidth: TUpDown
+          Left = 146
+          Top = 2
+          Width = 16
+          Height = 22
+          Associate = NbSeqWidth
+          Position = 4
+          TabOrder = 6
+        end
+        object EdSeqSuf: TEdit
+          Left = 163
+          Top = 2
+          Width = 26
+          Height = 22
+          TabOrder = 7
+          Text = ')'
+          OnChange = EdPreviewChange
+        end
       end
     end
     object AdvPanel3: TPanel
       Left = 16
-      Top = 344
+      Top = 390
       Width = 600
-      Height = 41
+      Height = 35
       Hint = 'Files will only be renamed where Exif:DocumentName is defined.'
       BevelOuter = bvLowered
       Font.Charset = DEFAULT_CHARSET
@@ -178,7 +266,7 @@ object FFileDateTime: TFFileDateTime
       TabOrder = 1
       object RadioButton1: TRadioButton
         Left = 24
-        Top = 8
+        Top = 6
         Width = 450
         Height = 17
         Caption = 'Use Filename from Exif:DocumentName'
@@ -187,8 +275,8 @@ object FFileDateTime: TFFileDateTime
         TabStop = True
       end
       object Button3: TButton
-        Left = 490
-        Top = 7
+        Left = 505
+        Top = 5
         Width = 75
         Height = 25
         Caption = 'Rename'
@@ -198,9 +286,9 @@ object FFileDateTime: TFFileDateTime
     end
     object AdvPanel4: TPanel
       Left = 16
-      Top = 400
+      Top = 434
       Width = 600
-      Height = 41
+      Height = 35
       Hint = 'DateTime part must be separated by SPACE!'
       BevelOuter = bvLowered
       Font.Charset = DEFAULT_CHARSET
@@ -212,7 +300,7 @@ object FFileDateTime: TFFileDateTime
       TabOrder = 2
       object RadioButton2: TRadioButton
         Left = 24
-        Top = 8
+        Top = 10
         Width = 450
         Height = 17
         Caption = 'Remove leading DateTime (incl. SPACE)'
@@ -221,8 +309,8 @@ object FFileDateTime: TFFileDateTime
         TabStop = True
       end
       object Button4: TButton
-        Left = 490
-        Top = 7
+        Left = 505
+        Top = 5
         Width = 75
         Height = 25
         Caption = 'Rename'
