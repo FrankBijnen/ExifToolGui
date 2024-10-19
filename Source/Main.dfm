@@ -576,7 +576,6 @@ object FMain: TFMain
         List = True
         AllowTextButtons = True
         TabOrder = 0
-        ExplicitWidth = 358
         object TbFlRefresh: TToolButton
           Left = 0
           Top = 0
@@ -643,8 +642,6 @@ object FMain: TFMain
         Font.Style = []
         ParentFont = False
         TabOrder = 1
-        ExplicitTop = 323
-        ExplicitWidth = 358
         DesignSize = (
           362
           184)
@@ -774,7 +771,6 @@ object FMain: TFMain
           Text = ''
           OnChange = EditETdirectChange
           OnKeyDown = EditETdirectKeyDown
-          ExplicitWidth = 318
         end
         object CBoxETdirect: TComboBox
           Left = 1
@@ -849,7 +845,6 @@ object FMain: TFMain
         BevelOuter = bvNone
         ShowCaption = False
         TabOrder = 3
-        ExplicitWidth = 358
       end
     end
     object AdvTabChart: TTabSheet
@@ -858,7 +853,7 @@ object FMain: TFMain
         Left = 0
         Top = 0
         Width = 362
-        Height = 137
+        Height = 121
         Align = alTop
         BevelOuter = bvNone
         Font.Charset = DEFAULT_CHARSET
@@ -868,28 +863,37 @@ object FMain: TFMain
         Font.Style = []
         ParentFont = False
         TabOrder = 0
+        ExplicitWidth = 358
+        object BvlChartFunc: TBevel
+          Left = 1
+          Top = 86
+          Width = 360
+          Height = 29
+        end
         object SpeedBtnChartRefresh: TSpeedButton
-          Left = 214
-          Top = 104
+          Left = 8
+          Top = 88
           Width = 74
           Height = 24
           Caption = 'Refresh'
+          ImageIndex = 0
+          Images = VirtualImageListFileList
           OnClick = SpeedBtnChartRefreshClick
         end
         object AdvCheckBox_Subfolders: TCheckBox
-          Left = 8
-          Top = 104
-          Width = 120
-          Height = 20
-          Alignment = taLeftJustify
-          Caption = '+subfolders'
-          TabOrder = 0
+          Left = 85
+          Top = 88
+          Width = 90
+          Height = 24
+          Caption = '+ Sub folders'
+          TabOrder = 2
+          OnClick = ChartCheckClick
         end
         object AdvRadioGroup1: TRadioGroup
-          Left = 8
+          Left = 1
           Top = 0
-          Width = 280
-          Height = 42
+          Width = 360
+          Height = 40
           Caption = 'Files'
           Columns = 6
           ItemIndex = 0
@@ -901,14 +905,14 @@ object FMain: TFMain
             'PEF'
             'DNG')
           ParentBackground = False
-          TabOrder = 1
+          TabOrder = 0
           OnClick = AdvRadioGroup1Click
         end
         object AdvRadioGroup2: TRadioGroup
-          Left = 8
-          Top = 48
-          Width = 280
-          Height = 50
+          Left = 1
+          Top = 41
+          Width = 360
+          Height = 40
           Caption = 'Value'
           Columns = 3
           ItemIndex = 0
@@ -917,16 +921,34 @@ object FMain: TFMain
             'FNumber [1.2-22]'
             'ISO [50-6400]')
           ParentBackground = False
-          TabOrder = 2
+          TabOrder = 1
           WordWrap = True
           OnClick = AdvRadioGroup2Click
+        end
+        object AdvCheckBox_Zeroes: TCheckBox
+          Left = 176
+          Top = 88
+          Width = 90
+          Height = 24
+          Caption = '+ Zeroes'
+          TabOrder = 3
+          OnClick = ChartCheckClick
+        end
+        object AdvCheckBox_Legend: TCheckBox
+          Left = 267
+          Top = 88
+          Width = 90
+          Height = 24
+          Caption = 'Legend'
+          TabOrder = 4
+          OnClick = ChartCheckClick
         end
       end
       object ETChart: TChart
         Left = 0
-        Top = 137
+        Top = 121
         Width = 362
-        Height = 371
+        Height = 387
         Legend.Visible = False
         Title.Font.Color = clBlack
         Title.Font.Height = -19
@@ -938,11 +960,13 @@ object FMain: TFMain
         LeftAxis.Maximum = 15.000000000000000000
         Align = alClient
         TabOrder = 1
+        ExplicitWidth = 358
+        ExplicitHeight = 386
         DefaultCanvas = 'TGDIPlusCanvas'
         PrintMargins = (
-          27
+          24
           15
-          27
+          24
           15)
         ColorPaletteIndex = 13
         object Series1: TBarSeries
@@ -957,6 +981,7 @@ object FMain: TFMain
             0000322E380000000000002040FF03000000342E300000000000002040FF0300
             0000352E360000000000001040FF03000000382E300000000000001040FF0400
             000031312E30}
+          Detail = {0000000000}
         end
       end
     end

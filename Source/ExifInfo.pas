@@ -270,7 +270,8 @@ type
   end;
 
 function GetMetadata(AName: string; AGetOptions: TGetOptions; VarData: TVarData = nil; FieldNames: TStrings = nil): FotoRec;
-procedure ChartFindFiles(StartDir, FileMask: string; SubDir: boolean;
+procedure ChartFindFiles(StartDir, FileMask: string;
+                         SubDirs, Zeroes: boolean;
                          var ETFocal, ETFnum, ETIso: TNrSortedStringList);
 
 implementation
@@ -2482,13 +2483,14 @@ begin
   end;
 end;
 
-procedure ChartFindFiles(StartDir, FileMask: string; SubDir: boolean;
+procedure ChartFindFiles(StartDir, FileMask: string;
+                         SubDirs, Zeroes: boolean;
                          var ETFocal, ETFnum, ETIso: TNrSortedStringList);
 var
   Foto: FotoRec;
   SR: TSearchRec;
   DirList: TStringList;
-  IsFound, DoSub: boolean;
+  IsFound, DoSub, DoZeroes: boolean;
   Indx: integer;
   CrWait, CrNormal: HCURSOR;
 begin
@@ -2496,7 +2498,8 @@ begin
   CrNormal := SetCursor(CrWait);
   try
     StartDir := IncludeTrailingPathDelimiter(StartDir);
-    DoSub := SubDir;
+    DoSub := SubDirs;
+    DoZeroes := Zeroes;
 
     // Build a list of the files in directory StartDir -not the directories!
     IsFound := FindFirst(StartDir + FileMask, faAnyFile - faDirectory, SR) = 0;
@@ -2507,17 +2510,19 @@ begin
       begin
         if (ExifIFD.HasData) then
         begin
-//TODO Add param?
           // focal length:
-          if (ExifIFD.FocalLength <> '0.0') then
+          if (DoZeroes) or
+             (StrToFloatDef(ExifIFD.FocalLength, 0, FloatFormatSettings) <> 0) then
             ETFocal.IncValue(ExifIFD.FocalLength);
 
           // aperture:
-          if (ExifIFD.FNumber <> '0.0') then
+          if (DoZeroes) or
+             (StrToFloatDef(ExifIFD.FNumber, 0, FloatFormatSettings) <> 0) then
             ETFnum.IncValue(ExifIFD.FNumber);
 
           // ISO:
-          if (ExifIFD.ISO <> '0') then
+          if (DoZeroes) or
+             (StrToFloatDef(ExifIFD.ISO, 0, FloatFormatSettings) <> 0) then
             ETIso.IncValue(ExifIFD.ISO);
         end;
       end;
@@ -2539,7 +2544,8 @@ begin
       System.SysUtils.FindClose(SR);
       // Scan the list of subdirectories
       for Indx := 0 to DirList.Count - 1 do
-        ChartFindFiles(DirList[Indx], FileMask, DoSub,
+        ChartFindFiles(DirList[Indx], FileMask,
+                       DoSub, DoZeroes,
                        ETFocal, ETFnum, ETIso);
       DirList.Free;
     end;

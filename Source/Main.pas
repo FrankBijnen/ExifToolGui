@@ -198,6 +198,9 @@ type
     SelectMenu: TPopupMenu;
     Selectall2: TMenuItem;
     Selectnone2: TMenuItem;
+    AdvCheckBox_Zeroes: TCheckBox;
+    BvlChartFunc: TBevel;
+    AdvCheckBox_Legend: TCheckBox;
     procedure ShellListClick(Sender: TObject);
     procedure ShellListKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
     procedure SpeedBtnExifClick(Sender: TObject);
@@ -332,6 +335,7 @@ type
     procedure Selectnone1Click(Sender: TObject);
     procedure Selectall2Click(Sender: TObject);
     procedure Selectnone2Click(Sender: TObject);
+    procedure ChartCheckClick(Sender: TObject);
   private
     { Private declarations }
     ETBarSeriesFocal: TBarSeries;
@@ -538,17 +542,23 @@ begin
   SpeedBtnChartRefreshClick(Sender);
 end;
 
-procedure TFMain.AdvRadioGroup2Click(Sender: TObject);
-var
-  LeftInc: double;
+procedure TFMain.ChartCheckClick(Sender: TObject);
 begin
   with ETChart do
   begin
     UndoZoom;
     ETChart.Title.Visible := true;
-    Legend.Visible := false;
+    Legend.Visible := AdvCheckBox_Legend.Checked;
     RemoveAllSeries;
   end;
+end;
+
+procedure TFMain.AdvRadioGroup2Click(Sender: TObject);
+var
+  LeftInc: double;
+begin
+
+  ChartCheckClick(Sender);
 
   with ETChart.LeftAxis do
   begin
@@ -3682,7 +3692,9 @@ begin
   ETFnum := TNrSortedStringList.Create;
   ETISO := TNrSortedStringList.Create;
   try
-    ChartFindFiles(ShellList.Path, Ext, AdvCheckBox_Subfolders.Checked,
+    ChartFindFiles(ShellList.Path, Ext,
+                   AdvCheckBox_Subfolders.Checked,
+                   AdvCheckBox_Zeroes.Checked,
                    ETFocal, ETFnum, ETISO);
 
     ETFocal.Sort;
