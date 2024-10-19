@@ -6,7 +6,7 @@ uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants,
   System.Classes, Vcl.Graphics,
   Vcl.Controls, Vcl.Forms, UnitScaleForm, Vcl.Dialogs, Vcl.ExtCtrls, Vcl.ComCtrls,
-  Vcl.StdCtrls;
+  Vcl.StdCtrls, Vcl.NumberBox;
 
 type
   TFFileDateTime = class(TScaleForm)
@@ -29,7 +29,16 @@ type
     RadioButton2: TRadioButton;
     Button4: TButton;
     ChkDateFirst: TCheckBox;
-    ChkSequence: TCheckBox;
+    RadDuplicates: TRadioGroup;
+    PnlCustomSeq: TPanel;
+    EdSeqPref: TEdit;
+    EdSeqPerc: TEdit;
+    NbSeqStart: TNumberBox;
+    UdSeqStart: TUpDown;
+    EdSeqColon: TEdit;
+    NbSeqWidth: TNumberBox;
+    UdWidth: TUpDown;
+    EdSeqSuf: TEdit;
     procedure FormShow(Sender: TObject);
     procedure CheckBox1Click(Sender: TObject);
     procedure RadioGroup3Click(Sender: TObject);
@@ -37,9 +46,13 @@ type
     procedure Button3Click(Sender: TObject);
     procedure Button4Click(Sender: TObject);
     procedure FormCreate(Sender: TObject);
-    procedure Edit1Change(Sender: TObject);
+    procedure EdPreviewChange(Sender: TObject);
+    procedure RadDuplicatesClick(Sender: TObject);
   private
     { Private declarations }
+    function GetRenameSample: string;
+    function GetStandardFormat: string;
+    function GetCustomFormat: string;
     procedure UpdatePreview;
     procedure DisplayHint(Sender: TObject);
   public
@@ -57,6 +70,33 @@ uses Main, ExifTool, UnitLangResources, ExifToolsGui_ShellList, Winapi.CommCtrl;
 
 var
   ETcmd: string;
+
+function TFFileDateTime.GetRenameSample: string;
+begin
+  result := '';
+  case RadDuplicates.ItemIndex of
+    1: result := '-1';
+    2: result := Format('%s%s%s', [EdSeqPref.Text,
+                                   Format('%.*d', [NbSeqWidth.ValueInt, NbSeqStart.ValueInt]),
+                                   EdSeqSuf.Text]);
+  end;
+end;
+
+function TFFileDateTime.GetStandardFormat: string;
+begin
+  result := '%-c';
+end;
+
+//%2:4C = Start from 2, 4 positions width = 0002
+function TFFileDateTime.GetCustomFormat: string;
+begin
+  result := Format('%s%s%d%s%dC%s', [EdSeqPref.Text,
+                                     EdSeqPerc.Text,
+                                     NbSeqStart.ValueInt,
+                                     EdSeqColon.Text,
+                                     NbSeqWidth.ValueInt,
+                                     EdSeqSuf.Text]);
+end;
 
 procedure TFFileDateTime.Button2Click(Sender: TObject);
 var
@@ -87,7 +127,10 @@ var
   begin
     if (ChkDateFirst.Checked = false) then
       ETcmd := ETcmd + ' ';
-    ETcmd := ETcmd + '%-c';
+    case RadDuplicates.ItemIndex of
+      1: ETcmd := ETcmd + GetStandardFormat;
+      2: ETcmd := ETcmd + GetCustomFormat;
+    end;
   end;
 
 begin
@@ -111,8 +154,8 @@ begin
     ETcmd := ETcmd + ' ';
     AddDateTime;
   end;
-  if (ChkSequence.Checked) then
-    AddSeq;
+
+  AddSeq;
 
   ETcmd := ETcmd + '.%e';
 
@@ -131,6 +174,7 @@ begin
     2:
       ETcmd := ETcmd + '%Y' + Ds + '%m' + Ds + '%d';
   end;
+
   ET.OpenExec(ETcmd, FMain.GetSelectedFiles, ETout, ETerr);
   ModalResult := mrOK;
 end;
@@ -184,61 +228,82 @@ begin
 
   with RadioGroup2 do
   begin
-    Items[0] := '';
-    Items[1] := '';
-    Items[2] := '';
-    if not ChkDateFirst.Checked then
-    begin
-      Items[0] := SampleFileName + ' ';
-      Items[1] := SampleFileName + ' ';
-      Items[2] := SampleFileName + ' ';
-    end;
-    if CheckBox1.Checked then
-    begin
-      if CheckBox2.Checked then
+    Items.BeginUpdate;
+    try
+      Items[0] := '';
+      Items[1] := '';
+      Items[2] := '';
+      if not ChkDateFirst.Checked then
       begin
-        Items[0] := Items[0] + 'YYYY-MM-DD_HH-MM-SS';
-        Items[1] := Items[1] + 'YYYY-MM-DD_HH-MM';
+        Items[0] := SampleFileName + ' ';
+        Items[1] := SampleFileName + ' ';
+        Items[2] := SampleFileName + ' ';
+      end;
+      if CheckBox1.Checked then
+      begin
+        if CheckBox2.Checked then
+        begin
+          Items[0] := Items[0] + 'YYYY-MM-DD_HH-MM-SS';
+          Items[1] := Items[1] + 'YYYY-MM-DD_HH-MM';
+        end
+        else
+        begin
+          Items[0] := Items[0] + 'YYYY-MM-DD_HHMMSS';
+          Items[1] := Items[1] + 'YYYY-MM-DD_HHMM';
+        end;
+        Items[2] := Items[2] + 'YYYY-MM-DD';
       end
       else
       begin
-        Items[0] := Items[0] + 'YYYY-MM-DD_HHMMSS';
-        Items[1] := Items[1] + 'YYYY-MM-DD_HHMM';
+        if CheckBox2.Checked then
+        begin
+          Items[0] := Items[0] + 'YYYYMMDD_HH-MM-SS';
+          Items[1] := Items[1] + 'YYYYMMDD_HH-MM';
+        end
+        else
+        begin
+          Items[0] := Items[0] + 'YYYYMMDD_HHMMSS';
+          Items[1] := Items[1] + 'YYYYMMDD_HHMM';
+        end;
+        Items[2] := Items[2] + 'YYYYMMDD';
       end;
-      Items[2] := Items[2] + 'YYYY-MM-DD';
-    end
-    else
-    begin
-      if CheckBox2.Checked then
+      if ChkDateFirst.Checked then
       begin
-        Items[0] := Items[0] + 'YYYYMMDD_HH-MM-SS';
-        Items[1] := Items[1] + 'YYYYMMDD_HH-MM';
+        Items[0] := Items[0] + ' ' + SampleFileName;
+        Items[1] := Items[1] + ' ' + SampleFileName;
+        Items[2] := Items[2] + ' ' + SampleFileName;
       end
       else
       begin
-        Items[0] := Items[0] + 'YYYYMMDD_HHMMSS';
-        Items[1] := Items[1] + 'YYYYMMDD_HHMM';
+        Items[0] := Items[0] + ' ';
+        Items[1] := Items[1] + ' ';
+        Items[2] := Items[2] + ' ';
       end;
-      Items[2] := Items[2] + 'YYYYMMDD';
+      case RadDuplicates.ItemIndex of
+        1:
+          begin
+            Items[0] := Items[0] + '-1';
+            Items[1] := Items[1] + '-1';
+            Items[2] := Items[2] + '-1';
+          end;
+        2:
+          begin
+            Items[0] := Items[0] + GetRenameSample;
+            Items[1] := Items[1] + GetRenameSample;
+            Items[2] := Items[2] + GetRenameSample;
+          end;
+      end;
+    finally
+      Items.EndUpdate;
     end;
-    if ChkDateFirst.Checked then
-    begin
-      Items[0] := Items[0] + ' ' + SampleFileName;
-      Items[1] := Items[1] + ' ' + SampleFileName;
-      Items[2] := Items[2] + ' ' + SampleFileName;
-    end
-    else
-    begin
-      Items[0] := Items[0] + ' ';
-      Items[1] := Items[1] + ' ';
-      Items[2] := Items[2] + ' ';
-    end;
-    if (ChkSequence.Checked) then
-    begin
-      Items[0] := Items[0] + '-1';
-      Items[1] := Items[1] + '-1';
-      Items[2] := Items[2] + '-1';
-    end;
+  end;
+  RadDuplicates.Items.BeginUpdate;
+  try
+    RadDuplicates.Items[0] := StrUseNone;
+    RadDuplicates.Items[1] := StrUseStandardSeq + ' ' + GetStandardFormat;
+    RadDuplicates.Items[2] := StrUseCustomSeq + ' ' + GetCustomFormat;
+  finally
+    RadDuplicates.Items.EndUpdate;
   end;
 end;
 
@@ -252,7 +317,7 @@ begin
   StatusBar1.SimpleText := GetShortHint(Application.Hint);
 end;
 
-procedure TFFileDateTime.Edit1Change(Sender: TObject);
+procedure TFFileDateTime.EdPreviewChange(Sender: TObject);
 begin
   UpdatePreview;
 end;
@@ -260,7 +325,7 @@ end;
 procedure TFFileDateTime.FormCreate(Sender: TObject);
 begin
   ChkDateFirst.Checked := true;
-  ChkSequence.Checked := true;
+  RadDuplicatesClick(Sender);
 end;
 
 procedure TFFileDateTime.FormShow(Sender: TObject);
@@ -270,6 +335,12 @@ begin
 
   RadioGroup3Click(Sender);
   Application.OnHint := DisplayHint;
+end;
+
+procedure TFFileDateTime.RadDuplicatesClick(Sender: TObject);
+begin
+  PnlCustomSeq.Visible := (RadDuplicates.ItemIndex = 2);
+  UpdatePreview;
 end;
 
 procedure TFFileDateTime.RadioGroup3Click(Sender: TObject);

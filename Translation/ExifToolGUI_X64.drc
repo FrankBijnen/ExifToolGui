@@ -8,140 +8,143 @@
   resources were bound to the produced executable.
 */
 
-#define Vcl_VDBConsts_SDeleteRecordQuestion 64128
-#define Vcl_VDBConsts_SDeleteMultipleRecordsQuestion 64129
-#define Vcl_VDBConsts_SDataSourceFixed 64130
-#define Vcl_VDBConsts_SPropDefByLookup 64131
-#define Vcl_VDBConsts_STooManyColumns 64132
-#define Vcl_VDBConsts_SRemoteLogin 64133
-#define Datasnap_MidConst_SClassNotAvailable 64144
-#define Datasnap_MidConst_SOutOfMemory 64145
-#define Datasnap_MidConst_SInvalidArg 64146
-#define Datasnap_MidConst_SUnableToLoadICU 64147
-#define Vcl_VDBConsts_SFirstRecord 64148
-#define Vcl_VDBConsts_SPriorRecord 64149
-#define Vcl_VDBConsts_SNextRecord 64150
-#define Vcl_VDBConsts_SLastRecord 64151
-#define Vcl_VDBConsts_SInsertRecord 64152
-#define Vcl_VDBConsts_SDeleteRecord 64153
-#define Vcl_VDBConsts_SEditRecord 64154
-#define Vcl_VDBConsts_SPostEdit 64155
-#define Vcl_VDBConsts_SCancelEdit 64156
-#define Vcl_VDBConsts_SRefreshRecord 64157
-#define Vcl_VDBConsts_SApplyUpdates 64158
-#define Vcl_VDBConsts_SCancelUpdates 64159
-#define Datasnap_MidConst_SConstraintFailed 64160
-#define Datasnap_MidConst_SField 64161
-#define Datasnap_MidConst_SReadOnlyProvider 64162
-#define Datasnap_MidConst_SNoKeySpecified 64163
-#define Datasnap_MidConst_SNoDataSets 64164
-#define Datasnap_MidConst_SRecConstFail 64165
-#define Datasnap_MidConst_SFieldConstFail 64166
-#define Datasnap_MidConst_SDefExprFail 64167
-#define Datasnap_MidConst_SArrayElementError 64168
-#define Datasnap_MidConst_SNoTableName 64169
-#define Datasnap_MidConst_SNoEditsAllowed 64170
-#define Datasnap_MidConst_SNoDeletesAllowed 64171
-#define Datasnap_MidConst_SNoInsertsAllowed 64172
-#define Datasnap_MidConst_SCannotChangeCommandText 64173
-#define Datasnap_MidConst_SConnectionMissing 64174
-#define Datasnap_MidConst_SNoCircularConnection 64175
-#define Data_DBConsts_SCouldNotParseTimeStamp 64176
-#define Data_DBConsts_SInvalidSqlTimeStamp 64177
-#define Datasnap_MidConst_SProviderNotExported 64178
-#define Datasnap_MidConst_SNoDataProvider 64179
-#define Datasnap_MidConst_SInvalidDataPacket 64180
-#define Datasnap_MidConst_SRefreshError 64181
-#define Datasnap_MidConst_SAggsNoSuchLevel 64182
-#define Datasnap_MidConst_SNoCircularReference 64183
-#define Datasnap_MidConst_SErrorLoadingMidas 64184
-#define Datasnap_MidConst_SCannotCreateDataSet 64185
-#define Datasnap_MidConst_SNoConnectToBroker 64186
-#define Datasnap_MidConst_SNoParentConnection 64187
-#define Datasnap_MidConst_SInvalidResponse 64188
-#define Datasnap_MidConst_STooManyRecordsModified 64189
-#define Datasnap_MidConst_SInvalidOptParamType 64190
-#define Datasnap_MidConst_SMissingDataSet 64191
-#define Data_DBConsts_SInvalidKeywordUse 64192
-#define Data_DBConsts_STextFalse 64193
-#define Data_DBConsts_STextTrue 64194
-#define Data_DBConsts_SParameterNotFound 64195
-#define Data_DBConsts_SInvalidVersion 64196
-#define Data_DBConsts_SBadFieldType 64197
-#define Data_DBConsts_SAggActive 64198
-#define Data_DBConsts_SProviderSQLNotSupported 64199
-#define Data_DBConsts_SProviderExecuteNotSupported 64200
-#define Data_DBConsts_SExprNoAggOnCalcs 64201
-#define Data_DBConsts_SRecordChanged 64202
-#define Data_DBConsts_SDataSetUnidirectional 64203
-#define Data_DBConsts_SUnassignedVar 64204
-#define Data_DBConsts_SRecordNotFound 64205
-#define Data_DBConsts_SBcdOverflow 64206
-#define Data_DBConsts_SInvalidBcdValue 64207
-#define Data_DBConsts_SExprNoLParen 64208
-#define Data_DBConsts_SExprNoRParen 64209
-#define Data_DBConsts_SExprNoRParenOrComma 64210
-#define Data_DBConsts_SExprExpected 64211
-#define Data_DBConsts_SExprBadField 64212
-#define Data_DBConsts_SExprBadNullTest 64213
-#define Data_DBConsts_SExprRangeError 64214
-#define Data_DBConsts_SExprIncorrect 64215
-#define Data_DBConsts_SExprNothing 64216
-#define Data_DBConsts_SExprTypeMis 64217
-#define Data_DBConsts_SExprBadScope 64218
-#define Data_DBConsts_SExprNoArith 64219
-#define Data_DBConsts_SExprNotAgg 64220
-#define Data_DBConsts_SExprBadConst 64221
-#define Data_DBConsts_SExprNoAggFilter 64222
-#define Data_DBConsts_SExprEmptyInList 64223
-#define Data_DBConsts_SIndexNotFound 64224
-#define Data_DBConsts_SDBDuplicateName 64225
-#define Data_DBConsts_SCircularDataLink 64226
-#define Data_DBConsts_SLookupInfoError 64227
-#define Data_DBConsts_SDataSourceChange 64228
-#define Data_DBConsts_SNoNestedMasterSource 64229
-#define Data_DBConsts_SDataSetOpen 64230
-#define Data_DBConsts_SNotEditing 64231
-#define Data_DBConsts_SDataSetClosed 64232
-#define Data_DBConsts_SDataSetEmpty 64233
-#define Data_DBConsts_SDataSetReadOnly 64234
-#define Data_DBConsts_SNestedDataSetClass 64235
-#define Data_DBConsts_SExprTermination 64236
-#define Data_DBConsts_SExprNameError 64237
-#define Data_DBConsts_SExprStringError 64238
-#define Data_DBConsts_SExprInvalidChar 64239
-#define Data_DBConsts_SInvalidBoolValue 64240
-#define Data_DBConsts_SInvalidFloatValue 64241
-#define Data_DBConsts_SFieldTypeMismatch 64242
-#define Data_DBConsts_SFieldSizeMismatch 64243
-#define Data_DBConsts_SInvalidVarByteArray 64244
-#define Data_DBConsts_SFieldOutOfRange 64245
-#define Data_DBConsts_SFieldRequired 64246
-#define Data_DBConsts_SDataSetMissing 64247
-#define Data_DBConsts_SInvalidCalcType 64248
-#define Data_DBConsts_SFieldReadOnly 64249
-#define Data_DBConsts_SFieldIndexError 64250
-#define Data_DBConsts_SNoFieldIndexes 64251
-#define Data_DBConsts_SNotIndexField 64252
-#define Data_DBConsts_SIndexFieldMissing 64253
-#define Data_DBConsts_SDuplicateIndexName 64254
-#define Data_DBConsts_SNoIndexForFields 64255
-#define sdJpegTypes_sOperationOnlyFor8x8 64256
-#define sdJpegTypes_sCommentCannotBeSet 64257
-#define sdJpegTypes_sDNLMarkerExpected 64258
-#define sdJpegTypes_sCannotUseTileMode 64259
-#define sdJpegTypes_sRangeErrorInTileLoading 64260
-#define Data_DBConsts_SInvalidFieldSize 64261
-#define Data_DBConsts_SInvalidFieldKind 64262
-#define Data_DBConsts_SUnknownFieldType 64263
-#define Data_DBConsts_SFieldNameMissing 64264
-#define Data_DBConsts_SDuplicateFieldName 64265
-#define Data_DBConsts_SFieldNotFound 64266
-#define Data_DBConsts_SFieldAccessError 64267
-#define Data_DBConsts_SFieldValueError 64268
-#define Data_DBConsts_SFieldRangeError 64269
-#define Data_DBConsts_SBcdFieldRangeError 64270
-#define Data_DBConsts_SInvalidIntegerValue 64271
+#define Vcl_VDBConsts_SRefreshRecord 64128
+#define Vcl_VDBConsts_SApplyUpdates 64129
+#define Vcl_VDBConsts_SCancelUpdates 64130
+#define Vcl_VDBConsts_SDeleteRecordQuestion 64131
+#define Vcl_VDBConsts_SDeleteMultipleRecordsQuestion 64132
+#define Vcl_VDBConsts_SDataSourceFixed 64133
+#define Vcl_VDBConsts_SPropDefByLookup 64134
+#define Vcl_VDBConsts_STooManyColumns 64135
+#define Vcl_VDBConsts_SRemoteLogin 64136
+#define Datasnap_MidConst_SCannotChangeCommandText 64144
+#define Datasnap_MidConst_SConnectionMissing 64145
+#define Datasnap_MidConst_SNoCircularConnection 64146
+#define Datasnap_MidConst_SClassNotAvailable 64147
+#define Datasnap_MidConst_SOutOfMemory 64148
+#define Datasnap_MidConst_SInvalidArg 64149
+#define Datasnap_MidConst_SUnableToLoadICU 64150
+#define Vcl_VDBConsts_SFirstRecord 64151
+#define Vcl_VDBConsts_SPriorRecord 64152
+#define Vcl_VDBConsts_SNextRecord 64153
+#define Vcl_VDBConsts_SLastRecord 64154
+#define Vcl_VDBConsts_SInsertRecord 64155
+#define Vcl_VDBConsts_SDeleteRecord 64156
+#define Vcl_VDBConsts_SEditRecord 64157
+#define Vcl_VDBConsts_SPostEdit 64158
+#define Vcl_VDBConsts_SCancelEdit 64159
+#define Datasnap_MidConst_STooManyRecordsModified 64160
+#define Datasnap_MidConst_SInvalidOptParamType 64161
+#define Datasnap_MidConst_SMissingDataSet 64162
+#define Datasnap_MidConst_SConstraintFailed 64163
+#define Datasnap_MidConst_SField 64164
+#define Datasnap_MidConst_SReadOnlyProvider 64165
+#define Datasnap_MidConst_SNoKeySpecified 64166
+#define Datasnap_MidConst_SNoDataSets 64167
+#define Datasnap_MidConst_SRecConstFail 64168
+#define Datasnap_MidConst_SFieldConstFail 64169
+#define Datasnap_MidConst_SDefExprFail 64170
+#define Datasnap_MidConst_SArrayElementError 64171
+#define Datasnap_MidConst_SNoTableName 64172
+#define Datasnap_MidConst_SNoEditsAllowed 64173
+#define Datasnap_MidConst_SNoDeletesAllowed 64174
+#define Datasnap_MidConst_SNoInsertsAllowed 64175
+#define Data_DBConsts_SRecordNotFound 64176
+#define Data_DBConsts_SBcdOverflow 64177
+#define Data_DBConsts_SInvalidBcdValue 64178
+#define Data_DBConsts_SCouldNotParseTimeStamp 64179
+#define Data_DBConsts_SInvalidSqlTimeStamp 64180
+#define Datasnap_MidConst_SProviderNotExported 64181
+#define Datasnap_MidConst_SNoDataProvider 64182
+#define Datasnap_MidConst_SInvalidDataPacket 64183
+#define Datasnap_MidConst_SRefreshError 64184
+#define Datasnap_MidConst_SAggsNoSuchLevel 64185
+#define Datasnap_MidConst_SNoCircularReference 64186
+#define Datasnap_MidConst_SErrorLoadingMidas 64187
+#define Datasnap_MidConst_SCannotCreateDataSet 64188
+#define Datasnap_MidConst_SNoConnectToBroker 64189
+#define Datasnap_MidConst_SNoParentConnection 64190
+#define Datasnap_MidConst_SInvalidResponse 64191
+#define Data_DBConsts_SExprBadConst 64192
+#define Data_DBConsts_SExprNoAggFilter 64193
+#define Data_DBConsts_SExprEmptyInList 64194
+#define Data_DBConsts_SInvalidKeywordUse 64195
+#define Data_DBConsts_STextFalse 64196
+#define Data_DBConsts_STextTrue 64197
+#define Data_DBConsts_SParameterNotFound 64198
+#define Data_DBConsts_SInvalidVersion 64199
+#define Data_DBConsts_SBadFieldType 64200
+#define Data_DBConsts_SAggActive 64201
+#define Data_DBConsts_SProviderSQLNotSupported 64202
+#define Data_DBConsts_SProviderExecuteNotSupported 64203
+#define Data_DBConsts_SExprNoAggOnCalcs 64204
+#define Data_DBConsts_SRecordChanged 64205
+#define Data_DBConsts_SDataSetUnidirectional 64206
+#define Data_DBConsts_SUnassignedVar 64207
+#define Data_DBConsts_SExprNameError 64208
+#define Data_DBConsts_SExprStringError 64209
+#define Data_DBConsts_SExprInvalidChar 64210
+#define Data_DBConsts_SExprNoLParen 64211
+#define Data_DBConsts_SExprNoRParen 64212
+#define Data_DBConsts_SExprNoRParenOrComma 64213
+#define Data_DBConsts_SExprExpected 64214
+#define Data_DBConsts_SExprBadField 64215
+#define Data_DBConsts_SExprBadNullTest 64216
+#define Data_DBConsts_SExprRangeError 64217
+#define Data_DBConsts_SExprIncorrect 64218
+#define Data_DBConsts_SExprNothing 64219
+#define Data_DBConsts_SExprTypeMis 64220
+#define Data_DBConsts_SExprBadScope 64221
+#define Data_DBConsts_SExprNoArith 64222
+#define Data_DBConsts_SExprNotAgg 64223
+#define Data_DBConsts_SIndexFieldMissing 64224
+#define Data_DBConsts_SDuplicateIndexName 64225
+#define Data_DBConsts_SNoIndexForFields 64226
+#define Data_DBConsts_SIndexNotFound 64227
+#define Data_DBConsts_SDBDuplicateName 64228
+#define Data_DBConsts_SCircularDataLink 64229
+#define Data_DBConsts_SLookupInfoError 64230
+#define Data_DBConsts_SDataSourceChange 64231
+#define Data_DBConsts_SNoNestedMasterSource 64232
+#define Data_DBConsts_SDataSetOpen 64233
+#define Data_DBConsts_SNotEditing 64234
+#define Data_DBConsts_SDataSetClosed 64235
+#define Data_DBConsts_SDataSetEmpty 64236
+#define Data_DBConsts_SDataSetReadOnly 64237
+#define Data_DBConsts_SNestedDataSetClass 64238
+#define Data_DBConsts_SExprTermination 64239
+#define Data_DBConsts_SFieldRangeError 64240
+#define Data_DBConsts_SBcdFieldRangeError 64241
+#define Data_DBConsts_SInvalidIntegerValue 64242
+#define Data_DBConsts_SInvalidBoolValue 64243
+#define Data_DBConsts_SInvalidFloatValue 64244
+#define Data_DBConsts_SFieldTypeMismatch 64245
+#define Data_DBConsts_SFieldSizeMismatch 64246
+#define Data_DBConsts_SInvalidVarByteArray 64247
+#define Data_DBConsts_SFieldOutOfRange 64248
+#define Data_DBConsts_SFieldRequired 64249
+#define Data_DBConsts_SDataSetMissing 64250
+#define Data_DBConsts_SInvalidCalcType 64251
+#define Data_DBConsts_SFieldReadOnly 64252
+#define Data_DBConsts_SFieldIndexError 64253
+#define Data_DBConsts_SNoFieldIndexes 64254
+#define Data_DBConsts_SNotIndexField 64255
+#define sdJpegTypes_sUnexpectedMarkerInEncodedStream 64256
+#define sdJpegTypes_sInvalidFrameRef 64257
+#define sdJpegTypes_sNoDCTCoefficentsAvailable 64258
+#define sdJpegTypes_sOperationOnlyFor8x8 64259
+#define sdJpegTypes_sCommentCannotBeSet 64260
+#define sdJpegTypes_sDNLMarkerExpected 64261
+#define sdJpegTypes_sCannotUseTileMode 64262
+#define sdJpegTypes_sRangeErrorInTileLoading 64263
+#define Data_DBConsts_SInvalidFieldSize 64264
+#define Data_DBConsts_SInvalidFieldKind 64265
+#define Data_DBConsts_SUnknownFieldType 64266
+#define Data_DBConsts_SFieldNameMissing 64267
+#define Data_DBConsts_SDuplicateFieldName 64268
+#define Data_DBConsts_SFieldNotFound 64269
+#define Data_DBConsts_SFieldAccessError 64270
+#define Data_DBConsts_SFieldValueError 64271
 #define UnitLangResources_StrFLPhotoTitle 64272
 #define UnitLangResources_StrShowAllFiles 64273
 #define UnitLangResources_StrThumbNails 64274
@@ -150,14 +153,14 @@
 #define UnitLangResources_StrExistSavedFirst 64277
 #define UnitLangResources_StrNewName 64278
 #define UnitLangResources_StrCopy 64279
-#define sdJpegTypes_sInternalError 64280
-#define sdJpegTypes_sUnsupportedEncoding 64281
-#define sdJpegTypes_sMarkerExpected 64282
-#define sdJpegTypes_sInvalidTableClass 64283
-#define sdJpegTypes_sInputStreamChopped 64284
-#define sdJpegTypes_sUnexpectedMarkerInEncodedStream 64285
-#define sdJpegTypes_sInvalidFrameRef 64286
-#define sdJpegTypes_sNoDCTCoefficentsAvailable 64287
+#define UnitLangResources_StrUseNone 64280
+#define UnitLangResources_StrUseStandardSeq 64281
+#define UnitLangResources_StrUseCustomSeq 64282
+#define sdJpegTypes_sInternalError 64283
+#define sdJpegTypes_sUnsupportedEncoding 64284
+#define sdJpegTypes_sMarkerExpected 64285
+#define sdJpegTypes_sInvalidTableClass 64286
+#define sdJpegTypes_sInputStreamChopped 64287
 #define UnitLangResources_StrFLExpComp 64288
 #define UnitLangResources_StrFLFLength 64289
 #define UnitLangResources_StrFLFlash 64290
@@ -1408,12 +1411,18 @@
 #define System_SysConst_SInvalidUnknownFilename 65535
 STRINGTABLE
 BEGIN
+	Vcl_VDBConsts_SRefreshRecord,	L"Refresh data"
+	Vcl_VDBConsts_SApplyUpdates,	L"Apply updates"
+	Vcl_VDBConsts_SCancelUpdates,	L"Cancel updates"
 	Vcl_VDBConsts_SDeleteRecordQuestion,	L"Delete record?"
 	Vcl_VDBConsts_SDeleteMultipleRecordsQuestion,	L"Delete all selected records?"
 	Vcl_VDBConsts_SDataSourceFixed,	L"Operation not allowed in a DBCtrlGrid"
 	Vcl_VDBConsts_SPropDefByLookup,	L"Property already defined by lookup field"
 	Vcl_VDBConsts_STooManyColumns,	L"Grid requested to display more than 256 columns"
 	Vcl_VDBConsts_SRemoteLogin,	L"Remote Login"
+	Datasnap_MidConst_SCannotChangeCommandText,	L"CommandText changes are not allowed"
+	Datasnap_MidConst_SConnectionMissing,	L"Requires Connection before opening"
+	Datasnap_MidConst_SNoCircularConnection,	L"Circular reference to Connection not allowed"
 	Datasnap_MidConst_SClassNotAvailable,	L"Class not available"
 	Datasnap_MidConst_SOutOfMemory,	L"Out of memory"
 	Datasnap_MidConst_SInvalidArg,	L"Invalid argument"
@@ -1427,9 +1436,9 @@ BEGIN
 	Vcl_VDBConsts_SEditRecord,	L"Edit record"
 	Vcl_VDBConsts_SPostEdit,	L"Post edit"
 	Vcl_VDBConsts_SCancelEdit,	L"Cancel edit"
-	Vcl_VDBConsts_SRefreshRecord,	L"Refresh data"
-	Vcl_VDBConsts_SApplyUpdates,	L"Apply updates"
-	Vcl_VDBConsts_SCancelUpdates,	L"Cancel updates"
+	Datasnap_MidConst_STooManyRecordsModified,	L"Update affected more than 1 record."
+	Datasnap_MidConst_SInvalidOptParamType,	L"Value cannot be stored in an optional parameter"
+	Datasnap_MidConst_SMissingDataSet,	L"Missing DataSet property"
 	Datasnap_MidConst_SConstraintFailed,	L"Record or field constraint failed."
 	Datasnap_MidConst_SField,	L"Field"
 	Datasnap_MidConst_SReadOnlyProvider,	L"Cannot apply updates to a ReadOnly provider"
@@ -1443,9 +1452,9 @@ BEGIN
 	Datasnap_MidConst_SNoEditsAllowed,	L"Modifications are not allowed"
 	Datasnap_MidConst_SNoDeletesAllowed,	L"Deletes are not allowed"
 	Datasnap_MidConst_SNoInsertsAllowed,	L"Inserts are not allowed"
-	Datasnap_MidConst_SCannotChangeCommandText,	L"CommandText changes are not allowed"
-	Datasnap_MidConst_SConnectionMissing,	L"Requires Connection before opening"
-	Datasnap_MidConst_SNoCircularConnection,	L"Circular reference to Connection not allowed"
+	Data_DBConsts_SRecordNotFound,	L"Record not found"
+	Data_DBConsts_SBcdOverflow,	L"BCD overflow"
+	Data_DBConsts_SInvalidBcdValue,	L"%s is not a valid BCD value"
 	Data_DBConsts_SCouldNotParseTimeStamp,	L"Could not parse SQL TimeStamp string"
 	Data_DBConsts_SInvalidSqlTimeStamp,	L"Invalid SQL date/time values"
 	Datasnap_MidConst_SProviderNotExported,	L"Provider not exported: %s"
@@ -1459,9 +1468,9 @@ BEGIN
 	Datasnap_MidConst_SNoConnectToBroker,	L"Connection not allowed to TConnectionBroker"
 	Datasnap_MidConst_SNoParentConnection,	L"ParentConnection is not assigned"
 	Datasnap_MidConst_SInvalidResponse,	L"Invalid response"
-	Datasnap_MidConst_STooManyRecordsModified,	L"Update affected more than 1 record."
-	Datasnap_MidConst_SInvalidOptParamType,	L"Value cannot be stored in an optional parameter"
-	Datasnap_MidConst_SMissingDataSet,	L"Missing DataSet property"
+	Data_DBConsts_SExprBadConst,	L"Constant is not correct type %s"
+	Data_DBConsts_SExprNoAggFilter,	L"Aggregate expressions not allowed in filters"
+	Data_DBConsts_SExprEmptyInList,	L"IN predicate list may not be empty"
 	Data_DBConsts_SInvalidKeywordUse,	L"Invalid use of keyword"
 	Data_DBConsts_STextFalse,	L"False"
 	Data_DBConsts_STextTrue,	L"True"
@@ -1475,9 +1484,9 @@ BEGIN
 	Data_DBConsts_SRecordChanged,	L"Record not found or changed by another user"
 	Data_DBConsts_SDataSetUnidirectional,	L"Operation not allowed on a unidirectional dataset"
 	Data_DBConsts_SUnassignedVar,	L"Unassigned variant value"
-	Data_DBConsts_SRecordNotFound,	L"Record not found"
-	Data_DBConsts_SBcdOverflow,	L"BCD overflow"
-	Data_DBConsts_SInvalidBcdValue,	L"%s is not a valid BCD value"
+	Data_DBConsts_SExprNameError,	L"Unterminated field name"
+	Data_DBConsts_SExprStringError,	L"Unterminated string constant"
+	Data_DBConsts_SExprInvalidChar,	L"Invalid filter expression character: '%s'"
 	Data_DBConsts_SExprNoLParen,	L"'(' expected but %s found"
 	Data_DBConsts_SExprNoRParen,	L"')' expected but %s found"
 	Data_DBConsts_SExprNoRParenOrComma,	L"')' or ',' expected but %s found"
@@ -1491,9 +1500,9 @@ BEGIN
 	Data_DBConsts_SExprBadScope,	L"Operation cannot mix aggregate value with record-varying value"
 	Data_DBConsts_SExprNoArith,	L"Arithmetic in filter expressions not supported"
 	Data_DBConsts_SExprNotAgg,	L"Expression is not an aggregate expression"
-	Data_DBConsts_SExprBadConst,	L"Constant is not correct type %s"
-	Data_DBConsts_SExprNoAggFilter,	L"Aggregate expressions not allowed in filters"
-	Data_DBConsts_SExprEmptyInList,	L"IN predicate list may not be empty"
+	Data_DBConsts_SIndexFieldMissing,	L"Cannot access index field '%s'"
+	Data_DBConsts_SDuplicateIndexName,	L"Duplicate index name '%s'"
+	Data_DBConsts_SNoIndexForFields,	L"No index for fields '%s'"
 	Data_DBConsts_SIndexNotFound,	L"Index '%s' not found"
 	Data_DBConsts_SDBDuplicateName,	L"Duplicate name '%s' in %s"
 	Data_DBConsts_SCircularDataLink,	L"Circular datalinks are not allowed"
@@ -1507,9 +1516,9 @@ BEGIN
 	Data_DBConsts_SDataSetReadOnly,	L"Cannot modify a read-only dataset"
 	Data_DBConsts_SNestedDataSetClass,	L"Nested dataset must inherit from %s"
 	Data_DBConsts_SExprTermination,	L"Filter expression incorrectly terminated"
-	Data_DBConsts_SExprNameError,	L"Unterminated field name"
-	Data_DBConsts_SExprStringError,	L"Unterminated string constant"
-	Data_DBConsts_SExprInvalidChar,	L"Invalid filter expression character: '%s'"
+	Data_DBConsts_SFieldRangeError,	L"%g is not a valid value for field '%s'. The allowed range is %g to %g"
+	Data_DBConsts_SBcdFieldRangeError,	L"%s is not a valid value for field '%s'. The allowed range is %s to %s"
+	Data_DBConsts_SInvalidIntegerValue,	L"'%s' is not a valid integer value for field '%s'"
 	Data_DBConsts_SInvalidBoolValue,	L"'%s' is not a valid boolean value for field '%s'"
 	Data_DBConsts_SInvalidFloatValue,	L"'%s' is not a valid floating point value for field '%s'"
 	Data_DBConsts_SFieldTypeMismatch,	L"Type mismatch for field '%s', expecting: %s actual: %s"
@@ -1523,9 +1532,9 @@ BEGIN
 	Data_DBConsts_SFieldIndexError,	L"Field index out of range"
 	Data_DBConsts_SNoFieldIndexes,	L"No index currently active"
 	Data_DBConsts_SNotIndexField,	L"Field '%s' is not indexed and cannot be modified"
-	Data_DBConsts_SIndexFieldMissing,	L"Cannot access index field '%s'"
-	Data_DBConsts_SDuplicateIndexName,	L"Duplicate index name '%s'"
-	Data_DBConsts_SNoIndexForFields,	L"No index for fields '%s'"
+	sdJpegTypes_sUnexpectedMarkerInEncodedStream,	L"Unexpected marker in encoded stream"
+	sdJpegTypes_sInvalidFrameRef,	L"Invalid frame reference in scan component"
+	sdJpegTypes_sNoDCTCoefficentsAvailable,	L"No DCT coefficients available (compress first)"
 	sdJpegTypes_sOperationOnlyFor8x8,	L"Operation can only be performed with LoadScale = jsFull"
 	sdJpegTypes_sCommentCannotBeSet,	L"Comment cannot be set before assigning bitmap"
 	sdJpegTypes_sDNLMarkerExpected,	L"DNL marker expected"
@@ -1539,9 +1548,6 @@ BEGIN
 	Data_DBConsts_SFieldNotFound,	L"Field '%s' not found"
 	Data_DBConsts_SFieldAccessError,	L"Cannot access field '%s' as type %s"
 	Data_DBConsts_SFieldValueError,	L"Invalid value for field '%s'"
-	Data_DBConsts_SFieldRangeError,	L"%g is not a valid value for field '%s'. The allowed range is %g to %g"
-	Data_DBConsts_SBcdFieldRangeError,	L"%s is not a valid value for field '%s'. The allowed range is %s to %s"
-	Data_DBConsts_SInvalidIntegerValue,	L"'%s' is not a valid integer value for field '%s'"
 	UnitLangResources_StrFLPhotoTitle,	L"Photo title"
 	UnitLangResources_StrShowAllFiles,	L"Show All Files"
 	UnitLangResources_StrThumbNails,	L"Thumbnails"
@@ -1550,14 +1556,14 @@ BEGIN
 	UnitLangResources_StrExistSavedFirst,	L"Existing definitions will be saved first!"
 	UnitLangResources_StrNewName,	L"New Name"
 	UnitLangResources_StrCopy,	L"Copy"
+	UnitLangResources_StrUseNone,	L"None (Show error)"
+	UnitLangResources_StrUseStandardSeq,	L"Use standard sequence"
+	UnitLangResources_StrUseCustomSeq,	L"Use custom sequence"
 	sdJpegTypes_sInternalError,	L"Internal error"
 	sdJpegTypes_sUnsupportedEncoding,	L"Unsupported encoding: SOF%d"
 	sdJpegTypes_sMarkerExpected,	L"Jpeg Marker expected"
 	sdJpegTypes_sInvalidTableClass,	L"Invalid table class in DHT marker"
 	sdJpegTypes_sInputStreamChopped,	L"Input stream prematurely chopped"
-	sdJpegTypes_sUnexpectedMarkerInEncodedStream,	L"Unexpected marker in encoded stream"
-	sdJpegTypes_sInvalidFrameRef,	L"Invalid frame reference in scan component"
-	sdJpegTypes_sNoDCTCoefficentsAvailable,	L"No DCT coefficients available (compress first)"
 	UnitLangResources_StrFLExpComp,	L"ExpComp."
 	UnitLangResources_StrFLFLength,	L"FLength"
 	UnitLangResources_StrFLFlash,	L"Flash"

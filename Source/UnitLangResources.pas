@@ -228,6 +228,10 @@ resourcestring
   StrNewName                = 'New Name';
   StrCopy                   = 'Copy';
 
+  StrUseNone                = 'None (Show error)';
+  StrUseStandardSeq         = 'Use standard sequence';
+  StrUseCustomSeq           = 'Use custom sequence';
+
 implementation
 
 end.
