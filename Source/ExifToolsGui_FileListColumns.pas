@@ -319,6 +319,9 @@ begin
     exit;
 
   AFolder := AShellList.Folders[ItemIndex];
+  if (AFolder = nil) then
+    exit;
+
   AOptions := AShellList.ReadModeOptions;
   AColumnDefs := AShellList.ColumnDefs;
 

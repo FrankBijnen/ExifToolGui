@@ -252,7 +252,8 @@ end;
 
 class function TSubShellFolder.HasParentShellFolder(Folder: TShellFolder): boolean;
 begin
-  result := (Folder.Parent <> nil) and
+  result := (Folder <> nil) and
+            (Folder.Parent <> nil) and
             (Folder.ParentShellFolder <> nil);
 end;
 
