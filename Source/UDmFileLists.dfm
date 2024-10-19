@@ -33,20 +33,24 @@ object DmFileLists: TDmFileLists
       FieldName = 'Sort'
     end
     object CdsFileListDefName: TWideStringField
+      DisplayLabel = 'Name_'
       DisplayWidth = 25
       FieldName = 'Name'
       Size = 64
     end
     object CdsFileListDefType: TStringField
+      DisplayLabel = 'Type_'
       DisplayWidth = 10
       FieldName = 'Type'
       Size = 10
     end
     object CdsFileListDefReadMode: TIntegerField
+      DisplayLabel = 'ReadMode_'
       FieldName = 'ReadMode'
       OnChange = CdsFileListDefReadModeChange
     end
     object CdsFileListDefReadModeLookup: TStringField
+      DisplayLabel = 'ReadModeLookup_'
       FieldKind = fkLookup
       FieldName = 'ReadModeLookup'
       LookupDataSet = CdsReadMode
@@ -56,6 +60,7 @@ object DmFileLists: TDmFileLists
       Lookup = True
     end
     object CdsFileListDefOptions: TIntegerField
+      DisplayLabel = 'Options_'
       FieldName = 'Options'
     end
   end
@@ -76,34 +81,42 @@ object DmFileLists: TDmFileLists
       FieldName = 'Id'
     end
     object CdsColumnSetCaption: TWideStringField
+      DisplayLabel = 'Caption_'
       DisplayWidth = 50
       FieldName = 'Caption'
       Size = 255
     end
     object CdsColumnSetCommand: TStringField
+      DisplayLabel = 'Command_'
       DisplayWidth = 64
       FieldName = 'Command'
       OnValidate = CdsColumnSetCommandValidate
       Size = 255
     end
     object CdsColumnSetBackup: TIntegerField
+      DisplayLabel = 'Backup_'
       FieldName = 'Backup'
     end
     object CdsColumnSetOption: TStringField
+      DisplayLabel = 'Option_'
       FieldName = 'Option'
       Size = 10
     end
     object CdsColumnSetAlignR: TIntegerField
+      DisplayLabel = 'AlignR_'
       FieldName = 'AlignR'
       DisplayFormat = '#'
     end
     object CdsColumnSetWidth: TStringField
+      DisplayLabel = 'Width_'
       FieldName = 'Width'
     end
     object CdsColumnSetSort: TIntegerField
+      DisplayLabel = 'Sort_'
       FieldName = 'Sort'
     end
     object CdsColumnSetBackupLookUp: TStringField
+      DisplayLabel = 'BackupLookUp_'
       FieldKind = fkLookup
       FieldName = 'BackupLookUp'
       LookupDataSet = CdsBackup
@@ -113,6 +126,7 @@ object DmFileLists: TDmFileLists
       Lookup = True
     end
     object CdsColumnSetOptionLookUp: TStringField
+      DisplayLabel = 'OptionLookUp_'
       FieldKind = fkLookup
       FieldName = 'OptionLookUp'
       LookupDataSet = CdsOption
@@ -122,12 +136,14 @@ object DmFileLists: TDmFileLists
       Lookup = True
     end
     object CdsColumnSetSampleValue: TWideStringField
+      DisplayLabel = 'SampleValue_'
       FieldKind = fkCalculated
       FieldName = 'SampleValue'
       Size = 64
       Calculated = True
     end
     object CdsColumnSetCommandLookup: TStringField
+      DisplayLabel = 'CommandLookup_'
       FieldKind = fkLookup
       FieldName = 'CommandLookup'
       LookupDataSet = CdsTagNames
@@ -187,10 +203,12 @@ object DmFileLists: TDmFileLists
     Left = 78
     Top = 285
     object CdsTagNamesTagName: TStringField
+      DisplayLabel = 'TagName_'
       FieldName = 'TagName'
       Size = 64
     end
     object CdsTagNamesSampleValue: TWideStringField
+      DisplayLabel = 'SampleValue_'
       FieldKind = fkCalculated
       FieldName = 'SampleValue'
       Size = 64

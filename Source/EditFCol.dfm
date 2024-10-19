@@ -129,6 +129,7 @@ object FEditFColumn: TFEditFColumn
           item
             Expanded = False
             FieldName = 'Name'
+            Title.Caption = 'Name'
             Width = 182
             Visible = True
           end
@@ -139,6 +140,7 @@ object FEditFColumn: TFEditFColumn
               'Internal'
               'ExifTool')
             ReadOnly = True
+            Title.Caption = 'Type'
             Width = 96
             Visible = True
           end
@@ -212,6 +214,7 @@ object FEditFColumn: TFEditFColumn
         item
           Expanded = False
           FieldName = 'Caption'
+          Title.Caption = 'Caption'
           Width = 149
           Visible = True
         end
@@ -220,6 +223,7 @@ object FEditFColumn: TFEditFColumn
           DropDownRows = 30
           Expanded = False
           FieldName = 'Command'
+          Title.Caption = 'Command'
           Width = 179
           Visible = True
         end
@@ -459,7 +463,7 @@ object FEditFColumn: TFEditFColumn
       1068
       29)
     object BtnOk: TBitBtn
-      Left = 878
+      Left = 866
       Top = 2
       Width = 87
       Height = 25
@@ -486,10 +490,10 @@ object FEditFColumn: TFEditFColumn
       ModalResult = 1
       NumGlyphs = 2
       TabOrder = 0
-      ExplicitLeft = 874
+      ExplicitLeft = 862
     end
     object BtnCancel: TBitBtn
-      Left = 969
+      Left = 957
       Top = 2
       Width = 87
       Height = 25
@@ -516,7 +520,7 @@ object FEditFColumn: TFEditFColumn
       ModalResult = 2
       NumGlyphs = 2
       TabOrder = 1
-      ExplicitLeft = 965
+      ExplicitLeft = 953
     end
   end
 end
