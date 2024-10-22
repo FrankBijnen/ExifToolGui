@@ -60,7 +60,7 @@ begin
   if (GUIsettings.GuiStyle = cSystemStyleName) then // AV unregistering style hooks
     exit;
 
-  Application.ProcessMessages;
+  ProcessMessages;
   SetForegroundWindow(Self.Handle);
 end;
 

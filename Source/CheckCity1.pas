@@ -131,7 +131,7 @@ begin
 
       panel1.Caption := format('Read: %d, Loaded: %d', [Indx, Loaded]);
       if ((indx mod 250) = 0) then
-        Application.ProcessMessages;
+        ProcessMessages;
 
       with Listview1.Items.Add do
       begin
@@ -180,7 +180,7 @@ begin
         Anitem.Update;
 
         Anitem.MakeVisible(false);
-        Application.ProcessMessages;
+        ProcessMessages;
       end;
     end;
   finally

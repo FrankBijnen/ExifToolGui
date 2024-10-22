@@ -3,7 +3,7 @@ unit ExifToolsGui_ShellList;
 interface
 
 uses
-  System.Classes, System.SysUtils, System.Types, System.Threading,
+  System.Classes, System.SysUtils, System.Types, System.Threading, System.Generics.Collections,
   Winapi.Windows, Winapi.Messages, Winapi.CommCtrl, Winapi.ShlObj,
   Vcl.Shell.ShellCtrls, Vcl.Shell.ShellConsts, Vcl.ComCtrls, Vcl.Menus, Vcl.Controls, Vcl.Graphics,
   ExifToolsGUI_Thumbnails, ExifToolsGUI_MultiContextMenu, UnitColumnDefs;
@@ -23,7 +23,6 @@ type
 
   TThumbErrorEvent = procedure(Sender: TObject; Item: TListItem; E: Exception) of object;
   TThumbGenerateEvent = procedure(Sender: TObject; Item: TListItem; Status: TThumbGenStatus; Total, Remaining: integer) of object;
-  TPopulateBeforeEvent = procedure(Sender: TObject; var DoDefault: boolean) of object;
   TOwnerDataFetchEvent = procedure(Sender: TObject; Item: TListItem; Request: TItemRequest; AFolder: TShellFolder) of object;
   TEnumColumnsEvent = procedure(Sender: TObject; var FileListOptions: TReadModeOptions; var ColumnDefs: TColumnsArray) of object;
 
@@ -52,6 +51,7 @@ type
     FHiddenFolders: TList;
     FThreadPool: TThreadPool;
     FThumbTasks: Tlist;
+    FPopulating: boolean;
     FDoDefault: boolean;
     FSubFolders: WPARAM;
     FIncludeSubFolders: boolean;
@@ -77,8 +77,9 @@ type
     FThumbNailCache: array of integer;
     FOnNotifyErrorEvent: TThumbErrorEvent;
     FOnNotifyGenerateEvent: TThumbGenerateEvent;
-    FOnPopulateBeforeEvent: TPopulateBeforeEvent;
-    FOnEnumColumnsAfterEvent: TEnumColumnsEvent;
+    FOnPopulateBeforeEvent: TNotifyEvent;
+    FOnEnumColumnsBeforeEvent: TEnumColumnsEvent;
+    FOnEnumColumnsAfterEvent: TNotifyEvent;
     FOnPathChange: TNotifyEvent;
     FOnItemsLoaded: TNotifyEvent;
     FOnOwnerDataFetchEvent: TOwnerDataFetchEvent;
@@ -117,10 +118,13 @@ type
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
     procedure Invalidate; override;
+    function DetailsNeeded: boolean;
     procedure ClearSelection; override;
     procedure SelectAll; override;
+    procedure SaveSelection(SaveSelection: Tlist<integer>);
+    procedure RestoreSelection(SaveSelection: Tlist<integer>);
     procedure Refresh;
-
+    procedure RefreshSelected;
     procedure AddDate; // Adds next columns if it is a Date.
     function Path: string;
     function GetSelectedFolder(ItemIndex: integer): TShellFolder;
@@ -150,8 +154,9 @@ type
     property OnThumbError: TThumbErrorEvent read FOnNotifyErrorEvent write FOnNotifyErrorEvent;
     property OnThumbGenerate: TThumbGenerateEvent read FOnNotifyGenerateEvent write FOnNotifyGenerateEvent;
     property Generating: integer read FGenerating;
-    property OnPopulateBeforeEvent: TPopulateBeforeEvent read FOnPopulateBeforeEvent write FOnPopulateBeforeEvent;
-    property OnEnumColumnsAfterEvent: TEnumColumnsEvent read FOnEnumColumnsAfterEvent write FOnEnumColumnsAfterEvent;
+    property OnPopulateBeforeEvent: TNotifyEvent read FOnPopulateBeforeEvent write FOnPopulateBeforeEvent;
+    property OnEnumColumnsBeforeEvent: TEnumColumnsEvent read FOnEnumColumnsBeforeEvent write FOnEnumColumnsBeforeEvent;
+    property OnEnumColumnsAfterEvent: TNotifyEvent read FOnEnumColumnsAfterEvent write FOnEnumColumnsAfterEvent;
     property ColumnDefs: TColumnsArray read FColumnDefs write FColumnDefs;
     property ReadModeOptions: TReadModeOptions read FReadModeOptions write FReadModeOptions;
     property OnPathChange: TNotifyEvent read FOnPathChange write FOnPathChange;
@@ -252,7 +257,8 @@ end;
 
 class function TSubShellFolder.HasParentShellFolder(Folder: TShellFolder): boolean;
 begin
-  result := (Folder.Parent <> nil) and
+  result := (Folder <> nil) and
+            (Folder.Parent <> nil) and
             (Folder.ParentShellFolder <> nil);
 end;
 
@@ -276,11 +282,12 @@ begin
       result := ExtractFilename(ExcludeTrailingPathDelimiter(Folder.PathName));
     TRelativeNameType.rnSort:
       // For Sorting
-      // Use the DisplayName, but prepend a Chr(0) for items in the root, so they will be first
+      // Use the DisplayName, but prepend a space for items in the root, so they will be first
       begin
-        if not (Folder is TSubShellFolder) then
-          result := Chr(0);
-        result := result + Folder.DisplayName;
+        if (Folder is TSubShellFolder) then
+          result := Folder.DisplayName
+        else
+          result := ' ' + Folder.DisplayName;
       end;
   end;
 end;
@@ -507,13 +514,13 @@ begin
         begin
           if (LocalCompareColumn = 0) then // Compare the relative name, not just the filename.
             result := CompareText(TSubShellFolder.GetRelativeSortName(Item1), TSubShellFolder.GetRelativeSortName(Item2),
-                                  TLocaleOptions.loInvariantLocale)
+                                  TLocaleOptions.loUserLocale)
           else
           begin // Compare the values from DetailStrings. Always text.
             if (LocalCompareColumn <= TShellFolder(Item1).DetailStrings.Count) and
                (LocalCompareColumn <= TShellFolder(Item2).DetailStrings.Count) then
               result := CompareText(TShellFolder(Item1).Details[LocalCompareColumn], TShellFolder(Item2).Details[LocalCompareColumn],
-                                    TLocaleOptions.loInvariantLocale);
+                                    TLocaleOptions.loUserLocale);
           end;
         end
         else
@@ -531,7 +538,7 @@ begin
       begin
         if (LocalIncludeSubFolders) then
           result := CompareText(TSubShellFolder.GetRelativeSortName(Item1), TSubShellFolder.GetRelativeSortName(Item2),
-                                TLocaleOptions.loInvariantLocale)
+                                TLocaleOptions.loUserLocale)
         else
           result := Smallint(TShellFolder(Item1).ParentShellFolder.CompareIDs(0,
                                                                               TShellFolder(Item1).RelativeID,
@@ -683,6 +690,24 @@ begin
     ListView_SetItemState(Handle, Indx, 0, LVIS_SELECTED);
 end;
 
+procedure TShellListView.SaveSelection(SaveSelection: Tlist<integer>);
+var
+  Index: integer;
+begin
+  for Index := 0 to Items.Count -1 do
+    if (ListView_GetItemState(Handle, Index, LVIS_SELECTED) = LVIS_SELECTED) then
+      SaveSelection.Add(Index);
+end;
+
+procedure TShellListView.RestoreSelection(SaveSelection: Tlist<integer>);
+var
+  Index: integer;
+begin
+  ListView_SetItemState(Handle, 0, 0, LVIS_SELECTED); // First Item is usually selected. Clear
+  for Index := 0 to SaveSelection.Count -1 do
+    ListView_SetItemState(Handle, integer(SaveSelection[Index]), LVIS_SELECTED, LVIS_SELECTED);
+end;
+
 procedure TShellListView.SelectAll;
 var
   Indx: integer;
@@ -696,6 +721,38 @@ begin
   ClearSelection;
 
   inherited Refresh;
+end;
+
+function TShellListView.DetailsNeeded: boolean;
+begin
+  result := (ViewStyle = TViewStyle.vsReport) and
+            (ReadModeOptions <> []);
+end;
+
+procedure TShellListView.RefreshSelected;
+var
+  Index: integer;
+  SavedSel: Tlist<integer>;
+begin
+  SavedSel := Tlist<integer>.Create;
+  try
+    SaveSelection(SavedSel);
+    if (DetailsNeeded) then
+    begin
+      for Index := 0 to SavedSel.Count -1 do
+      begin
+        Folders[SavedSel[Index]].DetailStrings.Clear;
+        Items[SavedSel[Index]].Update;
+      end;
+    end
+    else
+    begin
+      Refresh;
+      RestoreSelection(SavedSel);
+    end;
+  finally
+    SavedSel.Free;
+  end;
 end;
 
 procedure TShellListView.AddDate;
@@ -712,15 +769,22 @@ begin
   SendMessage(Handle, WM_SETREDRAW, 0, 0);
 
   try
+    FColumnDefs := nil;
+    if Assigned(FOnEnumColumnsBeforeEvent) then
+      FOnEnumColumnsBeforeEvent(Self, FReadModeOptions, FColumnDefs);
+
+    // Call standard OwnerDataFetch?
+    FDoDefault := not DetailsNeeded;
+
     Selected := nil;
     ItemFocused := nil;
     ClearSelection;
+
     if (FDoDefault) then
       inherited;
 
-    FColumnDefs := nil;
     if Assigned(FOnEnumColumnsAfterEvent) then
-      FOnEnumColumnsAfterEvent(Self, FReadModeOptions, FColumnDefs);
+      FOnEnumColumnsAfterEvent(Self);
 
     if Enabled and
        ValidDir(Path) and
@@ -892,6 +956,7 @@ var
   NewShellFolder: IShellFolder;
   NewRelativeFolder: TSubShellFolder;
 begin
+
   if (FRelativeFolder.ShellFolder = nil) then
     exit;
 
@@ -943,31 +1008,32 @@ begin
     exit;
   // until here
 
-  if Assigned(FOnPopulateBeforeEvent) then
-    FOnPopulateBeforeEvent(Self, FDoDefault);
-
-  // Force initialization of array with zeroes
-  SetLength(FThumbNailCache, 0);
-  ClearHiddenItems;
+  if FPopulating then
+    exit;
+  FPopulating := true;
 
   Items.BeginUpdate;
-  if (FIncludeSubFolders) then
-  begin
-    FSubFolders := 0;
-    FrmGenerate.Show;
-    SendMessage(FrmGenerate.Handle, CM_SubFolderScan, FSubFolders, LPARAM(Path));
-  end;
-
   try
-    try
-      inherited;
-    finally
-      Items.Count := FoldersList.Count;
-      Items.EndUpdate;
+    // Not used.
+    if Assigned(FOnPopulateBeforeEvent) then
+      FOnPopulateBeforeEvent(Self);
+
+    // Force initialization of array with zeroes
+    SetLength(FThumbNailCache, 0);
+    ClearHiddenItems;
+
+    if (FIncludeSubFolders) then
+    begin
+      FSubFolders := 0;
+      FrmGenerate.Show;
+      SendMessage(FrmGenerate.Handle, CM_SubFolderScan, FSubFolders, LPARAM(Path));
     end;
 
+    inherited;
+    Items.Count := FoldersList.Count; // Make sure Item count is updated. Can include subfolders!
+
     // Optimize memory allocation
-    AllocBy := Items.Count;
+    ListView_SetItemCountEx(Handle, Items.Count, LVSICF_NOINVALIDATEALL + LVSICF_NOSCROLL);
 
     if (ViewStyle = vsReport) then
       exit;
@@ -988,15 +1054,17 @@ begin
 
     GetThumbNails;
 
+    // All data loaded
+    if (Assigned(FOnItemsLoaded)) then
+      FOnItemsLoaded(Self);
+
   finally
     if (FIncludeSubFolders) then
       FrmGenerate.Close;
+
+    FPopulating := false;
+    Items.EndUpdate;
   end;
-
-  // All data loaded
-  if (Assigned(FOnItemsLoaded)) then
-    FOnItemsLoaded(Self);
-
 end;
 
 // When in vsReport mode, calls the OwnerDataFetch event to get the item.caption and subitems.
@@ -1058,10 +1126,14 @@ function TShellListView.OwnerDataFetch(Item: TListItem; Request: TItemRequest): 
 begin
   Result := true; // The inherited always return true!
 
+  // Dont interupt now. Still populating.
+  if FPopulating then
+    exit;
+
   if (not(FDoDefault) and
       not(csDesigning in ComponentState) and Assigned(FOnOwnerDataFetchEvent)) then
     FOnOwnerDataFetchEvent(Self, Item, Request, Folders[Item.Index])
-  else
+  else if TSubShellFolder.HasParentShellFolder(Folders[Item.Index]) then
     Result := inherited;
 
   // Set the Item.caption. Could be a relative filename. E.g. Subdir\file1.jpg
@@ -1080,6 +1152,7 @@ begin
 
   ICM2 := nil;
 
+  FPopulating := false;
   DoubleBuffered := true;
   FThumbNailSize := 0;
   FGenerating := 0;

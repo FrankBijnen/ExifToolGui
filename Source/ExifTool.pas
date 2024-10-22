@@ -11,9 +11,6 @@ const
   GUI_SEP = '-GUI-SEP';
 
   CmdStr = '-';
-  CmdDateOriginal = 'exif:DateTimeOriginal';
-  CmdDateCreate = 'exif:CreateDate';
-  CmdDateModify = 'exif:ModifyDate';
 
 type
   TExecETEvent = procedure(ExecNum: word; EtCmds, EtOuts, EtErrs, StatusLine: string; PopupOnError: boolean) of object;
@@ -97,6 +94,10 @@ type
     property RecordingFile: string read FRecordingFile write SetRecordingFile;
   end;
 
+function CmdDateTimeOriginal(const Group: string): string;
+function CmdCreateDate(const Group: string): string;
+function CmdModifyDate(const Group: string): string;
+
 var
    ET: TExifTool;
 
@@ -106,6 +107,21 @@ uses
   System.SysUtils, System.IOUtils,
   Main, MainDef, ExifToolsGUI_Utils,
   UnitLangResources;
+
+function CmdDateTimeOriginal(const Group: string): string;
+begin
+  result := Group + ':DateTimeOriginal';
+end;
+
+function CmdCreateDate(const Group: string): string;
+begin
+  result := Group + ':CreateDate';
+end;
+
+function CmdModifyDate(const Group: string): string;
+begin
+  result := Group + ':ModifyDate';
+end;
 
 const
   SizePipeBuffer = 65535;

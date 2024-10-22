@@ -64,6 +64,9 @@ uses Main, ExifTool, ExifToolsGUI_Utils, System.DateUtils, UnitLangResources, Sy
 
 {$R *.dfm}
 
+const
+  Group = 'exif';
+
 procedure TFDateTimeShift.BtnExecuteClick(Sender: TObject);
 var
   PN: string[3];
@@ -81,11 +84,11 @@ begin
     if (CompareDateTime(NewDateSample, DateSample) <> EqualsValue)  then
     begin
       if ChkShiftOriginal.Checked then
-        ETcmd := CmdStr + CmdDateOriginal + PN + MeShiftAmount.EditText;
+        ETcmd := CmdStr + CmdDateTimeOriginal(Group) + PN + MeShiftAmount.EditText;
       if ChkShiftCreate.Checked then
-        ETcmd := EndsWithCRLF(ETcmd) + CmdStr + CmdDateCreate + PN + MeShiftAmount.EditText;
+        ETcmd := EndsWithCRLF(ETcmd) + CmdStr + CmdCreateDate(Group) + PN + MeShiftAmount.EditText;
       if ChkShiftModify.Checked then
-        ETcmd := EndsWithCRLF(ETcmd) + CmdStr + CmdDateModify + PN + MeShiftAmount.EditText;
+        ETcmd := EndsWithCRLF(ETcmd) + CmdStr + CmdModifyDate(Group) + PN + MeShiftAmount.EditText;
     end;
   end;
   // ShiftDates in Exif?
@@ -95,9 +98,9 @@ begin
   // Correct FileDates?
   ETcmd := '';
   if ChkFileModified.Checked then
-    ETcmd := '-FileModifyDate<' + CmdDateModify;
+    ETcmd := '-FileModifyDate<' + CmdModifyDate(Group);
   if ChkFileCreated.Checked then
-    ETcmd := EndsWithCRLF(ETcmd) + '-FileCreateDate<' + CmdDateOriginal;
+    ETcmd := EndsWithCRLF(ETcmd) + '-FileCreateDate<' + CmdDateTimeOriginal(Group);
   if (ETcmd <> '') then
     ET.OpenExec(Etcmd, FMain.GetSelectedFiles);
 
@@ -205,8 +208,8 @@ end;
 
 procedure TFDateTimeShift.FormCreate(Sender: TObject);
 begin
-  ChkFileCreated.Caption := ChkFileCreated.Caption + '<' + CmdStr + CmdDateCreate;
-  ChkFileModified.Caption := ChkFileModified.Caption + '<' + CmdStr + CmdDateModify;
+  ChkFileCreated.Caption := ChkFileCreated.Caption + '<' + CmdStr + CmdCreateDate(Group);
+  ChkFileModified.Caption := ChkFileModified.Caption + '<' + CmdStr + CmdModifyDate(Group);
 end;
 
 procedure TFDateTimeShift.FormShow(Sender: TObject);
@@ -231,9 +234,9 @@ begin
     Application.OnHint := DisplayHint;
 
     ETcmd := '-s3' + CRLF + '-f' + CRLF +
-             CmdStr + CmdDateOriginal + CRLF +
-             CmdStr + CmdDateCreate + CRLF +
-             CmdStr + CmdDateModify;
+             CmdStr + CmdDateTimeOriginal(Group) + CRLF +
+             CmdStr + CmdCreateDate(Group) + CRLF +
+             CmdStr + CmdModifyDate(Group);
     ET.OpenExec(ETcmd, FMain.GetFirstSelectedFile, ETResult, false);
     if (ETResult.Count > 2) then
     begin

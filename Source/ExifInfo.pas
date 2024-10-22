@@ -1289,7 +1289,7 @@ begin
 
     if (GeoLat <> '') or
        (GeoLon <> '') then
-      GpsPosition := AddCompositeData('GpsPosition', Format('%s, %s', [GeoLat, GeoLon]));
+      GpsPosition := AddCompositeData('GpsPosition', Format('%s %s', [GeoLat, GeoLon]));
   end;
 end;
 
