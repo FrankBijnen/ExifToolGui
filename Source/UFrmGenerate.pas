@@ -67,7 +67,7 @@ begin
   LblGenerate.Caption := string(Message.LParam);
   PbProgress.Position := 0;
   PbProgress.Max := 0;
-  Application.ProcessMessages;
+  ProcessMessages;
 end;
 
 procedure TFrmGenerate.CMSubFolderSort(var Message: TMessage);
@@ -81,7 +81,7 @@ procedure TFrmGenerate.CMSubFolderSortProgress(var Message: TMessage);
 begin
   LblGenerate.Caption := string(Message.LParam);
   PbProgress.Position := Message.WParam;
-  Application.ProcessMessages;
+  ProcessMessages;
 end;
 
 procedure TFrmGenerate.CMIconStart(var Message: TMessage);

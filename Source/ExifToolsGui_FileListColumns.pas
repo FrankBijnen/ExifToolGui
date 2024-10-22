@@ -69,6 +69,7 @@ procedure ExportToCsv(AShellList: ExifToolsGui_ShellList.TShellListView;
                       FileName: string);
 procedure ExportToJson(AShellList: ExifToolsGui_ShellList.TShellListView;
                       FileName: string);
+
 implementation
 
 uses
@@ -78,12 +79,6 @@ uses
   ExifToolsGUI_Utils,
   ExifToolsGui_ThreadPool,
   MainDef;
-
-function DetailsNeeded(AShellList: ExifToolsGui_ShellList.TShellListView): boolean;
-begin
-  result := (AShellList.ViewStyle = TViewStyle.vsReport) and
-            (AShellList.ReadModeOptions <> []);
-end;
 
 procedure PostProcess(Folder: TShellFolder;
                       ColumnDefs: TColumnsArray;
@@ -315,7 +310,7 @@ var
   AColumnDefs: TColumnsArray;
   AOptions: TReadModeOptions;
 begin
-  if not DetailsNeeded(AShellList) then
+  if not AShellList.DetailsNeeded then
     exit;
 
   AFolder := AShellList.Folders[ItemIndex];
@@ -480,7 +475,7 @@ var
   SaveEnabled: boolean;
   Controller: TMetaDataGetController;
 begin
-  if not DetailsNeeded(AShellList) then
+  if not AShellList.DetailsNeeded then
     exit;
 
   SaveEnabled := AShellList.Enabled;

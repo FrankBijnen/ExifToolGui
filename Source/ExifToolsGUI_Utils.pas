@@ -135,6 +135,9 @@ procedure RemoveFromContext(const AppTitle: string);
 // Resource
 procedure LoadResourceList(Resource: string; List: TStringList);
 
+// Process message Queue. (No need for Vcl.Forms)
+procedure ProcessMessages;
+
 // Running elevated or admin?
 var
   FloatFormatSettings: TFormatSettings; // for StrToFloatDef -see Initialization
@@ -362,7 +365,7 @@ begin
 
     Dec(CurrentTry);
     Sleep(100);
-    Application.ProcessMessages;
+    ProcessMessages;
   until (CurrentTry < 1);
 
   if (ShResult <> 0) and (ShOp.fAnyOperationsAborted = false) then
@@ -1415,7 +1418,6 @@ begin
     DrawRect.Left := LinePos + ACanvas.TextWidth('Q');
     ACanvas.TextRect(DrawRect, TagValue, [TTextFormats.tfLeft, TTextFormats.tfSingleLine]);
   end;
-
 end;
 
 procedure SetTagItem(const AnItem: TlistItem; ACaption: string = '');
@@ -2016,6 +2018,16 @@ begin
     List.LoadFromStream(ResStream);
   finally
     ResStream.Free;
+  end;
+end;
+
+procedure ProcessMessages;
+var pmMsg:TMsg;
+begin
+  while (PeekMessage(pmMsg, 0, 0, 0, PM_REMOVE)) do
+  begin
+    TranslateMessage(pmMsg);
+    DispatchMessage(pmMsg);
   end;
 end;
 

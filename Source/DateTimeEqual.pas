@@ -43,22 +43,22 @@ uses Main, ExifTool, UnitLangResources;
 {$R *.dfm}
 
 const
-  CmdDateOriginal = '-exif:DateTimeOriginal';
-  CmdDateCreate = '-exif:CreateDate';
-  CmdDateModify = '-exif:ModifyDate';
-
-var
-  ETcmd: string;
+  Group = 'exif';
 
 procedure TFDateTimeEqual.Button2Click(Sender: TObject);
+var
+  ETcmd: string;
 begin
   ETcmd := '';
   if RadioButton1.Checked then
-    ETcmd := '-exif:DateTimeOriginal>exif:ModifyDate' + CRLF + '-exif:DateTimeOriginal>exif:CreateDate';
+    ETcmd := CmdStr + CmdDateTimeOriginal(Group) + '>' + CmdModifyDate(Group) + CRLF +
+             CmdStr + CmdDateTimeOriginal(Group) + '>' + CmdCreateDate(Group);
   if RadioButton2.Checked then
-    ETcmd := '-exif:CreateDate>exif:ModifyDate' + CRLF + '-exif:CreateDate>exif:DateTimeOriginal';
+    ETcmd := CmdStr + CmdCreateDate(Group) + '>' + CmdModifyDate(Group) + CRLF +
+             CmdStr + CmdCreateDate(Group) + '>' + CmdDateTimeOriginal(Group);
   if RadioButton3.Checked then
-    ETcmd := '-exif:ModifyDate>exif:DateTimeOriginal' + CRLF + '-exif:ModifyDate>exif:CreateDate';
+    ETcmd := CmdStr + CmdModifyDate(Group) + '>' + CmdDateTimeOriginal(Group) + CRLF +
+             CmdStr + CmdModifyDate(Group) + '>' + CmdCreateDate(Group);
 
   ET.OpenExec(ETcmd, FMain.GetSelectedFiles, ETout, ETerr);
   ModalResult := mrOK;
@@ -71,6 +71,7 @@ end;
 
 procedure TFDateTimeEqual.FormShow(Sender: TObject);
 var
+  ETcmd: string;
   ETresult: TStringList;
 begin
   ETresult := TStringList.Create;
@@ -86,7 +87,9 @@ begin
       Label1.Caption := StrBackupON;
     Application.OnHint := DisplayHint;
 
-    ETcmd := '-s3' + CRLF + '-f' + CRLF + CmdDateOriginal + CRLF + CmdDateCreate + CRLF + CmdDateModify;
+    ETcmd := '-s3' + CRLF + '-f' + CRLF + CmdStr + CmdDateTimeOriginal(Group) + CRLF +
+                                          CmdStr + CmdCreateDate(Group) + CRLF +
+                                          CmdStr + CmdModifyDate(Group);
     ET.OpenExec(ETcmd, FMain.GetFirstSelectedFile, ETresult, false);
     if (ETresult.Count > 2) then
     begin

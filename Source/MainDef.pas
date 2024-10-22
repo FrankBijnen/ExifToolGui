@@ -878,6 +878,7 @@ begin
   end;
 end;
 
+//TODO Prevent losing ini, when an exception occurs
 function SaveGUIini: boolean;
 begin
   result := true;

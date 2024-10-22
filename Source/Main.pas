@@ -372,8 +372,9 @@ type
 
     procedure ShellListCustomDrawItem(Sender: TCustomListView; Item: TListItem; State: TCustomDrawState;
       var DefaultDraw: Boolean);
-    procedure ShellListBeforePopulate(Sender: TObject; var DoDefault: boolean);
-    procedure ShellListAfterEnumColumns(Sender: TObject; var ReadModeOptions: TReadModeOptions; var ColumnDefs: TColumnsArray);
+
+    procedure ShellListBeforeEnumColumns(Sender: TObject; var ReadModeOptions: TReadModeOptions; var ColumnDefs: TColumnsArray);
+    procedure ShellListAfterEnumColumns(Sender: TObject);
     procedure ShellListPathChange(Sender: TObject);
     procedure ShellListItemsLoaded(Sender: TObject);
     procedure ShellListOwnerDataFetch(Sender: TObject; Item: TListItem; Request: TItemRequest; AFolder: TShellFolder);
@@ -1205,7 +1206,7 @@ procedure TFMain.MExifDateTimeshiftClick(Sender: TObject);
 begin
   if FDateTimeShift.ShowModal = mrOK then
   begin
-    ShellList.Refresh;
+    ShellList.RefreshSelected;
     ShowMetadata;
   end;
 end;
@@ -1265,16 +1266,19 @@ begin
     TbFlRefreshClick(Sender);
 end;
 
+const
+  Group = 'exif';
+
 procedure TFMain.MFileDateFromExifClick(Sender: TObject);
 var
   ETout, ETerr: string;
 begin
   if MessageDlg(FileDateFromExif1 + #10 +
-                Format(FileDateFromExif2, [CmdDateCreate, CmdDateModify]) + #10#10 +
+                Format(FileDateFromExif2, [CmdCreateDate(Group), CmdModifyDate(Group)]) + #10#10 +
                 StrOKToProceed, mtInformation, [mbOk, mbCancel], 0) = mrOK then
   begin
-    ET.OpenExec('-FileCreateDate<' + CmdDateCreate + CRLF +
-                '-FileModifyDate<' + CmdDateModify,
+    ET.OpenExec('-FileCreateDate<' + CmdCreateDate(Group) + CRLF +
+                '-FileModifyDate<' + CmdModifyDate(Group),
                 GetSelectedFiles, ETout, ETerr);
     RefreshSelected(Sender);
     ShowMetadata;
@@ -1285,7 +1289,7 @@ end;
 procedure TFMain.MFileNameDateTimeClick(Sender: TObject);
 begin
   if (FFileDateTime.ShowModal = idOK) then
-    ShellList.Refresh;
+    ShellList.RefreshSelected;
 end;
 
 procedure TFMain.MIgnoreErrorsClick(Sender: TObject);
@@ -2722,7 +2726,7 @@ begin
   ShellTree.PreferredRoot := ShellTree.Root;
 
   // Set properties of Shelllist in code.
-  ShellList.OnPopulateBeforeEvent := ShellListBeforePopulate;
+  ShellList.OnEnumColumnsBeforeEvent := ShellListBeforeEnumColumns;
   ShellList.OnEnumColumnsAfterEvent := ShellListAfterEnumColumns;
   ShellList.OnPathChange := ShellListPathChange;
   ShellList.OnItemsLoaded := ShellListItemsLoaded;
@@ -2966,7 +2970,7 @@ begin
     exit;
   end;
 
-  Application.ProcessMessages;
+  ProcessMessages;
   FolderName := ExtractFileName(AFolder.PathName);
   if (GUIsettings.FileFilter <> StrShowAllFiles) then
   begin
@@ -3035,12 +3039,13 @@ begin
   StyledDrawListviewItem(FStyleServices, Sender, Item, State);
 end;
 
-procedure TFMain.ShellListBeforePopulate(Sender: TObject; var DoDefault: boolean);
+procedure TFMain.ShellListBeforeEnumColumns(Sender: TObject; var ReadModeOptions: TReadModeOptions; var ColumnDefs: TColumnsArray);
 begin
-  DoDefault := ((ShellList.ViewStyle <> vsReport) or (GUIsettings.DetailsSel = 0));
+  ReadModeOptions := GetFileListDefs[GUIsettings.DetailsSel].ReadMode;
+  ColumnDefs := GetFileListDefs[GUIsettings.DetailsSel].ColumnDefs;
 end;
 
-procedure TFMain.ShellListAfterEnumColumns(Sender: TObject; var ReadModeOptions: TReadModeOptions; var ColumnDefs: TColumnsArray);
+procedure TFMain.ShellListAfterEnumColumns(Sender: TObject);
 
   procedure AdjustColumns(ColumnDefs: TColumnsArray);
   var
@@ -3084,23 +3089,19 @@ procedure TFMain.ShellListAfterEnumColumns(Sender: TObject; var ReadModeOptions:
   end;
 
 begin
-  ReadModeOptions := GetFileListDefs[GUIsettings.DetailsSel].ReadMode;
-  ColumnDefs := GetFileListDefs[GUIsettings.DetailsSel].ColumnDefs;
 
-  case GUIsettings.DetailsSel of
-    0:
-      begin
-        ShellList.AddDate;
-        AdjustColumns(ColumnDefs);
-      end;
+  if (ShellList.DetailsNeeded) then
+    AddColumns(ShellList.ColumnDefs)
   else
-    AddColumns(ColumnDefs);
+  begin
+    ShellList.AddDate;
+    AdjustColumns(ShellList.ColumnDefs);
   end;
 
   // Update Sys and Country Columns
   UpdateSysColumns(ShellList.RootFolder);
 
-  SetupCountry(ColumnDefs, GeoSettings.CountryCodeLocation);
+  SetupCountry(ShellList.ColumnDefs, GeoSettings.CountryCodeLocation);
 
 end;
 
@@ -3385,19 +3386,8 @@ begin
 end;
 
 procedure TFMain.RefreshSelected(Sender: TObject);
-var
-  Index: integer;
-  AnItem: TListItem;
 begin
-  for Index := 0 to ShellList.Items.Count -1 do
-  begin
-    if (ListView_GetItemState(ShellList.Handle, Index, LVIS_SELECTED) = LVIS_SELECTED) then
-    begin
-      ShellList.Folders[Index].DetailStrings.Clear;
-      AnItem := ShellList.Items[Index];
-      AnItem.Update;
-    end;
-  end;
+  ShellList.RefreshSelected;
 end;
 
 procedure TFMain.Tray_ResetwindowsizeClick(Sender: TObject);
