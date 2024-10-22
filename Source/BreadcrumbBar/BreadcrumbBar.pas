@@ -127,7 +127,7 @@ type
     FStyle: string;
     FSharedImages: THandle;
     FIconSize: integer;
-    procedure DrawArrow(ArrowRect: TRect);
+    procedure DrawArrow(ArrowRect: TRect; const ASelected: boolean = false);
     procedure ResetRectStates;
     function PointInRect(X, Y: integer; const Rect: TRect): boolean; inline;
     function GetMouseState: TRectState;
@@ -554,16 +554,17 @@ begin
       Exit(i);
 end;
 
-procedure TCustomBreadcrumbBar.DrawArrow(ArrowRect: TRect);
+procedure TCustomBreadcrumbBar.DrawArrow(ArrowRect: TRect; const ASelected: boolean = false);
 var
   arr: array[0..2] of TPoint;
   xleft, xright,
   ytop, ybottom, ymiddle: integer;
 begin
   Canvas.Brush.Style := bsSolid;
-  Canvas.Brush.Color := GetPenColor;
+  Canvas.Brush.Color := GetButtonTextColor(ASelected);
   Canvas.Pen.Style := psSolid;
   Canvas.Pen.Mode := pmCopy;
+
   xleft := ArrowRect.Left + (ArrowRect.Right - ArrowRect.Left - DpiScale(ARROW_SIZE)) div 2;
   xright := xleft + DpiScale(ARROW_SIZE);
   ytop := (Height - DpiScale(ARROW_SIZE)) div 2;
@@ -769,7 +770,7 @@ begin
     with FBreadcrumbArrowRects[i] do
       Rectangle(Canvas.Handle, Left, Top, Right, Bottom);
 
-    DrawArrow(FBreadcrumbArrowRects[i]);
+    DrawArrow(FBreadcrumbArrowRects[i], FArrowStates[i] <> rsNormal);
   end;
 end;
 
