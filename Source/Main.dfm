@@ -1266,11 +1266,9 @@ object FMain: TFMain
             Items = <
               item
                 Action = MaExifDateTimeshift
-                Caption = '&Exif: DateTime shift...'
               end
               item
                 Action = MaExifDateTimeEqualize
-                Caption = 'E&xif: DateTime equalize...'
               end
               item
                 Action = MaExifLensFromMaker
@@ -1533,13 +1531,13 @@ object FMain: TFMain
     object MaExifDateTimeshift: TAction
       Tag = 30
       Category = 'Modify'
-      Caption = 'Exif: DateTime shift...'
+      Caption = 'Exif/Xmp: DateTime shift...'
       OnExecute = MExifDateTimeshiftClick
     end
     object MaExifDateTimeEqualize: TAction
       Tag = 30
       Category = 'Modify'
-      Caption = 'Exif: DateTime equalize...'
+      Caption = 'Exif/Xmp: DateTime equalize...'
       OnExecute = MExifDateTimeEqualizeClick
     end
     object MaExifLensFromMaker: TAction

@@ -21,15 +21,20 @@ type
     Button1: TButton;
     Button2: TButton;
     Label1: TLabel;
+    CmbGroup: TComboBox;
+    LblGroup: TLabel;
+    Bevel1: TBevel;
     procedure FormShow(Sender: TObject);
     procedure RadioButton1Click(Sender: TObject);
     procedure Button2Click(Sender: TObject);
+    procedure CmbGroupClick(Sender: TObject);
   private
     { Private declarations }
+    Group: string;
     procedure DisplayHint(Sender: TObject);
+    procedure GetCurrentValues;
   public
     { Public declarations }
-  var
     ETout, ETerr: string;
   end;
 
@@ -42,8 +47,29 @@ uses Main, ExifTool, UnitLangResources;
 
 {$R *.dfm}
 
-const
-  Group = 'exif';
+procedure TFDateTimeEqual.GetCurrentValues;
+var
+  ETcmd: string;
+  ETresult: TStringList;
+begin
+  Group := CmbGroup.Text;
+
+  ETresult := TStringList.Create;
+  try
+    ETcmd := '-s3' + CRLF + '-f' + CRLF + CmdStr + CmdDateTimeOriginal(Group) + CRLF +
+                                          CmdStr + CmdCreateDate(Group) + CRLF +
+                                          CmdStr + CmdModifyDate(Group);
+    ET.OpenExec(ETcmd, FMain.GetFirstSelectedFile, ETresult, false);
+    if (ETresult.Count > 2) then
+    begin
+      LabeledEdit1.Text := ETresult[0];
+      LabeledEdit2.Text := ETresult[1];
+      LabeledEdit3.Text := ETresult[2];
+    end;
+  finally
+    ETresult.Free;
+  end;
+end;
 
 procedure TFDateTimeEqual.Button2Click(Sender: TObject);
 var
@@ -64,43 +90,31 @@ begin
   ModalResult := mrOK;
 end;
 
+procedure TFDateTimeEqual.CmbGroupClick(Sender: TObject);
+begin
+  GetCurrentValues;
+end;
+
 procedure TFDateTimeEqual.DisplayHint(Sender: TObject);
 begin
   StatusBar1.SimpleText := GetShortHint(Application.Hint);
 end;
 
 procedure TFDateTimeEqual.FormShow(Sender: TObject);
-var
-  ETcmd: string;
-  ETresult: TStringList;
 begin
-  ETresult := TStringList.Create;
-  try
-    Left := FMain.GetFormOffset.X;
-    Top := FMain.GetFormOffset.Y;
+  Left := FMain.GetFormOffset.X;
+  Top := FMain.GetFormOffset.Y;
 
-    RadioButton1Click(Sender);
+  GetCurrentValues;
+  RadioButton1Click(Sender);
 
-    if FMain.MaDontBackup.Checked then
-      Label1.Caption := StrBackupOFF
-    else
-      Label1.Caption := StrBackupON;
-    Application.OnHint := DisplayHint;
+  if FMain.MaDontBackup.Checked then
+    Label1.Caption := StrBackupOFF
+  else
+    Label1.Caption := StrBackupON;
+  Application.OnHint := DisplayHint;
 
-    ETcmd := '-s3' + CRLF + '-f' + CRLF + CmdStr + CmdDateTimeOriginal(Group) + CRLF +
-                                          CmdStr + CmdCreateDate(Group) + CRLF +
-                                          CmdStr + CmdModifyDate(Group);
-    ET.OpenExec(ETcmd, FMain.GetFirstSelectedFile, ETresult, false);
-    if (ETresult.Count > 2) then
-    begin
-      LabeledEdit1.Text := ETresult[0];
-      LabeledEdit2.Text := ETresult[1];
-      LabeledEdit3.Text := ETresult[2];
-    end;
-    RadioButton1.SetFocus;
-  finally
-    ETresult.Free;
-  end;
+  RadioButton1.SetFocus;
 end;
 
 procedure TFDateTimeEqual.RadioButton1Click(Sender: TObject);

@@ -30,6 +30,9 @@ type
     Label3: TLabel;
     DtPickTimeResult: TDateTimePicker;
     LblDebug: TLabel;
+    CmbGroup: TComboBox;
+    Bevel1: TBevel;
+    LblGroup: TLabel;
     procedure FormShow(Sender: TObject);
     procedure ChkShiftClick(Sender: TObject);
     procedure ChkIncrementClick(Sender: TObject);
@@ -39,15 +42,17 @@ type
     procedure DtPickResultChange(Sender: TObject);
     procedure DtPickTimeResultUserInput(Sender: TObject; const UserString: string; var DateAndTime: TDateTime;
       var AllowChange: Boolean);
+    procedure CmbGroupClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
   private
     { Private declarations }
-    ETcmd: string;
-    ETouts: string;
-    ETerrs: string;
+    Group: string;
     DateSample: TDateTime;
     NewDateSample: TDateTime;
     DateTimeOK: boolean;
+    OrigChkFileModified: string;
+    OrigChkFileCreated: string;
+    procedure GetCurrentValues;
     procedure ComputeDiff(NewDT: TdateTime);
     procedure GetDateTimeOriginal;
     procedure DisplayHint(Sender: TObject);
@@ -64,12 +69,48 @@ uses Main, ExifTool, ExifToolsGUI_Utils, System.DateUtils, UnitLangResources, Sy
 
 {$R *.dfm}
 
-const
-  Group = 'exif';
+procedure TFDateTimeShift.GetCurrentValues;
+var
+  ETResult: TStringList;
+  ETcmd: string;
+begin
+  Group := CmbGroup.Text;
+  ChkFileModified.Caption := OrigChkFileModified + '<' + CmdStr + CmdModifyDate(Group);
+  ChkFileCreated.Caption := OrigChkFileCreated + '<' + CmdStr + CmdCreateDate(Group);
+
+  ETResult := TStringList.Create;
+  try
+    ETcmd := '-s3' + CRLF + '-f' + CRLF +
+             CmdStr + CmdDateTimeOriginal(Group) + CRLF +
+             CmdStr + CmdCreateDate(Group) + CRLF +
+             CmdStr + CmdModifyDate(Group);
+    ET.OpenExec(ETcmd, FMain.GetFirstSelectedFile, ETResult, false);
+
+    if (ETResult.Count > 2) then
+    begin
+      ChkShiftOriginal.Checked := true;
+      ChkShiftCreate.Checked := true;
+      ChkFileCreated.Checked := true;
+      LblEdOriginal.Text := ETResult[0];
+      LblEdCreate.Text := ETResult[1];
+      LblEdModify.Text := ETResult[2];
+    end;
+
+    GetDateTimeOriginal;
+
+    MeShiftAmount.Clear;
+    MeShiftAmount.SetFocus;
+  finally
+    ETResult.Free;
+  end;
+end;
 
 procedure TFDateTimeShift.BtnExecuteClick(Sender: TObject);
 var
   PN: string[3];
+  ETcmd: string;
+  ETouts: string;
+  ETerrs: string;
 begin
   if ChkIncrement.Checked then
     PN := '+='
@@ -78,7 +119,7 @@ begin
 
   ETcmd := '';
   if (ChkShiftOriginal.Checked) and (ChkShiftCreate.Checked) and (ChkShiftModify.Checked) then
-    ETcmd := '-exif:AllDates' + PN + MeShiftAmount.EditText + CRLF
+    ETcmd := CmdStr + Group +  ':AllDates' + PN + MeShiftAmount.EditText + CRLF
   else
   begin
     if (CompareDateTime(NewDateSample, DateSample) <> EqualsValue)  then
@@ -112,6 +153,11 @@ begin
   GetDateTimeOriginal;
   BtnExecute.Enabled := (ChkShiftOriginal.Checked) or (ChkShiftCreate.Checked) or (ChkShiftModify.Checked) or
                         (ChkFileModified.Checked) or (ChkFileCreated.Checked);
+end;
+
+procedure TFDateTimeShift.CmbGroupClick(Sender: TObject);
+begin
+  GetCurrentValues;
 end;
 
 procedure TFDateTimeShift.ChkIncrementClick(Sender: TObject);
@@ -208,51 +254,29 @@ end;
 
 procedure TFDateTimeShift.FormCreate(Sender: TObject);
 begin
-  ChkFileCreated.Caption := ChkFileCreated.Caption + '<' + CmdStr + CmdCreateDate(Group);
-  ChkFileModified.Caption := ChkFileModified.Caption + '<' + CmdStr + CmdModifyDate(Group);
+  OrigChkFileModified := ChkFileModified.Caption;
+  OrigChkFileCreated := ChkFileCreated.Caption;
 end;
 
 procedure TFDateTimeShift.FormShow(Sender: TObject);
-var
-  ETResult: TStringList;
 begin
-  ETResult := TStringList.Create;
-  try
-    Left := FMain.GetFormOffset.X;
-    Top := FMain.GetFormOffset.Y;
-    if FMain.MaDontBackup.Checked then
-      Label1.Caption := StrBackupOFF
-    else
-      Label1.Caption := StrBackupON;
+  Left := FMain.GetFormOffset.X;
+  Top := FMain.GetFormOffset.Y;
+  if FMain.MaDontBackup.Checked then
+    Label1.Caption := StrBackupOFF
+  else
+    Label1.Caption := StrBackupON;
 
-    ChkShiftOriginal.Checked := false;
-    ChkShiftCreate.Checked := false;
-    ChkShiftModify.Checked := FMain.MaPreserveDateMod.Checked;
-    ChkFileModified.Checked := FMain.MaPreserveDateMod.Checked;
-    ChkFileCreated.Checked := false;
+  ChkShiftOriginal.Checked := false;
+  ChkShiftCreate.Checked := false;
+  ChkShiftModify.Checked := FMain.MaPreserveDateMod.Checked;
 
-    Application.OnHint := DisplayHint;
+  ChkFileModified.Checked := FMain.MaPreserveDateMod.Checked;
+  ChkFileCreated.Checked := false;
 
-    ETcmd := '-s3' + CRLF + '-f' + CRLF +
-             CmdStr + CmdDateTimeOriginal(Group) + CRLF +
-             CmdStr + CmdCreateDate(Group) + CRLF +
-             CmdStr + CmdModifyDate(Group);
-    ET.OpenExec(ETcmd, FMain.GetFirstSelectedFile, ETResult, false);
-    if (ETResult.Count > 2) then
-    begin
-      ChkShiftOriginal.Checked := true;
-      ChkShiftCreate.Checked := true;
-      ChkFileCreated.Checked := true;
-      LblEdOriginal.Text := ETResult[0];
-      LblEdCreate.Text := ETResult[1];
-      LblEdModify.Text := ETResult[2];
-    end;
-    GetDateTimeOriginal;
-    MeShiftAmount.Clear;
-    MeShiftAmount.SetFocus;
-  finally
-    ETResult.Free;
-  end;
+  GetCurrentValues;
+
+  Application.OnHint := DisplayHint;
 end;
 
 procedure TFDateTimeShift.MeShiftAmountChange(Sender: TObject);
