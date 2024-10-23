@@ -2,8 +2,8 @@ object FDateTimeShift: TFDateTimeShift
   Left = 0
   Top = 0
   BorderStyle = bsDialog
-  Caption = 'Exif: DateTime shift'
-  ClientHeight = 243
+  Caption = 'Exif/Xmp: DateTime shift'
+  ClientHeight = 276
   ClientWidth = 577
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
@@ -23,7 +23,7 @@ object FDateTimeShift: TFDateTimeShift
   end
   object StatusBar1: TStatusBar
     Left = 0
-    Top = 224
+    Top = 257
     Width = 577
     Height = 19
     Panels = <>
@@ -35,7 +35,7 @@ object FDateTimeShift: TFDateTimeShift
     Left = 0
     Top = 0
     Width = 483
-    Height = 224
+    Height = 257
     Align = alLeft
     DoubleBuffered = True
     Font.Charset = DEFAULT_CHARSET
@@ -49,7 +49,7 @@ object FDateTimeShift: TFDateTimeShift
     ExplicitHeight = 223
     object Label2: TLabel
       Left = 5
-      Top = 119
+      Top = 154
       Width = 145
       Height = 14
       Alignment = taRightJustify
@@ -58,7 +58,7 @@ object FDateTimeShift: TFDateTimeShift
     end
     object Label3: TLabel
       Left = 5
-      Top = 150
+      Top = 185
       Width = 145
       Height = 14
       Alignment = taRightJustify
@@ -66,9 +66,9 @@ object FDateTimeShift: TFDateTimeShift
       Caption = 'DateTime result:'
     end
     object LblDebug: TLabel
-      Left = 10
-      Top = 170
-      Width = 137
+      Left = 5
+      Top = 205
+      Width = 145
       Height = 25
       AutoSize = False
       Caption = 'Debug'
@@ -83,9 +83,25 @@ object FDateTimeShift: TFDateTimeShift
       Visible = False
       StyleElements = []
     end
+    object Bevel1: TBevel
+      Left = 6
+      Top = 5
+      Width = 465
+      Height = 34
+    end
+    object LblGroup: TLabel
+      Left = 5
+      Top = 11
+      Width = 145
+      Height = 22
+      Alignment = taRightJustify
+      AutoSize = False
+      Caption = 'Group:'
+      Layout = tlCenter
+    end
     object LblEdOriginal: TLabeledEdit
       Left = 153
-      Top = 10
+      Top = 45
       Width = 142
       Height = 22
       EditLabel.Width = 98
@@ -98,7 +114,7 @@ object FDateTimeShift: TFDateTimeShift
     end
     object LblEdCreate: TLabeledEdit
       Left = 153
-      Top = 38
+      Top = 73
       Width = 142
       Height = 22
       EditLabel.Width = 66
@@ -111,7 +127,7 @@ object FDateTimeShift: TFDateTimeShift
     end
     object LblEdModify: TLabeledEdit
       Left = 153
-      Top = 66
+      Top = 101
       Width = 142
       Height = 22
       EditLabel.Width = 65
@@ -124,7 +140,7 @@ object FDateTimeShift: TFDateTimeShift
     end
     object ChkShiftOriginal: TCheckBox
       Left = 302
-      Top = 13
+      Top = 48
       Width = 175
       Height = 17
       Caption = '-shift'
@@ -135,7 +151,7 @@ object FDateTimeShift: TFDateTimeShift
     end
     object ChkShiftCreate: TCheckBox
       Left = 302
-      Top = 41
+      Top = 76
       Width = 175
       Height = 17
       Caption = '-shift'
@@ -146,7 +162,7 @@ object FDateTimeShift: TFDateTimeShift
     end
     object ChkShiftModify: TCheckBox
       Left = 302
-      Top = 69
+      Top = 104
       Width = 175
       Height = 17
       Caption = '-shift'
@@ -155,7 +171,7 @@ object FDateTimeShift: TFDateTimeShift
     end
     object MeShiftAmount: TMaskEdit
       Left = 153
-      Top = 116
+      Top = 151
       Width = 142
       Height = 22
       Hint = 'Example: [0000:00:01 02:00:00] =shift for 1 day & 2 hours'
@@ -167,7 +183,7 @@ object FDateTimeShift: TFDateTimeShift
     end
     object ChkIncrement: TCheckBox
       Left = 302
-      Top = 119
+      Top = 154
       Width = 175
       Height = 17
       Caption = '=Increment'
@@ -178,7 +194,7 @@ object FDateTimeShift: TFDateTimeShift
     end
     object ChkFileModified: TCheckBox
       Left = 153
-      Top = 172
+      Top = 207
       Width = 320
       Height = 17
       Hint = 'File: Date modified becomes (shifted) exif:ModifyDate value'
@@ -188,7 +204,7 @@ object FDateTimeShift: TFDateTimeShift
     end
     object ChkFileCreated: TCheckBox
       Left = 153
-      Top = 195
+      Top = 230
       Width = 320
       Height = 17
       Hint = 'File: Date created becomes (shifted) exif:CreateDate value'
@@ -198,7 +214,7 @@ object FDateTimeShift: TFDateTimeShift
     end
     object DtPickDateResult: TDateTimePicker
       Left = 153
-      Top = 144
+      Top = 179
       Width = 90
       Height = 22
       Hint = 'Example of DateTimeOriginal after shifting'
@@ -215,7 +231,7 @@ object FDateTimeShift: TFDateTimeShift
     end
     object DtPickTimeResult: TDateTimePicker
       Left = 245
-      Top = 144
+      Top = 179
       Width = 75
       Height = 22
       Date = 45539.000000000000000000
@@ -228,6 +244,19 @@ object FDateTimeShift: TFDateTimeShift
       TabOrder = 9
       OnChange = DtPickResultChange
       OnUserInput = DtPickTimeResultUserInput
+    end
+    object CmbGroup: TComboBox
+      Left = 153
+      Top = 11
+      Width = 129
+      Height = 22
+      ItemIndex = 0
+      TabOrder = 12
+      Text = 'Exif'
+      OnClick = CmbGroupClick
+      Items.Strings = (
+        'Exif'
+        'Xmp')
     end
   end
   object BtnCancel: TButton

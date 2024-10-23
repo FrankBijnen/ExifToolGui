@@ -3,7 +3,7 @@ object FFileDateTime: TFFileDateTime
   Top = 0
   BorderStyle = bsDialog
   Caption = 'Rename files'
-  ClientHeight = 493
+  ClientHeight = 542
   ClientWidth = 710
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
@@ -11,24 +11,23 @@ object FFileDateTime: TFFileDateTime
   Font.Height = -11
   Font.Name = 'Tahoma'
   Font.Style = []
-  OnCreate = FormCreate
   OnShow = FormShow
   TextHeight = 13
   object StatusBar1: TStatusBar
     Left = 0
-    Top = 474
+    Top = 523
     Width = 710
     Height = 19
     Panels = <>
     SimplePanel = True
-    ExplicitTop = 450
+    ExplicitTop = 522
     ExplicitWidth = 706
   end
   object AdvPanel1: TPanel
     Left = 0
     Top = 0
     Width = 631
-    Height = 474
+    Height = 523
     Align = alLeft
     DoubleBuffered = True
     Font.Charset = DEFAULT_CHARSET
@@ -39,12 +38,12 @@ object FFileDateTime: TFFileDateTime
     ParentDoubleBuffered = False
     ParentFont = False
     TabOrder = 1
-    ExplicitHeight = 450
+    ExplicitHeight = 522
     object AdvPanel2: TPanel
       Left = 16
       Top = 16
       Width = 600
-      Height = 367
+      Height = 416
       Hint = 'Note: No backup files are created when renaming!'
       BevelOuter = bvLowered
       Font.Charset = DEFAULT_CHARSET
@@ -54,23 +53,53 @@ object FFileDateTime: TFFileDateTime
       Font.Style = []
       ParentFont = False
       TabOrder = 0
-      object RadioGroup1: TRadioGroup
+      object GroupBox1: TGroupBox
         Left = 16
-        Top = 8
-        Width = 564
-        Height = 49
-        Caption = 'Get DateTime from Exif'
-        Columns = 3
-        ItemIndex = 0
-        Items.Strings = (
-          'DateTimeOriginal'
-          'CreateDate'
-          'ModifyDate')
-        TabOrder = 0
+        Top = 12
+        Width = 567
+        Height = 81
+        Caption = 'Get DateTime from'
+        TabOrder = 10
+        object LblSampleDate: TLabel
+          Left = 157
+          Top = 20
+          Width = 392
+          Height = 22
+          AutoSize = False
+          Caption = 'Sample date'
+        end
+        object CmbGroup: TComboBox
+          Left = 14
+          Top = 19
+          Width = 129
+          Height = 22
+          ItemIndex = 0
+          TabOrder = 0
+          Text = 'Exif'
+          OnClick = CmbGroupClick
+          Items.Strings = (
+            'Exif'
+            'Xmp')
+        end
+        object RadioGroup1: TRadioGroup
+          Left = 1
+          Top = 44
+          Width = 555
+          Height = 34
+          Columns = 3
+          ItemIndex = 0
+          Items.Strings = (
+            'DateTimeOriginal'
+            'CreateDate'
+            'ModifyDate')
+          ShowFrame = False
+          TabOrder = 1
+          OnClick = RadioGroup1Click
+        end
       end
       object RadioGroup2: TRadioGroup
         Left = 16
-        Top = 63
+        Top = 99
         Width = 324
         Height = 90
         Caption = 'New Filename starts/ends with'
@@ -79,11 +108,11 @@ object FFileDateTime: TFFileDateTime
           'YYYYMMDD_HHMMSS Filename'
           'YYYYMMDD_HHMM Filename'
           'YYYYMMDD Filename')
-        TabOrder = 1
+        TabOrder = 0
       end
       object RadioGroup3: TRadioGroup
         Left = 16
-        Top = 155
+        Top = 197
         Width = 324
         Height = 65
         Caption = 'Change Filename'
@@ -91,71 +120,73 @@ object FFileDateTime: TFFileDateTime
         Items.Strings = (
           'keep as is'
           'set to:')
-        TabOrder = 2
+        TabOrder = 1
         OnClick = RadioGroup3Click
       end
       object RadioGroup4: TRadioGroup
         Left = 357
-        Top = 155
-        Width = 223
+        Top = 197
+        Width = 227
         Height = 65
         Caption = 'Save existing Filename to'
         ItemIndex = 0
         Items.Strings = (
           'Exif:DocumentName'
           'Don'#39't save')
-        TabOrder = 3
+        TabOrder = 2
       end
       object CheckBox1: TCheckBox
         Left = 357
-        Top = 73
+        Top = 109
         Width = 208
         Height = 17
         Caption = '-set separator in Date field'
-        TabOrder = 4
+        TabOrder = 3
         OnClick = CheckBox1Click
       end
       object CheckBox2: TCheckBox
         Left = 357
-        Top = 96
+        Top = 132
         Width = 208
         Height = 17
         Caption = '-set separator in Time field'
-        TabOrder = 5
+        TabOrder = 4
         OnClick = CheckBox1Click
       end
       object Edit1: TEdit
         Left = 115
-        Top = 191
-        Width = 206
+        Top = 234
+        Width = 219
         Height = 22
         Color = clBtnFace
         MaxLength = 64
-        TabOrder = 6
+        TabOrder = 5
         OnChange = EdPreviewChange
       end
       object Button2: TButton
         Left = 505
-        Top = 335
+        Top = 384
         Width = 75
         Height = 25
         Caption = 'Rename'
-        TabOrder = 7
+        TabOrder = 6
         OnClick = Button2Click
       end
       object ChkDateFirst: TCheckBox
         Left = 16
-        Top = 223
+        Top = 271
         Width = 324
         Height = 17
         Caption = '-DateTime first'
-        TabOrder = 8
+        Checked = True
+        State = cbChecked
+        TabOrder = 7
         OnClick = CheckBox1Click
       end
       object RadDuplicates: TRadioGroup
         Left = 16
-        Top = 246
-        Width = 564
+        Top = 295
+        Width = 568
         Height = 82
         Caption = 'Action on duplicate filename'
         ItemIndex = 1
@@ -163,18 +194,18 @@ object FFileDateTime: TFFileDateTime
           'None (Show error)'
           'Use standard sequence %-c'
           'Use custom sequence')
-        TabOrder = 9
+        TabOrder = 8
         OnClick = RadDuplicatesClick
       end
       object PnlCustomSeq: TPanel
-        Left = 378
-        Top = 298
+        Left = 383
+        Top = 342
         Width = 196
-        Height = 28
-        TabOrder = 10
+        Height = 31
+        TabOrder = 9
         object EdSeqPref: TEdit
           Left = 3
-          Top = 2
+          Top = 4
           Width = 26
           Height = 22
           TabOrder = 0
@@ -183,7 +214,7 @@ object FFileDateTime: TFFileDateTime
         end
         object EdSeqPerc: TEdit
           Left = 31
-          Top = 2
+          Top = 4
           Width = 18
           Height = 22
           Enabled = False
@@ -193,7 +224,7 @@ object FFileDateTime: TFFileDateTime
         end
         object NbSeqStart: TNumberBox
           Left = 55
-          Top = 2
+          Top = 4
           Width = 34
           Height = 22
           MaxLength = 4
@@ -202,7 +233,7 @@ object FFileDateTime: TFFileDateTime
         end
         object UdSeqStart: TUpDown
           Left = 89
-          Top = 2
+          Top = 4
           Width = 16
           Height = 22
           Associate = NbSeqStart
@@ -210,7 +241,7 @@ object FFileDateTime: TFFileDateTime
         end
         object EdSeqColon: TEdit
           Left = 107
-          Top = 2
+          Top = 4
           Width = 16
           Height = 22
           Enabled = False
@@ -220,7 +251,7 @@ object FFileDateTime: TFFileDateTime
         end
         object NbSeqWidth: TNumberBox
           Left = 124
-          Top = 2
+          Top = 4
           Width = 22
           Height = 22
           MinValue = 1.000000000000000000
@@ -232,7 +263,7 @@ object FFileDateTime: TFFileDateTime
         end
         object UdWidth: TUpDown
           Left = 146
-          Top = 2
+          Top = 4
           Width = 16
           Height = 22
           Associate = NbSeqWidth
@@ -241,7 +272,7 @@ object FFileDateTime: TFFileDateTime
         end
         object EdSeqSuf: TEdit
           Left = 163
-          Top = 2
+          Top = 4
           Width = 26
           Height = 22
           TabOrder = 7
@@ -252,7 +283,7 @@ object FFileDateTime: TFFileDateTime
     end
     object AdvPanel3: TPanel
       Left = 16
-      Top = 390
+      Top = 437
       Width = 600
       Height = 35
       Hint = 'Files will only be renamed where Exif:DocumentName is defined.'
@@ -286,7 +317,7 @@ object FFileDateTime: TFFileDateTime
     end
     object AdvPanel4: TPanel
       Left = 16
-      Top = 434
+      Top = 478
       Width = 600
       Height = 35
       Hint = 'DateTime part must be separated by SPACE!'

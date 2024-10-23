@@ -20,7 +20,6 @@ resourcestring
   StrWriteToSFailed         = 'Write to %s failed';
 
   StrFilesRenamed           = ' file(s) renamed.';
-  StrFilename               = 'Filename';
 
   StrRequestFailedWith      = 'Request failed with:';
   StrContinueReenabl        = 'Continue ? (Re-enable in Preferences)';

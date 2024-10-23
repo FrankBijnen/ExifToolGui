@@ -2,9 +2,9 @@ object FDateTimeEqual: TFDateTimeEqual
   Left = 0
   Top = 0
   BorderStyle = bsDialog
-  Caption = 'Exif DateTime equalize'
-  ClientHeight = 144
-  ClientWidth = 504
+  Caption = 'Exif/Xmp DateTime equalize'
+  ClientHeight = 178
+  ClientWidth = 529
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -15,25 +15,26 @@ object FDateTimeEqual: TFDateTimeEqual
   TextHeight = 13
   object Label1: TLabel
     Left = 430
-    Top = 76
-    Width = 31
+    Top = 102
+    Width = 90
     Height = 13
+    AutoSize = False
     Caption = 'Label1'
   end
   object StatusBar1: TStatusBar
     Left = 0
-    Top = 125
-    Width = 504
+    Top = 159
+    Width = 529
     Height = 19
     Panels = <>
     ExplicitTop = 124
-    ExplicitWidth = 487
+    ExplicitWidth = 500
   end
   object AdvPanel1: TPanel
     Left = 0
     Top = 0
     Width = 424
-    Height = 125
+    Height = 159
     Align = alLeft
     DoubleBuffered = True
     Font.Charset = DEFAULT_CHARSET
@@ -45,9 +46,38 @@ object FDateTimeEqual: TFDateTimeEqual
     ParentFont = False
     TabOrder = 1
     ExplicitHeight = 124
+    object Bevel1: TBevel
+      Left = 6
+      Top = 6
+      Width = 407
+      Height = 38
+    end
+    object LblGroup: TLabel
+      Left = 1
+      Top = 11
+      Width = 129
+      Height = 22
+      Alignment = taRightJustify
+      AutoSize = False
+      Caption = 'Group:'
+      Layout = tlCenter
+    end
+    object CmbGroup: TComboBox
+      Left = 137
+      Top = 11
+      Width = 129
+      Height = 22
+      ItemIndex = 0
+      TabOrder = 6
+      Text = 'Exif'
+      OnClick = CmbGroupClick
+      Items.Strings = (
+        'Exif'
+        'Xmp')
+    end
     object LabeledEdit1: TLabeledEdit
       Left = 137
-      Top = 24
+      Top = 55
       Width = 129
       Height = 22
       TabStop = False
@@ -61,7 +91,7 @@ object FDateTimeEqual: TFDateTimeEqual
     end
     object LabeledEdit2: TLabeledEdit
       Left = 137
-      Top = 56
+      Top = 87
       Width = 129
       Height = 22
       TabStop = False
@@ -75,7 +105,7 @@ object FDateTimeEqual: TFDateTimeEqual
     end
     object LabeledEdit3: TLabeledEdit
       Left = 137
-      Top = 88
+      Top = 119
       Width = 129
       Height = 22
       TabStop = False
@@ -89,7 +119,7 @@ object FDateTimeEqual: TFDateTimeEqual
     end
     object RadioButton1: TRadioButton
       Left = 272
-      Top = 27
+      Top = 58
       Width = 150
       Height = 17
       Caption = '-use as source'
@@ -100,7 +130,7 @@ object FDateTimeEqual: TFDateTimeEqual
     end
     object RadioButton2: TRadioButton
       Left = 272
-      Top = 59
+      Top = 90
       Width = 150
       Height = 17
       Caption = '-and copy here'
@@ -109,7 +139,7 @@ object FDateTimeEqual: TFDateTimeEqual
     end
     object RadioButton3: TRadioButton
       Left = 272
-      Top = 91
+      Top = 122
       Width = 150
       Height = 17
       Caption = '-and copy here'
@@ -120,7 +150,7 @@ object FDateTimeEqual: TFDateTimeEqual
   object Button1: TButton
     Left = 430
     Top = 13
-    Width = 65
+    Width = 90
     Height = 25
     Caption = 'Cancel'
     ModalResult = 2
@@ -128,8 +158,8 @@ object FDateTimeEqual: TFDateTimeEqual
   end
   object Button2: TButton
     Left = 430
-    Top = 95
-    Width = 65
+    Top = 121
+    Width = 90
     Height = 25
     Caption = 'Execute'
     Default = True
