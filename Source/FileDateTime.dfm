@@ -58,7 +58,7 @@ object FFileDateTime: TFFileDateTime
         Top = 12
         Width = 567
         Height = 81
-        Caption = 'Get DateTime from'
+        Caption = 'Use date and time from'
         TabOrder = 10
         object LblSampleDate: TLabel
           Left = 157

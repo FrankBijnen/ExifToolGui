@@ -230,6 +230,7 @@ var
   ETouts: string;
   ETerrs: string;
   SampleFileName: string;
+  SampleFileExt: string;
 begin
   if not Showing then
     exit;
@@ -245,12 +246,13 @@ begin
     1: ETcmd := ETcmd + CRLF + CmdStr + CmdCreateDate(Group);
     2: ETcmd := ETcmd + CRLF + CmdStr + CmdModifyDate(Group);
   end;
-  ET.OpenExec(ETcmd, FSample, ETouts, ETerrs);
+  ET.OpenExec(ETcmd, FSample, ETouts, ETerrs, false);
 
   if (RadioGroup3.ItemIndex = 1) then
     SampleFileName := Edit1.Text
   else
-    SampleFileName := FSample;
+    SampleFileName := ChangeFileExt(ExtractFileName(FSample), '');
+  SampleFileExt := ExtractFileExt(FSample);
 
   ETouts := StringReplace(ETouts, CRLF, ' ', [rfReplaceAll]);
   LblSampleDate.Caption := FSample + ' ' + ETouts;
@@ -322,6 +324,9 @@ begin
             Items[2] := Items[2] + GetRenameSample;
           end;
       end;
+      Items[0] := Items[0] + SampleFileExt;
+      Items[1] := Items[1] + SampleFileExt;
+      Items[2] := Items[2] + SampleFileExt;
     finally
       Items.EndUpdate;
     end;
