@@ -878,17 +878,19 @@ begin
   end;
 end;
 
-//TODO Prevent losing ini, when an exception occurs
+// First write everything to stream. If all OK write stream to disk.
+// Prevents losing ini file, in case an exception occurs.
 function SaveGUIini: boolean;
+var
+  IniStream: TMemoryStream;
 begin
   result := true;
   if (DontSaveIni) then
     exit;
-  try
-    // Recreate the INI file, by deleting first
-    System.SysUtils.DeleteFile(GetIniFilePath(false));
 
-    GUIini := TMemIniFile.Create(GetIniFilePath(false), TEncoding.UTF8);
+  try
+    IniStream := TMemoryStream.Create;
+    GUIini := TMemIniFile.Create(IniStream, TEncoding.UTF8);
     try
       with GUIini, FMain do
       begin
@@ -989,10 +991,18 @@ begin
         WriteCopySingleTags(GUIini);
 
       end;
+
       WriteGeoCodeSettings(GUIini);
+
+      // Write to stream
       GUIini.UpdateFile;
+
+      //Write Stream to disk. Will raise exception if unsuccesful.
+      IniStream.SaveToFile(GetIniFilePath(false));
+
     finally
       GUIini.Free;
+      IniStream.Free;
     end;
 
   except
