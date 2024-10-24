@@ -576,6 +576,7 @@ object FMain: TFMain
         List = True
         AllowTextButtons = True
         TabOrder = 0
+        ExplicitWidth = 358
         object TbFlRefresh: TToolButton
           Left = 0
           Top = 0
@@ -642,6 +643,8 @@ object FMain: TFMain
         Font.Style = []
         ParentFont = False
         TabOrder = 1
+        ExplicitTop = 323
+        ExplicitWidth = 358
         DesignSize = (
           362
           184)
@@ -771,6 +774,7 @@ object FMain: TFMain
           Text = ''
           OnChange = EditETdirectChange
           OnKeyDown = EditETdirectKeyDown
+          ExplicitWidth = 318
         end
         object CBoxETdirect: TComboBox
           Left = 1
@@ -845,6 +849,7 @@ object FMain: TFMain
         BevelOuter = bvNone
         ShowCaption = False
         TabOrder = 3
+        ExplicitWidth = 358
       end
     end
     object AdvTabChart: TTabSheet
@@ -863,7 +868,6 @@ object FMain: TFMain
         Font.Style = []
         ParentFont = False
         TabOrder = 0
-        ExplicitWidth = 358
         object BvlChartFunc: TBevel
           Left = 1
           Top = 86
@@ -991,7 +995,6 @@ object FMain: TFMain
     Top = 0
     Width = 940
     Height = 25
-    UseSystemFont = False
     ActionManager = MainActionManager
     Caption = 'ActionMainMenuBar'
     Color = clMenuBar
@@ -1000,7 +1003,7 @@ object FMain: TFMain
     ColorMap.BtnSelectedFont = clBlack
     ColorMap.UnusedColor = clWhite
     Font.Charset = DEFAULT_CHARSET
-    Font.Color = clBlack
+    Font.Color = clWindowText
     Font.Height = -12
     Font.Name = 'Segoe UI'
     Font.Style = []
@@ -1266,9 +1269,11 @@ object FMain: TFMain
             Items = <
               item
                 Action = MaExifDateTimeshift
+                Caption = '&Exif/Xmp: DateTime shift...'
               end
               item
                 Action = MaExifDateTimeEqualize
+                Caption = 'E&xif/Xmp: DateTime equalize...'
               end
               item
                 Action = MaExifLensFromMaker

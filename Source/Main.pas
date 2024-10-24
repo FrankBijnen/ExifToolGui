@@ -382,7 +382,6 @@ type
     procedure ShellListMouseWheel(Sender: TObject; Shift: TShiftState; WheelDelta: Integer; MousePos: TPoint; var Handled: Boolean);
     procedure CounterETEvent(Counter: integer);
     procedure ResetRootShowAll;
-    function SyncShellTree: TTreenode;
     procedure SetCaptionAndImage;
     procedure ViewPopupDrawItem(Sender: TObject; ACanvas: TCanvas; ARect: TRect; Selected: Boolean);
     procedure ViewPopupClick(Sender: TObject);
@@ -446,52 +445,6 @@ begin
   result.Y := Top + GUIBorderHeight;
   if (AddFileList) then
     result.Y := result.Y + AdvPageFilelist.Top;
-end;
-
-// Make the path, from the selected file in the FileList, visible in the Directory Treeview
-// Notes: Without selecting. That would refresh the ShellList
-//        Especially useful when subdirs are shown
-function TFMain.SyncShellTree: TTreenode;
-var
-  NewNode: TTreenode;
-  APath: string;
-  ASub: string;
-  ASubPath: string;
-begin
-  result := ShellTree.Items[0];
-  if (ShellList.IncludeSubFolders = false) then
-    exit;
-  if (ShellList.SelectedFolder = nil) then
-    exit;
-
-  APath := ExtractFilePath(ShellList.SelectedFolder.PathName);
-  // Break-up Path in pieces, and find them in the treeview.
-  // Expand, if needed
-  // MakeVisible
-  ASubPath := '';
-  while (APath <> '') do
-  begin
-    ASub := NextField(APath, PathDelim);
-
-    if (ASub = '?') then // Check for long filenames. \\?\C:\blabla\
-    begin
-      ASubPath := '';
-      continue;
-    end;
-
-    ASubPath := ASubPath + ASub + PathDelim;
-    NewNode := ShellTree.NodeFromPath(result, ASubPath);
-    if (NewNode = nil) then
-      continue;
-
-    result := NewNode;
-    if (result <> nil) and
-       (result.Expanded = false) then
-      result.Expand(false);
-
-  end;
-
-  result.MakeVisible;
 end;
 
 procedure TFMain.ResetRootShowAll;
@@ -2999,8 +2952,8 @@ begin
 
   EnableMenuItems;
 
-//TODO: Add param
-  SyncShellTree;
+  if (ShellList.IncludeSubFolders) then
+    ShellTree.SyncShellTreeFromShellList;
 end;
 
 procedure TFMain.ShellListColumnClick(Sender: TObject; Column: TListColumn);

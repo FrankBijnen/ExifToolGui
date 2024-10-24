@@ -37,6 +37,8 @@ type
     procedure RefreshPath(const APath: string);
     procedure SetPaths2Refresh;
     procedure RefreshAfterPaste;
+    procedure SyncShellTreeFromShellList;
+
     property OnBeforeContextMenu: TNotifyEvent read FOnBeforeContextMenu write FOnBeforeContextMenu;
     property OnAfterContextMenu: TNotifyEvent read FOnAfterContextMenu write FOnAfterContextMenu;
     property OnCustomDrawItem;
@@ -48,9 +50,9 @@ implementation
 
 uses
   System.IOUtils,
-  Winapi.ActiveX,
+  Winapi.ActiveX, Winapi.CommCtrl,
   Vcl.Shell.ShellConsts,
-  ExifToolsGUI_Thumbnails, ExiftoolsGui_ShellList, UnitFilesOnClipBoard;
+  ExifToolsGUI_Thumbnails, ExiftoolsGui_ShellList, ExifToolsGUI_Utils, UnitFilesOnClipBoard;
 
 constructor TShellTreeView.Create(AOwner: TComponent);
 begin
@@ -256,6 +258,60 @@ begin
     Root := FPreferredRoot;
   end;
   inherited Path := APath;
+end;
+
+// Make the path, from the selected file in the FileList, visible in the Directory Treeview
+// Notes: Without selecting. That would refresh the ShellList
+//        Especially useful when subdirs are shown
+procedure TShellTreeView.SyncShellTreeFromShellList;
+var
+  TempNode: TTreenode;
+  NewNode: TTreenode;
+  APath: string;
+  ASub: string;
+  ASubPath: string;
+  Rect: TRect;
+begin
+  if (ShellListView.SelectedFolder = nil) then
+    exit;
+
+  Items.BeginUpdate;
+  try
+    NewNode := Items[0];
+    APath := ExtractFilePath(ShellListView.SelectedFolder.PathName);
+    // Break-up Path in pieces, and find them in the treeview.
+    // Expand, if needed
+    // Make top item
+    ASubPath := '';
+    while (APath <> '') do
+    begin
+      ASub := NextField(APath, PathDelim);
+
+      if (ASub = '?') then // Check for long filenames. \\?\C:\blabla\
+      begin
+        ASubPath := '';
+        continue;
+      end;
+
+      ASubPath := ASubPath + ASub + PathDelim;
+      TempNode := NodeFromPath(NewNode, ASubPath);
+      if (TempNode = nil) then
+        continue;
+
+      NewNode := TempNode;
+      if (NewNode.Expanded = false) then
+        NewNode.Expand(false);
+    end;
+
+    // Is node in View?
+    TreeView_GetItemRect(Handle, NewNode.ItemId, Rect, True);
+    if (Rect.Top < 0) or
+       (Rect.Bottom > ClientHeight) then
+      TopItem := NewNode; // No, make top item
+
+  finally
+    Items.EndUpdate;
+  end;
 end;
 
 // to handle submenus of context menus.

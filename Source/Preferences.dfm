@@ -156,7 +156,7 @@ object FPreferences: TFPreferences
         Top = 308
         Width = 521
         Height = 17
-        Caption = '-save Filelist Details state on exit'
+        Caption = '-save File list Details state on exit'
         TabOrder = 10
       end
     end
@@ -467,7 +467,7 @@ object FPreferences: TFPreferences
           Top = 88
           Width = 450
           Height = 17
-          Caption = 'Show CountryCode in Filelist'
+          Caption = 'Show CountryCode in File list'
           TabOrder = 2
         end
         object CmbGeoCodingEnable: TComboBox
@@ -899,7 +899,7 @@ object FPreferences: TFPreferences
         Top = 182
         Width = 565
         Height = 17
-        Caption = '-Filelist: Show Folders in Filelist'
+        Caption = '-File list: Show Folders in File list'
         TabOrder = 5
       end
       object HintPause: TEdit
@@ -925,7 +925,7 @@ object FPreferences: TFPreferences
         Top = 229
         Width = 565
         Height = 17
-        Caption = '-Filelist: Show Breadcrumb (Address Bar) in Filelist'
+        Caption = '-File list: Show Breadcrumb (Address Bar) in File list'
         TabOrder = 7
       end
       object CheckBox8: TCheckBox
@@ -934,8 +934,8 @@ object FPreferences: TFPreferences
         Width = 565
         Height = 17
         Caption = 
-          '-Filelist: Show Hidden Folders and Files in Filelist (Admin requ' +
-          'ired)'
+          '-File list: Show Hidden Folders and Files in File list (Admin re' +
+          'quired)'
         TabOrder = 6
       end
       object GrpConfig: TGroupBox
