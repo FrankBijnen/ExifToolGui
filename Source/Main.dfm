@@ -1228,6 +1228,7 @@ object FMain: TFMain
               end
               item
                 Action = MaImportMetaSingle
+                Caption = '&Copy metadata from single file...'
               end
               item
                 Action = MaImportMetaSelected
@@ -1267,9 +1268,11 @@ object FMain: TFMain
             Items = <
               item
                 Action = MaExifDateTimeshift
+                Caption = '&Exif/Xmp: DateTime shift...'
               end
               item
                 Action = MaExifDateTimeEqualize
+                Caption = 'E&xif/Xmp: DateTime equalize...'
               end
               item
                 Action = MaExifLensFromMaker
