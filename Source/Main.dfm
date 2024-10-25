@@ -964,8 +964,6 @@ object FMain: TFMain
         LeftAxis.Maximum = 15.000000000000000000
         Align = alClient
         TabOrder = 1
-        ExplicitWidth = 358
-        ExplicitHeight = 386
         DefaultCanvas = 'TGDIPlusCanvas'
         PrintMargins = (
           24
@@ -995,6 +993,7 @@ object FMain: TFMain
     Top = 0
     Width = 940
     Height = 25
+    UseSystemFont = False
     ActionManager = MainActionManager
     Caption = 'ActionMainMenuBar'
     Color = clMenuBar
@@ -1003,7 +1002,7 @@ object FMain: TFMain
     ColorMap.BtnSelectedFont = clBlack
     ColorMap.UnusedColor = clWhite
     Font.Charset = DEFAULT_CHARSET
-    Font.Color = clWindowText
+    Font.Color = clBlack
     Font.Height = -12
     Font.Name = 'Segoe UI'
     Font.Style = []
@@ -1229,7 +1228,6 @@ object FMain: TFMain
               end
               item
                 Action = MaImportMetaSingle
-                Caption = '&Copy metadata from single file...'
               end
               item
                 Action = MaImportMetaSelected
@@ -1269,11 +1267,9 @@ object FMain: TFMain
             Items = <
               item
                 Action = MaExifDateTimeshift
-                Caption = '&Exif/Xmp: DateTime shift...'
               end
               item
                 Action = MaExifDateTimeEqualize
-                Caption = 'E&xif/Xmp: DateTime equalize...'
               end
               item
                 Action = MaExifLensFromMaker
