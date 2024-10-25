@@ -28,6 +28,7 @@ type
     EdMargin: TLabeledEdit;
     UdMargin: TUpDown;
     BtnOnMap: TButton;
+    LblMoreThan1: TLabel;
     procedure FormShow(Sender: TObject);
     procedure Button3Click(Sender: TObject);
     procedure TrackBar1Change(Sender: TObject);
