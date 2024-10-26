@@ -6,21 +6,24 @@ uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants,
   System.Classes, Vcl.Graphics,
   Vcl.Controls, UnitScaleForm, Vcl.Dialogs, Vcl.StdCtrls, Vcl.ExtCtrls,
-  Vcl.ComCtrls, Vcl.Buttons;
+  Vcl.ComCtrls, Vcl.Buttons, Vcl.CheckLst;
 
 type
   TFEditFFilter = class(TScaleForm)
     AdvPanel1: TPanel;
     EdFilter: TEdit;
     BtnAdd: TButton;
-    LbFilter: TListBox;
+    LbFilter: TCheckListBox;
     BtnUp: TButton;
     BtnDown: TButton;
     BtnDel: TButton;
     BtnUpdate: TButton;
-    Panel1: TPanel;
+    PnlBottom: TPanel;
     BtnCancel: TBitBtn;
     BtnOK: TBitBtn;
+    Label1: TLabel;
+    BevStartupUse: TBevel;
+    BtnDefault: TButton;
     procedure FormShow(Sender: TObject);
     procedure EdFilterChange(Sender: TObject);
     procedure BtnAddClick(Sender: TObject);
@@ -29,8 +32,11 @@ type
     procedure BtnUpClick(Sender: TObject);
     procedure BtnOkClick(Sender: TObject);
     procedure BtnUpdateClick(Sender: TObject);
+    procedure LbFilterClickCheck(Sender: TObject);
+    procedure BtnDefaultClick(Sender: TObject);
   private
     { Private declarations }
+    procedure LoadListBox;
   public
     { Public declarations }
   end;
@@ -40,14 +46,37 @@ var
 
 implementation
 
-uses Main, MainDef, ExifToolsGUI_Utils, UnitLangResources;
+uses
+  System.StrUtils,
+  Main, MainDef, ExifToolsGUI_Utils, UnitLangResources;
 
 {$R *.dfm}
+
+procedure TFEditFFilter.LoadListBox;
+begin
+  LbFilter.Items.Text := GUIsettings.FileFilters;
+  LbFilter.ItemIndex := -1;
+  if (GUIsettings.FilterStartup < LbFilter.Items.Count) then
+    LbFilter.Checked[GUIsettings.FilterStartup] := true;
+  EdFilter.Text := '';
+
+  if (GUIsettings.FilterSel > -1) and
+     (GUIsettings.FilterSel < LbFilter.Items.Count) then
+    LbFilter.ItemIndex := GUIsettings.FilterSel;
+  LbFilterClick(LbFilter);
+end;
 
 procedure TFEditFFilter.BtnAddClick(Sender: TObject);
 begin
   LbFilter.Items.Append(EdFilter.Text);
   EdFilter.Text := '';
+end;
+
+procedure TFEditFFilter.BtnDefaultClick(Sender: TObject);
+begin
+  GUIsettings.FileFilters := StrShowAllFiles + #10 + StringReplace(DefFileFilter, '|', #10, [rfReplaceAll]);
+  GUIsettings.FilterStartup := 0;
+  LoadListBox;
 end;
 
 procedure TFEditFFilter.BtnDelClick(Sender: TObject);
@@ -84,12 +113,20 @@ begin
       if Sender = BtnUp then
       begin
         if I > 1 then
+        begin
           Items.Exchange(I, I - 1); // Up
+          if (I = GUIsettings.FilterStartup) then
+            Dec(GUIsettings.FilterStartup);
+        end;
       end
       else
       begin
         if I < X then
+        begin
           Items.Exchange(I, I + 1); // Down
+          if (I = GUIsettings.FilterStartup) then
+            Inc(GUIsettings.FilterStartup);
+        end;
       end;
     end;
   end;
@@ -111,13 +148,7 @@ procedure TFEditFFilter.FormShow(Sender: TObject);
 begin
   Left := FMain.GetFormOffset(false).X;
   Top := FMain.GetFormOffset(false).Y;
-  LbFilter.Items.Text := GUIsettings.FileFilters;
-  LbFilter.ItemIndex := -1;
-  EdFilter.Text := '';
-  if (GUIsettings.FilterSel > -1) and
-     (GUIsettings.FilterSel < LbFilter.Items.Count) then
-    LbFilter.ItemIndex := GUIsettings.FilterSel;
-  LbFilterClick(Sender);
+  LoadListBox;
 end;
 
 procedure TFEditFFilter.LbFilterClick(Sender: TObject);
@@ -131,6 +162,31 @@ begin
   else
     EdFilter.Text := StrShowAllFiles;
   EdFilter.OnChange := EdFilterChange;
+end;
+
+procedure TFEditFFilter.LbFilterClickCheck(Sender: TObject);
+var
+  Index: integer;
+begin
+  if (LbFilter.ItemIndex < 0) or
+     (LbFilter.ItemIndex > LbFilter.Items.Count -1) then
+    exit;
+
+  if (ContainsText(LbFilter.Items[LbFilter.ItemIndex], '/s')) then
+    MessageDlgEx('Setting this item as startup could potentially increase startup time', '',
+                 TMsgDlgType.mtWarning, [TMsgDlgBtn.mbOK]);
+
+  GUIsettings.FilterStartup := LbFilter.ItemIndex;
+  LbFilter.Items.BeginUpdate;
+  try
+    for Index := 0 to LbFilter.Items.Count -1 do
+    begin
+      if (Index <> GUIsettings.FilterStartup) then
+        LbFilter.Checked[Index] := false;
+    end;
+  finally
+    LbFilter.Items.EndUpdate;
+  end;
 end;
 
 end.
