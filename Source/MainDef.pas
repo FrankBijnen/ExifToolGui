@@ -64,6 +64,11 @@ const
     'Xmp-crs:All ' +
     'Xmp-exif:All ';
 
+  DefFileFilter =
+    '*.JPG;*.JPE;*.JPEG;*.TIF;*.TIFF|*.CRW;*.CR2;*.CR3|*.PEF|*.ARW;*.SR2;*.SRF|*.NEF;*.NRW|*.DNG|*.MP4|' +
+    '*.JPG;*.CRW;*.CR2;*.CR3|*.JPG;*.PEF|*.JPG;*.ARW;*.SR2;*.SRF|*.JPG;*.NEF;*.NRW|*.JPG;*.DNG|' +
+    '*.JPG;*.MP4;/s';
+
   DefThumbNailSizes: array of integer = [96, 128, 160, 256, 512];
   ThumbNailPix = 'pix';
 
@@ -87,6 +92,7 @@ type
     ThumbCleanSet: string[4];
     DetailsSel: integer;
     FileFilters: string;
+    FilterStartup: integer;
     FilterSel: integer;
     AutoIncLine: boolean;
     DblClickUpdTags: boolean;
@@ -691,11 +697,8 @@ begin
         ET.Options.SetLangDef(Language);
         AutoRotatePreview := ReadBool(Ini_Settings, 'AutoRotatePreview', false);
         FileFilters := StrShowAllFiles + #10 +
-                       StringReplace(ReadString(Ini_Settings, 'FileFilters', '*.JPG|*.CR2|*.JPG;*.CR2|*.JPG;*.DNG|*.JPG;*.PEF'),
-                                     '|', #10, [rfReplaceAll]);
-//TODO Decide
-//        FilterSel := ReadInteger(Ini_Settings, 'FilterSel', 0); // Restore last
-        FilterSel := 0; // Default to Show All
+                       StringReplace(ReadString(Ini_Settings, 'FileFilters', DefFileFilter), '|', #10, [rfReplaceAll]);
+        FilterStartup := ReadInteger(Ini_Settings, 'FilterStartup', 0);
         DefStartupUse := ReadBool(Ini_Settings, 'DefStartupUse', false);
         DefStartupDir := ReadString(Ini_Settings, 'DefStartupDir', 'c:\');
         if DefStartupUse and ValidDir(DefStartupDir) then
@@ -720,11 +723,13 @@ begin
         if UseExitDetails then
         begin
           DetailsSel := ReadInteger(Ini_Settings, 'DetailsSel', 0);
+          FilterSel := FilterStartup;
           FMain.ShellList.ViewStyle := TviewStyle(ReadInteger(Ini_Settings, 'ViewStyle', 3));
         end
         else
         begin
           DetailsSel := 0;
+          FilterSel := 0;
           FMain.ShellList.ViewStyle := TViewStyle.vsReport;
         end;
         AutoIncLine := ReadBool(Ini_Settings, 'AutoIncLine', True);
@@ -912,7 +917,7 @@ begin
           WriteString(Ini_Settings, 'Language', Language);
           WriteBool(Ini_Settings, 'AutoRotatePreview', AutoRotatePreview);
           WriteString(Ini_Settings, 'FileFilters', SaveFileFilter);
-          WriteInteger(Ini_Settings, 'FilterSel', FilterSel);
+          WriteInteger(Ini_Settings, 'FilterStartup', FilterStartup);
           WriteBool(Ini_Settings, 'DefStartupUse', DefStartupUse);
           WriteString(Ini_Settings, 'DefStartupDir', DefStartupDir);
           WriteString(Ini_Settings, 'ETOverrideDir', ETOverrideDir);

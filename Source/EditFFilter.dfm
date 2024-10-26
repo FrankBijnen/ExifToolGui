@@ -3,8 +3,8 @@ object FEditFFilter: TFEditFFilter
   Top = 0
   BorderStyle = bsDialog
   Caption = 'Configure file filters'
-  ClientHeight = 374
-  ClientWidth = 364
+  ClientHeight = 403
+  ClientWidth = 464
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -16,8 +16,8 @@ object FEditFFilter: TFEditFFilter
   object AdvPanel1: TPanel
     Left = 0
     Top = 0
-    Width = 364
-    Height = 344
+    Width = 464
+    Height = 373
     Align = alClient
     DoubleBuffered = True
     Font.Charset = DEFAULT_CHARSET
@@ -28,16 +28,32 @@ object FEditFFilter: TFEditFFilter
     ParentDoubleBuffered = False
     ParentFont = False
     TabOrder = 0
+    ExplicitWidth = 360
+    ExplicitHeight = 355
+    object BevStartupUse: TBevel
+      Left = 40
+      Top = 329
+      Width = 417
+      Height = 20
+    end
+    object Label1: TLabel
+      Left = 45
+      Top = 333
+      Width = 404
+      Height = 13
+      AutoSize = False
+      Caption = 'Checked item will be used at startup'
+    end
     object EdFilter: TEdit
-      Left = 39
+      Left = 40
       Top = 37
-      Width = 319
+      Width = 417
       Height = 21
-      TabOrder = 3
+      TabOrder = 4
       OnChange = EdFilterChange
     end
     object BtnAdd: TButton
-      Left = 38
+      Left = 40
       Top = 6
       Width = 100
       Height = 25
@@ -45,14 +61,15 @@ object FEditFFilter: TFEditFFilter
       TabOrder = 0
       OnClick = BtnAddClick
     end
-    object LbFilter: TListBox
-      Left = 38
+    object LbFilter: TCheckListBox
+      Left = 40
       Top = 64
-      Width = 319
+      Width = 417
       Height = 262
-      ItemHeight = 13
-      TabOrder = 4
+      ItemHeight = 17
+      TabOrder = 5
       OnClick = LbFilterClick
+      OnClickCheck = LbFilterClickCheck
       OnDblClick = BtnOkClick
     end
     object BtnUp: TButton
@@ -67,7 +84,7 @@ object FEditFFilter: TFEditFFilter
       Font.Name = 'Webdings'
       Font.Style = []
       ParentFont = False
-      TabOrder = 5
+      TabOrder = 6
       OnClick = BtnUpClick
     end
     object BtnDown: TButton
@@ -82,11 +99,11 @@ object FEditFFilter: TFEditFFilter
       Font.Name = 'Webdings'
       Font.Style = []
       ParentFont = False
-      TabOrder = 6
+      TabOrder = 7
       OnClick = BtnUpClick
     end
     object BtnDel: TButton
-      Left = 257
+      Left = 251
       Top = 6
       Width = 100
       Height = 25
@@ -95,7 +112,7 @@ object FEditFFilter: TFEditFFilter
       OnClick = BtnDelClick
     end
     object BtnUpdate: TButton
-      Left = 147
+      Left = 145
       Top = 6
       Width = 100
       Height = 25
@@ -103,31 +120,42 @@ object FEditFFilter: TFEditFFilter
       TabOrder = 1
       OnClick = BtnUpdateClick
     end
+    object BtnDefault: TButton
+      Left = 357
+      Top = 6
+      Width = 100
+      Height = 25
+      Caption = 'Default'
+      TabOrder = 3
+      OnClick = BtnDefaultClick
+    end
   end
-  object Panel1: TPanel
+  object PnlBottom: TPanel
     Left = 0
-    Top = 344
-    Width = 364
+    Top = 373
+    Width = 464
     Height = 30
     Align = alBottom
     TabOrder = 1
+    ExplicitTop = 355
+    ExplicitWidth = 360
     object BtnCancel: TBitBtn
-      Left = 282
+      Left = 384
       Top = 2
       Width = 75
       Height = 25
       Kind = bkCancel
       NumGlyphs = 2
-      TabOrder = 0
+      TabOrder = 1
     end
     object BtnOK: TBitBtn
-      Left = 201
+      Left = 303
       Top = 2
       Width = 75
       Height = 25
       Kind = bkOK
       NumGlyphs = 2
-      TabOrder = 1
+      TabOrder = 0
       OnClick = BtnOkClick
     end
   end
