@@ -23,7 +23,7 @@ type
     BtnOK: TBitBtn;
     Label1: TLabel;
     BevStartupUse: TBevel;
-    BtnDefault: TButton;
+    BtnDefaults: TButton;
     procedure FormShow(Sender: TObject);
     procedure EdFilterChange(Sender: TObject);
     procedure BtnAddClick(Sender: TObject);
@@ -33,7 +33,7 @@ type
     procedure BtnOkClick(Sender: TObject);
     procedure BtnUpdateClick(Sender: TObject);
     procedure LbFilterClickCheck(Sender: TObject);
-    procedure BtnDefaultClick(Sender: TObject);
+    procedure BtnDefaultsClick(Sender: TObject);
   private
     { Private declarations }
     procedure LoadListBox;
@@ -72,7 +72,7 @@ begin
   EdFilter.Text := '';
 end;
 
-procedure TFEditFFilter.BtnDefaultClick(Sender: TObject);
+procedure TFEditFFilter.BtnDefaultsClick(Sender: TObject);
 begin
   GUIsettings.FileFilters := StrShowAllFiles + #10 + StringReplace(DefFileFilter, '|', #10, [rfReplaceAll]);
   GUIsettings.FilterStartup := 0;
@@ -173,7 +173,7 @@ begin
     exit;
 
   if (ContainsText(LbFilter.Items[LbFilter.ItemIndex], '/s')) then
-    MessageDlgEx('Setting this item as startup could potentially increase startup time', '',
+    MessageDlgEx(StrStartupTime, '',
                  TMsgDlgType.mtWarning, [TMsgDlgBtn.mbOK]);
 
   GUIsettings.FilterStartup := LbFilter.ItemIndex;

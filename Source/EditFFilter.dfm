@@ -120,14 +120,14 @@ object FEditFFilter: TFEditFFilter
       TabOrder = 1
       OnClick = BtnUpdateClick
     end
-    object BtnDefault: TButton
+    object BtnDefaults: TButton
       Left = 357
       Top = 6
       Width = 100
       Height = 25
-      Caption = 'Default'
+      Caption = 'Defaults'
       TabOrder = 3
-      OnClick = BtnDefaultClick
+      OnClick = BtnDefaultsClick
     end
   end
   object PnlBottom: TPanel
