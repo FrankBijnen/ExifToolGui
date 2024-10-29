@@ -219,6 +219,7 @@ resourcestring
   StrFLPhotoTitle           = 'Photo title';
 
   StrShowAllFiles           = 'Show All Files';
+  StrStartupTime            = 'Setting this item as startup could potentially increase startup time';
 
   StrThumbNails             = 'Thumbnails';
   StrDetails                = 'Details';

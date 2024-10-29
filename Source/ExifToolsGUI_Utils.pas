@@ -48,7 +48,7 @@ function GetHtmlTmp: string;
 function GetTrackTmp: string;
 function GetPreviewTmp: string;
 function GetEdgeUserData: string;
-function GetNrOfFiles(StartDir, FileMask: string; subDir: boolean): integer;
+function GetNrOfFiles(StartDir, FileMask: string; SubDirs: boolean): integer;
 function GetComSpec: string;
 function PasteDirectory(ADir, TargetDir: string; Cut: boolean = false): boolean;
 
@@ -148,7 +148,7 @@ implementation
 
 uses
   Winapi.ShellAPI, Winapi.KnownFolders, System.Win.Registry, System.UITypes, System.Types, System.DateUtils,
-  UFrmGenerate, MainDef, ExifTool, ExifInfo, UnitLangResources;
+  MainDef, ExifTool, ExifInfo, UnitLangResources;
 
 var
   GlobalImgFact: IWICImagingFactory;
@@ -396,32 +396,30 @@ begin
   result := (ShResult = 0);
 end;
 
-function GetNrOfFiles(StartDir, FileMask: string; subDir: boolean): integer;
+function GetNrOfFiles(StartDir, FileMask: string; SubDirs: boolean): integer;
 var
   SR: TSearchRec;
   DirList: TStringList;
-  IsFound, DoSub: boolean;
-  I, X: integer;
+  IsFound: boolean;
+  I: integer;
   CrNormal, CrWait: HCURSOR;
 begin
   CrWait := LoadCursor(0, IDC_WAIT);
   CrNormal := SetCursor(CrWait);
   try
-    if StartDir[Length(StartDir)] <> '\' then
-      StartDir := StartDir + '\';
-    DoSub := subDir;
-    X := 0;
+    StartDir := IncludeTrailingPathDelimiter(StartDir);
+    result := 0;
     // Count files in directory
     IsFound := FindFirst(StartDir + FileMask, faAnyFile - faDirectory, SR) = 0;
     while IsFound do
     begin
-      inc(X);
+      inc(result);
       IsFound := FindNext(SR) = 0;
     end;
     FindClose(SR);
 
     // Build a list of subdirectories
-    if DoSub then
+    if SubDirs then
     begin
       DirList := TStringList.Create;
       IsFound := FindFirst(StartDir + '*.*', faAnyFile, SR) = 0;
@@ -434,10 +432,9 @@ begin
       FindClose(SR);
       // Scan the list of subdirectories
       for I := 0 to DirList.Count - 1 do
-        X := X + GetNrOfFiles(DirList[I], FileMask, DoSub);
+        result := result + GetNrOfFiles(DirList[I], FileMask, SubDirs);
       DirList.Free;
     end;
-    result := X;
   finally
     SetCursor(CrNormal);
   end;

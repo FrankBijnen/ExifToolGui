@@ -661,6 +661,8 @@ end;
 
 function ShowInstalledVersion(const Param: string): String;
 begin
+  if (CURver = '') then
+    CurVer := GetInstalledVersion;
   result := ConvertToString(CurVer);
 end;
 
@@ -783,10 +785,6 @@ var
   ExifTool_Files_Dir: AnsiString;
 begin
   Result := true;
-
-  // We know the AppDir
-  if (CurPageID = wpSelectComponents) then
-    CurVer := GetInstalledVersion;
 
   if (CurPageID  = wpSelectTasks) then
   begin
