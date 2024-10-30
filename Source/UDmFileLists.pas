@@ -336,7 +336,7 @@ begin
 
     case FListReadMode of
       0:;   // Limit to System Fields
-      1,3:  // Limit to Internal fields
+      1,3:  // Limit to System + Internal fields
         begin
           // Load all internal fields
           for TagName in TMetaData.AllInternalFields do
@@ -366,9 +366,10 @@ begin
       begin
         if (TSubShellFolder.GetIsFolder(FSample)) then
           exit;
+        // All ExifTool tags.
         ETOut := TStringList.Create;
         try
-          ETCmd := '-G1' + CRLF + '-s';
+          ETCmd := '-G1' + CRLF + '-s' + CRLF + '-a';
           ET.OpenExec(Etcmd, FSample.PathName, EtOut);
           for Index := 0 to ETOut.Count -1 do
           begin

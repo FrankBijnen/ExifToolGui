@@ -102,12 +102,11 @@ var
   GroupName, TagName: string;
 begin
   CmbFamily.ItemIndex := 1; // Allways 1
-  CmbFamilyChange(CmbFamily);
 
   GuessGroupAndTagName(GroupName, TagName);
-
-  if (GroupName <> '') and
-     (TagName <> '') then
+  if (GroupName = '') then
+    CmbFamilyChange(CmbFamily) // Could not guess, Present all data
+  else
   begin
     CmbGroupName.Text := GroupName;
     for Index := 0 to CmbGroupName.Items.Count -1 do
@@ -132,7 +131,6 @@ begin
     end;
     CmbTagNameChange(CmbTagName);
   end;
-
 end;
 
 procedure TFrmTagNames.ChkExcludeClick(Sender: TObject);
@@ -158,7 +156,9 @@ end;
 
 procedure TFrmTagNames.CmbGroupNameChange(Sender: TObject);
 begin
+  CmbTagName.SetFullSearch(false);
   FillTagsInCombo(UseSample, CmbTagName, PreferredFamily, CmbGroupName.Text);
+  CmbTagName.StoredItems.Assign(CmbTagName.Items);
   CmbTagNameChange(Sender);
 end;
 
@@ -166,6 +166,8 @@ procedure TFrmTagNames.CmbTagNameChange(Sender: TObject);
 var
   Tag: string;
 begin
+  CmbTagName.SetFullSearch(CmbTagName.DroppedDown);
+
   if (UseSample = '') then
     Tag := CmbGroupName.Text + ':' + CmbTagName.Text + '|'
   else
@@ -247,13 +249,13 @@ begin
   end;
 
   FillGroupsInCombo(UseSample, CmbGroupName, PreferredFamily);
-  if (FSearchString = '') then
+  if (FSearchString <> '') then
+    LookupSearchString
+  else
   begin
     CmbGroupNameChange(Sender);
     CmbTagNameChange(Sender);
-  end
-  else
-    LookupSearchString;
+  end;
 end;
 
 procedure TFrmTagNames.SetSearchString(ASearchString: string);
