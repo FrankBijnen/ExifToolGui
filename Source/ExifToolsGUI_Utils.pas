@@ -106,6 +106,7 @@ procedure FillTagsInStrings(SelectedFile: string;
                             const Family, GroupName: string;
                             Sort: boolean = true);
 procedure FillTagsInCombo(SelectedFile: string; CmbTags: TComboBox; const Family, GroupName: string);
+procedure SetupTagsCombo(SelectedFile: string; CmbTags: TComboBox);
 procedure DrawItemTagName(Control: TWinControl; Index: Integer; Rect: TRect; State: TOwnerDrawState);
 procedure SetTagItem(const AnItem: TlistItem; ACaption: string = '');
 function RemoveInvalidTags(const Tag: string; AllowExclude: boolean = false): string;
@@ -1352,18 +1353,17 @@ begin
   end;
 end;
 
-procedure FillTagsInCombo(SelectedFile: string; CmbTags: TComboBox; const Family, GroupName: string);
+procedure SetupTagsCombo(SelectedFile: string; CmbTags: TComboBox);
 var
   ThisWidth: integer;
   P: integer;
   ALine: string;
 begin
-  FillTagsInStrings(SelectedFile, CmbTags.Items, Family, GroupName);
 // Setup ComboBox
   CmbTags.Text := CmbTags.Items[0];
   CmbTags.Tag := CmbTags.Width;     // No Sample data, take complete width
 
-  // Compute Width of largest group + Tagname and store that in Tag.
+  // Compute Width of largest Group + Tag name and store that in Tag.
   if (SelectedFile <> '') then
   begin
     CmbTags.Tag := 0;
@@ -1378,6 +1378,12 @@ begin
       end;
     end;
   end;
+end;
+
+procedure FillTagsInCombo(SelectedFile: string; CmbTags: TComboBox; const Family, GroupName: string);
+begin
+  FillTagsInStrings(SelectedFile, CmbTags.Items, Family, GroupName);
+  SetupTagsCombo(SelectedFile, CmbTags);
 end;
 
 procedure DrawItemTagName(Control: TWinControl; Index: Integer; Rect: TRect; State: TOwnerDrawState);
