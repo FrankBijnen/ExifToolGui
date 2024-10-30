@@ -1,7 +1,7 @@
 unit ExifToolsGui_ComboBox;
 
 // Allow OwnerDraw with edit box
-// Filtering on Full text
+// Full text searching
 
 interface
 
@@ -13,19 +13,17 @@ uses
 type
   TComboBox = class(Vcl.StdCtrls.TComboBox)
   private
-    FFullSearch: boolean;
-    FStoredItems: TStringList;
+    FFullTextSearch: boolean;
+    FFullTextSearchItems: TStringList;
     procedure FilterItems;
-    procedure StoredItemsChange(Sender: TObject);
-    procedure SetStoredItems(const Value: TStringList);
+    procedure SetFullTextSearch(AValue: boolean);
     procedure CNCommand(var AMessage: TWMCommand); message CN_COMMAND;
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
     procedure CreateParams(var Params: TCreateParams); override;
-    procedure SetFullSearch(AValue: boolean);
-    property StoredItems: TStringList read FStoredItems write SetStoredItems;
-    property FullSearch: boolean read FFullSearch;
+    procedure EnableFullTextSearch;
+    property FullTextSearch: boolean read FFullTextSearch write SetFullTextSearch;
   end;
 
 implementation
@@ -36,14 +34,13 @@ uses
 constructor TComboBox.Create(AOwner: TComponent);
 begin
   inherited;
-  FFullSearch := false;
-  FStoredItems := TStringList.Create;
-  FStoredItems.OnChange := StoredItemsChange;
+  FFullTextSearch := false;
+  FFullTextSearchItems := TStringList.Create;
 end;
 
 destructor TComboBox.Destroy;
 begin
-  FStoredItems.Free;
+  FFullTextSearchItems.Free;
   inherited;
 end;
 
@@ -68,7 +65,7 @@ var
   ALine: string;
   Selection: TSelection;
 begin
-  if not FFullSearch then
+  if not FFullTextSearch then
     exit;
 
   // store the current combo edit selection
@@ -77,11 +74,11 @@ begin
   Items.BeginUpdate;
   try
     if Text = '' then
-      Items.Assign(FStoredItems)
+      Items.Assign(FFullTextSearchItems)
     else
     begin
       Items.Clear;
-      for ALine in FStoredItems do
+      for ALine in FFullTextSearchItems do
       begin
         if ContainsText(ALine, Text) then
           Items.Add(ALine);
@@ -94,25 +91,17 @@ begin
   SendMessage(Handle, CB_SETEDITSEL, 0, MakeLParam(Selection.StartPos, Selection.EndPos));
 end;
 
-procedure TComboBox.StoredItemsChange(Sender: TObject);
+procedure TComboBox.SetFullTextSearch(AValue: boolean);
 begin
-  if Assigned(FStoredItems) then
-    FilterItems;
+  if (FFullTextSearch <> AValue) then
+    FFullTextSearch := AValue;
+  AutoComplete := not FFullTextSearch;
 end;
 
-procedure TComboBox.SetStoredItems(const Value: TStringList);
+procedure TComboBox.EnableFullTextSearch;
 begin
-  if Assigned(FStoredItems) then
-    FStoredItems.Assign(Value)
-  else
-    FStoredItems := Value;
-end;
-
-procedure TComboBox.SetFullSearch(AValue: boolean);
-begin
-  if (FFullSearch <> AValue) then
-    FFullSearch := AValue;
-  AutoComplete := not FFullSearch;
+  FFullTextSearchItems.Assign(Items);
+  FullTextSearch := true;
 end;
 
 end.

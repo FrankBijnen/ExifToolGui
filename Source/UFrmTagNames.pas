@@ -150,15 +150,16 @@ end;
 procedure TFrmTagNames.CmbFamilyChange(Sender: TObject);
 begin
   FillGroupsInCombo(UseSample, CmbGroupName, PreferredFamily);
+  CmbGroupName.EnableFullTextSearch;
   CmbGroupName.ItemIndex := 0;
   CmbGroupNameChange(CmbGroupName);
 end;
 
 procedure TFrmTagNames.CmbGroupNameChange(Sender: TObject);
 begin
-  CmbTagName.SetFullSearch(false);
   FillTagsInCombo(UseSample, CmbTagName, PreferredFamily, CmbGroupName.Text);
-  CmbTagName.StoredItems.Assign(CmbTagName.Items);
+  CmbTagName.EnableFullTextSearch;
+
   CmbTagNameChange(Sender);
 end;
 
@@ -166,8 +167,6 @@ procedure TFrmTagNames.CmbTagNameChange(Sender: TObject);
 var
   Tag: string;
 begin
-  CmbTagName.SetFullSearch(CmbTagName.DroppedDown);
-
   if (UseSample = '') then
     Tag := CmbGroupName.Text + ':' + CmbTagName.Text + '|'
   else
@@ -249,6 +248,7 @@ begin
   end;
 
   FillGroupsInCombo(UseSample, CmbGroupName, PreferredFamily);
+  CmbGroupName.EnableFullTextSearch;
   if (FSearchString <> '') then
     LookupSearchString
   else

@@ -158,24 +158,14 @@ var
 
 const
   TempPrefix = 'ExT';
-
-const
   ExifToolTempFileName = 'ExifToolGUI%s.tmp';
-
-const
   HtmlTempFileName = 'ExifToolGUI.html';
-
-const
   TrackFileName = 'ExifToolGUI.track';
-
-const
   PreviewTempFileName = 'ExifToolGui_Preview.jpg';
-
-const
   EdgeUserDataDir = 'Edge';
-
-const
   GeoLocation500 = 'GeoLocation500';
+  EmptyList = '[empty list]';
+  AllGroupTag = 'All';
 
 procedure BreakPoint;
 {$IFDEF DEBUG}
@@ -1221,7 +1211,7 @@ begin
       GroupName   := NextField(AResult, ']');             // Group name
       if (First) then
       begin
-        TagName := 'All';
+        TagName := AllGroupTag;
         TagValue := '';
         result.Add(ATagInfo);
         First := false;
@@ -1247,7 +1237,7 @@ begin
     Groups.Clear;
     if (SelectedFile <> '') then
     begin
-      Groups.Add('All');
+      Groups.Add(AllGroupTag);
       ETUnSorted := TStringList.Create;
       try
         ETResult.Sorted := true;
@@ -1332,10 +1322,18 @@ begin
     end
     else
     begin
-      ETCmd := '-listw' + CRLF + '-' + Groupname + ':All';
+      ETCmd := '-quiet' + CRLF + '-listw' + CRLF + '-' + Groupname + ':All';
       ET.OpenExec(ETcmd, '', ETResult, false);
-      Tags.Add('All');
-      for Indx := 1 to ETResult.Count -1 do
+
+      if (ETResult.Count = 1) and
+         (ETResult[0] = EmptyList) then
+      begin
+        Tags.Add(ETResult[0]);
+        exit;
+      end;
+
+      Tags.Add(AllGroupTag);
+      for Indx := 0 to ETResult.Count -1 do
       begin
         AGroupLine := ETResult[Indx];
         while (AGroupLine <> '') do
