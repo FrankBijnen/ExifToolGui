@@ -32,7 +32,9 @@ PhaseOne        Iiq                       Credo 40
 interface
 
 uses System.Classes, System.SysUtils, System.Generics.Collections, System.Types,
-     Vcl.StdCtrls, ExifToolsGUI_StringList;
+     Vcl.StdCtrls,
+     Xml.VerySimple,    // XML parsing for XMP
+     ExifToolsGUI_StringList;
 
 type
   TMakerNotes = (None, Cr2, Pentax, Nikon);
@@ -144,10 +146,16 @@ type
     Date: string[19];
     PhotoType: string;
     Title, Event: string;
-    CountryCodeShown, CountryNameShown, ProvinceShown, CityShown, LocationShown: string;
+    CountryCode, CountryName, ProvinceState, City, SubLocation: string;
     PersonInImage: string;
-    Keywords: string; // =Subject
+    Subject: string;
     Rating: string[1];
+    function GetRDF(const Xml: TXmlVerySimple): TXmlNode;
+    function DetectEncoding(TmpStream: TMemoryStream): string;
+    function ChangeETPrefix(const SubNode: string): string;
+    function GetNodeKey(ThisNode, SubNode: string; var ParmIsList: boolean): string;
+    procedure Add2Xmp(const AMetaInfo: TMetaInfo; AKey: string);
+
     procedure Clear;
   end;
 
@@ -202,8 +210,6 @@ type
     procedure AddXmpBlock(AnOffset, ASize: int64);
     procedure SetVarData(const InVarData: TVarData; InFieldNames: TStrings);
     procedure AddBag(var BagData: TMetaInfo; const ANode: TMetaInfo);
-    function GetETTagName(ATagName: string): string;
-    function GetKeyName(const AGroup, AKey: string): string;
     function AddVarData(const AGroup, AKey: string; AValue: TMetaInfo; AllowBag: boolean): TMetaInfo;
 
     function AddGpsData(const AKey: string; AValue: TMetaInfo): TMetaInfo;
@@ -239,6 +245,9 @@ type
     procedure ParseICCprofile;
     procedure GetIFDentry(var IFDentry: IFDentryRec);
     procedure ParseIfd(Offset: int64; ParseProc: TParseIFDProc);
+    function Add2Xmp(const AKey, AValue: string): TMetaInfo;
+
+    procedure LevelDeeper(const ANode: TXmlNode; AParent: string = ''; ParentIsList: boolean = false);
     procedure ParseXMPBlock(TmpStream: TMemoryStream);
     procedure ReadCanonVrd;
     function GetCRWString(ALength: word): string;
@@ -282,7 +291,6 @@ uses
   Main, ExifTool,
   ExifToolsGUI_Utils,
   UnitLangResources, // Language
-  Xml.VerySimple,    // XML parsing for XMP
   SDJPegTypes;       // JPEG APP types
 
 var
@@ -358,6 +366,173 @@ begin
     LoadResourceList(ETD_PentaxLenses, FPentaxLenses);
   end;
   result := FPentaxLenses;
+end;
+
+function XMPrec.GetRDF(const Xml: TXmlVerySimple): TXmlNode;
+const
+  XMPMETA             = 'x:xmpmeta';
+  RDF                 = 'rdf:RDF';
+begin
+  result := Xml.ChildNodes.Find(XMPMETA);
+  if (result <> nil) then
+    result := result.ChildNodes.Find(RDF);
+end;
+
+function XMPrec.DetectEncoding(TmpStream: TMemoryStream): string;
+const
+  XMPEncoding_utf8    = 'utf-8';
+  XMPEncoding_utf16   = 'utf-16';
+  XMPEncoding_utf16be = 'utf-16be';
+  XPacketMagic        = '<?xpacket begin=';
+
+(*
+Possible encodings in XMP. Sadly the UTF32 encodings are not supported.
+utf8    ef bb bf
+utf16be fe ff
+utf16le ff fe
+utf32be 00 00 fe ff
+utf32le ff fe 00 00
+*)
+
+  UTF8_BOM:     array[0..3] of byte = ($ef, $bb, $bf, $00);
+  UTF16BE_BOM:  array[0..3] of byte = ($fe, $ff, $00, $00);
+  UTF16LE_BOM:  array[0..3] of byte = ($ff, $fe, $00, $00);
+var
+  BOM: array[0..3] of byte;
+  Quote: byte;
+  AByte: PByte;
+  Index: integer;
+
+  // Scan for XPacket
+  function ReadXpacket: boolean;
+  var
+    XPacket: array[0..15] of AnsiChar;
+  begin
+    AByte := PByte(TmpStream.Memory);
+    Index := 0;
+    while (Index <= High(XPacket)) do
+    begin
+      while (Abyte^ = 0) do
+        Inc(AByte);
+      XPacket[Index] := AnsiChar(Abyte^);
+      Inc(Index);
+      Inc(AByte);
+    end;
+
+    result := (XPacket = XPacketMagic);
+  end;
+
+  // Scan for ' or "
+  function ScanQuote: boolean;
+  begin
+    while (Abyte^ = 0) do
+      Inc(AByte);
+    Quote := AByte^;
+    result := (Quote = $22) or
+              (Quote = $27);
+  end;
+
+  // Get the BOM
+  procedure ReadBOM;
+  begin
+    // Read max 4 Bytes, until quote.
+    FillChar(BOM, SizeOf(BOM), 0);
+    Index := 0;
+    Inc(AByte);
+    while (Index < High(BOM)) and
+          (AByte^ <> Quote) do
+    begin
+      BOM[Index] := AByte^;
+      Inc(Index);
+      Inc(AByte);
+    end;
+  end;
+
+begin
+  result := XMPEncoding_utf8; // UTF8 is default!
+
+  if not ReadXpacket then
+    exit;
+
+  if not ScanQuote then
+    exit;
+
+  ReadBom;
+
+  if CompareMem(@BOM, @UTF16BE_BOM, SizeOf(BOM)) then
+    exit(XMPEncoding_utf16be);
+  if CompareMem(@BOM, @UTF16LE_BOM, SizeOf(BOM)) then
+    exit(XMPEncoding_utf16);
+end;
+
+function XMPRec.ChangeETPrefix(const SubNode: string): string;
+const
+  ETPrefixes : array[0..1, 0..1] of string =
+    (('Iptc4xmpExt:','iptcExt:'),
+     ('Iptc4xmpCore:','iptcCore:'));
+var
+  Index: integer;
+begin
+  result := SubNode;
+  for Index := 0 to High(ETPrefixes) do
+  begin
+    if (StartsText(ETPrefixes[Index, 0], result)) then
+      Exit(ETPrefixes[Index, 1] + Copy(result, Length(ETPrefixes[Index, 0]) +1));
+  end;
+end;
+
+function XMPRec.GetNodeKey(ThisNode, SubNode: string; var ParmIsList: boolean): string;
+var
+  P: integer;
+begin
+  result := ThisNode;
+
+  if (Trim(result) = '') then
+    result := ChangeETPrefix(SubNode)
+  else if (ParmIsList) then
+  begin
+    P := Pos(':', SubNode);
+    if (P > 0) then
+      result := result + Copy(SubNode, P +1);
+  end;
+
+  ParmIsList := ParmIsList or
+                SameText('rdf:li', SubNode);
+end;
+
+procedure XMPRec.Add2Xmp(const AMetaInfo: TMetaInfo; AKey: string);
+begin
+  if (StartsText('IptcExt:LocationShownCountryCode', AKey)) then
+    CountryCode := AMetaInfo
+  else if (StartsText('IptcExt:LocationShownCountryName', AKey)) then
+    CountryName := AMetaInfo
+  else if (StartsText('IptcExt:LocationShownProvinceState', AKey)) then
+    ProvinceState := AMetaInfo
+  else if (StartsText('IptcExt:LocationShownCity', AKey)) then
+    City := AMetaInfo
+  else if (StartsText('IptcExt:LocationShownSublocation', AKey)) then
+    SubLocation := AMetaInfo
+  else if (StartsText('IptcExt:PersonInImage', AKey)) then
+    PersonInImage := AMetaInfo
+  else if (StartsText('IptcExt:Event', AKey)) then
+    Event := AMetaInfo
+
+  else if (StartsText('dc:creator', AKey)) then
+    Creator := AMetaInfo
+  else if (StartsText('dc:rights', AKey)) then
+    Rights := AMetaInfo
+  else if (StartsText('dc:date', AKey)) then
+    Date := AMetaInfo
+  else if (StartsText('dc:type', AKey)) then
+    PhotoType := AMetaInfo
+  else if (StartsText('dc:title', AKey)) then
+    Title := AMetaInfo
+  else if (StartsText('dc:subject', AKey)) then
+    Subject := AMetaInfo
+
+  else if (StartsText('xmp:Rating', AKey)) or
+          (StartsText('xap:Rating', AKey)) then
+    Rating := AMetaInfo;
 end;
 
 procedure XMPrec.Clear;
@@ -514,27 +689,13 @@ begin
   end;
 end;
 
-function FotoRec.GetETTagName(ATagName: string): string;
-begin
-  result := StringReplace(ATagName, 'Xmp-Iptc4xmpExt:',  'Xmp-IptcExt:',  [rfReplaceAll, rfIgnoreCase]);
-  result := StringReplace(result,   'Xmp-Iptc4xmpCore:', 'XMP-iptcCore:', [rfReplaceAll, rfIgnoreCase]);
-end;
-
-function FotoRec.GetKeyName(const AGroup, AKey: string): string;
-begin
-  if EndsText('-', AGroup) then
-    result := GetETTagName(AGroup + AKey)
-  else
-    result := (GetETTagName(AGroup) + ':' + AKey);
-end;
-
 function FotoRec.AddVarData(const AGroup, AKey: string; AValue: TMetaInfo; AllowBag: boolean): TMetaInfo;
 var
   KeyName: string;
 begin
   if Assigned(VarData) then
   begin
-    KeyName := GetKeyName(AGroup, AKey);
+    KeyName := AGroup + AKey;
     if (Assigned(FieldNames)) then
       FieldNames.Add(KeyName);
     KeyName := LowerCase(KeyName);
@@ -565,42 +726,42 @@ end;
 
 function FotoRec.AddGpsData(const AKey: string; AValue: TMetaInfo): TMetaInfo;
 begin
-  result := AddVarData('GPS', AKey, AValue, false);
+  result := AddVarData('GPS:', AKey, AValue, false);
 end;
 
 function FotoRec.AddIptcData(const AKey: string; AValue: TMetaInfo; AllowBag: boolean = false): TMetaInfo;
 begin
-  result := AddVarData('IPTC', AKey, AValue, AllowBag);
+  result := AddVarData('IPTC:', AKey, AValue, AllowBag);
 end;
 
 function FotoRec.AddMakerNotesData(const AKey: string; AValue: TMetaInfo): TMetaInfo;
 begin
-  result := AddVarData('MakerNotes', AKey, AValue, false);
+  result := AddVarData('MakerNotes:', AKey, AValue, false);
 end;
 
 function FotoRec.AddIfd0Data(const AKey: string; AValue: TMetaInfo): TMetaInfo;
 begin
-  result := AddVarData('IFD0', AKey, AValue, false);
+  result := AddVarData('IFD0:', AKey, AValue, false);
 end;
 
 function FotoRec.AddExifIFDData(const AKey: string; AValue: TMetaInfo): TMetaInfo;
 begin
-  result := AddVarData('ExifIFD', AKey, AValue, false);
+  result := AddVarData('ExifIFD:', AKey, AValue, false);
 end;
 
 function FotoRec.AddInterOpData(const AKey: string; AValue: TMetaInfo): TMetaInfo;
 begin
-  result := AddVarData('InteropIFD', AKey, AValue, false);
+  result := AddVarData('InteropIFD:', AKey, AValue, false);
 end;
 
 function FotoRec.AddCompositeData(const AKey: string; AValue: TMetaInfo): TMetaInfo;
 begin
-  result := AddVarData('Composite', AKey, AValue, false);
+  result := AddVarData('Composite:', AKey, AValue, false);
 end;
 
 function FotoRec.AddICCProfileData(const AKey: string; AValue: TMetaInfo): TMetaInfo;
 begin
-  result := AddVarData('ICC_Profile', AKey, AValue, false);
+  result := AddVarData('ICC_Profile:', AKey, AValue, false);
 end;
 
 function FotoRec.AddXmp_Data(const AKey: string; AValue: TMetaInfo): TMetaInfo;
@@ -708,9 +869,9 @@ begin
       Digits := 0
     else
       Digits := 1;
-    Tx := FloatToStrF(L1 / L2, ffFixed, 7, Digits);
+    Tx := FloatToStrF(L1 / L2, ffFixed, 7, Digits, FloatFormatSettings);
     if (L1 / L2) <> (L3 / L4) then
-      Tx := Tx + '-' + FloatToStrF(L3 / L4, ffFixed, 7, Digits);
+      Tx := Tx + '-' + FloatToStrF(L3 / L4, ffFixed, 7, Digits, FloatFormatSettings);
   end
   else
     Tx := '?';
@@ -729,13 +890,12 @@ begin
   end;
   if (L2 <> 0) and (L4 <> 0) then
   begin
-    Tx := Tx + FloatToStrF(L1 / L2, ffFixed, 7, 1);
+    Tx := Tx + FloatToStrF(L1 / L2, ffFixed, 7, 1, FloatFormatSettings);
     if (L1 / L2) <> (L3 / L4) then
-      Tx := Tx + '-' + FloatToStrF(L3 / L4, ffFixed, 7, 1);
+      Tx := Tx + '-' + FloatToStrF(L3 / L4, ffFixed, 7, 1, FloatFormatSettings);
   end
   else
     Tx := Tx + '?';
-  Result := StringReplace(Tx, ',', '.', [rfReplaceAll]);
 end;
 
 function FotoRec.DecodeNikonLens(IFDentry: IFDentryRec): string;
@@ -1955,16 +2115,56 @@ begin
 end;
 
 // ==============================================================================
-const
-  XMPMINSIZE          = 25;
-  XMPMETA             = 'x:xmpmeta';
-  RDF                 = 'rdf:RDF';
-
-function GetRDF(const Xml: TXmlVerySimple): TXmlNode;
+function FotoRec.Add2Xmp(const AKey, AValue: string): TMetaInfo;
+var
+  UnEscaped: string;
 begin
-  result := Xml.ChildNodes.Find(XMPMETA);
-  if (result <> nil) then
-    result := result.ChildNodes.Find(RDF);
+  // ExifTool escapes (needlessly) ' and " in XML.
+  // VerySimpleXML does not UnEscape '&#39;' .
+  UnEscaped := StringReplace(AValue, '&#39;', '''', [rfReplaceAll]);
+
+  // For XMP add every node found.
+  result := AddXmp_Data(AKey, UnEscaped);
+end;
+
+procedure FotoRec.LevelDeeper(const ANode: TXmlNode; AParent: string = ''; ParentIsList: boolean = false);
+var
+  ANodeList: TXmlNodeList;
+  ASubNode: TXmlNode;
+  Attribute: TXmlAttribute;
+  SelNode: string;
+  NodeKey: string;
+  ThisIsList: boolean;
+begin
+  SelNode := Trim(AParent);
+
+  if (ANode.NodeValue <> '') then
+    XMP.Add2Xmp(Add2Xmp(SelNode, ANode.NodeValue), SelNode);
+
+  // Look in Attributes of Node
+  for Attribute in ANode.AttributeList do
+  begin
+    // Skip xml:lang etc.
+    if StartsText('xml:', Attribute.Name) then
+      continue;
+    if StartsText('xmlns:', Attribute.Name) then
+      continue;
+    if StartsText('rdf:About', Attribute.Name) then
+      continue;
+
+    ThisIsList := false; // Attribute cant be a list
+    NodeKey := XMP.GetNodeKey(SelNode, Attribute.Name, ThisIsList);
+    XMP.Add2Xmp(Add2Xmp(NodeKey, Attribute.Value), NodeKey);
+  end;
+
+  // Look in Childnodes
+  ANodeList := ANode.ChildNodes;
+  for ASubNode in ANodeList do
+  begin
+    ThisIsList := ParentIsList;
+    NodeKey := XMP.GetNodeKey(SelNode, ASubNode.NodeName, ThisIsList);
+    LevelDeeper(ASubNode, NodeKey, ThisIsList);
+  end;
 end;
 
 procedure FotoRec.ParseXMPBlock(TmpStream: TMemoryStream);
@@ -1972,202 +2172,11 @@ var
   Xml: TXmlVerySimple;
   RDF, RDFDesc: TXmlNode;
   RDFDescNodes: TXmlNodeList;
-
-(*
-Possible encodings in XMP. Sadly the UTF32 encodings are not supported.
-utf8    ef bb bf
-utf16be fe ff
-utf16le ff fe
-utf32be 00 00 fe ff
-utf32le ff fe 00 00
-*)
-
-  function DetectEncoding: string;
-  const
-    XMPEncoding_utf8    = 'utf-8';
-    XMPEncoding_utf16   = 'utf-16';
-    XMPEncoding_utf16be = 'utf-16be';
-    XPacketMagic        = '<?xpacket begin=';
-
-    UTF8_BOM:     array[0..3] of byte = ($ef, $bb, $bf, $00);
-    UTF16BE_BOM:  array[0..3] of byte = ($fe, $ff, $00, $00);
-    UTF16LE_BOM:  array[0..3] of byte = ($ff, $fe, $00, $00);
-  var
-    BOM: array[0..3] of byte;
-    Quote: byte;
-    AByte: PByte;
-    Index: integer;
-
-    // Scan for XPacket
-    function ReadXpacket: boolean;
-    var
-      XPacket: array[0..15] of AnsiChar;
-    begin
-      AByte := PByte(TmpStream.Memory);
-      Index := 0;
-      while (Index <= High(XPacket)) do
-      begin
-        while (Abyte^ = 0) do
-          Inc(AByte);
-        XPacket[Index] := AnsiChar(Abyte^);
-        Inc(Index);
-        Inc(AByte);
-      end;
-
-      result := (XPacket = XPacketMagic);
-    end;
-
-    // Scan for ' or "
-    function ScanQuote: boolean;
-    begin
-      while (Abyte^ = 0) do
-        Inc(AByte);
-      Quote := AByte^;
-      result := (Quote = $22) or
-                (Quote = $27);
-    end;
-
-    // Get the BOM
-    procedure ReadBOM;
-    begin
-      // Read max 4 Bytes, until quote.
-      FillChar(BOM, SizeOf(BOM), 0);
-      Index := 0;
-      Inc(AByte);
-      while (Index < High(BOM)) and
-            (AByte^ <> Quote) do
-      begin
-        BOM[Index] := AByte^;
-        Inc(Index);
-        Inc(AByte);
-      end;
-    end;
-
-  begin
-    result := XMPEncoding_utf8; // UTF8 is default!
-
-    if not ReadXpacket then
-      exit;
-
-    if not ScanQuote then
-      exit;
-
-    ReadBom;
-
-    if CompareMem(@BOM, @UTF16BE_BOM, SizeOf(BOM)) then
-      exit(XMPEncoding_utf16be);
-    if CompareMem(@BOM, @UTF16LE_BOM, SizeOf(BOM)) then
-      exit(XMPEncoding_utf16);
-  end;
-
-  procedure Add2Xmp(const AKey, AValue: string; const isList: boolean);
-  var
-    UnEscaped: string;
-    MetaInfo: variant;
-  begin
-    // ExifTool escapes (needlessly) ' and " in XML.
-    // VerySimpleXML does not UnEscape '&#39;' .
-    UnEscaped := StringReplace(AValue, '&#39;', '''', [rfReplaceAll]);
-
-    // For XMP add every node found.
-    MetaInfo := AddXmp_Data(AKey, AValue);
-
-    // Only Fill the record if needed
-    if (StartsText('Iptc4xmpExt:LocationShownCountryCode', AKey)) then
-      XMP.CountryCodeShown := MetaInfo
-    else if (StartsText('Iptc4xmpExt:LocationShownCountryName', AKey)) then
-      XMP.CountryNameShown := MetaInfo
-    else if (StartsText('Iptc4xmpExt:LocationShownProvinceState', AKey)) then
-      XMP.ProvinceShown := MetaInfo
-    else if (StartsText('Iptc4xmpExt:LocationShownCity', AKey)) then
-      XMP.CityShown := MetaInfo
-    else if (StartsText('Iptc4xmpExt:LocationShownSublocation', AKey)) then
-      XMP.LocationShown := MetaInfo
-    else if (StartsText('Iptc4xmpExt:PersonInImage', AKey)) then
-      XMP.PersonInImage := MetaInfo
-
-    else if (StartsText('dc:creator', AKey)) then
-      XMP.Creator := MetaInfo
-    else if (StartsText('dc:rights', AKey)) then
-      XMP.Rights := MetaInfo
-    else if (StartsText('dc:date', AKey)) then
-      XMP.Date := MetaInfo
-    else if (StartsText('dc:type', AKey)) then
-      XMP.PhotoType := MetaInfo
-    else if (StartsText('dc:title', AKey)) then
-      XMP.Title := MetaInfo
-    else if (StartsText('dc:subject', AKey)) then
-      XMP.Keywords := MetaInfo
-
-    else if (StartsText('Iptc4xmpExt:Event', AKey)) then
-      XMP.Event := MetaInfo
-
-    else if (StartsText('xmp:Rating', AKey)) or
-            (StartsText('xap:Rating', AKey)) then
-      XMP.Rating := MetaInfo
-  end;
-
-  function GetNodeKey(ThisNode, SubNode: string; var ParmIsList: boolean): string;
-  var
-    P: integer;
-  begin
-    result := ThisNode;
-
-    if (Trim(result) = '') then
-      result := SubNode
-    else if (ParmIsList) then
-    begin
-      P := Pos(':', SubNode);
-      if (P > 0) then
-        result := result + Copy(SubNode, P +1);
-    end;
-
-    ParmIsList := ParmIsList or
-                  SameText('rdf:li', SubNode);
-  end;
-
-  procedure LevelDeeper(const ANode: TXmlNode; AParent: string = ''; ParentIsList: boolean = false);
-  var
-    ANodeList: TXmlNodeList;
-    ASubNode: TXmlNode;
-    Attribute: TXmlAttribute;
-    SelNode: string;
-    ThisIsList: boolean;
-  begin
-    SelNode := Trim(AParent);
-
-    if (ANode.NodeValue <> '') then
-      Add2Xmp(SelNode, ANode.NodeValue, ThisIsList);
-
-    // Look in Attributes of Node
-    for Attribute in ANode.AttributeList do
-    begin
-      // Skip xml:lang etc.
-      if StartsText('xml:', Attribute.Name) then
-        continue;
-      if StartsText('xmlns:', Attribute.Name) then
-        continue;
-      if StartsText('rdf:About', Attribute.Name) then
-        continue;
-
-      ThisIsList := false; // Attribute cant be a list
-      Add2Xmp(GetNodeKey(SelNode, Attribute.Name, ThisIsList), Attribute.Value, ThisIsList);
-    end;
-
-    // Look in Childnodes
-    ANodeList := ANode.ChildNodes;
-    for ASubNode in ANodeList do
-    begin
-      ThisIsList := ParentIsList;
-      LevelDeeper(ASubNode, GetNodeKey(SelNode, ASubNode.NodeName, ThisIsList), ThisIsList);
-    end;
-  end;
-
 begin
   Xml:= TXmlVerySimple.Create;
   try
     TmpStream.Position := 0;
-    Xml.Encoding := DetectEncoding;
+    Xml.Encoding := XMP.DetectEncoding(TmpStream);
     try
       Xml.LoadFromStream(TmpStream);
     except on E:Exception do
@@ -2180,7 +2189,7 @@ begin
       end;
     end;
 
-    RDF := GetRDF(Xml);
+    RDF := XMP.GetRDF(Xml);
     if (RDF = nil) then
       exit;
 
@@ -2196,6 +2205,8 @@ begin
 end;
 
 procedure FotoRec.ReadXMP;
+const
+  XMPMINSIZE = 25; // Minimum size needed to read the xpacket stuff.
 var
   Index: integer;
   Bytes: TBytes;
@@ -2213,7 +2224,7 @@ begin
          (TmpStream.Size > XMPMINSIZE)then // Process standard XMP
       begin
 {$IFDEF DEBUG_XMP}
-        TmpStream.SaveToFile(ChangeFileExt(Self.FileName, '_XML'));
+        TmpStream.SaveToFile(ChangeFileExt(Self.FileName, '.XML'));
 {$ENDIF}
         ParseXMPBlock(TmpStream);
         TmpStream.Clear;
@@ -2223,7 +2234,7 @@ begin
     if (TmpStream.Size > XMPMINSIZE) then  // Process Extended XMP
     begin
 {$IFDEF DEBUG_XMP}
-      TmpStream.SaveToFile(ChangeFileExt(Self.FileName, '_XML_EXT'));
+      TmpStream.SaveToFile(ChangeFileExt(Self.FileName, '.XML_EXT'));
 {$ENDIF}
       ParseXMPBlock(TmpStream);
     end;

@@ -421,7 +421,7 @@ end;
 
 procedure TExifTool.OpenExit(WaitForClose: boolean = false);
 const
-  ExitCmd: AnsiString = '-stay_open' + CRLF + 'False' + CRLF; // Needs to be AnsiString.
+  ExitCmd: AnsiString = '-stay_open' + CRLF + 'False' + CRLF; // Can not be Unicode
 var
   BytesCount: Dword;
 begin
@@ -449,7 +449,7 @@ var
   FinalCmd: string;
   StatusLine: string;
   LengthReady: integer;
-  Call_ET: AnsiString; // Needs to be AnsiString. Only holds the -@ <argsfilename>
+  Call_ET: AnsiString; // Can not be Unicode. Only holds the -@ <argsfilename> so no international chars expected
   BytesCount: Dword;
   CanUseUtf8: boolean;
   CrWait, CrNormal: HCURSOR;
@@ -464,14 +464,18 @@ begin
 
     TMonitor.Enter(Self);
     try
-      // Create TempFile with commands and filenames
-      if pos('||', ETcmd) > 0 then
-        ETcmd := StringReplace(ETcmd, '||', CRLF, [rfReplaceAll]);
+      // Dont know what it's for!
+      ETcmd := StringReplace(ETcmd, '||', CRLF, [rfReplaceAll]);
+
+      // Also probably not needed, since all is UTF8
       CanUseUtf8 := (pos('-L' + CRLF, ETcmd) = 0);
+
+      // Create TempFile with commands and filenames
       FinalCmd := EndsWithCRLF(Options.GetOptions(CanUseUtf8) + ETcmd);
       if FNames <> '' then
         FinalCmd := EndsWithCRLF(FinalCmd + FNames);
 
+      // Add Execnum, also to stderr!
       AddExecNum(FinalCmd);
 
       // Create tempfile
@@ -535,6 +539,8 @@ begin
   result := OpenExec(ETcmd, FNames, ETouts, ETErrs, PopupOnError);
 end;
 
+// Executes ExifTool as a separate process,
+// but needs the ExifTool object for Execnum, Options, tempfile and counter
 class function TExifTool.ExecET(ETcmd, FNames, WorkingDir: string; var ETouts, ETErrs: string): boolean;
 var
   ReadOut: TReadPipeThread;
@@ -579,7 +585,7 @@ begin
     else
       PWorkingDir := PChar(WorkingDir);
 
-    CanUseUtf8 := (pos('-L ', ETcmd) = 0);
+    CanUseUtf8 := (Pos('-L ', ETcmd) = 0);
 
     FinalCmd := EndsWithCRLF(ET.Options.GetOptions(CanUseUtf8) + ArgsFromDirectCmd(ETcmd));
     FinalCmd := EndsWithCRLF(FinalCmd + FNames);
