@@ -139,7 +139,6 @@ begin
     SetMinorError(false);
     SetGpsFormat(true);
     SetShowNumber(false);
-//    ETCharset := '-CHARSET' + CRLF + 'FILENAME=UTF8' + CRLF + '-CHARSET' + CRLF + 'UTF8'; // UTF8 it is. No choice
     ETCharset := '-CHARSET' + CRLF + 'FILENAME=UTF8'; // UTF8 it is. No choice  (CHARSET UTF8 is Default PH)
     SetVerbose(0);
     SetGeoDir('');
@@ -465,7 +464,7 @@ begin
     TMonitor.Enter(Self);
     try
       // Dont know what it's for!
-      ETcmd := StringReplace(ETcmd, '||', CRLF, [rfReplaceAll]);
+      ETcmd := ReplaceAll(ETcmd, ['||'], [CRLF]);
 
       // Also probably not needed, since all is UTF8
       CanUseUtf8 := (pos('-L' + CRLF, ETcmd) = 0);

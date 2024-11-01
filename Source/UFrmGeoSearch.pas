@@ -161,7 +161,7 @@ begin
 
   CmbGeoProvider.ItemIndex := Ord(GeoSettings.GetCoordProvider);
   CmbLang.Text := GeoSettings.GeoCodeLang;
-  CmbCountryRegion.Items.Text := StringReplace(GetCountryList.Text, '=', '|', [rfReplaceAll]);
+  CmbCountryRegion.Items.Text := ReplaceAll(GetCountryList.Text, ['='], ['|']);
   CmbCountryRegion.ItemIndex := GetCountryList.IndexOfName(CountryRegion);
   if (CmbCountryRegion.ItemIndex = -1) then
     CmbCountryRegion.Text := CountryRegion;

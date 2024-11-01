@@ -287,7 +287,7 @@ begin
   if (LeftStr(Value, 1) = '"') and
      (RightStr(Value, 1) = '"') then
     result := Copy(result, 2, Length(result) -2);
-  result := StringReplace(result, '\/', '/', [rfReplaceAll]); // Belgium
+  result := ReplaceAll(result, ['\/'], ['/']); // Belgium
 end;
 
 function TPlace.GetCountryLocation: string;
@@ -443,14 +443,10 @@ end;
 
 function TPlace.HtmlEscape(const HTML: string): string;
 begin
-  result := HTML;
-  result := StringReplace(result, '&',  '&amp;',   [rfReplaceAll]);
-  result := StringReplace(result, '<',  '&lt;',    [rfReplaceAll]);
-  result := StringReplace(result, '>',  '&gt;',    [rfReplaceAll]);
-  result := StringReplace(result, '"',  '&quot;',  [rfReplaceAll]);
-  result := StringReplace(result, '''', '&#39;',   [rfReplaceAll]);
-  result := StringReplace(result, ' ',  '&nbsp;',  [rfReplaceAll]);
-  result := StringReplace(result, '-',  '&#8209;', [rfReplaceAll]);
+  result := ReplaceAll(HTML,
+                       ['&',     '<',    '>',    '"',      '''',    ' ',      '-'],
+                       ['&amp;', '&lt;', '&gt;', '&quot;', '&#39;', '&nbsp;', '&#8209']
+                      );
 end;
 
 function TPlace.GetHtmlSearchResult: string;
@@ -770,7 +766,9 @@ begin
       if (ImgName = '') then
         continue;
       if (boolean(Place.Value.Objects[PlaceCnt]) = true) then
-        Href := Href + GetHyperLink('href="file://' + StringReplace(ImgName, '\', '/', [rfReplaceAll]) + '"') +
+        Href := Href + GetHyperLink('href="file://' +
+                                    ReplaceAll(ImgName, ['\'], ['/']) +
+                                    '"') +
                        ExtractFileName(ImgName) +
                        '</a><br>'
       else if (GetPlace = false) then
@@ -1260,7 +1258,7 @@ begin
   SearchNode := Format('node[%%s][place~"%s"](area.searchArea);%%s', [SearchPlaces]);
   SearchName := Format('"%%s"%s"%s%s%s"%s',
                   [SearchOp, SearchStart,
-                   StringReplace(Trim(City), '&', '', [rfReplaceAll]),
+                   ReplaceAll(Trim(City), ['&'], ['']),
                    SearchEnd, SearchCase]);
 
   Data := Format('[out:json][timeout:25];%s',
@@ -1292,7 +1290,7 @@ begin
                        ');%s' +
                        'map_to_area->.searchArea;%s',
                         [FormatNL,
-                         StringReplace(Trim(UpperCase(CountryRegion)), '&', '', [rfReplaceAll]),
+                         ReplaceAll(Trim(UpperCase(CountryRegion)), ['&'], ['']),
                          FormatNL,
                          FormatNL,
                          FormatNL,
@@ -1305,7 +1303,7 @@ begin
                         ');%s' +
                         'map_to_area->.searchArea;%s',
                         [FormatNL,
-                         StringReplace(Trim(CountryRegion), '&', '', [rfReplaceAll]),
+                         ReplaceAll(Trim(CountryRegion), ['&'], ['']),
                          FormatNL,
                          FormatNL,
                          FormatNL]);

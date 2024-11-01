@@ -279,8 +279,7 @@ begin
     Text := FileFilters;
     if (Count > 0) then
       Delete(0);
-    result := StringReplace(Text,   #13, '', [rfReplaceAll]);
-    result := StringReplace(result, #10, '|', [rfReplaceAll]);
+      result := ReplaceAll(Text, [CRLF], ['|']);
     Free;
   end;
 end;
@@ -697,7 +696,7 @@ begin
         ET.Options.SetLangDef(Language);
         AutoRotatePreview := ReadBool(Ini_Settings, 'AutoRotatePreview', false);
         FileFilters := StrShowAllFiles + #10 +
-                       StringReplace(ReadString(Ini_Settings, 'FileFilters', DefFileFilter), '|', #10, [rfReplaceAll]);
+                       ReplaceAll(ReadString(Ini_Settings, 'FileFilters', DefFileFilter), ['|'], [#10]);
         FilterStartup := ReadInteger(Ini_Settings, 'FilterStartup', 0);
         DefStartupUse := ReadBool(Ini_Settings, 'DefStartupUse', false);
         DefStartupDir := ReadString(Ini_Settings, 'DefStartupDir', 'c:\');
