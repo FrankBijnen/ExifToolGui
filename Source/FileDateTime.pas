@@ -254,7 +254,7 @@ begin
     SampleFileName := ChangeFileExt(ExtractFileName(FSample), '');
   SampleFileExt := ExtractFileExt(FSample);
 
-  ETouts := StringReplace(ETouts, CRLF, ' ', [rfReplaceAll]);
+  ETouts := ReplaceAll(ETouts, [CRLF], [' ']);
   LblSampleDate.Caption := FSample + ' ' + ETouts;
   YYYY := NextField(ETouts, ':');
   MM   := NextField(ETouts, ':');
@@ -365,7 +365,7 @@ procedure TFFileDateTime.FormShow(Sender: TObject);
 begin
   Left := FMain.GetFormOffset.X;
   Top := FMain.GetFormOffset.Y;
-  FSample := StringReplace(FMain.GetFirstSelectedFile, CRLF, '', [rfReplaceAll]);
+  FSample := ReplaceAll(FMain.GetFirstSelectedFile, [CRLF], ['']);
   PnlCustomSeq.Visible := (RadDuplicates.ItemIndex = 2);
   Edit1.Enabled := (RadioGroup3.ItemIndex <> 0);
 

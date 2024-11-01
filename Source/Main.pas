@@ -3540,7 +3540,7 @@ begin
           ETcmd := ETcmd + '-f' + CRLF + CustomViewTagList;
           E := Length(ETcmd);
           SetLength(ETcmd, E - 1); // remove last space char
-          ETcmd := StringReplace(ETcmd, ' ', CRLF, [rfReplaceAll]);
+          ETcmd := ReplaceAll(ETcmd, [' '], [CRLF]);
         end;
       end;
 

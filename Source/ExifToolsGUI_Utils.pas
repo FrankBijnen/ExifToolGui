@@ -59,6 +59,9 @@ procedure Exchange(var A, B: integer);
 function NextField(var AString: string; const ADelimiter: string): string;
 function QuotedArg(FileName: string): string;
 function ReplaceLastChar(const AString: string; AFrom, ATo: Char): string;
+function ReplaceAll(const AString: string;
+                    const OldPatterns, NewPatterns: array of string;
+                    Flags: TReplaceFlags = [rfReplaceAll]): string;
 function EndsWithCRLF(const AString: string): string;
 function ArgsFromDirectCmd(const CmdIn: string): string;
 function DirectCmdFromArgs(const ArgsIn: string): string;
@@ -489,6 +492,22 @@ begin
       result[Len] := ATo;
 end;
 
+function ReplaceAll(const AString: string;
+                    const OldPatterns, NewPatterns: array of string;
+                    Flags: TReplaceFlags = [rfReplaceAll]): string;
+var
+  PatternHigh: integer;
+  Index: integer;
+begin
+  PatternHigh := Min(High(NewPatterns), High(OldPatterns));
+  if (PatternHigh < 0) then
+    exit(AString);
+
+  result := StringReplace(AString, OldPatterns[0], NewPatterns[0], Flags);
+  for Index := 1 to PatternHigh do
+    result := StringReplace(result, OldPatterns[Index], NewPatterns[Index], Flags);
+end;
+
 function EndsWithCRLF(const AString: string): string;
 begin
   result := AString;
@@ -503,7 +522,7 @@ var Indx: integer;
 begin
   DQuote := false;
   result := CmdIn;
-  result := StringReplace(result, '\"', #0, [rfReplaceAll]);    // Put a double quote in data: -make="Pentax\"Ricoh\""
+  result := ReplaceAll(result, ['\"'], [#0]);    // Put a double quote in data: -make="Pentax\"Ricoh\""
   for Indx := 1 to Length(result) do
   begin
     if (result[Indx] = '"') then
@@ -515,9 +534,10 @@ begin
     if (result[Indx] = ' ') then
       result[Indx] := #10;                                      // Change a space to a LF, If not present within " "
   end;
-  result := StringReplace(result, '"', '', [rfReplaceAll]);     // remove Double quotes
-  result := StringReplace(result, #0, '"', [rfReplaceAll]);     // Put the Double quotes in, that belong to the data
-  result := StringReplace(result, #10, #13#10, [rfReplaceAll]); // LF => CRLF
+  result := ReplaceAll(result,
+                       ['"', #0,  #10],
+                       ['',  '"', CRLF]
+                      );
 end;
 
 function DirectCmdFromArgs(const ArgsIn: string): string;
@@ -533,7 +553,7 @@ begin
     result := '';
     for Indx := 0 to ArgsInList.Count -1 do
     begin
-      Aline := StringReplace(ArgsInList[Indx], '"', '\"', [rfReplaceAll]);
+      Aline := ReplaceAll(ArgsInList[Indx], ['"'], ['\"']);
       result := result + Sep + QuotedArg(Aline);
       Sep := ' ';
     end;
@@ -545,31 +565,31 @@ end;
 function DirectCmdFromArgsCMD(const ArgsIn: string): string;
 begin
   result := DirectCmdFromArgs(ArgsIn);
-  result := StringReplace(result, '%', '%%', [rfReplaceAll]);
+  result := ReplaceAll(result, ['%'], ['%%']);
 end;
 
 function DirectCmdFromArgsPS(const ArgsIn: string): string;
 begin
   result := DirectCmdFromArgs(ArgsIn);
-  result := StringReplace(result, '{', '`{', [rfReplaceAll]);
-  result := StringReplace(result, '}', '`}', [rfReplaceAll]);
-  result := StringReplace(result, '\"', '\`"', [rfReplaceAll]);
+  result := ReplaceAll(result,
+                       ['{',  '}',  '\"'],
+                       ['`{', '`}', '\`"']
+                      );
 end;
 
 function EscapeArgsForCmd(const Cmd: string): string;
 begin
   // https://www.robvanderwoude.com/escapechars.php
-  result := StringReplace(Cmd,    '%', '%%', [rfReplaceAll]);
-  result := StringReplace(result, '^', '^^', [rfReplaceAll]);
-  result := StringReplace(result, '&', '^&', [rfReplaceAll]);
-  result := StringReplace(result, '<', '^<', [rfReplaceAll]);
-  result := StringReplace(result, '>', '^>', [rfReplaceAll]);
-  result := StringReplace(result, '|', '^|', [rfReplaceAll]);
+  result := ReplaceAll(Cmd,
+                       ['%',  '^',  '&',  '<',  '>',  '|'],
+                       ['%%', '^^', '^&', '^<', '^>', '^|']
+                      );
+
 end;
 
 function EscapeArgsForPS(const Cmd: string): string;
 begin
-  result := StringReplace(Cmd, '"', '""', [rfReplaceAll]);
+  result := ReplaceAll(Cmd, ['"'], ['""']);
 end;
 
 
@@ -1437,18 +1457,13 @@ begin
 end;
 
 function RemoveInvalidTags(const Tag: string; AllowExclude: boolean = false): string;
-const
-  InvalidChars: array of Char = [' ', '<', '='];
-var
-  AChar: Char;
 begin
   result := Tag;
   if (not AllowExclude) and
      (Pos('-', Tag) = 1) then
      Delete(result, 1, 1);
 
-  for AChar in InvalidChars do
-    result := StringReplace(result, AChar, '', [rfReplaceAll]);
+  result := ReplaceAll(result, [' ', '<', '='], ['', '', '']);
 
   if result <> Tag then
     MessageDlgEx(Format(StrInvalidCharsRemoved, [Tag]), '', TMsgDlgType.mtError, [TMsgDlgBtn.mbOK]);
@@ -1545,8 +1560,8 @@ begin
         // Need to replace / by \ (E.G. If *.gpx is used)
         // Need to replace ' by \' for JavaScript
         ALogName := Copy(LeftStr(ALine, Length(Aline) -1), P + Length(HasLog) +1);
-        ALogName := ExtractFileName(StringReplace(ALogName, '/', '\', [rfReplaceAll]));
-        ALogName := StringReplace(ALogName, '''', '\''', [rfReplaceAll]);
+        ALogName := ExtractFileName(ReplaceAll(ALogName, ['/'], ['\']));
+        ALogName := ReplaceAll(ALogName, [''''], ['\''']);
         continue;
       end;
       P := Pos(HasUTC, ALine);
@@ -1558,7 +1573,7 @@ begin
       while (ALine <> '') and
             ((ALat = '') or (ALon = '')) do
       begin
-        AKey := StringReplace(NextField(ALine, ' '), ',', '.', [rfReplaceAll]);
+        AKey := ReplaceAll(NextField(ALine, ' '), [','], ['.']);
         if (LeftStr(AKey, 4) = 'lat=') then
         begin
           Alat := AKey;
@@ -1614,7 +1629,7 @@ begin
   if (result = '.') then
     result := '';
   if (result <> '') then
-    result := IncludeTrailingPathDelimiter(StringReplace(result, '/', '\', [rfReplaceAll]));
+    result := IncludeTrailingPathDelimiter(ReplaceAll(result, ['/'], ['\']));
   result := result + NextField(ETout, CRLF);
 
   // Take Composite Lat & Lon. If not avail get without group.

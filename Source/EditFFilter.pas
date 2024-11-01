@@ -74,7 +74,7 @@ end;
 
 procedure TFEditFFilter.BtnDefaultsClick(Sender: TObject);
 begin
-  GUIsettings.FileFilters := StrShowAllFiles + #10 + StringReplace(DefFileFilter, '|', #10, [rfReplaceAll]);
+  GUIsettings.FileFilters := strShowAllFiles + #10 + ReplaceAll(DefFileFilter, ['|'], [#10]);
   GUIsettings.FilterStartup := 0;
   LoadListBox;
 end;

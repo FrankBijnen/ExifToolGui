@@ -2121,7 +2121,7 @@ var
 begin
   // ExifTool escapes (needlessly) ' and " in XML.
   // VerySimpleXML does not UnEscape '&#39;' .
-  UnEscaped := StringReplace(AValue, '&#39;', '''', [rfReplaceAll]);
+  UnEscaped := ReplaceAll(AValue, ['&#39;'], ['''']);
 
   // For XMP add every node found.
   result := AddXmp_Data(AKey, UnEscaped);
