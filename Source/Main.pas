@@ -397,6 +397,7 @@ type
     function GetFirstSelectedFile: string;
     function GetFirstSelectedFilePath: string;
     function GetFullPath(MustExpandPath: boolean): string;
+    function GetFileNameForArgs(FileName: string; MustExpandPath: boolean): string;
     function GetSelectedFile(FileName: string; MustExpandPath: boolean): string; overload;
     function GetSelectedFile(FileName: string): string; overload;
     function GetSelectedFiles(MustExpandPath: boolean): string; overload;
@@ -775,12 +776,24 @@ begin
     result := IncludeTrailingPathDelimiter(ShellList.Path);
 end;
 
+function TFMain.GetFileNameForArgs(FileName: string; MustExpandPath: boolean): string;
+const
+  InvalidArgChars = [' ', '-', '#'];
+begin
+  if (MustExpandPath = false) and
+     (Length(Filename) > 0) and
+     (CharInSet(FileName[1], InvalidArgChars)) then
+    result := '.\' + FileName
+  else
+    result := FileName;
+end;
+
 function TFMain.GetSelectedFile(FileName: string; MustExpandPath: boolean): string;
 begin
   if (FileName = '') then
     result := ''
   else
-    result := GetFullPath(MustExpandPath) + FileName;
+    result := GetFullPath(MustExpandPath) + GetFileNameForArgs(FileName, MustExpandPath);
 end;
 
 function TFMain.GetSelectedFile(FileName: string): string;
@@ -802,7 +815,7 @@ begin
     if (ListView_GetItemState(ShellList.Handle, Index, LVIS_SELECTED) = LVIS_SELECTED) and
        (TSubShellFolder.GetIsFolder(ShellList.Folders[Index]) = false) then
     begin
-      result := result + FullPath + ShellList.RelFileName(Index) + CRLF;
+      result := result + FullPath + GetFileNameForArgs(ShellList.RelFileName(Index), MustExpandPath) + CRLF;
       Inc(Cnt);
     end;
   end;
