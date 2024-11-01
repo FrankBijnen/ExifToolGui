@@ -4,7 +4,7 @@ object FGenericExtract: TFGenericExtract
   BorderStyle = bsDialog
   Caption = 'Generic extract previews'
   ClientHeight = 352
-  ClientWidth = 588
+  ClientWidth = 608
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -17,7 +17,7 @@ object FGenericExtract: TFGenericExtract
   object StatusBar1: TStatusBar
     Left = 0
     Top = 333
-    Width = 588
+    Width = 608
     Height = 19
     Panels = <>
     SimplePanel = True
@@ -123,8 +123,8 @@ object FGenericExtract: TFGenericExtract
   end
   object BtnCancel: TButton
     Left = 503
-    Top = 16
-    Width = 78
+    Top = 15
+    Width = 95
     Height = 25
     Caption = 'Cancel'
     ModalResult = 2
@@ -133,7 +133,7 @@ object FGenericExtract: TFGenericExtract
   object BtnExecute: TButton
     Left = 503
     Top = 302
-    Width = 78
+    Width = 95
     Height = 25
     Caption = 'Execute'
     Default = True

@@ -3,8 +3,8 @@ object FGenericImport: TFGenericImport
   Top = 0
   BorderStyle = bsDialog
   Caption = 'Generic import previews'
-  ClientHeight = 343
-  ClientWidth = 590
+  ClientHeight = 313
+  ClientWidth = 608
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -16,8 +16,8 @@ object FGenericImport: TFGenericImport
   TextHeight = 13
   object StatusBar1: TStatusBar
     Left = 0
-    Top = 324
-    Width = 590
+    Top = 294
+    Width = 608
     Height = 19
     Panels = <>
     SimplePanel = True
@@ -28,7 +28,7 @@ object FGenericImport: TFGenericImport
     Left = 0
     Top = 0
     Width = 495
-    Height = 324
+    Height = 294
     Align = alLeft
     DoubleBuffered = True
     Font.Charset = DEFAULT_CHARSET
@@ -85,7 +85,7 @@ object FGenericImport: TFGenericImport
     end
     object ChkAutoRotate: TCheckBox
       Left = 10
-      Top = 229
+      Top = 226
       Width = 470
       Height = 17
       Caption = 'Auto rotate imported JPEG'#39's'
@@ -93,7 +93,7 @@ object FGenericImport: TFGenericImport
     end
     object CmbCrop: TComboBox
       Left = 10
-      Top = 260
+      Top = 257
       Width = 204
       Height = 22
       ItemIndex = 0
@@ -104,19 +104,11 @@ object FGenericImport: TFGenericImport
         'Crop to multiple of 8'
         'Crop to multiple of 16')
     end
-    object ChkRemoveOthers: TCheckBox
-      Left = 10
-      Top = 291
-      Width = 470
-      Height = 17
-      Caption = 'Remove unchecked previews'
-      TabOrder = 3
-    end
   end
   object BtnCancel: TButton
     Left = 503
-    Top = 14
-    Width = 80
+    Top = 15
+    Width = 95
     Height = 25
     Caption = 'Cancel'
     ModalResult = 2
@@ -124,8 +116,8 @@ object FGenericImport: TFGenericImport
   end
   object BtnExecute: TButton
     Left = 503
-    Top = 287
-    Width = 80
+    Top = 262
+    Width = 95
     Height = 25
     Caption = 'Execute'
     Default = True
