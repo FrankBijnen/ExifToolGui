@@ -1,6 +1,4 @@
 unit UFrmGenericImport;
-//TODO Decide if we want to enable. For now to dangerous.
-{.$DEFINE ENABLEREMOVEOTHERS}
 
 interface
 
@@ -21,7 +19,6 @@ type
     ChkAutoRotate: TCheckBox;
     CmbCrop: TComboBox;
     LblSample: TLabel;
-    ChkRemoveOthers: TCheckBox;
     procedure FormShow(Sender: TObject);
     procedure BtnExecuteClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
@@ -120,15 +117,6 @@ begin
 
         StatusBar1.SimpleText := Format(StrRotatingSAngle, [GetPreviewTmp, Angle, Modulo]);
         ASize := PerformLossLess(AnImport, Angle, Modulo, GetPreviewTmp);
-        ETcmd := '';
-        if (ChkRemoveOthers.Checked) then // Remove others?
-        begin
-          EtCmd := '-a' + CRLF + '-Preview:All=' + CRLF;
-          StatusBar1.SimpleText := Format(StrUpdatingPreviewIn, [AFile]);
-          ET.OpenExec(ETcmd, FMain.GetSelectedFile(AFile), ETouts, ETerrs);
-          result := result and (ETerrs = '');
-        end;
-
         ETcmd := Preview + '<=' + GetPreviewTmp + CRLF +
                  '-' + IFD + ':ImageWidth=' + IntToStr(ASize.cx) + CRLF +
                  '-' + IFD + ':ImageHeight=' + IntToStr(ASize.cy);
@@ -164,11 +152,6 @@ end;
 procedure TFGenericImport.FormCreate(Sender: TObject);
 begin
   ChkAutoRotate.Checked := true;
-  ChkRemoveOthers.Visible := false;
-  ChkRemoveOthers.Checked := false;
-{$IFDEF ENABLEREMOVEOTHERS}
-  ChkRemoveOthers.Visible := true;
-{$ENDIF}
   CmbCrop.ItemIndex := 0;
 end;
 
