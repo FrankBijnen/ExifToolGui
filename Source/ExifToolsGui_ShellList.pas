@@ -271,6 +271,9 @@ begin
 end;
 
 class function TSubShellFolder.GetName(Folder: TShellFolder; RelativeNameType: TRelativeNameType): string;
+var
+  TmpBuf: string;
+  Len: integer;
 begin
   case (RelativeNameType) of
     TRelativeNameType.rnDisplay:
@@ -279,7 +282,17 @@ begin
     TRelativeNameType.rnFile:
       // For File IO functions
       // This call is much slower, it keeps getting DesktopFolder
-      result := ExtractFilename(ExcludeTrailingPathDelimiter(Folder.PathName));
+      //result := ExtractFilename(ExcludeTrailingPathDelimiter(Folder.PathName));
+      begin
+        TmpBuf := Folder.PathName;
+        Len := GetLongPathName(PChar(TmpBuf), nil, 0); // Length including nul terminator
+        if (Len > 0) then
+        begin
+          SetLength(result, Len -1);
+          GetLongPathName(PChar(TmpBuf), PChar(result), Len);
+        end;
+        result := ExtractFilename(ExcludeTrailingPathDelimiter(result));
+      end;
     TRelativeNameType.rnSort:
       // For Sorting
       // Use the DisplayName, but prepend a space for items in the root, so they will be first
