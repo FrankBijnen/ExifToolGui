@@ -201,6 +201,7 @@ type
     AdvCheckBox_Zeroes: TCheckBox;
     BvlChartFunc: TBevel;
     AdvCheckBox_Legend: TCheckBox;
+    MaAPIWindowsLongPath: TAction;
     procedure ShellListClick(Sender: TObject);
     procedure ShellListKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
     procedure SpeedBtnExifClick(Sender: TObject);
@@ -336,6 +337,7 @@ type
     procedure Selectall2Click(Sender: TObject);
     procedure Selectnone2Click(Sender: TObject);
     procedure ChartCheckClick(Sender: TObject);
+    procedure MaAPIWindowsLongPathExecute(Sender: TObject);
   private
     { Private declarations }
     ETBarSeriesFocal: TBarSeries;
@@ -877,6 +879,19 @@ begin
     SetApiWindowsWideFile(MaAPIWindowsWideFile.Checked);
 end;
 
+procedure TFMain.MaAPIWindowsLongPathExecute(Sender: TObject);
+begin
+  with ET.Options do
+    SetApiWindowsLongPath(MaAPIWindowsLongPath.Checked);
+  ShellList.ForceLongPath := MaAPIWindowsLongPath.Checked;
+end;
+
+procedure TFMain.MaAPILargeFileSupportExecute(Sender: TObject);
+begin
+  with ET.Options do
+    SetApiLargeFileSupport(MaAPILargeFileSupport.Checked);
+end;
+
 procedure TFMain.MaUserDefLoadExecute(Sender: TObject);
 begin
   if (LoadIniDialog(OpenFileDlg, TIniData.idFileLists, false)) then
@@ -908,17 +923,6 @@ end;
 procedure TFMain.MaPredefinedSaveExecute(Sender: TObject);
 begin
   SaveIniDialog(SaveFileDlg, TIniData.idPredefinedTags, true);
-end;
-
-procedure TFMain.MaAPILargeFileSupportExecute(Sender: TObject);
-begin
-  with ET.Options do
-    SetApiLargeFileSupport(MaAPILargeFileSupport.Checked);
-end;
-
-procedure TFMain.MDontBackupClick(Sender: TObject);
-begin
-  ET.Options.SetBackupMode(MaDontBackup.Checked);
 end;
 
 procedure TFMain.MetadataListDblClick(Sender: TObject);
@@ -1256,6 +1260,11 @@ procedure TFMain.MFileNameDateTimeClick(Sender: TObject);
 begin
   if (FFileDateTime.ShowModal = idOK) then
     ShellList.RefreshSelected;
+end;
+
+procedure TFMain.MDontBackupClick(Sender: TObject);
+begin
+  ET.Options.SetBackupMode(MaDontBackup.Checked);
 end;
 
 procedure TFMain.MIgnoreErrorsClick(Sender: TObject);
@@ -2929,7 +2938,7 @@ begin
   begin
     CanAdd := false;
     CopyFolder := TSubShellFolder.Create(AFolder.Parent, AFolder.RelativeID, AFolder.ShellFolder);
-    CopyFolder.FRelativePath := TSubShellFolder.GetRelativeFileName(AFolder);
+    CopyFolder.FRelativePath := TSubShellFolder.GetRelativeFileName(AFolder, TShellListView(Sender).ForceLongPath);
 
     TShellListView(Sender).FoldersList.Add(CopyFolder);
     TShellListView(Sender).PopulateSubDirs(CopyFolder);

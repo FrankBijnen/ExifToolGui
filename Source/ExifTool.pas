@@ -26,6 +26,7 @@ type
     ETCharset: string;
     ETVerbose: integer;
     ETAPIWindowsWideFile: string;
+    ETAPIWindowsLongPath: string;
     ETAPILargeFileSupport: string;
     ETGeoDir: string;
     ETCustomOptions: string;
@@ -38,6 +39,7 @@ type
     procedure SetShowNumber(UseShowNumber: boolean);
     procedure SetVerbose(Level: integer);
     procedure SetApiWindowsWideFile(UseWide: boolean);
+    procedure SetApiWindowsLongPath(UseLong: boolean);
     procedure SetApiLargeFileSupport(UseLarge: boolean);
     procedure SetGeoDir(GeoDir: string);
     procedure SetCustomOptions(Custom: string);
@@ -205,6 +207,14 @@ begin
     ETAPIWindowsWideFile := '-API' + CRLF + 'WindowsWideFile=1' + CRLF
   else
     ETAPIWindowsWideFile := '';
+end;
+
+procedure TET_OptionsRec.SetApiWindowsLongPath(UseLong: boolean);
+begin
+  if UseLong then
+    ETAPIWindowsLongPath := '-API' + CRLF + 'WindowsLongPath=1' + CRLF
+  else
+    ETAPIWindowsLongPath := '';
 end;
 
 procedure TET_OptionsRec.SetApiLargeFileSupport(UseLarge: boolean);

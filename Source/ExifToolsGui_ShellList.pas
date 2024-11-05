@@ -30,14 +30,19 @@ type
   TSubShellFolder = class(TShellFolder)
     FRelativePath: string;
     function RelativePath: string;
-    class function GetRelativeName(Folder: TShellFolder; RelativeNameType: TRelativeNameType): string;
+    class function GetName(Folder: TShellFolder;
+                                   RelativeNameType: TRelativeNameType;
+                                   ForceLongPath: boolean): string;
+    class function GetRelativeName(Folder: TShellFolder;
+                                   RelativeNameType: TRelativeNameType;
+                                   ForceLongPath: boolean): string;
   public
     destructor Destroy; override;
     class function HasParentShellFolder(Folder: TShellFolder): boolean;
     class function GetIsFolder(Folder: TShellFolder): boolean;
-    class function GetName(Folder: TShellFolder; RelativeNameType: TRelativeNameType): string;
     class function GetRelativeDisplayName(Folder: TShellFolder): string;
-    class function GetRelativeFileName(Folder: TShellFolder): string;
+    class function GetRelativeFileName(Folder: TShellFolder;
+                                       ForceLongPath: boolean): string;
     class function GetRelativeSortName(Folder: TShellFolder): string;
     class procedure AllFastSystemFields(RootFolder: TShellFolder; FieldList: TStrings);
     class function SystemFieldIsDate(RootFolder: TShellFolder; Column: integer): boolean;
@@ -55,6 +60,7 @@ type
     FDoDefault: boolean;
     FSubFolders: WPARAM;
     FIncludeSubFolders: boolean;
+    FForceLongPath: boolean;
 
     FColumnDefs: TColumnsArray;
     FReadModeOptions: TReadModeOptions;
@@ -165,6 +171,7 @@ type
     property OnMouseWheel;
     property OnCustomDrawItem;
     property IncludeSubFolders: boolean read FIncludeSubFolders write FIncludeSubFolders;
+    property ForceLongPath: boolean read FForceLongPath write FForceLongPath;
   end;
 
 implementation
@@ -270,7 +277,9 @@ begin
     result := Folder.IsFolder;
 end;
 
-class function TSubShellFolder.GetName(Folder: TShellFolder; RelativeNameType: TRelativeNameType): string;
+class function TSubShellFolder.GetName(Folder: TShellFolder;
+                                       RelativeNameType: TRelativeNameType;
+                                       ForceLongPath: boolean): string;
 var
   TmpBuf: string;
   Len: integer;
@@ -284,14 +293,19 @@ begin
       // This call is much slower, it keeps getting DesktopFolder
       //result := ExtractFilename(ExcludeTrailingPathDelimiter(Folder.PathName));
       begin
-        TmpBuf := Folder.PathName;
-        Len := GetLongPathName(PChar(TmpBuf), nil, 0); // Length including nul terminator
-        if (Len > 0) then
+        if (ForceLongPath) then
         begin
-          SetLength(result, Len -1);
-          GetLongPathName(PChar(TmpBuf), PChar(result), Len);
-        end;
-        result := ExtractFilename(ExcludeTrailingPathDelimiter(result));
+          TmpBuf := Folder.PathName;
+          Len := GetLongPathName(PChar(TmpBuf), nil, 0); // Length including nul terminator
+          if (Len > 0) then
+          begin
+            SetLength(result, Len -1);
+            GetLongPathName(PChar(TmpBuf), PChar(result), Len);
+          end;
+          result := ExtractFilename(ExcludeTrailingPathDelimiter(result));
+        end
+        else
+          result := ExtractFilename(ExcludeTrailingPathDelimiter(Folder.PathName));
       end;
     TRelativeNameType.rnSort:
       // For Sorting
@@ -305,7 +319,9 @@ begin
   end;
 end;
 
-class function TSubShellFolder.GetRelativeName(Folder: TShellFolder; RelativeNameType: TRelativeNameType): string;
+class function TSubShellFolder.GetRelativeName(Folder: TShellFolder;
+                                               RelativeNameType: TRelativeNameType;
+                                               ForceLongPath: boolean): string;
 begin
   result := '';
 
@@ -318,7 +334,7 @@ begin
     exit;
 
   // Get Filename
-  result := TSubShellFolder.GetName(Folder, RelativeNameType);
+  result := TSubShellFolder.GetName(Folder, RelativeNameType, ForceLongPath);
 
   // Prepend (relative) directory name?
   if (Folder.IsFolder = false) and    // Folders? Dont add RelativePath
@@ -328,17 +344,18 @@ end;
 
 class function TSubShellFolder.GetRelativeDisplayName(Folder: TShellFolder): string;
 begin
-  result := TSubShellFolder.GetRelativeName(Folder, TRelativeNameType.rnDisplay);
+  result := TSubShellFolder.GetRelativeName(Folder, TRelativeNameType.rnDisplay, false);
 end;
 
-class function TSubShellFolder.GetRelativeFileName(Folder: TShellFolder): string;
+class function TSubShellFolder.GetRelativeFileName(Folder: TShellFolder;
+                                                   ForceLongPath: boolean): string;
 begin
-  result := TSubShellFolder.GetRelativeName(Folder, TRelativeNameType.rnFile);
+  result := TSubShellFolder.GetRelativeName(Folder, TRelativeNameType.rnFile, ForceLongPath);
 end;
 
 class function TSubShellFolder.GetRelativeSortName(Folder: TShellFolder): string;
 begin
-  result := TSubShellFolder.GetRelativeName(Folder, TRelativeNameType.rnSort);
+  result := TSubShellFolder.GetRelativeName(Folder, TRelativeNameType.rnSort, false);
 end;
 
 class procedure TSubShellFolder.AllFastSystemFields(RootFolder: TShellFolder; FieldList: TStrings);
@@ -992,7 +1009,7 @@ begin
     if (TSubShellFolder.GetIsFolder(NewRelativeFolder)) then
     begin
       NewRelativeFolder.FRelativePath := IncludeTrailingPathDelimiter(FRelativeFolder.FRelativePath) +
-                                         TSubShellFolder.GetName(NewRelativeFolder, TRelativeNameType.rnFile);
+                                         TSubShellFolder.GetName(NewRelativeFolder, TRelativeNameType.rnFile, ForceLongPath);
       PopulateSubDirs(NewRelativeFolder);
       FHiddenFolders.Add(NewRelativeFolder); // We dont want subfoldernames visible. But keep a reference, so we can free them
       Continue;
@@ -1171,6 +1188,7 @@ begin
   FGenerating := 0;
   FHiddenFolders := Tlist.Create;
   FIncludeSubFolders := false;
+  FForceLongPath := false;
   InitSortSpec(0, THeaderSortState.hssNone);
   FThumbTasks := Tlist.Create;
   FThumbNails := TImageList.Create(Self);
@@ -1307,7 +1325,7 @@ begin
   AFolder := GetSelectedFolder(ItemIndex);
   if (AFolder <> nil) and
      (TSubShellFolder.GetIsFolder(AFolder) = false) then
-    result := TSubShellFolder.GetRelativeFileName(AFolder);
+    result := TSubShellFolder.GetRelativeFileName(AFolder, ForceLongPath);
 end;
 
 function TShellListView.FileExt(ItemIndex: integer = -1): string;
