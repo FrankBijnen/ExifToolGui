@@ -1415,8 +1415,12 @@ begin
 end;
 
 procedure TFMain.MImportXMPLogClick(Sender: TObject);
+const
+  XmpExt = '.Xmp';
+
 var
   SrcDir, ETcmd, ETout, ETerr: string;
+  XmpMask: string;
 begin
   if MessageDlg(ImportXMP1 + #10+
                 ImportXMP2 + #10 +
@@ -1433,10 +1437,12 @@ begin
     SrcDir := BrowseFolderDlg(StrChooseFolderContai, 1, SrcDir);
     if SrcDir <> '' then
     begin
-      if SrcDir[length(SrcDir)] <> '\' then
-        SrcDir := SrcDir + '\';
+      SrcDir := IncludeTrailingPathDelimiter(SrcDir);
       GpsXmpDir := SrcDir;
-      ETcmd := '-TagsFromFile' + CRLF + SrcDir + '%f.xmp' + CRLF;
+      XmpMask := '%f' + XmpExt;
+      if (FileExists(SrcDir + ExtractFileName(GetFirstSelectedFilePath) + XmpExt)) then
+        XmpMask := '%f.%e' + XmpExt;
+      ETcmd := '-TagsFromFile' + CRLF + SrcDir + XmpMask + CRLF;
       ETcmd := ETcmd + '-GPS:GPSLatitude<Xmp-exif:GPSLatitude' + CRLF + '-GPS:GPSLongitude<Xmp-exif:GPSLongitude' + CRLF;
       ETcmd := ETcmd + '-GPS:GPSLatitudeRef<Composite:GPSLatitudeRef' + CRLF + '-GPS:GPSLongitudeRef<Composite:GPSLongitudeRef' + CRLF;
       ETcmd := ETcmd + '-GPS:GPSDateStamp<XMP-exif:GPSDateTime' + CRLF + '-GPS:GPSTimeStamp<XMP-exif:GPSDateTime';

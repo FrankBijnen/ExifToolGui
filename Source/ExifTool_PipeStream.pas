@@ -24,12 +24,13 @@ type
     FileBuffer: array of byte;
     FETCounterLast: integer;
     FETCounter: TET_Counter;
+    FCheckPipe: boolean;
     function BeforeLineEnds(CurPos: PByte): PByte;
     function PrevLineStart(FromPos: PByte): PByte;
     function GetLastLinePosition(var StartPos, EndPos: PByte): boolean;
     function GetPipe(StartPos: PByte = nil; EndPos: PByte = nil): Utf8String;
   public
-    constructor Create(AFile: THandle; ABufSize: integer);
+    constructor Create(AFile: THandle; ABufSize: integer; ACheckPipe: boolean = true);
     function PipeHasData: boolean;
     function PipeHasReadyOrFatal(const ExecNum: word): boolean;
     procedure CheckFilesProcessed;
@@ -74,9 +75,10 @@ const
   Fatal:       Utf8string = '{Fatal}';
   FilePrompt:  Utf8string  = '========';
 
-constructor TPipeStream.Create(AFile: THandle; ABufSize: integer);
+constructor TPipeStream.Create(AFile: THandle; ABufSize: integer; ACheckPipe: boolean);
 begin
   inherited Create;
+  FCheckPipe := ACheckPipe;
   HFile := AFile;
   FBufSize := ABufSize;
   SetLength(FileBuffer, FBufSize);
@@ -203,11 +205,14 @@ var
 begin
   if (Winapi.Windows.ReadFile(HFile, FileBuffer[0], FBufSize, result, nil) = false) then
   begin
-    // Write the ErrorMessage + {Fatal} in stream.
-    // Prevents hang when ExifTool does not write {Ready}. E.G. Perl aborts because compilation error
-    // PipeHasReadyOrFatal checks this.
-    FLastError := SysErrorMessage(GetLastError) + Chr(CR) + Chr(LF) + Fatal + Chr(CR) + Chr(LF);
-    Self.Write(FLastError[1], Length(FLastError));
+    if (FCheckPipe) then
+    begin
+      // Write the ErrorMessage + {Fatal} in stream.
+      // Prevents hang when ExifTool does not write {Ready}. E.G. Perl aborts because compilation error
+      // PipeHasReadyOrFatal checks this.
+      FLastError := SysErrorMessage(GetLastError) + Chr(CR) + Chr(LF) + Fatal + Chr(CR) + Chr(LF);
+      Self.Write(FLastError[1], Length(FLastError));
+    end;
     exit(0); // Stop reading pipe
   end;
 
@@ -258,7 +263,7 @@ end;
 // Read Pipe in separate thread
 constructor TReadPipeThread.Create(AFile: THandle; ABufSize: integer);
 begin
-  FPipeStream := TPipeStream.Create(AFile, ABufSize);
+  FPipeStream := TPipeStream.Create(AFile, ABufSize, false);
   inherited Create(false); // start running
 end;
 
