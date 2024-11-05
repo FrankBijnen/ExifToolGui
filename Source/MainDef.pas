@@ -772,6 +772,9 @@ begin
         MaNotDuplicated.Checked := ReadBool(Ini_Options, 'NotDuplicated', false);
         MaAPIWindowsWideFile.Checked := ReadBool(Ini_Options, 'APIWindowsWideFile', true);
         SetApiWindowsWideFile(MaAPIWindowsWideFile.Checked);
+        MaAPIWindowsLongPath.Checked := ReadBool(Ini_Options, 'APIWindowsLongPath', true);
+        SetApiWindowsLongPath(MaAPIWindowsLongPath.Checked);
+        ShellList.ForceLongPath := MaAPIWindowsLongPath.Checked;
         MaAPILargeFileSupport.Checked := ReadBool(Ini_Options, 'APILargeFileSupport', false);
         SetApiLargeFileSupport(MaAPILargeFileSupport.Checked);
         SetCustomOptions(ReadString(Ini_Options, 'CustomOptions', ''));
@@ -964,6 +967,7 @@ begin
         WriteBool(Ini_Options, 'ShowComposite', MaShowComposite.Checked);
         WriteBool(Ini_Options, 'NotDuplicated', MaNotDuplicated.Checked);
         WriteBool(Ini_Options, 'APIWindowsWideFile', MaAPIWindowsWideFile.Checked);
+        WriteBool(Ini_Options, 'APIWindowsLongPath', MaAPIWindowsLongPath.Checked);
         WriteBool(Ini_Options, 'APILargeFileSupport', MaAPILargeFileSupport.Checked);
         WriteString(Ini_Options, 'CustomOptions', ET.Options.ETCustomOptions);
 

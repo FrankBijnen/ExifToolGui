@@ -188,7 +188,7 @@ object FFileDateTime: TFFileDateTime
         Top = 295
         Width = 568
         Height = 82
-        Caption = 'Action on duplicate filename'
+        Caption = 'Action on duplicate filename (Custom requires Exiftool V12.97)'
         ItemIndex = 1
         Items.Strings = (
           'None (Show error)'

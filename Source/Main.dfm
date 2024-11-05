@@ -1186,8 +1186,11 @@ object FMain: TFMain
                 Caption = '&API WindowsWideFile (Requires Exiftool V12.66)'
               end
               item
+                Action = MaAPIWindowsLongPath
+              end
+              item
                 Action = MaAPILargeFileSupport
-                Caption = 'API &LargeFileSupport'
+                Caption = 'API &LargeFileSupport (Requires Exiftool V12.88)'
               end
               item
                 Caption = '-'
@@ -1467,6 +1470,14 @@ object FMain: TFMain
       Checked = True
       OnExecute = MAPIWindowsWideFileClick
     end
+    object MaAPIWindowsLongPath: TAction
+      Tag = 10
+      Category = 'Options'
+      AutoCheck = True
+      Caption = 'API WindowsLongPath (Requires Exiftool V13.02)'
+      Checked = True
+      OnExecute = MaAPIWindowsLongPathExecute
+    end
     object MaExportMetaXMP: TAction
       Tag = 20
       Category = 'Export_Metadata'
@@ -1590,7 +1601,7 @@ object FMain: TFMain
       Tag = 10
       Category = 'Options'
       AutoCheck = True
-      Caption = 'API LargeFileSupport'
+      Caption = 'API LargeFileSupport (Requires Exiftool V12.88)'
       OnExecute = MaAPILargeFileSupportExecute
     end
     object MaCustomOptions: TAction
