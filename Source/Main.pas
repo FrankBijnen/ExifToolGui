@@ -3835,11 +3835,16 @@ begin
   FStyleServices := TStyleManager.Style[GUIsettings.GuiStyle];
 
   if Assigned(FStyleServices) then
+  begin
     GUIColorWindow := FStyleServices.GetStyleColor(scWindow);
+    ShellList.Color :=  FStyleServices.GetStyleColor(scListView);
+    ShellTree.Color := FStyleServices.GetStyleColor(scTreeView);;
+  end;
+
+  ShellList.BkColor := GUIColorWindow;
   BreadcrumbBar.Style := GUIsettings.GuiStyle;
   BreadcrumbBar.Color := GUIColorWindow;
 
-  ShellList.BkColor := GUIColorWindow;
 end;
 
 procedure TFMain.ShellistThumbError(Sender: TObject; Item: TListItem; E: Exception);
