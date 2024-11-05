@@ -31,7 +31,7 @@ type
   public
     constructor Create(AFile: THandle; ABufSize: integer);
     function PipeHasData: boolean;
-    function PipeHasReady(const ExecNum: word): boolean;
+    function PipeHasReadyOrFatal(const ExecNum: word): boolean;
     procedure CheckFilesProcessed;
     procedure ClearCounter;
     procedure SetCounter(ACounter: TET_Counter);
@@ -64,13 +64,15 @@ type
 
 implementation
 
-uses System.SysUtils;
+uses
+  System.SysUtils;
 
 const
   CR = 13;
   LF = 10;
   ReadyPrompt: Utf8string = '{ready';
-  FilePrompt: Utf8string  = '========';
+  Fatal:       Utf8string = '{Fatal}';
+  FilePrompt:  Utf8string  = '========';
 
 constructor TPipeStream.Create(AFile: THandle; ABufSize: integer);
 begin
@@ -148,7 +150,7 @@ begin
 end;
 
 // Note: {Readynn} can occur on multiple lines, only the last line is checked!
-function TPipeStream.PipeHasReady(const ExecNum: word): boolean;
+function TPipeStream.PipeHasReadyOrFatal(const ExecNum: word): boolean;
 var StartPos, EndPos: PByte;
     ReadyLine: UTF8String;
 begin
@@ -160,7 +162,8 @@ begin
     exit(false);
 
   ReadyLine := GetPipe(StartPos, EndPos);
-  result := (Pos(ReadyPrompt + IntToStr(ExecNum) + '}', ReadyLine) > 0);
+  result := (ReadyLine = Fatal) or
+            (Pos(ReadyPrompt + IntToStr(ExecNum) + '}', ReadyLine) > 0);
 end;
 
 // Scan for ===== (New file processed by ExifTool)
@@ -195,9 +198,21 @@ begin
 end;
 
 function TPipeStream.ReadPipe: DWORD;
+var
+  FLastError: UTF8String;
 begin
-  if (Winapi.Windows.ReadFile(HFile, FileBuffer[0], FBufSize, result, nil)) then
-    Self.Write(FileBuffer[0], result);
+  if (Winapi.Windows.ReadFile(HFile, FileBuffer[0], FBufSize, result, nil) = false) then
+  begin
+    // Write the ErrorMessage + {Fatal} in stream.
+    // Prevents hang when ExifTool does not write {Ready}. E.G. Perl aborts because compilation error
+    // PipeHasReadyOrFatal checks this.
+    FLastError := SysErrorMessage(GetLastError) + Chr(CR) + Chr(LF) + Fatal + Chr(CR) + Chr(LF);
+    Self.Write(FLastError[1], Length(FLastError));
+    exit(0); // Stop reading pipe
+  end;
+
+  Self.Write(FileBuffer[0], result);
+
   if (result > 0) then
     CheckFilesProcessed;
 end;
@@ -239,8 +254,8 @@ begin
 end;
 
 { TReadPipeThread }
-// Read Pipe in separate thread
 
+// Read Pipe in separate thread
 constructor TReadPipeThread.Create(AFile: THandle; ABufSize: integer);
 begin
   FPipeStream := TPipeStream.Create(AFile, ABufSize);
@@ -271,7 +286,7 @@ procedure TSOReadPipeThread.Execute;
 begin
   // Continue until we see our execnum
   // -executexx and -echo4 CRLF xx need to be set for this to work
-  while (not FPipeStream.PipeHasReady(FExecNum)) do
+  while (not FPipeStream.PipeHasReadyOrFatal(FExecNum)) do
     FPipeStream.ReadPipe;
 end;
 
