@@ -266,6 +266,7 @@ begin
   result := result + ETMinorError + ETFileDate;
   result := result + ETGpsFormat + ETShowNumber;
   result := result + ETAPIWindowsWideFile;
+  result := result + ETAPIWindowsLongPath;
   result := result + ETAPILargeFileSupport;
   result := result + GetGeoDir;
   result := result + GetCustomOptions;
