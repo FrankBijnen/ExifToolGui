@@ -51,12 +51,15 @@ implementation
 uses
   System.IOUtils,
   Winapi.ActiveX, Winapi.CommCtrl,
-  Vcl.Shell.ShellConsts,
+  Vcl.Shell.ShellConsts, Vcl.Controls,
   ExifToolsGUI_Thumbnails, ExiftoolsGui_ShellList, ExifToolsGUI_Utils, UnitFilesOnClipBoard;
 
 constructor TShellTreeView.Create(AOwner: TComponent);
 begin
   Inherited Create(AOwner);
+  StyleElements := [seFont, seBorder];
+  DoubleBuffered := true;
+
   FPaths2Refresh := TStringList.Create;
   FPaths2Refresh.Sorted := true;
   FPaths2Refresh.Duplicates := TDuplicates.dupIgnore;

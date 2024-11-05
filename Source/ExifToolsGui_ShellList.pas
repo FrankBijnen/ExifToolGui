@@ -1184,6 +1184,7 @@ begin
 
   FPopulating := false;
   DoubleBuffered := true;
+  StyleElements := [seFont, seBorder];
   FThumbNailSize := 0;
   FGenerating := 0;
   FHiddenFolders := Tlist.Create;
