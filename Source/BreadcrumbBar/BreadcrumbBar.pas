@@ -96,6 +96,7 @@ type
     TRectStateArray = array of TRectState;
   const
     ARROW_SIZE = 8;
+    MIN_ITEM_SIZE = 16;
     ARROW_BOX_SIZE = 16;
     SEP_PADDING = 16;
     INDENT = 3;
@@ -676,23 +677,18 @@ end;
 
 procedure TCustomBreadcrumbBar.Paint;
 var
-  i: Integer;
+  i: integer;
   S: string;
   r: TRect;
   MaxWidth: integer;
-var
   A_VERT_PADDING: integer;
   A_INDENT: integer;
-const
-  RectConst: array[TRectState] of integer = (BDR_RAISED, BDR_RAISED, BDR_SUNKEN);
 begin
   inherited;
 
   if EditMode or
      (FCurrentItems.Count = 0) then
     Exit;
-
-  MaxWidth := floor(Width / FCurrentItems.Count) - DpiScale(ARROW_BOX_SIZE) - DpiScale(SEP_PADDING);
 
   A_VERT_PADDING := DpiScale(VERT_PADDING);
   A_INDENT := DpiScale(INDENT);
@@ -707,10 +703,39 @@ begin
   with r do
     Rectangle(Canvas.Handle, Left, Top, Right, Bottom);
   Canvas.Font.Assign(Font);
-  for i := 0 to FCurrentItems.Count - 1 do
+
+// Calculate maxwidth for items.
+// The last item should be completely visible, if possible.
+  MaxWidth := Width -
+              DpiScale(ARROW_BOX_SIZE) - DpiScale(SEP_PADDING);    // Last arrow + Separator
+  i := High(FBreadcrumbRects);
+  if (i > 0) then
   begin
 
-  // Draw breadcrumb
+    S := FCurrentItems[i];
+    DrawText(Canvas.Handle,
+      PChar(S),
+      length(S),
+      FBreadcrumbRects[i],                                         // DrawText updates this
+      DT_SINGLELINE or DT_LEFT or DT_CENTER or DT_VCENTER or DT_CALCRECT);  // <== DT_CALCRECT: Only calculate
+
+    // Room for all items, except last.
+    MaxWidth := MaxWidth -
+       (i * (DpiScale(ARROW_BOX_SIZE) + DpiScale(SEP_PADDING))) -  // Room for all other arrows and separators
+       A_INDENT -                                                  // First Indent
+       (FBreadcrumbRects[i].Right - FBreadcrumbRects[i].Left);     // Width of last element
+
+    if (MaxWidth < MIN_ITEM_SIZE) then
+        // Last element can not be shown completely. Revert to original code.
+        MaxWidth := floor(Width / FCurrentItems.Count) - DpiScale(ARROW_BOX_SIZE) - DpiScale(SEP_PADDING)
+    else
+      // Room per element
+      MaxWidth := MaxWidth div i;
+  end;
+
+  // Draw breadcrumb items
+  for i := 0 to FCurrentItems.Count - 1 do
+  begin
 
   // Compute rectangle needed for text S
     if i = 0 then
@@ -725,10 +750,15 @@ begin
       PChar(S),
       length(S),
       FBreadcrumbRects[i],
-      DT_SINGLELINE or DT_LEFT or DT_VCENTER or DT_CALCRECT);  // <== DT_CALCRECT: Only calculate
+      DT_SINGLELINE or DT_LEFT or DT_CENTER or DT_VCENTER or DT_CALCRECT);  // <== DT_CALCRECT: Only calculate
 
-    FBreadcrumbRects[i].Right := Min(FBreadcrumbRects[i].Right,
-      FBreadcrumbRects[i].Left + MaxWidth);
+// Compute max right. Allow for last element to take up all space
+    if (i = High(FBreadcrumbRects)) then
+      FBreadcrumbRects[i].Right := Min(FBreadcrumbRects[i].Right,
+        Width - DpiScale(ARROW_BOX_SIZE) - DpiScale(SEP_PADDING))
+    else
+      FBreadcrumbRects[i].Right := Min(FBreadcrumbRects[i].Right,
+        FBreadcrumbRects[i].Left + MaxWidth);
     FBreadcrumbRects[i].Bottom := Height - A_VERT_PADDING;
     inc(FBreadcrumbRects[i].Right, DpiScale(SEP_PADDING));
 
@@ -736,8 +766,8 @@ begin
     Canvas.Brush.Color := GetButtonColor(FBreadcrumbStates[i]);
     Canvas.Brush.Style := bsSolid;
     FillRect(Canvas.Handle,
-      FBreadcrumbRects[i],
-      Canvas.Brush.Handle);
+             FBreadcrumbRects[i],
+             Canvas.Brush.Handle);
 
     Canvas.Pen.Color := GetBorderColor;
     Canvas.Pen.Style := psSolid;
