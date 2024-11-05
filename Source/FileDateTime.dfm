@@ -119,7 +119,7 @@ object FFileDateTime: TFFileDateTime
         ItemIndex = 0
         Items.Strings = (
           'keep as is'
-          'set to:')
+          'into')
         TabOrder = 1
         OnClick = RadioGroup3Click
       end
