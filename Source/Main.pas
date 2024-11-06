@@ -395,6 +395,11 @@ type
   protected
     function GetDefWindowSizes: TRect; override;
   public
+    GUIBorderWidth, GUIBorderHeight: integer;
+    GUIColorWindow: TColor;
+    GUIColorShellTree: TColor;
+    GUIColorShellList: TColor;
+
     { Public declarations }
     function GetFirstSelectedFile: string;
     function GetFirstSelectedFilePath: string;
@@ -407,11 +412,10 @@ type
     procedure ExecETEvent_Done(ExecNum: word; EtCmds, EtOuts, EtErrs, StatusLine: string; PopupOnError: boolean);
     procedure ExecRestEvent_Done(Url, Response: string; Succes: boolean);
     procedure UpdateStatusBar_FilesShown;
-    procedure SetGuiStyle;
+    procedure GetColorsFromStyle;
+    procedure SetColorsFromStyle;
     function GetFormOffset(AddFileList: boolean = true): TPoint;
 
-    var GUIBorderWidth, GUIBorderHeight: integer;
-    var GUIColorWindow: TColor;
   end;
 
 var
@@ -2662,6 +2666,8 @@ end;
 
 procedure TFMain.FormCreate(Sender: TObject);
 begin
+  ShellList.LockDrawing;
+
   Application.OnMinimize := ApplicationMinimize;
 
   ReadFormSizes(Self, Self.DefWindowSizes);
@@ -2695,7 +2701,7 @@ begin
 
   // Set Style
   TStyleManager.TrySetStyle(GUIsettings.GuiStyle, false);
-  SetGuiStyle;
+  GetColorsFromStyle;
 
   // EdgeBrowser
   EdgeBrowser1.UserDataFolder := GetEdgeUserData;
@@ -2816,94 +2822,101 @@ begin
   if TrayIcon.Visible then
     exit;
 
-  FSharedMem.RegisterOwner(Self.Handle, CM_ActivateWindow);
+  try
+    FSharedMem.RegisterOwner(Self.Handle, CM_ActivateWindow);
 
-  SetCaption;
+    SetColorsFromStyle;
 
-  OnAfterMonitorDpiChanged(Sender, 0, 0); // DPI Values are not used
+    SetCaption;
 
-  AdvPageMetadata.ActivePage := AdvTabMetadata;
-  AdvPageFilelist.ActivePage := AdvTabFilelist;
+    OnAfterMonitorDpiChanged(Sender, 0, 0); // DPI Values are not used
 
-  MaUpdateLocationfromGPScoordinates.Enabled := false;
-  AdvTabOSMMap.Enabled := false;
-  EdgeBrowser1.Visible := false;
-  if GUIsettings.EnableGMap then
-  begin
-    try
-      MaUpdateLocationfromGPScoordinates.Enabled := true;
-      ParseLatLon(GUIsettings.DefGMapHome, Lat, Lon);
-      OSMMapInit(EdgeBrowser1, Lat, Lon, OSMHome, InitialZoom_Out);
-      AdvTabOSMMap.Enabled := true;
-      EdgeBrowser1.Visible := true;
-    except
-      on E:Exception do
-        MessageDlgEx(E.Message, StrErrorPositioningHo, TMsgDlgType.mtWarning, [TMsgDlgBtn.mbOK]);
-    end;
-  end;
+    AdvPageMetadata.ActivePage := AdvTabMetadata;
+    AdvPageFilelist.ActivePage := AdvTabFilelist;
 
-  // Init Chart
-  AdvRadioGroup2Click(Sender);
-
-  WrkIniDir := GetAppPath;
-  DontSaveIni := FindCmdLineSwitch('DontSaveIni', true);
-
-  // The shellList is initally disabled. Now enable and refresh
-  PathFromParm := false;
-  ShellListSetFolders;
-  ShellList.Enabled := true;
-
-  // GUI started as "Send to" or "Open with":
-  if ParamCount > 0 then
-  begin
-    Param := ParamStr(1);
-
-    if DirectoryExists(Param) then
+    MaUpdateLocationfromGPScoordinates.Enabled := false;
+    AdvTabOSMMap.Enabled := false;
+    EdgeBrowser1.Visible := false;
+    if GUIsettings.EnableGMap then
     begin
-      PathFromParm := true;
-      ShellTree.Path := Param; // directory only
-    end
-    else
-    begin
-      if FileExists(Param) then
-      begin // file specified
-        PathFromParm := true;
-        ShellTree.Path := ExtractFileDir(Param);
-        Param := ExtractFileName(Param);
-        ShellList.ItemIndex := -1;
-        for Index := 0 to ShellList.Items.Count -1 do
-        begin
-          if SameText(ShellList.RelFileName(Index), Param) then
-          begin
-            ShellList.ItemIndex := Index;
-            break;
-          end;
-        end;
-        if (ShellList.ItemIndex <> -1) then
-        begin
-          ShellList.SetFocus;
-          ShellListClick(Sender);
-        end
-        else
-          ShellTree.SetFocus;
+      try
+        MaUpdateLocationfromGPScoordinates.Enabled := true;
+        ParseLatLon(GUIsettings.DefGMapHome, Lat, Lon);
+        OSMMapInit(EdgeBrowser1, Lat, Lon, OSMHome, InitialZoom_Out);
+        AdvTabOSMMap.Enabled := true;
+        EdgeBrowser1.Visible := true;
+      except
+        on E:Exception do
+          MessageDlgEx(E.Message, StrErrorPositioningHo, TMsgDlgType.mtWarning, [TMsgDlgBtn.mbOK]);
       end;
     end;
+
+    // Init Chart
+    AdvRadioGroup2Click(Sender);
+
+    WrkIniDir := GetAppPath;
+    DontSaveIni := FindCmdLineSwitch('DontSaveIni', true);
+
+    // The shellList is initally disabled. Now enable and refresh
+    PathFromParm := false;
+    ShellListSetFolders;
+    ShellList.Enabled := true;
+    SendMessage(ShellList.Handle, WM_SETREDRAW, 1, 0);
+
+    // GUI started as "Send to" or "Open with":
+    if ParamCount > 0 then
+    begin
+      Param := ParamStr(1);
+
+      if DirectoryExists(Param) then
+      begin
+        PathFromParm := true;
+        ShellTree.Path := Param; // directory only
+      end
+      else
+      begin
+        if FileExists(Param) then
+        begin // file specified
+          PathFromParm := true;
+          ShellTree.Path := ExtractFileDir(Param);
+          Param := ExtractFileName(Param);
+          ShellList.ItemIndex := -1;
+          for Index := 0 to ShellList.Items.Count -1 do
+          begin
+            if SameText(ShellList.RelFileName(Index), Param) then
+            begin
+              ShellList.ItemIndex := Index;
+              break;
+            end;
+          end;
+          if (ShellList.ItemIndex <> -1) then
+          begin
+            ShellList.SetFocus;
+            ShellListClick(Sender);
+          end
+          else
+            ShellTree.SetFocus;
+        end;
+      end;
+    end;
+
+    // If Path was not set from parm, use the setting
+    if (PathFromParm = false) and
+       ValidDir(GUIsettings.InitialDir) then
+    begin
+      ShellTree.Path := GUIsettings.InitialDir;
+      ShellList.SetFocus;
+    end;
+
+    // Scroll in view. Select initial
+    if (ShellTree.Selected <> nil) then
+      ShellTree.Selected.MakeVisible;
+
+    // --------------------------
+    DragAcceptFiles(Self.Handle, true);
+  finally
+    ShellList.UnLockDrawing;
   end;
-
-  // If Path was not set from parm, use the setting
-  if (PathFromParm = false) and
-     ValidDir(GUIsettings.InitialDir) then
-  begin
-    ShellTree.Path := GUIsettings.InitialDir;
-    ShellList.SetFocus;
-  end;
-
-  // Scroll in view. Select initial
-  if (ShellTree.Selected <> nil) then
-    ShellTree.Selected.MakeVisible;
-
-  // --------------------------
-  DragAcceptFiles(Self.Handle, true);
 end;
 
 procedure TFMain.RotateImgResize(Sender: TObject);
@@ -3835,22 +3848,29 @@ begin
   AlignStatusBar;
 end;
 
-procedure TFMain.SetGuiStyle;
+procedure TFMain.GetColorsFromStyle;
 begin
-  GUIColorWindow := clBlack;
-  FStyleServices := TStyleManager.Style[GUIsettings.GuiStyle];
+  GUIColorWindow := clWhite;
+  GUIColorShellTree := GUIColorWindow;
+  GUIColorShellList := GUIColorWindow;
 
+  FStyleServices := TStyleManager.Style[GUIsettings.GuiStyle];
   if Assigned(FStyleServices) then
   begin
     GUIColorWindow := FStyleServices.GetStyleColor(scWindow);
-    ShellList.Color :=  FStyleServices.GetStyleColor(scListView);
-    ShellTree.Color := FStyleServices.GetStyleColor(scTreeView);;
+    GUIColorShellTree := FStyleServices.GetStyleColor(scTreeView);;
+    GUIColorShellList :=  FStyleServices.GetStyleColor(scListView);
   end;
+  ShellList.Color := GUIColorShellList; // Items are not drawn correctly
+end;
 
-  ShellList.BkColor := GUIColorWindow;
+procedure TFMain.SetColorsFromStyle;
+begin
   BreadcrumbBar.Style := GUIsettings.GuiStyle;
   BreadcrumbBar.Color := GUIColorWindow;
-
+  ShellTree.Color := GUIColorShellTree;
+  ShellList.Color := GUIColorShellList;
+  ShellList.BkColor := GUIColorWindow;
 end;
 
 procedure TFMain.ShellistThumbError(Sender: TObject; Item: TListItem; E: Exception);
