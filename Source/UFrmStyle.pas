@@ -55,7 +55,7 @@ procedure TFrmStyle.SetNewStyle(Style: string);
 begin
   GUIsettings.GuiStyle := Style;
   TStyleManager.TrySetStyle(GUIsettings.GuiStyle, false);
-  FMain.SetGuiStyle;
+  FMain.GetColorsFromStyle;
 
   if (GUIsettings.GuiStyle = cSystemStyleName) then // AV unregistering style hooks
     exit;
