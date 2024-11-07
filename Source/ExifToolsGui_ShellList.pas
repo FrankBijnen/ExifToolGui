@@ -796,7 +796,7 @@ end;
 
 procedure TShellListView.EnumColumns;
 begin
-  SendMessage(Handle, WM_SETREDRAW, 0, 0);
+  LockDrawing;
 
   try
     FColumnDefs := nil;
@@ -846,7 +846,7 @@ begin
 
     end;
   finally
-    SendMessage(Handle, WM_SETREDRAW, 1, 0);
+    UnlockDrawing;
     Invalidate; // Creates new window handle!
   end;
 end;
