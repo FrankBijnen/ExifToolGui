@@ -253,7 +253,7 @@ begin
       exit;
     end;
 
-    APath := AFolder.PathName;                          // Note: This is the complete path, not the relative path.
+    APath := TSubShellFolder.GetLongPath(AFolder);      // Note: This is the complete path, not the relative path.
                                                         //       Potential problem with Long paths.
     if (rmInternal in AOptions) then
     begin
