@@ -26,7 +26,7 @@ type
   TOwnerDataFetchEvent = procedure(Sender: TObject; Item: TListItem; Request: TItemRequest; AFolder: TShellFolder) of object;
   TEnumColumnsEvent = procedure(Sender: TObject; var FileListOptions: TReadModeOptions; var ColumnDefs: TColumnsArray) of object;
 
-  TRelativeNameType = (rnDisplay, rnFile, rnSort);
+  TRelativeNameType = (rnDisplay, rnLong, rnFile, rnSort);
   TSubShellFolder = class(TShellFolder)
     FRelativePath: string;
     function RelativePath: string;
@@ -44,6 +44,7 @@ type
     class function GetRelativeFileName(Folder: TShellFolder;
                                        ForceLongPath: boolean): string;
     class function GetRelativeSortName(Folder: TShellFolder): string;
+    class function GetLongPath(Folder: TShellFolder): string;
     class procedure AllFastSystemFields(RootFolder: TShellFolder; FieldList: TStrings);
     class function SystemFieldIsDate(RootFolder: TShellFolder; Column: integer): boolean;
     class function GetSystemField(RootFolder: TShellFolder; RelativeID: PItemIDList; Column: integer): string;
@@ -176,7 +177,7 @@ type
 
 implementation
 
-uses System.Win.ComObj, System.UITypes,
+uses System.Win.ComObj, System.UITypes, System.StrUtils,
      Vcl.ImgList, Winapi.ActiveX,
      ExifToolsGUI_Utils, ExifToolsGui_ThreadPool, ExifToolsGui_FileListColumns,
      UnitFilesOnClipBoard, UnitLangResources, UFrmGenerate;
@@ -241,6 +242,31 @@ begin
 end;
 
 { TSubShellFolder }
+
+function GetLongPathFromFolder(AFolder: TShellFolder; Prefix: boolean): string;
+var
+  TmpBuf: string;
+  Len: integer;
+begin
+  result := '';
+  TmpBuf := AFolder.PathName;
+  Len := GetLongPathName(PChar(TmpBuf), nil, 0); // Length including nul terminator
+  if (Len > 0) then
+  begin
+    SetLength(result, Len -1);
+    GetLongPathName(PChar(TmpBuf), PChar(result), Len);
+  end;
+  if (Prefix) and
+     not (StartsText('\\?\', result)) and
+     (Length(result) > 247) then
+  begin
+    if (Copy(result, 1, 2) = '\\') then
+      result := '\\?\UNC' + Copy(result, 2)
+    else
+      result := '\\?\' + result;
+  end;
+end;
+
 function GetIShellFolder(IFolder: IShellFolder; PIDL: PItemIDList): IShellFolder;
 begin
   result := nil;
@@ -280,33 +306,21 @@ end;
 class function TSubShellFolder.GetName(Folder: TShellFolder;
                                        RelativeNameType: TRelativeNameType;
                                        ForceLongPath: boolean): string;
-var
-  TmpBuf: string;
-  Len: integer;
 begin
   case (RelativeNameType) of
     TRelativeNameType.rnDisplay:
       // For Display in the ShellList
       result := Folder.DisplayName;
+    TRelativeNameType.rnLong:
+      result := GetLongPathFromFolder(Folder, true);
     TRelativeNameType.rnFile:
       // For File IO functions
       // This call is much slower, it keeps getting DesktopFolder
       //result := ExtractFilename(ExcludeTrailingPathDelimiter(Folder.PathName));
-      begin
         if (ForceLongPath) then
-        begin
-          TmpBuf := Folder.PathName;
-          Len := GetLongPathName(PChar(TmpBuf), nil, 0); // Length including nul terminator
-          if (Len > 0) then
-          begin
-            SetLength(result, Len -1);
-            GetLongPathName(PChar(TmpBuf), PChar(result), Len);
-          end;
-          result := ExtractFilename(ExcludeTrailingPathDelimiter(result));
-        end
+          result := ExtractFilename(ExcludeTrailingPathDelimiter(GetLongPathFromFolder(Folder, false)))
         else
           result := ExtractFilename(ExcludeTrailingPathDelimiter(Folder.PathName));
-      end;
     TRelativeNameType.rnSort:
       // For Sorting
       // Use the DisplayName, but prepend a space for items in the root, so they will be first
@@ -356,6 +370,11 @@ end;
 class function TSubShellFolder.GetRelativeSortName(Folder: TShellFolder): string;
 begin
   result := TSubShellFolder.GetRelativeName(Folder, TRelativeNameType.rnSort, false);
+end;
+
+class function TSubShellFolder.GetLongPath(Folder: TShellFolder): string;
+begin
+  result := TSubShellFolder.GetName(Folder, TRelativeNameType.rnLong, true);
 end;
 
 class procedure TSubShellFolder.AllFastSystemFields(RootFolder: TShellFolder; FieldList: TStrings);
