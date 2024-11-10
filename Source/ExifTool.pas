@@ -74,7 +74,8 @@ type
   protected
     procedure AddExecNum(var FinalCmd: string);
   public
-    constructor Create(const Id: integer = 0);
+    constructor Create; overload;
+    constructor Create(const Id: integer); overload;
     destructor Destroy; override;
 
     function StayOpen(WorkingDir: string): boolean;
@@ -325,11 +326,11 @@ begin
   result := FETTempFile;
 end;
 
-constructor TexifTool.Create(const Id: integer = 0);
+constructor TExifTool.Create;
 begin
   inherited Create;
 
-  FId := Id;
+  FId := 0;
   FExecNum := 10; // From 10 to 99
   FETWorkingDir := '';
   FRecordingFile := '';
@@ -337,6 +338,13 @@ begin
   FETOutPipe := nil;
   FETErrPipe := nil;
   SetCounter(nil, 0);
+end;
+
+constructor TExifTool.Create(const Id: integer);
+begin
+  Create;
+  FId := Id +1;
+  FOptionsRec := ET.Options;
 end;
 
 destructor TExifTool.Destroy;
@@ -350,6 +358,7 @@ begin
   FETWorkingDir := '';
   FETTempFile := '';
   FRecordingFile := '';
+
   inherited Destroy;
 end;
 
