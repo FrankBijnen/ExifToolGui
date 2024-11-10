@@ -283,6 +283,7 @@ begin
         APath := IncludeTrailingPathDelimiter(AWorkingDir)
       else
         APath := '';
+
       APath := APath + TSubShellFolder.GetRelativeFileName(AFolder, (AET.Options.ETAPIWindowsLongPath <> ''));
       AExt := ExtractFileExt(APath);
 
