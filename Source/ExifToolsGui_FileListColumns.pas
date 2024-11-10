@@ -253,10 +253,9 @@ begin
       exit;
     end;
 
-    APath := TSubShellFolder.GetLongPath(AFolder);      // Note: This is the complete path, not the relative path.
-                                                        //       Potential problem with Long paths.
     if (rmInternal in AOptions) then
     begin
+      APath := TSubShellFolder.GetLongPath(AFolder);    // Note: This is the complete path, possibly prefixed with \\?\
       AMetaData.ReadMeta(APath, [gmXMP, gmGPS]);        // Internal mode
 
       if (AMetaData.Foto.ErrNotOpen) then               // File in use
@@ -278,9 +277,16 @@ begin
     begin
       if (AET.ETWorkingDir = '') then                   // Need to start ET?
         AET.StayOpen(AWorkingDir);
+
+      // Get Path and Ext for ExifTool. ET will prepend if needed.
+      if (AET.Options.ETAPIWindowsWideFile = '') then
+        APath := IncludeTrailingPathDelimiter(AWorkingDir)
+      else
+        APath := '';
+      APath := APath + TSubShellFolder.GetRelativeFileName(AFolder, (AET.Options.ETAPIWindowsLongPath <> ''));
       AExt := ExtractFileExt(APath);
 
-      AET.OpenExec(GUIsettings.Fast3(AExt) + AETCmd,    // Get DetailStrings from EExifTool
+      AET.OpenExec(GUIsettings.Fast3(AExt) + AETCmd,    // Get DetailStrings from ExifTool
                    APath,
                    ETOuts,
                    ETErr,
@@ -325,7 +331,7 @@ begin
     ProcessFolder(AFolder,
                   MetaData,
                   ET,
-                  ET.ETWorkingDir, // Not used, ET will be open
+                  ET.ETWorkingDir,
                   GetETCmd(AColumnDefs),
                   AOptions,
                   AColumnDefs);

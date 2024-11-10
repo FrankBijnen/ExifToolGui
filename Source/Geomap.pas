@@ -94,7 +94,7 @@ type
 
 procedure OsmMapInit(Browser: TEdgeBrowser;
                      const Lat, Lon, Desc, InitialZoom: string);
-procedure ShowImagesOnMap(Browser: TEdgeBrowser; Apath, ETOuts: string);
+procedure ShowImagesOnMap(Browser: TEdgeBrowser; APath, ETOuts: string);
 procedure MapGetLocation(Browser: TEdgeBrowser);
 function MapGoToPlace(Browser: TEdgeBrowser; Place, Bounds, Desc, InitialZoom: string): string;
 procedure ParseJsonMessage(const Message: string; var Msg, Parm1, Parm2: string);
@@ -897,7 +897,7 @@ begin
 end;
 
 // ==============================================================================
-procedure ShowImagesOnMap(Browser: TEdgeBrowser; Apath, ETOuts: string);
+procedure ShowImagesOnMap(Browser: TEdgeBrowser; APath, ETOuts: string);
 var
   OsmHelper: TOSMHelper;
   ETout, Lat, Lon, MIMEType, Filename, LastCoord: string;
@@ -915,7 +915,7 @@ begin
     begin
       FileName := AnalyzeGPSCoords(ETOut, Lat, Lon, MIMEType, IsQuickTime);
       if (ET.Options.ETAPIWindowsWideFile <> '') then
-        Filename := IncludeTrailingPathDelimiter(Apath) + Filename;
+        Filename := IncludeTrailingPathDelimiter(APath) + Filename;
       if ((Pos('image', MIMEType) > 0) or
           (Pos('video', MIMEType) > 0) or
           (Pos('application/rdf+xml', MIMEType) > 0)  // XMP side car

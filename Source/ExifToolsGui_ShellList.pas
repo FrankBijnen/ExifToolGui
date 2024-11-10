@@ -44,7 +44,7 @@ type
     class function GetRelativeFileName(Folder: TShellFolder;
                                        ForceLongPath: boolean): string;
     class function GetRelativeSortName(Folder: TShellFolder): string;
-    class function GetLongPath(Folder: TShellFolder): string;
+    class function GetLongPath(Folder: TShellFolder; Prefix: boolean = true): string;
     class procedure AllFastSystemFields(RootFolder: TShellFolder; FieldList: TStrings);
     class function SystemFieldIsDate(RootFolder: TShellFolder; Column: integer): boolean;
     class function GetSystemField(RootFolder: TShellFolder; RelativeID: PItemIDList; Column: integer): string;
@@ -312,7 +312,7 @@ begin
       // For Display in the ShellList
       result := Folder.DisplayName;
     TRelativeNameType.rnLong:
-      result := GetLongPathFromFolder(Folder, true);
+      result := GetLongPathFromFolder(Folder, ForceLongPath);
     TRelativeNameType.rnFile:
       // For File IO functions
       // This call is much slower, it keeps getting DesktopFolder
@@ -372,9 +372,9 @@ begin
   result := TSubShellFolder.GetRelativeName(Folder, TRelativeNameType.rnSort, false);
 end;
 
-class function TSubShellFolder.GetLongPath(Folder: TShellFolder): string;
+class function TSubShellFolder.GetLongPath(Folder: TShellFolder; Prefix: boolean = true): string;
 begin
-  result := TSubShellFolder.GetName(Folder, TRelativeNameType.rnLong, true);
+  result := TSubShellFolder.GetName(Folder, TRelativeNameType.rnLong, Prefix);
 end;
 
 class procedure TSubShellFolder.AllFastSystemFields(RootFolder: TShellFolder; FieldList: TStrings);
