@@ -2186,8 +2186,10 @@ begin
   end;
 
   ETtx := EditETdirect.Text;
-  if (Key = VK_Return) and (length(ETtx) > 1) then
+  if (Key = VK_Return) and
+     (length(ETtx) > 1) then
   begin
+    Key := 0; // No Bell
     IsRecursive := (pos('-r ', ETtx) > 0);
     ETprm := ETtx;
     if IsRecursive then
