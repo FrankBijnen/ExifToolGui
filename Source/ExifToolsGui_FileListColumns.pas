@@ -76,9 +76,7 @@ uses
   System.SysUtils, System.JSON,
   Winapi.Windows, Winapi.CommCtrl,
   Vcl.ComCtrls,
-  ExifToolsGUI_Utils,
-  ExifToolsGui_ThreadPool,
-  MainDef;
+  ExifToolsGUI_Utils, ExifToolsGui_ThreadPool, MainDef;
 
 procedure PostProcess(Folder: TShellFolder;
                       ColumnDefs: TColumnsArray;
@@ -284,7 +282,7 @@ begin
       else
         APath := '';
 
-      APath := APath + TSubShellFolder.GetRelativeDisplayNameWithExt(AFolder);
+      APath := APath + TSubShellFolder.GetRelativeFileName(AFolder);
       AExt := ExtractFileExt(APath);
 
       AET.OpenExec(GUIsettings.Fast3(AExt) + AETCmd,    // Get DetailStrings from ExifTool

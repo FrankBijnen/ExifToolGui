@@ -49,6 +49,13 @@ function GetTrackTmp: string;
 function GetPreviewTmp: string;
 function GetEdgeUserData: string;
 function GetNrOfFiles(StartDir, FileMask: string; SubDirs: boolean): integer;
+function BrowseFolderDlg(const Title: string;
+                         const StartFolder: string = '';
+                         const iFlag: integer = BIF_USENEWUI): string;
+function BrowseFolderFileSysDlg(const Title: string;
+                                const StartFolder: string = '';
+                                const iFlag: integer = BIF_USENEWUI): string;
+
 function GetComSpec: string;
 function PasteDirectory(ADir, TargetDir: string; Cut: boolean = false): boolean;
 
@@ -434,6 +441,62 @@ begin
   end;
 end;
 
+function BrowseFolderCallBack(Wnd: HWND; uMsg: UINT; lParam, lpData: LPARAM): integer stdcall;
+begin
+  result := 0;
+  case uMsg of
+    BFFM_VALIDATEFAILED:
+      result := -1;
+    BFFM_SELCHANGED:;
+    BFFM_INITIALIZED:
+      begin
+        SendMessage(Wnd, BFFM_SETSELECTION, 1, NativeInt(lpData));
+        SendMessage(Wnd, BFFM_SETEXPANDED, 1, NativeInt(lpData));
+      end;
+  end;
+end;
+
+function BrowseFolderDlg(const Title: string;
+                         const StartFolder: string = '';
+                         const iFlag: integer = BIF_USENEWUI): string;
+var
+  lpItemID: PItemIDList;
+  BrowseInfo: TBrowseInfo;
+  DisplayName: array [0 .. MAX_PATH] of Char;
+begin
+  result := '';
+  FillChar(BrowseInfo, SizeOf(TBrowseInfo), #0);
+  with BrowseInfo do
+  begin
+    hwndOwner := Application.Handle;
+    pszDisplayName := @DisplayName;
+    lpszTitle := PChar(Title);
+    ulFlags := iFlag;
+
+    if StartFolder <> '' then
+    begin
+      BrowseInfo.lpfn := BrowseFolderCallBack;
+      BrowseInfo.lParam := NativeInt(@StartFolder[1]);
+    end;
+
+  end;
+  lpItemID := SHBrowseForFolder(BrowseInfo);
+
+  if lpItemID <> nil then
+  begin
+    if (SHGetPathFromIDList(lpItemID, DisplayName)) then
+      result := DisplayName;
+    GlobalFreePtr(lpItemID);
+  end;
+end;
+
+function BrowseFolderFileSysDlg(const Title: string;
+                                const StartFolder: string = '';
+                                const iFlag: integer = BIF_USENEWUI): string;
+begin
+  result := BrowseFolderDlg(Title, StartFolder, BIF_RETURNONLYFSDIRS or iFlag )
+end;
+
 procedure Exchange(var A, B: integer);
 var
   Temp: integer;
@@ -532,7 +595,7 @@ begin
       continue;
 
     if (result[Indx] = ' ') then
-      result[Indx] := #10;                                      // Change a space to a LF, If not present within " "
+      result[Indx] := #10;                       // Change a space to a LF, If not present within " "
   end;
   result := ReplaceAll(result,
                        ['"', #0,  #10],
@@ -1161,7 +1224,7 @@ begin
   MenuHeight := ARect.Height;
   Offset := (MenuHeight - RadioWidth) div 2;
 
-  // Draw a kind of radio button ourselves.
+  // Draw something that looks like a radio button ourselves.
   if AnItem.Checked then
   begin
     R.Top := R.Top + Offset;

@@ -74,7 +74,7 @@ begin
     exit;
   end;
 
-  DirJPG := BrowseFolderDlg(StrSelectFolderCont, 1, Fmain.ShellList.Path);
+  DirJPG := BrowseFolderFileSysDlg(StrSelectFolderCont, Fmain.ShellList.Path);
   if (DirJpg = '') then
     exit;
 

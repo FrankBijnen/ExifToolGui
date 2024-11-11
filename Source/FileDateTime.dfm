@@ -4,7 +4,7 @@ object FFileDateTime: TFFileDateTime
   BorderStyle = bsDialog
   Caption = 'Rename files'
   ClientHeight = 542
-  ClientWidth = 710
+  ClientWidth = 718
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -16,7 +16,7 @@ object FFileDateTime: TFFileDateTime
   object StatusBar1: TStatusBar
     Left = 0
     Top = 523
-    Width = 710
+    Width = 718
     Height = 19
     Panels = <>
     SimplePanel = True
@@ -351,9 +351,9 @@ object FFileDateTime: TFFileDateTime
     end
   end
   object Button1: TButton
-    Left = 637
+    Left = 635
     Top = 16
-    Width = 68
+    Width = 78
     Height = 25
     Caption = 'Cancel'
     ModalResult = 2

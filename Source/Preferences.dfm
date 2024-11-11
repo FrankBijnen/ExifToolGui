@@ -3,8 +3,8 @@ object FPreferences: TFPreferences
   Top = 0
   BorderStyle = bsDialog
   Caption = 'Preferences'
-  ClientHeight = 414
-  ClientWidth = 704
+  ClientHeight = 413
+  ClientWidth = 700
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -37,13 +37,12 @@ object FPreferences: TFPreferences
     Left = 0
     Top = 0
     Width = 606
-    Height = 414
+    Height = 413
     ActivePage = AdvTabGeneral
     Align = alLeft
     DoubleBuffered = True
     ParentDoubleBuffered = False
     TabOrder = 0
-    ExplicitHeight = 413
     object AdvTabGeneral: TTabSheet
       Caption = 'General'
       object Label1: TLabel

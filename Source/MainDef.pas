@@ -167,12 +167,11 @@ procedure ReadGUIini;
 function SaveGUIini: boolean;
 function LoadIniDialog(OpenFileDlg: TOpenDialog; AIniData: TIniData; ShowMsg: boolean = true): boolean;
 function SaveIniDialog(SaveFileDlg: TSaveDialog; AIniData: TIniData; ShowMsg: boolean = true): boolean;
-function BrowseFolderDlg(const Title: string; iFlag: integer; const StartFolder: string = ''): string;
 
 implementation
 
-uses System.SysUtils, System.StrUtils, System.IniFiles,
-  Winapi.ShellAPI, Winapi.ShlObj,
+uses
+  System.SysUtils, System.StrUtils, System.IniFiles,
   Vcl.Forms, Vcl.StdCtrls,
   Main, UnitColumnDefs, ExifToolsGUI_Utils, ExifToolsGui_FileListColumns, ExifInfo, LogWin;
 
@@ -203,7 +202,6 @@ const
 
 var
   GUIini: TMemIniFile;
-  lg_StartFolder: string;
 
 function GetParmIniPath: string;
 begin
@@ -1207,43 +1205,6 @@ begin
     end;
   end;
 end;
-
-// ------------------------------------------------------------------------------
-function BrowseFolderCallBack(Wnd: HWND; uMsg: UINT; lParam, lpData: lParam): integer stdcall;
-begin
-  if uMsg = BFFM_INITIALIZED then
-    SendMessage(Wnd, BFFM_SETSELECTION, 1, NativeInt(@lg_StartFolder[1]));
-  result := 0;
-end;
-
-function BrowseFolderDlg(const Title: string; iFlag: integer; const StartFolder: string = ''): string;
-var
-  lpItemID: PItemIDList;
-  BrowseInfo: TBrowseInfo;
-  DisplayName: array [0 .. MAX_PATH] of Char;
-begin
-  result := '';
-  FillChar(BrowseInfo, sizeof(TBrowseInfo), #0);
-  lg_StartFolder := StartFolder;
-  with BrowseInfo do
-  begin
-    hwndOwner := Application.Handle;
-    pszDisplayName := @DisplayName;
-    lpszTitle := PChar(Title);
-    ulFlags := iFlag;
-    if StartFolder <> '' then
-      BrowseInfo.lpfn := BrowseFolderCallBack;
-  end;
-  lpItemID := SHBrowseForFolder(BrowseInfo);
-  // -we got folder name (without path) into DisplayName
-  if lpItemID <> nil then
-  begin // get full path
-    SHGetPathFromIDList(lpItemID, DisplayName);
-    result := DisplayName; // =without final dash
-    GlobalFreePtr(lpItemID);
-  end;
-end;
-// ------------------------------------------------------------------------------
 
 initialization
 

@@ -463,7 +463,7 @@ object FEditFColumn: TFEditFColumn
       1068
       29)
     object BtnOk: TBitBtn
-      Left = 866
+      Left = 884
       Top = 2
       Width = 87
       Height = 25
@@ -490,10 +490,9 @@ object FEditFColumn: TFEditFColumn
       ModalResult = 1
       NumGlyphs = 2
       TabOrder = 0
-      ExplicitLeft = 862
     end
     object BtnCancel: TBitBtn
-      Left = 957
+      Left = 975
       Top = 2
       Width = 87
       Height = 25
@@ -520,7 +519,6 @@ object FEditFColumn: TFEditFColumn
       ModalResult = 2
       NumGlyphs = 2
       TabOrder = 1
-      ExplicitLeft = 953
     end
   end
 end

@@ -228,9 +228,7 @@ procedure TFPreferences.BtnGenThumbsClick(Sender: TObject);
 var
   xDir: string;
 begin
-  xDir := BrowseFolderDlg(StrFolderIncludingSub + #10 +
-                          StrGeneratingBackgr, 0,
-                           FMain.ShellList.Path);
+  xDir := BrowseFolderDlg(StrFolderIncludingSub + #10 + StrGeneratingBackgr, FMain.ShellList.Path);
   if (xDir <> '') then
   begin
     GenerateThumbs(xDir, true, FMain.ShellList.ThumbNailSize);
@@ -244,25 +242,25 @@ var
 begin
   if Sender = BtnStartupFolder then
   begin
-    XDir := BrowseFolderDlg(StrSelectDefaultStart, 0);
+    XDir := BrowseFolderDlg(StrSelectDefaultStart, EdStartupFolder.Text);
     if XDir <> '' then
       EdStartupFolder.Text := XDir;
   end;
   if Sender = BtnExportMetaFolder then
   begin
-    XDir := BrowseFolderDlg(StrSelectDefaultExpor, 0);
+    XDir := BrowseFolderDlg(StrSelectDefaultExpor, EdExportMetaFolder.Text);
     if XDir <> '' then
       EdExportMetaFolder.Text := XDir;
   end;
   if Sender = BtnETOverride then
   begin
-    XDir := BrowseFolderDlg(StrSelectExifToolFold, 0);
+    XDir := BrowseFolderDlg(StrSelectExifToolFold, EdETOverride.Text);
     if XDir <> '' then
       EdETOverride.Text := XDir;
   end;
   if Sender = BtnGeoLocation500Dir then
   begin
-    XDir := BrowseFolderDlg(StrSelectGeoLocation, 0);
+    XDir := BrowseFolderDlg(StrSelectGeoLocation, EdGeoLocation500Dir.Text);
     if XDir <> '' then
       EdGeoLocation500Dir.Text := XDir;
   end;
