@@ -887,7 +887,6 @@ procedure TFMain.MaAPIWindowsLongPathExecute(Sender: TObject);
 begin
   with ET.Options do
     SetApiWindowsLongPath(MaAPIWindowsLongPath.Checked);
-  ShellList.ForceLongPath := MaAPIWindowsLongPath.Checked;
 end;
 
 procedure TFMain.MaAPILargeFileSupportExecute(Sender: TObject);
@@ -2952,7 +2951,7 @@ begin
   begin
     CanAdd := false;
     CopyFolder := TSubShellFolder.Create(AFolder.Parent, AFolder.RelativeID, AFolder.ShellFolder);
-    CopyFolder.FRelativePath := TSubShellFolder.GetRelativeFileName(AFolder, TShellListView(Sender).ForceLongPath);
+    CopyFolder.FRelativePath := TSubShellFolder.GetRelativeDisplayNameWithExt(AFolder);
 
     TShellListView(Sender).FoldersList.Add(CopyFolder);
     TShellListView(Sender).PopulateSubDirs(CopyFolder);
@@ -2960,7 +2959,7 @@ begin
   end;
 
   ProcessMessages;
-  FolderName := ExtractFileName(AFolder.PathName);
+  FolderName := TSubShellFolder.GetRelativeDisplayNameWithExt(AFolder);
   if (GUIsettings.FileFilter <> StrShowAllFiles) then
   begin
     Filter := GUIsettings.FileFilter;

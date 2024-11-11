@@ -255,7 +255,7 @@ begin
 
     if (rmInternal in AOptions) then
     begin
-      APath := TSubShellFolder.GetLongPath(AFolder);    // Note: This is the complete path, possibly prefixed with \\?\
+      APath := AFolder.PathName;                        // Note: This is the complete path, possibly 8dot3, possibly prefixed with \\?\
       AMetaData.ReadMeta(APath, [gmXMP, gmGPS]);        // Internal mode
 
       if (AMetaData.Foto.ErrNotOpen) then               // File in use
@@ -284,7 +284,7 @@ begin
       else
         APath := '';
 
-      APath := APath + TSubShellFolder.GetRelativeFileName(AFolder, (AET.Options.ETAPIWindowsLongPath <> ''));
+      APath := APath + TSubShellFolder.GetRelativeDisplayNameWithExt(AFolder);
       AExt := ExtractFileExt(APath);
 
       AET.OpenExec(GUIsettings.Fast3(AExt) + AETCmd,    // Get DetailStrings from ExifTool
