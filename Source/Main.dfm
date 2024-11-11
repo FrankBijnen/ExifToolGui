@@ -774,6 +774,7 @@ object FMain: TFMain
           Text = ''
           OnChange = EditETdirectChange
           OnKeyDown = EditETdirectKeyDown
+          OnKeyPress = EditETdirectKeyPress
           ExplicitWidth = 318
         end
         object CBoxETdirect: TComboBox

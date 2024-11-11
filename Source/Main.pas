@@ -338,6 +338,7 @@ type
     procedure Selectnone2Click(Sender: TObject);
     procedure ChartCheckClick(Sender: TObject);
     procedure MaAPIWindowsLongPathExecute(Sender: TObject);
+    procedure EditETdirectKeyPress(Sender: TObject; var Key: Char);
   private
     { Private declarations }
     ETBarSeriesFocal: TBarSeries;
@@ -2189,7 +2190,6 @@ begin
   if (Key = VK_Return) and
      (length(ETtx) > 1) then
   begin
-    Key := 0; // No Bell
     IsRecursive := (pos('-r ', ETtx) > 0);
     ETprm := ETtx;
     if IsRecursive then
@@ -2229,6 +2229,12 @@ begin
     ShowMetadata;
     ShowPreview;
   end;
+end;
+
+procedure TFMain.EditETdirectKeyPress(Sender: TObject; var Key: Char);
+begin
+  if (Key = #13) then
+    Key := #0; // No Bell
 end;
 
 procedure TFMain.EditFindMetaKeyPress(Sender: TObject; var Key: Char);
