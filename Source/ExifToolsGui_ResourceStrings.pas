@@ -46,7 +46,7 @@ begin
     ResourceStringList := TStringList.Create;
     LoadResourceList(ETD_ResourceStrings, ResourceStringList);
   end;
-  result := ResourceStringList.Values[Id];
+  result := ReplaceAll(ResourceStringList.Values[Id], ['\n'], [#10]);
 end;
 
 initialization
