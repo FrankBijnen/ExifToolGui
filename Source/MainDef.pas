@@ -774,7 +774,6 @@ begin
         SetApiWindowsWideFile(MaAPIWindowsWideFile.Checked);
         MaAPIWindowsLongPath.Checked := ReadBool(Ini_Options, 'APIWindowsLongPath', true);
         SetApiWindowsLongPath(MaAPIWindowsLongPath.Checked);
-        ShellList.ForceLongPath := MaAPIWindowsLongPath.Checked;
         MaAPILargeFileSupport.Checked := ReadBool(Ini_Options, 'APILargeFileSupport', false);
         SetApiLargeFileSupport(MaAPILargeFileSupport.Checked);
         SetCustomOptions(ReadString(Ini_Options, 'CustomOptions', ''));
