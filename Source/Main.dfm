@@ -720,7 +720,7 @@ object FMain: TFMain
           OnClick = SpeedBtn_ETclearClick
         end
         object SpbRecord: TSpeedButton
-          Left = 329
+          Left = 325
           Top = 50
           Width = 22
           Height = 22
@@ -751,7 +751,7 @@ object FMain: TFMain
         object EditETdirect: TLabeledEdit
           Left = 1
           Top = 50
-          Width = 322
+          Width = 318
           Height = 23
           Hint = 
             'Spaces in data require double quotes, double quotes in data requ' +
@@ -775,7 +775,7 @@ object FMain: TFMain
           OnChange = EditETdirectChange
           OnKeyDown = EditETdirectKeyDown
           OnKeyPress = EditETdirectKeyPress
-          ExplicitWidth = 318
+          ExplicitWidth = 314
         end
         object CBoxETdirect: TComboBox
           Left = 1

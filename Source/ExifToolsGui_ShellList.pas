@@ -26,7 +26,8 @@ type
   TOwnerDataFetchEvent = procedure(Sender: TObject; Item: TListItem; Request: TItemRequest; AFolder: TShellFolder) of object;
   TEnumColumnsEvent = procedure(Sender: TObject; var FileListOptions: TReadModeOptions; var ColumnDefs: TColumnsArray) of object;
 
-  TRelativeNameType = (rnDisplay, rnDisplayExt, rnSort);
+  TRelativeNameType = (rnDisplay, rnFile, rnSort);
+
   TSubShellFolder = class(TShellFolder)
     FRelativePath: string;
     function RelativePath: string;
@@ -36,15 +37,24 @@ type
                                    RelativeNameType: TRelativeNameType): string;
   public
     destructor Destroy; override;
+    // Safe versions, to prevent AV's.
     class function HasParentShellFolder(Folder: TShellFolder): boolean;
     class function GetIsFolder(Folder: TShellFolder): boolean;
+    // Get File names:
+    // For display. Respect the Explorer option 'Hide extensions for known file types'
     class function GetRelativeDisplayName(Folder: TShellFolder): string;
-    class function GetRelativeDisplayNameWithExt(Folder: TShellFolder): string;
+    // For File I/O. Includes the etension.
+    class function GetRelativeFileName(Folder: TShellFolder): string;
+    // For Sorting. The files in the root folder are prefixed with a space, so they will be first.
     class function GetRelativeSortName(Folder: TShellFolder): string;
+    // Query System fields. (Name, Size, Type, Date modified, Date created etc.)
     class procedure AllFastSystemFields(RootFolder: TShellFolder; FieldList: TStrings);
     class function SystemFieldIsDate(RootFolder: TShellFolder; Column: integer): boolean;
+    // Get a system field
     class function GetSystemField(RootFolder: TShellFolder; RelativeID: PItemIDList; Column: integer): string;
+    // Same, but for multi-threading.
     class function GetSystemField_MT(RootFolder: TShellFolder; RelativeID: PItemIDList; Column: integer): string;
+    // Not used
     class function GetSystemFieldEx(RootFolder: TShellFolder; RelativeID: PItemIDList; Column: integer): string;
   end;
 
@@ -131,6 +141,7 @@ type
     function Path: string;
     function GetSelectedFolder(ItemIndex: integer): TShellFolder;
     function FilePath(ItemIndex: integer = -1): string;
+    function RelDisplayName(ItemIndex: integer = -1): string;
     function RelFileName(ItemIndex: integer = -1): string;
     function FileExt(ItemIndex: integer = -1): string;
     procedure ColumnClick(Column: TListColumn);
@@ -176,7 +187,7 @@ uses System.Win.ComObj, System.UITypes, System.StrUtils,
      ExifToolsGUI_Utils, ExifToolsGui_ThreadPool, ExifToolsGui_FileListColumns,
      UnitFilesOnClipBoard, UnitLangResources, UFrmGenerate;
 
-// res file contains the ?
+// res file contains the Hourglass
 
 {$R ShellList.res}
 
@@ -247,7 +258,7 @@ begin
       if Assigned(StrRet.pOleStr) then
       begin
         Result := StrRet.pOleStr;
-        CoTaskMemFree(StrRet.pOleStr);
+        CoTaskMemFree(StrRet.pOleStr); // Need to free!
       end;
     STRRET_OFFSET:  // Not used. is Ansi.
       begin
@@ -266,9 +277,10 @@ begin
     IFolder.BindToObject(PIDL, nil, IID_IShellFolder, Pointer(Result));
 end;
 
-//https://www.zabkat.com/2xExplorer/shellFAQ/bas_xplore2.html
-//Note: This returns only the filename.ext. Not the complete path, so the limit MAX_PATH does not apply.
-function GetDisplayNameWithExt(ParentFolder: IShellFolder; PIDL: PItemIDList): string;
+// This function returns a filename + ext. We need this for File I/O functions.
+// Contrary to Folder.GetDisplayName, that will only return the ext if the Explorer option
+// 'Hide extensions for known file types' is unchecked.
+function GetFileNameFromFindData(ParentFolder: IShellFolder; PIDL: PItemIDList): string;
 var
   FindData: WIN32_FIND_DATA;
 begin
@@ -316,9 +328,9 @@ begin
     TRelativeNameType.rnDisplay:
       // For Display in the ShellList
       result := Folder.DisplayName;
-    TRelativeNameType.rnDisplayExt:
+    TRelativeNameType.rnFile:
       // For File IO functions
-      result := GetDisplayNameWithExt(Folder.ParentShellFolder, Folder.RelativeID);
+      result := GetFileNameFromFindData(Folder.ParentShellFolder, Folder.RelativeID);
     TRelativeNameType.rnSort:
       // For Sorting
       // Use the DisplayName, but prepend a space for items in the root, so they will be first
@@ -358,9 +370,9 @@ begin
   result := TSubShellFolder.GetRelativeName(Folder, TRelativeNameType.rnDisplay);
 end;
 
-class function TSubShellFolder.GetRelativeDisplayNameWithExt(Folder: TShellFolder): string;
+class function TSubShellFolder.GetRelativeFileName(Folder: TShellFolder): string;
 begin
-  result := TSubShellFolder.GetRelativeName(Folder, TRelativeNameType.rnDisplayExt);
+  result := TSubShellFolder.GetRelativeName(Folder, TRelativeNameType.rnFile);
 end;
 
 class function TSubShellFolder.GetRelativeSortName(Folder: TShellFolder): string;
@@ -494,7 +506,7 @@ begin
   if (ColumnSorted = false) then
     exit;
 
-  // When Including subfolders the file is display as a relative path. Requires special sorting.
+  // When Including subfolders the file is displayed as a relative path. Requires special sorting.
   LocalIncludeSubFolders := IncludeSubFolders;
 
   // Sorting column
@@ -1008,7 +1020,7 @@ begin
     if (TSubShellFolder.GetIsFolder(NewRelativeFolder)) then
     begin
       NewRelativeFolder.FRelativePath := IncludeTrailingPathDelimiter(FRelativeFolder.FRelativePath) +
-                                         TSubShellFolder.GetName(NewRelativeFolder, TRelativeNameType.rnDisplayExt);
+                                         TSubShellFolder.GetName(NewRelativeFolder, TRelativeNameType.rnFile);
       PopulateSubDirs(NewRelativeFolder);
       FHiddenFolders.Add(NewRelativeFolder); // We dont want subfoldernames visible. But keep a reference, so we can free them
       Continue;
@@ -1315,6 +1327,18 @@ begin
   end;
 end;
 
+function TShellListView.RelDisplayName(ItemIndex: integer = -1): string;
+var
+  AFolder: TShellFolder;
+begin
+  result := '';
+
+  AFolder := GetSelectedFolder(ItemIndex);
+  if (AFolder <> nil) and
+     (TSubShellFolder.GetIsFolder(AFolder) = false) then
+    result := TSubShellFolder.GetRelativeDisplayName(AFolder);
+end;
+
 function TShellListView.RelFileName(ItemIndex: integer = -1): string;
 var
   AFolder: TShellFolder;
@@ -1324,7 +1348,7 @@ begin
   AFolder := GetSelectedFolder(ItemIndex);
   if (AFolder <> nil) and
      (TSubShellFolder.GetIsFolder(AFolder) = false) then
-    result := TSubShellFolder.GetRelativeDisplayNameWithExt(AFolder);
+    result := TSubShellFolder.GetRelativeFileName(AFolder);
 end;
 
 function TShellListView.FileExt(ItemIndex: integer = -1): string;

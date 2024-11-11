@@ -22,8 +22,8 @@ object FCopyMetaSingle: TFCopyMetaSingle
     Width = 448
     Height = 19
     Panels = <>
-    ExplicitTop = 442
-    ExplicitWidth = 456
+    ExplicitTop = 418
+    ExplicitWidth = 440
   end
   object AdvPanel1: TPanel
     Left = 0
@@ -40,13 +40,13 @@ object FCopyMetaSingle: TFCopyMetaSingle
     ParentDoubleBuffered = False
     ParentFont = False
     TabOrder = 0
-    ExplicitWidth = 341
-    ExplicitHeight = 442
+    ExplicitWidth = 325
+    ExplicitHeight = 418
     object ChkImportAll: TCheckBox
       AlignWithMargins = True
       Left = 11
       Top = 4
-      Width = 334
+      Width = 318
       Height = 25
       Margins.Left = 10
       Align = alTop
@@ -55,33 +55,33 @@ object FCopyMetaSingle: TFCopyMetaSingle
       State = cbChecked
       TabOrder = 0
       OnClick = ChkImportAllClick
-      ExplicitWidth = 326
+      ExplicitWidth = 310
     end
     object ChkNoOverWrite: TCheckBox
       AlignWithMargins = True
       Left = 11
-      Top = 425
-      Width = 334
+      Top = 401
+      Width = 318
       Height = 25
       Margins.Left = 10
       Align = alBottom
       Caption = 'Dont overwrite existing data (-wm cg)'
       TabOrder = 3
-      ExplicitTop = 413
-      ExplicitWidth = 326
+      ExplicitTop = 389
+      ExplicitWidth = 310
     end
     object PnlButtons: TPanel
       AlignWithMargins = True
       Left = 11
       Top = 35
-      Width = 334
+      Width = 318
       Height = 25
       Margins.Left = 10
       Align = alTop
       TabOrder = 1
-      ExplicitWidth = 326
+      ExplicitWidth = 310
       object SpbPredefined: TSpeedButton
-        Left = 238
+        Left = 222
         Top = 1
         Width = 95
         Height = 23
@@ -95,12 +95,13 @@ object FCopyMetaSingle: TFCopyMetaSingle
       object CmbPredefined: TComboBox
         Left = 1
         Top = 1
-        Width = 237
+        Width = 221
         Height = 22
         Align = alClient
         TabOrder = 0
         Text = 'CmbPredefined'
         OnChange = CmbPredefinedChange
+        ExplicitWidth = 213
       end
     end
     object LvTagNames: TListView
@@ -125,8 +126,6 @@ object FCopyMetaSingle: TFCopyMetaSingle
       ViewStyle = vsReport
       OnCustomDrawItem = LvTagNamesCustomDrawItem
       OnItemChecked = LvTagNamesItemChecked
-      ExplicitWidth = 326
-      ExplicitHeight = 341
     end
   end
   object PnlRight: TPanel
@@ -137,14 +136,14 @@ object FCopyMetaSingle: TFCopyMetaSingle
     Align = alRight
     BevelOuter = bvNone
     TabOrder = 2
-    ExplicitLeft = 341
-    ExplicitHeight = 442
+    ExplicitLeft = 325
+    ExplicitHeight = 418
     DesignSize = (
       115
       430)
     object Label1: TLabel
       Left = 2
-      Top = 353
+      Top = 364
       Width = 110
       Height = 27
       Alignment = taCenter
@@ -152,7 +151,6 @@ object FCopyMetaSingle: TFCopyMetaSingle
       AutoSize = False
       Caption = 'Label1'
       Layout = tlCenter
-      ExplicitTop = 373
     end
     object BtnCancel: TButton
       Left = 2
@@ -165,7 +163,7 @@ object FCopyMetaSingle: TFCopyMetaSingle
     end
     object BtnPreview: TButton
       Left = 2
-      Top = 317
+      Top = 328
       Width = 110
       Height = 25
       Anchors = [akRight, akBottom]
@@ -173,11 +171,10 @@ object FCopyMetaSingle: TFCopyMetaSingle
       Enabled = False
       TabOrder = 1
       OnClick = BtnPreviewClick
-      ExplicitTop = 329
     end
     object BtnExecute: TButton
       Left = 2
-      Top = 390
+      Top = 401
       Width = 110
       Height = 25
       Anchors = [akRight, akBottom]
@@ -187,7 +184,6 @@ object FCopyMetaSingle: TFCopyMetaSingle
       ModalResult = 1
       TabOrder = 2
       OnClick = BtnExecuteClick
-      ExplicitTop = 402
     end
   end
   object ImageCollection: TImageCollection

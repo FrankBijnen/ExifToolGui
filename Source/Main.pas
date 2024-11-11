@@ -1,33 +1,40 @@
 unit Main;
 // Note all code formatted with Delphi formatter, Right margin 80->150
+
 // Note about the Path.
 // - To change: Set ShellTree.Path
 // - To read:   Get ShellList.Path
+
+// Note about the Filename.
+// - To get the full pathname, use ShellList.FilePath(Index), or Folder.PathName. Will be prefixed with \\?\ if needed.
+// - To get the relative filename for Display: ShellList.RelDisplayName(Index), or TSubShellFolder.GetRelativeDisplayName(Folder)
+// - To get the relative filename for File I/O: ShellList.RelFileName(Index), or TSubShellFolder.GetRelativeFileName(Folder)
+// DONT use Folder.DisplayName directly. This does not work if subfolders are included.
+
 interface
 
 uses
-  Winapi.Windows, Winapi.Messages, System.ImageList, System.SysUtils,
-  System.Variants, System.Classes,
-  Vcl.Graphics, Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.Grids, Vcl.Mask,
-  Vcl.ValEdit, Vcl.ImgList,
-  Vcl.ComCtrls, Vcl.ExtCtrls, Vcl.Menus, Vcl.Buttons, Vcl.StdCtrls, Vcl.ExtDlgs,
-  Vcl.Shell.ShellCtrls, // Embarcadero ShellTreeView and ShellListView
-  Winapi.WebView2, Winapi.ActiveX, Winapi.EdgeUtils, Vcl.Edge, // Edgebrowser
+  System.SysUtils, System.Variants, System.Classes, System.ImageList, System.Win.TaskbarCore, System.Actions,
+  Winapi.Windows, Winapi.Messages,
+  Vcl.Graphics, Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.Grids, Vcl.Mask, Vcl.ValEdit, Vcl.ImgList,
   VclTee.TeeGDIPlus, VclTee.TeEngine, VclTee.TeeProcs, VclTee.Chart,
-  VclTee.Series, // Chart
-  BreadcrumbBar, // BreadcrumbBar
-  UnitScaleForm, // Scale form from Commandline parm.
-  UnitSingleApp, // Single Instance App.
-  UnitColumnDefs, // Columndefs for file list
-  ExifToolsGUI_ShellTree,   // Extension of ShellTreeView
-  ExifToolsGUI_ShellList,   // Extension of ShellListView
-  ExifToolsGUI_Thumbnails,  // Thumbnails
-  ExifToolsGUI_ValEdit,     // MetaData
-  ExifToolsGUI_OpenPicture, // OpenPicture dialog
-  ExifToolsGUI_Utils,       // Various
-  Vcl.ActnMan, Vcl.ActnCtrls, Vcl.ActnMenus, System.Actions, Vcl.ActnList, Vcl.PlatformDefaultStyleActnCtrls,
+  Vcl.ActnMan, Vcl.ActnCtrls, Vcl.ActnMenus, Vcl.ActnList, Vcl.PlatformDefaultStyleActnCtrls,
   Vcl.ActnPopup, Vcl.BaseImageCollection, Vcl.ImageCollection, Vcl.VirtualImageList,
-  System.Win.TaskbarCore, Vcl.Taskbar, Vcl.ToolWin;
+  Vcl.Taskbar, Vcl.ToolWin,
+  Vcl.ComCtrls, Vcl.ExtCtrls, Vcl.Menus, Vcl.Buttons, Vcl.StdCtrls, Vcl.ExtDlgs,
+  Vcl.Shell.ShellCtrls,       // Embarcadero ShellTreeView and ShellListView
+  Winapi.WebView2, Winapi.ActiveX, Winapi.EdgeUtils, Vcl.Edge, // Edgebrowser
+  VclTee.Series,              // Chart
+  BreadcrumbBar,              // BreadcrumbBar
+  UnitScaleForm,              // Scale form from Commandline parm.
+  UnitSingleApp,              // Single Instance App.
+  UnitColumnDefs,             // Columndefs for file list
+  ExifToolsGUI_ShellTree,     // Extension of ShellTreeView
+  ExifToolsGUI_ShellList,     // Extension of ShellListView
+  ExifToolsGUI_Thumbnails,    // Thumbnails
+  ExifToolsGUI_ValEdit,       // MetaData
+  ExifToolsGUI_OpenPicture,   // OpenPicture dialog
+  ExifToolsGUI_Utils;         // Various
 
 const
   CM_ActivateWindow = WM_USER + 100;
@@ -230,7 +237,6 @@ type
     procedure BtnQuickSaveClick(Sender: TObject);
     procedure MPreferencesClick(Sender: TObject);
     procedure BtnShowLogClick(Sender: TObject);
-    procedure ShellListDeletion(Sender: TObject; Item: TListItem);
     procedure MDontBackupClick(Sender: TObject);
     procedure MPreserveDateModClick(Sender: TObject);
     procedure MIgnoreErrorsClick(Sender: TObject);
@@ -355,6 +361,7 @@ type
     procedure ShowPreview;
     procedure RestoreGUI;
     procedure ShellListSetFolders;
+    procedure RefreshSelected(Sender: TObject);
     procedure SelectAll;
     procedure EnableMenus(Enable: boolean);
     procedure EnableMenuItems;
@@ -365,17 +372,15 @@ type
 
     procedure BreadCrumbClick(Sender: TObject);
     procedure BreadCrumbHome(Sender: TObject);
-    procedure RefreshSelected(Sender: TObject);
+
     procedure ShellTreeBeforeContext(Sender: TObject);
     procedure ShellTreeAfterContext(Sender: TObject);
     procedure ShellTreeCustomDrawItem(Sender: TCustomTreeView; Node: TTreeNode; State: TCustomDrawState; var DefaultDraw: Boolean);
 
     procedure ShellistThumbError(Sender: TObject; Item: TListItem; E: Exception);
     procedure ShellistThumbGenerate(Sender: TObject; Item: TListItem; Status: TThumbGenStatus; Total, Remaining: integer);
-
     procedure ShellListCustomDrawItem(Sender: TCustomListView; Item: TListItem; State: TCustomDrawState;
       var DefaultDraw: Boolean);
-
     procedure ShellListBeforeEnumColumns(Sender: TObject; var ReadModeOptions: TReadModeOptions; var ColumnDefs: TColumnsArray);
     procedure ShellListAfterEnumColumns(Sender: TObject);
     procedure ShellListPathChange(Sender: TObject);
@@ -383,6 +388,7 @@ type
     procedure ShellListOwnerDataFetch(Sender: TObject; Item: TListItem; Request: TItemRequest; AFolder: TShellFolder);
     procedure ShellListColumnResized(Sender: TObject);
     procedure ShellListMouseWheel(Sender: TObject; Shift: TShiftState; WheelDelta: Integer; MousePos: TPoint; var Handled: Boolean);
+
     procedure CounterETEvent(Counter: integer);
     procedure ResetRootShowAll;
     procedure SetCaptionAndImage;
@@ -783,6 +789,7 @@ begin
     result := IncludeTrailingPathDelimiter(ShellList.Path);
 end;
 
+// Special characters in args files need to be prefixed with '.\'
 function TFMain.GetFileNameForArgs(FileName: string; MustExpandPath: boolean): string;
 const
   InvalidArgChars = [' ', '-', '#'];
@@ -1438,7 +1445,7 @@ begin
       SrcDir := GpsXmpDir
     else
       SrcDir := ShellList.Path;
-    SrcDir := BrowseFolderDlg(StrChooseFolderContai, 1, SrcDir);
+    SrcDir := BrowseFolderFileSysDlg(StrChooseFolderContai, SrcDir);
     if SrcDir <> '' then
     begin
       SrcDir := IncludeTrailingPathDelimiter(SrcDir);
@@ -2214,7 +2221,7 @@ begin
     else
       SelectedFiles := GetSelectedFiles;
 
-    // Call ETDirect or ET.OpenExec
+    // Call TExifTool.ExecET or ET.OpenExec
     case CmbETDirectMode.ItemIndex of
       0: ETResult := ET.OpenExec(ArgsFromDirectCmd(ETprm), SelectedFiles, ETout, ETerr);
       1: ETResult := TExifTool.ExecET(ETprm, SelectedFiles, ShellList.Path, ETout, ETerr);
@@ -2959,7 +2966,7 @@ begin
   begin
     CanAdd := false;
     CopyFolder := TSubShellFolder.Create(AFolder.Parent, AFolder.RelativeID, AFolder.ShellFolder);
-    CopyFolder.FRelativePath := TSubShellFolder.GetRelativeDisplayNameWithExt(AFolder);
+    CopyFolder.FRelativePath := TSubShellFolder.GetRelativeFileName(AFolder);
 
     TShellListView(Sender).FoldersList.Add(CopyFolder);
     TShellListView(Sender).PopulateSubDirs(CopyFolder);
@@ -2967,7 +2974,7 @@ begin
   end;
 
   ProcessMessages;
-  FolderName := TSubShellFolder.GetRelativeDisplayNameWithExt(AFolder);
+  FolderName := TSubShellFolder.GetRelativeFileName(AFolder);
   if (GUIsettings.FileFilter <> StrShowAllFiles) then
   begin
     Filter := GUIsettings.FileFilter;
@@ -3173,12 +3180,6 @@ begin
   for ADetail in Details do
     Item.SubItems.Append(ADetail);
 
-end;
-
-procedure TFMain.ShellListDeletion(Sender: TObject; Item: TListItem);
-begin // event is executed for each deleted file -so make it fast!
-  RotateImg.Picture.Bitmap.Handle := 0;
-  MetadataList.Strings.Clear;
 end;
 
 //Remove focus rectangle
@@ -3813,7 +3814,7 @@ end;
 
 procedure TFMain.SpeedBtn_MapHomeClick(Sender: TObject);
 begin
-  DeleteFile(GetTrackTmp);
+  System.SysUtils.DeleteFile(GetTrackTmp);
   MapGotoPlace(EdgeBrowser1, GUIsettings.DefGMapHome, '', OSMHome, InitialZoom_Out);
 end;
 

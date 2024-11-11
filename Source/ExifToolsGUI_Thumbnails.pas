@@ -66,9 +66,9 @@ uses Winapi.ShellAPI, System.Win.Registry, System.UITypes, System.Win.ComObj,
   ExifToolsGUI_Utils, UFrmGenerate;
 
 
-  // TThumbTask. Generates Thumbnail in a separate thread.
+// TThumbTask. Generates Thumbnail in a separate thread.
 
-  // Constructor for use in Listview
+// Constructor for use in Listview
 constructor TThumbTask.Create(const AItemIndex: integer; const AListView: TShellListView;
                               const AThreadPool: TThreadPool; const AMax: integer);
 begin

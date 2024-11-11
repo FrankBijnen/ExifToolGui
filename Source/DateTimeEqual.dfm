@@ -14,9 +14,9 @@ object FDateTimeEqual: TFDateTimeEqual
   OnShow = FormShow
   TextHeight = 13
   object Label1: TLabel
-    Left = 430
-    Top = 102
-    Width = 90
+    Left = 429
+    Top = 108
+    Width = 99
     Height = 13
     AutoSize = False
     Caption = 'Label1'
@@ -27,8 +27,8 @@ object FDateTimeEqual: TFDateTimeEqual
     Width = 529
     Height = 19
     Panels = <>
-    ExplicitTop = 124
-    ExplicitWidth = 500
+    ExplicitTop = 158
+    ExplicitWidth = 525
   end
   object AdvPanel1: TPanel
     Left = 0
@@ -45,7 +45,7 @@ object FDateTimeEqual: TFDateTimeEqual
     ParentDoubleBuffered = False
     ParentFont = False
     TabOrder = 1
-    ExplicitHeight = 124
+    ExplicitHeight = 158
     object Bevel1: TBevel
       Left = 6
       Top = 6
@@ -148,18 +148,18 @@ object FDateTimeEqual: TFDateTimeEqual
     end
   end
   object Button1: TButton
-    Left = 430
+    Left = 429
     Top = 13
-    Width = 90
+    Width = 99
     Height = 25
     Caption = 'Cancel'
     ModalResult = 2
     TabOrder = 2
   end
   object Button2: TButton
-    Left = 430
-    Top = 121
-    Width = 90
+    Left = 429
+    Top = 127
+    Width = 99
     Height = 25
     Caption = 'Execute'
     Default = True

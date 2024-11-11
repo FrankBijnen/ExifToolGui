@@ -1838,7 +1838,7 @@ begin
           FotoF.Read(SData, SizeOf(SData)); // CanonExposureMode
           case (SData) of
             0: ExifIFD.ExposureProgram := AddExifIFDData('ExposureProgram', 'Easy');
-            1: ExifIFD.ExposureProgram := AddExifIFDData('ExposureProgram', ' Program AE');
+            1: ExifIFD.ExposureProgram := AddExifIFDData('ExposureProgram', 'Program AE');
             2: ExifIFD.ExposureProgram := AddExifIFDData('ExposureProgram', 'Shutter speed priority AE');
             3: ExifIFD.ExposureProgram := AddExifIFDData('ExposureProgram', 'Aperture-priority AE');
             4: ExifIFD.ExposureProgram := AddExifIFDData('ExposureProgram', 'Manual');

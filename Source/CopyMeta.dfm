@@ -23,8 +23,8 @@ object FCopyMetadata: TFCopyMetadata
     Height = 19
     Panels = <>
     SimplePanel = True
-    ExplicitTop = 430
-    ExplicitWidth = 448
+    ExplicitTop = 433
+    ExplicitWidth = 457
   end
   object AdvPanel1: TPanel
     Left = 0
@@ -42,8 +42,8 @@ object FCopyMetadata: TFCopyMetadata
     ParentDoubleBuffered = False
     ParentFont = False
     TabOrder = 0
-    ExplicitWidth = 336
-    ExplicitHeight = 430
+    ExplicitWidth = 340
+    ExplicitHeight = 433
     object Label2: TLabel
       Left = 1
       Top = 1
@@ -97,8 +97,8 @@ object FCopyMetadata: TFCopyMetadata
       TabOrder = 1
       ViewStyle = vsReport
       OnCustomDrawItem = LvTagNamesCustomDrawItem
-      ExplicitWidth = 321
-      ExplicitHeight = 311
+      ExplicitWidth = 325
+      ExplicitHeight = 314
     end
     object PnlButtons: TPanel
       AlignWithMargins = True
@@ -109,7 +109,7 @@ object FCopyMetadata: TFCopyMetadata
       Margins.Left = 10
       Align = alTop
       TabOrder = 0
-      ExplicitWidth = 321
+      ExplicitWidth = 325
       object SpbPredefined: TSpeedButton
         Left = 237
         Top = 1
@@ -131,7 +131,7 @@ object FCopyMetadata: TFCopyMetadata
         TabOrder = 0
         Text = 'CmbPredefined'
         OnChange = CmbPredefinedChange
-        ExplicitWidth = 224
+        ExplicitWidth = 228
       end
     end
   end
@@ -143,20 +143,20 @@ object FCopyMetadata: TFCopyMetadata
     Align = alRight
     BevelOuter = bvNone
     TabOrder = 2
+    ExplicitLeft = 340
+    ExplicitHeight = 433
     DesignSize = (
       117
       445)
     object Label1: TLabel
       Left = 5
-      Top = 367
+      Top = 380
       Width = 110
       Height = 25
       Alignment = taCenter
       Anchors = [akRight, akBottom]
       AutoSize = False
       Caption = 'Label1'
-      ExplicitLeft = 0
-      ExplicitTop = 374
     end
     object BtnCancel: TButton
       Left = 2
@@ -169,19 +169,17 @@ object FCopyMetadata: TFCopyMetadata
     end
     object BtnPreview: TButton
       Left = 5
-      Top = 331
+      Top = 344
       Width = 110
       Height = 25
       Anchors = [akRight, akBottom]
       Caption = 'Preview'
       TabOrder = 1
       OnClick = BtnPreviewClick
-      ExplicitLeft = 0
-      ExplicitTop = 316
     end
     object BtnExecute: TButton
       Left = 5
-      Top = 403
+      Top = 416
       Width = 110
       Height = 25
       Anchors = [akRight, akBottom]
@@ -189,8 +187,6 @@ object FCopyMetadata: TFCopyMetadata
       Default = True
       ModalResult = 1
       TabOrder = 2
-      ExplicitLeft = 0
-      ExplicitTop = 388
     end
   end
   object PopupMenuLv: TPopupMenu

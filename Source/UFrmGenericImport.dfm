@@ -3,8 +3,8 @@ object FGenericImport: TFGenericImport
   Top = 0
   BorderStyle = bsDialog
   Caption = 'Generic import previews'
-  ClientHeight = 313
-  ClientWidth = 608
+  ClientHeight = 312
+  ClientWidth = 604
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -16,8 +16,8 @@ object FGenericImport: TFGenericImport
   TextHeight = 13
   object StatusBar1: TStatusBar
     Left = 0
-    Top = 294
-    Width = 608
+    Top = 293
+    Width = 604
     Height = 19
     Panels = <>
     SimplePanel = True
@@ -28,7 +28,7 @@ object FGenericImport: TFGenericImport
     Left = 0
     Top = 0
     Width = 495
-    Height = 294
+    Height = 293
     Align = alLeft
     DoubleBuffered = True
     Font.Charset = DEFAULT_CHARSET

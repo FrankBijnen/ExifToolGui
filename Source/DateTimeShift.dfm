@@ -4,7 +4,7 @@ object FDateTimeShift: TFDateTimeShift
   BorderStyle = bsDialog
   Caption = 'Exif/Xmp: DateTime shift'
   ClientHeight = 276
-  ClientWidth = 577
+  ClientWidth = 581
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -15,20 +15,21 @@ object FDateTimeShift: TFDateTimeShift
   OnShow = FormShow
   TextHeight = 13
   object Label1: TLabel
-    Left = 500
-    Top = 166
-    Width = 31
+    Left = 488
+    Top = 199
+    Width = 91
     Height = 13
+    AutoSize = False
     Caption = 'Label1'
   end
   object StatusBar1: TStatusBar
     Left = 0
     Top = 257
-    Width = 577
+    Width = 581
     Height = 19
     Panels = <>
     SimplePanel = True
-    ExplicitTop = 223
+    ExplicitTop = 256
     ExplicitWidth = 573
   end
   object AdvPanel1: TPanel
@@ -46,7 +47,7 @@ object FDateTimeShift: TFDateTimeShift
     ParentDoubleBuffered = False
     ParentFont = False
     TabOrder = 1
-    ExplicitHeight = 223
+    ExplicitHeight = 256
     object Label2: TLabel
       Left = 5
       Top = 154
@@ -260,18 +261,18 @@ object FDateTimeShift: TFDateTimeShift
     end
   end
   object BtnCancel: TButton
-    Left = 500
+    Left = 488
     Top = 8
-    Width = 69
+    Width = 91
     Height = 25
     Caption = 'Cancel'
     ModalResult = 2
     TabOrder = 2
   end
   object BtnExecute: TButton
-    Left = 500
-    Top = 190
-    Width = 69
+    Left = 488
+    Top = 223
+    Width = 91
     Height = 25
     Caption = 'Execute'
     Default = True
