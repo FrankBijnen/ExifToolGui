@@ -63,7 +63,7 @@ Notes:
 
 The reasons for using command line parameters instead of adding options in preferences:
 - They are hopefully only temporary. The long term solution is to use the manifest.
-- The preferences are read to late. A window handle is already created.
+- The preferences are read too late. A window handle is already created.
 
 The problem that I face is that I dont own a 4K monitor, so it's very hard to test. I can only test a lower DPI.
 Anyone with such a monitor willing to help? Create an issue on Github with your testresults. https://github.com/FrankBijnen/ExifToolGui/issues

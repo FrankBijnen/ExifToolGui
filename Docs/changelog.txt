@@ -122,3 +122,23 @@ Version:        Description             Issue
                 Fix Issue #476          Fix sorting issues that showed up after enabling subfolders
                 Fix Issue #482          Fix Issues for V6.3.5
                 Fix Issue #516          Using cursor keys left-right in thumbnail mode does not refresh preview/metadata
+6.3.6.0         Fix Issue #484          [feature request] Ideas for optimizing UI in the Filelist window section #484
+                Fix Issue #545          Feature request FileCreateDate
+                Fix Issue #546          Feature request File: Name
+                Fix Issue #551          Opening Style form can take long.
+                Fix Issue #553          Fixes for showing previews. In particular non WIC files. (Mp4 etc.)
+                Fix Issue #555          Redesign reading Metadata for filelist
+                Fix Issue #558          Ensure selected item in Filelist Listview is visible in Directory Treeview
+                Fix Issue #561          Check all ExtractFileDir calls
+                Fix Issue #578          Add partial support for CRW files in filelist
+                Fix Issue #587          Add support for UTF16(LE/BE) encoded XMP blocks in flielist
+                Fix Issue #611          Remove default Charset=UTF8 from options
+                Fix Issue #616          Cannot shift .xmp time
+                Fix Issue #619          Charts X axes are not naturally ordered
+                Fix Issue #630          Fixes for memory leaks in Filelist (TShellListView)
+                Fix Issue #634          Escape " (Double quote) when generating PS script
+                Fix Issue #668          [bug] If file name starts with a whitespace or "-" no metada is displayed
+                Fix Issue #673          Import GPS data from/Xmp files. Support file.ext.xmp 
+                Fix Issue #674          Add WindowsLongPath as option. (Requires exiftool 13.03)
+                Fix Issue #675          Prevent hangup when reading ExifTool pipe fails
+                Fix Issue #689          Fix Issues for V6.3.6

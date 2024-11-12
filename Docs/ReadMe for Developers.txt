@@ -172,4 +172,26 @@ Version 6.3.5
   - Redesigned to use configurable Listview
   - Added UFrmPredefinedTags and UFrmTagNames to maintain the predefined lists.
 
+Version 6.3.6
+
+- Created objects for ExifInfo and ExifTool to be able to use them multi-threaded.
+  Introduced VarData, to make the XMP elements flexible, code-review, add more file-types and fields. EG Makernotes for Pentax, CRW and NIKON.
+  Used SHGetDataFromIDList to get the filename with ext. Much more reliable and faster.
+  Part of the redesign of the filelist.
+  Created UnitColumnDefs to hold the file list details.
+  Used many PNG's from freepik for the buttons
+- Remove seClient from StyleElements for ShellTree and ShellList, to remove flickering. Set the background color manually.
+- Introduce MidasLib, to be able to use ClientDatasets to configure the Filelists. Includes a Datamodule.
+  Needed to create, because of conflicts with MidasLib, ExifToolsGui_ResourceStrings. It now uses rcdata to link in a complete txt file.
+- Fixed Memory leaks. https://learn.microsoft.com/en-us/windows-hardware/drivers/debugger/using-umdh-to-find-a-user-mode-memory-leak
+  The necessary PDB files were generated using map2dbg and cv2pdb
+  The Vcl.Shell.Shellctrls.pas was modified, see readme in the Vcl.ShellControls directory.
+- Reviewed usage of StringReplace. Created ReplaceAll that allows from and to pattern to be arrays.
+- Fixes for getting the name of a TSubShellFolder.
+- Check result of ReadFile in PipeStream, to prevent a hang in GUI. Could occur when ExifTool had compiler errors.
+- BreadcrumBar. Make sure last element is always visible. Updates to colors for some styles.
+- Xml.VerySimple. Add UTF16 LE and BE
+- Added EnableFullTextSearch for ComboBox (Used in FrmTagNames)
+
+
 Frank

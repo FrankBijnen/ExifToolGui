@@ -1,3 +1,11 @@
+V6.3.6
+
+Did you know that using the 'GeoCode' provider you can search for streetnames, or POI's within a city?
+Use the + plus sign after the city. Use the + also for spaces in the street/POI
+
+Example: Amsterdam+de+Wallen
+
+
 Starting from V6.3.2 and Exiftool 12.84:
 You can install a larger GeoCoding DB from https://exiftool.org/geolocation.html. Read 'Alternate databases' for more info.
 To use it you can:

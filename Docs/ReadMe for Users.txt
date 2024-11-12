@@ -175,5 +175,17 @@ Changed with version 6.3.5
   - Make sure you enabled 'Show folders' in Preferences.
   - Define a 'File filter' with '/s', and select that.
 
+Changed with version 6.3.6
+- File dates and renaming enhanced.
+- File list redesigned. New drop down buttons are used in the filelist. More details shown, for more file types.
+- Configuration of the filelist enhanced.
+  You can select the readmode for internal and user-defined lists.
+  For internal lists (camera settings, location info and about photo) fields can be customized.
+  You can define multiple User-defined lists.
+  Adding fields improved, by using drop-down lists, and showing sample values.
+  You can check the file filter to use on startup (E.g.: *.jpg)
+- Improved performance by starting ExifTool multi-threaded to get the details, when sorting the filelist, or selecting.
+- Improved performance by buffering and disabling style elements for the file list.
+- Fixed memory leaks.
 
 Frank
