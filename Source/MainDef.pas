@@ -770,7 +770,7 @@ begin
         MaNotDuplicated.Checked := ReadBool(Ini_Options, 'NotDuplicated', false);
         MaAPIWindowsWideFile.Checked := ReadBool(Ini_Options, 'APIWindowsWideFile', true);
         SetApiWindowsWideFile(MaAPIWindowsWideFile.Checked);
-        MaAPIWindowsLongPath.Checked := ReadBool(Ini_Options, 'APIWindowsLongPath', true);
+        MaAPIWindowsLongPath.Checked := ReadBool(Ini_Options, 'APIWindowsLongPath', false);
         SetApiWindowsLongPath(MaAPIWindowsLongPath.Checked);
         MaAPILargeFileSupport.Checked := ReadBool(Ini_Options, 'APILargeFileSupport', false);
         SetApiLargeFileSupport(MaAPILargeFileSupport.Checked);
