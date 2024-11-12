@@ -3,12 +3,16 @@
 
 This is an updated version of the ExifToolGui program created by Bogdan Hrastnik. Many thanks go out to him.
 
-<b>Released version: <b>V6.3.5</b> updated August 26, 2024</b><br>
+<b>Released version: <b>V6.3.6</b> updated November 13, 2024</b><br>
 
-- Added the option to scan and display sub folders in the filelist.<br>
-  See: [Scanning and displaying sub folders in the filelist](Docs/ExifToolGUI_V6.md#p_subfolder)<br>
-- Managing (removing, copying) metadata has become much more flexible. See:<br>
-  See: [Managing metadata](Docs/ExifToolGUI_V6.md#p_managemetadata)<br>
+- Redesigned the file list.<br>Credits to AngusPhoe for his ideas, inpiration, testing and excellent feedback. https://github.com/AngusPhoe<br>
+  Be sure to read the docs: [File list panel](Docs/ExifToolGUI_V6.md#p_filelist)<br>
+- Add more details and more customization options to the file list.<br>
+- Redesigned shifting date-time and renaming files.<br>Credits to PhilsHappy for his ideas, inpiration, testing and excellent feedback. https://github.com/Philshappy<br>
+- Added support for Long Paths.<br>Credits to Phil Harvey for adding support to ExifTool. https://exiftool.org<br>
+- Improved performance:
+  - By using ExifTool multithreaded when sorting on columns and selecting all files.
+  - By using buffering, and disable some styling elements.
 - Various bugfixes.<br>
 - For the complete info see the [changelog](Docs/changelog.txt).<br>
 
