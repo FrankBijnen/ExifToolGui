@@ -1188,7 +1188,7 @@ object FMain: TFMain
               end
               item
                 Action = MaAPIWindowsLongPath
-                Caption = 'API WindowsLongPa&th (Requires Exiftool V13.02)'
+                Caption = 'API WindowsLongPa&th (Requires Exiftool V13.03)'
               end
               item
                 Action = MaAPILargeFileSupport
@@ -1476,7 +1476,7 @@ object FMain: TFMain
       Tag = 10
       Category = 'Options'
       AutoCheck = True
-      Caption = 'API WindowsLongPath (Requires Exiftool V13.02)'
+      Caption = 'API WindowsLongPath (Requires Exiftool V13.03)'
       Checked = True
       OnExecute = MaAPIWindowsLongPathExecute
     end
