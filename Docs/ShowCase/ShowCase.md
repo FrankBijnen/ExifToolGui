@@ -27,7 +27,7 @@ Geocoding. Tagging your files, and showing them on an OpenStreetMap map.<br>
 
 <h4>Export Import</h4>
 
-<img src="7_Export_import.jpg">
+<img src="7_Export_import.jpg"><br>
 
 <img src="8_Export_previews.jpg">
 
@@ -37,7 +37,7 @@ Geocoding. Tagging your files, and showing them on an OpenStreetMap map.<br>
 
 <h4>Various</h4>
 
-<img src="10_Various.jpg">
+<img src="10_Various.jpg"><br>
 
 <img src="11_Various_lossless_rotate.jpg">
 

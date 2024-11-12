@@ -1,3 +1,7 @@
+ExifToolGUI 6.2.7
+
+- Removed deprecated functions
+
 Starting with Version 6.2.5 the executables Jhead.exe and Jpegtran.exe are no longer needed. They can however still be used, but the menuitems are marked 'deprecated'.
 This change affects: JPG Lossless rotate and Export/Import previews.
 

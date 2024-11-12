@@ -1,6 +1,6 @@
 ExiftoolGui Portable?
 
-Starting with version V6.3.0. a new program parameters is available: '/IniPath=<path>'
+Starting with version V6.3.0. a new program parameter is available: '/IniPath=<path>'
 With this parameter you specify the location of the ini file. If it is specified, then immediately after starting GUI, the INI file will be saved. 
 If it fails an error message is displayed and the program halted. To prevent that changes made by the user would not be saved.
 <path> can be:
