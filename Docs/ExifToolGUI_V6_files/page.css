@@ -1,7 +1,7 @@
 <html>
 <head>
 <style type="text/css">
-body {}
+body {width:50%}
 body {margin-left:0; margin-top:0}
 body {font-family:arial; font-size:10pt; color:#000000; background-color:#DDDDDD}
 
@@ -18,7 +18,7 @@ ul {margin-left:2px; margin-top:0px; margin-bottom:0px}
 
 table.A4
 {table-layout:fixed;
- width:500px;
+ width:98%;
  border:0px #AA0000 solid;
  margin-top:0px;
  margin-left:1%;
