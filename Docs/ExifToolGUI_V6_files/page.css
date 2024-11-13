@@ -34,7 +34,8 @@ table.A4
 td.A4
 {width:95%;
  vertical-align:top;
- padding-left:4px}
+ padding-left:4px;
+ padding-right:100px}
 
 font.blue
 {color:#0000FF;
