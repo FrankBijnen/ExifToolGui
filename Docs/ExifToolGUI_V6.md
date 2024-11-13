@@ -565,6 +565,7 @@ are only temporary (as long GUI is running) and are not checked by default:<br>
 Expert option. Normally used with the Log Window.<br>
 Possible use case is adding an API option <b>-API WindowsLongPath=1</b><br>
 <br>
+
 <h2><a name="m_exp_imp">Export/Import menu</a></h2><br><br>
 <h3><a name="m_exp_meta">Export metadata into : TXT, MIE, XMP, EXIF, HTML files</a></h3>
 Each format has a different purpose: i.e. MIE is for making backup of complete metadata inside image file,
@@ -681,31 +682,29 @@ As usual in GUI, you first must select files you wish to geotag. In most cases, 
 <u>Step 2:</u> Check <b>use all log files in directory</b> if more than one log file for set of files exist.<br>
 Let's say you've made a three day trip to Venice. In such case all photos will reside in single folder,
 but three (or more) log files will exist for that set of photos.<br>
-Note: In this case, it doesn't matter which (of multiple) log file you choose. Important is, all log files must have the same extension.<br>
+Note: In this case, it doesn't matter which (of multiple) log file you choose. Important is, all log files
+must have the same extension.<br>
 <br>
 <u>Step 3:</u> Optional: Show on Map. Use this to visually check the log files.</b>.<br>
 <u>Step 4:</u> Choose <b>Reference DateTime value</b>.<br>
 Here you define which photo DateTime values to compare with those in log file.<br>
 <br>
-<u>Step 5:</u> Margin before or beyond Track. Change this if the time of your images is not within 1800 secs
-(default) of the track time.<br>
+<u>Step 5:</u> Margin before or beyond Track. Change this if the time of your images is not within 1800 secs (default)
+of the track time.<br>
 <u>Step 6:</u> Choose if <b>TimeZone offset</b> is needed to be taken into account.<br>
 This is a funny one... The thing is, log files contain UTC time, while a camera is usually set to local time
 (where the photo is taken). In most cases, we are dealing with two scenarios:<br>
 <ul>
     <li>Case A: Photos are taken in your local (time) area<br>
-    -in this case there's no need to use TimeZone offset option. Short
-    explanation: if TimeZone offset option doesn't exist, ExifTool "assumes"
-     that camera time and PC's system time have the same TimeZone offset and
-     ExifTool will handle logged UTC time automatically.</li>
+    -in this case there's no need to use TimeZone offset option. Short explanation: if TimeZone offset option doesn't exist,
+    ExifTool "assumes" that camera time and PC's system time have the same TimeZone offset and ExifTool will handle the logged UTC time
+    automatically.</li>
     <li>Case B: Photos are taken somewhere outside your local TimeZone area<br>
-    -in this case you must use TimeZone offset option. Example: if you live
-    in New York and photo was taken in Vienna, then you must set TimeZone
-    offset to +01 (depending on winter/summer time?)</li>
+    -in this case you must use TimeZone offset option. Example: if you live in New York and the photo was taken in Vienna,
+    then you must set TimeZone offset to +01 (depending on winter/summer time?)</li>
 </ul>
-In both cases above it's assumed, that camera is set to local time of
-where photos are taken. It's also assumed, that when geotagging, your
-PC/laptop is set to your local (home) TimeZone.<br>
+In both cases above it's assumed, that camera is set to local time of where photos are taken. It's also assumed,
+that when geotagging, your PC/laptop is set to your local (home) TimeZone.<br>
 For further reading/questions see <a href="https://exiftool.org/forum/index.php/topic,3333.0.html">here</a>.<br><br>
 <u>Step 7:</u> Check Update Geo Location, if you wish to update Country, Province and City.<br>
 Click on <a href="#m_geotag_setup"><b>Setup Geo</b></a> to control how these fields are filled.<br>
@@ -714,36 +713,29 @@ Note: These fields are also shown in the file list if it's set to 'Location info
 
 <h3><a name="m_import_gps_xmp">Import GPS data from: Xmp files</a></h3>
 By using this menu, you can copy GPS data from xmp sidecar files into Exif GPS section of selected image files.<br>
-<u>Note:</u> It is expected that image and sidecar files only differ in
-extension. The name part however, must be equal. Example of valid
-image-sidecar file pair is:<br>
+<u>Note:</u> It is expected that image and sidecar files only differ in extension. The name part however, must be equal.
+Examples of valid image-sidecar file pair are:<br>
 <br>
 MyPhoto.jpg - MyPhoto.xmp or MyPhoto.jpg.xmp<br>
 img_01.cr2 - img_01.xmp or img_01.cr2.xmp<br>
-etc.<br>
-<br>
-Because image and sidecar files usually reside in the same folder (that
-is, they are mixed), it is a good idea to use file type filter (which is
- set to "Show ALL files" by default). That is, if you wish to write GPS
-data into JPG files, you should set filter to "JPG files only". However,
- this setting is not required! <br>
-Workflow is as follows:<br>
-<li>Sort files by file extension (so, for example, JPG and XMP files are
- grouped -not mixed) or use desired file type filter (i.e. "CR2 files
-only"). The only reason for doing this is: you can select (only) image
-files easier.</li>
+etc.<br><br>
+
+Because image and sidecar files usually reside in the same folder (that is, they are mixed), it is a good idea to use
+the file type filter (which is set to "Show ALL files" by default). That is, if you wish to write GPS data into JPG files,
+you should set filter to "JPG files only". However, this setting is not required! <br>
+Workflow is like this:<br>
+<li>Sort files by file extension (so, for example, JPG and XMP files are grouped -not mixed) or use desired file type filter
+(i.e. "CR2 files only"). The only reason for doing this is: you can select (only) image files easier.</li>
 <li>Select all image files you wish to modify.</li>
-<li>After choosing menu <b>Import GPS data from xmp file(s)</b>, you'll
-be prompted to select folder containing (xmp) sidecar files -in most
-cases, that will be the same folder where image files reside.</li>
+<li>After choosing menu <b>Import GPS data from xmp file(s)</b>, you'll be prompted to select folder containing (xmp) sidecar files.
+In most cases, that will be the same folder where image files reside.</li>
 ...and that's it.<br>
 <br>
 
 <h3><a name="m_extract_previews">Generic extract previews</a></h3>
-As you may know raw image files can also contain a JPG image, which serves for
-previewing raw image file content. In most cases, this JPG image is "as
-if photo would be taken in JPG mode" -while this is true for exposure
-and colors, resolution (pixel size) may differ (depends on camera).<br>
+As you may know raw image files can also contain a JPG image, which serves for previewing raw image file content.
+In most cases, this JPG image is "as if photo would be taken in JPG mode" -while this is true for exposure and colors,
+resolution (pixel size) may differ (depends on camera).<br>
 Because there are many flavours possible I created a generic function.
 It shows, for the selected file, what previews are available, and their sizes.<br>
 You can check which preview(s) to extract and optionally perform autorate, and or crop.<br><br>
