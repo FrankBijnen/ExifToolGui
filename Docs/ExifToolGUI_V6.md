@@ -96,7 +96,7 @@ This revival resulted in <b>Version 6</b><br>
 Read his complete documentation <a href="https://htmlpreview.github.io/?https://github.com/FrankBijnen/ExifToolGui/blob/main/Docs/Original%20notes/ExifToolGUI_V516.htm"><b>here</b></a><br><br>
 This was his intro, I will quote it now, because it still holds for me:<br><br>
 <em>
-<p>There are many tools for viewing/editing metadata inside image files. In my opinion, <b>ExifTool</b> by <b>Phil Harvey</b>,
+<p class="A4">There are many tools for viewing/editing metadata inside image files. In my opinion, <b>ExifTool</b> by <b>Phil Harvey</b>,
 is the best I've found so far. Here's why:</p>
 <ul>
     <li>-it shows more metadata tags than any other tool,</li>
@@ -104,7 +104,7 @@ is the best I've found so far. Here's why:</p>
     <li>-it is very secure to use, is regulary updated and has the best possible support.</li>
 </ul>
 <br>
-<p>The only downside for many potential users is the fact, that ExifTool is a "command-line" utility. That means, there's no
+<p class="A4">The only downside for many potential users is the fact, that ExifTool is a "command-line" utility. That means, there's no
 Graphic User Interface (GUI), so all work must be done by typing commands inside "Command Prompt" window. Such approach gives
 ExifTool great flexibility, but is somehow difficult to use -especially for those, who don't use ExifTool regularly.
 </p>
