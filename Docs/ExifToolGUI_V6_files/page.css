@@ -18,11 +18,11 @@ ul {margin-left:2px; margin-top:0px; margin-bottom:0px}
 
 table.A4
 {table-layout:fixed;
- width:95%;
+ minWidth:800px;
+ width:98%;
  border:0px #AA0000 solid;
  margin-top:0px;
- margin-left:2%;
- margin-right:3%;
+ margin-left:1%;
  border-spacing:4px;
  border-collapse: collapse;
  background-color:#F4F8FF;
@@ -31,7 +31,8 @@ table.A4
  color:#000000
 }
 td.A4
-{vertical-align:top;
+{width:100%;
+ vertical-align:top;
  padding-left:4px}
 
 font.blue
