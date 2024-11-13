@@ -1075,11 +1075,9 @@ For more info on the file filter see the Embarcadero documentation on the Delphi
         <ul>
             <li>Standard file list.<br>
             This works relatively fast on all columns.<br><br></li>
-
             <li>Camera details, Location info, About photo. (Read mode=internal)<br>
             When sorting is active on Filename this is also relatively fast.<br>
             Sorting on other columns force GUI to get the details of all files selected, this will be much slower.<br><br></li>
-
             <li>User defined (Read mode=ExifTool)<br>
             Sorting on Filename is also relatively fast, any other column will be an excercise in patience.<br>
             GUI has to execute ExifTool for all files found to get the details.
