@@ -714,7 +714,7 @@ Note: These fields are also shown in the file list if it's set to 'Location info
 <h3><a name="m_import_gps_xmp">Import GPS data from: Xmp files</a></h3>
 By using this menu, you can copy GPS data from xmp sidecar files into Exif GPS section of selected image files.<br>
 <u>Note:</u> It is expected that image and sidecar files only differ in extension. The name part however, must be equal.
-Examples of valid image-sidecar file pair are:<br>
+Examples of valid image-sidecar file pairs are:<br>
 <br>
 MyPhoto.jpg - MyPhoto.xmp or MyPhoto.jpg.xmp<br>
 img_01.cr2 - img_01.xmp or img_01.cr2.xmp<br>
