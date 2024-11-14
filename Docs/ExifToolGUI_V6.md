@@ -1513,8 +1513,7 @@ By clicking on this button, all selected files will be geotagged with current ma
 
 <ul>
     <li>The coordinates displayed in the <b>Find:</b> edit box are used. They could be different from the center of the map!<br>
-    Examples that have happened to me:</li>
-
+    Examples that have happened to me:</li><br>
     <li>You type the name of a City, but dont press Enter to search.</li>
     <li>You paste coordinates in the edit box.</li>
     <li>The Geotag files dialog appears.<br></li>
