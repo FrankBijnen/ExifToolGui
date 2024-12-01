@@ -445,7 +445,7 @@ function TPlace.HtmlEscape(const HTML: string): string;
 begin
   result := ReplaceAll(HTML,
                        ['&',     '<',    '>',    '"',      '''',    ' ',      '-'],
-                       ['&amp;', '&lt;', '&gt;', '&quot;', '&#39;', '&nbsp;', '&#8209']
+                       ['&amp;', '&lt;', '&gt;', '&quot;', '&#39;', '&nbsp;', '&#8209;']
                       );
 end;
 
