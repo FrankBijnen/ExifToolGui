@@ -20,6 +20,7 @@ type
     FOnBeforeContextMenu: TNotifyEvent;
     FOnAfterContextMenu: TNotifyEvent;
   protected
+    procedure InitNode(NewNode: TTreeNode; ID: PItemIDList; ParentNode: TTreeNode); override;
     procedure DoContextPopup(MousePos: TPoint; var Handled: boolean); override;
     procedure ShowMultiContextMenu(MousePos: TPoint);
     procedure WndProc(var Message: TMessage); override;
@@ -78,6 +79,31 @@ begin
   if (SelectedFolder = nil) then
     exit;
   InvokeMultiContextMenu(Self, SelectedFolder, MousePos, ICM2);
+end;
+
+procedure TShellTreeView.InitNode(NewNode: TTreeNode; ID: PItemIDList; ParentNode: TTreeNode);
+var
+  NewFolder: IShellFolder;
+  TempFolder: TShellFolder;
+begin
+  // Archives (TAR, ZIP TGZ etc.) may be reported as folders in TCustomShellTreeView.PopulateNode
+  // Resulting in needlessly scanning large files
+  if not (otNonFolders in ObjectTypes) then
+  begin
+    NewFolder := GetIShellFolder(TShellFolder(ParentNode.Data).ShellFolder, ID);
+    TempFolder := TShellFolder.Create(TShellFolder(ParentNode.Data), ID, NewFolder);
+    try
+      if not (ValidDir(TempFolder.PathName)) then
+      begin
+        NewNode.Delete;
+        exit;
+      end;
+    finally
+      TempFolder.Free;
+    end;
+  end;
+
+  inherited InitNode(NewNode, ID, ParentNode);
 end;
 
 procedure TShellTreeView.DoContextPopup(MousePos: TPoint; var Handled: boolean);

@@ -29,9 +29,16 @@ Due to the Copyright statement I can't distribute that source, but the Community
     property FoldersList: TList read FFolders;
 //ExifTool_x     
 
+5) In the 'protected' declarations of TCustomShellTreeView, add 'virtual' to 'InitNode'. (Comment the original line, and add a new with ' virtual;')
+
+//ExifTool
+//    procedure InitNode(NewNode: TTreeNode; ID: PItemIDList; ParentNode: TTreeNode);
+    procedure InitNode(NewNode: TTreeNode; ID: PItemIDList; ParentNode: TTreeNode); virtual;
+//ExifTool_x
+
 Fixes for memory leaks that show clearly when selecting many files (2500+) combined with column sorting.
 
-5) In 'function StrRetToString', after 'if Assigned(StrRet.pOleStr) then' replace
+6) In 'function StrRetToString', after 'if Assigned(StrRet.pOleStr) then' replace
 
      Result := StrRet.pOleStr
 
@@ -43,15 +50,15 @@ with this block
         Result := StrRet.pOleStr;
         CoTaskMemFree(StrRet.pOleStr);
       end
-//ExifTool_Leak_X
+//ExifTool_Leak_x
 
-6) In 'procedure TCustomShellListView.Populate;', after 'AFolder := TShellFolder.Create(FRootFolder, ID, NewFolder);'
+7) In 'procedure TCustomShellListView.Populate;', after 'AFolder := TShellFolder.Create(FRootFolder, ID, NewFolder);'
 
 add this block
 
 //ExifTool_Leak
         CoTaskMemFree(ID);
-//ExifTool_Leak_X
+//ExifTool_Leak_x
 
 Note: For documentation purposes the original line is kept, but commented. 
 

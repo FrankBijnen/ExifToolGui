@@ -270,13 +270,6 @@ begin
   end;
 end;
 
-function GetIShellFolder(IFolder: IShellFolder; PIDL: PItemIDList): IShellFolder;
-begin
-  result := nil;
-  if Assigned(IFolder) then
-    IFolder.BindToObject(PIDL, nil, IID_IShellFolder, Pointer(Result));
-end;
-
 // This function returns a filename + ext. We need this for File I/O functions.
 // Contrary to Folder.GetDisplayName, that will only return the ext if the Explorer option
 // 'Hide extensions for known file types' is unchecked.
