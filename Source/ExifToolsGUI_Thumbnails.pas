@@ -54,7 +54,6 @@ type
 function GetThumbCache(APIdl: PItemIDList; var hBmp: HBITMAP; Flags: TSIIGBF; AMaxX: longint; AMaxY: longint): HRESULT; overload;
 function GetThumbCache(APath: string; var hBmp: HBITMAP; Flags: TSIIGBF; AMaxX: longint; AMaxY: longint): HRESULT; overload;
 procedure GenerateThumbs(AFilePath: string; Subdirs: boolean; AMax: longint; FOnReady: TNotifyEvent = nil);
-function GetPidlFromName(const Name: string): PItemIDList;
 
 // Functions for CleanMgr.exe
 function ExistsSageSet(const StateFlagId: TStateFlagId): boolean;
@@ -207,12 +206,6 @@ begin
     S.cy := AMaxY;
     result := FileShellItemImage.GetImage(S, Flags, hBmp);
   end;
-end;
-
-// Caller should check
-function GetPidlFromName(const Name: string): PItemIDList;
-begin
-  Result := ILCreateFromPath(PChar(Name));
 end;
 
 function GetThumbCache(APath: string; var hBmp: HBITMAP; Flags: TSIIGBF; AMaxX: longint; AMaxY: longint): HRESULT;

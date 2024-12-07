@@ -37,6 +37,8 @@ function GetFileVersionNumber(FName: string): string;
 function GetFileVersionNumberPlatForm(FName: string): string;
 
 // FileSystem
+function GetIShellFolder(IFolder: IShellFolder; PIDL: PItemIDList): IShellFolder;
+function GetPidlFromName(const Name: string): PItemIDList;
 function ValidDir(ADir: string): boolean;
 function ValidFile(AFolder: TShellFolder): boolean;
 function GetINIPath(AllowCreate: boolean = false): string;
@@ -240,18 +242,26 @@ begin
 end;
 
 // Directories
+// Caller should check
+function GetPidlFromName(const Name: string): PItemIDList;
+begin
+  Result := ILCreateFromPath(PChar(Name));
+end;
+
+
+function GetIShellFolder(IFolder: IShellFolder; PIDL: PItemIDList): IShellFolder;
+begin
+  result := nil;
+  if Assigned(IFolder) then
+    IFolder.BindToObject(PIDL, nil, IID_IShellFolder, Pointer(Result));
+end;
+
 function ValidDir(ADir: string): boolean;
 var
-  AShell: IShellFolder;
-  P: PWideChar;
-  Flags, NumChars: LongWord;
-  NewPIDL: PItemIDList;
+  Attrs: DWORD;
 begin
-  SHGetDesktopFolder(AShell);
-  P := StringToOleStr(ADir);
-  NumChars := Length(ADir);
-  Flags := 0;
-  result := (AShell.ParseDisplayName(0, nil, P, NumChars, NewPIDL, Flags) = S_OK);
+  Attrs := GetFileAttributes(PChar(ADir));
+  result := (Attrs and FILE_ATTRIBUTE_DIRECTORY) <> 0;
 end;
 
 function ValidFile(AFolder: TShellFolder): boolean;
