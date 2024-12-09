@@ -1496,6 +1496,8 @@ procedure TFMain.MImportGPSLogClick(Sender: TObject);
 begin
   if FGeotag.ShowModal = mrOK then
   begin
+    FGeotag.DoGeoTag;
+
     RefreshSelected(Sender);
     ShowMetadata;
   end;
