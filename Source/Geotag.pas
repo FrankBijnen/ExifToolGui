@@ -41,6 +41,7 @@ type
     procedure DisplayHint(Sender: TObject);
     function LogPath: string;
   public
+    procedure DoGeoTag;
     { Public declarations }
   end;
 
@@ -49,7 +50,7 @@ var
 
 implementation
 
-uses Main, MainDef, ExifTool, ExifToolsGUI_Utils, UFrmGeoSetup, Geomap, UnitLangResources;
+uses Main, MainDef, ExifTool, ExifToolsGUI_Utils, UFrmGeoSetup, Geomap, UnitLangResources, LogWin;
 
 {$R *.dfm}
 
@@ -136,6 +137,11 @@ begin
 end;
 
 procedure TFGeotag.Button2Click(Sender: TObject);
+begin
+  ModalResult := mrOK;
+end;
+
+procedure TFGeotag.DoGeoTag;
 var
   SavedVerbose: integer;
   ETcmd, ETout, ETerr: string;
@@ -185,7 +191,6 @@ begin
     end;
   finally
     ET.Options.SetVerbose(SavedVerbose);
-    ModalResult := mrOK;
   end;
 end;
 
