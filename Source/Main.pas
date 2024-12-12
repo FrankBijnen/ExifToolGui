@@ -2805,6 +2805,7 @@ begin
       ShellTree.Path := ExtractFileDir(FName);
       FName := ExtractFileName(FName);
       ShellList.Refresh;
+      ListView_SetItemState(ShellList.Handle, 0, 0, LVIS_SELECTED);
       for Index := 0 to ShellList.Items.Count -1 do
       begin
         if ShellList.RelFileName(Index) = FName then
