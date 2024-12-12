@@ -2815,6 +2815,7 @@ begin
         end;
       end;
     end;
+    DragFinish(Msg.Drop);
     ShowPreview;
     ShowMetadata;
     Application.BringToFront;
