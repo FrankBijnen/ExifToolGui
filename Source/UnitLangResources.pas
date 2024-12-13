@@ -158,7 +158,6 @@ resourcestring
   StrNoMoreMatchesFo        = 'No (more) matches found.';
   StrMinimizedToTray        = 'Minimized to tray.';
   StrClickToDisableThi      = 'Click to disable this hint.';
-  StrDropOnlyOneFileA       = 'Drop only one file at a time!';
   StrErrorPositioningHo     = 'Error positioning Home';
   StrYes                    = 'Yes';
   StrNo                     = 'No';

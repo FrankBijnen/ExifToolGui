@@ -400,6 +400,8 @@ type
     procedure EditFileFilter(Sender: TObject);
 
   protected
+    procedure CreateWnd; override;
+    procedure DestroyWnd; override;
     function GetDefWindowSizes: TRect; override;
   public
     GUIBorderWidth, GUIBorderHeight: integer;
@@ -2778,50 +2780,69 @@ begin
 end;
 
 // ---------------Drag_Drop procs --------------------
+procedure TFMain.CreateWnd;
+begin
+  inherited;
+  DragAcceptFiles(Handle, True);
+end;
+
+procedure TFMain.DestroyWnd;
+begin
+  DragAcceptFiles(Handle, False);
+  inherited;
+end;
+
 procedure TFMain.ImageDrop(var Msg: TWMDROPFILES);
 var
-  NumFiles: integer;
-  Buffer: array of Char;
-  PBuffer: PChar absolute Buffer;
-  LBuffer: integer;
+  NumFiles, FileNum: integer;
   FName: string;
+  FNames: TStringList;
   Index: integer;
 begin
-  NumFiles := DragQueryFile(Msg.Drop, UINT(-1), nil, 0);
-  if NumFiles > 1 then
-    ShowMessage(StrDropOnlyOneFileA)
-  else
-  begin
-    LBuffer := DragQueryFile(Msg.Drop, 0, nil, 0) +1;
-    SetLength(Buffer, LBuffer);
-    DragQueryFile(Msg.Drop, 0, PBuffer, LBuffer);
-    FName := PBuffer;
+  // Create a stringlist with all dropped files
+  // Change the path to the filepath of the first selected file
+  FNames := TStringList.Create;
+  try
+    NumFiles := DragQueryFile(Msg.Drop, UINT(-1), nil, 0);
 
-    ShellList.ItemIndex := -1;
-    if (DirectoryExists(FName)) then
-      ShellTree.Path := FName
-    else
+    for FileNum := 0 to NumFiles -1 do
     begin
-      ShellTree.Path := ExtractFileDir(FName);
-      FName := ExtractFileName(FName);
-      ShellList.Refresh;
-      ListView_SetItemState(ShellList.Handle, 0, 0, LVIS_SELECTED);
-      for Index := 0 to ShellList.Items.Count -1 do
+      // Get Filename
+      SetLength(FName, DragQueryFile(Msg.Drop, FileNum, nil, 0));
+      DragQueryFile(Msg.Drop, FileNum, PChar(FName), Length(FName) +1);
+
+      // Dropped a directory? Just set the path
+      if (DirectoryExists(FName)) then
       begin
-        if ShellList.RelFileName(Index) = FName then
-        begin
-          ShellList.ItemIndex := Index;
-          break;
-        end;
+        ShellTree.Path := FName;
+        break;
       end;
+
+      // First file sets path, and refreshes shellList
+      if (FileNum = 0) then
+        ShellTree.Path := ExtractFileDir(FName)
+      else if (ShellTree.Path <> ExtractFileDir(FName)) then // all files should be in same dir!
+        break;
+
+      // Add to selection
+      FNames.Add(FName);
     end;
-    DragFinish(Msg.Drop);
+
+    // Now select the files in our stringlist
+    ShellList.ClearSelection;
+    for Index := 0 to ShellList.Items.Count -1 do
+      ShellList.Items[Index].Selected := (FNames.IndexOf(ShellList.Folders[Index].PathName) > -1);
+
+    // Show data of first selected file
     ShowPreview;
     ShowMetadata;
     Application.BringToFront;
+
+  finally
+    FNames.Free;
+    DragFinish(Msg.Drop);
   end;
 end;
-
 // ------------- ^ Enf of Drag_Drop procs ^-------------------------------
 
 procedure TFMain.FormShow(Sender: TObject);
@@ -2928,8 +2949,6 @@ begin
   if (ShellTree.Selected <> nil) then
     ShellTree.Selected.MakeVisible;
 
-  // --------------------------
-  DragAcceptFiles(Self.Handle, true);
 end;
 
 procedure TFMain.RotateImgResize(Sender: TObject);
@@ -3915,4 +3934,3 @@ begin
 end;
 
 end.
-
