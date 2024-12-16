@@ -38,8 +38,8 @@ const SupportedFormats: TSupportedFormats =
       (cfFormat: CF_HDROP; ptd: nil; dwAspect: DVASPECT_CONTENT; lindex: -1; tymed: TYMED_HGLOBAL)
 );
 
-IdFormatCut = 0;
-IdFormatCopy = 1;
+ 	IdFormatCut = 0;
+	IdFormatCopy = 1;
 
 function Format2Id(Fmt: TClipFormat): integer;
 begin
