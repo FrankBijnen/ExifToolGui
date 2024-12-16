@@ -4,7 +4,7 @@ interface
 
 uses
   System.Classes, System.SysUtils, System.Types, System.Threading, System.Generics.Collections,
-  Winapi.Windows, Winapi.Messages, Winapi.CommCtrl, Winapi.ShlObj,
+  Winapi.Windows, Winapi.Messages, Winapi.CommCtrl, Winapi.ShlObj, Winapi.ActiveX,
   Vcl.Shell.ShellCtrls, Vcl.Shell.ShellConsts, Vcl.ComCtrls, Vcl.Menus, Vcl.Controls, Vcl.Graphics,
   ExifToolsGUI_Thumbnails, ExifToolsGUI_MultiContextMenu, UnitColumnDefs;
 
@@ -58,7 +58,7 @@ type
     class function GetSystemFieldEx(RootFolder: TShellFolder; RelativeID: PItemIDList; Column: integer): string;
   end;
 
-  TShellListView = class(Vcl.Shell.ShellCtrls.TShellListView, IShellCommandVerbExifTool)
+  TShellListView = class(Vcl.Shell.ShellCtrls.TShellListView, IShellCommandVerbExifTool, IDropSource)
   private
     FHiddenFolders: TList;
     FThreadPool: TThreadPool;
@@ -96,6 +96,11 @@ type
     FOnItemsLoaded: TNotifyEvent;
     FOnOwnerDataFetchEvent: TOwnerDataFetchEvent;
     ICM2: IContextMenu2;
+    FDragStartPos: TPoint;
+    FDragSource: boolean;
+    function GiveFeedback(dwEffect: Longint): HResult; stdcall;
+    function QueryContinueDrag(fEscapePressed: BOOL; grfKeyState: Longint): HResult; stdcall;
+
     procedure SetColumnSorted(AValue: boolean);
     procedure ClearHiddenItems;
     procedure InitThumbNails;
@@ -109,6 +114,9 @@ type
     function CreateSelectedFileList(FullPaths: boolean): TStringList;
     procedure RefreshTreeViewAfterContext;
   protected
+    procedure MouseDown(Button: TMouseButton; Shift: TShiftState; X, Y: Integer); override;
+    procedure MouseMove(Shift: TShiftState; X, Y: Integer); override;
+
     procedure WMNotify(var Msg: TWMNotify); message WM_NOTIFY;
     procedure InitSortSpec(SortColumn: integer; SortState: THeaderSortState);
     procedure ColumnSort; virtual;
@@ -178,12 +186,13 @@ type
     property OnMouseWheel;
     property OnCustomDrawItem;
     property IncludeSubFolders: boolean read FIncludeSubFolders write FIncludeSubFolders;
+    property DragSource: boolean read FDragSource write FDragSource;
   end;
 
 implementation
 
 uses System.Win.ComObj, System.UITypes, System.StrUtils,
-     Vcl.ImgList, Winapi.ActiveX,
+     Vcl.ImgList,
      ExifToolsGUI_Utils, ExifToolsGui_ThreadPool, ExifToolsGui_FileListColumns,
      UnitFilesOnClipBoard, UnitLangResources, UFrmGenerate;
 
@@ -1191,6 +1200,7 @@ begin
   StyleElements := [seFont, seBorder];
   FThumbNailSize := 0;
   FGenerating := 0;
+  FDragSource := false;
   FHiddenFolders := Tlist.Create;
   FIncludeSubFolders := false;
   InitSortSpec(0, THeaderSortState.hssNone);
@@ -1529,6 +1539,72 @@ begin
       FThumbNailCache[ANitemIndex] := Items[ANitemIndex].ImageIndex;
   finally
     ABitMap.Free;
+  end;
+end;
+
+function TShellListView.GiveFeedback(dwEffect: Longint): HResult; stdcall;
+begin
+  Result := DRAGDROP_S_USEDEFAULTCURSORS;
+end;
+
+function TShellListView.QueryContinueDrag(fEscapePressed: BOOL; grfKeyState: Longint): HResult; stdcall;
+begin
+  if fEscapePressed or (grfKeyState and MK_RBUTTON = MK_RBUTTON) then
+    Result := DRAGDROP_S_CANCEL
+  else if grfKeyState and MK_LBUTTON = 0 then
+    Result := DRAGDROP_S_DROP
+  else
+    Result := S_OK;
+end;
+
+procedure TShellListView.MouseDown(Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
+begin
+  if (FDragSource) and
+     (Button = mbLeft) then
+  begin
+    FDragStartPos.X := X;
+    FDragStartPos.Y := Y;
+  end;
+  inherited MouseDown(Button, Shift, X, Y);
+end;
+
+procedure TShellListView.MouseMove(Shift: TShiftState; X, Y: Integer);
+const
+  Threshold = 3;
+var
+  HR: HResult;
+  ItemIDListArray: array of PItemIDList;
+  Index, Cnt: integer;
+  DataObject: IDataObject;
+  Effect: Longint;
+begin
+  inherited MouseMove(Shift, X, Y);
+
+  if (FDragSource = false) then
+    exit;
+
+  if (SelCount > 0) and
+     (csLButtonDown in ControlState) and
+     ((Abs(X - FDragStartPos.X) >= Threshold) or (Abs(Y - FDragStartPos.Y) >= Threshold)) then
+  begin
+    Perform(WM_LBUTTONUP, 0, MakeLong(X, Y));
+    SetLength(ItemIDListArray, SelCount);
+    Cnt := 0;
+    for Index := 0 to Items.Count - 1 do
+    begin
+      if (ListView_GetItemState(Handle, Index, LVIS_SELECTED) = LVIS_SELECTED) then
+      begin
+        ItemIDListArray[Cnt] := Folders[Index].RelativeID;
+        Inc(Cnt);
+      end;
+    end;
+
+    HR := RootFolder.ShellFolder.GetUIObjectOf(0, SelCount, ItemIDListArray[0], IDataObject, nil, DataObject);
+    if (HR = S_OK) then
+    begin
+      Effect := DROPEFFECT_NONE;
+      DoDragDrop(DataObject, Self, DROPEFFECT_COPY, Effect);
+    end;
   end;
 end;
 
