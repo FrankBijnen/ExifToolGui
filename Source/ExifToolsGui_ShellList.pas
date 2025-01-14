@@ -84,7 +84,7 @@ type
     // Thumbnail cache. An index for every item in FThumbNails
     //
     // > 1 The index to use for FThumbNails. Minus 1!
-    // = 0 The index needs to be generated. Displayed as a ?
+    // = 0 The index needs to be generated. Displayed as an hourglass
     // < 1 A temporary icon to display, until the thumbnail is generated. The actual index in FThumbNails is * -1
     FThumbNailCache: array of integer;
     FOnNotifyErrorEvent: TThumbErrorEvent;
@@ -204,8 +204,10 @@ const
   HOURGLASS = 'HOURGLASS';
   HOURGLASS_TRANSPARENT = $ff00ff;
 
+{$IFDEF VER350}
   Arrow_Up = #$25b2;
   Arrow_Down = #$25bc;
+{$ENDIF}
 
 { Listview Sort helpers }
 
@@ -240,15 +242,19 @@ begin
     hssAscending:
       begin
         // Add an arrow to the caption. Using styles doesn't show the arrows in the header
+{$IFDEF VER350}
         if (Column.Caption[Length(Column.Caption)] <> Arrow_Up) then
           Column.Caption := Column.Caption + ' ' + Arrow_Up;
+{$ENDIF}
         Item.fmt := Item.fmt or HDF_SORTUP;
       end;
     hssDescending:
       begin
         // Add an arrow to the caption.
+{$IFDEF VER350}
         if (Column.Caption[Length(Column.Caption)] <> Arrow_Down) then
           Column.Caption := Column.Caption + ' ' + Arrow_Down;
+{$ENDIF}
         Item.fmt := Item.fmt or HDF_SORTDOWN;
       end;
   end;
@@ -473,13 +479,15 @@ begin
         begin
           ResizedColumn := pHDNotify(Msg.NMHdr)^.Item;
           Column := Columns[ResizedColumn];
-
-          // HeaderSortState gets reset when resizing. Restore from Caption
-          if (Column.Caption[Length(Column.Caption)] = Arrow_Up) then
-            SetListHeaderSortState(Self, Column, hssAscending)
-          else if (Column.Caption[Length(Column.Caption)] = Arrow_Down) then
-            SetListHeaderSortState(Self, Column, hssDescending);
-
+          if (Column.Index = FSortColumn) then
+          begin
+            case (FSortState) of
+              THeaderSortState.hssAscending:
+                SetListHeaderSortState(Self, Column, hssAscending);
+              THeaderSortState.hssDescending:
+                SetListHeaderSortState(Self, Column, hssDescending);
+            end;
+          end;
           FOnColumnResized(Column);
         end;
       end;
