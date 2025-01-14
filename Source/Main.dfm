@@ -66,8 +66,6 @@ object FMain: TFMain
       item
         Width = 50
       end>
-    ExplicitTop = 560
-    ExplicitWidth = 936
   end
   object AdvPanelBrowse: TPanel
     Left = 0
@@ -84,7 +82,6 @@ object FMain: TFMain
     ParentDoubleBuffered = False
     ParentFont = False
     TabOrder = 1
-    ExplicitHeight = 535
     object Splitter3: TSplitter
       Left = 1
       Top = 310
@@ -105,7 +102,6 @@ object FMain: TFMain
       ActivePage = AdvTabBrowse
       Align = alClient
       TabOrder = 0
-      ExplicitHeight = 308
       object AdvTabBrowse: TTabSheet
         Caption = 'Folders'
         object ShellTree: TShellTreeView
@@ -134,7 +130,6 @@ object FMain: TFMain
           TabOrder = 0
           OnKeyDown = ShellTreeKeyDown
           OnChanging = ShellTreeChanging
-          ExplicitHeight = 280
         end
       end
     end
@@ -147,7 +142,6 @@ object FMain: TFMain
       Align = alBottom
       TabOrder = 1
       OnResize = AdvPagePreviewResize
-      ExplicitTop = 313
       object AdvTabPreview: TTabSheet
         Caption = 'Preview '
         object RotateImg: TImage
@@ -172,8 +166,6 @@ object FMain: TFMain
     DoubleBuffered = True
     ParentDoubleBuffered = False
     TabOrder = 2
-    ExplicitLeft = 616
-    ExplicitHeight = 535
     object AdvTabMetadata: TTabSheet
       Caption = 'Metadata'
       object AdvPanelMetaTop: TPanel
@@ -284,7 +276,6 @@ object FMain: TFMain
         Font.Style = []
         ParentFont = False
         TabOrder = 1
-        ExplicitTop = 401
         DesignSize = (
           312
           106)
@@ -374,7 +365,6 @@ object FMain: TFMain
         OnMouseDown = MetadataListMouseDown
         OnMouseMove = MetadataListMouseMove
         OnSelectCell = MetadataListSelectCell
-        ExplicitHeight = 344
         ColWidths = (
           150
           160)
@@ -403,6 +393,8 @@ object FMain: TFMain
           Height = 417
           Align = alClient
           TabOrder = 0
+          AllowSingleSignOnUsingOSPrimaryAccount = False
+          TargetCompatibleBrowserVersion = '117.0.2045.28'
           UserDataFolder = '%LOCALAPPDATA%\bds.exe.WebView2'
           OnCreateWebViewCompleted = EdgeBrowser1CreateWebViewCompleted
           OnNavigationStarting = EdgeBrowser1NavigationStarting
@@ -559,8 +551,6 @@ object FMain: TFMain
     DoubleBuffered = True
     ParentDoubleBuffered = False
     TabOrder = 3
-    ExplicitWidth = 366
-    ExplicitHeight = 535
     object AdvTabFilelist: TTabSheet
       Caption = 'File list'
       object TbFileList: TToolBar
@@ -576,7 +566,6 @@ object FMain: TFMain
         List = True
         AllowTextButtons = True
         TabOrder = 0
-        ExplicitWidth = 358
         object TbFlRefresh: TToolButton
           Left = 0
           Top = 0
@@ -643,8 +632,6 @@ object FMain: TFMain
         Font.Style = []
         ParentFont = False
         TabOrder = 1
-        ExplicitTop = 323
-        ExplicitWidth = 358
         DesignSize = (
           362
           184)
@@ -775,7 +762,6 @@ object FMain: TFMain
           OnChange = EditETdirectChange
           OnKeyDown = EditETdirectKeyDown
           OnKeyPress = EditETdirectKeyPress
-          ExplicitWidth = 314
         end
         object CBoxETdirect: TComboBox
           Left = 1
@@ -850,7 +836,6 @@ object FMain: TFMain
         BevelOuter = bvNone
         ShowCaption = False
         TabOrder = 3
-        ExplicitWidth = 358
       end
     end
     object AdvTabChart: TTabSheet
@@ -1008,7 +993,6 @@ object FMain: TFMain
     Font.Name = 'Segoe UI'
     Font.Style = []
     Spacing = 0
-    ExplicitWidth = 936
   end
   object OpenPictureDlg: TOpenPictureDialog
     Filter = 

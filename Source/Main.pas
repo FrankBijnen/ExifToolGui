@@ -3165,6 +3165,7 @@ begin
   // Select 1st Item rightaway
   if (AShellList.Items.Count > 0) then
   begin
+    AShellList.Items[0].Focused := true;
     AShellList.Items[0].Selected := true;
     if (Assigned(AShellList.OnClick)) then
       AShellList.OnClick(Sender);

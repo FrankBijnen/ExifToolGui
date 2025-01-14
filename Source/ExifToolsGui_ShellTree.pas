@@ -137,7 +137,7 @@ begin
   // Need a selected node
   if (Selected <> nil) then
   begin
-    if (Verb = SCmdVerbRefresh) then
+    if SameText(Verb, SCmdVerbRefresh) then
     begin
       Refresh(Selected);
       Handled := true;
@@ -165,6 +165,19 @@ begin
 
   if SameText(Verb, SCmdVerbPaste) then
     SetPaths2Refresh;
+
+  if SameText(Verb, SCmdSelLeft) then
+  begin
+    SelectLeftDir;
+    Handled := true;
+  end;
+
+  if SameText(Verb, SCmdVerDiff) then
+  begin
+    ShowCompareDlgDir(Path);
+    Handled := true;
+  end;
+
 end;
 
 procedure TShellTreeView.CommandCompletedExif(Verb: String; Succeeded: Boolean);

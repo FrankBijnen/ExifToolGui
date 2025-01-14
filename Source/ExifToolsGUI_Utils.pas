@@ -145,6 +145,12 @@ function ContextInstalled(const AppTitle: string): string;
 procedure Add2Context(const AppTitle, Description: string);
 procedure RemoveFromContext(const AppTitle: string);
 
+//Diff. Compare
+procedure Selectleft;
+procedure SelectleftDir;
+procedure ShowCompareDlg(const PathL, PathR: string);
+procedure ShowCompareDlgDir(const PathR: string);
+
 // Resource
 procedure LoadResourceList(Resource: string; List: TStringList);
 
@@ -161,7 +167,7 @@ implementation
 
 uses
   Winapi.ShellAPI, Winapi.KnownFolders, System.Win.Registry, System.UITypes, System.Types, System.DateUtils,
-  MainDef, ExifTool, ExifInfo, UnitLangResources;
+  MainDef, ExifTool, ExifInfo, UnitLangResources, UFrmDiff;
 
 var
   GlobalImgFact: IWICImagingFactory;
@@ -2096,6 +2102,33 @@ begin
   finally
     Reg.Free
   end;
+end;
+
+procedure SelectLeft;
+begin
+  FrmDiff.SelectLeft;
+end;
+
+procedure SelectLeftDir;
+begin
+  FrmDiff.SelectLeftDir;
+end;
+
+procedure ShowCompareDlg(const PathL, PathR: string);
+begin
+  if (PathL <> '') and
+     (PathR <> '') then
+    FrmDiff.ShowCompare(PathL, PathR)
+  else
+    FrmDiff.ShowModal;
+end;
+
+procedure ShowCompareDlgDir(const PathR: string);
+begin
+  if (PathR <> '') then
+    FrmDiff.ShowCompare(PathR)
+  else
+    FrmDiff.ShowModal;
 end;
 
 procedure LoadResourceList(Resource: string; List: TStringList);

@@ -41,6 +41,7 @@ uses
   ExifToolsGui_Versions in 'ExifToolsGui_Versions.pas',
   ExifToolsGUI_StringList in 'ExifToolsGUI_StringList.pas',
   ExifToolsGui_ComboBox in 'ExifToolsGui_ComboBox.pas',
+  ExifToolsGui_Listview in 'ExifToolsGui_Listview.pas',
   ExifInfo in 'ExifInfo.pas',
   ExifTool in 'ExifTool.pas',
   ExifTool_PipeStream in 'ExifTool_PipeStream.pas',
@@ -71,7 +72,8 @@ uses
   UFrmGenerate in 'UFrmGenerate.pas' {FrmGenerate},
   UFrmCheckVersions in 'UFrmCheckVersions.pas' {FrmCheckVersions},
   UFrmTagNames in 'UFrmTagNames.pas' {FrmTagNames},
-  UFrmPredefinedTags in 'UFrmPredefinedTags.pas' {FrmPredefinedTags};
+  UFrmPredefinedTags in 'UFrmPredefinedTags.pas' {FrmPredefinedTags},
+  UFrmDiff in 'UFrmDiff.pas' {FrmDiff};
 
 {$R *.res}
 
@@ -111,7 +113,7 @@ begin
   Application.CreateForm(TFRemoveMeta, FRemoveMeta);
   Application.CreateForm(TFCopyMetaSingle, FCopyMetaSingle);
   Application.CreateForm(TFFileDateTime, FFileDateTime);
-  Application.CreateForm(TFrmPlaces, FrmPlaces);
+  Application.CreateForm(TFrmDiff, FrmDiff);
   Application.CreateForm(TFrmStyle, FrmStyle);
   Application.CreateForm(TFrmAbout, FrmAbout);
   Application.CreateForm(TFrmCheckVersions, FrmCheckVersions);
@@ -122,5 +124,6 @@ begin
   Application.CreateForm(TFGeoSetup, FGeoSetup);
   Application.CreateForm(TFrmTagNames, FrmTagNames);
   Application.CreateForm(TFrmPredefinedTags, FrmPredefinedTags);
+  Application.CreateForm(TFrmPlaces, FrmPlaces);
   Application.Run;
 end.
