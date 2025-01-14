@@ -30,8 +30,6 @@ object FrmPredefinedTags: TFrmPredefinedTags
     Height = 29
     Align = alBottom
     TabOrder = 2
-    ExplicitTop = 495
-    ExplicitWidth = 690
     DesignSize = (
       694
       29)
@@ -101,7 +99,6 @@ object FrmPredefinedTags: TFrmPredefinedTags
     Height = 32
     Align = alTop
     TabOrder = 0
-    ExplicitWidth = 690
     object SpbAddPred: TSpeedButton
       Left = 2
       Top = 3
@@ -157,7 +154,6 @@ object FrmPredefinedTags: TFrmPredefinedTags
     OnDrawCell = SGPredefinedTagsDrawCell
     OnExit = SGPredefinedTagsExit
     OnSelectCell = SGPredefinedTagsSelectCell
-    ExplicitWidth = 690
     ColWidths = (
       624
       64
@@ -183,8 +179,6 @@ object FrmPredefinedTags: TFrmPredefinedTags
     OnCustomDrawItem = LvTagNamesCustomDrawItem
     OnEdited = LvTagNamesEdited
     OnItemChecked = LvTagNamesItemChecked
-    ExplicitWidth = 690
-    ExplicitHeight = 254
   end
   object PnlTags: TPanel
     Left = 0
@@ -193,7 +187,6 @@ object FrmPredefinedTags: TFrmPredefinedTags
     Height = 29
     Align = alTop
     TabOrder = 4
-    ExplicitWidth = 690
     object SpbAddTag: TSpeedButton
       Left = 2
       Top = 3

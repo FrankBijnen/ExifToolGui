@@ -44,7 +44,6 @@ object FLogWin: TFLogWin
     ActivePage = TabExecs
     Align = alTop
     TabOrder = 0
-    ExplicitWidth = 609
     object TabExecs: TTabSheet
       Caption = 'Logged ExifTool commands'
       object LBExecs: TListBox
@@ -56,7 +55,6 @@ object FLogWin: TFLogWin
         ItemHeight = 13
         TabOrder = 0
         OnClick = LBExecsClick
-        ExplicitWidth = 601
       end
     end
   end
@@ -69,8 +67,6 @@ object FLogWin: TFLogWin
     Constraints.MinHeight = 200
     Constraints.MinWidth = 200
     TabOrder = 2
-    ExplicitWidth = 609
-    ExplicitHeight = 205
     object Splitter3: TSplitter
       Left = 331
       Top = 1
@@ -88,7 +84,6 @@ object FLogWin: TFLogWin
       Align = alLeft
       Constraints.MinWidth = 285
       TabOrder = 1
-      ExplicitHeight = 203
       object TabCommands: TTabSheet
         Caption = 'Executed commands'
         object PnlCommands: TPanel
@@ -150,7 +145,6 @@ object FLogWin: TFLogWin
           TabOrder = 1
           WordWrap = False
           OnKeyDown = MemoKeyDown
-          ExplicitHeight = 135
         end
       end
       object TabRestRequest: TTabSheet
@@ -203,8 +197,6 @@ object FLogWin: TFLogWin
       Align = alClient
       Constraints.MinWidth = 100
       TabOrder = 0
-      ExplicitWidth = 271
-      ExplicitHeight = 203
       object TabOutput: TTabSheet
         Caption = 'Output from commands'
         object MemoOuts: TMemo
@@ -224,8 +216,6 @@ object FLogWin: TFLogWin
           ScrollBars = ssVertical
           TabOrder = 0
           OnKeyDown = MemoKeyDown
-          ExplicitWidth = 263
-          ExplicitHeight = 175
         end
       end
     end
@@ -238,8 +228,6 @@ object FLogWin: TFLogWin
     ActivePage = TabErrors
     Align = alBottom
     TabOrder = 1
-    ExplicitTop = 401
-    ExplicitWidth = 609
     object TabErrors: TTabSheet
       Caption = 'Errors'
       object MemoErrs: TMemo
@@ -259,7 +247,6 @@ object FLogWin: TFLogWin
         ScrollBars = ssVertical
         TabOrder = 0
         OnKeyDown = MemoKeyDown
-        ExplicitWidth = 601
       end
     end
   end

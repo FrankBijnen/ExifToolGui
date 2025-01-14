@@ -273,6 +273,9 @@ begin
   PredefinedTagList.AddPair(Fmain.MaImportMetaSelected.Caption, DefExcludeCopyTags);
   SelPredefinedTagList.AddPair(Fmain.MaImportMetaSelected.Caption, DefSelExcludeCopyTags);
 
+  PredefinedTagList.AddPair(SrCmdVerbDiff, DefDiffTags);
+  SelPredefinedTagList.AddPair(SrCmdVerbDiff, DefSelDiffTags);
+
   SetupStringGrid;
 
   case Caller of
@@ -282,6 +285,8 @@ begin
       SGPredefinedTags.Row := 2;
     TIniTagsData.idtCopyTags:
       SGPredefinedTags.Row := 3;
+    TIniTagsData.idtDiffTags:
+      SGPredefinedTags.Row := 4;
   end;
   SGPredefinedTags.SetFocus;
   SGPredefinedTags.Col := 0;

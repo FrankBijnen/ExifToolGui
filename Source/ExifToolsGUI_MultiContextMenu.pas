@@ -14,10 +14,14 @@ const IdCmdFirst            = 1;
       IdCmdLast             = $7fff;
 const SCmdVerbRefresh       = 'Refresh';
       IDVerbRefresh         = $8000;
-const SCmdVerbGenThumbs     = 'Generate Thumbnails';
+const SCmdVerbGenThumbs     = 'GenThumbnails';
       IDVerbGenThumbs       = $8001;
-const SCmdVerbGenThumbsSub  = 'Generate Thumbnails (Incl Subdirs)';
+const SCmdVerbGenThumbsSub  = 'GenThumbnailsSub';
       IDVerbGenThumbsSub    = $8002;
+const SCmdSelLeft           = 'SelLeft';
+      IDVerbSelLeft         = $8003;
+const SCmdVerDiff           = 'DiffMetadata';
+      IDVerbDiff            = $8004;
 
 type
   IShellCommandVerbExifTool = interface
@@ -27,17 +31,24 @@ type
   end;
 
 procedure DoContextMenuVerb(AFolder: TShellFolder; Verb: PAnsiChar);
-procedure InvokeMultiContextMenu(Owner: TWinControl; AFolder: TShellFolder; MousePos: TPoint;
-                                 var ICM2: IContextMenu2; AFileList: TStrings = nil);
+procedure InvokeMultiContextMenu(Owner: TWinControl;
+                                 AFolder: TShellFolder;
+                                 MousePos: TPoint;
+                                 var ICM2: IContextMenu2;
+                                 AFileList: TStrings = nil);
 
 implementation
 
-uses UnitLangResources;
+uses
+  UnitLangResources, ExifToolsGui_ShellList;
 
-  // Contextmenu supporting multi select
+// Contextmenu supporting multi select
 
-procedure InvokeMultiContextMenu(Owner: TWinControl; AFolder: TShellFolder; MousePos: TPoint;
-                                 var ICM2: IContextMenu2; AFileList: TStrings = nil);
+procedure InvokeMultiContextMenu(Owner: TWinControl;
+                                 AFolder: TShellFolder;
+                                 MousePos: TPoint;
+                                 var ICM2: IContextMenu2;
+                                 AFileList: TStrings = nil);
 var
   PIDL: PItemIDList;
   CM: IContextMenu;
@@ -53,29 +64,58 @@ var
   HR: HResult;
   ItemIDListArray: array of PItemIDList;
   Index: integer;
+  SubFolder: TShellFolder;
+
+  SelCount: integer;
+  IsFolder: boolean;
+  MixingFolderAndFiles: boolean;
+  MenuPosition: UINT;
+
+  procedure AddMenuItem(Id: UINT; Caption: string; var Position: UINT);
+  var
+    Flags: UINT;
+  begin
+    if (Id = 0) then
+      Flags := MF_SEPARATOR or MF_BYPOSITION
+    else
+      Flags := MF_STRING or MF_BYPOSITION;
+    InsertMenu(Menu, Position, Flags, Id +1, PWideChar(Caption));
+    Inc(Position);
+  end;
 
 begin
   if (AFolder.ParentShellFolder = nil) then
     exit;
 
-  if not Assigned(AFileList) then     // get the IContextMenu Interface for FilePIDL
+  MixingFolderAndFiles := false;
+  if not Assigned(AFileList) then                 // get the IContextMenu Interface for FilePIDL
   begin
     PIDL := AFolder.RelativeID;
     HR := AFolder.ParentShellFolder.GetUIObjectOf(Owner.Handle, 1, PIDL, IID_IContextMenu, nil, CM);
+    SelCount := 1;
+    IsFolder := TSubShellFolder.GetIsFolder(AFolder);
   end
   else
-  begin                             // get the IContextMenu Interface for the file array
-    // Setup ItemIDListArray.
-    SetLength(ItemIDListArray, AFileList.Count);
+  begin                                           // get the IContextMenu Interface for the file array
+    SetLength(ItemIDListArray, AFileList.Count);  // Setup ItemIDListArray.
+    IsFolder := false;
     for Index := 0 to AFileList.Count - 1 do
-      ItemIDListArray[Index] := Pointer(AFileList.Objects[Index]);
+    begin
+      SubFolder := TShellFolder(AFileList.Objects[Index]);
+      ItemIDListArray[Index] := SubFolder.RelativeID;
+      if (Index = 0) then
+        IsFolder := TSubShellFolder.GetIsFolder(SubFolder)
+      else
+        MixingFolderAndFiles := MixingFolderAndFiles or
+                                (IsFolder <> TSubShellFolder.GetIsFolder(SubFolder));
+    end;
+    SelCount := AFileList.Count;
     HR := AFolder.ParentShellFolder.GetUIObjectOf(Owner.Handle, AFileList.Count, ItemIDListArray[0], IID_IContextMenu, nil, CM);
   end;
-  // Indicate nothing happened
   if ((HR <> 0) or
       (CM = nil)) and
       (Supports(Owner, IShellCommandVerbExifTool, SCVEXIF)) then
-  begin
+  begin                                           // Pretend nothing happened
     Handled := false;
     SCVEXIF.ExecuteCommandExif('', Handled);
     exit;
@@ -85,13 +125,22 @@ begin
   Menu := CreatePopupMenu;
   try
     CM.QueryContextMenu(Menu, 0, IdCmdFirst, IdCmdLast, CMF_EXPLORE or CMF_CANRENAME);
-    CM.QueryInterface(IID_IContextMenu2, ICM2); // To handle submenus. Note: See WndProc of ShellTree and ShellList
+    CM.QueryInterface(IID_IContextMenu2, ICM2);   // To handle submenus. Note: See WndProc of ShellTree and ShellList
 
     // Add Custom items on top
-    InsertMenu(Menu, 0, MF_STRING or MF_BYPOSITION, IDVerbRefresh +1, PWideChar(SrCmdVerbRefresh));
-    InsertMenu(Menu, 1, MF_STRING or MF_BYPOSITION, IDVerbGenThumbs +1, PWideChar(SrCmdVerbGenThumbs));
-    InsertMenu(Menu, 2, MF_STRING or MF_BYPOSITION, IDVerbGenThumbsSub  +1, PWideChar(SrCmdVerbGenThumbsSub));
-    InsertMenu(Menu, 3, MF_SEPARATOR or MF_BYPOSITION, 0, PWideChar('-'));
+    MenuPosition := 0;
+    AddMenuItem(IDVerbRefresh, SrCmdVerbRefresh, MenuPosition);
+    AddMenuItem(IDVerbGenThumbs, SrCmdVerbGenThumbs, MenuPosition);
+    AddMenuItem(IDVerbGenThumbsSub, SrCmdVerbGenThumbsSub, MenuPosition);
+    AddMenuItem(0, '-', MenuPosition);
+    if (MixingFolderAndFiles = false) then
+    begin
+      if ((SelCount = 1) and IsFolder) or
+         ((SelCount > 0) and not IsFolder) then
+        AddMenuItem(IDVerbSelLeft, SrCmdSelLeft, MenuPosition);
+      AddMenuItem(IDVerbDiff, SrCmdVerbDiff, MenuPosition);
+      AddMenuItem(0, '-', MenuPosition);
+    end;
     // Until here
 
     try
@@ -107,17 +156,21 @@ begin
       ICmd := LongInt(Command) - IdCmdFirst;
       HR := 0;
       case Word(ICmd) of
-        0..IdCmdLast:    // Standard 'Explorer like'
+        0..IdCmdLast:                             // Standard 'Explorer like'
           begin
             HR := CM.GetCommandString(ICmd, GCS_VERBA, nil, ZVerb, SizeOf(ZVerb));
             Verb := string(ZVerb);
           end;
-        IDVerbRefresh:      // Custom
+        IDVerbRefresh:                            // Custom
           Verb := SCmdVerbRefresh;
         IDVerbGenThumbs:
           Verb := SCmdVerbGenThumbs;
         IDVerbGenThumbsSub:
           Verb := SCmdVerbGenThumbsSub;
+        IDVerbSelLeft:
+          Verb := SCmdSelLeft;
+        IDVerbDiff:
+          Verb := SCmdVerDiff;
       end;
 
       Handled := False;

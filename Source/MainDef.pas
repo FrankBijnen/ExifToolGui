@@ -64,6 +64,11 @@ const
     'Xmp-crs:All ' +
     'Xmp-exif:All ';
 
+  DefDiffTags =
+    '-System:All ';
+  DefSelDiffTags =
+    '-System:All ';
+
   DefFileFilter =
     '*.JPG;*.JPE;*.JPEG;*.TIF;*.TIFF|*.CRW;*.CR2;*.CR3|*.PEF|*.ARW;*.SR2;*.SRF|*.NEF;*.NRW|*.DNG|*.MP4|' +
     '*.JPG;*.CRW;*.CR2;*.CR3|*.JPG;*.PEF|*.JPG;*.ARW;*.SR2;*.SRF|*.JPG;*.NEF;*.NRW|*.JPG;*.DNG|' +
@@ -76,7 +81,7 @@ const
 
 type
   TIniTagsData = (idtWorkSpace, idtETDirect, idtFileLists, idtCustomView, idtPredefinedTags,
-                  idtMarked, idtRemoveTags, idtCopySingleTags, idtCopyTags);
+                  idtMarked, idtRemoveTags, idtCopySingleTags, idtCopyTags, idtDiffTags);
 
   TIniData = (idWorkSpace, idETDirect, idFileLists, idCustomView, idPredefinedTags);
 
@@ -159,6 +164,10 @@ var
   SelRemoveTagList: string;
   SelCopySingleTagList: string;
 
+  DiffTagListName: string;
+  DiffTagList: string;
+  SelDiffTagList: string;
+
 function GetIniFilePath(AllowPrevVer: boolean): string;
 procedure ReadFormSizes(AForm: TScaleForm; DefaultPos: TRect);
 function ReadSingleInstanceApp: boolean;
@@ -196,6 +205,8 @@ const
   SelRemoveTags = 'SelRemoveTags';
   CopySingleTags = 'CopySingleTags';
   SelCopySingleTags = 'SelCopySingleTags';
+  DiffTags = 'DiffTags';
+  SelDiffTags = 'SelDiffTags';
 
   // Check for IniPath commandLine param. See initialization.
   INIPATHSWITCH = 'IniPath';
@@ -448,6 +459,9 @@ begin
     ExcludeCopyTagListName := FMain.MaImportMetaSelected.Caption;
     ExcludeCopyTagList := DefExcludeCopyTags;
     SelExcludeCopyTagList := DefSelExcludeCopyTags;
+
+    PredefinedTagList.AddPair(ExcludeCopyTagListName, DefExcludeCopyTags);
+    SelPredefinedTagList.AddPair(DiffTagListName, DefSelExcludeCopyTags);
   end;
 end;
 
@@ -464,6 +478,9 @@ begin
     RemoveTagListName := FMain.MaRemoveMeta.Caption;
     RemoveTagList := DefRemoveTags;
     SelRemoveTagList := DefSelRemoveTags;
+
+    PredefinedTagList.AddPair(RemoveTagListName, DefRemoveTags);
+    SelPredefinedTagList.AddPair(RemoveTagListName, DefSelRemoveTags);
   end;
 end;
 
@@ -480,6 +497,28 @@ begin
     CopySingleTagListName := FMain.MaImportMetaSingle.Caption;
     CopySingleTagList := DefCopySingleTags;
     SelCopySingleTagList := DefSelCopySingleTags;
+
+    PredefinedTagList.AddPair(CopySingleTagListName, DefCopySingleTags);
+    SelPredefinedTagList.AddPair(CopySingleTagListName, DefSelCopySingleTags);
+  end;
+end;
+
+function ReadDiffTags(GUIini: TMemIniFile): integer;
+begin
+  DiffTagListName := GUIini.ReadString(TagList, DiffTags, '');
+
+  DiffTagList := ReplaceLastChar(PredefinedTagList.Values[DiffTagListName], '<', ' ');
+  SelDiffTagList := ReplaceLastChar(GUIini.ReadString(TagList, SelDiffTags, '<'), '<', ' ');
+
+  result := Length(Trim(DiffTagList));
+  if (result = 0) then
+  begin
+    DiffTagListName := SrCmdVerbDiff;
+    DiffTagList := DefDiffTags;
+    SelDiffTagList := DefSelDiffTags;
+
+    PredefinedTagList.AddPair(DiffTagListName, DefDiffTags);
+    SelPredefinedTagList.AddPair(DiffTagListName, DefSelDiffTags);
   end;
 end;
 
@@ -628,6 +667,12 @@ procedure WriteCopySingleTags(GUIini: TMemIniFile);
 begin
   GUIini.WriteString(TagList, CopySingleTags, CopySingleTagListName);
   WriteTagList(GUIini, SelCopySingleTags, SelCopySingleTagList);
+end;
+
+procedure WriteDiffTags(GUIini: TMemIniFile);
+begin
+  GUIini.WriteString(TagList, DiffTags, DiffTagListName);
+  WriteTagList(GUIini, SelDiffTags, SelDiffTagList);
 end;
 
 procedure ReadMainWindowSizes(const AIniFile: TMemIniFile);
@@ -803,6 +848,9 @@ begin
 
       // -- CopySingleTags & SelCopySingleTags
       ReadCopySingleTags(GUIini);
+
+      // -- Diff
+      ReadDiffTags(GUIini);
 
       // ---GeoCode
       ReadGeoCodeSettings(GUIini);
@@ -995,6 +1043,9 @@ begin
         // -- CopySingleTags & SelCopySingleTags
         WriteCopySingleTags(GUIini);
 
+        // -- Diff
+        WriteDiffTags(GUIini);
+
       end;
 
       WriteGeoCodeSettings(GUIini);
@@ -1058,6 +1109,7 @@ begin
         TIniTagsData.idtRemoveTags:       LoadOK := (ReadRemoveTags(GuiIni) <> 0);
         TIniTagsData.idtCopySingleTags:   LoadOK := (ReadCopySingleTags(GuiIni) <> 0);
         TIniTagsData.idtCopyTags:         LoadOK := (ReadCopyTags(GuiIni) <> 0);
+        TIniTagsData.idtDiffTags:         LoadOK := (ReadDiffTags(GuiIni) <> 0);
       else
         LoadOK := false;
       end;
@@ -1098,7 +1150,8 @@ begin
                                           TIniTagsData.idtMarked,
                                           TIniTagsData.idtRemoveTags,
                                           TIniTagsData.idtCopySingleTags,
-                                          TIniTagsData.idtCopyTags]);
+                                          TIniTagsData.idtCopyTags,
+                                          TIniTagsData.idtDiffTags]);
       end;
       if IniLoaded then
       begin
@@ -1135,6 +1188,7 @@ begin
           TIniTagsData.idtRemoveTags:     WriteRemoveTags(GuiIni);
           TIniTagsData.idtCopySingleTags: WriteCopySingleTags(GuiIni);
           TIniTagsData.idtCopyTags:       WriteCopyTags(GuiIni);
+          TIniTagsData.idtDiffTags:       WriteDiffTags(GuiIni);
         end;
       end;
       GUIini.UpdateFile;

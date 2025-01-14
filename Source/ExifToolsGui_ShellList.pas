@@ -647,6 +647,8 @@ begin
 end;
 
 procedure TShellListView.ExecuteCommandExif(Verb: string; var Handled: boolean);
+var
+  FileList: TStringList;
 begin
 
   if (Verb = SCmdVerbRefresh) then
@@ -665,6 +667,24 @@ begin
   begin
     GenerateThumbs(RootFolder.PathName, true, ThumbNailSize, ShellListOnGenerateReady);
     Handled := true;
+  end;
+
+  if SameText(Verb, SCmdSelLeft) then
+    SelectLeft;
+
+  if SameText(Verb, SCmdVerDiff) then
+  begin
+    if (SelCount <> 2) then
+      ShowCompareDlg('', '')
+    else
+    begin
+      FileList := CreateSelectedFileList(true);
+      try
+        ShowCompareDlg(FileList[0], FileList[1]);
+      finally
+        FileList.Free;
+      end;
+    end;
   end;
 
 end;
@@ -971,9 +991,9 @@ begin
       end;
 
       if (FullPaths) then
-        Result.AddObject(Folders[Index].PathName, Pointer(Folders[Index].RelativeID))
+        Result.AddObject(Folders[Index].PathName, Folders[Index])
       else
-        Result.AddObject(RelFileName(Index), Pointer(Folders[Index].RelativeID));
+        Result.AddObject(RelFileName(Index), Folders[Index]);
     end;
   end;
 
@@ -1099,7 +1119,6 @@ begin
     ColumnSort;
 
     // Get Thumbnails and load in imagelist.
-
     if (FIncludeSubFolders) then
       SendMessage(FrmGenerate.Handle, CM_IconStart, Items.Count, LPARAM(Path));
 
