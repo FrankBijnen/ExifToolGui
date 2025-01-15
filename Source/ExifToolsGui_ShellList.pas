@@ -111,7 +111,6 @@ type
     procedure CMThumbEnd(var Message: TMessage); message CM_ThumbEnd;
     procedure CMThumbError(var Message: TMessage); message CM_ThumbError;
     procedure CMThumbRefresh(var Message: TMessage); message CM_ThumbRefresh;
-    function CreateSelectedFileList(FullPaths: boolean): TStringList;
     procedure RefreshTreeViewAfterContext;
   protected
     procedure MouseDown(Button: TMouseButton; Shift: TShiftState; X, Y: Integer); override;
@@ -153,6 +152,7 @@ type
     function RelFileName(ItemIndex: integer = -1): string;
     function FileExt(ItemIndex: integer = -1): string;
     procedure ColumnClick(Column: TListColumn);
+    function CreateSelectedFoldersList(FullPaths: boolean): TStringList;
     procedure FileNamesToClipboard(Cut: boolean = false);
     procedure PasteFilesFromClipboard;
     procedure PopulateSubDirs(FRelativeFolder: TSubShellFolder);
@@ -607,7 +607,7 @@ procedure TShellListView.FileNamesToClipboard(Cut: boolean = false);
 var
   FileList: TStringList;
 begin
-  FileList := CreateSelectedFileList(true);
+  FileList := CreateSelectedFoldersList(true);
   try
     SetFileNamesOnClipboard(FileList, Cut);
   finally
@@ -678,7 +678,7 @@ begin
       ShowCompareDlg('', '')
     else
     begin
-      FileList := CreateSelectedFileList(true);
+      FileList := CreateSelectedFoldersList(true);
       try
         ShowCompareDlg(FileList[0], FileList[1]);
       finally
@@ -714,7 +714,7 @@ begin
   if (SelectedFolder = nil) then
     exit;
 
-  FileList := CreateSelectedFileList(false);
+  FileList := CreateSelectedFoldersList(false);
   try
     InvokeMultiContextMenu(Self, SelectedFolder, MousePos, ICM2, FileList);
   finally
@@ -967,7 +967,7 @@ begin
   end;
 end;
 
-function TShellListView.CreateSelectedFileList(FullPaths: boolean): TStringList;
+function TShellListView.CreateSelectedFoldersList(FullPaths: boolean): TStringList;
 var
   Index: integer;
   SelectedParent: TShellFolder;

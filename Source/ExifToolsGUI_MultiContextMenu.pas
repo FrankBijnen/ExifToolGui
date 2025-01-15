@@ -30,6 +30,7 @@ type
     procedure CommandCompletedExif(Verb: string; Succeeded: boolean);
   end;
 
+function InvalidMixFoldersAndFiles(FileList: TStrings; var IsFolder: boolean): boolean;
 procedure DoContextMenuVerb(AFolder: TShellFolder; Verb: PAnsiChar);
 procedure InvokeMultiContextMenu(Owner: TWinControl;
                                  AFolder: TShellFolder;
@@ -43,6 +44,30 @@ uses
   UnitLangResources, ExifToolsGui_ShellList;
 
 // Contextmenu supporting multi select
+
+function InvalidMixFoldersAndFiles(FileList: TStrings; var IsFolder: boolean): boolean;
+var
+  Index: integer;
+  SubFolder: TShellFolder;
+begin
+  result := false;
+  IsFolder := false;
+  for Index := 0 to FileList.Count - 1 do
+  begin
+    SubFolder := TShellFolder(FileList.Objects[Index]);
+    if (Index = 0) then
+    begin
+      IsFolder := TSubShellFolder.GetIsFolder(SubFolder);
+      if (IsFolder) and
+         (FileList.Count > 2) then
+        result := true;
+    end
+    else
+      result := result or (IsFolder <> TSubShellFolder.GetIsFolder(SubFolder));
+    if (result) then
+      break;
+  end;
+end;
 
 procedure InvokeMultiContextMenu(Owner: TWinControl;
                                  AFolder: TShellFolder;
@@ -64,7 +89,6 @@ var
   HR: HResult;
   ItemIDListArray: array of PItemIDList;
   Index: integer;
-  SubFolder: TShellFolder;
 
   SelCount: integer;
   IsFolder: boolean;
@@ -88,28 +112,20 @@ begin
     exit;
 
   MixingFolderAndFiles := false;
+  IsFolder := TSubShellFolder.GetIsFolder(AFolder);
   if not Assigned(AFileList) then                 // get the IContextMenu Interface for FilePIDL
   begin
     PIDL := AFolder.RelativeID;
     HR := AFolder.ParentShellFolder.GetUIObjectOf(Owner.Handle, 1, PIDL, IID_IContextMenu, nil, CM);
     SelCount := 1;
-    IsFolder := TSubShellFolder.GetIsFolder(AFolder);
   end
   else
   begin                                           // get the IContextMenu Interface for the file array
     SetLength(ItemIDListArray, AFileList.Count);  // Setup ItemIDListArray.
-    IsFolder := false;
     for Index := 0 to AFileList.Count - 1 do
-    begin
-      SubFolder := TShellFolder(AFileList.Objects[Index]);
-      ItemIDListArray[Index] := SubFolder.RelativeID;
-      if (Index = 0) then
-        IsFolder := TSubShellFolder.GetIsFolder(SubFolder)
-      else
-        MixingFolderAndFiles := MixingFolderAndFiles or
-                                (IsFolder <> TSubShellFolder.GetIsFolder(SubFolder));
-    end;
+      ItemIDListArray[Index] := TShellFolder(AFileList.Objects[Index]).RelativeID;
     SelCount := AFileList.Count;
+    MixingFolderAndFiles := InvalidMixFoldersAndFiles(AFileList, IsFolder);
     HR := AFolder.ParentShellFolder.GetUIObjectOf(Owner.Handle, AFileList.Count, ItemIDListArray[0], IID_IContextMenu, nil, CM);
   end;
   if ((HR <> 0) or

@@ -1296,6 +1296,13 @@ object FMain: TFMain
               item
                 Action = MaJPGGenericlosslessautorotate
                 Caption = '&JPG:  Lossless rotate + crop...'
+              end
+              item
+                Caption = '-'
+              end
+              item
+                Action = MaShowDiff
+                Caption = '&Show diff metadata'
               end>
             Caption = '&Various'
           end
@@ -1641,6 +1648,12 @@ object FMain: TFMain
       Category = 'Program_Predefined'
       Caption = 'Save...'
       OnExecute = MaPredefinedSaveExecute
+    end
+    object MaShowDiff: TAction
+      Category = 'Various'
+      Caption = 'Show diff metadata'
+      OnExecute = MaShowDiffExecute
+      OnUpdate = MaShowDiffUpdate
     end
   end
   object QuickPopUpMenu: TPopupMenu
