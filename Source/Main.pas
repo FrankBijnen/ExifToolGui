@@ -209,6 +209,7 @@ type
     BvlChartFunc: TBevel;
     AdvCheckBox_Legend: TCheckBox;
     MaAPIWindowsLongPath: TAction;
+    MaShowDiff: TAction;
     procedure ShellListClick(Sender: TObject);
     procedure ShellListKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
     procedure SpeedBtnExifClick(Sender: TObject);
@@ -345,6 +346,8 @@ type
     procedure ChartCheckClick(Sender: TObject);
     procedure MaAPIWindowsLongPathExecute(Sender: TObject);
     procedure EditETdirectKeyPress(Sender: TObject; var Key: Char);
+    procedure MaShowDiffExecute(Sender: TObject);
+    procedure MaShowDiffUpdate(Sender: TObject);
   private
     { Private declarations }
     ETBarSeriesFocal: TBarSeries;
@@ -440,7 +443,7 @@ uses System.StrUtils, System.Math, System.Masks, System.Types, System.UITypes,
   MainDef, LogWin, Preferences, EditFFilter, EditFCol, UFrmStyle, UFrmAbout, UFrmCheckVersions,
   QuickMngr, DateTimeShift, DateTimeEqual, CopyMeta, RemoveMeta, Geotag, Geomap, CopyMetaSingle, FileDateTime,
   UFrmGenericExtract, UFrmGenericImport, UFrmLossLessRotate, UFrmGeoTagFiles, UFrmGeoSetup, UFrmGenerate,
-  UnitLangResources;
+  UFrmDiff, UnitLangResources;
 
 {$R *.dfm}
 
@@ -938,16 +941,53 @@ begin
   SaveIniDialog(SaveFileDlg, TIniData.idPredefinedTags, true);
 end;
 
+procedure TFMain.MaShowDiffExecute(Sender: TObject);
+var
+  FileList: TStringList;
+begin
+  if (ShellList.SelCount <> 2) then
+    ShowCompareDlg('', '')
+  else
+  begin
+    FileList := ShellList.CreateSelectedFoldersList(true); // Need also directories
+    try
+      ShowCompareDlg(FileList[0], FileList[1]);
+    finally
+      FileList.Free;
+    end;
+  end;
+end;
+
+procedure TFMain.MaShowDiffUpdate(Sender: TObject);
+var
+  IsFolder: boolean;
+  FileList: TStringList;
+begin
+  case (ShellList.SelCount) of
+    0: TAction(Sender).Enabled := false;
+    1: TAction(Sender).Enabled := true;
+    else
+      begin
+        FileList := ShellList.CreateSelectedFoldersList(true);
+        try
+          TAction(Sender).Enabled := not InvalidMixFoldersAndFiles(FileList, IsFolder);
+        finally
+          FileList.Free;
+        end;
+      end;
+  end;
+end;
+
 procedure TFMain.MetadataListDblClick(Sender: TObject);
 var
-  tx: string;
+  Tx: string;
   IsSep: boolean;
 begin
   if (GUIsettings.DblClickUpdTags = false) then
     exit;
 
-  tx := MetadataList.Keys[MetadataList.Row];
-  IsSep := (length(tx) = 0);
+  Tx := MetadataList.Keys[MetadataList.Row];
+  IsSep := (length(Tx) = 0);
   if (IsSep) then
     exit;
 
