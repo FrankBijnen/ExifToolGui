@@ -172,7 +172,7 @@ end;
 
 function TFrmDiff.GetSelectedFilesOrFolder: string;
 begin
-  result := FMain.GetSelectedFiles;
+  result := FMain.GetSelectedFiles(true);
   if (result = '') and
      (FMain.ShellList.SelCount = 1) then
     result := FMain.ShellList.GetSelectedFolder(-1).PathName + CRLF;
