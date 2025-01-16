@@ -3,7 +3,7 @@ unit UFrmDiff;
 interface
 
 uses
-   System.Classes, System.UITypes, System.ImageList,
+  System.Classes, System.UITypes, System.ImageList,
   Winapi.Windows, Winapi.Messages,
   Vcl.StdCtrls, Vcl.Buttons, Vcl.Controls, Vcl.ExtCtrls, Vcl.BaseImageCollection, Vcl.ImageCollection,
   Vcl.ImgList, Vcl.VirtualImageList, Vcl.Dialogs, Vcl.ComCtrls,
@@ -26,7 +26,7 @@ type
     CmbExt: TComboBox;
     MemoExplain: TMemo;
     GrpOptions: TGroupBox;
-    ChkNoPrintConv: TCheckBox;
+    ChkGroupHeadings: TCheckBox;
     CmbFamily: TComboBox;
     PnlPredefined: TPanel;
     CmbPredefined: TComboBox;
@@ -35,6 +35,7 @@ type
     BtnRemoveLeft: TButton;
     BtnRemoveRight: TButton;
     ChkVerbose: TCheckBox;
+    ChkNoPrintConv: TCheckBox;
     procedure FormShow(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
@@ -45,16 +46,17 @@ type
     procedure CmbPredefinedChange(Sender: TObject);
     procedure CmbExtKeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
     procedure CmbExtClick(Sender: TObject);
-    procedure ChkNoPrintConvClick(Sender: TObject);
+    procedure ChkGroupHeadingsClick(Sender: TObject);
     procedure CmbFamilyChange(Sender: TObject);
     procedure PnlMergeLeftClick(Sender: TObject);
     procedure PnlMergeRightClick(Sender: TObject);
     procedure BtnRemoveRightClick(Sender: TObject);
     procedure BtnRemoveLeftClick(Sender: TObject);
     procedure ChkVerboseClick(Sender: TObject);
+    procedure ChkNoPrintConvClick(Sender: TObject);
   private
     { Private declarations }
-    FolderMode: boolean;
+    RightIsFolder: boolean;
     PathL: TStringList;
     PathR: string;
     function TagSelection: string;
@@ -141,6 +143,11 @@ begin
   RunCompare;
 end;
 
+procedure TFrmDiff.ChkGroupHeadingsClick(Sender: TObject);
+begin
+  RunCompare;
+end;
+
 procedure TFrmDiff.ChkNoPrintConvClick(Sender: TObject);
 begin
   RunCompare;
@@ -181,7 +188,7 @@ end;
 procedure TFrmDiff.SetMatchVisible;
 begin
   GrpMatchRight.Visible := (PathL.Count <> 1) or
-                           (FolderMode);
+                           (RightIsFolder);
   CmbExt.ItemIndex := 0;
 end;
 
@@ -230,7 +237,12 @@ begin
         GroupIndex := LVCompare.Items[Index].GroupID;
         if (GroupIndex > -1) and
            (GroupIndex < LVCompare.Items.Count) then
-          result := LVCompare.Items[GroupIndex].GroupID;
+        begin
+          case (LVCompare.Items[GroupIndex].ImageIndex) of
+            0: result := GroupIndex;
+            1: result := LVCompare.Items[GroupIndex].GroupID;
+          end;
+        end;
       end;
   end;
 end;
@@ -254,11 +266,21 @@ var
     OValue := Copy(Aline, 3);
     result := (OValue[1] <> ' ');
     if result then
-      OTag := Trim(NextField(OValue, ': '))
+    begin
+      if (OValue[1] <> '[') then // -g
+        OTag := Trim(NextField(OValue, ': '))
+      else
+      begin                      // -G
+        SaveValue := NextField(OValue, '[');
+        SaveValue := NextField(OValue, ']');
+        OTag      := Format('%s:%s', [SaveValue, Trim(NextField(OValue, ': '))]);
+      end;
+    end
     else
     begin
       SaveValue := Trim(NextField(OValue, ': '));
       // If the tag and value where not separated by ': ', restore from SaveValue
+      // Bug in ExifTool. Fixed in 13.13
       if (OValue = '') and
          (SaveValue <> '') then
         OValue := SaveValue;
@@ -289,6 +311,7 @@ begin
           ALeft := NextField(ARight, '<');
           ALeft := NextField(ARight, '>');
           CurrentFile := AddItem('File', 0, Trim(ALeft), Trim(ARight));
+          CurrentGroup := CurrentFile;
         end;
       '-': // Tag group
         begin
@@ -297,7 +320,7 @@ begin
           ALeft := NextField(ALeft, ')');
           Tag := ReplaceAll(Tag, ['---- ', ' ----'], ['', '']);
           CurrentGroup := AddItem(Tag, 1, ALeft, '');
-          CurrentItem.GroupID := CurrentFile;
+          CurrentItem.GroupID := CurrentFile; // -G
         end;
       '<': // Left
         begin
@@ -323,19 +346,23 @@ begin
   if (PathL.Count = 0) then
     PathL.Text := GetSelectedFilesOrFolder;
 
+  // We must have a left. (The menu items will normally not allow this)
+  if (PathL.Count = 0) then
+    exit(false);
+
   // Should Right be a folder?
-  FolderMode := (PathL.Count > 0) and
-                (DirectoryExists(PathL[0]));
+  RightIsFolder := (PathL.Count > 2) or
+                   (DirectoryExists(PathL[0]));
 
   // Get Right
-  if (PathL.Count = 1) and
-     (PathR = '') then
+  if (PathR = '') then
   begin
-    PathR := GetSelectedFilesOrFolder;
+    // User navigated to different directory?
+    PathR := FMain.ShellList.Path;
 
-    if (PathR = PathL.Text) then  // Current selection is the same as Left
+    if StartsText(PathR, PathL[0]) then // No Dir is still the same.
     begin
-      if (FolderMode) then
+      if (RightIsFolder) then
         PathR := BrowseFolderDlg(StrSelectRight, Fmain.ShellList.Path)
       else
       with FMain.OpenFileDlg do
@@ -369,13 +396,16 @@ begin
     LVCompare.Items.Clear;
     if (ET.ETWorkingDir = '') then
       ET.StayOpen(FMain.ShellList.Path);
-    ETcmd := '-g' + IntToStr(CmbFamily.ItemIndex) + CRLF + '-s';
+    if (ChkGroupHeadings.Checked) then
+      ETCmd := '-g'
+    else
+      ETCmd := '-G';
+    ETcmd := ETCmd + IntToStr(CmbFamily.ItemIndex);
     if (ChkVerbose.Checked) then
       ETCmd := ETCmd + CRLF + '-v';
     if (ChkNoPrintConv.Checked) then
       ETCmd := ETCmd + CRLF + '-n';
-
-    ETcmd := ETCmd + CRLF + PATHL.Text + TagSelection + '-diff' + CRLF ;
+    ETCmd := ETCmd + CRLF + '-s' + CRLF + PATHL.Text + TagSelection + '-diff' + CRLF ;
 
     if (GrpMatchRight.Visible) then
       ETcmd := ETcmd + Format('%s%s',
@@ -416,7 +446,7 @@ begin
     if (Remove) then
     begin
       ETcmd := TagList;
-      ET.OpenExec(ETcmd, LVCompare.Items[ FileIndex].SubItems[SourceIndex], true);
+      ET.OpenExec(ETcmd, LVCompare.Items[FileIndex].SubItems[SourceIndex], true);
     end
     else
     begin
@@ -453,7 +483,12 @@ begin
           GroupIndex := LVCompare.Items[Index].GroupID;
           if (GroupIndex > -1) and
              (GroupIndex < LVCompare.Items.Count) then
-            Tag := LVCompare.Items[GroupIndex].Caption + ':' + LVCompare.Items[Index].Caption;
+          begin
+            case (LVCompare.Items[GroupIndex].ImageIndex) of
+              0: Tag := LVCompare.Items[Index].Caption;
+              1: Tag := LVCompare.Items[GroupIndex].Caption + ':' + LVCompare.Items[Index].Caption;
+            end;
+          end;
         end;
       end;
       FileIndex := GetMergeFile(Index);
@@ -562,7 +597,7 @@ procedure TFrmDiff.FormClose(Sender: TObject; var Action: TCloseAction);
 begin
   PathL.Clear;
   PathR := '';
-  FolderMode := false;
+  RightIsFolder := false;
   LVCompare.Items.Clear;
 end;
 

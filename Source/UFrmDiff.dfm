@@ -3,8 +3,8 @@ object FrmDiff: TFrmDiff
   Top = 0
   ActiveControl = pnlBottom
   Caption = 'Diff. Compare metadata'
-  ClientHeight = 441
-  ClientWidth = 624
+  ClientHeight = 442
+  ClientWidth = 628
   Color = clBtnFace
   CustomTitleBar.CaptionAlignment = taCenter
   Constraints.MinHeight = 480
@@ -23,13 +23,15 @@ object FrmDiff: TFrmDiff
   TextHeight = 13
   object pnlBottom: TPanel
     Left = 0
-    Top = 412
-    Width = 624
+    Top = 413
+    Width = 628
     Height = 29
     Align = alBottom
     TabOrder = 0
+    ExplicitTop = 412
+    ExplicitWidth = 624
     DesignSize = (
-      624
+      628
       29)
     object BtnClose: TBitBtn
       Left = 532
@@ -40,20 +42,22 @@ object FrmDiff: TFrmDiff
       Kind = bkClose
       NumGlyphs = 2
       TabOrder = 0
+      ExplicitLeft = 528
     end
   end
   object PnlTop: TPanel
     Left = 0
     Top = 0
-    Width = 624
-    Height = 76
+    Width = 628
+    Height = 94
     Align = alTop
     TabOrder = 1
+    ExplicitWidth = 624
     object GrpTagSelection: TGroupBox
       Left = 1
       Top = 1
       Width = 256
-      Height = 74
+      Height = 92
       Align = alLeft
       Caption = 'Tag selection'
       TabOrder = 0
@@ -94,7 +98,7 @@ object FrmDiff: TFrmDiff
         Left = 2
         Top = 40
         Width = 252
-        Height = 32
+        Height = 50
         TabStop = False
         Align = alClient
         Enabled = False
@@ -106,7 +110,7 @@ object FrmDiff: TFrmDiff
       Left = 409
       Top = 1
       Width = 144
-      Height = 74
+      Height = 92
       Align = alLeft
       Caption = 'Matching right file'
       TabOrder = 1
@@ -140,7 +144,7 @@ object FrmDiff: TFrmDiff
         Left = 2
         Top = 36
         Width = 140
-        Height = 36
+        Height = 54
         TabStop = False
         Align = alClient
         Enabled = False
@@ -155,23 +159,25 @@ object FrmDiff: TFrmDiff
       Left = 257
       Top = 1
       Width = 152
-      Height = 74
+      Height = 92
       Align = alLeft
       Caption = 'Options'
       TabOrder = 2
-      object ChkNoPrintConv: TCheckBox
+      object ChkGroupHeadings: TCheckBox
         Left = 2
-        Top = 33
+        Top = 51
         Width = 148
         Height = 18
         Align = alTop
-        Caption = 'No print conversion (-n)'
+        Caption = 'Group headings (-g)'
+        Checked = True
+        State = cbChecked
         TabOrder = 0
-        OnClick = ChkNoPrintConvClick
+        OnClick = ChkGroupHeadingsClick
       end
       object CmbFamily: TComboBox
         Left = 2
-        Top = 51
+        Top = 69
         Width = 148
         Height = 21
         Align = alBottom
@@ -200,13 +206,23 @@ object FrmDiff: TFrmDiff
         TabOrder = 2
         OnClick = ChkVerboseClick
       end
+      object ChkNoPrintConv: TCheckBox
+        Left = 2
+        Top = 33
+        Width = 148
+        Height = 18
+        Align = alTop
+        Caption = 'No print conversion (-n)'
+        TabOrder = 3
+        OnClick = ChkNoPrintConvClick
+      end
     end
   end
   object LVCompare: TListView
     Left = 0
-    Top = 76
-    Width = 624
-    Height = 294
+    Top = 94
+    Width = 628
+    Height = 277
     Align = alClient
     Columns = <
       item
@@ -229,14 +245,18 @@ object FrmDiff: TFrmDiff
     ViewStyle = vsReport
     OnCustomDrawItem = LVCompareCustomDrawItem
     OnResize = LVCompareResize
+    ExplicitWidth = 624
+    ExplicitHeight = 276
   end
   object PnlMerge: TPanel
     Left = 0
-    Top = 370
-    Width = 624
+    Top = 371
+    Width = 628
     Height = 42
     Align = alBottom
     TabOrder = 3
+    ExplicitTop = 370
+    ExplicitWidth = 624
     object PnlMergeTag: TPanel
       Left = 1
       Top = 1
