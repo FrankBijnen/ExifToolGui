@@ -210,6 +210,7 @@ type
     AdvCheckBox_Legend: TCheckBox;
     MaAPIWindowsLongPath: TAction;
     MaShowDiff: TAction;
+    MaSelectDiff: TAction;
     procedure ShellListClick(Sender: TObject);
     procedure ShellListKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
     procedure SpeedBtnExifClick(Sender: TObject);
@@ -347,7 +348,8 @@ type
     procedure MaAPIWindowsLongPathExecute(Sender: TObject);
     procedure EditETdirectKeyPress(Sender: TObject; var Key: Char);
     procedure MaShowDiffExecute(Sender: TObject);
-    procedure MaShowDiffUpdate(Sender: TObject);
+    procedure MaEnableDiff(Sender: TObject);
+    procedure MaSelectDiffExecute(Sender: TObject);
   private
     { Private declarations }
     ETBarSeriesFocal: TBarSeries;
@@ -941,6 +943,23 @@ begin
   SaveIniDialog(SaveFileDlg, TIniData.idPredefinedTags, true);
 end;
 
+procedure TFMain.MaSelectDiffExecute(Sender: TObject);
+var
+  FileList: TStringList;
+begin
+  FileList := ShellList.CreateSelectedFoldersList(true); // Need also directories
+  try
+    if (FileList.Count = 0) then
+      exit;
+    if (TSubShellFolder.GetIsFolder(TshellFolder(FileList.Objects[0]))) then
+      Frmdiff.SelectLeftDir
+    else
+      Frmdiff.SelectLeft;
+  finally
+    FileList.Free;
+  end;
+end;
+
 procedure TFMain.MaShowDiffExecute(Sender: TObject);
 var
   FileList: TStringList;
@@ -958,19 +977,24 @@ begin
   end;
 end;
 
-procedure TFMain.MaShowDiffUpdate(Sender: TObject);
+procedure TFMain.MaEnableDiff(Sender: TObject);
 var
   IsFolder: boolean;
   FileList: TStringList;
+  CurAction: TAction;
 begin
+  CurAction := TAction(Sender);
   case (ShellList.SelCount) of
-    0: TAction(Sender).Enabled := false;
-    1: TAction(Sender).Enabled := true;
+    0: CurAction.Enabled := false;
+    1: CurAction.Enabled := true;
     else
       begin
         FileList := ShellList.CreateSelectedFoldersList(true);
         try
-          TAction(Sender).Enabled := not InvalidMixFoldersAndFiles(FileList, IsFolder);
+          CurAction.Enabled := not InvalidMixFoldersAndFiles(FileList, IsFolder);
+          if (CurAction.Tag <> 0) and // Select left has tag = 1
+             (IsFolder) then
+            CurAction.Enabled := false;
         finally
           FileList.Free;
         end;

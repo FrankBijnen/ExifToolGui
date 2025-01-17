@@ -979,7 +979,6 @@ object FMain: TFMain
     Top = 0
     Width = 940
     Height = 25
-    UseSystemFont = False
     ActionManager = MainActionManager
     Caption = 'ActionMainMenuBar'
     Color = clMenuBar
@@ -988,7 +987,7 @@ object FMain: TFMain
     ColorMap.BtnSelectedFont = clBlack
     ColorMap.UnusedColor = clWhite
     Font.Charset = DEFAULT_CHARSET
-    Font.Color = clBlack
+    Font.Color = clWindowText
     Font.Height = -12
     Font.Name = 'Segoe UI'
     Font.Style = []
@@ -1299,6 +1298,9 @@ object FMain: TFMain
               end
               item
                 Caption = '-'
+              end
+              item
+                Action = MaSelectDiff
               end
               item
                 Action = MaShowDiff
@@ -1649,11 +1651,18 @@ object FMain: TFMain
       Caption = 'Save...'
       OnExecute = MaPredefinedSaveExecute
     end
+    object MaSelectDiff: TAction
+      Tag = 1
+      Category = 'Various'
+      Caption = 'Select left diff'
+      OnExecute = MaSelectDiffExecute
+      OnUpdate = MaEnableDiff
+    end
     object MaShowDiff: TAction
       Category = 'Various'
       Caption = 'Show diff metadata'
       OnExecute = MaShowDiffExecute
-      OnUpdate = MaShowDiffUpdate
+      OnUpdate = MaEnableDiff
     end
   end
   object QuickPopUpMenu: TPopupMenu

@@ -336,6 +336,13 @@ begin
           CurrentItem.SubItems[1] := ARight;
           CurrentItem.GroupID := CurrentGroup;
         end;
+      ' ': // Info/Verbose
+        begin
+          ALeft := ALine;
+          Tag := NextField(ALeft, '(');
+          ALeft := NextField(ALeft, ')');
+          AddItem(Tag, 3, ALeft, '');
+        end;
     end;
   end;
 end;
@@ -351,16 +358,18 @@ begin
     exit(false);
 
   // Should Right be a folder?
-  RightIsFolder := (PathL.Count > 2) or
+  RightIsFolder := (PathL.Count > 1) or
                    (DirectoryExists(PathL[0]));
 
   // Get Right
   if (PathR = '') then
   begin
-    // User navigated to different directory?
-    PathR := FMain.ShellList.Path;
+    if (RightIsFolder) then
+      PathR := FMain.ShellList.Path             // User navigated to different directory?
+    else
+      PathR := FMain.GetFirstSelectedFilePath;  // User selected a different file?
 
-    if StartsText(PathR, PathL[0]) then // No Dir is still the same.
+    if StartsText(PathR, PathL[0]) then         // No, still the same.
     begin
       if (RightIsFolder) then
         PathR := BrowseFolderDlg(StrSelectRight, Fmain.ShellList.Path)
@@ -534,6 +543,7 @@ begin
     PrepareMergeRemove(LeftSource, Remove);
     RunCompare(false);
 
+    // Try to reposition Listview
     if (SavedSelected < LVCompare.Items.Count) then
     begin
       LVCompare.Items[SavedSelected].Selected := true;
