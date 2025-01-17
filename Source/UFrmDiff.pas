@@ -594,14 +594,14 @@ begin
     PathL.Text := APathR
   else
     PathR := APathR;
-  ShowModal;
+  Show;
 end;
 
 procedure TFrmDiff.ShowCompare(const APathL, APathR: string);
 begin
   PathL.Text := APathL;
   PathR := APathR;
-  ShowModal;
+  Show;
 end;
 
 procedure TFrmDiff.FormClose(Sender: TObject; var Action: TCloseAction);
