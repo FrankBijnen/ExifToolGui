@@ -2120,7 +2120,7 @@ begin
      (PathR <> '') then
     FrmDiff.ShowCompare(PathL, PathR)
   else
-    FrmDiff.ShowModal;
+    FrmDiff.Show;
 end;
 
 procedure ShowCompareDlgDir(const PathR: string);
@@ -2128,7 +2128,7 @@ begin
   if (PathR <> '') then
     FrmDiff.ShowCompare(PathR)
   else
-    FrmDiff.ShowModal;
+    FrmDiff.Show;
 end;
 
 procedure LoadResourceList(Resource: string; List: TStringList);
