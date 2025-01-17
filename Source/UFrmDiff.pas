@@ -336,7 +336,8 @@ begin
           CurrentItem.SubItems[1] := ARight;
           CurrentItem.GroupID := CurrentGroup;
         end;
-      ' ': // Info/Verbose
+      ' ',  // Info/Verbose
+      '(':
         begin
           ALeft := ALine;
           Tag := NextField(ALeft, '(');
