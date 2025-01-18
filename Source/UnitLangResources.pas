@@ -15,7 +15,7 @@ resourcestring
   SrCmdVerbGenThumbsSub     = 'Generate Thumbnails (Incl Subdirs)';
   SrCmdSelLeft              = 'Select left diff';
   SrCmdVerbDiff             = 'Show diff metadata';
-  StrSelectRight            = 'Select Right';
+  StrSelectRight            = 'Select right diff';
   StrContextMenuFailed      = 'Context menu failed';
   StrMultipleDirsInContext  = 'Context menu for files from multiple directories not supported';
 

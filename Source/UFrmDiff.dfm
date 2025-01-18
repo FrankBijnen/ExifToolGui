@@ -15,10 +15,12 @@ object FrmDiff: TFrmDiff
   Font.Name = 'Tahoma'
   Font.Style = []
   FormStyle = fsStayOnTop
+  KeyPreview = True
   Position = poOwnerFormCenter
   OnClose = FormClose
   OnCreate = FormCreate
   OnDestroy = FormDestroy
+  OnKeyUp = FormKeyUp
   OnShow = FormShow
   TextHeight = 13
   object pnlBottom: TPanel
@@ -40,6 +42,7 @@ object FrmDiff: TFrmDiff
       Kind = bkClose
       NumGlyphs = 2
       TabOrder = 0
+      TabStop = False
     end
   end
   object PnlTop: TPanel
@@ -105,15 +108,15 @@ object FrmDiff: TFrmDiff
     object GrpMatchRight: TGroupBox
       Left = 409
       Top = 1
-      Width = 144
+      Width = 208
       Height = 92
       Align = alLeft
       Caption = 'Matching right file'
-      TabOrder = 1
+      TabOrder = 2
       object CmbExt: TComboBox
         Left = 2
         Top = 15
-        Width = 140
+        Width = 204
         Height = 21
         Margins.Top = 5
         Align = alTop
@@ -135,11 +138,12 @@ object FrmDiff: TFrmDiff
           '%f.nrw'
           '%f.dng'
           '%f.mp4')
+        ExplicitWidth = 140
       end
       object MemoExplain: TMemo
         Left = 2
         Top = 36
-        Width = 140
+        Width = 204
         Height = 54
         TabStop = False
         Align = alClient
@@ -149,6 +153,7 @@ object FrmDiff: TFrmDiff
           '%e = extension')
         ReadOnly = True
         TabOrder = 1
+        ExplicitWidth = 140
       end
     end
     object GrpOptions: TGroupBox
@@ -158,7 +163,7 @@ object FrmDiff: TFrmDiff
       Height = 92
       Align = alLeft
       Caption = 'Options'
-      TabOrder = 2
+      TabOrder = 1
       object ChkGroupHeadings: TCheckBox
         Left = 2
         Top = 51
@@ -168,7 +173,7 @@ object FrmDiff: TFrmDiff
         Caption = 'Group headings (-g)'
         Checked = True
         State = cbChecked
-        TabOrder = 0
+        TabOrder = 2
         OnClick = ChkGroupHeadingsClick
       end
       object CmbFamily: TComboBox
@@ -178,19 +183,13 @@ object FrmDiff: TFrmDiff
         Height = 21
         Align = alBottom
         ItemIndex = 1
-        TabOrder = 1
+        TabOrder = 3
         Text = '1 - Specific location'
         OnChange = CmbFamilyChange
         Items.Strings = (
           '0 - Information Type'
           '1 - Specific location'
-          '2 - Category'
-          '3 - Document number'
-          '4 - Instance number'
-          '5 - Metadata path'
-          '6 - Exif/Tiff format'
-          '7 - Tag ID'
-          '9 - File number')
+          '2 - Category')
       end
       object ChkVerbose: TCheckBox
         Left = 2
@@ -199,7 +198,7 @@ object FrmDiff: TFrmDiff
         Height = 18
         Align = alTop
         Caption = 'Verbose (-v)'
-        TabOrder = 2
+        TabOrder = 0
         OnClick = ChkVerboseClick
       end
       object ChkNoPrintConv: TCheckBox
@@ -209,7 +208,7 @@ object FrmDiff: TFrmDiff
         Height = 18
         Align = alTop
         Caption = 'No print conversion (-n)'
-        TabOrder = 3
+        TabOrder = 1
         OnClick = ChkNoPrintConvClick
       end
     end
@@ -279,6 +278,7 @@ object FrmDiff: TFrmDiff
         ImageName = 'freepik_diff_remove'
         Images = VirtualImageList
         TabOrder = 0
+        TabStop = False
         OnClick = BtnRemoveLeftClick
       end
     end
@@ -303,6 +303,7 @@ object FrmDiff: TFrmDiff
         ImageName = 'freepik_diff_remove'
         Images = VirtualImageList
         TabOrder = 0
+        TabStop = False
         OnClick = BtnRemoveRightClick
       end
     end
