@@ -54,6 +54,7 @@ type
     procedure BtnRemoveLeftClick(Sender: TObject);
     procedure ChkVerboseClick(Sender: TObject);
     procedure ChkNoPrintConvClick(Sender: TObject);
+    procedure FormKeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
   private
     { Private declarations }
     RightIsFolder: boolean;
@@ -621,6 +622,12 @@ end;
 procedure TFrmDiff.FormDestroy(Sender: TObject);
 begin
   PathL.Free;
+end;
+
+procedure TFrmDiff.FormKeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
+begin
+  if (Key = VK_ESCAPE) then
+    Close;
 end;
 
 procedure TFrmDiff.FormShow(Sender: TObject);
