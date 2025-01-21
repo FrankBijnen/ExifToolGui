@@ -281,7 +281,7 @@ var
     begin
       SaveValue := Trim(NextField(OValue, ': '));
       // If the tag and value where not separated by ': ', restore from SaveValue
-      // Bug in ExifTool. Fixed in 13.13
+      // Fixed in ExifTool 13.13.
       if (OValue = '') and
          (SaveValue <> '') then
         OValue := SaveValue;

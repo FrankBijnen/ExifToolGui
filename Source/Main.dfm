@@ -181,7 +181,7 @@ object FMain: TFMain
         Font.Name = 'Tahoma'
         Font.Style = []
         ParentFont = False
-        TabOrder = 2
+        TabOrder = 0
         object SpeedBtnExif: TSpeedButton
           Left = 1
           Top = 2
@@ -275,7 +275,7 @@ object FMain: TFMain
         Font.Name = 'Tahoma'
         Font.Style = []
         ParentFont = False
-        TabOrder = 1
+        TabOrder = 2
         DesignSize = (
           312
           106)
@@ -310,7 +310,7 @@ object FMain: TFMain
           Font.Name = 'Tahoma'
           Font.Style = []
           ParentFont = False
-          TabOrder = 0
+          TabOrder = 1
           WantReturns = False
           StyleElements = [seFont, seBorder]
           OnEnter = EditQuickEnter
@@ -329,7 +329,7 @@ object FMain: TFMain
           Font.Name = 'Tahoma'
           Font.Style = []
           ParentFont = False
-          TabOrder = 1
+          TabOrder = 0
           StyleElements = [seFont, seBorder]
           OnEnter = EditQuickEnter
           OnExit = EditQuickExit
@@ -354,7 +354,7 @@ object FMain: TFMain
         ParentShowHint = False
         PopupMenu = QuickPopUpMenu
         ShowHint = True
-        TabOrder = 0
+        TabOrder = 1
         TitleCaptions.Strings = (
           'Tag name'
           'Value')
@@ -385,7 +385,7 @@ object FMain: TFMain
         Font.Name = 'Tahoma'
         Font.Style = []
         ParentFont = False
-        TabOrder = 0
+        TabOrder = 1
         object EdgeBrowser1: TEdgeBrowser
           Left = 1
           Top = 1
@@ -415,7 +415,7 @@ object FMain: TFMain
         Font.Name = 'Tahoma'
         Font.Style = []
         ParentFont = False
-        TabOrder = 1
+        TabOrder = 2
         object SpeedBtn_Geotag: TSpeedButton
           AlignWithMargins = True
           Left = 1
@@ -467,7 +467,7 @@ object FMain: TFMain
         Font.Name = 'Tahoma'
         Font.Style = []
         ParentFont = False
-        TabOrder = 2
+        TabOrder = 0
         object SpeedBtn_ShowOnMap: TSpeedButton
           Left = 1
           Top = 2
@@ -631,7 +631,7 @@ object FMain: TFMain
         Font.Name = 'Tahoma'
         Font.Style = []
         ParentFont = False
-        TabOrder = 1
+        TabOrder = 3
         DesignSize = (
           362
           184)
@@ -835,7 +835,7 @@ object FMain: TFMain
         Align = alTop
         BevelOuter = bvNone
         ShowCaption = False
-        TabOrder = 3
+        TabOrder = 1
       end
     end
     object AdvTabChart: TTabSheet
@@ -979,6 +979,7 @@ object FMain: TFMain
     Top = 0
     Width = 940
     Height = 25
+    UseSystemFont = False
     ActionManager = MainActionManager
     Caption = 'ActionMainMenuBar'
     Color = clMenuBar
@@ -987,7 +988,7 @@ object FMain: TFMain
     ColorMap.BtnSelectedFont = clBlack
     ColorMap.UnusedColor = clWhite
     Font.Charset = DEFAULT_CHARSET
-    Font.Color = clWindowText
+    Font.Color = clBlack
     Font.Height = -12
     Font.Name = 'Segoe UI'
     Font.Style = []
@@ -1301,6 +1302,7 @@ object FMain: TFMain
               end
               item
                 Action = MaSelectDiff
+                Caption = 'S&elect left diff'
               end
               item
                 Action = MaShowDiff
