@@ -359,6 +359,7 @@ type
     EdgeZoom: double;
     MinFileListWidth: integer;
     MenusEnabled: boolean;
+    CustomTabStops: array of TWinControl;
     procedure AlignStatusBar;
     procedure ImageDrop(var Msg: TWMDROPFILES); message WM_DROPFILES;
     procedure SetCaption(AnItem: string = '');
@@ -370,7 +371,9 @@ type
     procedure SelectAll;
     procedure EnableMenus(Enable: boolean);
     procedure EnableMenuItems;
-
+    procedure SetupCustomTabStops;
+    function SetCustomTabStop: boolean;
+    procedure CMDialogKey(var AMessage: TCMDialogKey); message CM_DIALOGKEY;
     procedure CMActivateWindow(var Message: TMessage); message CM_ActivateWindow;
     procedure WMEndSession(var Msg: TWMEndSession); message WM_ENDSESSION;
     function TranslateTagName(xMeta, xName: string): string;
@@ -491,6 +494,65 @@ begin // for Windows Shutdown/Log-off while GUI is open
   if Msg.EndSession = true then
     SaveGUIini;
   inherited;
+end;
+
+procedure TFMain.SetupCustomTabStops;
+begin
+  SetLength(CustomTabStops, 0);
+  CustomTabStops := CustomTabStops + [ShellTree];
+  CustomTabStops := CustomTabStops + [ShellList];
+  CustomTabStops := CustomTabStops + [EditETdirect];
+  CustomTabStops := CustomTabStops + [MetadataList];
+  CustomTabStops := CustomTabStops + [EditMapFind];
+end;
+
+function TFMain.SetCustomTabStop: boolean;
+var
+  ShiftPressed: boolean;
+  CurControl: TWinControl;
+  CurStop: integer;
+  NextStop: integer;
+begin
+  result := false;
+
+  CurControl := ActiveControl;
+  ShiftPressed := (GetAsyncKeyState(VK_SHIFT) and $8000) <> 0;
+
+  for CurStop := Low(CustomTabStops) to High(CustomTabStops) do
+  begin
+    if (CustomTabStops[CurStop] = CurControl) then
+    begin
+      NextStop := CurStop;
+      repeat
+        // Prev or Next
+        if (ShiftPressed) then
+          Dec(NextStop)
+        else
+          Inc(NextStop);
+
+        // Check Arrar bounds
+        if (NextStop < Low(CustomTabStops)) then
+          NextStop := High(CustomTabStops);
+        if (NextStop > High(CustomTabStops)) then
+          NextStop := Low(CustomTabStops);
+
+        // Can we focus?
+        if (CustomTabStops[NextStop].CanFocus) then
+        begin
+          CustomTabStops[NextStop].SetFocus;
+          exit(true);
+        end;
+
+      until NextStop = CurStop; // Been round
+    end;
+  end;
+end;
+
+procedure TFMain.CMDialogKey(var AMessage: TCMDialogKey);
+begin
+  if (AMessage.CharCode = VK_TAB) and
+     (SetCustomTabStop) then
+    AMessage.Result := 1;
 end;
 
 procedure TFMain.CMActivateWindow(var Message: TMessage);
@@ -2408,7 +2470,7 @@ end;
 
 procedure TFMain.ShowPreview;
 var
-{$IFDEF DEBUG}
+{$IFDEF DEBUG_META}
   MetaData: TMetaData;
   Tag: string;
 {$ENDIF}
@@ -2440,7 +2502,7 @@ begin
           8:
             Rotate := 270;
         end;
- {$IFDEF DEBUG}
+ {$IFDEF DEBUG_META}
         MetaData := TMetaData.Create;
         try
           MetaData.ReadMeta(FPath, [gmXMP, gmGPS]);
@@ -2785,6 +2847,8 @@ begin
   SetColorsFromStyle;
 
   TStyleManager.TrySetStyle(GUIsettings.GuiStyle, false);
+  // Custom TabStops
+  SetupCustomTabStops;
 
   // EdgeBrowser
   EdgeBrowser1.UserDataFolder := GetEdgeUserData;
@@ -2830,6 +2894,37 @@ begin
         ShellListKeyDown(Sender, Key, Shift);
         Key := 0;
       end;
+      Ord('D'): //Focus Dir ShellTree
+      begin
+        ShellTree.SetFocus;
+        Key := 0;
+      end;
+      Ord('L'): //Focus Filelist ShellList
+      begin
+        AdvPageFilelist.ActivePage := AdvTabFilelist;
+        ShellList.SetFocus;
+        Key := 0;
+      end;
+      Ord('W'):  //Focus Workspace
+      begin
+        SpeedBtnQuick.Down := true;
+        SpeedBtnExifClick(SpeedBtnQuick);
+        MetadataList.SetFocus;
+        if (MetadataList.RowCount > 1) then
+          MetadataList.Row := 2;
+        Key := 0;
+      end;
+      Ord('T'): //Focus ExifTool Direct
+      begin
+        SpeedBtn_ETdirect.Down := not SpeedBtn_ETdirect.Down;
+        SpeedBtn_ETedit.Down := false;
+        SpeedBtn_ETdirectClick(SpeedBtn_ETdirect);
+        Key := 0;
+      end;
+      // datetime shift = ALT/M, E
+      // datetime equalize = ALT/M, X
+      // remove metadata = ALT/M, R
+      // file date created = ALT/V, F
     end;
   end;
 end;
@@ -2963,6 +3058,10 @@ begin
   SetColorsFromStyle;
   ShellListSetFolders;
   ShellList.Enabled := true;
+
+  // ET direct
+  SpeedBtn_ETdirect.Down := false;
+  SpeedBtn_ETdirectClick(SpeedBtn_ETdirect);
 
   // GUI started as "Send to" or "Open with":
   if ParamCount > 0 then
@@ -3848,12 +3947,14 @@ begin
     else
       H := 105;
     AdvPanelETdirect.Height := ScaleDesignDpi(H);
+    EditETdirect.Enabled := true;
     EditETdirect.SetFocus;
   end
   else
   begin
     AdvPanelETdirect.Height := ScaleDesignDpi(32);
     ShellList.SetFocus;
+    EditETdirect.Enabled := false;
   end;
 end;
 

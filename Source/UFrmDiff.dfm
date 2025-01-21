@@ -138,7 +138,6 @@ object FrmDiff: TFrmDiff
           '%f.nrw'
           '%f.dng'
           '%f.mp4')
-        ExplicitWidth = 140
       end
       object MemoExplain: TMemo
         Left = 2
@@ -153,7 +152,6 @@ object FrmDiff: TFrmDiff
           '%e = extension')
         ReadOnly = True
         TabOrder = 1
-        ExplicitWidth = 140
       end
     end
     object GrpOptions: TGroupBox
