@@ -1224,6 +1224,9 @@ begin
 
   FPopulating := false;
   DoubleBuffered := true;
+{$IFNDEF VER350}
+  DoubleBufferedMode := TDoubleBufferedMode.dbmRequested;
+{$ENDIF}
   StyleElements := [seFont, seBorder];
   FThumbNailSize := 0;
   FGenerating := 0;

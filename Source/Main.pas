@@ -2470,7 +2470,7 @@ end;
 
 procedure TFMain.ShowPreview;
 var
-{$IFDEF DEBUG}
+{$IFDEF DEBUG_META}
   MetaData: TMetaData;
   Tag: string;
 {$ENDIF}
@@ -2502,7 +2502,7 @@ begin
           8:
             Rotate := 270;
         end;
- {$IFDEF DEBUG}
+ {$IFDEF DEBUG_META}
         MetaData := TMetaData.Create;
         try
           MetaData.ReadMeta(FPath, [gmXMP, gmGPS]);
