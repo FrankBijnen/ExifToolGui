@@ -27,7 +27,7 @@ type
     CheckBox2: TCheckBox;
     CheckBox3: TCheckBox;
     AdvTabOther: TTabSheet;
-    CheckBox4: TCheckBox;
+    ChkWorkNextLine: TCheckBox;
     RgETOverride: TRadioGroup;
     EdETOverride: TEdit;
     BtnETOverride: TButton;
@@ -39,7 +39,7 @@ type
     BtnClean: TBitBtn;
     GpxCleanThumbNails: TGroupBox;
     BtnGenThumbs: TBitBtn;
-    CheckBox5: TCheckBox;
+    ChkWorkAddRem: TCheckBox;
     GrpGeoCode: TGroupBox;
     EdGeoCodeUrl: TLabeledEdit;
     UpdThrottleGeoCode: TUpDown;
@@ -54,13 +54,13 @@ type
     Label4: TLabel;
     UpdThrottleOverpass: TUpDown;
     EdOverPassUrl: TLabeledEdit;
-    CheckBox6: TCheckBox;
+    ChkFileListFolders: TCheckBox;
     Label5: TLabel;
     HintPause: TEdit;
     UpDHintPause: TUpDown;
-    CheckBox7: TCheckBox;
+    ChkFileListBreadCrumb: TCheckBox;
     EdGeoCodeApiKey: TLabeledEdit;
-    CheckBox8: TCheckBox;
+    ChkFileListHidden: TCheckBox;
     AdvTabIntegration: TTabSheet;
     CheckBox9: TCheckBox;
     GrpContextMenu: TGroupBox;
@@ -77,6 +77,7 @@ type
     GrpExifTool: TGroupBox;
     EdGeoLocation500Dir: TEdit;
     BtnGeoLocation500Dir: TButton;
+    ChkWorkLineEdit: TCheckBox;
     procedure FormShow(Sender: TObject);
     procedure BtnSaveClick(Sender: TObject);
     procedure BtnBrowseFolder(Sender: TObject);
@@ -145,11 +146,12 @@ begin
 
   GUIsettings.EnableGMap := CheckBox2.Checked;
   GUIsettings.UseExitDetails := CheckBox3.Checked;
-  GUIsettings.AutoIncLine := CheckBox4.Checked;
-  GUIsettings.DblClickUpdTags := CheckBox5.Checked;
-  GUIsettings.ShowFolders := CheckBox6.Checked;
-  GUIsettings.ShowHidden := CheckBox8.Checked;
-  GUIsettings.ShowBreadCrumb := CheckBox7.Checked;
+  GUIsettings.AutoIncLine := ChkWorkNextLine.Checked;
+  GUIsettings.DblClickUpdTags := ChkWorkAddRem.Checked;
+  GUIsettings.EditLine := ChkWorkLineEdit.Checked;
+  GUIsettings.ShowFolders := ChkFileListFolders.Checked;
+  GUIsettings.ShowHidden := ChkFileListHidden.Checked;
+  GUIsettings.ShowBreadCrumb := ChkFileListBreadCrumb.Checked;
   GUIsettings.MinimizeToTray := CheckBox9.Checked;
   GUIsettings.SingleInstanceApp := CheckBox10.Checked;
   Application.HintHidePause := UpDHintPause.Position;
@@ -326,12 +328,13 @@ begin
 
   CheckBox2.Checked := GUIsettings.EnableGMap;
   CheckBox3.Checked := GUIsettings.UseExitDetails;
-  CheckBox4.Checked := GUIsettings.AutoIncLine;
-  CheckBox5.Checked := GUIsettings.DblClickUpdTags;
-  CheckBox6.Checked := GUIsettings.ShowFolders;
-  CheckBox8.Checked := GUIsettings.ShowHidden;
-  CheckBox8.Enabled := IsAdminUser or IsElevated;
-  CheckBox7.Checked := GUIsettings.ShowBreadCrumb;
+  ChkWorkNextLine.Checked := GUIsettings.AutoIncLine;
+  ChkWorkAddRem.Checked := GUIsettings.DblClickUpdTags;
+  ChkWorkLineEdit.Checked := GUIsettings.EditLine;
+  ChkFileListFolders.Checked := GUIsettings.ShowFolders;
+  ChkFileListHidden.Checked := GUIsettings.ShowHidden;
+  ChkFileListHidden.Enabled := IsAdminUser or IsElevated;
+  ChkFileListBreadCrumb.Checked := GUIsettings.ShowBreadCrumb;
   CheckBox9.Checked := GUIsettings.MinimizeToTray;
   CheckBox10.Checked := GUIsettings.SingleInstanceApp;
   UpDHintPause.Position := Application.HintHidePause;

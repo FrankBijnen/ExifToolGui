@@ -38,7 +38,7 @@ object FPreferences: TFPreferences
     Top = 0
     Width = 606
     Height = 413
-    ActivePage = AdvTabGeneral
+    ActivePage = AdvTabOther
     Align = alLeft
     DoubleBuffered = True
     ParentDoubleBuffered = False
@@ -842,7 +842,7 @@ object FPreferences: TFPreferences
       Caption = 'Other'
       object Label5: TLabel
         Left = 103
-        Top = 258
+        Top = 279
         Width = 478
         Height = 13
         AutoSize = False
@@ -850,7 +850,7 @@ object FPreferences: TFPreferences
       end
       object RgETOverride: TRadioGroup
         Left = 16
-        Top = 62
+        Top = 81
         Width = 562
         Height = 73
         Caption = 'ExifTool.exe location'
@@ -861,9 +861,9 @@ object FPreferences: TFPreferences
         TabOrder = 2
         OnClick = RadioGroupClick
       end
-      object CheckBox4: TCheckBox
+      object ChkWorkNextLine: TCheckBox
         Left = 16
-        Top = 16
+        Top = 15
         Width = 556
         Height = 17
         Caption = '-Workspace: Move focus to next tag/line after value is entered'
@@ -871,31 +871,31 @@ object FPreferences: TFPreferences
       end
       object EdETOverride: TEdit
         Left = 157
-        Top = 105
+        Top = 124
         Width = 349
         Height = 21
         TabOrder = 3
       end
       object BtnETOverride: TButton
         Left = 514
-        Top = 105
+        Top = 124
         Width = 28
         Height = 22
         Caption = '...'
         TabOrder = 4
         OnClick = BtnBrowseFolder
       end
-      object CheckBox5: TCheckBox
+      object ChkWorkAddRem: TCheckBox
         Left = 16
-        Top = 39
+        Top = 37
         Width = 556
         Height = 17
         Caption = '-Workspace: Double Click adds/removes tags'
         TabOrder = 1
       end
-      object CheckBox6: TCheckBox
+      object ChkFileListFolders: TCheckBox
         Left = 16
-        Top = 182
+        Top = 203
         Width = 565
         Height = 17
         Caption = '-File list: Show Folders in File list'
@@ -903,7 +903,7 @@ object FPreferences: TFPreferences
       end
       object HintPause: TEdit
         Left = 16
-        Top = 255
+        Top = 276
         Width = 66
         Height = 21
         TabOrder = 8
@@ -911,7 +911,7 @@ object FPreferences: TFPreferences
       end
       object UpDHintPause: TUpDown
         Left = 82
-        Top = 255
+        Top = 276
         Width = 16
         Height = 21
         Associate = HintPause
@@ -919,17 +919,17 @@ object FPreferences: TFPreferences
         Increment = 10
         TabOrder = 9
       end
-      object CheckBox7: TCheckBox
+      object ChkFileListBreadCrumb: TCheckBox
         Left = 16
-        Top = 229
+        Top = 250
         Width = 565
         Height = 17
         Caption = '-File list: Show Breadcrumb (Address Bar) in File list'
         TabOrder = 7
       end
-      object CheckBox8: TCheckBox
+      object ChkFileListHidden: TCheckBox
         Left = 16
-        Top = 205
+        Top = 226
         Width = 565
         Height = 17
         Caption = 
@@ -939,27 +939,35 @@ object FPreferences: TFPreferences
       end
       object GrpConfig: TGroupBox
         Left = 16
-        Top = 136
+        Top = 156
         Width = 562
-        Height = 42
+        Height = 44
         Caption = 'Exiftool config (-config CFGFILE)'
         TabOrder = 10
         object EdETCustomConfig: TEdit
           Left = 141
-          Top = 15
+          Top = 16
           Width = 349
           Height = 21
           TabOrder = 0
         end
         object BtnEtCustomConfig: TButton
           Left = 498
-          Top = 15
+          Top = 16
           Width = 28
           Height = 22
           Caption = '...'
           TabOrder = 1
           OnClick = BtnBrowseFolder
         end
+      end
+      object ChkWorkLineEdit: TCheckBox
+        Left = 16
+        Top = 59
+        Width = 556
+        Height = 17
+        Caption = '-Workspace: Enable line editing'
+        TabOrder = 11
       end
     end
   end
