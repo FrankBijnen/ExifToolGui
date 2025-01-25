@@ -316,6 +316,7 @@ object FMain: TFMain
           OnEnter = EditQuickEnter
           OnExit = EditQuickExit
           OnKeyDown = EditQuickKeyDown
+          OnKeyPress = EditQuickKeyPress
         end
         object EditQuick: TEdit
           Left = 48
@@ -334,6 +335,7 @@ object FMain: TFMain
           OnEnter = EditQuickEnter
           OnExit = EditQuickExit
           OnKeyDown = EditQuickKeyDown
+          OnKeyPress = EditQuickKeyPress
         end
       end
       object MetadataList: TValueListEditor

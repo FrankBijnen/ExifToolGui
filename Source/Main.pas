@@ -352,6 +352,7 @@ type
     procedure CBoxETdirectKeyPress(Sender: TObject; var Key: Char);
     procedure MetadataListStringsChange(Sender: TObject);
     procedure MetadataListMouseUp(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
+    procedure EditQuickKeyPress(Sender: TObject; var Key: Char);
   private
     { Private declarations }
     ETBarSeriesFocal: TBarSeries;
@@ -2534,6 +2535,12 @@ begin
     end;
     MetadataList.SetFocus;
   end;
+end;
+
+procedure TFMain.EditQuickKeyPress(Sender: TObject; var Key: Char);
+begin
+  if (Key = #13) then
+    Key := #0;
 end;
 
 procedure TFMain.ShowPreview;
