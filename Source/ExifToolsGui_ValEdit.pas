@@ -5,9 +5,20 @@ unit ExifToolsGui_ValEdit;
 
 interface
 
-uses System.Classes, Winapi.Messages, Vcl.ValEdit, Vcl.Controls;
+uses
+  System.Classes, Winapi.Messages, Vcl.ValEdit, Vcl.Controls, Vcl.Grids;
 
 type
+  TValueListEditor = class;
+
+  TETGuiInplaceEdit = class(Vcl.Grids.TInplaceEdit)
+  private
+    procedure OwnerPoint(var X, Y: integer);
+    function ValueListEditor: TValueListEditor;
+  protected
+    procedure MouseDown(Button: TMouseButton; Shift: TShiftState; X, Y: integer); override;
+    procedure KeyDown(var Key: Word; Shift: TShiftState); override;
+  end;
 
   TValueListEditor = class(Vcl.ValEdit.TValueListEditor)
   private
@@ -15,7 +26,9 @@ type
     FDataRows: integer;
     FRowsPossible: integer;
     FOnCtrlKeyDown: TkeyEvent;
+    FInplaceEdit: TETGuiInplaceEdit;
   protected
+    function CreateEditor: TInplaceEdit; override;
     procedure KeyDown(var Key: Word; Shift: TShiftState); override;
     function GetRowsPossible: integer;
     procedure SetProportionalVScroll(Value: boolean);
@@ -28,19 +41,64 @@ type
     constructor Create(AOwner: TComponent); override;
     property OnCtrlKeyDown: TkeyEvent read FOnCtrlKeyDown write FOnCtrlKeyDown;
     property ProportionalVScroll: boolean read FProportionalVScroll write SetProportionalVScroll default false;
+    property FixedRows;
   end;
 
 implementation
 
-uses Winapi.Windows, System.UITypes, Vcl.Grids;
+uses
+  System.UITypes, Winapi.Windows;
+
+procedure TETGuiInplaceEdit.OwnerPoint(var X, Y: integer);
+var
+  Pt: TPoint;
+begin
+  Pt := Self.ClientToScreen(Point(X, Y));
+  Pt := Grid.ScreenToClient(Pt);
+  X := Pt.X;
+  Y := Pt.Y;
+end;
+
+function TETGuiInplaceEdit.ValueListEditor: TValueListEditor;
+begin
+  result := TValueListEditor(Grid);
+end;
+
+procedure TETGuiInplaceEdit.KeyDown(var Key: Word; Shift: TShiftState);
+begin
+  if (Shift = [ssCtrl]) then
+    ValueListEditor.KeyDown(Key, Shift);
+
+  inherited KeyDown(Key, Shift);
+end;
+
+procedure TETGuiInplaceEdit.MouseDown(Button: TMouseButton; Shift: TShiftState; X, Y: integer);
+begin
+  if (Button = TMouseButton.mbRight) then
+  begin
+    OwnerPoint(X, Y);
+    ValueListEditor.MouseDown(Button, Shift, X, Y);
+  end;
+
+  inherited MouseDown(Button, Shift, X, Y);
+end;
 
 constructor TValueListEditor.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
 
+{$IFNDEF VER350}
+  DoubleBufferedMode := TDoubleBufferedMode.dbmRequested;
+{$ENDIF}
   FProportionalVScroll := false;
   FDataRows := 0;
   FRowsPossible := 0;
+end;
+
+function TValueListEditor.CreateEditor: TInplaceEdit;
+begin
+  FInplaceEdit := TETGuiInplaceEdit.Create(Self);
+  result := FInplaceEdit;
 end;
 
 procedure TValueListEditor.KeyDown(var Key: Word; Shift: TShiftState);

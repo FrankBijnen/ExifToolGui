@@ -44,7 +44,7 @@ type
   TOnBreadcrumbBarGetText = procedure(Sender: TObject; var Text: string) of object;
   TCustomBreadcrumbBar = class;
 
-  TPopupMenu = class(Vcl.Menus.TPopupMenu)
+  TBreadCrumbPopupMenu = class(Vcl.Menus.TPopupMenu)
   private
     FOnClose: TNotifyEvent;
   public
@@ -122,7 +122,7 @@ type
     FEdit: TEdit;
     FOnBreadcrumbBarGetText: TOnBreadcrumbBarGetText;
     FCrumbDown: Integer;
-    FBarPopup: TPopupMenu;
+    FBarPopup: TBreadCrumbPopupMenu;
     FHome: string;
     FStyleServices: TCustomStyleServices;
     FStyle: string;
@@ -275,7 +275,7 @@ begin
   FEdit.OnKeyPress := EditKeyPress;
   FEdit.OnExit := EditExit;
   FEditable := true;
-  FBarPopup := TPopupMenu.Create(Self);
+  FBarPopup := TBreadCrumbPopupMenu.Create(Self);
   MenuItem := TMenuItem.Create(FBarPopup);
   MenuItem.Caption := SCopyText;
   MenuItem.OnClick := CopyTextClick;
@@ -870,14 +870,15 @@ end;
 
 { TPopupMenu }
 
-procedure TPopupMenu.Popup(X, Y: Integer);
+procedure TBreadCrumbPopupMenu.Popup(X, Y: Integer);
 begin
   inherited;
+
   if Assigned(FOnClose) then
     FOnClose(Self);
 end;
 
-procedure TPopupMenu.PopupAtPoint(Point: TPoint);
+procedure TBreadCrumbPopupMenu.PopupAtPoint(Point: TPoint);
 begin
   with Point do Popup(X, Y);
 end;

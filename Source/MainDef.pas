@@ -100,6 +100,7 @@ type
     FilterStartup: integer;
     FilterSel: integer;
     AutoIncLine: boolean;
+    EditLine: boolean;
     DblClickUpdTags: boolean;
     EnableGMap: boolean;
     DefGMapHome: string[23];
@@ -775,6 +776,7 @@ begin
           FMain.ShellList.ViewStyle := TViewStyle.vsReport;
         end;
         AutoIncLine := ReadBool(Ini_Settings, 'AutoIncLine', True);
+        EditLine := ReadBool(Ini_Settings, 'EditLine', False);
         DblClickUpdTags := ReadBool(Ini_Settings, 'DblClickUpdTags', False);
         ETdirDefCmd := ReadInteger(Ini_Settings, 'ETdirDefCmd', -1);
         ETdirMode := ReadInteger(Ini_Settings, 'ETdirMode', 0);
@@ -985,6 +987,7 @@ begin
           WriteInteger(Ini_Settings, 'DetailsSel', DetailsSel);
           WriteInteger(Ini_Settings, 'ViewStyle', Ord(Fmain.ShellList.ViewStyle));
           WriteBool(Ini_Settings, 'AutoIncLine', AutoIncLine);
+          WriteBool(Ini_Settings, 'EditLine', EditLine);
           WriteBool(Ini_Settings, 'DblClickUpdTags', DblClickUpdTags);
           WriteInteger(Ini_Settings, 'ETdirDefCmd', ETdirDefCmd);
           WriteInteger(Ini_Settings, 'ETdirMode', ETdirMode);

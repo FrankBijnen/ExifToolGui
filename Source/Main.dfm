@@ -349,7 +349,6 @@ object FMain: TFMain
         Font.Height = -12
         Font.Name = 'Segoe UI'
         Font.Style = []
-        Options = [goFixedVertLine, goFixedHorzLine, goVertLine, goHorzLine, goColSizing, goRowSelect, goThumbTracking]
         ParentFont = False
         ParentShowHint = False
         PopupMenu = QuickPopUpMenu
@@ -364,7 +363,9 @@ object FMain: TFMain
         OnKeyDown = MetadataListKeyDown
         OnMouseDown = MetadataListMouseDown
         OnMouseMove = MetadataListMouseMove
+        OnMouseUp = MetadataListMouseUp
         OnSelectCell = MetadataListSelectCell
+        OnStringsChange = MetadataListStringsChange
         ColWidths = (
           150
           160)
@@ -772,6 +773,8 @@ object FMain: TFMain
           DropDownCount = 16
           TabOrder = 1
           OnChange = CBoxETdirectChange
+          OnCloseUp = CBoxETdirectCloseUp
+          OnKeyPress = CBoxETdirectKeyPress
         end
         object EditETcmdName: TLabeledEdit
           Left = 1

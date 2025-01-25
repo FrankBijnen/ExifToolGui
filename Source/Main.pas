@@ -340,8 +340,6 @@ type
     procedure Csv1Click(Sender: TObject);
     procedure SpbRecordClick(Sender: TObject);
     procedure Json1Click(Sender: TObject);
-    procedure Selectall1Click(Sender: TObject);
-    procedure Selectnone1Click(Sender: TObject);
     procedure Selectall2Click(Sender: TObject);
     procedure Selectnone2Click(Sender: TObject);
     procedure ChartCheckClick(Sender: TObject);
@@ -350,6 +348,10 @@ type
     procedure MaShowDiffExecute(Sender: TObject);
     procedure MaEnableDiff(Sender: TObject);
     procedure MaSelectDiffExecute(Sender: TObject);
+    procedure CBoxETdirectCloseUp(Sender: TObject);
+    procedure CBoxETdirectKeyPress(Sender: TObject; var Key: Char);
+    procedure MetadataListStringsChange(Sender: TObject);
+    procedure MetadataListMouseUp(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
   private
     { Private declarations }
     ETBarSeriesFocal: TBarSeries;
@@ -363,6 +365,9 @@ type
     procedure AlignStatusBar;
     procedure ImageDrop(var Msg: TWMDROPFILES); message WM_DROPFILES;
     procedure SetCaption(AnItem: string = '');
+    procedure AutoIncLine(const LineNum: integer);
+    procedure MarkLineModified(const LineNum: integer);
+    procedure SetGridEditor(const Enable: boolean);
     procedure ShowMetadata;
     procedure ShowPreview;
     procedure RestoreGUI;
@@ -502,6 +507,7 @@ begin
   CustomTabStops := CustomTabStops + [ShellTree];
   CustomTabStops := CustomTabStops + [ShellList];
   CustomTabStops := CustomTabStops + [EditETdirect];
+  CustomTabStops := CustomTabStops + [CBoxETdirect];
   CustomTabStops := CustomTabStops + [MetadataList];
   CustomTabStops := CustomTabStops + [EditMapFind];
 end;
@@ -657,7 +663,7 @@ end;
 
 procedure TFMain.BtnETdirectAddClick(Sender: TObject);
 begin
-  EditETdirect.Text := trim(EditETdirect.Text);
+  EditETdirect.Text := Trim(EditETdirect.Text);
   ETdirectCmdList.Append(EditETdirect.Text); // store command
   EditETcmdName.Text := trim(EditETcmdName.Text);
   CBoxETdirect.ItemIndex := CBoxETdirect.Items.Add(EditETcmdName.Text);
@@ -685,9 +691,9 @@ var
 begin
   Indx := CBoxETdirect.ItemIndex;
   CBoxETdirect.ItemIndex := -1;
-  EditETdirect.Text := trim(EditETdirect.Text);
+  EditETdirect.Text := Trim(EditETdirect.Text);
   ETdirectCmdList[Indx] := EditETdirect.Text;
-  EditETcmdName.Text := trim(EditETcmdName.Text);
+  EditETcmdName.Text := Trim(EditETcmdName.Text);
   CBoxETdirect.Items[Indx] := EditETcmdName.Text;
   CBoxETdirect.ItemIndex := Indx;
   CBoxETdirectChange(Sender);
@@ -1173,13 +1179,27 @@ procedure TFMain.MetadataListKeyDown(Sender: TObject; var Key: Word; Shift: TShi
 var
   I: integer;
 begin
-  I := MetadataList.Row;
-  if (Key = VK_Return) and SpeedBtnQuick.Down and not(QuickTags[I - 1].NoEdit) then
+  I := MetadataList.Row +1;
+  if (Key = VK_Return) and
+     (SpeedBtnQuick.Down) then
   begin
-    if SpeedBtnLarge.Down then
-      MemoQuick.SetFocus
+    if not (goRowSelect in MetadataList.Options) then
+    begin
+      AutoIncLine(I);
+      MetadataList.EditorMode := true;
+    end
     else
-      EditQuick.SetFocus;
+    begin
+      if (QuickTags[I -1].NoEdit) then
+        AutoIncLine(I)
+      else
+      begin
+        if SpeedBtnLarge.Down then
+          MemoQuick.SetFocus
+        else
+          EditQuick.SetFocus;
+      end;
+    end;
   end;
 end;
 
@@ -1217,13 +1237,11 @@ procedure TFMain.MetadataListCtrlKeyDown(Sender: TObject; var Key: Word; Shift: 
       New := Old + 1
     else
       New := Old - 1;
-    if (New < 0) then
-      New := 0;
     if not CheckIndex(New) then
       exit;
 
     // Select only the item, and make that visible
-    ShellList.Refresh;
+    ShellList.ClearSelection;
     ShellList.Items[New].Selected := true;
     ShellList.Items[New].MakeVisible(false);
 
@@ -1242,6 +1260,10 @@ begin
       Clipboard.AsText := MetadataList.Cells[1, MetadataList.Row];
     Ord('S'):
       BtnQuickSaveClick(Sender);
+    VK_HOME:
+      MetadataList.Row := MetadataList.FixedRows;
+    VK_END:
+      MetadataList.Row := MetadataList.RowCount -1;
     VK_UP, VK_DOWN:
       begin
         SelectPrevNext(Key = VK_DOWN);
@@ -1254,12 +1276,20 @@ procedure TFMain.MetadataListMouseDown(Sender: TObject; Button: TMouseButton; Sh
 var
   XCol, XRow: integer;
 begin
-  if Button = mbRight then
-    with MetadataList do
-    begin
-      MouseToCell(X, Y, XCol, XRow);
-      Row := XRow;
-    end;
+  if Button <> mbRight then
+    exit;
+
+  SetGridEditor(false);
+  MetadataList.MouseToCell(X, Y, XCol, XRow); //Right Click selects cell
+  MetadataList.Row := XRow;
+end;
+
+procedure TFMain.MetadataListMouseUp(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
+begin
+  if Button <> mbRight then
+    exit;
+
+  SetGridEditor(SpeedBtnQuick.Down);
 end;
 
 procedure TFMain.MetadataListMouseMove(Sender: TObject; Shift: TShiftState; X, Y: Integer);
@@ -1281,9 +1311,9 @@ begin
 end;
 
 procedure TFMain.MetadataListSelectCell(Sender: TObject; ACol, ARow: integer; var CanSelect: boolean);
-var EditText: string;
+var
+  EditText: string;
 begin
-
   EditQuick.Text := '';
   MemoQuick.Text := '';
   if (ARow - 1 > High(QuickTags)) then
@@ -1299,6 +1329,18 @@ begin
       MemoQuick.Text := EditText
     else
       EditQuick.Text := EditText;
+
+    StatusBar.Panels[2].Text := QuickTags[ARow - 1].Help;
+  end;
+end;
+
+procedure TFMain.MetadataListStringsChange(Sender: TObject);
+begin
+  if (MetadataList.Tag <> -1) and
+     not (goRowSelect in MetadataList.Options) then
+  begin
+    MarkLineModified(MetadataList.Row);
+    SpeedBtnQuickSave.Enabled := true;
   end;
 end;
 
@@ -1637,6 +1679,7 @@ begin
   begin
     ET.OpenExit(true); // Force restart of ExifTool. CustomConfig could have changed
     EnableMenus(ET.StayOpen(ShellList.Path)); // Recheck Exiftool.exe.
+    SetGridEditor(SpeedBtnQuick.Down);
     ShellListSetFolders;
     ShellList.Refresh;
     ShowMetadata;
@@ -2429,40 +2472,65 @@ begin
   StatusBar.Panels[2].Text := '';
 end;
 
-procedure TFMain.EditQuickKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
+procedure TFMain.AutoIncLine(const LineNum: integer);
 var
-  Indx: integer;
+  Index: integer;
+begin
+  Index := LineNum;
+  if (Index > MetadataList.RowCount - 1) then
+    Index := MetadataList.RowCount - 1;
+  try
+    if (GUIsettings.AutoIncLine = false) then
+      exit;
+    while (Index < MetadataList.RowCount - 1) and
+          (QuickTags[Index - 1].NoEdit) do
+      Inc(Index);
+  finally
+    MetadataList.Col := 1;
+    MetadataList.Row := Index;
+  end;
+end;
+
+procedure TFMain.MarkLineModified(const LineNum: integer);
+var
   Tx: string;
 begin
-  Indx := MetadataList.Row;
+  Tx := MetadataList.Keys[LineNum];
+  if (TX <> '') and
+     (Tx[1] <> '*') then
+    MetadataList.Keys[LineNum] := '*' + Tx; // mark tag value changed
+end;
 
-  if (Key = VK_Return) and
-      not(QuickTags[Indx - 1].NoEdit) then
+procedure TFMain.EditQuickKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
+var
+  Index: integer;
+begin
+  Index := MetadataList.Row;
+
+  if (Key = VK_Return) then
   begin
-    Tx := Trim(TCustomEdit(Sender).Text);
-    MetadataList.Cells[1, Indx] := Tx;
-    Tx := MetadataList.Keys[Indx];
-    if TCustomEdit(Sender).Modified and
-       (Tx[1] <> '*') then
-      MetadataList.Keys[Indx] := '*' + Tx; // mark tag value changed
-    if GUIsettings.AutoIncLine and // select next row
-      (Indx < MetadataList.RowCount - 1) then
-      MetadataList.Row := Indx + 1;
-    MetadataList.Refresh;
-    MetadataList.SetFocus;
-    SpeedBtnQuickSave.Enabled := true;
+    if (QuickTags[Index - 1].NoEdit = false) then
+    begin
+      MetadataList.Cells[1, Index] := Trim(TCustomEdit(Sender).Text);
+      if TCustomEdit(Sender).Modified then
+        MarkLineModified(Index);
+      MetadataList.Refresh;
+      MetadataList.SetFocus;
+      SpeedBtnQuickSave.Enabled := true;
+    end;
+    AutoIncLine(Index +1);
   end;
 
   if Key = VK_ESCAPE then
   begin
-    if QuickTags[Indx - 1].NoEdit then
+    if QuickTags[Index - 1].NoEdit then
       TCustomEdit(Sender).Text := ''
     else
     begin
-      if RightStr(MetadataList.Keys[Indx], 1) = #177 then
+      if RightStr(MetadataList.Keys[Index], 1) = #177 then
         TCustomEdit(Sender).Text := '+'
       else
-        TCustomEdit(Sender).Text := MetadataList.Cells[1, Indx];
+        TCustomEdit(Sender).Text := MetadataList.Cells[1, Index];
     end;
     MetadataList.SetFocus;
   end;
@@ -2621,13 +2689,18 @@ begin
     SpeedBtnETdirectDel.Enabled := false;
   SpeedBtnETdirectReplace.Enabled := false;
   SpeedBtnETdirectAdd.Enabled := false;
+end;
+
+procedure TFMain.CBoxETdirectCloseUp(Sender: TObject);
+begin
   if (EditETdirect.Showing) then
     EditETdirect.SetFocus;
 end;
 
-procedure TFMain.Selectnone1Click(Sender: TObject);
+procedure TFMain.CBoxETdirectKeyPress(Sender: TObject; var Key: Char);
 begin
-  ShellList.ClearSelection;
+  if (Key = #13) then
+    CBoxETdirectCloseUp(Sender);
 end;
 
 procedure TFMain.Selectnone2Click(Sender: TObject);
@@ -2896,28 +2969,42 @@ begin
       end;
       Ord('D'): //Focus Dir ShellTree
       begin
-        ShellTree.SetFocus;
+        if (ShellTree.CanFocus) then
+          ShellTree.SetFocus;
         Key := 0;
       end;
       Ord('L'): //Focus Filelist ShellList
       begin
         AdvPageFilelist.ActivePage := AdvTabFilelist;
-        ShellList.SetFocus;
+        if (ShellList.CanFocus) then
+          ShellList.SetFocus;
         Key := 0;
       end;
       Ord('W'):  //Focus Workspace
       begin
-        SpeedBtnQuick.Down := true;
-        SpeedBtnExifClick(SpeedBtnQuick);
-        MetadataList.SetFocus;
-        if (MetadataList.RowCount > 1) then
-          MetadataList.Row := 2;
+        MetadataList.LockDrawing;
+        try
+          AdvPageMetadata.ActivePage := AdvTabMetadata;
+          SpeedBtnQuick.Down := true;
+          SpeedBtnExifClick(SpeedBtnQuick);
+          AutoIncLine(MetadataList.Row);
+        finally
+          MetadataList.UnlockDrawing;
+          if (MetadataList.CanFocus) then
+            MetadataList.SetFocus;
+        end;
+        Key := 0;
+      end;
+      Ord('M'):  //Focus OSM Map
+      begin
+        AdvPageMetadata.ActivePage := AdvTabOSMMap;
+        if (EditMapFind.CanFocus) then
+          EditMapFind.SetFocus;
         Key := 0;
       end;
       Ord('T'): //Focus ExifTool Direct
       begin
         SpeedBtn_ETdirect.Down := not SpeedBtn_ETdirect.Down;
-        SpeedBtn_ETedit.Down := false;
         SpeedBtn_ETdirectClick(SpeedBtn_ETdirect);
         Key := 0;
       end;
@@ -3112,6 +3199,7 @@ begin
   if (ShellTree.Selected <> nil) then
     ShellTree.Selected.MakeVisible;
 
+  SetGridEditor(SpeedBtnQuick.Down);
 end;
 
 procedure TFMain.RotateImgResize(Sender: TObject);
@@ -3333,6 +3421,7 @@ begin
     if (Assigned(AShellList.OnClick)) then
       AShellList.OnClick(Sender);
   end;
+
   EnableMenuItems;
 end;
 
@@ -3611,11 +3700,6 @@ begin
     ShellList.SelectAll;
 end;
 
-procedure TFMain.Selectall1Click(Sender: TObject);
-begin
-  SelectAll;
-end;
-
 procedure TFMain.Selectall2Click(Sender: TObject);
 begin
   SelectAll;
@@ -3635,6 +3719,25 @@ begin
 end;
 
 // =========================== Show Metadata ====================================
+procedure TFMain.SetGridEditor(const Enable: boolean);
+var
+  GridOptions: TGridOptions;
+begin
+  GridOptions := MetadataList.Options;
+  Exclude(GridOptions, goEditing);
+  Exclude(GridOptions, goAlwaysShowEditor);
+  Include(GridOptions, goRowSelect);
+  if GUIsettings.EditLine and
+     Enable then
+  begin
+    Exclude(GridOptions, goRowSelect);
+    Include(GridOptions, goEditing);
+    Include(GridOptions, goAlwaysShowEditor);
+  end;
+  MetadataList.Options := GridOptions;
+  MetadataList.Col := 1;
+end;
+
 procedure TFMain.ShowMetadata;
 var
   E, N, SavedRow: integer;
@@ -3649,6 +3752,7 @@ begin
   begin
     with MetadataList do
     begin
+      Enabled := false;
       Row := 1;
       Strings.Clear;
     end;
@@ -3657,6 +3761,7 @@ begin
     exit;
   end;
 
+  MetadataList.Enabled := true;
   SavedRow := MetadataList.Row;
   MetadataList.Row := 1;
 
@@ -3709,6 +3814,8 @@ begin
                 Tx := QuickTags[E].Caption + '=' + ETResult[E];
             end;
             Strings.Append(Tx);
+            if (QuickTags[E].NoEdit) then
+              MetadataList.ItemProps[E].ReadOnly := true;
           end;
         finally
           Strings.EndUpdate;
@@ -3798,6 +3905,7 @@ begin
       MetadataList.Row := SavedRow
     else
       MetadataList.Row := MetadataList.RowCount - 1;
+
   finally
     ETResult.Free;
   end;
@@ -3897,7 +4005,9 @@ procedure TFMain.SpeedBtnExifClick(Sender: TObject);
 begin
   AdvPanelMetaBottom.Visible := SpeedBtnQuick.Down;
   SpeedBtnQuickSave.Enabled := false;
+
   ShowMetadata;
+  SetGridEditor(SpeedBtnQuick.Down);
 end;
 
 procedure TFMain.SpeedBtnFilterEditClick(Sender: TObject);
@@ -3948,6 +4058,7 @@ begin
       H := 105;
     AdvPanelETdirect.Height := ScaleDesignDpi(H);
     EditETdirect.Enabled := true;
+    CBoxETdirect.Enabled := true;
     EditETdirect.SetFocus;
   end
   else
@@ -3955,6 +4066,7 @@ begin
     AdvPanelETdirect.Height := ScaleDesignDpi(32);
     ShellList.SetFocus;
     EditETdirect.Enabled := false;
+    CBoxETdirect.Enabled := false;
   end;
 end;
 
