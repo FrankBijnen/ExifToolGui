@@ -47,7 +47,7 @@ type
 implementation
 
 uses
-  System.UITypes, Winapi.Windows;
+  System.Types, System.UITypes, Winapi.Windows;
 
 procedure TETGuiInplaceEdit.OwnerPoint(var X, Y: integer);
 var
@@ -103,7 +103,6 @@ end;
 
 procedure TValueListEditor.KeyDown(var Key: Word; Shift: TShiftState);
 begin
-
   if (Assigned(FOnCtrlKeyDown)) and
      (Shift = [ssCtrl]) then
     FOnCtrlKeyDown(Self, Key, Shift);

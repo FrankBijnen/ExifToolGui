@@ -363,6 +363,7 @@ object FMain: TFMain
         OnDrawCell = MetadataListDrawCell
         OnExit = MetadataListExit
         OnKeyDown = MetadataListKeyDown
+        OnKeyPress = MetadataListKeyPress
         OnMouseDown = MetadataListMouseDown
         OnMouseMove = MetadataListMouseMove
         OnMouseUp = MetadataListMouseUp
@@ -539,6 +540,7 @@ object FMain: TFMain
           Text = ''
           TextHint = '0.1234, 0.1234'
           OnKeyDown = EditMapFindKeyDown
+          OnKeyPress = EditMapFindKeyPress
         end
       end
     end

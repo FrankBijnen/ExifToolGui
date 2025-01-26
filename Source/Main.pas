@@ -353,6 +353,8 @@ type
     procedure MetadataListStringsChange(Sender: TObject);
     procedure MetadataListMouseUp(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
     procedure EditQuickKeyPress(Sender: TObject; var Key: Char);
+    procedure MetadataListKeyPress(Sender: TObject; var Key: Char);
+    procedure EditMapFindKeyPress(Sender: TObject; var Key: Char);
   private
     { Private declarations }
     ETBarSeriesFocal: TBarSeries;
@@ -925,6 +927,11 @@ begin
     EditMapFind.Text := MapGotoPlace(EdgeBrowser1, EditMapFind.Text, EditMapBounds.Text, '', InitialZoom_Out);
 end;
 
+procedure TFMain.EditMapFindKeyPress(Sender: TObject; var Key: Char);
+begin
+  NoBell(Key);
+end;
+
 procedure TFMain.MGUIStyleClick(Sender: TObject);
 begin
   ShellTree.SetFocus;
@@ -1202,6 +1209,12 @@ begin
       end;
     end;
   end;
+end;
+
+procedure TFMain.MetadataListKeyPress(Sender: TObject; var Key: Char);
+begin
+  if (Ord(Key) = VK_PAUSE) then  // CTRL/S
+    Key := #0; // no bell
 end;
 
 // Event handler for CTRL Keydown.
@@ -2414,17 +2427,16 @@ end;
 
 procedure TFMain.EditETdirectKeyPress(Sender: TObject; var Key: Char);
 begin
-  if (Key = #13) then
-    Key := #0; // No Bell
+  NoBell(Key);
 end;
 
 procedure TFMain.EditFindMetaKeyPress(Sender: TObject; var Key: Char);
 var NewRow: Integer;
 begin
   StatusBar.Panels[1].Text := '';
-  if (Key = #13) then
+  if (Key = Chr_Return) then
   begin
-    Key := #0;
+    NoBell(Key);
     NewRow := MetadataList.Row;
     while (NewRow < Metadatalist.RowCount -1) do
     begin
@@ -2539,8 +2551,7 @@ end;
 
 procedure TFMain.EditQuickKeyPress(Sender: TObject; var Key: Char);
 begin
-  if (Key = #13) then
-    Key := #0;
+  NoBell(Key);
 end;
 
 procedure TFMain.ShowPreview;
@@ -2706,7 +2717,7 @@ end;
 
 procedure TFMain.CBoxETdirectKeyPress(Sender: TObject; var Key: Char);
 begin
-  if (Key = #13) then
+  if (Key = Chr_Return) then
     CBoxETdirectCloseUp(Sender);
 end;
 

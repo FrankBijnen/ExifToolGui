@@ -12,6 +12,10 @@ uses Winapi.ShlObj, Winapi.ActiveX, Winapi.Wincodec, Winapi.Windows, Winapi.Mess
   Vcl.Controls, Vcl.Menus, Vcl.VirtualImageList,
   Geomap;
 
+const
+  Chr_Return  = Chr(VK_RETURN);
+  Chr_Pause   = Chr(VK_PAUSE);  // Ctrl/S
+
 type
   TPreviewInfo = record
     GroupName: string;
@@ -31,6 +35,9 @@ type
 // Debug
 procedure BreakPoint;
 procedure DebugMsg(const Msg: array of variant);
+
+// No bell
+procedure NoBell(var Key: Char);
 
 // Version
 function GetFileVersionNumber(FName: string): string;
@@ -206,6 +213,14 @@ begin
 {$ELSE}
 begin
 {$ENDIF}
+end;
+
+procedure NoBell(var Key: Char);
+begin
+  case Key of
+    Chr_Return:   Key := #0;
+    Chr_Pause:    Key := #0;
+  end;
 end;
 
 // Version
