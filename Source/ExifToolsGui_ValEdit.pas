@@ -39,6 +39,7 @@ type
     procedure TopLeftChanged; override;
   public
     constructor Create(AOwner: TComponent); override;
+    procedure SetFocus; override;
     property OnCtrlKeyDown: TkeyEvent read FOnCtrlKeyDown write FOnCtrlKeyDown;
     property ProportionalVScroll: boolean read FProportionalVScroll write SetProportionalVScroll default false;
     property FixedRows;
@@ -248,6 +249,12 @@ begin
 
   if (FProportionalVScroll) then
     SetScrollPos(Self.Handle, SB_VERT, TopRow, true);
+end;
+
+procedure TValueListEditor.SetFocus;
+begin
+  if CanFocus then
+    inherited SetFocus;
 end;
 
 end.
