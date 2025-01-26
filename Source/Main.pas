@@ -364,6 +364,8 @@ type
     EdgeZoom: double;
     MinFileListWidth: integer;
     MenusEnabled: boolean;
+    MetadataLoading: boolean;
+    EditLineActive: boolean;
     CustomTabStops: array of TWinControl;
     procedure AlignStatusBar;
     procedure ImageDrop(var Msg: TWMDROPFILES); message WM_DROPFILES;
@@ -1191,7 +1193,7 @@ begin
   if (Key = VK_Return) and
      (SpeedBtnQuick.Down) then
   begin
-    if not (goRowSelect in MetadataList.Options) then
+    if (EditLineActive) then
     begin
       AutoIncLine(I);
       MetadataList.EditorMode := true;
@@ -1350,8 +1352,8 @@ end;
 
 procedure TFMain.MetadataListStringsChange(Sender: TObject);
 begin
-  if (MetadataList.Tag <> -1) and
-     not (goRowSelect in MetadataList.Options) then
+  if (EditLineActive) and
+     (MetadataLoading = false) then
   begin
     MarkLineModified(MetadataList.Row);
     SpeedBtnQuickSave.Enabled := true;
@@ -2117,20 +2119,30 @@ end;
 
 procedure TFMain.QuickPopUp_UndoEditClick(Sender: TObject);
 var
-  I, N, X: integer;
+  I: integer;
+  EnableSave: boolean;
   Tx, ETouts, ETerrs: string;
 begin
-  I := MetadataList.Row;
-  MetadataList.Keys[I] := QuickTags[I - 1].Caption;
-  Tx := '-s3' + CRLF + '-f' + CRLF + QuickTags[I - 1].Command;
-  ET.OpenExec(Tx, GetSelectedFile(ShellList.RelFileName), ETouts, ETerrs);
-  MetadataList.Cells[1, I] := ETouts;
-  N := MetadataList.RowCount - 1;
-  X := 0;
-  for I := 1 to N do
-    if pos('*', MetadataList.Keys[I]) = 1 then
-      inc(X);
-  SpeedBtnQuickSave.Enabled := (X > 0);
+  MetadataLoading := true;
+  try
+    I := MetadataList.Row;
+    MetadataList.Keys[I] := QuickTags[I - 1].Caption;
+    Tx := '-s3' + CRLF + '-f' + CRLF + QuickTags[I - 1].Command;
+    ET.OpenExec(Tx, GetSelectedFile(ShellList.RelFileName), ETouts, ETerrs);
+    MetadataList.Cells[1, I] := ETouts;
+    EnableSave := false;
+    I := 0;
+    while (I < MetadataList.RowCount -1) and
+          (EnableSave = false) do
+    begin
+      Inc(I);
+      if pos('*', MetadataList.Keys[I]) = 1 then
+        EnableSave := true;
+    end;
+    SpeedBtnQuickSave.Enabled := EnableSave;
+  finally
+    MetadataLoading := false;
+  end;
 end;
 
 procedure TFMain.ExecETEvent_Done(ExecNum: word; EtCmds, EtOuts, EtErrs, StatusLine: string; PopupOnError: boolean);
@@ -3741,17 +3753,21 @@ procedure TFMain.SetGridEditor(const Enable: boolean);
 var
   GridOptions: TGridOptions;
 begin
+  EditLineActive := false;
   GridOptions := MetadataList.Options;
   Exclude(GridOptions, goEditing);
   Exclude(GridOptions, goAlwaysShowEditor);
   Include(GridOptions, goRowSelect);
+
   if GUIsettings.EditLine and
      Enable then
   begin
+    EditLineActive := true;
     Exclude(GridOptions, goRowSelect);
     Include(GridOptions, goEditing);
     Include(GridOptions, goAlwaysShowEditor);
   end;
+
   MetadataList.Options := GridOptions;
   MetadataList.Col := 1;
 end;
@@ -3764,25 +3780,22 @@ var
   NoChars:  TSysCharSet;
 begin
   MetadataList.Tag := -1; // Reset hint row
+  MetadataList.Strings.Clear;
+  SavedRow := MetadataList.Row;
+  MetadataList.Row := 1;
+
   Item := GetSelectedFile(ShellList.RelFileName);
   SetCaption(Item);
   if (Item = '') then
   begin
-    with MetadataList do
-    begin
-      Enabled := false;
-      Row := 1;
-      Strings.Clear;
-    end;
+    MetadataList.Enabled := false;
     EditQuick.Text := '';
     MemoQuick.Text := '';
     exit;
   end;
 
   MetadataList.Enabled := true;
-  SavedRow := MetadataList.Row;
-  MetadataList.Row := 1;
-
+  MetadataLoading := true;
   ETResult := TStringList.Create;
   try
     if SpeedBtnQuick.Down then
@@ -3926,6 +3939,7 @@ begin
 
   finally
     ETResult.Free;
+    MetadataLoading := false;
   end;
 end;
 
