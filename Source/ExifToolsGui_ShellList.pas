@@ -475,21 +475,19 @@ begin
     HDN_ENDTRACK,
     HDN_DIVIDERDBLCLICK:
       begin
-        if (Assigned(FOnColumnResized)) then
+        ResizedColumn := pHDNotify(Msg.NMHdr)^.Item;
+        Column := Columns[ResizedColumn];
+        if (Column.Index = FSortColumn) then
         begin
-          ResizedColumn := pHDNotify(Msg.NMHdr)^.Item;
-          Column := Columns[ResizedColumn];
-          if (Column.Index = FSortColumn) then
-          begin
-            case (FSortState) of
-              THeaderSortState.hssAscending:
-                SetListHeaderSortState(Self, Column, hssAscending);
-              THeaderSortState.hssDescending:
-                SetListHeaderSortState(Self, Column, hssDescending);
-            end;
+          case (FSortState) of
+            THeaderSortState.hssAscending:
+              SetListHeaderSortState(Self, Column, hssAscending);
+            THeaderSortState.hssDescending:
+              SetListHeaderSortState(Self, Column, hssDescending);
           end;
-          FOnColumnResized(Column);
         end;
+        if (Assigned(FOnColumnResized)) then
+          FOnColumnResized(Column);
       end;
     HDN_BEGINTRACK:
       ;
