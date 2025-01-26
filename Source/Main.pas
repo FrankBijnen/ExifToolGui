@@ -2121,15 +2121,18 @@ procedure TFMain.QuickPopUp_UndoEditClick(Sender: TObject);
 var
   I: integer;
   EnableSave: boolean;
-  Tx, ETouts, ETerrs: string;
+  Tx: string;
+  ETouts: TStringList;
 begin
+  ETouts := TStringList.Create;
   MetadataLoading := true;
   try
     I := MetadataList.Row;
     MetadataList.Keys[I] := QuickTags[I - 1].Caption;
     Tx := '-s3' + CRLF + '-f' + CRLF + QuickTags[I - 1].Command;
-    ET.OpenExec(Tx, GetSelectedFile(ShellList.RelFileName), ETouts, ETerrs);
-    MetadataList.Cells[1, I] := ETouts;
+    ET.OpenExec(Tx, GetSelectedFile(ShellList.RelFileName), ETouts, true);
+    if (ETouts.Count > 0) then
+      MetadataList.Cells[1, I] := ETouts[0];
     EnableSave := false;
     I := 0;
     while (I < MetadataList.RowCount -1) and
@@ -2142,6 +2145,7 @@ begin
     SpeedBtnQuickSave.Enabled := EnableSave;
   finally
     MetadataLoading := false;
+    ETouts.Free;
   end;
 end;
 

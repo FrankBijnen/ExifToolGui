@@ -67,6 +67,14 @@ end;
 
 procedure TETGuiInplaceEdit.KeyDown(var Key: Word; Shift: TShiftState);
 begin
+  if (Key = VK_RIGHT) and
+     (SelStart = 0) and
+     (SelLength >= Length(Text)) then
+  begin
+    Deselect;
+    SelStart := Length(Text);
+    Key := 0;
+  end;
   if (Shift = [ssCtrl]) then
     ValueListEditor.KeyDown(Key, Shift);
 
