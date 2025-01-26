@@ -3779,22 +3779,26 @@ var
   ETResult: TStringList;
   NoChars:  TSysCharSet;
 begin
+// Saved position?
+  SavedRow := MetadataList.Tag;
+  if (SavedRow < 1) then
+    SavedRow := MetadataList.Row;
   MetadataList.Tag := -1; // Reset hint row
+
   MetadataList.Strings.Clear;
-  SavedRow := MetadataList.Row;
   MetadataList.Row := 1;
 
   Item := GetSelectedFile(ShellList.RelFileName);
   SetCaption(Item);
   if (Item = '') then
   begin
-    MetadataList.Enabled := false;
+    MetadataList.Strings.Add('-');
+    MetadataList.ItemProps[0].ReadOnly := true;
     EditQuick.Text := '';
     MemoQuick.Text := '';
     exit;
   end;
 
-  MetadataList.Enabled := true;
   MetadataLoading := true;
   ETResult := TStringList.Create;
   try
