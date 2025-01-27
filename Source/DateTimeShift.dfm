@@ -29,8 +29,6 @@ object FDateTimeShift: TFDateTimeShift
     Height = 19
     Panels = <>
     SimplePanel = True
-    ExplicitTop = 256
-    ExplicitWidth = 573
   end
   object AdvPanel1: TPanel
     Left = 0
@@ -47,7 +45,6 @@ object FDateTimeShift: TFDateTimeShift
     ParentDoubleBuffered = False
     ParentFont = False
     TabOrder = 1
-    ExplicitHeight = 256
     object Label2: TLabel
       Left = 5
       Top = 154
@@ -251,13 +248,13 @@ object FDateTimeShift: TFDateTimeShift
       Top = 11
       Width = 129
       Height = 22
-      ItemIndex = 0
       TabOrder = 12
       Text = 'Exif'
       OnClick = CmbGroupClick
       Items.Strings = (
         'Exif'
-        'Xmp')
+        'Xmp'
+        'QuickTime')
     end
   end
   object BtnCancel: TButton

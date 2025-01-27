@@ -53,6 +53,9 @@ var
   ETresult: TStringList;
 begin
   Group := CmbGroup.Text;
+  RadioButton1.Enabled := CmbGroup.ItemIndex <> 2;   // QuickTime
+  RadioButton1.Checked := RadioButton1.Enabled;      // QuickTime
+  RadioButton2.Checked := not RadioButton1.Enabled;  // QuickTime
 
   ETresult := TStringList.Create;
   try
@@ -80,12 +83,21 @@ begin
     ETcmd := CmdStr + CmdDateTimeOriginal(Group) + '>' + CmdModifyDate(Group) + CRLF +
              CmdStr + CmdDateTimeOriginal(Group) + '>' + CmdCreateDate(Group);
   if RadioButton2.Checked then
-    ETcmd := CmdStr + CmdCreateDate(Group) + '>' + CmdModifyDate(Group) + CRLF +
-             CmdStr + CmdCreateDate(Group) + '>' + CmdDateTimeOriginal(Group);
+  begin
+    if (RadioButton1.Enabled) then
+      ETcmd := CmdStr + CmdCreateDate(Group) + '>' + CmdModifyDate(Group) + CRLF +
+               CmdStr + CmdCreateDate(Group) + '>' + CmdDateTimeOriginal(Group)
+    else
+      ETcmd := CmdStr + CmdCreateDate(Group) + '>' + CmdModifyDate(Group); // QuickTime
+  end;
   if RadioButton3.Checked then
-    ETcmd := CmdStr + CmdModifyDate(Group) + '>' + CmdDateTimeOriginal(Group) + CRLF +
-             CmdStr + CmdModifyDate(Group) + '>' + CmdCreateDate(Group);
-
+  begin
+    if (RadioButton1.Enabled) then
+      ETcmd := CmdStr + CmdModifyDate(Group) + '>' + CmdDateTimeOriginal(Group) + CRLF +
+               CmdStr + CmdModifyDate(Group) + '>' + CmdCreateDate(Group)
+    else
+      ETcmd := CmdStr + CmdModifyDate(Group) + '>' + CmdCreateDate(Group); // QuickTime
+  end;
   ET.OpenExec(ETcmd, FMain.GetSelectedFiles, ETout, ETerr);
   ModalResult := mrOK;
 end;
@@ -113,8 +125,10 @@ begin
   else
     Label1.Caption := StrBackupON;
   Application.OnHint := DisplayHint;
-
-  RadioButton1.SetFocus;
+  if (RadioButton1.Enabled) then
+    RadioButton1.SetFocus
+  else
+    RadioButton2.SetFocus;
 end;
 
 procedure TFDateTimeEqual.RadioButton1Click(Sender: TObject);

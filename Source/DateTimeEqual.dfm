@@ -27,8 +27,6 @@ object FDateTimeEqual: TFDateTimeEqual
     Width = 529
     Height = 19
     Panels = <>
-    ExplicitTop = 158
-    ExplicitWidth = 525
   end
   object AdvPanel1: TPanel
     Left = 0
@@ -45,7 +43,6 @@ object FDateTimeEqual: TFDateTimeEqual
     ParentDoubleBuffered = False
     ParentFont = False
     TabOrder = 1
-    ExplicitHeight = 158
     object Bevel1: TBevel
       Left = 6
       Top = 6
@@ -67,13 +64,13 @@ object FDateTimeEqual: TFDateTimeEqual
       Top = 11
       Width = 129
       Height = 22
-      ItemIndex = 0
       TabOrder = 6
       Text = 'Exif'
       OnClick = CmbGroupClick
       Items.Strings = (
         'Exif'
-        'Xmp')
+        'Xmp'
+        'QuickTime')
     end
     object LabeledEdit1: TLabeledEdit
       Left = 137
