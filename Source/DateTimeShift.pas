@@ -75,6 +75,7 @@ var
   ETcmd: string;
 begin
   Group := CmbGroup.Text;
+  ChkShiftOriginal.Enabled := (CmbGroup.ItemIndex <> 2); // Not for Quicktime
   ChkFileModified.Caption := OrigChkFileModified + '<' + CmdStr + CmdModifyDate(Group);
   ChkFileCreated.Caption := OrigChkFileCreated + '<' + CmdStr + CmdCreateDate(Group);
 
@@ -88,7 +89,7 @@ begin
 
     if (ETResult.Count > 2) then
     begin
-      ChkShiftOriginal.Checked := true;
+      ChkShiftOriginal.Checked := ChkShiftOriginal.Enabled;
       ChkShiftCreate.Checked := true;
       ChkFileCreated.Checked := true;
       LblEdOriginal.Text := ETResult[0];
@@ -118,7 +119,8 @@ begin
     PN := '-=';
 
   ETcmd := '';
-  if (ChkShiftOriginal.Checked) and (ChkShiftCreate.Checked) and (ChkShiftModify.Checked) then
+  if ( (ChkShiftOriginal.Enabled = false) or (ChkShiftOriginal.Checked) ) and //QuickTime
+     (ChkShiftCreate.Checked) and (ChkShiftModify.Checked) then
     ETcmd := CmdStr + Group +  ':AllDates' + PN + MeShiftAmount.EditText + CRLF
   else
   begin
@@ -141,7 +143,7 @@ begin
   if ChkFileModified.Checked then
     ETcmd := '-FileModifyDate<' + CmdModifyDate(Group);
   if ChkFileCreated.Checked then
-    ETcmd := EndsWithCRLF(ETcmd) + '-FileCreateDate<' + CmdDateTimeOriginal(Group);
+    ETcmd := EndsWithCRLF(ETcmd) + '-FileCreateDate<' + CmdCreateDate(Group);
   if (ETcmd <> '') then
     ET.OpenExec(Etcmd, FMain.GetSelectedFiles);
 

@@ -20,8 +20,6 @@ object FFileDateTime: TFFileDateTime
     Height = 19
     Panels = <>
     SimplePanel = True
-    ExplicitTop = 522
-    ExplicitWidth = 706
   end
   object AdvPanel1: TPanel
     Left = 0
@@ -38,7 +36,6 @@ object FFileDateTime: TFFileDateTime
     ParentDoubleBuffered = False
     ParentFont = False
     TabOrder = 1
-    ExplicitHeight = 522
     object AdvPanel2: TPanel
       Left = 16
       Top = 16
@@ -73,13 +70,13 @@ object FFileDateTime: TFFileDateTime
           Top = 19
           Width = 129
           Height = 22
-          ItemIndex = 0
           TabOrder = 0
           Text = 'Exif'
           OnClick = CmbGroupClick
           Items.Strings = (
             'Exif'
-            'Xmp')
+            'Xmp'
+            'QuickTime')
         end
         object RadioGroup1: TRadioGroup
           Left = 1

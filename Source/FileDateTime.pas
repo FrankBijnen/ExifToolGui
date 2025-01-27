@@ -236,6 +236,10 @@ begin
     exit;
 
   Group := CmbGroup.Text;
+  RadioGroup1.Buttons[0].Enabled := CmbGroup.ItemIndex <> 2;            // QuickTime
+  RadioGroup1.Buttons[0].Checked := RadioGroup1.Buttons[0].Enabled;     // QuickTime
+  RadioGroup1.Buttons[1].Checked := not RadioGroup1.Buttons[0].Enabled; // QuickTime
+
   // Xmp:DocumentName does not exist
   RadioGroup4.Enabled := (CmbGroup.ItemIndex = 0);
   Button3.Enabled := (CmbGroup.ItemIndex = 0);
