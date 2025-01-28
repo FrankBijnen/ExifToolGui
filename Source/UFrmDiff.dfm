@@ -3,12 +3,12 @@ object FrmDiff: TFrmDiff
   Top = 0
   ActiveControl = pnlBottom
   Caption = 'Show diff metadata'
-  ClientHeight = 442
-  ClientWidth = 628
+  ClientHeight = 561
+  ClientWidth = 784
   Color = clBtnFace
   CustomTitleBar.CaptionAlignment = taCenter
-  Constraints.MinHeight = 480
-  Constraints.MinWidth = 640
+  Constraints.MinHeight = 600
+  Constraints.MinWidth = 800
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
   Font.Height = -11
@@ -25,16 +25,18 @@ object FrmDiff: TFrmDiff
   TextHeight = 13
   object pnlBottom: TPanel
     Left = 0
-    Top = 413
-    Width = 628
+    Top = 532
+    Width = 784
     Height = 29
     Align = alBottom
     TabOrder = 0
+    ExplicitTop = 413
+    ExplicitWidth = 628
     DesignSize = (
-      628
+      784
       29)
     object BtnClose: TBitBtn
-      Left = 532
+      Left = 688
       Top = 2
       Width = 85
       Height = 25
@@ -43,34 +45,39 @@ object FrmDiff: TFrmDiff
       NumGlyphs = 2
       TabOrder = 0
       TabStop = False
+      ExplicitLeft = 532
     end
   end
   object PnlTop: TPanel
     Left = 0
     Top = 0
-    Width = 628
+    Width = 784
     Height = 94
     Align = alTop
     TabOrder = 1
+    ExplicitWidth = 628
     object GrpTagSelection: TGroupBox
       Left = 1
       Top = 1
-      Width = 256
+      Width = 272
       Height = 92
       Align = alLeft
       Caption = 'Tag selection'
       TabOrder = 0
+      ExplicitLeft = -5
+      ExplicitTop = -4
       object PnlPredefined: TPanel
         Left = 2
         Top = 15
-        Width = 252
+        Width = 268
         Height = 25
         Align = alTop
         TabOrder = 0
+        ExplicitWidth = 252
         object SpbPredefined: TSpeedButton
           Left = 158
           Top = 1
-          Width = 93
+          Width = 109
           Height = 21
           Align = alClient
           Constraints.MaxHeight = 21
@@ -96,27 +103,29 @@ object FrmDiff: TFrmDiff
       object MemoTagSel: TMemo
         Left = 2
         Top = 40
-        Width = 252
+        Width = 268
         Height = 50
         TabStop = False
         Align = alClient
         Enabled = False
         ReadOnly = True
         TabOrder = 1
+        ExplicitWidth = 252
       end
     end
     object GrpMatchRight: TGroupBox
-      Left = 409
+      Left = 545
       Top = 1
-      Width = 208
+      Width = 244
       Height = 92
       Align = alLeft
       Caption = 'Matching right file'
       TabOrder = 2
+      ExplicitLeft = 529
       object CmbExt: TComboBox
         Left = 2
         Top = 15
-        Width = 204
+        Width = 240
         Height = 21
         Margins.Top = 5
         Align = alTop
@@ -138,11 +147,12 @@ object FrmDiff: TFrmDiff
           '%f.nrw'
           '%f.dng'
           '%f.mp4')
+        ExplicitWidth = 204
       end
       object MemoExplain: TMemo
         Left = 2
         Top = 36
-        Width = 204
+        Width = 240
         Height = 54
         TabStop = False
         Align = alClient
@@ -152,20 +162,22 @@ object FrmDiff: TFrmDiff
           '%e = extension')
         ReadOnly = True
         TabOrder = 1
+        ExplicitWidth = 204
       end
     end
     object GrpOptions: TGroupBox
-      Left = 257
+      Left = 273
       Top = 1
-      Width = 152
+      Width = 272
       Height = 92
       Align = alLeft
       Caption = 'Options'
       TabOrder = 1
+      ExplicitLeft = 257
       object ChkGroupHeadings: TCheckBox
         Left = 2
         Top = 51
-        Width = 148
+        Width = 268
         Height = 18
         Align = alTop
         Caption = 'Group headings (-g)'
@@ -173,11 +185,12 @@ object FrmDiff: TFrmDiff
         State = cbChecked
         TabOrder = 2
         OnClick = ChkGroupHeadingsClick
+        ExplicitWidth = 148
       end
       object CmbFamily: TComboBox
         Left = 2
         Top = 69
-        Width = 148
+        Width = 268
         Height = 21
         Align = alBottom
         ItemIndex = 1
@@ -188,34 +201,37 @@ object FrmDiff: TFrmDiff
           '0 - Information Type'
           '1 - Specific location'
           '2 - Category')
+        ExplicitWidth = 148
       end
       object ChkVerbose: TCheckBox
         Left = 2
         Top = 15
-        Width = 148
+        Width = 268
         Height = 18
         Align = alTop
         Caption = 'Verbose (-v)'
         TabOrder = 0
         OnClick = ChkVerboseClick
+        ExplicitWidth = 148
       end
       object ChkNoPrintConv: TCheckBox
         Left = 2
         Top = 33
-        Width = 148
+        Width = 268
         Height = 18
         Align = alTop
         Caption = 'No print conversion (-n)'
         TabOrder = 1
         OnClick = ChkNoPrintConvClick
+        ExplicitWidth = 148
       end
     end
   end
   object LVCompare: TListView
     Left = 0
     Top = 94
-    Width = 628
-    Height = 277
+    Width = 784
+    Height = 396
     Align = alClient
     Columns = <
       item
@@ -238,14 +254,18 @@ object FrmDiff: TFrmDiff
     ViewStyle = vsReport
     OnCustomDrawItem = LVCompareCustomDrawItem
     OnResize = LVCompareResize
+    ExplicitWidth = 628
+    ExplicitHeight = 277
   end
   object PnlMerge: TPanel
     Left = 0
-    Top = 371
-    Width = 628
+    Top = 490
+    Width = 784
     Height = 42
     Align = alBottom
     TabOrder = 3
+    ExplicitTop = 371
+    ExplicitWidth = 628
     object PnlMergeTag: TPanel
       Left = 1
       Top = 1
@@ -258,7 +278,7 @@ object FrmDiff: TFrmDiff
     object PnlMergeLeft: TPanel
       Left = 186
       Top = 1
-      Width = 200
+      Width = 280
       Height = 40
       Align = alLeft
       BevelWidth = 2
@@ -281,9 +301,9 @@ object FrmDiff: TFrmDiff
       end
     end
     object PnlMergeRight: TPanel
-      Left = 386
+      Left = 466
       Top = 1
-      Width = 200
+      Width = 280
       Height = 40
       Align = alLeft
       BevelWidth = 2
@@ -291,7 +311,7 @@ object FrmDiff: TFrmDiff
       TabOrder = 2
       OnClick = PnlMergeRightClick
       object BtnRemoveRight: TButton
-        Left = 160
+        Left = 240
         Top = 2
         Width = 38
         Height = 36
@@ -303,6 +323,7 @@ object FrmDiff: TFrmDiff
         TabOrder = 0
         TabStop = False
         OnClick = BtnRemoveRightClick
+        ExplicitLeft = 160
       end
     end
   end
