@@ -1230,8 +1230,8 @@ end;
 
 procedure TFMain.MetadataListKeyPress(Sender: TObject; var Key: Char);
 begin
-  if (Ord(Key) = VK_PAUSE) then  // CTRL/S
-    Key := #0; // no bell
+  if (Key = Chr_Pause) then  // Only CTRL/S wanted
+    NoBell(Key);             // no bell
 end;
 
 // Event handler for CTRL Keydown.
@@ -2995,6 +2995,7 @@ begin
   ShellList.ColumnSorted := ShellList.Sorted;
   ShellList.OnCustomDrawItem := ShellListCustomDrawItem;
   Shelllist.IncludeSubFolders := ContainsText(GUIsettings.FileFilter, '/s');
+  Shelllist.DragSource := true;
 
   SetCaptionAndImage;
 
