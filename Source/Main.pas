@@ -1187,29 +1187,44 @@ end;
 
 procedure TFMain.MetadataListKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
 var
-  I: integer;
+  CurrentLine: integer;
+  InplaceEdit: TETGuiInplaceEdit;
 begin
-  I := MetadataList.Row +1;
-  if (Key = VK_Return) and
-     (SpeedBtnQuick.Down) then
-  begin
-    if (EditLineActive) then
-    begin
-      AutoIncLine(I);
-      MetadataList.EditorMode := true;
-    end
-    else
-    begin
-      if (QuickTags[I -1].NoEdit) then
-        AutoIncLine(I)
-      else
+  if (SpeedBtnQuick.Down = false) then
+    exit;
+
+  case Key of
+    VK_RIGHT:
       begin
-        if SpeedBtnLarge.Down then
-          MemoQuick.SetFocus
-        else
-          EditQuick.SetFocus;
+        InplaceEdit := MetadataList.InplaceEdit;
+        if (InplaceEdit.SelStart = 0) and
+           (InplaceEdit.SelLength >= Length(InplaceEdit.Text)) then
+        begin
+          InplaceEdit.SelStart := Length(InplaceEdit.Text);
+          Key := 0;
+        end;
       end;
-    end;
+    VK_RETURN:
+      begin
+        CurrentLine := MetadataList.Row +1;
+        if (EditLineActive) then
+        begin
+          AutoIncLine(CurrentLine);
+          MetadataList.EditorMode := true;
+        end
+        else
+        begin
+          if (QuickTags[CurrentLine -1].NoEdit) then
+            AutoIncLine(CurrentLine)
+          else
+          begin
+            if SpeedBtnLarge.Down then
+              MemoQuick.SetFocus
+            else
+              EditQuick.SetFocus;
+          end;
+        end;
+      end;
   end;
 end;
 

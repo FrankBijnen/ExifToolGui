@@ -13,7 +13,7 @@ type
 
   TETGuiInplaceEdit = class(Vcl.Grids.TInplaceEdit)
   private
-    procedure OwnerPoint(var X, Y: integer);
+    procedure ConvertToGridPoint(var X, Y: integer);
     function ValueListEditor: TValueListEditor;
   protected
     procedure MouseDown(Button: TMouseButton; Shift: TShiftState; X, Y: integer); override;
@@ -43,6 +43,7 @@ type
     property OnCtrlKeyDown: TkeyEvent read FOnCtrlKeyDown write FOnCtrlKeyDown;
     property ProportionalVScroll: boolean read FProportionalVScroll write SetProportionalVScroll default false;
     property FixedRows;
+    property InplaceEdit: TETGuiInplaceEdit read FInplaceEdit;
   end;
 
 implementation
@@ -50,7 +51,7 @@ implementation
 uses
   System.Types, System.UITypes, Winapi.Windows;
 
-procedure TETGuiInplaceEdit.OwnerPoint(var X, Y: integer);
+procedure TETGuiInplaceEdit.ConvertToGridPoint(var X, Y: integer);
 var
   Pt: TPoint;
 begin
@@ -67,14 +68,6 @@ end;
 
 procedure TETGuiInplaceEdit.KeyDown(var Key: Word; Shift: TShiftState);
 begin
-  if (Key = VK_RIGHT) and
-     (SelStart = 0) and
-     (SelLength >= Length(Text)) then
-  begin
-    Deselect;
-    SelStart := Length(Text);
-    Key := 0;
-  end;
   if (Shift = [ssCtrl]) then
     ValueListEditor.KeyDown(Key, Shift);
 
@@ -85,7 +78,7 @@ procedure TETGuiInplaceEdit.MouseDown(Button: TMouseButton; Shift: TShiftState; 
 begin
   if (Button = TMouseButton.mbRight) then
   begin
-    OwnerPoint(X, Y);
+    ConvertToGridPoint(X, Y);
     ValueListEditor.MouseDown(Button, Shift, X, Y);
   end;
 
