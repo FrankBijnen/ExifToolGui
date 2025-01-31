@@ -7,7 +7,7 @@ uses
   Winapi.Windows, Winapi.Messages,
   Vcl.StdCtrls, Vcl.Buttons, Vcl.Controls, Vcl.ExtCtrls, Vcl.BaseImageCollection, Vcl.ImageCollection,
   Vcl.ImgList, Vcl.VirtualImageList, Vcl.Dialogs, Vcl.ComCtrls,
-  ExifToolsGui_Listview, UnitScaleForm;
+  ExifToolsGui_Listview, UnitScaleForm, Vcl.Forms;
 
 type
   TFrmDiff = class(TScaleForm)
@@ -44,7 +44,6 @@ type
     procedure LVCompareCustomDrawItem(Sender: TCustomListView; Item: TListItem; State: TCustomDrawState; var DefaultDraw: Boolean);
     procedure SpbPredefinedClick(Sender: TObject);
     procedure CmbPredefinedChange(Sender: TObject);
-    procedure CmbExtKeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
     procedure CmbExtClick(Sender: TObject);
     procedure ChkGroupHeadingsClick(Sender: TObject);
     procedure CmbFamilyChange(Sender: TObject);
@@ -55,6 +54,7 @@ type
     procedure ChkVerboseClick(Sender: TObject);
     procedure ChkNoPrintConvClick(Sender: TObject);
     procedure FormKeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
+    procedure CmbExtKeyPress(Sender: TObject; var Key: Char);
   private
     { Private declarations }
     RightIsFolder: boolean;
@@ -87,7 +87,7 @@ var
 implementation
 
 uses
-  System.SysUtils, System.StrUtils,
+  System.SysUtils, System.StrUtils, System.Math,
   Winapi.CommCtrl,
   Vcl.Themes,
   ExifTool, ExifToolsGUI_Utils, Main, MainDef, UFrmPredefinedTags, UnitLangResources;
@@ -164,12 +164,12 @@ begin
   RunCompare;
 end;
 
-procedure TFrmDiff.CmbExtKeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
+procedure TFrmDiff.CmbExtKeyPress(Sender: TObject; var Key: Char);
 begin
-  if (Key = 13) then
+  if (Key = Chr_Return) then
   begin
     RunCompare;
-    Key := 0;
+    Key := #0;
   end;
 end;
 
@@ -202,12 +202,16 @@ begin
 end;
 
 procedure TFrmDiff.ResizePanels;
+var
+  SpaceLeft: integer;
 begin
   if (LVCompare.Columns.Count < 3) then
     exit;
+
   PnlMergeTag.Width := LVCompare.Columns[0].Width;
   PnlMergeLeft.Width := LVCompare.Columns[1].Width;
-  PnlMergeRight.Width := LVCompare.Columns[2].Width;
+  SpaceLeft := PnlMerge.ClientWidth - (PnlMergeTag.Width + PnlMergeLeft.Width);
+  PnlMergeRight.Width := Min(SpaceLeft, LVCompare.Columns[2].Width);
 end;
 
 procedure TFrmDiff.LVCompareResize(Sender: TObject);
@@ -216,8 +220,14 @@ var
 begin
   if (LVCompare.Columns.Count < 3) then
     exit;
-  LVCompare.Columns[0].Width := DefTagWidth;
+
   SpaceLeft := LVCompare.ClientWidth - LVCompare.Columns[0].Width;
+  if (SpaceLeft < DefTagWidth) then // Need some room to play with
+  begin
+    LVCompare.Columns[0].Width := DefTagWidth;
+    SpaceLeft := LVCompare.ClientWidth - LVCompare.Columns[0].Width;
+  end;
+
   LVCompare.Columns[1].Width := SpaceLeft div 2;
   LVCompare.Columns[2].Width := LVCompare.Columns[1].Width;
   ResizePanels;
@@ -594,7 +604,15 @@ begin
   if (PathL.Text = '') then
     PathL.Text := APathR
   else
+  begin
     PathR := APathR;
+    // Left side has a) multiple files, or b) is directory. Right side must also be a dir
+    // Set PathR to ''. See ValidatePaths
+    if ((PathL.Count > 1) or
+        (DirectoryExists(PathL[0]))) and
+       not DirectoryExists(APathR) then
+      PathR := '';
+  end;
   Show;
 end;
 
@@ -634,6 +652,9 @@ procedure TFrmDiff.FormShow(Sender: TObject);
 var
   CanCompare: boolean;
 begin
+  if (LVCompare.Columns[0].Width < DefTagWidth) then
+    LVCompare.Columns[0].Width := DefTagWidth;
+
   FStyleServices := TStyleManager.Style[GUIsettings.GuiStyle];
 
   SetupPredefined;

@@ -155,8 +155,10 @@ procedure RemoveFromContext(const AppTitle: string);
 //Diff. Compare
 procedure Selectleft;
 procedure SelectleftDir;
-procedure ShowCompareDlg(const PathL, PathR: string);
-procedure ShowCompareDlgDir(const PathR: string);
+procedure ShowCompareDlg; overload;
+procedure ShowCompareDlg(const PathR: string); overload;
+procedure ShowCompareDlg(const PathL, PathR: string); overload;
+procedure ShowCompareDlg(const PathList: TStrings); overload;
 
 // Resource
 procedure LoadResourceList(Resource: string; List: TStringList);
@@ -2129,6 +2131,19 @@ begin
   FrmDiff.SelectLeftDir;
 end;
 
+procedure ShowCompareDlg;
+begin
+  FrmDiff.Show;
+end;
+
+procedure ShowCompareDlg(const PathR: string);
+begin
+  if (PathR <> '') then
+    FrmDiff.ShowCompare(PathR)
+  else
+    FrmDiff.Show;
+end;
+
 procedure ShowCompareDlg(const PathL, PathR: string);
 begin
   if (PathL <> '') and
@@ -2138,12 +2153,14 @@ begin
     FrmDiff.Show;
 end;
 
-procedure ShowCompareDlgDir(const PathR: string);
+procedure ShowCompareDlg(const PathList: TStrings); overload;
 begin
-  if (PathR <> '') then
-    FrmDiff.ShowCompare(PathR)
-  else
-    FrmDiff.Show;
+  case (PathList.Count) of
+    1: ShowCompareDlg(PathList[0]);
+    2: ShowCompareDlg(PathList[0], PathList[1]);
+    else
+       ShowCompareDlg;
+  end
 end;
 
 procedure LoadResourceList(Resource: string; List: TStringList);

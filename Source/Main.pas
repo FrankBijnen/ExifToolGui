@@ -355,6 +355,9 @@ type
     procedure EditQuickKeyPress(Sender: TObject; var Key: Char);
     procedure MetadataListKeyPress(Sender: TObject; var Key: Char);
     procedure EditMapFindKeyPress(Sender: TObject; var Key: Char);
+    procedure ShellTreeEditingEnded(Sender: TObject; Node: TTreeNode; var S: string);
+    procedure ShellTreeEdited(Sender: TObject; Node: TTreeNode; var S: string);
+    procedure FormKeyPress(Sender: TObject; var Key: Char);
   private
     { Private declarations }
     ETBarSeriesFocal: TBarSeries;
@@ -1022,36 +1025,21 @@ begin
 end;
 
 procedure TFMain.MaSelectDiffExecute(Sender: TObject);
-var
-  FileList: TStringList;
 begin
-  FileList := ShellList.CreateSelectedFoldersList(true); // Need also directories
-  try
-    if (FileList.Count = 0) then
-      exit;
-    if (TSubShellFolder.GetIsFolder(TshellFolder(FileList.Objects[0]))) then
-      Frmdiff.SelectLeftDir
-    else
-      Frmdiff.SelectLeft;
-  finally
-    FileList.Free;
-  end;
+  if (ShellList.SelCount = 0) then
+    exit;
+  SelectLeft;
 end;
 
 procedure TFMain.MaShowDiffExecute(Sender: TObject);
 var
   FileList: TStringList;
 begin
-  if (ShellList.SelCount <> 2) then
-    ShowCompareDlg('', '')
-  else
-  begin
-    FileList := ShellList.CreateSelectedFoldersList(true); // Need also directories
-    try
-      ShowCompareDlg(FileList[0], FileList[1]);
-    finally
-      FileList.Free;
-    end;
+  FileList := ShellList.CreateSelectedFoldersList(true); // Need also directories
+  try
+    ShowCompareDlg(FileList);
+  finally
+    FileList.Free;
   end;
 end;
 
@@ -1193,7 +1181,14 @@ begin
   if (SpeedBtnQuick.Down = false) then
     exit;
 
+  CurrentLine := MetadataList.Row;
   case Key of
+    VK_ESCAPE:
+      begin
+        if (EditLineActive) and
+           (Pos('*', MetadataList.Keys[CurrentLine]) = 1) then
+          QuickPopUp_UndoEditClick(QuickPopUp_UndoEditAct);
+      end;
     VK_RIGHT:
       begin
         InplaceEdit := MetadataList.InplaceEdit;
@@ -1206,16 +1201,15 @@ begin
       end;
     VK_RETURN:
       begin
-        CurrentLine := MetadataList.Row +1;
         if (EditLineActive) then
         begin
-          AutoIncLine(CurrentLine);
+          AutoIncLine(CurrentLine +1);
           MetadataList.EditorMode := true;
         end
         else
         begin
-          if (QuickTags[CurrentLine -1].NoEdit) then
-            AutoIncLine(CurrentLine)
+          if (QuickTags[CurrentLine].NoEdit) then
+            AutoIncLine(CurrentLine +1)
           else
           begin
             if SpeedBtnLarge.Down then
@@ -1790,7 +1784,7 @@ var
 begin
   I := MetadataList.Row;
   Tx := MetadataList.Keys[I];
-  QuickPopUp_UndoEditAct.Visible := (pos('*', Tx) = 1);
+  QuickPopUp_UndoEditAct.Visible := (Pos('*', Tx) = 1);
   IsSep := (Length(Tx) = 0);
 
   QuickPopUp_AddQuickAct.Visible := not(SpeedBtnQuick.Down or SpeedBtnCustom.Down or IsSep);
@@ -2413,7 +2407,7 @@ begin
 
   ETtx := EditETdirect.Text;
   if (Key = VK_Return) and
-     (length(ETtx) > 1) then
+     (Length(ETtx) > 1) then
   begin
     IsRecursive := (pos('-r ', ETtx) > 0);
     ETprm := ETtx;
@@ -2979,6 +2973,7 @@ begin
   ShellTree.OnBeforeContextMenu := ShellTreeBeforeContext;
   ShellTree.OnAfterContextMenu := ShellTreeAfterContext;
   ShellTree.OnCustomDrawItem := ShellTreeCustomDrawItem;
+  ShellTree.OnEditingEnded := ShellTreeEditingEnded;
   ShellTree.PreferredRoot := ShellTree.Root;
 
   // Set properties of Shelllist in code.
@@ -3015,20 +3010,17 @@ begin
       Ord('A'):
       begin
         ShellListKeyDown(Sender, Key, Shift);
-        Key := 0;
       end;
       Ord('D'): //Focus Dir ShellTree
       begin
         if (ShellTree.CanFocus) then
           ShellTree.SetFocus;
-        Key := 0;
       end;
       Ord('L'): //Focus Filelist ShellList
       begin
         AdvPageFilelist.ActivePage := AdvTabFilelist;
         if (ShellList.CanFocus) then
           ShellList.SetFocus;
-        Key := 0;
       end;
       Ord('W'):  //Focus Workspace
       begin
@@ -3043,26 +3035,35 @@ begin
           if (MetadataList.CanFocus) then
             MetadataList.SetFocus;
         end;
-        Key := 0;
       end;
       Ord('M'):  //Focus OSM Map
       begin
         AdvPageMetadata.ActivePage := AdvTabOSMMap;
         if (EditMapFind.CanFocus) then
           EditMapFind.SetFocus;
-        Key := 0;
       end;
       Ord('T'): //Focus ExifTool Direct
       begin
         SpeedBtn_ETdirect.Down := not SpeedBtn_ETdirect.Down;
         SpeedBtn_ETdirectClick(SpeedBtn_ETdirect);
-        Key := 0;
       end;
-      // datetime shift = ALT/M, E
-      // datetime equalize = ALT/M, X
-      // remove metadata = ALT/M, R
-      // file date created = ALT/V, F
+      // datetime shift     = ALT/M, E
+      // datetime equalize  = ALT/M, X
+      // remove metadata    = ALT/M, R
+      // file date created  = ALT/V, F
     end;
+  end;
+end;
+
+procedure TFMain.FormKeyPress(Sender: TObject; var Key: Char);
+begin
+  case Ord(Key) of
+    1,      // CTRL/A
+    4,      // CTRL/D
+    12,     // CTRL/L
+    20,     // CTRL/T
+    23:     // CTRL/W
+      Key := #0;  // No Bell
   end;
 end;
 
@@ -3698,6 +3699,17 @@ begin
     Sender.Canvas.Font.Style := Sender.Canvas.Font.Style + [fsBold];
 end;
 
+procedure TFMain.ShellTreeEdited(Sender: TObject; Node: TTreeNode; var S: string);
+begin
+  ShellTreeBeforeContext(Sender);
+end;
+
+procedure TFMain.ShellTreeEditingEnded(Sender: TObject; Node: TTreeNode; var S: string);
+begin
+  ShellTree.Refresh(Node.Parent); // Will trigger starting ET
+  ShellTree.TopItem := Node;      // Make top item
+end;
+
 procedure TFMain.ShellTreeKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
 begin
   if (ssCtrl in Shift) and (Key = Ord('C')) then
@@ -3706,6 +3718,9 @@ begin
     ShellTree.FileNamesToClipboard(true);
   if (ssCtrl in Shift) and (Key = Ord('V')) then
     ShellTree.PasteFilesFromClipboard;
+  if (Key = VK_F2) and
+     (Shelltree.Selected <> nil) then
+    ShellTree.Selected.EditText;
 end;
 
 procedure TFMain.RefreshSelected(Sender: TObject);
@@ -3723,7 +3738,7 @@ end;
 // Close Exiftool before context menu. Delete directory fails
 procedure TFMain.ShellTreeBeforeContext(Sender: TObject);
 begin
-  ET.OpenExit;
+  ET.OpenExit(true);
 end;
 
 // Restart Exiftool when context menu done.

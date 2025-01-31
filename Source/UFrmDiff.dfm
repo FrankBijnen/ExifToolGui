@@ -30,8 +30,6 @@ object FrmDiff: TFrmDiff
     Height = 29
     Align = alBottom
     TabOrder = 0
-    ExplicitTop = 413
-    ExplicitWidth = 628
     DesignSize = (
       784
       29)
@@ -45,7 +43,6 @@ object FrmDiff: TFrmDiff
       NumGlyphs = 2
       TabOrder = 0
       TabStop = False
-      ExplicitLeft = 532
     end
   end
   object PnlTop: TPanel
@@ -55,7 +52,6 @@ object FrmDiff: TFrmDiff
     Height = 94
     Align = alTop
     TabOrder = 1
-    ExplicitWidth = 628
     object GrpTagSelection: TGroupBox
       Left = 1
       Top = 1
@@ -64,8 +60,6 @@ object FrmDiff: TFrmDiff
       Align = alLeft
       Caption = 'Tag selection'
       TabOrder = 0
-      ExplicitLeft = -5
-      ExplicitTop = -4
       object PnlPredefined: TPanel
         Left = 2
         Top = 15
@@ -73,7 +67,6 @@ object FrmDiff: TFrmDiff
         Height = 25
         Align = alTop
         TabOrder = 0
-        ExplicitWidth = 252
         object SpbPredefined: TSpeedButton
           Left = 158
           Top = 1
@@ -110,7 +103,6 @@ object FrmDiff: TFrmDiff
         Enabled = False
         ReadOnly = True
         TabOrder = 1
-        ExplicitWidth = 252
       end
     end
     object GrpMatchRight: TGroupBox
@@ -121,7 +113,6 @@ object FrmDiff: TFrmDiff
       Align = alLeft
       Caption = 'Matching right file'
       TabOrder = 2
-      ExplicitLeft = 529
       object CmbExt: TComboBox
         Left = 2
         Top = 15
@@ -131,7 +122,7 @@ object FrmDiff: TFrmDiff
         Align = alTop
         TabOrder = 0
         OnClick = CmbExtClick
-        OnKeyUp = CmbExtKeyUp
+        OnKeyPress = CmbExtKeyPress
         Items.Strings = (
           '%f.%e'
           '%f.%e.xmp'
@@ -147,7 +138,6 @@ object FrmDiff: TFrmDiff
           '%f.nrw'
           '%f.dng'
           '%f.mp4')
-        ExplicitWidth = 204
       end
       object MemoExplain: TMemo
         Left = 2
@@ -162,7 +152,6 @@ object FrmDiff: TFrmDiff
           '%e = extension')
         ReadOnly = True
         TabOrder = 1
-        ExplicitWidth = 204
       end
     end
     object GrpOptions: TGroupBox
@@ -173,7 +162,6 @@ object FrmDiff: TFrmDiff
       Align = alLeft
       Caption = 'Options'
       TabOrder = 1
-      ExplicitLeft = 257
       object ChkGroupHeadings: TCheckBox
         Left = 2
         Top = 51
@@ -185,7 +173,6 @@ object FrmDiff: TFrmDiff
         State = cbChecked
         TabOrder = 2
         OnClick = ChkGroupHeadingsClick
-        ExplicitWidth = 148
       end
       object CmbFamily: TComboBox
         Left = 2
@@ -201,7 +188,6 @@ object FrmDiff: TFrmDiff
           '0 - Information Type'
           '1 - Specific location'
           '2 - Category')
-        ExplicitWidth = 148
       end
       object ChkVerbose: TCheckBox
         Left = 2
@@ -212,7 +198,6 @@ object FrmDiff: TFrmDiff
         Caption = 'Verbose (-v)'
         TabOrder = 0
         OnClick = ChkVerboseClick
-        ExplicitWidth = 148
       end
       object ChkNoPrintConv: TCheckBox
         Left = 2
@@ -223,7 +208,6 @@ object FrmDiff: TFrmDiff
         Caption = 'No print conversion (-n)'
         TabOrder = 1
         OnClick = ChkNoPrintConvClick
-        ExplicitWidth = 148
       end
     end
   end
@@ -254,8 +238,6 @@ object FrmDiff: TFrmDiff
     ViewStyle = vsReport
     OnCustomDrawItem = LVCompareCustomDrawItem
     OnResize = LVCompareResize
-    ExplicitWidth = 628
-    ExplicitHeight = 277
   end
   object PnlMerge: TPanel
     Left = 0
@@ -264,8 +246,6 @@ object FrmDiff: TFrmDiff
     Height = 42
     Align = alBottom
     TabOrder = 3
-    ExplicitTop = 371
-    ExplicitWidth = 628
     object PnlMergeTag: TPanel
       Left = 1
       Top = 1
@@ -278,7 +258,7 @@ object FrmDiff: TFrmDiff
     object PnlMergeLeft: TPanel
       Left = 186
       Top = 1
-      Width = 280
+      Width = 200
       Height = 40
       Align = alLeft
       BevelWidth = 2
@@ -301,9 +281,9 @@ object FrmDiff: TFrmDiff
       end
     end
     object PnlMergeRight: TPanel
-      Left = 466
+      Left = 386
       Top = 1
-      Width = 280
+      Width = 231
       Height = 40
       Align = alLeft
       BevelWidth = 2
@@ -311,7 +291,7 @@ object FrmDiff: TFrmDiff
       TabOrder = 2
       OnClick = PnlMergeRightClick
       object BtnRemoveRight: TButton
-        Left = 240
+        Left = 191
         Top = 2
         Width = 38
         Height = 36
@@ -323,7 +303,6 @@ object FrmDiff: TFrmDiff
         TabOrder = 0
         TabStop = False
         OnClick = BtnRemoveRightClick
-        ExplicitLeft = 160
       end
     end
   end
