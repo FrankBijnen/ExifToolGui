@@ -124,6 +124,7 @@ type
     MinimizeToTray: boolean;
     SingleInstanceApp: boolean;
     ShowBalloon: boolean;
+    AllowNonMSWicCodec: boolean;
     function FileFilter: string;
     function SaveFileFilter: string;
     function CanShowHidden: boolean;
@@ -797,6 +798,7 @@ begin
         MinimizeToTray := ReadBool(Ini_Settings, 'MinimizeToTray', false);
         SingleInstanceApp := ReadBool(Ini_Settings, 'SingleInstanceApp', false);
         ShowBalloon := ReadBool(Ini_Settings, 'ShowBalloon', true);
+        AllowNonMSWicCodec := ReadBool(Ini_Settings, 'AllowNonMSWicCodec', false);
 
         Application.HintHidePause := ReadInteger(Ini_Settings, 'HintHidePause', 5000);
       end;
@@ -1002,6 +1004,7 @@ begin
           WriteBool(Ini_Settings, 'MinimizeToTray', MinimizeToTray);
           WriteBool(Ini_Settings, 'SingleInstanceApp', SingleInstanceApp);
           WriteBool(Ini_Settings, 'ShowBalloon', ShowBalloon);
+          WriteBool(Ini_Settings, 'AllowNonMSWicCodec', AllowNonMSWicCodec);
 
           WriteInteger(Ini_Settings, 'HintHidePause', Application.HintHidePause);
         end;

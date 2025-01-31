@@ -26,6 +26,8 @@ const
   CM_ThumbRefresh = WM_USER + 4;
 
 type
+  TThumbType = (ttIcon, ttThumb, ttThumbCache, ttThumbBiggerCache);
+
   TThumbTask = class(TTask, ITask)
   private
     FHandle: HWND;
@@ -51,8 +53,10 @@ type
   end;
 
   // Image thumbnails
-function GetThumbCache(APIdl: PItemIDList; var hBmp: HBITMAP; Flags: TSIIGBF; AMaxX: longint; AMaxY: longint): HRESULT; overload;
-function GetThumbCache(APath: string; var hBmp: HBITMAP; Flags: TSIIGBF; AMaxX: longint; AMaxY: longint): HRESULT; overload;
+function GetThumbCache(APIdl: PItemIDList; ThumbType: TThumbType; AMaxX, AMaxY: longint;
+                       var hBmp: HBITMAP): HRESULT; overload;
+function GetThumbCache(APath: string; ThumbType: TThumbType; AMaxX, AMaxY: longint;
+                       var hBmp: HBITMAP): HRESULT; overload;
 procedure GenerateThumbs(AFilePath: string; Subdirs: boolean; AMax: longint; FOnReady: TNotifyEvent = nil);
 
 // Functions for CleanMgr.exe
@@ -101,28 +105,13 @@ end;
 
 procedure TThumbTask.DoExecuteListView;
 var
-  Flags: TSIIGBF;
   hBmp: HBITMAP;
   Hr: HRESULT;
-  Tries: integer;
 begin
   CoInitialize(nil);
   try
     try
-      Hr := S_FALSE;
-      Flags := SIIGBF_THUMBNAILONLY;
-
-      // TODO: Figure out why a retry is needed.
-      Tries := 2; // Try a few times.
-      while (Tries > 0) and
-            (Hr <> S_OK) and
-            (GetStatus <> TTaskStatus.Canceled) do
-      begin
-        dec(Tries);
-        Hr := GetThumbCache(FPitemIDListItem, hBmp, Flags, FMax, FMax);
-        if (Hr <> S_OK) then
-          Sleep(50);
-      end;
+      Hr := GetThumbCache(FPitemIDListItem, TThumbType.ttThumb, FMax, FMax, hBmp);
 
       // The task is canceled, or the current path has changed.
       // Dont send any messages, but delete bitmap. If the handle is invalid, doesn't matter
@@ -136,7 +125,7 @@ begin
 
       // Getting a thumbnail failed. return an Icon
       if (HR <> S_OK) then
-        Hr := GetThumbCache(FPitemIDListItem, hBmp, SIIGBF_ICONONLY, FMax, FMax);
+        Hr := GetThumbCache(FPitemIDListItem, TThumbType.ttIcon, FMax, FMax, hBmp);
 
       if (Hr = S_OK) then
         // We must update the imagelist in the main thread, send a message
@@ -161,7 +150,6 @@ end;
 
 procedure TThumbTask.DoExecuteBackground;
 var
-  Flags: TSIIGBF;
   hBmp: HBITMAP;
   Hr: HRESULT;
 begin
@@ -170,8 +158,7 @@ begin
     if (GetStatus = TTaskStatus.Canceled) or (boolean(SendMessage(FHandle, CM_WantsToClose, 0, 0))) then
       exit;
 
-    Flags := SIIGBF_THUMBNAILONLY;
-    Hr := GetThumbCache(FPathName, hBmp, Flags, FMax, FMax);
+    Hr := GetThumbCache(FPathName, TThumbType.ttThumb, FMax, FMax, hBmp);
     // We must update the form in the main thread, send a message
     if (Hr = S_OK) then
       SendMessage(FHandle, CM_ThumbGenProgress, FItemIndex, LPARAM(ExtractFileName(FPathName)));
@@ -192,12 +179,29 @@ begin
   inherited;
 end;
 
-function GetThumbCache(APIdl: PItemIDList; var hBmp: HBITMAP; Flags: TSIIGBF; AMaxX: longint; AMaxY: longint): HRESULT;
+function GetThumbCache(APIdl: PItemIDList; ThumbType: TThumbType; AMaxX, AMaxY: longint;
+                       var hBmp: HBITMAP): HRESULT; overload;
 var
+  Tries: integer;
   FileShellItemImage: IShellItemImageFactory;
   S: TSize;
+  Flags: TSIIGBF;
 begin
+  result := S_FALSE;
   hBmp := 0;
+
+  case ThumbType of
+    TThumbType.ttIcon:
+      Flags := SIIGBF_ICONONLY;
+    TThumbType.ttThumb:
+      Flags := SIIGBF_THUMBNAILONLY;
+    TThumbType.ttThumbCache:
+      Flags := SIIGBF_THUMBNAILONLY or SIIGBF_INCACHEONLY;
+    TThumbType.ttThumbBiggerCache:
+      Flags := SIIGBF_THUMBNAILONLY or SIIGBF_BIGGERSIZEOK or SIIGBF_INCACHEONLY;
+    else
+      exit;
+  end;
   result := SHCreateItemFromIDList(APIdl, IShellItemImageFactory, FileShellItemImage);
 
   if Succeeded(result) then
@@ -205,10 +209,22 @@ begin
     S.cx := AMaxX;
     S.cy := AMaxY;
     result := FileShellItemImage.GetImage(S, Flags, hBmp);
+
+    // TODO: Figure out why a retry is needed.
+    Tries := 2;
+    while (ThumbType = TThumbType.ttThumb) and
+          (Tries > 0) and
+          not Succeeded(result) do
+    begin
+      Dec(Tries);
+      Sleep(50);
+      result := FileShellItemImage.GetImage(S, Flags, hBmp);
+    end;
   end;
 end;
 
-function GetThumbCache(APath: string; var hBmp: HBITMAP; Flags: TSIIGBF; AMaxX: longint; AMaxY: longint): HRESULT;
+function GetThumbCache(APath: string; ThumbType: TThumbType; AMaxX, AMaxY: longint;
+                       var hBmp: HBITMAP): HRESULT; overload;
 var APidl: PItemIDList;
 begin
   result := S_FALSE;
@@ -217,7 +233,7 @@ begin
     exit;
 
   try
-    result := GetThumbCache(APidl, hBmp, Flags, AMaxX, AMaxY);
+    result := GetThumbCache(APidl, ThumbType, AMaxX, AMaxY, hBmp);
   finally
     CoTaskMemFree(APidl);
   end;
@@ -360,6 +376,5 @@ begin
     StateFlagsValues.Free;
   end;
 end;
-
 
 end.

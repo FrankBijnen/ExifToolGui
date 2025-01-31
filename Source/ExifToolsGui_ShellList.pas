@@ -128,7 +128,8 @@ type
     procedure Populate; override;
     function OwnerDataFetch(Item: TListItem; Request: TItemRequest): boolean; override;
 
-    procedure Add2ThumbNails(ABmp: HBITMAP; ANitemIndex: integer; NeedsGenerating: boolean);
+    procedure Add2ThumbNails(ABitMap: TBitmap; ANitemIndex: integer; NeedsGenerating: boolean); overload;
+    procedure Add2ThumbNails(ABmp: HBITMAP; ANitemIndex: integer; NeedsGenerating: boolean); overload;
     procedure CancelThumbTasks;
     procedure RemoveThumbTask(ItemIndex: integer);
     procedure ShowMultiContextMenu(MousePos: TPoint);
@@ -944,12 +945,12 @@ begin
     begin
       Hr := S_FALSE;
       if (TSubShellFolder.GetIsFolder(Folders[ItemIndx])) then // Only get icons for folders
-        Hr := GetThumbCache(Folders[ItemIndx].AbsoluteID, HBmp, SIIGBF_ICONONLY, FThumbNails.Width, FThumbNails.Height)
+        Hr := GetThumbCache(Folders[ItemIndx].AbsoluteID, TThumbType.ttIcon, FThumbNails.Width, FThumbNails.Height, HBmp)
       else if (FIncludeSubFolders = false) then // Defer loading thumbnails when including subfolders.
       begin
-        Hr := GetThumbCache(Folders[ItemIndx].AbsoluteID, HBmp, SIIGBF_THUMBNAILONLY or SIIGBF_INCACHEONLY, FThumbNails.Width, FThumbNails.Height);
+        Hr := GetThumbCache(Folders[ItemIndx].AbsoluteID, TThumbType.ttThumbCache, FThumbNails.Width, FThumbNails.Height, HBmp);
         if (Hr <> S_OK) then
-          Hr := GetThumbCache(Folders[ItemIndx].AbsoluteID, HBmp, SIIGBF_ICONONLY, FThumbNails.Width, FThumbNails.Height);
+          Hr := GetThumbCache(Folders[ItemIndx].AbsoluteID, TThumbType.ttIcon, FThumbNails.Width, FThumbNails.Height, HBmp);
       end;
 
       if (Hr = S_OK) then
@@ -1517,36 +1518,57 @@ begin
 
   if (ItemIndex > Items.Count -1) then
     exit;
+
+  // Get the cached (by Windows) thumbnail if avail
+  Hr := GetThumbCache(Folders[ItemIndex].AbsoluteID, TThumbType.ttThumbBiggerCache, W, H, HBmp);
+  if (HR = S_OK) then
+  begin
+    result := BitMapFromHBitMap(HBmp, W, H, FBkColor);
+    exit;
+  end;
+
+  // Need to increase the cache?
   if (ItemIndex > High(FThumbNailCache)) then
     SetLength(FThumbNailCache, Items.Count);
 
-  // Get the cached (by Windows) thumbnail if avail
-  Hr := GetThumbCache(Folders[ItemIndex].AbsoluteID, HBmp, SIIGBF_THUMBNAILONLY or SIIGBF_INCACHEONLY or SIIGBF_BIGGERSIZEOK, W, H);
-  if (HR = S_OK) then
-    result := BitMapFromHBitMap(HBmp, W, H, FBkColor)
-  else
+  // In the cache there is no thumbnail, or it needs generating.
+  // Get the thumbnail, return that and save it resized in the cache.
+  if (FThumbNailCache[ItemIndex] <= 0) then
   begin
-    // Need to update our cache?
-    // Notes:
-    //   - Sizes are smaller.
-    //   - Used when not in VsReport mode.
-    if (FThumbNailCache[ItemIndex] = 0) then
+    Hr := GetThumbCache(Folders[ItemIndex].AbsoluteID, TThumbType.ttThumb, FThumbNailSize, FThumbNailSize, HBmp);
+
+    // Use Icon as fallback, if generating thumbnail failed.
+    if (Hr <> S_OK) then
+      Hr := GetThumbCache(Folders[ItemIndex].AbsoluteID, TThumbType.ttIcon, FThumbNailSize, FThumbNailSize, HBmp);
+
+    // We have something
+    if (Hr = S_OK) then
     begin
-      Hr := GetThumbCache(Folders[ItemIndex].AbsoluteID, HBmp, SIIGBF_THUMBNAILONLY, FThumbNailSize, FThumbNailSize);
-      if (Hr <> S_OK) then
-        Hr := GetThumbCache(Folders[ItemIndex].AbsoluteID, HBmp, SIIGBF_ICONONLY, FThumbNailSize, FThumbNailSize);
-      if (Hr = S_OK) then
-        Add2ThumbNails(HBmp, ItemIndex, false);
-    end;
-    // Use what's in our cache. Maybe updated 2 lines earlier.
-    if (FThumbNailCache[ItemIndex] <> 0) then
-    begin
-      result := TBitmap.Create;
-      // Draw the Bitmap with the currently selected BackColor. (From the Style)
-      FThumbNails.GetBitmap(Abs(FThumbNailCache[ItemIndex]), result);
+      // Create a Bitmap to save in the cache.
+      result := BitMapFromHBitMap(HBmp, FThumbNailSize, FThumbNailSize, FBkColor);
+      Add2ThumbNails(result, ItemIndex, false);
+      // Resize to desired.
       ResizeBitmapCanvas(result, W, H, FBkColor);
+      exit;
     end;
   end;
+
+  // Use what's in our cache.
+  if (FThumbNailCache[ItemIndex] > 0) then
+  begin
+    result := TBitmap.Create;
+    FThumbNails.GetBitmap(Abs(FThumbNailCache[ItemIndex]), result);
+    ResizeBitmapCanvas(result, W, H, FBkColor);
+  end;
+end;
+
+procedure TShellListView.Add2ThumbNails(ABitMap: TBitmap; ANitemIndex: integer; NeedsGenerating: boolean);
+begin
+  Items[ANitemIndex].ImageIndex := FThumbNails.AddMasked(ABitMap, FBkColor);
+  if (NeedsGenerating) then
+    FThumbNailCache[ANitemIndex] := Items[ANitemIndex].ImageIndex * -1
+  else
+    FThumbNailCache[ANitemIndex] := Items[ANitemIndex].ImageIndex;
 end;
 
 procedure TShellListView.Add2ThumbNails(ABmp: HBITMAP; ANitemIndex: integer; NeedsGenerating: boolean);
@@ -1555,11 +1577,7 @@ var
 begin
   ABitMap := BitMapFromHBitMap(ABmp, FThumbNails.Width, FThumbNails.Height, FBkColor);
   try
-    Items[ANitemIndex].ImageIndex := FThumbNails.AddMasked(ABitMap, FBkColor);
-    if (NeedsGenerating) then
-      FThumbNailCache[ANitemIndex] := Items[ANitemIndex].ImageIndex * -1
-    else
-      FThumbNailCache[ANitemIndex] := Items[ANitemIndex].ImageIndex;
+    Add2ThumbNails(ABitMap, ANitemIndex, NeedsGenerating);
   finally
     ABitMap.Free;
   end;

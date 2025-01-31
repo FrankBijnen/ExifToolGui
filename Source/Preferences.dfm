@@ -434,6 +434,14 @@ object FPreferences: TFPreferences
         TabOrder = 5
         OnClick = BtnGenThumbsClick
       end
+      object ChkAllowNonMSWicCodec: TCheckBox
+        Left = 20
+        Top = 32
+        Width = 539
+        Height = 17
+        Caption = 'Allow Non Microsoft Wic codecs'
+        TabOrder = 6
+      end
     end
     object TabGeoCoding: TTabSheet
       Caption = 'GeoCoding'

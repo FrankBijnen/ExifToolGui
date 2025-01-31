@@ -2626,7 +2626,8 @@ begin
         end;
  {$ENDIF}
       end;
-      ABitMap := GetBitmapFromWic(WicPreview(FPath, Rotate, RotateImg.Width, RotateImg.Height));
+      if (FPath <> '') then // Directory?
+        ABitMap := GetBitmapFromWic(WicPreview(FPath, Rotate, RotateImg.Width, RotateImg.Height));
       if (ABitMap <> nil) then
         ResizeBitmapCanvas(ABitMap, RotateImg.Width, RotateImg.Height, GUIColorWindow)
       else
