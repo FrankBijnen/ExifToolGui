@@ -6,7 +6,7 @@ unit ExifToolsGui_ShellTree;
 interface
 
 uses System.Classes, System.SysUtils,
-     Winapi.Windows, Winapi.ShlObj, Winapi.Messages,
+     Winapi.Windows, Winapi.ShlObj, Winapi.Messages, Winapi.CommCtrl,
      Vcl.Shell.ShellCtrls, Vcl.ComCtrls,
      ExifToolsGUI_MultiContextMenu;
 
@@ -17,9 +17,11 @@ type
     FPreferredRoot: string;
     FPaths2Refresh: TStringList;
     ICM2: IContextMenu2;
+    FOnEditingEnded: TTVEditedEvent;
     FOnBeforeContextMenu: TNotifyEvent;
     FOnAfterContextMenu: TNotifyEvent;
   protected
+    procedure Edit(const Item: TTVItem); override;
     procedure InitNode(NewNode: TTreeNode; ID: PItemIDList; ParentNode: TTreeNode); override;
     procedure DoContextPopup(MousePos: TPoint; var Handled: boolean); override;
     procedure ShowMultiContextMenu(MousePos: TPoint);
@@ -43,6 +45,7 @@ type
     property OnBeforeContextMenu: TNotifyEvent read FOnBeforeContextMenu write FOnBeforeContextMenu;
     property OnAfterContextMenu: TNotifyEvent read FOnAfterContextMenu write FOnAfterContextMenu;
     property OnCustomDrawItem;
+    property OnEditingEnded: TTVEditedEvent read FOnEditingEnded write FOnEditingEnded;
     property Path: string read GetPath write SetPath;
     property PreferredRoot: string read FPreferredRoot write FPreferredRoot;
  end;
@@ -51,7 +54,7 @@ implementation
 
 uses
   System.IOUtils,
-  Winapi.ActiveX, Winapi.CommCtrl,
+  Winapi.ActiveX,
   Vcl.Shell.ShellConsts, Vcl.Controls,
   ExifToolsGUI_Thumbnails, ExiftoolsGui_ShellList, ExifToolsGUI_Utils, UnitFilesOnClipBoard;
 
@@ -79,6 +82,24 @@ begin
   if (SelectedFolder = nil) then
     exit;
   InvokeMultiContextMenu(Self, SelectedFolder, MousePos, ICM2);
+end;
+
+procedure TShellTreeView.Edit(const Item: TTVItem);
+var
+  Node: TTreeNode;
+  S: string;
+begin
+  inherited Edit(Item);
+
+  // Need an event after the rename. To make sure ExifTool is restarted.
+  // Note: S is a var parm, but any changes made by the event handler are ignored.
+  if (Item.pszText <> '') and
+     (Assigned(FOnEditingEnded)) then
+  begin
+    Node := Items.GetNode(Item.hItem);
+    S := Node.Text;
+    FOnEditingEnded(Self, Node, S);
+  end;
 end;
 
 procedure TShellTreeView.InitNode(NewNode: TTreeNode; ID: PItemIDList; ParentNode: TTreeNode);
@@ -174,7 +195,7 @@ begin
 
   if SameText(Verb, SCmdVerDiff) then
   begin
-    ShowCompareDlgDir(Path);
+    ShowCompareDlg(Path);
     Handled := true;
   end;
 

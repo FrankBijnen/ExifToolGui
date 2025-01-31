@@ -672,16 +672,11 @@ begin
 
   if SameText(Verb, SCmdVerDiff) then
   begin
-    if (SelCount <> 2) then
-      ShowCompareDlg('', '')
-    else
-    begin
-      FileList := CreateSelectedFoldersList(true);
-      try
-        ShowCompareDlg(FileList[0], FileList[1]);
-      finally
-        FileList.Free;
-      end;
+    FileList := CreateSelectedFoldersList(true);
+    try
+      ShowCompareDlg(FileList);
+    finally
+      FileList.Free;
     end;
   end;
 

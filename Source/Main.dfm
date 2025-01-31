@@ -19,6 +19,7 @@ object FMain: TFMain
   OnClose = FormClose
   OnCreate = FormCreate
   OnKeyDown = FormKeyDown
+  OnKeyPress = FormKeyPress
   OnShow = FormShow
   TextHeight = 13
   object Splitter1: TSplitter
@@ -130,6 +131,7 @@ object FMain: TFMain
           TabOrder = 0
           OnKeyDown = ShellTreeKeyDown
           OnChanging = ShellTreeChanging
+          OnEdited = ShellTreeEdited
         end
       end
     end
