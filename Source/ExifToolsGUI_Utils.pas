@@ -893,6 +893,16 @@ begin
 end;
 
 // Image
+
+// Prefer MS builtin codecs. Set up in preferences.
+function VendorGUID: TGuid;
+begin
+  if GUIsettings.AllowNonMSWicCodec then
+    result := StringToGuid('{00000000-0000-0000-0000-000000000000}')
+  else
+    result := GUID_VendorMicrosoftBuiltIn;
+end;
+
 function IsJpeg(Filename: string): boolean;
 var
   Ext: string;
@@ -995,6 +1005,7 @@ end;
 
 function WicPreview(AImg: string; Rotate, MaxW, MaxH: cardinal): IWICBitmapSource;
 var
+  Hr: HRESULT;
   IwD: IWICBitmapDecoder;
   IwdR: IWICBitmapFlipRotator;
   IwdS: IWICBitmapScaler;
@@ -1003,9 +1014,15 @@ var
   Portrait: boolean;
 begin
   result := nil;
-  GlobalImgFact.CreateDecoderFromFilename(PWideChar(AImg), GUID_VendorMicrosoftBuiltIn, // Use only builtin codecs. No additional installs needed.
-    GENERIC_READ, WICDecodeMetadataCacheOnDemand, IwD);
-  if IwD = nil then
+
+  Hr := GlobalImgFact.CreateDecoderFromFilename(PWideChar(AImg),
+    VendorGUID,
+    GENERIC_READ,
+    WICDecodeMetadataCacheOnDemand,
+    IwD);
+
+  if (Hr <> S_OK) or
+     (IwD = nil) then
     exit;
 
   IwD.GetPreview(result);

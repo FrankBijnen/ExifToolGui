@@ -78,6 +78,7 @@ type
     EdGeoLocation500Dir: TEdit;
     BtnGeoLocation500Dir: TButton;
     ChkWorkLineEdit: TCheckBox;
+    ChkAllowNonMSWicCodec: TCheckBox;
     procedure FormShow(Sender: TObject);
     procedure BtnSaveClick(Sender: TObject);
     procedure BtnBrowseFolder(Sender: TObject);
@@ -142,6 +143,7 @@ begin
 
   FMain.ShellList.ThumbAutoGenerate := ChkThumbAutoGenerate.Checked;
   GUIsettings.ThumbAutoGenerate := ChkThumbAutoGenerate.Checked;
+  GUIsettings.AllowNonMSWicCodec := ChkAllowNonMSWicCodec.Checked;
   GUIsettings.ThumbCleanSet := EdThumbCleanset.EditText;
 
   GUIsettings.EnableGMap := CheckBox2.Checked;
@@ -324,6 +326,7 @@ begin
   LabeledEdit1.Text := ET.Options.GetSeparator;
 
   ChkThumbAutoGenerate.Checked := GUIsettings.ThumbAutoGenerate;
+  ChkAllowNonMSWicCodec.Checked := GUIsettings.AllowNonMSWicCodec;
   EdThumbCleanset.Text := GUIsettings.ThumbCleanSet;
 
   CheckBox2.Checked := GUIsettings.EnableGMap;
