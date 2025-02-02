@@ -1156,7 +1156,7 @@ begin
     if (Win32MajorVersion >= 6) then
       with TTaskDialog.Create(Self) do
         try
-            Caption := SPathNotFoundCaption;
+          Caption := SPathNotFoundCaption;
           Title := SPathNotFoundCaption;
           Text := Format(SPathNotFoundText, [AText]);
           MainIcon := tdiInformation;

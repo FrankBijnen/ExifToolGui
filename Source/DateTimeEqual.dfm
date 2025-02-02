@@ -3,36 +3,38 @@ object FDateTimeEqual: TFDateTimeEqual
   Top = 0
   BorderStyle = bsDialog
   Caption = 'Exif/Xmp DateTime equalize'
-  ClientHeight = 178
-  ClientWidth = 529
+  ClientHeight = 223
+  ClientWidth = 572
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
   Font.Height = -11
   Font.Name = 'Tahoma'
   Font.Style = []
+  OnCreate = FormCreate
   OnShow = FormShow
   TextHeight = 13
   object Label1: TLabel
-    Left = 429
-    Top = 108
-    Width = 99
+    Left = 470
+    Top = 145
+    Width = 100
     Height = 13
     AutoSize = False
     Caption = 'Label1'
   end
   object StatusBar1: TStatusBar
     Left = 0
-    Top = 159
-    Width = 529
+    Top = 204
+    Width = 572
     Height = 19
     Panels = <>
+    SimplePanel = True
   end
   object AdvPanel1: TPanel
     Left = 0
     Top = 0
-    Width = 424
-    Height = 159
+    Width = 463
+    Height = 204
     Align = alLeft
     DoubleBuffered = True
     Font.Charset = DEFAULT_CHARSET
@@ -42,11 +44,11 @@ object FDateTimeEqual: TFDateTimeEqual
     Font.Style = []
     ParentDoubleBuffered = False
     ParentFont = False
-    TabOrder = 1
+    TabOrder = 0
     object Bevel1: TBevel
       Left = 6
       Top = 6
-      Width = 407
+      Width = 450
       Height = 38
     end
     object LblGroup: TLabel
@@ -64,7 +66,7 @@ object FDateTimeEqual: TFDateTimeEqual
       Top = 11
       Width = 129
       Height = 22
-      TabOrder = 6
+      TabOrder = 0
       Text = 'Exif'
       OnClick = CmbGroupClick
       Items.Strings = (
@@ -83,7 +85,7 @@ object FDateTimeEqual: TFDateTimeEqual
       EditLabel.Caption = 'DateTimeOriginal:'
       LabelPosition = lpLeft
       ReadOnly = True
-      TabOrder = 0
+      TabOrder = 1
       Text = '2012:01:12 18:15:00'
     end
     object LabeledEdit2: TLabeledEdit
@@ -97,7 +99,7 @@ object FDateTimeEqual: TFDateTimeEqual
       EditLabel.Caption = 'CreateDate:'
       LabelPosition = lpLeft
       ReadOnly = True
-      TabOrder = 1
+      TabOrder = 2
       Text = ''
     end
     object LabeledEdit3: TLabeledEdit
@@ -111,7 +113,7 @@ object FDateTimeEqual: TFDateTimeEqual
       EditLabel.Caption = 'ModifyDate:'
       LabelPosition = lpLeft
       ReadOnly = True
-      TabOrder = 2
+      TabOrder = 3
       Text = ''
     end
     object RadioButton1: TRadioButton
@@ -121,9 +123,9 @@ object FDateTimeEqual: TFDateTimeEqual
       Height = 17
       Caption = '-use as source'
       Checked = True
-      TabOrder = 3
+      TabOrder = 4
       TabStop = True
-      OnClick = RadioButton1Click
+      OnClick = RadioButtonClick
     end
     object RadioButton2: TRadioButton
       Left = 272
@@ -131,8 +133,8 @@ object FDateTimeEqual: TFDateTimeEqual
       Width = 150
       Height = 17
       Caption = '-and copy here'
-      TabOrder = 4
-      OnClick = RadioButton1Click
+      TabOrder = 5
+      OnClick = RadioButtonClick
     end
     object RadioButton3: TRadioButton
       Left = 272
@@ -140,23 +142,41 @@ object FDateTimeEqual: TFDateTimeEqual
       Width = 150
       Height = 17
       Caption = '-and copy here'
-      TabOrder = 5
-      OnClick = RadioButton1Click
+      TabOrder = 6
+      OnClick = RadioButtonClick
+    end
+    object ChkFileModified: TCheckBox
+      Left = 134
+      Top = 156
+      Width = 322
+      Height = 17
+      Hint = 'File: Date modified becomes (shifted) ModifyDate fom metadata'
+      Caption = '-change File: Date modified'
+      TabOrder = 7
+    end
+    object ChkFileCreated: TCheckBox
+      Left = 134
+      Top = 177
+      Width = 322
+      Height = 17
+      Hint = 'File: Date created becomes (shifted) CreateDate from metadata'
+      Caption = '-change File: Date created'
+      TabOrder = 8
     end
   end
   object Button1: TButton
-    Left = 429
-    Top = 13
-    Width = 99
+    Left = 468
+    Top = 8
+    Width = 100
     Height = 25
     Caption = 'Cancel'
     ModalResult = 2
     TabOrder = 2
   end
   object Button2: TButton
-    Left = 429
-    Top = 127
-    Width = 99
+    Left = 470
+    Top = 164
+    Width = 100
     Height = 25
     Caption = 'Execute'
     Default = True

@@ -1295,8 +1295,21 @@ object FMain: TFMain
           item
             Items = <
               item
-                Action = MaFileDateFromExif
-                Caption = '&File: Date created and modified as in Exif...'
+                Items = <
+                  item
+                    Action = MaFDateFromMetaExif
+                    Caption = '&Exif'
+                  end
+                  item
+                    Action = MaFDateFromMetaXmp
+                    Caption = '&Xmp'
+                  end
+                  item
+                    Action = MaFDateFromQuickTime
+                  end>
+                Tag = 40
+                Caption = 'File: Date created and modified as in ...'
+                UsageCount = 1
               end
               item
                 Action = MaFileNameDateTime
@@ -1579,12 +1592,6 @@ object FMain: TFMain
       Caption = 'Update City, Province, Country from GPS coordinates...'
       OnExecute = UpdateLocationfromGPScoordinatesClick
     end
-    object MaFileDateFromExif: TAction
-      Tag = 40
-      Category = 'Various'
-      Caption = 'File: Date created and modified as in Exif...'
-      OnExecute = MFileDateFromExifClick
-    end
     object MaFileNameDateTime: TAction
       Tag = 40
       Category = 'Various'
@@ -1674,6 +1681,24 @@ object FMain: TFMain
       Caption = 'Show diff metadata'
       OnExecute = MaShowDiffExecute
       OnUpdate = MaEnableDiff
+    end
+    object MaFDateFromMetaExif: TAction
+      Tag = 40
+      Category = 'Various_FileDate'
+      Caption = 'Exif'
+      OnExecute = MaFdateFromExifExecute
+    end
+    object MaFDateFromMetaXmp: TAction
+      Tag = 40
+      Category = 'Various_FileDate'
+      Caption = 'Xmp'
+      OnExecute = MaFDateFromXmpExecute
+    end
+    object MaFDateFromQuickTime: TAction
+      Tag = 40
+      Category = 'Various_FileDate'
+      Caption = 'QuickTime'
+      OnExecute = MaFDateFromQuickTimeExecute
     end
   end
   object QuickPopUpMenu: TPopupMenu

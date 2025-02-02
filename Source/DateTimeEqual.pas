@@ -24,13 +24,18 @@ type
     CmbGroup: TComboBox;
     LblGroup: TLabel;
     Bevel1: TBevel;
+    ChkFileModified: TCheckBox;
+    ChkFileCreated: TCheckBox;
     procedure FormShow(Sender: TObject);
-    procedure RadioButton1Click(Sender: TObject);
+    procedure RadioButtonClick(Sender: TObject);
     procedure Button2Click(Sender: TObject);
     procedure CmbGroupClick(Sender: TObject);
+    procedure FormCreate(Sender: TObject);
   private
     { Private declarations }
     Group: string;
+    OrigChkFileModified: string;
+    OrigChkFileCreated: string;
     procedure DisplayHint(Sender: TObject);
     procedure GetCurrentValues;
   public
@@ -43,7 +48,8 @@ var
 
 implementation
 
-uses Main, ExifTool, UnitLangResources;
+uses
+  Main, ExifTool, ExifToolsGUI_Utils, UnitLangResources;
 
 {$R *.dfm}
 
@@ -53,6 +59,8 @@ var
   ETresult: TStringList;
 begin
   Group := CmbGroup.Text;
+  ChkFileModified.Caption := OrigChkFileModified + '<' + CmdStr + CmdModifyDate(Group);
+  ChkFileCreated.Caption := OrigChkFileCreated + '<' + CmdStr + CmdCreateDate(Group);
   RadioButton1.Enabled := CmbGroup.ItemIndex <> 2;   // QuickTime
   RadioButton1.Checked := RadioButton1.Enabled;      // QuickTime
   RadioButton2.Checked := not RadioButton1.Enabled;  // QuickTime
@@ -65,6 +73,7 @@ begin
     ET.OpenExec(ETcmd, FMain.GetFirstSelectedFile, ETresult, false);
     if (ETresult.Count > 2) then
     begin
+      ChkFileCreated.Checked := true;
       LabeledEdit1.Text := ETresult[0];
       LabeledEdit2.Text := ETresult[1];
       LabeledEdit3.Text := ETresult[2];
@@ -82,6 +91,7 @@ begin
   if RadioButton1.Checked then
     ETcmd := CmdStr + CmdDateTimeOriginal(Group) + '>' + CmdModifyDate(Group) + CRLF +
              CmdStr + CmdDateTimeOriginal(Group) + '>' + CmdCreateDate(Group);
+
   if RadioButton2.Checked then
   begin
     if (RadioButton1.Enabled) then
@@ -90,6 +100,7 @@ begin
     else
       ETcmd := CmdStr + CmdCreateDate(Group) + '>' + CmdModifyDate(Group); // QuickTime
   end;
+
   if RadioButton3.Checked then
   begin
     if (RadioButton1.Enabled) then
@@ -99,6 +110,16 @@ begin
       ETcmd := CmdStr + CmdModifyDate(Group) + '>' + CmdCreateDate(Group); // QuickTime
   end;
   ET.OpenExec(ETcmd, FMain.GetSelectedFiles, ETout, ETerr);
+
+  // Correct FileDates?
+  ETcmd := '';
+  if ChkFileModified.Checked then
+    ETcmd := '-FileModifyDate<' + CmdModifyDate(Group);
+  if ChkFileCreated.Checked then
+    ETcmd := EndsWithCRLF(ETcmd) + '-FileCreateDate<' + CmdCreateDate(Group);
+  if (ETcmd <> '') then
+    ET.OpenExec(Etcmd, FMain.GetSelectedFiles);
+
   ModalResult := mrOK;
 end;
 
@@ -112,26 +133,36 @@ begin
   StatusBar1.SimpleText := GetShortHint(Application.Hint);
 end;
 
+procedure TFDateTimeEqual.FormCreate(Sender: TObject);
+begin
+  OrigChkFileModified := ChkFileModified.Caption;
+  OrigChkFileCreated := ChkFileCreated.Caption;
+
+  ChkFileCreated.Checked := false;
+end;
+
 procedure TFDateTimeEqual.FormShow(Sender: TObject);
 begin
+  Application.OnHint := DisplayHint;
   Left := FMain.GetFormOffset.X;
   Top := FMain.GetFormOffset.Y;
-
-  GetCurrentValues;
-  RadioButton1Click(Sender);
 
   if FMain.MaDontBackup.Checked then
     Label1.Caption := StrBackupOFF
   else
     Label1.Caption := StrBackupON;
-  Application.OnHint := DisplayHint;
+  ChkFileModified.Checked := FMain.MaPreserveDateMod.Checked;
+
+  GetCurrentValues;
+  RadioButtonClick(Sender);
+
   if (RadioButton1.Enabled) then
     RadioButton1.SetFocus
   else
     RadioButton2.SetFocus;
 end;
 
-procedure TFDateTimeEqual.RadioButton1Click(Sender: TObject);
+procedure TFDateTimeEqual.RadioButtonClick(Sender: TObject);
 begin
   if Sender = RadioButton1 then
   begin
