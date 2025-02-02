@@ -4,7 +4,7 @@ object FDateTimeShift: TFDateTimeShift
   BorderStyle = bsDialog
   Caption = 'Exif/Xmp: DateTime shift'
   ClientHeight = 276
-  ClientWidth = 581
+  ClientWidth = 593
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -17,7 +17,7 @@ object FDateTimeShift: TFDateTimeShift
   object Label1: TLabel
     Left = 488
     Top = 199
-    Width = 91
+    Width = 100
     Height = 13
     AutoSize = False
     Caption = 'Label1'
@@ -25,7 +25,7 @@ object FDateTimeShift: TFDateTimeShift
   object StatusBar1: TStatusBar
     Left = 0
     Top = 257
-    Width = 581
+    Width = 593
     Height = 19
     Panels = <>
     SimplePanel = True
@@ -195,7 +195,7 @@ object FDateTimeShift: TFDateTimeShift
       Top = 207
       Width = 320
       Height = 17
-      Hint = 'File: Date modified becomes (shifted) exif:ModifyDate value'
+      Hint = 'File: Date modified becomes (shifted) ModifyDate fom metadata'
       Caption = '-change File: Date modified'
       TabOrder = 10
       OnClick = ChkShiftClick
@@ -205,7 +205,7 @@ object FDateTimeShift: TFDateTimeShift
       Top = 230
       Width = 320
       Height = 17
-      Hint = 'File: Date created becomes (shifted) exif:CreateDate value'
+      Hint = 'File: Date created becomes (shifted) CreateDate from metadata'
       Caption = '-change File: Date created'
       TabOrder = 11
       OnClick = ChkShiftClick
@@ -260,7 +260,7 @@ object FDateTimeShift: TFDateTimeShift
   object BtnCancel: TButton
     Left = 488
     Top = 8
-    Width = 91
+    Width = 100
     Height = 25
     Caption = 'Cancel'
     ModalResult = 2
@@ -269,7 +269,7 @@ object FDateTimeShift: TFDateTimeShift
   object BtnExecute: TButton
     Left = 488
     Top = 223
-    Width = 91
+    Width = 100
     Height = 25
     Caption = 'Execute'
     Default = True

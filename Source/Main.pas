@@ -150,7 +150,6 @@ type
     MaExifLensFromMaker: TAction;
     MaRemoveMeta: TAction;
     MaUpdateLocationfromGPScoordinates: TAction;
-    MaFileDateFromExif: TAction;
     MaFileNameDateTime: TAction;
     MaJPGGenericlosslessautorotate: TAction;
     MaOnlineDocumentation: TAction;
@@ -211,6 +210,9 @@ type
     MaAPIWindowsLongPath: TAction;
     MaShowDiff: TAction;
     MaSelectDiff: TAction;
+    MaFDateFromMetaExif: TAction;
+    MaFDateFromMetaXmp: TAction;
+    MaFDateFromQuickTime: TAction;
     procedure ShellListClick(Sender: TObject);
     procedure ShellListKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
     procedure SpeedBtnExifClick(Sender: TObject);
@@ -264,7 +266,6 @@ type
     procedure MExifDateTimeEqualizeClick(Sender: TObject);
     procedure MRemoveMetaClick(Sender: TObject);
     procedure MExifLensFromMakerClick(Sender: TObject);
-    procedure MFileDateFromExifClick(Sender: TObject);
     procedure MAboutClick(Sender: TObject);
     procedure QuickPopUp_FillQuickClick(Sender: TObject);
     procedure SpeedBtn_GeotagClick(Sender: TObject);
@@ -358,6 +359,9 @@ type
     procedure ShellTreeEditingEnded(Sender: TObject; Node: TTreeNode; var S: string);
     procedure ShellTreeEdited(Sender: TObject; Node: TTreeNode; var S: string);
     procedure FormKeyPress(Sender: TObject; var Key: Char);
+    procedure MaFdateFromExifExecute(Sender: TObject);
+    procedure MaFDateFromXmpExecute(Sender: TObject);
+    procedure MaFDateFromQuickTimeExecute(Sender: TObject);
   private
     { Private declarations }
     ETBarSeriesFocal: TBarSeries;
@@ -419,6 +423,7 @@ type
     procedure FilterPopupClick(Sender: TObject);
     procedure EditFileLists(Sender: TObject);
     procedure EditFileFilter(Sender: TObject);
+    procedure FileDateFromMetaData(GroupId: integer);
 
   protected
     procedure CreateWnd; override;
@@ -1442,21 +1447,21 @@ begin
     TbFlRefreshClick(Sender);
 end;
 
+procedure TFMain.FileDateFromMetaData(GroupId: integer);
 const
-  Group = 'exif';
+  Groups: array[0..2] of string = ('exif', 'xmp', 'quicktime');
 
-procedure TFMain.MFileDateFromExifClick(Sender: TObject);
 var
   ETout, ETerr: string;
 begin
   if MessageDlg(FileDateFromExif1 + #10 +
-                Format(FileDateFromExif2, [CmdCreateDate(Group), CmdModifyDate(Group)]) + #10#10 +
+                Format(FileDateFromExif2, [CmdCreateDate(Groups[GroupId]), CmdModifyDate(Groups[GroupId])]) + #10#10 +
                 StrOKToProceed, mtInformation, [mbOk, mbCancel], 0) = mrOK then
   begin
-    ET.OpenExec('-FileCreateDate<' + CmdCreateDate(Group) + CRLF +
-                '-FileModifyDate<' + CmdModifyDate(Group),
+    ET.OpenExec('-FileCreateDate<' + CmdCreateDate(Groups[GroupId]) + CRLF +
+                '-FileModifyDate<' + CmdModifyDate(Groups[GroupId]),
                 GetSelectedFiles, ETout, ETerr);
-    RefreshSelected(Sender);
+    RefreshSelected(nil);
     ShowMetadata;
     ShowPreview;
   end;
@@ -2709,6 +2714,21 @@ begin
     ShellList.Refresh;
     ShellList.SetFocus;
   end;
+end;
+
+procedure TFMain.MaFdateFromExifExecute(Sender: TObject);
+begin
+  FileDateFromMetaData(0);
+end;
+
+procedure TFMain.MaFDateFromXmpExecute(Sender: TObject);
+begin
+  FileDateFromMetaData(1);
+end;
+
+procedure TFMain.MaFDateFromQuickTimeExecute(Sender: TObject);
+begin
+  FileDateFromMetaData(2);
 end;
 
 procedure TFMain.AdvPagePreviewResize(Sender: TObject);

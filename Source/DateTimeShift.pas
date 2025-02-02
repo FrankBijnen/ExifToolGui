@@ -262,8 +262,10 @@ end;
 
 procedure TFDateTimeShift.FormShow(Sender: TObject);
 begin
+  Application.OnHint := DisplayHint;
   Left := FMain.GetFormOffset.X;
   Top := FMain.GetFormOffset.Y;
+
   if FMain.MaDontBackup.Checked then
     Label1.Caption := StrBackupOFF
   else
@@ -272,13 +274,10 @@ begin
   ChkShiftOriginal.Checked := false;
   ChkShiftCreate.Checked := false;
   ChkShiftModify.Checked := FMain.MaPreserveDateMod.Checked;
-
   ChkFileModified.Checked := FMain.MaPreserveDateMod.Checked;
   ChkFileCreated.Checked := false;
 
   GetCurrentValues;
-
-  Application.OnHint := DisplayHint;
 end;
 
 procedure TFDateTimeShift.MeShiftAmountChange(Sender: TObject);
