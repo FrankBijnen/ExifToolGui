@@ -320,6 +320,7 @@ begin
       (Root <> FPreferredRoot) then
     Root := FPreferredRoot;
   end;
+
   inherited Path := APath;
 end;
 

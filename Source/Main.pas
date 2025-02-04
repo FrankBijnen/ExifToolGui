@@ -1057,12 +1057,12 @@ begin
   CurAction := TAction(Sender);
   case (ShellList.SelCount) of
     0: CurAction.Enabled := false;
-    1: CurAction.Enabled := true;
+    1: CurAction.Enabled := MenusEnabled;
     else
       begin
         FileList := ShellList.CreateSelectedFoldersList(true);
         try
-          CurAction.Enabled := not InvalidMixFoldersAndFiles(FileList, IsFolder);
+          CurAction.Enabled := MenusEnabled and not InvalidMixFoldersAndFiles(FileList, IsFolder);
           if (CurAction.Tag <> 0) and // Select left has tag = 1
              (IsFolder) then
             CurAction.Enabled := false;
@@ -3229,8 +3229,7 @@ begin
   if ParamCount > 0 then
   begin
     Param := ParamStr(1);
-
-    if DirectoryExists(Param) then
+    if ValidDir(Param) then
     begin
       PathFromParm := true;
       ShellTree.Path := Param; // directory only
@@ -3651,9 +3650,18 @@ begin
 
   AdvPageMetadata.Enabled := Enable;
   AdvPanelETdirect.Enabled := Enable;
-  TbFileList.Enabled := Enable;
 
-  if not Enable then
+  TbFlRefresh.Enabled := Enable;
+  TbFlView.Enabled := Enable;
+  TbFlView.EnableDropdown := Enable;
+  TbFlFilter.Enabled := Enable;
+  TbFlFilter.EnableDropdown := Enable;
+  TbFlExport.Enabled := Enable;
+  TbFlExport.EnableDropdown := Enable;
+  TbFlSelect.Enabled := Enable;
+
+  if not Enable and
+     ET.ETValidWorkingDir then
     if (MessageDlgEx(StrERRORExifTool1 + #10 +  #10 +
         StrERRORExifTool2 + #10 +
         StrERRORExifTool3 + GetAppPath + #10 +

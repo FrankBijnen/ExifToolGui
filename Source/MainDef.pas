@@ -956,7 +956,7 @@ begin
         WriteInteger(Ini_ETGUI, 'PreviewHeight', AdvPagePreview.Height);
         WriteInteger(Ini_ETGUI, 'MetadataWidth', AdvPageMetadata.Width);
         WriteInteger(Ini_ETGUI, 'MetadataTagWidth', MetadataList.ColWidths[0]);
-        WriteString(Ini_ETGUI, 'DefaultDir', ShellList.path);
+        WriteString(Ini_ETGUI, 'DefaultDir', ShellList.ShellPath);
 
         // Write all form sizes to INI
         WriteAllFormSizes(GUIini);

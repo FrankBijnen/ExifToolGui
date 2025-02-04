@@ -26,7 +26,7 @@ type
   TOwnerDataFetchEvent = procedure(Sender: TObject; Item: TListItem; Request: TItemRequest; AFolder: TShellFolder) of object;
   TEnumColumnsEvent = procedure(Sender: TObject; var FileListOptions: TReadModeOptions; var ColumnDefs: TColumnsArray) of object;
 
-  TRelativeNameType = (rnDisplay, rnFile, rnSort);
+  TRelativeNameType = (rnDisplay, rnFile, rnSort, rnShellPath);
 
   TSubShellFolder = class(TShellFolder)
     FRelativePath: string;
@@ -147,6 +147,7 @@ type
     procedure RefreshSelected;
     procedure AddDate; // Adds next columns if it is a Date.
     function Path: string;
+    function ShellPath: string;
     function GetSelectedFolder(ItemIndex: integer): TShellFolder;
     function FilePath(ItemIndex: integer = -1): string;
     function RelDisplayName(ItemIndex: integer = -1): string;
@@ -332,6 +333,8 @@ end;
 
 class function TSubShellFolder.GetName(Folder: TShellFolder;
                                        RelativeNameType: TRelativeNameType): string;
+var
+  StrRet: TStrRet;
 begin
   case (RelativeNameType) of
     TRelativeNameType.rnDisplay:
@@ -349,6 +352,13 @@ begin
         else
           result := ' ' + Folder.DisplayName;
       end;
+    TRelativeNameType.rnShellPath:
+    begin
+      // For Saving the Shell path. Can contain ::{ etc.
+      FillChar(StrRet, SizeOf(StrRet), 0);
+      Folder.ParentShellFolder.GetDisplayNameOf(Folder.RelativeID, SHGDN_FORPARSING, StrRet);
+      Result := StrRetToStr(StrRet, Folder.RelativeID);
+    end;
   end;
 end;
 
@@ -1315,6 +1325,11 @@ end;
 function TShellListView.Path: string;
 begin
   result := RootFolder.PathName;
+end;
+
+function TShellListView.ShellPath: string;
+begin
+  result := TSubShellFolder.GetRelativeName(RootFolder, TRelativeNameType.rnShellPath);
 end;
 
 function TShellListView.GetSelectedFolder(ItemIndex: integer): TShellFolder;
