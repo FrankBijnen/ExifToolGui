@@ -354,6 +354,7 @@ object FMain: TFMain
         Font.Height = -12
         Font.Name = 'Segoe UI'
         Font.Style = []
+        Options = [goFixedVertLine, goFixedHorzLine, goVertLine, goHorzLine, goColSizing, goEditing, goRowSelect, goThumbTracking]
         ParentDoubleBuffered = False
         ParentFont = False
         ParentShowHint = False

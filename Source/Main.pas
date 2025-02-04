@@ -1097,15 +1097,17 @@ var
   NewColor, TxtColor: TColor;
   I, N, X: integer;
 begin
-  if (ARow = 0) then
+  if (ARow < 1) or
+     ((State <> []) and (not (gdSelected in State))) then
     exit;
 
-  N := length(QuickTags) - 1;
+  N := Length(QuickTags) - 1;
   with MetadataList do
   begin
     CellTx := Cells[ACol, ARow];
     KeyTx := Cells[0, ARow];
     if (KeyTx = '') then
+    begin
       with Canvas do
       begin // =Group line
         Brush.Style := bsSolid;
@@ -1121,7 +1123,8 @@ begin
           Font.Color := clWindowText;
           TextRect(Rect, Rect.Left + 4, Rect.Top + 2, CellTx);
         end;
-      end
+      end;
+    end
     else if (ACol = 0) then
     begin // -remove "if ACol=0 then" to change both columns
       NewColor := clWindow;
@@ -1129,7 +1132,8 @@ begin
       begin // =Edited tag
         if (KeyTx[1] = '*') then
           NewColor := $BBFFFF;
-        if NewColor <> clWindow then
+        if (NewColor <> clWindow) then
+        begin
           with Canvas do
           begin
             Brush.Style := bsSolid;
@@ -1137,12 +1141,13 @@ begin
             Font.Color := $BB0000;
             TextRect(Rect, Rect.Left + 4, Rect.Top + 2, CellTx);
           end;
+        end;
       end
       else
       begin
-        Delete(KeyTx, 1, pos(' ', KeyTx)); // -in case of Show HexID prefix
+        Delete(KeyTx, 1, Pos(' ', KeyTx)); // -in case of Show HexID prefix
         TxtColor := clWindowText;
-        if pos(KeyTx + ' ', MarkedTagList) > 0 then
+        if Pos(KeyTx + ' ', MarkedTagList) > 0 then
           TxtColor := $0000FF; // tag is marked
         // check if tag is defined in Workspace
         KeyTx := UpperCase(KeyTx);
@@ -1158,7 +1163,9 @@ begin
             break;
           end;
         end;
-        if (NewColor <> clWindow) or (TxtColor <> clWindowText) then
+        if (NewColor <> clWindow) or
+           (TxtColor <> clWindowText) then
+        begin
           with Canvas do
           begin
             Brush.Style := bsSolid;
@@ -1166,6 +1173,7 @@ begin
             Font.Color := TxtColor;
             TextRect(Rect, Rect.Left + 4, Rect.Top + 2, CellTx);
           end;
+        end;
       end;
     end;
   end;
