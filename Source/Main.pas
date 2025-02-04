@@ -3650,7 +3650,15 @@ begin
 
   AdvPageMetadata.Enabled := Enable;
   AdvPanelETdirect.Enabled := Enable;
-  TbFileList.Enabled := Enable;
+
+  TbFlRefresh.Enabled := Enable;
+  TbFlView.Enabled := Enable;
+  TbFlView.EnableDropdown := Enable;
+  TbFlFilter.Enabled := Enable;
+  TbFlFilter.EnableDropdown := Enable;
+  TbFlExport.Enabled := Enable;
+  TbFlExport.EnableDropdown := Enable;
+  TbFlSelect.Enabled := Enable;
 
   if not Enable and
      ET.ETValidWorkingDir then
