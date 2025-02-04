@@ -46,8 +46,9 @@ function GetFileVersionNumberPlatForm(FName: string): string;
 // FileSystem
 function GetIShellFolder(IFolder: IShellFolder; PIDL: PItemIDList): IShellFolder;
 function GetPidlFromName(const Name: string): PItemIDList;
-function ValidDir(ADir: string): boolean;
+function ValidFolder(ADir: string): boolean;
 function ValidFile(AFolder: TShellFolder): boolean;
+function HasDirAttribute(ADir: string): boolean;
 function GetINIPath(AllowCreate: boolean = false): string;
 function GetAppPath: string;
 function GetGeoPath: string;
@@ -66,6 +67,7 @@ function BrowseFolderFileSysDlg(const Title: string;
                                 const iFlag: integer = BIF_USENEWUI): string;
 
 function GetComSpec: string;
+function FirstNonSwitchParm(const Switch: Char = '/'): string;
 function PasteDirectory(ADir, TargetDir: string; Cut: boolean = false): boolean;
 
 // Exchange
@@ -271,7 +273,6 @@ begin
   Result := ILCreateFromPath(PChar(Name));
 end;
 
-
 function GetIShellFolder(IFolder: IShellFolder; PIDL: PItemIDList): IShellFolder;
 begin
   result := nil;
@@ -279,12 +280,20 @@ begin
     IFolder.BindToObject(PIDL, nil, IID_IShellFolder, Pointer(Result));
 end;
 
-function ValidDir(ADir: string): boolean;
+// Can we use ADir as Path for the ShellTree?
+function ValidFolder(ADir: string): boolean;
 var
-  Attrs: DWORD;
+  AShell: IShellFolder;
+  P: PWideChar;
+  Flags, NumChars: LongWord;
+  PIDL: PItemIDList;
 begin
-  Attrs := GetFileAttributes(PChar(ADir));
-  result := (Attrs and FILE_ATTRIBUTE_DIRECTORY) <> 0;
+  SHGetDesktopFolder(AShell);
+  P := StringToOleStr(ADir);
+  NumChars := Length(ADir);
+  Flags := 0;
+  result := (AShell.ParseDisplayName(0, nil, P, NumChars, PIDL, Flags) = S_OK);
+  CoTaskMemFree(PIDL);
 end;
 
 function ValidFile(AFolder: TShellFolder): boolean;
@@ -296,6 +305,14 @@ begin
   Flags := SFGAO_FILESYSTEM;
   AFolder.ParentShellFolder.GetAttributesOf(1, PIDL, Flags);
   result := SFGAO_FILESYSTEM and Flags <> 0;
+end;
+
+function HasDirAttribute(ADir: string): boolean;
+var
+  Attrs: DWORD;
+begin
+  Attrs := GetFileAttributes(PChar(ADir));
+  result := ((Attrs and FILE_ATTRIBUTE_DIRECTORY) <> 0);
 end;
 
 function GetINIPath(AllowCreate: boolean = false): string;
@@ -1170,6 +1187,16 @@ begin
   result := GetEnvVarValue('ComSpec');
   if (result = '') then
     result := 'cmd.exe';
+end;
+
+function FirstNonSwitchParm(const Switch: Char = '/'): string;
+var
+  Index: integer;
+begin
+  result := '';
+  for Index := 1 to ParamCount do
+    if (LeftStr(Paramstr(Index), 1) <> Switch) then
+      exit(Paramstr(Index));
 end;
 
 function GetPreviews(ETResult: TStringList; var Biggest: integer): TPreviewInfoList;

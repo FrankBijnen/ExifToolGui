@@ -730,8 +730,7 @@ begin
     with GUIini, FMain do
     begin
       DefaultDir := ReadString(Ini_ETGUI, 'DefaultDir', 'c:\');
-      if (ValidDir(DefaultDir)) then
-        GUIsettings.InitialDir := DefaultDir;
+      GUIsettings.InitialDir := DefaultDir;
 
       ReadMainWindowSizes(GUIini);
 
@@ -745,7 +744,7 @@ begin
         FilterStartup := ReadInteger(Ini_Settings, 'FilterStartup', 0);
         DefStartupUse := ReadBool(Ini_Settings, 'DefStartupUse', false);
         DefStartupDir := ReadString(Ini_Settings, 'DefStartupDir', 'c:\');
-        if DefStartupUse and ValidDir(DefStartupDir) then
+        if DefStartupUse then
           GUIsettings.InitialDir := DefStartupDir;
         GUIsettings.ETOverrideDir := ReadString(Ini_Settings, 'ETOverrideDir', '');
         GUIsettings.ETCustomConfig := ReadString(Ini_Settings, 'ETCustomConfig', '');

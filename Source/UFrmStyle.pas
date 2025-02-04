@@ -67,8 +67,7 @@ end;
 procedure TFrmStyle.RequestClose;
 begin
   Close; // First close this form, so items can be added again to the shellist
-  if ValidDir(CurPath) then
-    FMain.ShellTree.Path := CurPath; // restore path
+  FMain.ShellTree.Path := CurPath; // restore path
 end;
 
 procedure TFrmStyle.FormShow(Sender: TObject);

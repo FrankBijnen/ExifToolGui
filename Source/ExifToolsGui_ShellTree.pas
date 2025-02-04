@@ -114,8 +114,8 @@ begin
     NewFolder := GetIShellFolder(TShellFolder(ParentNode.Data).ShellFolder, ID);
     TempFolder := TShellFolder.Create(TShellFolder(ParentNode.Data), ID, NewFolder);
     try
-      if not (ValidDir(TempFolder.PathName)) then
-      begin
+      if not (HasDirAttribute(TempFolder.PathName)) then
+      begin   // TempFolder does not have Directory Attribute. Dont show in Treeview
         NewNode.Delete;
         exit;
       end;
@@ -320,8 +320,8 @@ begin
       (Root <> FPreferredRoot) then
     Root := FPreferredRoot;
   end;
-
-  inherited Path := APath;
+  if (ValidFolder(APath)) then
+    inherited Path := APath;
 end;
 
 // Make the path, from the selected file in the FileList, visible in the Directory Treeview
