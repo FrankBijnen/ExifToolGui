@@ -348,11 +348,13 @@ object FMain: TFMain
         Align = alClient
         BorderStyle = bsNone
         DefaultRowHeight = 19
+        DoubleBuffered = False
         Font.Charset = DEFAULT_CHARSET
         Font.Color = clWindowText
         Font.Height = -12
         Font.Name = 'Segoe UI'
         Font.Style = []
+        ParentDoubleBuffered = False
         ParentFont = False
         ParentShowHint = False
         PopupMenu = QuickPopUpMenu
