@@ -131,6 +131,7 @@ begin
     SetupPredefined;
     DiffTagList := PredefinedTagList.Values[DiffTagListName];
     SelDiffTagList := SelPredefinedTagList.Values[DiffTagListName];
+    MemoTagSel.Text := SelDiffTagList;
     RunCompare;
   end;
 end;
