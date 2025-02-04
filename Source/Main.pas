@@ -2541,7 +2541,10 @@ begin
   Tx := MetadataList.Keys[LineNum];
   if (TX <> '') and
      (Tx[1] <> '*') then
+  begin
     MetadataList.Keys[LineNum] := '*' + Tx; // mark tag value changed
+    MetadataList.Repaint;
+  end;
 end;
 
 procedure TFMain.EditQuickKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
