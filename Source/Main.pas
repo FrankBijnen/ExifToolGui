@@ -377,7 +377,7 @@ type
     procedure AlignStatusBar;
     procedure ImageDrop(var Msg: TWMDROPFILES); message WM_DROPFILES;
     procedure SetCaption(AnItem: string = '');
-    procedure AutoIncLine(const LineNum: integer);
+    procedure AutoIncLine(const LineNum: integer; const Advance: boolean = true);
     procedure MarkLineModified(const LineNum: integer);
     procedure SetGridEditor(const Enable: boolean);
     procedure ShowMetadata;
@@ -549,7 +549,7 @@ begin
         else
           Inc(NextStop);
 
-        // Check Arrar bounds
+        // Check Array bounds
         if (NextStop < Low(CustomTabStops)) then
           NextStop := High(CustomTabStops);
         if (NextStop > High(CustomTabStops)) then
@@ -1207,13 +1207,13 @@ begin
       begin
         if (EditLineActive) then
         begin
-          AutoIncLine(CurrentLine +1);
+          AutoIncLine(CurrentLine);
           MetadataList.EditorMode := true;
         end
         else
         begin
           if (QuickTags[CurrentLine].NoEdit) then
-            AutoIncLine(CurrentLine +1)
+            AutoIncLine(CurrentLine)
           else
           begin
             if SpeedBtnLarge.Down then
@@ -1347,6 +1347,7 @@ begin
   MemoQuick.Text := '';
   if (ARow - 1 > High(QuickTags)) then
     exit;
+
   if SpeedBtnQuick.Down and
      not(QuickTags[ARow - 1].NoEdit) then
   begin
@@ -2514,16 +2515,17 @@ begin
   StatusBar.Panels[2].Text := '';
 end;
 
-procedure TFMain.AutoIncLine(const LineNum: integer);
+procedure TFMain.AutoIncLine(const LineNum: integer; const Advance: boolean = true);
 var
   Index: integer;
 begin
   Index := LineNum;
+  if (Advance) and
+     (GUIsettings.AutoIncLine) then
+    Inc(Index);
   if (Index > MetadataList.RowCount - 1) then
     Index := MetadataList.RowCount - 1;
   try
-    if (GUIsettings.AutoIncLine = false) then
-      exit;
     while (Index < MetadataList.RowCount - 1) and
           (QuickTags[Index - 1].NoEdit) do
       Inc(Index);
@@ -2563,7 +2565,7 @@ begin
       MetadataList.SetFocus;
       SpeedBtnQuickSave.Enabled := true;
     end;
-    AutoIncLine(Index +1);
+    AutoIncLine(Index);
   end;
 
   if Key = VK_ESCAPE then
@@ -3045,21 +3047,21 @@ begin
         if (ShellList.CanFocus) then
           ShellList.SetFocus;
       end;
-      Ord('W'):  //Focus Workspace
+      Ord('W'): //Focus Workspace
       begin
         MetadataList.LockDrawing;
         try
           AdvPageMetadata.ActivePage := AdvTabMetadata;
           SpeedBtnQuick.Down := true;
           SpeedBtnExifClick(SpeedBtnQuick);
-          AutoIncLine(MetadataList.Row);
+          AutoIncLine(MetadataList.Row, false);
         finally
           MetadataList.UnlockDrawing;
           if (MetadataList.CanFocus) then
             MetadataList.SetFocus;
         end;
       end;
-      Ord('M'):  //Focus OSM Map
+      Ord('M'): //Focus OSM Map
       begin
         AdvPageMetadata.ActivePage := AdvTabOSMMap;
         if (EditMapFind.CanFocus) then
@@ -3830,10 +3832,7 @@ var
   ETResult: TStringList;
   NoChars:  TSysCharSet;
 begin
-// Saved position?
-  SavedRow := MetadataList.Tag;
-  if (SavedRow < 1) then
-    SavedRow := MetadataList.Row;
+  SavedRow := MetadataList.Row; // Save position
   MetadataList.Tag := -1; // Reset hint row
 
   MetadataList.Strings.Clear;

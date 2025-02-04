@@ -89,9 +89,6 @@ constructor TValueListEditor.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
 
-{$IFNDEF VER350}
-  DoubleBufferedMode := TDoubleBufferedMode.dbmRequested;
-{$ENDIF}
   FProportionalVScroll := false;
   FDataRows := 0;
   FRowsPossible := 0;
