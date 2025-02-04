@@ -390,6 +390,7 @@ begin
       LvTagNames.ItemIndex := OldSel;
   end;
   SGPredefinedTags.Cells[1, SGPredefinedTags.Row] := GetLVTagNames;
+  SGPredefinedTags.Cells[2, SGPredefinedTags.Row] := GetLVTagNames(true);
   GetTagNames;
   LvTagNames.SetFocus;
 end;
