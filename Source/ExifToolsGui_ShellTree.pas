@@ -319,7 +319,10 @@ begin
    if (FPreferredRoot <> '') and
       (Root <> FPreferredRoot) then
     Root := FPreferredRoot;
+    if not DirectoryExists(APath) then
+      exit;
   end;
+
   inherited Path := APath;
 end;
 

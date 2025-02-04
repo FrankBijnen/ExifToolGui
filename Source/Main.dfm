@@ -1306,9 +1306,10 @@ object FMain: TFMain
                   end
                   item
                     Action = MaFDateFromQuickTime
+                    Caption = '&QuickTime'
                   end>
                 Tag = 40
-                Caption = 'File: Date created and modified as in ...'
+                Caption = '&File: Date created and modified as in ...'
                 UsageCount = 1
               end
               item
@@ -1670,13 +1671,14 @@ object FMain: TFMain
       OnExecute = MaPredefinedSaveExecute
     end
     object MaSelectDiff: TAction
-      Tag = 1
+      Tag = 40
       Category = 'Various'
       Caption = 'Select left diff'
       OnExecute = MaSelectDiffExecute
       OnUpdate = MaEnableDiff
     end
     object MaShowDiff: TAction
+      Tag = 40
       Category = 'Various'
       Caption = 'Show diff metadata'
       OnExecute = MaShowDiffExecute

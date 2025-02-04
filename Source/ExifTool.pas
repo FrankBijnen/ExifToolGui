@@ -63,6 +63,7 @@ type
     FPipeInRead, FPipeInWrite: THandle;
     FPipeOutRead, FPipeOutWrite: THandle;
     FPipeErrRead, FPipeErrWrite: THandle;
+    FETValidWorkingDir: boolean;
     FETWorkingDir: string;
     FETTempFile: string;
     FRecordingFile: string;
@@ -89,6 +90,7 @@ type
 
     procedure SetCounter(ACounterETEvent: TCounterETEvent; ACounter: integer);
     property ETWorkingDir: string read FETWorkingDir;
+    property ETValidWorkingDir: boolean read FETValidWorkingDir;
     property ETTempFile: string read GetTempFile;
     property ExecETEvent: TExecETEvent read FExecETEvent write FExecETEvent;
     property ExecNum: word read FExecNum;
@@ -376,13 +378,17 @@ function TExifTool.StayOpen(WorkingDir: string): boolean;
 var
   SecurityAttr: TSecurityAttributes;
   StartupInfo: TStartupInfo;
-  PWorkingDir: PChar;
   ETcmd: string;
 begin
   result := true;
   if (FETWorkingDir = WorkingDir) then
     exit;
+
   OpenExit; // -changing WorkingDir OnTheFly requires Exit first
+
+  FETValidWorkingDir := DirectoryExists(WorkingDir);
+  if not FETValidWorkingDir then
+    exit(FETValidWorkingDir);
 
   ETcmd := GUIsettings.ETOverrideDir + 'exiftool ' + GUIsettings.GetCustomConfig + ' -stay_open True -@ -';
   FillChar(FETprocessInfo, SizeOf(TProcessInformation), #0);
@@ -403,14 +409,11 @@ begin
     wShowWindow := SW_HIDE;
     dwFlags := STARTF_USESHOWWINDOW or STARTF_USESTDHANDLES;
   end;
-  if WorkingDir = '' then
-    PWorkingDir := nil
-  else
-    PWorkingDir := PChar(WorkingDir);
-  if CreateProcess(nil, PChar(ETcmd), nil, nil, true,
+
+  if (CreateProcess(nil, PChar(ETcmd), nil, nil, true,
                    CREATE_DEFAULT_ERROR_MODE or CREATE_NEW_CONSOLE or NORMAL_PRIORITY_CLASS,
-                   nil, PWorkingDir,
-    StartupInfo, FETprocessInfo) then
+                   nil, PChar(WorkingDir),
+    StartupInfo, FETprocessInfo)) then
   begin
     CloseHandle(FPipeInRead);
     CloseHandle(FPipeOutWrite);
@@ -599,7 +602,7 @@ begin
       wShowWindow := SW_HIDE;
       dwFlags := STARTF_USESHOWWINDOW or STARTF_USESTDHANDLES;
     end;
-    if WorkingDir = '' then
+    if not DirectoryExists(WorkingDir) then
       PWorkingDir := nil
     else
       PWorkingDir := PChar(WorkingDir);
