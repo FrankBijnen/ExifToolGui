@@ -581,8 +581,7 @@ begin
   RestoreGUI;
 
   NewSharedDir := FSharedMem.NewDirectory;
-  if (ValidDir(NewSharedDir)) then
-    ShellTree.Path := NewSharedDir;
+  ShellTree.Path := NewSharedDir;
 
   Message.Result := 0;
   inherited;
@@ -3171,7 +3170,6 @@ var
   Param: string;
   Lat, Lon: string;
   Index: integer;
-  PathFromParm: boolean;
 begin
 
   if (ParmIniPath <> '') then
@@ -3216,7 +3214,6 @@ begin
   DontSaveIni := FindCmdLineSwitch('DontSaveIni', true);
 
   // The shellList is initally disabled. Now enable and refresh
-  PathFromParm := false;
   SetColorsFromStyle;
   ShellListSetFolders;
   ShellList.Enabled := true;
@@ -3226,47 +3223,35 @@ begin
   SpeedBtn_ETdirectClick(SpeedBtn_ETdirect);
 
   // GUI started as "Send to" or "Open with":
-  if ParamCount > 0 then
+  Param := FirstNonSwitchParm;
+  if (Param = '') then
+    ShellTree.Path := GUIsettings.InitialDir
+  else
   begin
-    Param := ParamStr(1);
-    if ValidDir(Param) then
-    begin
-      PathFromParm := true;
-      ShellTree.Path := Param; // directory only
-    end
+    if HasDirAttribute(Param) then
+      ShellTree.Path := Param // directory only
     else
-    begin
-      if FileExists(Param) then
-      begin // file specified
-        PathFromParm := true;
-        ShellTree.Path := ExtractFileDir(Param);
-        Param := ExtractFileName(Param);
-        ShellList.ItemIndex := -1;
-        for Index := 0 to ShellList.Items.Count -1 do
+    begin // file specified
+      ShellTree.Path := ExtractFileDir(Param);
+      Param := ExtractFileName(Param);
+      ShellList.ItemIndex := -1;
+      for Index := 0 to ShellList.Items.Count -1 do
+      begin
+        if SameText(ShellList.RelFileName(Index), Param) then
         begin
-          if SameText(ShellList.RelFileName(Index), Param) then
-          begin
-            ShellList.ItemIndex := Index;
-            break;
-          end;
+          ShellList.ItemIndex := Index;
+          break;
         end;
-        if (ShellList.ItemIndex <> -1) then
-        begin
-          ShellList.SetFocus;
-          ShellListClick(Sender);
-        end
-        else
-          ShellTree.SetFocus;
       end;
-    end;
+    end
   end;
 
-  // If Path was not set from parm, use the setting
-  if (PathFromParm = false) and
-     ValidDir(GUIsettings.InitialDir) then
+  if (ShellList.ItemIndex < 0) then
+    ShellTree.SetFocus  // No files available to focus.
+  else
   begin
-    ShellTree.Path := GUIsettings.InitialDir;
     ShellList.SetFocus;
+    ShellListClick(Sender);
   end;
 
   // Scroll in view. Select initial
@@ -3776,8 +3761,7 @@ end;
 // Restart Exiftool when context menu done.
 procedure TFMain.ShellTreeAfterContext(Sender: TObject);
 begin
-  if (ValidDir(ShellList.Path)) then
-    ET.StayOpen(ShellList.Path);
+  ET.StayOpen(ShellList.Path);
 end;
 
 procedure TFMain.SelectAll;

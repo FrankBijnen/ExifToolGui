@@ -862,7 +862,7 @@ begin
       FOnEnumColumnsAfterEvent(Self);
 
     if Enabled and
-       ValidDir(Path) and
+       ValidFolder(Path) and
        (ViewStyle = vsReport) then // EnumColumns only called for ViewStyle=vsReport
     begin
 
