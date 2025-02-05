@@ -2422,20 +2422,24 @@ begin
   if (Key = VK_Return) and
      (Length(ETtx) > 1) then
   begin
-    IsRecursive := (pos('-r ', ETtx) > 0);
     ETprm := ETtx;
+//For tests on '-r ' and '-ext '.
+//TODO: Review code. ArgsFromDirectCmd?
+    ETtx := LowerCase(ETprm) + ' ';
+    IsRecursive :=(Pos('-r ', ETtx) > 0);
     if IsRecursive then
-    begin // init ETcounter:
+    begin
+      // init ETcounter
       ETprm := ETprm + ' "' + ExcludeTrailingPathDelimiter(ShellList.Path) + '"'; // If pathname ends with \, it would be escaping a "
-      I := pos('-ext ', ETtx); // ie. '-ext jpg ...'
+      I := Pos('-ext ', ETtx); // ie. '-ext jpg ...'
       if I = 0 then
         ETtx := '*.*'
       else
       begin
-        inc(I, 4);
+        Inc(I, 4);
         Delete(ETtx, 1, I);
         ETtx := TrimLeft(ETtx); // ='jpg ...'
-        I := pos(' ', ETtx);
+        I := Pos(' ', ETtx);
         if I > 0 then
           ETtx := LeftStr(ETtx, I - 1);
         ETtx := '*.' + ETtx;
