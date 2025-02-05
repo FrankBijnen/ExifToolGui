@@ -1220,7 +1220,7 @@ begin
         end
         else
         begin
-          if (QuickTags[CurrentLine].NoEdit) then
+          if (QuickTags[CurrentLine -1].NoEdit) then //QuickTags is 0 based!
             AutoIncLine(CurrentLine)
           else
           begin
