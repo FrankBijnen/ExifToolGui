@@ -4106,6 +4106,8 @@ begin
 
   ShowMetadata;
   SetGridEditor(SpeedBtnQuick.Down);
+  if (MetadataList.CanFocus) then
+    MetadataList.SetFocus;
 end;
 
 procedure TFMain.SpeedBtnFilterEditClick(Sender: TObject);
