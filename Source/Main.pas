@@ -1287,7 +1287,7 @@ procedure TFMain.MetadataListCtrlKeyDown(Sender: TObject; var Key: Word; Shift: 
 
     // Focus back on original Metadata Row
     MetadataList.SetFocus;
-    if (MetadataList.RowCount >= MetaDataRow) then
+    if (MetadataList.RowCount > MetaDataRow) then
       MetadataList.Row := MetaDataRow;
   end;
 
