@@ -213,6 +213,9 @@ type
     MaFDateFromMetaExif: TAction;
     MaFDateFromMetaXmp: TAction;
     MaFDateFromQuickTime: TAction;
+    QuickPopUp_CopyTag: TMenuItem;
+    N3: TMenuItem;
+    QuickPopUp_InsertETDirect: TMenuItem;
     procedure ShellListClick(Sender: TObject);
     procedure ShellListKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
     procedure SpeedBtnExifClick(Sender: TObject);
@@ -362,6 +365,8 @@ type
     procedure MaFdateFromExifExecute(Sender: TObject);
     procedure MaFDateFromXmpExecute(Sender: TObject);
     procedure MaFDateFromQuickTimeExecute(Sender: TObject);
+    procedure QuickPopUp_CopyTagNameClick(Sender: TObject);
+    procedure QuickPopUp_InsertETDirectClick(Sender: TObject);
   private
     { Private declarations }
     ETBarSeriesFocal: TBarSeries;
@@ -394,6 +399,7 @@ type
     procedure CMActivateWindow(var Message: TMessage); message CM_ActivateWindow;
     procedure WMEndSession(var Msg: TWMEndSession); message WM_ENDSESSION;
     function TranslateTagName(xMeta, xName: string): string;
+    function TagCmd: string;
 
     procedure BreadCrumbClick(Sender: TObject);
     procedure BreadCrumbHome(Sender: TObject);
@@ -589,7 +595,15 @@ end;
 
 procedure TFMain.QuickPopUp_CopyTagClick(Sender: TObject);
 begin
-  Clipboard.AsText := MetadataList.Cells[1, MetadataList.Row];
+  if EditLineActive then
+    Clipboard.AsText := MetadataList.InplaceEdit.SelText
+  else
+    Clipboard.AsText := MetadataList.Cells[1, MetadataList.Row];
+end;
+
+procedure TFMain.QuickPopUp_CopyTagNameClick(Sender: TObject);
+begin
+  Clipboard.AsText := TagCmd;
 end;
 
 procedure TFMain.AdvRadioGroup1Click(Sender: TObject);
@@ -1293,8 +1307,6 @@ procedure TFMain.MetadataListCtrlKeyDown(Sender: TObject; var Key: Word; Shift: 
 
 begin
   case Key of
-    Ord('C'):
-      Clipboard.AsText := MetadataList.Cells[1, MetadataList.Row];
     Ord('S'):
       BtnQuickSaveClick(Sender);
     VK_HOME:
@@ -1809,6 +1821,8 @@ begin
   QuickPopUp_DelQuickAct.Visible := not(IsSep) and SpeedBtnQuick.Down;
   QuickPopUp_FillQuickAct.Visible := QuickPopUp_DelQuickAct.Visible;
   QuickPopUp_CopyTagAct.Visible := not IsSep;
+  QuickPopUp_CopyTag.Visible := QuickPopUp_CopyTagAct.Visible;
+  QuickPopUp_InsertETDirect.Visible := QuickPopUp_CopyTag.Visible and SpeedBtn_ETdirect.Down;
 end;
 
 procedure TFMain.TaskbarThumbButtonClick(Sender: TObject; AButtonID: Integer);
@@ -1857,6 +1871,63 @@ begin
   end;
 end;
 
+function TFMain.TagCmd: string;
+var
+  Index, X: integer;
+  GroupName: string;
+  IsVRD: boolean;
+begin
+  Index := MetadataList.Row;
+
+  // For Workspace return the command specified in QuickTags
+  if SpeedBtnQuick.Down then
+    Exit(QuickTags[Index -1].Command + ' ');
+
+  result := MetadataList.Keys[Index];
+
+  // If  Prefix tags with ID number is checked
+  if LeftStr(result, 2) = '0x' then
+    Delete(result, 1, 7)
+  else if LeftStr(result, 2) = '- ' then
+    Delete(result, 1, 2);
+
+  result := TrimRight(result);
+
+  // Get group name
+  if SpeedBtnExif.Down then
+    GroupName := '-Exif:'
+  else if SpeedBtnXmp.Down then
+    GroupName := '-Xmp:'
+  else if SpeedBtnIptc.Down then
+    GroupName := '-Iptc:'
+  else if SpeedBtnMaker.Down then
+  begin
+    // Canon hack ?
+    repeat
+      dec(Index);
+      IsVRD := (pos('CanonVRD', MetadataList.Cells[1, Index]) > 0);
+    until IsVRD or (Index = 0);
+    if IsVRD then
+      GroupName := '-CanonVRD:'
+    else
+      GroupName := '-Makernotes:';
+  end
+  else if (MaGroup_g4.Checked) then // There are no reliable groupnames with -g4
+    GroupName := '-'
+  else
+  begin
+    // Find group by moving up until the group heading
+    X := Index;
+    repeat
+      Dec(X);
+      GroupName := MetadataList.Keys[X];
+    until (X < 1) or (Trim(GroupName) = '');
+    GroupName := ReplaceAll(MetadataList.Cells[1, X], ['---- ', ' ----'], ['-',':']); // eg '---- IFD0 ----' => 'IFD0:'
+  end;
+
+  result := GroupName + TranslateTagName(GroupName, result) + ' ';
+end;
+
 procedure TFMain.RestoreGUI;
 begin
   Application.Restore;
@@ -1886,37 +1957,9 @@ end;
 
 procedure TFMain.QuickPopUp_AddCustomClick(Sender: TObject);
 var
-  Indx: integer;
-  Tx, Ts: string;
-  IsVRD: boolean;
+  Tx: string;
 begin
-  Indx := MetadataList.Row;
-  Tx := MetadataList.Keys[Indx];
-  if LeftStr(Tx, 2) = '0x' then
-    Delete(Tx, 1, 7)
-  else if LeftStr(Tx, 2) = '- ' then
-    Delete(Tx, 1, 2);
-  Tx := TrimRight(Tx);
-  if SpeedBtnExif.Down then
-    Ts := '-Exif:'
-  else if SpeedBtnXmp.Down then
-    Ts := '-Xmp:'
-  else if SpeedBtnIptc.Down then
-    Ts := '-Iptc:'
-  else if SpeedBtnMaker.Down then
-  begin
-    repeat
-      dec(Indx);
-      IsVRD := (pos('CanonVRD', MetadataList.Cells[1, Indx]) > 0);
-    until IsVRD or (Indx = 0);
-    if IsVRD then
-      Ts := '-CanonVRD:'
-    else
-      Ts := '-Makernotes:';
-  end
-  else
-    Ts := '-';
-  Tx := Ts + TranslateTagName(Ts, Tx) + ' ';
+  Tx := TagCmd;
   if Pos(Tx, CustomViewTagList) > 0 then
     ShowMessage(StrTagAlreadyExistsI)
   else
@@ -1925,8 +1968,7 @@ end;
 
 procedure TFMain.QuickPopUp_AddDetailsUserClick(Sender: TObject);
 var
-  I, N, X: integer;
-  Tx, Tk: string;
+  I: integer;
   PrevSel, PrevRow: integer;
   FListUserDef: TColumnsArray;
 begin
@@ -1935,28 +1977,9 @@ begin
   FListUserDef := GetFileListColumnDefs(GUIsettings.DetailsSel);
   I := Length(FListUserDef);
   SetLength(FListUserDef, I + 1);
-  N := MetadataList.Row;
-  X := N;
-  repeat // find group
-    Dec(X);
-    Tx := MetadataList.Keys[X];
-  until length(Tx) = 0;
-  Tx := MetadataList.Cells[1, X];     // eg '---- IFD0 ----'
-  Delete(Tx, 1, 5);                   // ='IFD0 ----'
-  X := pos(' ', Tx);
-  SetLength(Tx, X - 1);               // ='IFD0'
-  Tx := '-' + Tx + ':';               // ='-IFD0:'
 
-  Tk := MetadataList.Keys[N];         // 'Make'
-  if LeftStr(Tk, 2) = '0x' then
-    Delete(Tk, 1, 7)
-  else if LeftStr(Tk, 2) = '- ' then
-    Delete(Tk, 1, 2);
-  Tk := TrimRight(Tk);
-
-  FListUserDef[I].SetCaption(Tk);
-  Tk := TranslateTagName(Tx, Tk);
-  FListUserDef[I].Command := Tx + Tk;  // ='-IFD0:Make'
+  FListUserDef[I].SetCaption(MetadataList.Keys[MetadataList.Row]);
+  FListUserDef[I].Command := TagCmd;
   FListUserDef[I].Width := 96;
   FListUserDef[I].AlignR := 0;
 
@@ -1980,8 +2003,7 @@ end;
 
 procedure TFMain.QuickPopUp_AddQuickClick(Sender: TObject);
 var
-  I, N, X: integer;
-  Tx, Ty, Tz, T1: string;
+  I: integer;
   CrWait, CrNormal: HCURSOR;
 begin
   CrWait := LoadCursor(0, IDC_WAIT);
@@ -1989,46 +2011,14 @@ begin
   try
     I := Length(QuickTags);
     SetLength(QuickTags, I + 1);
-    N := MetadataList.Row;
-    if SpeedBtnExif.Down then
-      Tz := 'Exif:'
-    else if SpeedBtnXmp.Down then
-      Tz := 'Xmp:'
-    else if SpeedBtnIptc.Down then
-      Tz := 'Iptc:'
-    else
-      Tz := '';
 
-    if MaGroup_g4.Checked then
-      Tx := Tz
-    else
-    begin // find group
-      X := N;
-      repeat
-        Dec(X);
-        Tx := MetadataList.Keys[X];
-      until (X = 1) or (length(Tx) = 0);
-      Tx := MetadataList.Cells[1, X]; // eg '---- IFD0 ----'
-      Delete(Tx, 1, 5);               // -> 'IFD0 ----'
-      X := pos(' ', Tx);
-      SetLength(Tx, X - 1);           // -> 'IFD0'
-      Tx := Tx + ':';                 // -> 'IFD0:'
-    end;
-
-    Ty := MetadataList.Keys[N];       // e.g. 'Make' or '0x010f Make' or '- Rating'
-    if LeftStr(Ty, 2) = '0x' then
-      Delete(Ty, 1, 7)
-    else if LeftStr(Ty, 2) = '- ' then
-      Delete(Ty, 1, 2);
-    Ty := TrimRight(Ty);
-    T1 := Ty;                         // tl=language specific tag name
-    Ty := TranslateTagName('-' + Tz, Ty);
     with QuickTags[I] do
     begin
-      Caption := Tz + T1;
-      Command := '-' + Tx + Ty;       // ='-IFD0:Make'
+      Caption := MetadataList.Keys[MetadataList.Row];
+      Command := TagCmd;
       Help := 'No Hint defined';
     end;
+
   finally
     MetadataList.Refresh;
     SetCursor(CrNormal);
@@ -2111,6 +2101,12 @@ begin
     end;
     SpeedBtnQuickSave.Enabled := true;
   end;
+end;
+
+procedure TFMain.QuickPopUp_InsertETDirectClick(Sender: TObject);
+begin
+  if (TmenuItem(Sender).Visible) then
+    EditETdirect.Text := EditETdirect.Text + TagCmd;
 end;
 
 procedure TFMain.QuickPopUp_MarkTagClick(Sender: TObject);
