@@ -1271,11 +1271,7 @@ procedure TFMain.MetadataListCtrlKeyDown(Sender: TObject; var Key: Word; Shift: 
   var
     Old: integer;
     New: integer;
-    MetaDataRow: integer;
   begin
-    // Save MetaData Row
-    MetaDataRow := MetadataList.Row;
-
     // Current
     if Assigned(ShellList.Selected) then
       Old := ShellList.Selected.Index
@@ -1298,11 +1294,6 @@ procedure TFMain.MetadataListCtrlKeyDown(Sender: TObject; var Key: Word; Shift: 
 
     // Simulate a click on the new item, will load Metadata etc.
     ShellListClick(ShellList);
-
-    // Focus back on original Metadata Row
-    MetadataList.SetFocus;
-    if (MetadataList.RowCount > MetaDataRow) then
-      MetadataList.Row := MetaDataRow;
   end;
 
 begin
@@ -3835,31 +3826,30 @@ end;
 
 procedure TFMain.ShowMetadata;
 var
-  E, N, SavedRow: integer;
+  E, N, SavedRow, SavedTopRow: integer;
   ETcmd, Item, Value, Tx: string;
   ETResult: TStringList;
   NoChars:  TSysCharSet;
 begin
-  SavedRow := MetadataList.Row; // Save position
-  MetadataList.Tag := -1; // Reset hint row
-
-  MetadataList.Strings.Clear;
-  MetadataList.Row := 1;
-
-  Item := GetSelectedFile(ShellList.RelFileName);
-  SetCaption(Item);
-  if (Item = '') then
-  begin
-    MetadataList.Strings.Add('-');
-    MetadataList.ItemProps[0].ReadOnly := true;
-    EditQuick.Text := '';
-    MemoQuick.Text := '';
-    exit;
-  end;
+  SavedTopRow := MetadataList.TopRow; // Save TopRow and Row
+  SavedRow := MetadataList.Row;
+  MetadataList.Tag := -1;             // Reset hint row
 
   MetadataLoading := true;
   ETResult := TStringList.Create;
   try
+    Item := GetSelectedFile(ShellList.RelFileName);
+    SetCaption(Item);
+
+    if (Item = '') then
+    begin
+      MetadataList.Strings.Text := '-';
+      MetadataList.ItemProps[0].ReadOnly := true;
+      EditQuick.Text := '';
+      MemoQuick.Text := '';
+      exit;
+    end;
+
     if SpeedBtnQuick.Down then
     begin
       N := Length(QuickTags) - 1;
@@ -3874,45 +3864,43 @@ begin
       end;
       ET.OpenExec(ETcmd, Item, ETResult, false);
       N := Min(N, ETResult.Count - 1);
-      with MetadataList do
-      begin
-        Strings.BeginUpdate;
-        try
-          Strings.Clear;
-          if (ETResult.Count < Length(QuickTags)) and
-             (ETResult.Count > 0) then
-            Strings.Append(Format('=' + StrWarningOnlyDRes,
-                                  [ETResult.Count, Length(QuickTags)]));
-          for E := 0 to N do
+      MetadataList.Row := 1;
+      MetadataList.Strings.BeginUpdate;
+      try
+        MetadataList.Strings.Clear;
+        if (ETResult.Count < Length(QuickTags)) and
+           (ETResult.Count > 0) then
+          MetadataList.Strings.Append(Format('=' + StrWarningOnlyDRes,
+                                     [ETResult.Count, Length(QuickTags)]));
+        for E := 0 to N do
+        begin
+          Tx := QuickTags[E].Command;
+          if UpperCase(LeftStr(Tx, Length(GUI_SEP))) = GUI_SEP then
+            Tx := '=' + QuickTags[E].Caption
+          else
           begin
-            Tx := QuickTags[E].Command;
-            if UpperCase(LeftStr(Tx, Length(GUI_SEP))) = GUI_SEP then
-              Tx := '=' + QuickTags[E].Caption
-            else
+            Tx := QuickTags[E].Caption;
+            if (Pos('?', Tx) > 0) then
             begin
-              Tx := QuickTags[E].Caption;
-              if (Pos('?', Tx) > 0) then
-              begin
-                Include(NoChars, '-');
-                if (Pos('??', Tx) > 0) then
-                  Include(NoChars, '0');
+              Include(NoChars, '-');
+              if (Pos('??', Tx) > 0) then
+                Include(NoChars, '0');
 
-                if (Length(ETResult[E]) < 1) or
-                   (CharInSet(ETResult[E][1], NoChars)) then
-                 Tx := Tx + '='+ StrNOAst
-                else
-                  Tx := Tx + '=' + StrYESAst;
-              end
+              if (Length(ETResult[E]) < 1) or
+                 (CharInSet(ETResult[E][1], NoChars)) then
+               Tx := Tx + '='+ StrNOAst
               else
-                Tx := QuickTags[E].Caption + '=' + ETResult[E];
-            end;
-            Strings.Append(Tx);
-            if (QuickTags[E].NoEdit) then
-              MetadataList.ItemProps[E].ReadOnly := true;
+                Tx := Tx + '=' + StrYESAst;
+            end
+            else
+              Tx := QuickTags[E].Caption + '=' + ETResult[E];
           end;
-        finally
-          Strings.EndUpdate;
+          MetadataList.Strings.Append(Tx);
+          if (QuickTags[E].NoEdit) then
+            MetadataList.ItemProps[E].ReadOnly := true;
         end;
+      finally
+        MetadataList.Strings.EndUpdate;
       end;
     end
     else
@@ -3983,21 +3971,24 @@ begin
         end;
       end;
 
-      with MetadataList do
-      begin
-        Strings.BeginUpdate;
-        try
-          Strings.Clear;
-          Strings.AddStrings(ETResult);
-        finally
-          Strings.EndUpdate;
-        end;
+      MetadataList.Strings.BeginUpdate;
+      try
+        MetadataList.Row := 1;
+        MetadataList.Strings.Assign(ETResult);
+      finally
+        MetadataList.Strings.EndUpdate;
       end;
     end;
+
     if MetadataList.RowCount > SavedRow then
       MetadataList.Row := SavedRow
     else
       MetadataList.Row := MetadataList.RowCount - 1;
+
+    if MetadataList.Row > SavedTopRow then
+      MetadataList.TopRow := SavedTopRow
+    else
+      MetadataList.TopRow := MetadataList.Row;
 
   finally
     ETResult.Free;
