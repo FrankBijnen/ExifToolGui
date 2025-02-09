@@ -456,7 +456,6 @@ type
     procedure GetColorsFromStyle;
     procedure SetColorsFromStyle;
     function GetFormOffset(AddFileList: boolean = true): TPoint;
-
   end;
 
 var
@@ -967,6 +966,7 @@ begin
     ResetRootShowAll;
 
     Show;
+
   end;
 end;
 
@@ -1218,7 +1218,8 @@ begin
     VK_RIGHT:
       begin
         InplaceEdit := MetadataList.InplaceEdit;
-        if (InplaceEdit.SelStart = 0) and
+        if (InplaceEdit <> nil) and
+           (InplaceEdit.SelStart = 0) and
            (InplaceEdit.SelLength >= Length(InplaceEdit.Text)) then
         begin
           InplaceEdit.SelStart := Length(InplaceEdit.Text);
@@ -2982,11 +2983,10 @@ begin
   ETBarSeriesIso.Marks.Visible := false;
 
   // Set Style
-
   GetColorsFromStyle;
   SetColorsFromStyle;
-
   TStyleManager.TrySetStyle(GUIsettings.GuiStyle, false);
+
   // Custom TabStops
   SetupCustomTabStops;
 
@@ -3802,6 +3802,8 @@ end;
 
 // =========================== Show Metadata ====================================
 procedure TFMain.SetGridEditor(const Enable: boolean);
+const
+  Margin = 100;
 var
   GridOptions: TGridOptions;
 begin
@@ -3819,22 +3821,20 @@ begin
     Include(GridOptions, goEditing);
     Include(GridOptions, goAlwaysShowEditor);
   end;
-
   MetadataList.Options := GridOptions;
+  if (MetadataList.ColWidths[0] > MetadataList.ClientWidth - Margin) then
+    MetadataList.ColWidths[0] := MetadataList.ClientWidth - Margin;
   MetadataList.Col := 1;
 end;
 
 procedure TFMain.ShowMetadata;
 var
-  E, N, SavedRow, SavedTopRow: integer;
+  E, N: integer;
   ETcmd, Item, Value, Tx: string;
   ETResult: TStringList;
   NoChars:  TSysCharSet;
 begin
-  SavedTopRow := MetadataList.TopRow; // Save TopRow and Row
-  SavedRow := MetadataList.Row;
   MetadataList.Tag := -1;             // Reset hint row
-
   MetadataLoading := true;
   ETResult := TStringList.Create;
   try
@@ -3862,12 +3862,13 @@ begin
           Tx := GUI_SEP;
         ETcmd := ETcmd + CRLF + Tx;
       end;
+
       ET.OpenExec(ETcmd, Item, ETResult, false);
       N := Min(N, ETResult.Count - 1);
-      MetadataList.Row := 1;
+
       MetadataList.Strings.BeginUpdate;
+      MetadataList.SetStringsCount(N +1);
       try
-        MetadataList.Strings.Clear;
         if (ETResult.Count < Length(QuickTags)) and
            (ETResult.Count > 0) then
           MetadataList.Strings.Append(Format('=' + StrWarningOnlyDRes,
@@ -3895,7 +3896,7 @@ begin
             else
               Tx := QuickTags[E].Caption + '=' + ETResult[E];
           end;
-          MetadataList.Strings.Append(Tx);
+          MetadataList.Strings[E] := Tx;
           if (QuickTags[E].NoEdit) then
             MetadataList.ItemProps[E].ReadOnly := true;
         end;
@@ -3972,23 +3973,14 @@ begin
       end;
 
       MetadataList.Strings.BeginUpdate;
+      MetadataList.SetStringsCount(ETResult.Count);
       try
-        MetadataList.Row := 1;
-        MetadataList.Strings.Assign(ETResult);
+        for E := 0 to ETResult.Count -1 do
+          MetadataList.Strings[E] := ETResult[E];
       finally
         MetadataList.Strings.EndUpdate;
       end;
     end;
-
-    if MetadataList.RowCount > SavedRow then
-      MetadataList.Row := SavedRow
-    else
-      MetadataList.Row := MetadataList.RowCount - 1;
-
-    if MetadataList.Row > SavedTopRow then
-      MetadataList.TopRow := SavedTopRow
-    else
-      MetadataList.TopRow := MetadataList.Row;
 
   finally
     ETResult.Free;
@@ -4091,8 +4083,13 @@ begin
   AdvPanelMetaBottom.Visible := SpeedBtnQuick.Down;
   SpeedBtnQuickSave.Enabled := false;
 
+  // View has changed. Reset the grid. Force init of the scrollbar.
+  MetadataList.Strings.Clear;
+  MetadataList.Row := 1;
   ShowMetadata;
+
   SetGridEditor(SpeedBtnQuick.Down);
+
   if (MetadataList.CanFocus) then
     MetadataList.SetFocus;
 end;
