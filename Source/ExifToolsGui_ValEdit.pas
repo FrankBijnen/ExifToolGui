@@ -259,8 +259,13 @@ end;
 
 procedure TValueListEditor.SetStringsCount(NewCount: integer);
 begin
-  if (Strings.Count <> NewCount) then
-    Strings.Text := StringOfChar(#10, NewCount);
+  if (Strings.Count = NewCount) then
+    exit;
+
+  if (Row > NewCount) then
+    Row := NewCount;
+  Strings.Clear;
+  Strings.Text := StringOfChar(#10, NewCount);
 end;
 
 end.
