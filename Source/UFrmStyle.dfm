@@ -24,8 +24,6 @@ object FrmStyle: TFrmStyle
     Height = 29
     Align = alBottom
     TabOrder = 0
-    ExplicitTop = 372
-    ExplicitWidth = 385
     DesignSize = (
       389
       29)
@@ -100,7 +98,5 @@ object FrmStyle: TFrmStyle
     Sorted = True
     TabOrder = 1
     OnClick = LstStylesClick
-    ExplicitWidth = 385
-    ExplicitHeight = 372
   end
 end

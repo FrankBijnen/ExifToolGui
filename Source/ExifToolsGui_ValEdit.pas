@@ -40,6 +40,7 @@ type
   public
     constructor Create(AOwner: TComponent); override;
     procedure SetFocus; override;
+    procedure SetStringsCount(NewCount: integer);
     property OnCtrlKeyDown: TkeyEvent read FOnCtrlKeyDown write FOnCtrlKeyDown;
     property ProportionalVScroll: boolean read FProportionalVScroll write SetProportionalVScroll default false;
     property FixedRows;
@@ -223,36 +224,43 @@ begin
   begin
     FRowsPossible := GetRowsPossible;
     UpdateScrollBar;
+    Perform(WM_NCPAINT, 0, 0);
   end;
 end;
 
 procedure TValueListEditor.SizeChanged(OldColCount, OldRowCount: Longint);
 begin
-
-  inherited;
-
   if (FProportionalVScroll) then
   begin
     FDataRows := RowCount - FixedRows;
-
-    // Must hide first, else thumb is not drawn correctly
-    SetScrollRange(Self.Handle, SB_VERT, 0, 0, false);
     UpdateScrollBar;
-  end;
+    Perform(WM_NCPAINT, 0, 0);
+  end
+  else
+    inherited;
 end;
 
 procedure TValueListEditor.TopLeftChanged;
 begin
-  inherited;
-
   if (FProportionalVScroll) then
+  begin
     SetScrollPos(Self.Handle, SB_VERT, TopRow, true);
+    Perform(WM_NCPAINT, 0, 0);
+  end
+  else
+    inherited;
 end;
 
 procedure TValueListEditor.SetFocus;
 begin
   if CanFocus then
     inherited SetFocus;
+end;
+
+procedure TValueListEditor.SetStringsCount(NewCount: integer);
+begin
+  if (Strings.Count <> NewCount) then
+    Strings.Text := StringOfChar(#10, NewCount);
 end;
 
 end.
