@@ -263,7 +263,14 @@ begin
     exit;
 
   if (Row > NewCount) then
+  begin
     Row := NewCount;
+    if ((Row - TopRow) > FRowsPossible) then
+      TopRow := Row - FRowsPossible
+    else
+      TopRow := 1;
+  end;
+
   Strings.Clear;
   Strings.Text := StringOfChar(#10, NewCount);
 end;
