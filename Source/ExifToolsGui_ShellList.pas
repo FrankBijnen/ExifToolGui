@@ -809,7 +809,10 @@ var
   Index: integer;
   SavedSel: Tlist<integer>;
 begin
+  if not Enabled then
+    exit;
   SavedSel := Tlist<integer>.Create;
+  Enabled := false;
   try
     SaveSelection(SavedSel);
     if (DetailsNeeded) then
@@ -827,6 +830,7 @@ begin
     end;
   finally
     SavedSel.Free;
+    Enabled := true;
   end;
 end;
 
