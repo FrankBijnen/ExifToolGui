@@ -86,7 +86,7 @@ var
   Index: integer;
   ATag: TFileListColumn;
   OrientationTag: Char;
-  FlashValue: SmallInt;
+  FlashValue, Decimals: SmallInt;
   BackupValue: string;
 begin
   if (High(ColumnDefs) < 0) then // Nothing to do
@@ -104,8 +104,6 @@ begin
     // PostProcess ET
     if (PostProcess = TPostProcess.ppExifTool) then
     begin
-      if ((ATag.Options and toDecimal) = toDecimal) then
-        DetailStrings[Index] := FormatExifDecimal(DetailStrings[Index], 1);
 
       if ((ATag.Options and toFlash) = toFlash) then
       begin
@@ -159,9 +157,20 @@ begin
         DetailStrings[Index] := StrYes;
     end;
 
+    // Decimal
+    if ((ATag.Options and toDecimal) = toDecimal) and
+       (ATag.AlignR <> 0) then
+    begin
+      if (ATag.AlignR < 0) then
+        Decimals := ATag.AlignR * -1
+      else
+        Decimals := 1;
+      DetailStrings[Index] := FormatExifDecimal(DetailStrings[Index], Decimals);
+    end;
+
     // Padleft?
     if (ATag.AlignR > 0) then
-      DetailStrings[Index] := DetailStrings[Index].PadLeft(ATag.AlignR);
+      DetailStrings[Index] := DetailStrings[Index].PadLeft(ATag.AlignR, ' ');
 
     // Backup column?
     if ((ATag.Options and toBackup) = toBackup) then

@@ -312,7 +312,8 @@ end;
 
 procedure TShellTreeView.SetPath(APath: string);
 begin
-  if TPath.IsUNCPath(APath) then
+  if (TPath.IsUNCPath(APath)) and
+     (ValidFolder(Path)) then
     Root := APath
   else
   begin
