@@ -1208,7 +1208,8 @@ begin
   SetLength(AValue, StrLen(PChar(AValue)));
   while (length(AValue) > 0) and (AValue[length(AValue)] = '\') do
     SetLength(AValue, length(AValue) - 1);
-  if (not SameText(FDirectory, AValue)) and DirectoryExists(AValue) then
+  if (not SameText(FDirectory, AValue)) and
+     ((DirectoryExists(AValue)) or (FHome <> '')) then
   begin
     FDirectory := AValue;
     FBreadcrumbs := SplitPath(FDirectory);

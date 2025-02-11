@@ -193,7 +193,7 @@ type
 
 implementation
 
-uses System.Win.ComObj, System.UITypes, System.StrUtils,
+uses System.Win.ComObj, System.UITypes, System.StrUtils, System.Math,
      Vcl.ImgList,
      ExifToolsGUI_Utils, ExifToolsGui_ThreadPool, ExifToolsGui_FileListColumns,
      UnitFilesOnClipBoard, UnitLangResources, UFrmGenerate;
@@ -518,7 +518,9 @@ var
   LocalCustomSortNeeded: boolean;
   LocalDescending: boolean;
   LocalIncludeSubFolders: boolean;
+  LocalUseDecimal: boolean;
   LocalCompareColumn: integer;
+  LocalDecimal1, LocalDecimal2: Double;
   TempColumn: integer;
 begin
   // Need to sort on column?
@@ -528,17 +530,17 @@ begin
   // When Including subfolders the file is displayed as a relative path. Requires special sorting.
   LocalIncludeSubFolders := IncludeSubFolders;
 
-  // Sorting column
-  if (SortColumn < Columns.Count) then
-    SetListHeaderSortState(Self, Columns[SortColumn], FSortState);
-  LocalDescending := (SortState = THeaderSortState.hssDescending);
+  // Descending?
+  LocalDescending := (FSortState = THeaderSortState.hssDescending);
 
   // Custom sort?
   LocalCustomSortNeeded := ((FDoDefault = false) and (SortColumn <> 0)) or  // A column from the non standard list, not name.
                             (LocalIncludeSubFolders and (SortColumn = 0));  // Including subfolders, need to sort on the relative name
 
+  // Column?
   // Is the sort field from the non standard list a system field?
   // Better to use the standard compare. EG: Size sorts wrong as text, because 'Bytes, KB, MB'
+  LocalUseDecimal := false;
   LocalCompareColumn := SortColumn;
   if (FDoDefault = false) and
      (LocalCompareColumn > 0) and
@@ -546,11 +548,14 @@ begin
   begin
     TempColumn := Columns[LocalCompareColumn].Tag -1;
     if (TempColumn >= 0) and
-       (TempColumn <= High(ColumnDefs)) and
-       ((ColumnDefs[TempColumn].Options and toSys) = toSys) then   // Yes, a system field
+       (TempColumn <= High(ColumnDefs)) then
     begin
-      LocalCompareColumn := StrToIntDef(ColumnDefs[TempColumn].Command, 0);
-      LocalCustomSortNeeded := false;
+      if ((ColumnDefs[TempColumn].Options and toSys) = toSys) then   // Yes, a system field
+      begin
+        LocalCompareColumn := StrToIntDef(ColumnDefs[TempColumn].Command, 0);
+        LocalCustomSortNeeded := false;
+      end;
+      LocalUseDecimal := (ColumnDefs[TempColumn].Options and toDecimal) = toDecimal;
     end;
   end;
 
@@ -576,11 +581,22 @@ begin
             result := CompareText(TSubShellFolder.GetRelativeSortName(Item1), TSubShellFolder.GetRelativeSortName(Item2),
                                   TLocaleOptions.loUserLocale)
           else
-          begin // Compare the values from DetailStrings. Always text.
+          begin // Compare the values from DetailStrings. Decimal if specified else text.
             if (LocalCompareColumn <= TShellFolder(Item1).DetailStrings.Count) and
                (LocalCompareColumn <= TShellFolder(Item2).DetailStrings.Count) then
-              result := CompareText(TShellFolder(Item1).Details[LocalCompareColumn], TShellFolder(Item2).Details[LocalCompareColumn],
-                                    TLocaleOptions.loUserLocale);
+            begin
+              if LocalUseDecimal then
+              begin
+                if not TryStrToFloat(TShellFolder(Item1).Details[LocalCompareColumn], LocalDecimal1, FloatFormatSettings) then
+                  LocalDecimal1 := -MaxDouble;
+                if not TryStrToFloat(TShellFolder(Item2).Details[LocalCompareColumn], LocalDecimal2, FloatFormatSettings) then
+                  LocalDecimal2 := -MaxDouble;
+                result := CompareValue(LocalDecimal1, LocalDecimal2);
+              end
+              else
+                result := CompareText(TShellFolder(Item1).Details[LocalCompareColumn], TShellFolder(Item2).Details[LocalCompareColumn],
+                                      TLocaleOptions.loUserLocale);
+            end;
           end;
         end
         else
@@ -754,6 +770,11 @@ begin
 
   for Indx := 0 to Items.Count - 1 do
     Folders[Indx].ViewHandle := Handle;
+
+  // Set sorting indicator. The Invalidate also clears that.
+  if (ColumnSorted) and
+     (SortColumn < Columns.Count) then
+    SetListHeaderSortState(Self, Columns[SortColumn], FSortState);
 end;
 
 // Prevent Calling OwnerData fetch
@@ -866,7 +887,6 @@ begin
       FOnEnumColumnsAfterEvent(Self);
 
     if Enabled and
-       ValidFolder(Path) and
        (ViewStyle = vsReport) then // EnumColumns only called for ViewStyle=vsReport
     begin
 

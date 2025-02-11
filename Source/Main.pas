@@ -3403,7 +3403,7 @@ procedure TFMain.ShellListAfterEnumColumns(Sender: TObject);
       Caption := ACaption;
       Width := AWidth;
       Tag := ATag;
-      if (AAlignment > 0) then
+      if (AAlignment <> 0) then
         Alignment := taRightJustify;
     end;
   end;
