@@ -33,7 +33,7 @@ Version:        Description             Issue
                 Fix Issue #91           Allow duplicate tag names in Workspace
                 Fix Issue #95           Column sorting and user defined fields. ET executed in wrong directory
 6.2.5.0         Fix Issue #51           Investigate the possibility to code the jhead & jpegtran in Delphi
-                Fix Issue #106          MenuMsg not handled forShellList and ShellTree submenus
+                Fix Issue #106          MenuMsg not handled for ShellList and ShellTree submenus
                 Fix Issue #109          Add Find function to Metadata
                 Fix Issue #111          Executing some commands make ExifToolGui hang. (Forgot CRLF)
                 Fix Issue #126          Reverse Geocoding (feature request) 
@@ -142,3 +142,15 @@ Version:        Description             Issue
                 Fix Issue #674          Add WindowsLongPath as option. (Requires exiftool 13.03)
                 Fix Issue #675          Prevent hangup when reading ExifTool pipe fails
                 Fix Issue #689          Fix Issues for V6.3.6
+6.3.7.0         Fix Issue #650          Add exiftool '-diff' feature
+                Fix Issue #705          Fix typo in HtmlEscape
+                Fix Issue #707          Network drive with large .tgz file in root results in unresponsive application
+                Fix Issue #709          Cant close geotag window when track outside margin
+                Fix Issue #713          Drag and drop enhancements
+                Fix Issue #718          Support for Delphi 12 Community Edition
+                Fix Issue #727          Display of preview image requires 2nd click
+                Fix Issue #738          Improving keyboard-based working
+                Fix Issue #739          Adding Quicktime tag group in DateTime shift/equalize
+		Fix Issue #754		Support simple visual comparison in Metadata window. (Fix Scrollbar issue)
+                Fix Issue #760          Dont show dialog 'ExifTool could not be started', only disable metadata if working dir is invalid
+		Fix Issue #768		Ease the use of "ExifTool direct" window by connecting it with Metadata panel

@@ -64,9 +64,11 @@
     </ul>
     <li><a href="#m_various">Various</a></li>
     <ul>
-        <li><a href="#file_datecremod_as_exif">File: Date created and modified as in Exif</a></li>
+        <li><a href="#file_datecremod_as_exif">File: Date created and modified as in</a></li>
         <li><a href="#name_datetime">File: Name=DateTime+Name</a></li>
         <li><a href="#jpg_lossless_rotate">JPG: Lossless autorotate + crop</a></li>
+        <li><a href="#select_left_diff">Select left diff</a></li>
+        <li><a href="#show_diff_metadata">Show_diff_metadata</a></li>
     </ul>
     <li><a href="#m_help">Help</a></li>
 </ul>
@@ -125,7 +127,7 @@ are essential for majority of users.<br>
 <h2><a name="m_changesv6">Major changes with ExifToolGUI v6.xx</a></h2>
 <br>
 <ul>
-    <li>The source code now compiles with Delphi Community Edition. Version used, as of writing, Rad 11.3.</li>
+    <li>The source code now compiles with Delphi Community Edition. Version used, as of writing, Rad 12.1.</li>
     <li>No (closed source) 3rd party libraries needed.</li>
     <li>All source code provided on GitHub.</li>
     <li>Added styles.</li>
@@ -183,6 +185,8 @@ are essential for majority of users.<br>
     <a href="Readme%20Long%20filenames.txt"><b>See Readme Long filenames.txt</b></a> and
     <a href="https://exiftool.org/ExifTool.html#WindowsLongPath"><b>WindowsLongPath</b></a> for more info.
     </li>
+    <li>Added support for <a href="#show_diff_metadata"><b>-diff</b></a> feature of ExifTool.</li>
+    <li>Improving <a href="Readme%20keyboard%20shortcuts.txt">keyboard-based</a> working</li>
 </ul>
 <br>
 <a href="changelog.txt"><b>See changelog.txt for a complete list of issues.</b></a>
@@ -280,6 +284,7 @@ More info for developers from Embarcadero</a>
 Of course you do. What you need is a "raw codec", usually available for free from the camera manufacturer.
 The best I've found so far is "FastPictureViewer codec" (from <a href="http://www.fastpictureviewer.com/codecs/">here</a>).
 It is very fast, covers many raw formats and is free for personal use.<br>
+<u>Note:</u> For recent Windows versions the Raw Image Extension obtainable in the Microsoft Store may be enough.<br><br>
 <a href="Readme Using Codecs.txt"><b>Readme Using Codecs.txt</b></a>
 
 <h3><a name="m_reqs_jhead_jtran">5. jhead.exe &amp; jpegtran.exe</a></h3>
@@ -333,6 +338,9 @@ are saved when closing GUI.<br>
 <b>Generate thumbnails as needed</b><br>
 Depending on the type of files, the codecs installed, and of course the system, generating thumbnails can be a time-consuming process.
 You can disable automatic generating here.<br><br>
+<b>Allow Non Microsoft Wic codecs</b><br>
+Enabling this option allows GUI to load Wic Codecs not provided by Microsoft.<br>
+Use this if you experience problems with previewing Raw images.<br><br>
 <b>Generate thumbnails now</b><br>
 if you dont have 'Generate thumbnails as needed' checked, this option allows you to manually generate them.
 You can also generate them manually from the context-menus on the folder and file list.<br><br>
@@ -382,8 +390,8 @@ If you have added GUI to the contextmenu you can start it by Right clicking on a
 <ul>
     <li>For Windows 11 you can find the context menu item under 'Show more options', or use SHIFT/Right click.
     If you search the net you can also find 'registry tweaks' that show the contextmenu directly.<br></li>
-    <li>When you decide to add GUI to the Contextmenu data is written to the registry.
-    If you have concerns with that, because GUI is not <b>Portable</b>, dont use it.<br> </li>
+    <li>When you decide to add GUI to the Contextmenu data is written to the registry.<br>
+    If you have concerns with that, because GUI would not be <b>Portable</b>, dont use it.<br> </li>
 </ul>
 <br><br>
 
@@ -397,6 +405,10 @@ move to the next tag/line. If you prefer focus would remain on currently edited 
 <b>Workspace: Double Click adds/removes tags</b><br>
 If you check this, double-clicking in the Workspace will remove a tag,
 double-clicking on one of the tabs Exif, Xmp, Iptc, Maker, All will add that tag to the Workspace.
+<br><br>
+<b>Workspace: Enable line editing</b><br>
+Enabling this option will allow direct editing in the Workspace.<br>
+See edit <a href="#p_metadata">metadata</a> in Workspace.
 <br><br>
 <b>Exiftool.exe location</b><br>
 If you need to override the location of exiftool.exe you can do that here.
@@ -495,7 +507,7 @@ Starting with V6.3.1 these definitions can also be Loaded and Saved. Its working
 <h4>Custom view definition file: Load/Save</h4>
 - The tags in the Custom view of the <a href="#p_metadata">Metadata panel</a><br>
 <h4><a name="m_predefinedfile">Predefined tags definition file: Load/Save</a></h4>
-- The <a href="#p_managemetadata">predefined tags</a> available for copying and removing metadata.<br>
+- The <a href="#p_managemetadata">predefined tags</a> available for copying, removing and show diff metadata.<br>
 <br><br>
 <h3><a name="m_style">Style</a></h3>
 <br>
@@ -843,7 +855,11 @@ are capable of:<br>
     <li>The data (Tag names and values) shown are from the first selected/source file.</li>
 </ul>
 <br>
+
 <img src="ExifToolGUI_V6_files/metadatapreview.jpg"><br><br>
+<br>
+
+<h4><a name="p_predefined_lists">Managing pre defined lists</a></h3>
 <ul>
     <li>You can customize the tags, by clicking on the button <b>Predefined</b>.<br>
     This will open the form <b>Predefined Tags</b>.</li>
@@ -892,8 +908,14 @@ When you're done modifying the predefined tags, you can export and import them u
 
 <h2><a name="m_various">Various menu</a></h2>
 
-<h3><a name="file_datecremod_as_exif">File: Date created and modified as in Exif</a></h3>
--use it, if you feel the need.<br><br>
+<h3><a name="file_datecremod_as_exif">File: Date created and modified as in...</a></h3>
+<ul>
+<li>Exif</li>
+<li>Xmp</li>
+<li>QuickTime</li>
+</ul>
+
+Use it, if you feel the need.<br><br>
 This is a remark originally made by Bogdan. I would like to add my comment why it's not a good idea.<br>
 If you have a backup tool that relies on the Date Modified, it will not notice that a file is modified. Example: Robocopy<br>
 
@@ -924,6 +946,54 @@ In addition you have more control over how the function is performed.<br><br>
 <br>
 <br>
 
+<h3><a name="select_left_diff">Select left diff</a></h3>
+This option allows you to specify the file, or directory to use on the left side of the compare window.<br>
+<br>
+
+<h3><a name="show_diff_metadata">Show diff metadata</a></h3>
+<h4>Accessing the Show diff metadata form</h4>
+<ul>
+<li>Select 1 file or directory, and click on <b>Show diff metadata</b>, from the various menu, or the context menu of the file list.<br>
+The selected file/directory is used on the <b>left side</b>. You will be prompted for a <b>right side</b>.
+</li>
+</ul><br>
+<img src="ExifToolGUI_V6_files/show_diff1.jpg"><br><br>
+<img src="ExifToolGUI_V6_files/show_diff2.jpg"><br><br>
+<ul>
+<li>Select 2 files or directories. Clicking on <b>Show diff metadata</b> opens the <b>Show diff metadata</b> form directly.</li>
+<li>Select 3 or more files. Clicking on <b>show diff metadata</b> prompts for the <b>right</b> directory</li>
+<li>You can control the <b>left side</b> by clicking that first.</li>
+</ul>
+<br><br>
+
+The <b>Show diff metadata</b> form opens.<br><br>
+<img src="ExifToolGUI_V6_files/show_diff3.jpg"><br><br>
+
+The <b>Show diff metadata</b> form has these options:<br>
+<ul>
+<li>Include/Exclude the tags to compare, and save them as default.<br>
+The list of tags is shared with the lists used for removing and copying metadata,<br>
+and can be saved and loaded using <b>Program/Predefined tags definition file</b>.<br>
+See <a href="#p_predefined_lists">Managing pre defined lists</a> how to customize these lists.<br>
+
+<br></li>
+<li>Formatting options. (-v, -n, -g, specify the family group name)</li>
+<li>When comparing 2 directories specify how to match the filenames.</li>
+</ul>
+<br>
+It also offers to <b>merge</b> the changes between 2 files.<br>
+<ul>
+<li>Click on the <b>buckets</b> to delete selected groups/tags from the <b>left</b>, or <b>right</b> side.<br>
+(For every selected tag a <b>-tagname=</b> is executed either on the <b>left</b>, or <b>right</b> file.)<br>
+</li>
+
+<li>Click on the <b>Arrows</b> to copy the selected groups/tags from the <b>left</b> to the <b>right</b>,
+or <b>right</b> to the <b>left</b> file.<br>
+(A <b>-tagsfromfile</b> is executed using the selected tags.)<br>
+</li>
+</ul>
+
+
 <h2><a name="m_help">Help menu</a></h2>
 <h3>Online Documentation</h3>
 -Opens this document<br>
@@ -936,7 +1006,7 @@ In addition you have more control over how the function is performed.<br><br>
 <br>
 
 <h2><a name="p_filelist">File list panel</a></h2>
-<h3>Changed with Version 6.3.6!</h3>
+<h3>Changed with Version 6.3.6.</h3>
 <br>
 The (dropdown) buttons on top of the file list replace the previous combo boxes. For the most part this should be self explanatory.<br><br>
 <img src="ExifToolGUI_V6_files/newdesignbuttons.jpg"><br>
@@ -1098,7 +1168,7 @@ A few small modifications to the Embarcadero source are needed. You can find the
 <br><br>
 
 <h3><a name="p_config_file_list">Configure File list columns</a></h3><br>
-This is a totallly new form and replaces the old 'Edit' button form.<br><br>
+This is a totally new form and replaces the old 'Edit' button form.<br><br>
 The form shown in previous versions:<br>
 <br>
 <img src="ExifToolGUI_V6_files/newdesignconfigfilelistold.jpg"><br><br>
@@ -1126,7 +1196,7 @@ This read mode defines fieldnames 0..6 <b>(Column Command)</b><br>
 You can <B>not</B> customize the standard file list, but you can use the system field names in Internal and User (column Type)<br>
 <br>
 <B>Internal</B>: This read mode uses internal Delphi/Pascal code to read the metadata directly.
-(The original Developer Bogdan Hrastnik created this, but I have extended it)<br>
+(The original Developer Bogdan Hrastnik created this, and I have extended it)<br>
 The advantage of this read mode is that it is much faster compared to ExifTool.
 This is because Delphi code is compiled to native assembler, where-as ExifTool uses Perl, and Perl is an interpreter language.
 Plus the fact that a constant communication between Gui and ExifTool is needed, makes it slower.<br>
@@ -1207,7 +1277,7 @@ By clicking on <font class="blue">ExifTool direct</font> button, you get an inpu
     For commands that don't need file names (EG <b>-ver</b>) use Select None first.<br>
     </li>
     <br>
-    <li>Even you're in <b>direct mode</b>, <font class="blue">Options menu</font> settings for:</li>
+    <li>Even if you're in <b>direct mode</b>, the <font class="blue">Options menu</font> settings for:</li>
     <ul>
         <li>Don't backup files when modifying</li>
         <li>Preserve Date modified of files</li>
@@ -1290,7 +1360,9 @@ By clicking on <font class="blue">Edit predefined</font> button, panel increases
 <font class="blue">^Default</font> -makes currently selected predefined command selected by default each time GUI starts.<br>
 <font class="blue">Deselect</font> -sets predefined commands combobox to "none selected" state.<br>
 <br>
-<font class="red">Note:</font> Don't use <font class="red">=</font> character in <font class="blue">Command name</font> field! -because in INI file, this character is used as separator between command name and actual command.<br>
+<font class="red">Note:</font> Don't use the <font class="red"><b>=</b></font> character in the
+<font class="blue">Command name</font> field! Because in INI files, this character is used as a separator between
+the command name and the actual command.<br>
 <br>
 <h3>Using args files</h3>
 <b>args</b> file is a text file, usually containing several ExifTool 
@@ -1357,8 +1429,12 @@ Here's how to edit metadata in <font class="blue">Workspace</font>:
     <li>Write tag value and press Enter key when you're done (or press <b>Esc</b> key to cancel editing)</li>
     <li>Tag name you've previously selected becomes yellow and contains the value you've just entered.</li>
     <li>If needed, pick another tag and repeat the process.</li>
+</ul><br>
+<u>Notes:</u>
+<ul>
+    <li>Data isn't saved yet!</li>
+    <li>If you have enabled <b>line editing</b> in Preferences/Other, you can (over)type the values directly in the grid.</li>
 </ul>
-<u>Note:</u> Data isn't saved yet!<br>
 
 <br>
 If you've changed your mind and don't wish to change particular tag,
@@ -1372,8 +1448,8 @@ Some tag values may require a bit longer text to be entered (just <u>a bit</u> l
 <img src="ExifToolGUI_V6_files/metadataworkspacelong.jpg"><br>
 <br>
 
-<b>Keyboard shortcuts</b><br>
-These keyboard shortcuts are recognized:
+<h4>Keyboard shortcuts</h4>
+These <a href="Readme%20keyboard%20shortcuts.txt">keyboard</a> shortcuts are recognized in the Workspace.<br>
 <ul>
     <li>Enter, Starts editing the field, confirms editing the value.</li>
     <li>Esc, Abandons editing the value.</li>
@@ -1384,18 +1460,21 @@ These keyboard shortcuts are recognized:
 </ul>
 <br>
 
-<b>Editing tags which names ends with ? character</b><br>
-This sign means tag can have multiple values defined (where keywords are
- most known). Posibilities for entering values for such tags:<br>
-<font class="brown">bird</font> -all existing keywords will be deleted and keyword "bird" will be saved.<br>
-<font class="brown">+flight</font> -keyword "flight" will be added to existing list of keywords.<br>
-<font class="brown">-bird</font> -keyword "bird" will be deleted from existing list of keywords (if it exist).<br>
-<br>
+<li>Not all lines in the workspace can be edited. E.G. -GUI-SEP lines, or tag names ending with a ?</li><br>
+<li>Editing tags which names end with <b>±</b> character<br><br>
+This sign means the tag can have multiple values defined (where keywords is  most well-known).<br>
+Posibilities for entering values for such tags:<br>
+<ul>
+<li><font class="brown">bird</font> -all existing keywords will be deleted and keyword "bird" will be saved.</li>
+<li><font class="brown">+flight</font> -keyword "flight" will be added to existing list of keywords.</li>
+<li><font class="brown">-bird</font> -keyword "bird" will be deleted from existing list of keywords (if it exists).</li>
+</ul>
 You can also add multiple keywords at once, for example by entering: <font class="brown">+nature+daylight+sky</font><br>
 or you can delete multiple keywords at once, for example: <font class="brown">-water-tree</font><br>
+</li>
 <br>
-<u>Note:</u> As you know by now, you can't enter keywords which contain + or - sign (which is a bad keywording habbit anyway).<br>
-<u>Advice:</u> Don't write stories into keywords -by it's definition, a keyword is meant to be a (single) word.<br>
+<u>Note:</u> As you know by now, you can't enter keywords which contain a + or - sign.<br>
+<u>Advice:</u> Don't write stories into keywords, by it's definition, a keyword is meant to be a (single) word.<br>
 <br>
 
 <h3><a name="m_popup_meta">Pop-up menu in Metadata panel</a></h3>
@@ -1431,7 +1510,7 @@ Adds selected tag to be shown in <font class="blue">Custom</font> view.<br>
 <b>Remove tag from Custom view</b> -in <font class="blue">Custom</font> view only.<br>
 It is a good practice, to keep only those tags in <font class="ble">Custom</font> view, on which you are temporary interested. Once number of tags listed here becomes too long, the meaning/purpose of <font class="blue">Custom</font> view is lost.<br>
 <br>
-<b>Add tag to File list Details</b> -in <font class="blue">Exif, Xmp</font> and <font class="blue">Iptc</font> view only<br>
+<b>Add tag to File list Details</b> -in <font class="blue">Exif, Xmp, Iptc</font> and <font class="blue">All</font> view only<br>
 This command adds selected tag into File list <font class="blue">Details: User defined</font> columns.<br>
 <br>
 
@@ -1439,6 +1518,16 @@ This command adds selected tag into File list <font class="blue">Details: User d
 As name implies, this option serves to mark/unmark tags of interest.
 Marked tag name is shown in red color in any view (except in <font class="blue">Workspace</font>), so you can locate it easier later.<br>
 <u>Note:</u> This selection is only available if <font class="blue">Exiftool standard (short)</font> language is selected in <font class="blue">Preferences</font>.<br>
+<br>
+<b>Copy Value to Clipboard</b><br>
+Copy the value of the selected line to the Clipboard.<br>
+<br>
+<b>Copy Tag name to Clipboard</b><br>
+Copy the Tag name of the selected line to the Clipboard.<br>
+<br>
+
+<b>Insert Tag name in to ExifTool Direct</b> - Only when <font class="blue">ExifTool direct</font> is active.<br>
+Copy the Tag name of the selected line to the ExifTool direct command.<br>
 <br>
 <br>
 
@@ -1555,6 +1644,7 @@ Modified on November, 2024<br>
     <li><a href="..\Source\NativeJpg\README.txt">ReadMe NativeJpg</a></li>
     <li><a href="..\Source\BreadcrumbBar\README.txt">ReadMe Breadcrumb Bar</a></li>
     <li><a href="..\Source\Xml.VerySimple\readme.txt">ReadMe XML verySimple</a></li>
+    <li><a href="Readme keyboard shortcuts.txt">Readme keyboard shortcuts</a></li>
     <li><a href="ReadMe for Users.txt">ReadMe for Users</a></li>
     <li><a href="Readme GeoCoding.txt">Readme GeoCoding</a></li>
     <li><a href="Readme GeoCoding Getting started.txt">Readme GeoCoding Getting started</a></li>

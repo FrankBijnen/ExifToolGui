@@ -188,4 +188,14 @@ Changed with version 6.3.6
 - Improved performance by buffering and disabling style elements for the file list.
 - Fixed memory leaks.
 
+Changed with version 6.3.7
+- Drag and drop enhancements. You can now drop multiple files (not directories) in GUI. All dropped files will be selected.
+  Also GUI can be used as a dragsource. EG. Dragging files from GUI to an Explorer window, or any application that accepts dragged files
+- A bug has been fixed, that could prevent displaying a preview of a RAW file. 
+  If you experience problems with preview Enable 'Allow Non Microsoft Wic codecs' in Preferences/Thumbnails
+- Add exiftool '-diff' feature. See documentation on Various/Show diff metadata
+- Add 'QuickTime' group in date time functions.
+- Removed MessageBeep, or Bell, when using the Enter key on input fields.
+- Small bug fixes.
+
 Frank
