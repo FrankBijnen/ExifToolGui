@@ -3,16 +3,13 @@
 
 This is an updated version of the ExifToolGui program created by Bogdan Hrastnik. Many thanks go out to him.
 
-<b>Released version: <b>V6.3.6</b> updated November 13, 2024</b><br>
+<b>Released version: <b>V6.3.7</b> updated February 14, 2025</b><br>
 
-- Redesigned the file list.<br>Credits to AngusPhoe for his ideas, inpiration, testing and excellent feedback. https://github.com/AngusPhoe<br>
-  Be sure to read the docs: [File list panel](Docs/ExifToolGUI_V6.md#p_filelist)<br>
-- Add more details and more customization options to the file list.<br>
-- Redesigned shifting date-time and renaming files.<br>Credits to PhilsHappy for his ideas, inpiration, testing and excellent feedback. https://github.com/Philshappy<br>
-- Added support for Long Paths.<br>Credits to Phil Harvey for adding support to ExifTool. https://exiftool.org<br>
-- Improved performance:
-  - By using ExifTool multithreaded when sorting on columns and selecting all files.
-  - By using buffering, and disable some styling elements.
+- Added ExifTool -diff feature. Allows comparing metadata of files and merging the differences.
+- Drag and drop enhancements. Allow multiple files to be dropped in GUI. GUI can act as a drag source.
+- Improved keyboard-based working. Allow line editing in Workspace.
+- Added Quicktime in date time functions.
+- Updated compiler to Rad 12.1 Community Edition, and installer to InnoSetup 6.4.0.
 - Various bugfixes.<br>
 - For the complete info see the [changelog](Docs/changelog.txt).<br>
 

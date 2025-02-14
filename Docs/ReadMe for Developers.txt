@@ -193,5 +193,9 @@ Version 6.3.6
 - Xml.VerySimple. Add UTF16 LE and BE
 - Added EnableFullTextSearch for ComboBox (Used in FrmTagNames)
 
+Version 6.3.7
+- This version is now built with RAD12.1 Community Edition.
+  See issue 718 for details.
+- Installer created with InnoSetup 6.4.0
 
 Frank

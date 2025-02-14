@@ -617,9 +617,10 @@ begin
   end;
   
   RTFText := RTFText + // InfoRawCodec.rtf
-    '\pard\b\sl276\slmult1\f0\fs22\lang9 If you wish to see thumbnails of raw image files \b0, you will need to install a codec adapted for the RAW files you use. ' + 
-    'FastPictureViewer provides free codecs for personal use: \par\tab {{\field{\*\fldinst{HYPERLINK https://www.fastpictureviewer.com/codecs/ }}{\fldrslt{https://www.fastpictureviewer.com/codecs/\ul0\cf0}}}}\f0\fs22\par' + #13 + #10;
-
+    '\pard\sl276\slmult1\b\f0\fs22\lang9 If you wish to see previews and thumbnails of raw image files \b0 , you may need to install a codec adapted for the RAW files you use. For recent Windows versions Microsoft offers the Raw Image Extension. FastPictureViewer provides free codecs for personal use: \par' + #10 + #13 +
+    '\tab {{\field{\*\fldinst{HYPERLINK https://www.fastpictureviewer.com/codecs/ }}{\fldrslt{https://www.fastpictureviewer.com/codecs/\ul0\cf0}}}}\f0\fs22\par' + #10 + #13 +
+    '\pard\sa200\sl276\slmult1\par' + #10 + #13;
+    
   RichEditViewer1.RTFText := RTFText + '}' + #13 + #10;
 end;
 
