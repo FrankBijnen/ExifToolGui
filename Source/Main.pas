@@ -1873,7 +1873,7 @@ begin
 
   // For Workspace return the command specified in QuickTags
   if SpeedBtnQuick.Down then
-    Exit(QuickTags[Index -1].Command + ' ');
+    Exit(QuickTags[Index -1].Command);
 
   result := MetadataList.Keys[Index];
 
@@ -1917,7 +1917,7 @@ begin
     GroupName := ReplaceAll(MetadataList.Cells[1, X], ['---- ', ' ----'], ['-',':']); // eg '---- IFD0 ----' => 'IFD0:'
   end;
 
-  result := GroupName + TranslateTagName(GroupName, result) + ' ';
+  result := GroupName + TranslateTagName(GroupName, result);
 end;
 
 procedure TFMain.RestoreGUI;
@@ -1955,7 +1955,7 @@ begin
   if Pos(Tx, CustomViewTagList) > 0 then
     ShowMessage(StrTagAlreadyExistsI)
   else
-    CustomViewTagList := CustomViewTagList + Tx;
+    CustomViewTagList := CustomViewTagList + Tx + ' ';
 end;
 
 procedure TFMain.QuickPopUp_AddDetailsUserClick(Sender: TObject);
@@ -2098,7 +2098,7 @@ end;
 procedure TFMain.QuickPopUp_InsertETDirectClick(Sender: TObject);
 begin
   if (TmenuItem(Sender).Visible) then
-    EditETdirect.Text := EditETdirect.Text + TagCmd;
+    EditETdirect.Text := EditETdirect.Text + TagCmd + ' ';
 end;
 
 procedure TFMain.QuickPopUp_MarkTagClick(Sender: TObject);
