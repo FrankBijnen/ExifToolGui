@@ -324,7 +324,7 @@ begin
     SetLength(QuickTags, result);
 
   QuickTags[AIndex].Caption := ACaption;
-  QuickTags[AIndex].Command := ACommand;
+  QuickTags[AIndex].Command := Trim(ACommand);
   QuickTags[AIndex].Help := AHelp;
 
   // Set NoEdit

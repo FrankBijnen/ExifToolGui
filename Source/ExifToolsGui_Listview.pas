@@ -15,7 +15,6 @@ type
   public
     procedure ScrollToItem(ItemIndex: Integer);
     property OnColumnResized: TNotifyEvent read FOnColumnResized write FOnColumnResized;
-
   end;
 
 implementation
