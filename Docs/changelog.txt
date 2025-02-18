@@ -151,6 +151,6 @@ Version:        Description             Issue
                 Fix Issue #727          Display of preview image requires 2nd click
                 Fix Issue #738          Improving keyboard-based working
                 Fix Issue #739          Adding Quicktime tag group in DateTime shift/equalize
-		Fix Issue #754		Support simple visual comparison in Metadata window. (Fix Scrollbar issue)
+                Fix Issue #754          Support simple visual comparison in Metadata window. (Fix Scrollbar issue)
                 Fix Issue #760          Dont show dialog 'ExifTool could not be started', only disable metadata if working dir is invalid
-		Fix Issue #768		Ease the use of "ExifTool direct" window by connecting it with Metadata panel
+                Fix Issue #768          Ease the use of "ExifTool direct" window by connecting it with Metadata panel
