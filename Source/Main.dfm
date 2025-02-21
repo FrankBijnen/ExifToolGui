@@ -340,11 +340,27 @@ object FMain: TFMain
           OnKeyPress = EditQuickKeyPress
         end
       end
-      object MetadataList: TValueListEditor
+      object CmbAutoComplete: TComboBox
         Left = 0
         Top = 57
         Width = 312
-        Height = 345
+        Height = 21
+        Align = alTop
+        ItemIndex = 0
+        TabOrder = 3
+        Text = 'acNone'
+        OnClick = CmbAutoCompleteClick
+        Items.Strings = (
+          'acNone'
+          'acAutoAppend'
+          'acAutoSuggest'
+          'acAutoAppendSuggest')
+      end
+      object MetadataList: TValueListEditor
+        Left = 0
+        Top = 78
+        Width = 312
+        Height = 324
         Align = alClient
         BorderStyle = bsNone
         DefaultRowHeight = 19
@@ -1054,6 +1070,11 @@ object FMain: TFMain
                   item
                     Action = MaWorkspaceSave
                     Caption = '&Save...'
+                  end
+                  item
+                    Visible = False
+                    Action = Action1
+                    Caption = 'S&aveAll'
                   end>
                 Caption = 'W&orkspace definition file'
                 UsageCount = 1
@@ -1703,6 +1724,11 @@ object FMain: TFMain
       Category = 'Various_FileDate'
       Caption = 'QuickTime'
       OnExecute = MaFDateFromQuickTimeExecute
+    end
+    object Action1: TAction
+      Category = 'Program_Workspace'
+      Caption = 'SaveAll'
+      OnExecute = Action1Execute
     end
   end
   object QuickPopUpMenu: TPopupMenu

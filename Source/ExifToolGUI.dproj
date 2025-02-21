@@ -144,6 +144,7 @@
         <DCCReference Include="ExifToolsGUI_Utils.pas"/>
         <DCCReference Include="UnitFilesOnClipBoard.pas"/>
         <DCCReference Include="UnitColumnDefs.pas"/>
+        <DCCReference Include="ExifToolsGui_AutoComplete.pas"/>
         <DCCReference Include="ExifToolsGui_ValEdit.pas"/>
         <DCCReference Include="ExifToolsGui_ThreadPool.pas"/>
         <DCCReference Include="ExifToolsGui_ShellList.pas"/>
@@ -157,6 +158,7 @@
         <DCCReference Include="ExifToolsGUI_StringList.pas"/>
         <DCCReference Include="ExifToolsGui_ComboBox.pas"/>
         <DCCReference Include="ExifToolsGui_Listview.pas"/>
+        <DCCReference Include="ExifToolsGui_AutoEdit.pas"/>
         <DCCReference Include="ExifInfo.pas"/>
         <DCCReference Include="ExifTool.pas"/>
         <DCCReference Include="ExifTool_PipeStream.pas"/>

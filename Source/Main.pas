@@ -34,7 +34,9 @@ uses
   ExifToolsGUI_Thumbnails,    // Thumbnails
   ExifToolsGUI_ValEdit,       // MetaData
   ExifToolsGUI_OpenPicture,   // OpenPicture dialog
-  ExifToolsGUI_Utils;         // Various
+  ExifToolsGUI_Utils,         // Various
+  ExifToolsGui_AutoEdit,      // AutoEdit
+  ExifToolsGui_AutoComplete;  // AutoComplete
 
 const
   CM_ActivateWindow = WM_USER + 100;
@@ -76,7 +78,7 @@ type
     SpeedBtnQuick: TSpeedButton;
     MemoQuick: TMemo;
     SpeedBtnLarge: TSpeedButton;
-    EditQuick: TEdit;
+    EditQuick: ExifToolsGui_AutoEdit.TEdit;  // Need our own version
     SpeedBtnShowLog: TSpeedButton;
     SpeedBtnQuickSave: TSpeedButton;
     SpeedBtnETdirectDel: TSpeedButton;
@@ -216,6 +218,8 @@ type
     QuickPopUp_CopyTag: TMenuItem;
     N3: TMenuItem;
     QuickPopUp_InsertETDirect: TMenuItem;
+    CmbAutoComplete: TComboBox;
+    Action1: TAction;
     procedure ShellListClick(Sender: TObject);
     procedure ShellListKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
     procedure SpeedBtnExifClick(Sender: TObject);
@@ -367,6 +371,8 @@ type
     procedure MaFDateFromQuickTimeExecute(Sender: TObject);
     procedure QuickPopUp_CopyTagNameClick(Sender: TObject);
     procedure QuickPopUp_InsertETDirectClick(Sender: TObject);
+    procedure CmbAutoCompleteClick(Sender: TObject);
+    procedure Action1Execute(Sender: TObject);
   private
     { Private declarations }
     ETBarSeriesFocal: TBarSeries;
@@ -464,7 +470,7 @@ var
 implementation
 
 uses System.StrUtils, System.Math, System.Masks, System.Types, System.UITypes,
-  Vcl.ClipBrd, Winapi.ShlObj, Winapi.ShellAPI, Winapi.CommCtrl, Vcl.Shell.ShellConsts, Vcl.Themes, Vcl.Styles,
+  Vcl.ClipBrd, Winapi.ShellAPI, Winapi.CommCtrl, Vcl.Shell.ShellConsts, Vcl.Themes, Vcl.Styles,
   ExifTool, ExifInfo, ExifToolsGui_LossLess, ExifTool_PipeStream, ExifToolsGui_ResourceStrings,
   ExifToolsGUI_MultiContextMenu, ExifToolsGUI_StringList, ExifToolsGui_FileListColumns,
   UDmFileLists,
@@ -476,7 +482,6 @@ uses System.StrUtils, System.Math, System.Masks, System.Types, System.UITypes,
 {$R *.dfm}
 
 var FStyleServices: TCustomStyleServices;
-
 
 function TFMain.GetDefWindowSizes: TRect;
 begin
@@ -988,7 +993,7 @@ end;
 
 procedure TFMain.MaEtDirectSaveExecute(Sender: TObject);
 begin
-  SaveIniDialog(SaveFileDlg, TIniData.idETDirect, true);
+  SaveIniDialog(SaveFileDlg, [TIniData.idETDirect], true);
 end;
 
 procedure TFMain.MAPIWindowsWideFileClick(Sender: TObject);
@@ -1017,7 +1022,7 @@ end;
 
 procedure TFMain.MaUserDefSaveExecute(Sender: TObject);
 begin
-  SaveIniDialog(SaveFileDlg, TIniData.idFileLists, true);
+  SaveIniDialog(SaveFileDlg, [TIniData.idFileLists], true);
 end;
 
 procedure TFMain.MaCustomViewLoadExecute(Sender: TObject);
@@ -1028,7 +1033,7 @@ end;
 
 procedure TFMain.MaCustomViewSaveExecute(Sender: TObject);
 begin
-  SaveIniDialog(SaveFileDlg, TIniData.idCustomView, true);
+  SaveIniDialog(SaveFileDlg, [TIniData.idCustomView], true);
 end;
 
 procedure TFMain.MaPredefinedLoadExecute(Sender: TObject);
@@ -1039,7 +1044,7 @@ end;
 
 procedure TFMain.MaPredefinedSaveExecute(Sender: TObject);
 begin
-  SaveIniDialog(SaveFileDlg, TIniData.idPredefinedTags, true);
+  SaveIniDialog(SaveFileDlg, [TIniData.idPredefinedTags], true);
 end;
 
 procedure TFMain.MaSelectDiffExecute(Sender: TObject);
@@ -1230,8 +1235,10 @@ begin
       begin
         if (EditLineActive) then
         begin
+          AutoComplete.Lines.Add(MetadataList.Cells[1, CurrentLine]);
           AutoIncLine(CurrentLine);
-          MetadataList.EditorMode := true;
+          if (MetadataList.EditorMode = false) then //TODO: Check
+            MetadataList.EditorMode := true;
         end
         else
         begin
@@ -1381,7 +1388,7 @@ begin
   if (EditLineActive) and
      (MetadataLoading = false) then
   begin
-    MarkLineModified(MetadataList.Row);
+    MarkLineModified(MetadataList.EditRow);
     SpeedBtnQuickSave.Enabled := true;
   end;
 end;
@@ -1739,12 +1746,12 @@ var
 begin
   if FQuickManager.ShowModal = mrOK then
   begin
-    Indx := FQuickManager.StringGrid1.Row;
+    Indx := FQuickManager.StringGrid1.Row + 1;
     if SpeedBtnQuick.Down then
     begin
       ShowMetadata;
-      if ShellList.ItemIndex >= 0 then
-        MetadataList.Row := Indx + 1;
+      if (MetadataList.RowCount > Indx) then
+        MetadataList.Row := Indx;
     end;
   end;
 end;
@@ -1785,7 +1792,7 @@ end;
 
 procedure TFMain.MWorkspaceSaveClick(Sender: TObject);
 begin
-  SaveIniDialog(SaveFileDlg, TIniData.idWorkSpace, true);
+  SaveIniDialog(SaveFileDlg, [TIniData.idWorkSpace], true);
 end;
 
 procedure TFMain.OnlineDocumentation1Click(Sender: TObject);
@@ -2385,6 +2392,12 @@ begin
   end;
 end;
 
+procedure TFMain.CmbAutoCompleteClick(Sender: TObject);
+begin
+  SetGridEditor(SpeedBtnQuick.Down);
+  MetadataList.SetFocus;
+end;
+
 procedure TFMain.CmbETDirectModeChange(Sender: TObject);
 begin
   GUIsettings.ETdirMode := CmbETDirectMode.ItemIndex;
@@ -2502,6 +2515,7 @@ begin
         MemoQuick.Color := $BBFFFF;
       MemoQuick.SelectAll;
     end;
+
     StatusBar.Panels[2].Text := QuickTags[Row - 1].Help;
   end;
 end;
@@ -2558,8 +2572,9 @@ begin
   begin
     if (QuickTags[Index - 1].NoEdit = false) then
     begin
-      MetadataList.Cells[1, Index] := Trim(TCustomEdit(Sender).Text);
-      if TCustomEdit(Sender).Modified then
+      MetadataList.Cells[1, Index] := Trim(TEdit(Sender).Text);
+      AutoComplete.Lines.Add(MetadataList.Cells[1, Index]);
+      if TEdit(Sender).Modified then
         MarkLineModified(Index);
       MetadataList.Refresh;
       MetadataList.SetFocus;
@@ -2733,6 +2748,11 @@ end;
 procedure TFMain.MaFDateFromQuickTimeExecute(Sender: TObject);
 begin
   FileDateFromMetaData(2);
+end;
+
+procedure TFMain.Action1Execute(Sender: TObject);
+begin
+  SaveIniDialog(SaveFileDlg, [TIniData.idWorkSpace, TIniData.idETDirect, TIniData.idPredefinedTags], true);
 end;
 
 procedure TFMain.AdvPagePreviewResize(Sender: TObject);
@@ -3056,8 +3076,7 @@ begin
           AutoIncLine(MetadataList.Row, false);
         finally
           MetadataList.UnlockDrawing;
-          if (MetadataList.CanFocus) then
-            MetadataList.SetFocus;
+          MetadataList.SetFocus;
         end;
       end;
       Ord('M'): //Focus OSM Map
@@ -3247,6 +3266,7 @@ begin
     end
   end;
 
+  SetGridEditor(SpeedBtnQuick.Down);
   if (ShellList.ItemIndex < 0) then
     ShellTree.SetFocus  // No files available to focus.
   else
@@ -3258,8 +3278,6 @@ begin
   // Scroll in view. Select initial
   if (ShellTree.Selected <> nil) then
     ShellTree.Selected.MakeVisible;
-
-  SetGridEditor(SpeedBtnQuick.Down);
 end;
 
 procedure TFMain.RotateImgResize(Sender: TObject);
@@ -3806,13 +3824,14 @@ const
   Margin = 100;
 var
   GridOptions: TGridOptions;
+  AutoCompleteMode: TAutoCompleteMode;
 begin
   EditLineActive := false;
   GridOptions := MetadataList.Options;
   Exclude(GridOptions, goEditing);
   Exclude(GridOptions, goAlwaysShowEditor);
   Include(GridOptions, goRowSelect);
-
+  AutoCompleteMode := TAutoCompleteMode(CmbAutoComplete.ItemIndex);
   if GUIsettings.EditLine and
      Enable then
   begin
@@ -3822,6 +3841,10 @@ begin
     Include(GridOptions, goAlwaysShowEditor);
   end;
   MetadataList.Options := GridOptions;
+  if (MetadataList.InplaceEdit <> nil) then
+    MetadataList.InplaceEdit.AutoCompleteMode := AutoCompleteMode;
+  EditQuick.AutoCompleteMode := AutoCompleteMode;
+
   if (MetadataList.ColWidths[0] > MetadataList.ClientWidth - Margin) then
     MetadataList.ColWidths[0] := MetadataList.ClientWidth - Margin;
   MetadataList.Col := 1;
@@ -3889,7 +3912,7 @@ begin
 
               if (Length(ETResult[E]) < 1) or
                  (CharInSet(ETResult[E][1], NoChars)) then
-               Tx := Tx + '='+ StrNOAst
+                Tx := Tx + '=' + StrNOAst
               else
                 Tx := Tx + '=' + StrYESAst;
             end
@@ -3898,7 +3921,9 @@ begin
           end;
           MetadataList.Strings[E] := Tx;
           if (QuickTags[E].NoEdit) then
-            MetadataList.ItemProps[E].ReadOnly := true;
+            MetadataList.ItemProps[E].ReadOnly := true
+          else
+            AutoComplete.Lines.Add(ETResult[E]);
         end;
       finally
         MetadataList.Strings.EndUpdate;
