@@ -177,7 +177,8 @@ procedure ResetWindowSizes;
 procedure ReadGUIini;
 function SaveGUIini: boolean;
 function LoadIniDialog(OpenFileDlg: TOpenDialog; AIniData: TIniData; ShowMsg: boolean = true): boolean;
-function SaveIniDialog(SaveFileDlg: TSaveDialog; AIniData: TIniData; ShowMsg: boolean = true): boolean;
+//function SaveIniDialog(SaveFileDlg: TSaveDialog; AIniData: TIniData; ShowMsg: boolean = true): boolean; overload;
+function SaveIniDialog(SaveFileDlg: TSaveDialog; AllIniData: array of TIniData; ShowMsg: boolean = true): boolean;
 
 implementation
 
@@ -1075,19 +1076,27 @@ begin
   end;
 end;
 
-function GetHrIniData(AIniData: TIniData): string;
+function GetHrIniData(AllIniData: array of TIniData): string;
+var
+  AIniData: TIniData;
 begin
-  case (AIniData) of
-    TIniData.idWorkSpace:
-      result := StrWorkspace;
-    TIniData.idETDirect:
-      result := StrETDirect;
-    TIniData.idFileLists:
-      result := StrFileLists;
-    TIniData.idCustomView:
-      result := StrCustomView;
-    TIniData.idPredefinedTags:
-      result := StrPredefinedTags;
+  result := '';
+  for AIniData in AllIniData do
+  begin
+    if (result <> '') then
+      result := result + #10;
+    case (AIniData) of
+      TIniData.idWorkSpace:
+        result := result + StrWorkspace;
+      TIniData.idETDirect:
+        result := result + StrETDirect;
+      TIniData.idFileLists:
+        result := result + StrFileLists;
+      TIniData.idCustomView:
+        result := result + StrCustomView;
+      TIniData.idPredefinedTags:
+        result := result + StrPredefinedTags;
+    end;
   end;
 end;
 
@@ -1172,6 +1181,53 @@ begin
   end;
 end;
 
+//function HrIniDialogFilename(AllIniData: array of TIniData): string;
+//var
+//  AIniData: TIniData;
+//begin
+//  result := '';
+//  for AIniData in AllIniData do
+//  begin
+//    result := result + GetHrIniData(AIniData) + #10;
+//  end;
+//end;
+
+function SaveIniDialogFilename(SaveFileDlg: TSaveDialog; HrIniData: string): string;
+var
+  DoSave: boolean;
+  IsOk: boolean;
+begin
+  result := '';
+  with SaveFileDlg do
+  begin
+    DefaultExt := 'ini';
+    InitialDir := WrkIniDir;
+    Filter := 'Ini file|*.ini';
+    Title := Format(StrSaveIniDefine, [HrIniData]);
+    repeat
+      IsOK := false;
+      DoSave := Execute;
+      InitialDir := ExtractFileDir(FileName);
+      if DoSave then
+      begin
+        IsOK := (ExtractFileName(FileName) <> ExtractFileName(GetIniFilePath(false)));
+        if not IsOK then
+          ShowMessage(Format(StrUseAnotherNameForIni, [HrIniData]));
+      end;
+    until not DoSave or IsOK;
+    if (DoSave) and (IsOk) then
+      result := FileName;
+  end;
+end;
+
+procedure ShowIniSaveResult(HrIniData: string; IniSaved: boolean);
+begin
+  if IniSaved then
+    ShowMessage(Format(StrIniDefinition, [HrIniData]))
+  else
+    ShowMessage(Format(StrIniDefNotSaved, [HrIniData]));
+end;
+
 function SaveIni(IniFName: string; AIniData: array of TIniTagsData): boolean;
 var
   ThisIniTag: TIniTagsData;
@@ -1204,7 +1260,7 @@ begin
     result := false;
   end;
 end;
-
+(*
 function SaveIniDialog(SaveFileDlg: TSaveDialog; AIniData: TIniData; ShowMsg: boolean = true): boolean;
 var
   DoSave: boolean;
@@ -1263,6 +1319,47 @@ begin
       WrkIniDir := ExtractFileDir(FileName);
     end;
   end;
+end;
+*)
+
+function SaveIniDialog(SaveFileDlg: TSaveDialog; AllIniData: array of TIniData; ShowMsg: boolean = true): boolean;
+var
+  HrIniData: string;
+  FileName: string;
+  AIniData: TIniData;
+  SelIniData: array of TIniTagsData;
+begin
+  result := false;
+
+  HrIniData := GetHrIniData(AllIniData);
+  FileName := SaveIniDialogFilename(SaveFileDlg, HrIniData);
+  if (FileName = '') then
+    exit;
+
+  SetLength(SelIniData, 0);
+  for AIniData in AllIniData do
+  begin
+    case AIniData of
+      TIniData.idWorkSpace:
+        SelIniData := SelIniData + [TIniTagsData.idtWorkSpace];
+      TIniData.idETDirect:
+        SelIniData := SelIniData + [TIniTagsData.idtETDirect];
+      TIniData.idFileLists:
+        SelIniData := SelIniData + [TIniTagsData.idtFileLists];
+      TIniData.idCustomView:
+        SelIniData := SelIniData + [TIniTagsData.idtCustomView];
+      TIniData.idPredefinedTags:
+        SelIniData := SelIniData + [TIniTagsData.idtPredefinedTags,
+                                    TIniTagsData.idtMarked,
+                                    TIniTagsData.idtRemoveTags,
+                                    TIniTagsData.idtCopySingleTags,
+                                    TIniTagsData.idtCopyTags];
+    end;
+  end;
+  result := SaveIni(FileName, SelIniData);
+
+  if (ShowMsg) then
+    ShowIniSaveResult(HrIniData, Result);
 end;
 
 initialization
