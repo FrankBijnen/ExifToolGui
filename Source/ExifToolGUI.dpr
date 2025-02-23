@@ -6,7 +6,7 @@ program ExifToolGUI;
 
 {$DEFINE LANGOVERRIDE}
 // Allows for overriding the default language, without writing to the registry.
-// CommandLine example: /OverrideLanguage=NLD
+// CommandLine example: /Lang=NLD
 
 {$R 'ExifToolsGui_Files.res' 'Resources\ExifToolsGui_Files.rc'}
 
@@ -75,7 +75,8 @@ uses
   UFrmCheckVersions in 'UFrmCheckVersions.pas' {FrmCheckVersions},
   UFrmTagNames in 'UFrmTagNames.pas' {FrmTagNames},
   UFrmPredefinedTags in 'UFrmPredefinedTags.pas' {FrmPredefinedTags},
-  UFrmDiff in 'UFrmDiff.pas' {FrmDiff};
+  UFrmDiff in 'UFrmDiff.pas' {FrmDiff},
+  UFrmSaveSettings in 'UFrmSaveSettings.pas' {FrmSaveSettings};
 
 {$R *.res}
 
@@ -127,5 +128,6 @@ begin
   Application.CreateForm(TFrmTagNames, FrmTagNames);
   Application.CreateForm(TFrmPredefinedTags, FrmPredefinedTags);
   Application.CreateForm(TFrmPlaces, FrmPlaces);
+  Application.CreateForm(TFrmSaveSettings, FrmSaveSettings);
   Application.Run;
 end.

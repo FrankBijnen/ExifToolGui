@@ -219,7 +219,8 @@ type
     N3: TMenuItem;
     QuickPopUp_InsertETDirect: TMenuItem;
     CmbAutoComplete: TComboBox;
-    Action1: TAction;
+    MaSaveSettings: TAction;
+    MaLoadSettings: TAction;
     procedure ShellListClick(Sender: TObject);
     procedure ShellListKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
     procedure SpeedBtnExifClick(Sender: TObject);
@@ -284,8 +285,6 @@ type
     procedure MImportMetaSingleClick(Sender: TObject);
     procedure QuickPopUp_CopyTagClick(Sender: TObject);
     procedure MFileNameDateTimeClick(Sender: TObject);
-    procedure MWorkspaceLoadClick(Sender: TObject);
-    procedure MWorkspaceSaveClick(Sender: TObject);
     procedure SpeedBtnChartRefreshClick(Sender: TObject);
     procedure AdvRadioGroup2Click(Sender: TObject);
     procedure MImportRecursiveAllClick(Sender: TObject);
@@ -328,14 +327,6 @@ type
     procedure MaAPILargeFileSupportExecute(Sender: TObject);
     procedure MaCheckVersionsExecute(Sender: TObject);
     procedure ShellListEnter(Sender: TObject);
-    procedure MaETDirectLoadExecute(Sender: TObject);
-    procedure MaEtDirectSaveExecute(Sender: TObject);
-    procedure MaUserDefLoadExecute(Sender: TObject);
-    procedure MaUserDefSaveExecute(Sender: TObject);
-    procedure MaCustomViewLoadExecute(Sender: TObject);
-    procedure MaCustomViewSaveExecute(Sender: TObject);
-    procedure MaPredefinedLoadExecute(Sender: TObject);
-    procedure MaPredefinedSaveExecute(Sender: TObject);
     procedure FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
     procedure ShellTreeKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
     procedure ShellListKeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
@@ -372,7 +363,8 @@ type
     procedure QuickPopUp_CopyTagNameClick(Sender: TObject);
     procedure QuickPopUp_InsertETDirectClick(Sender: TObject);
     procedure CmbAutoCompleteClick(Sender: TObject);
-    procedure Action1Execute(Sender: TObject);
+    procedure MaSaveSettingsExecute(Sender: TObject);
+    procedure MaLoadSettingsExecute(Sender: TObject);
   private
     { Private declarations }
     ETBarSeriesFocal: TBarSeries;
@@ -471,13 +463,12 @@ implementation
 
 uses System.StrUtils, System.Math, System.Masks, System.Types, System.UITypes,
   Vcl.ClipBrd, Winapi.ShellAPI, Winapi.CommCtrl, Vcl.Shell.ShellConsts, Vcl.Themes, Vcl.Styles,
-  ExifTool, ExifInfo, ExifToolsGui_LossLess, ExifTool_PipeStream, ExifToolsGui_ResourceStrings,
-  ExifToolsGUI_MultiContextMenu, ExifToolsGUI_StringList, ExifToolsGui_FileListColumns,
-  UDmFileLists,
+  ExifTool, ExifInfo, ExifToolsGui_LossLess, ExifTool_PipeStream, ExifToolsGui_ResourceStrings, UnitLangResources,
+  ExifToolsGUI_MultiContextMenu, ExifToolsGUI_StringList, ExifToolsGui_FileListColumns, UDmFileLists,
   MainDef, LogWin, Preferences, EditFFilter, EditFCol, UFrmStyle, UFrmAbout, UFrmCheckVersions,
   QuickMngr, DateTimeShift, DateTimeEqual, CopyMeta, RemoveMeta, Geotag, Geomap, CopyMetaSingle, FileDateTime,
   UFrmGenericExtract, UFrmGenericImport, UFrmLossLessRotate, UFrmGeoTagFiles, UFrmGeoSetup, UFrmGenerate,
-  UFrmDiff, UnitLangResources;
+  UFrmDiff, UFrmSaveSettings;
 
 {$R *.dfm}
 
@@ -985,17 +976,6 @@ begin
   FrmCheckVersions.ShowModal;
 end;
 
-procedure TFMain.MaETDirectLoadExecute(Sender: TObject);
-begin
-  if (LoadIniDialog(OpenFileDlg, TIniData.idETDirect, SpeedBtn_ETdirect.Down = false)) then
-    SpeedBtn_ETdirect.Down := true;
-end;
-
-procedure TFMain.MaEtDirectSaveExecute(Sender: TObject);
-begin
-  SaveIniDialog(SaveFileDlg, [TIniData.idETDirect], true);
-end;
-
 procedure TFMain.MAPIWindowsWideFileClick(Sender: TObject);
 begin
   with ET.Options do
@@ -1014,37 +994,10 @@ begin
     SetApiLargeFileSupport(MaAPILargeFileSupport.Checked);
 end;
 
-procedure TFMain.MaUserDefLoadExecute(Sender: TObject);
+procedure TFMain.MaSaveSettingsExecute(Sender: TObject);
 begin
-  if (LoadIniDialog(OpenFileDlg, TIniData.idFileLists, false)) then
-    EditFileLists(Sender)
-end;
-
-procedure TFMain.MaUserDefSaveExecute(Sender: TObject);
-begin
-  SaveIniDialog(SaveFileDlg, [TIniData.idFileLists], true);
-end;
-
-procedure TFMain.MaCustomViewLoadExecute(Sender: TObject);
-begin
-  if (LoadIniDialog(OpenFileDlg, TIniData.idCustomView, SpeedBtnCustom.Down = false)) then
-    ShowMetadata;
-end;
-
-procedure TFMain.MaCustomViewSaveExecute(Sender: TObject);
-begin
-  SaveIniDialog(SaveFileDlg, [TIniData.idCustomView], true);
-end;
-
-procedure TFMain.MaPredefinedLoadExecute(Sender: TObject);
-begin
-  if (LoadIniDialog(OpenFileDlg, TIniData.idPredefinedTags, False)) then
-    ShowMetadata;
-end;
-
-procedure TFMain.MaPredefinedSaveExecute(Sender: TObject);
-begin
-  SaveIniDialog(SaveFileDlg, [TIniData.idPredefinedTags], true);
+  if (FrmSaveSettings.ShowModal = IDOK) then
+    SaveIniDialog(SaveFileDlg, GuiSettings.SelIniData);
 end;
 
 procedure TFMain.MaSelectDiffExecute(Sender: TObject);
@@ -1782,17 +1735,6 @@ begin
   ET.Options.SetCustomOptions(InputBox(StrSpecifyCustomOptio,
                                        StrCustomOptions,
                                        ET.Options.ETCustomOptions));
-end;
-
-procedure TFMain.MWorkspaceLoadClick(Sender: TObject);
-begin
-  if (LoadIniDialog(OpenFileDlg, TIniData.idWorkSpace, SpeedBtnQuick.Down = false)) then
-    ShowMetadata;
-end;
-
-procedure TFMain.MWorkspaceSaveClick(Sender: TObject);
-begin
-  SaveIniDialog(SaveFileDlg, [TIniData.idWorkSpace], true);
 end;
 
 procedure TFMain.OnlineDocumentation1Click(Sender: TObject);
@@ -2745,14 +2687,28 @@ begin
   FileDateFromMetaData(1);
 end;
 
+procedure TFMain.MaLoadSettingsExecute(Sender: TObject);
+begin
+//  if (LoadIniDialog(OpenFileDlg, SpeedBtn_ETdirect.Down = false)) then
+//    SpeedBtn_ETdirect.Down := true;
+//  if (LoadIniDialog(OpenFileDlg, false)) then
+//    EditFileLists(Sender)
+//  if (LoadIniDialog(OpenFileDlg, false)) then
+//    EditFileLists(Sender)
+//  if (LoadIniDialog(OpenFileDlg, SpeedBtnCustom.Down = false)) then
+//    ShowMetadata;
+//  if (LoadIniDialog(OpenFileDlg, false)) then
+//    ShowMetadata;
+//  if (LoadIniDialog(OpenFileDlg, SpeedBtnQuick.Down = false)) then
+//    ShowMetadata;
+
+  if (LoadIniDialog(OpenFileDlg)) then
+    ShowMetadata;
+end;
+
 procedure TFMain.MaFDateFromQuickTimeExecute(Sender: TObject);
 begin
   FileDateFromMetaData(2);
-end;
-
-procedure TFMain.Action1Execute(Sender: TObject);
-begin
-  SaveIniDialog(SaveFileDlg, [TIniData.idWorkSpace, TIniData.idETDirect, TIniData.idPredefinedTags], true);
 end;
 
 procedure TFMain.AdvPagePreviewResize(Sender: TObject);
@@ -3230,7 +3186,7 @@ begin
   // Init Chart
   AdvRadioGroup2Click(Sender);
 
-  WrkIniDir := GetAppPath;
+  WrkIniDir := GetINIPath(false);
   DontSaveIni := FindCmdLineSwitch('DontSaveIni', true);
 
   // The shellList is initally disabled. Now enable and refresh
