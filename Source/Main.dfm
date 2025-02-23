@@ -1062,74 +1062,12 @@ object FMain: TFMain
                 Caption = '-'
               end
               item
-                Items = <
-                  item
-                    Action = MaWorkspaceLoad
-                    Caption = '&Load..'
-                  end
-                  item
-                    Action = MaWorkspaceSave
-                    Caption = '&Save...'
-                  end
-                  item
-                    Visible = False
-                    Action = Action1
-                    Caption = 'S&aveAll'
-                  end>
-                Caption = 'W&orkspace definition file'
-                UsageCount = 1
+                Action = MaLoadSettings
+                Caption = '&Load settings'
               end
               item
-                Items = <
-                  item
-                    Action = MaETDirectLoad
-                    Caption = '&Load..'
-                  end
-                  item
-                    Action = MaEtDirectSave
-                    Caption = '&Save...'
-                  end>
-                Caption = 'E&xifTool direct definition file'
-                UsageCount = 1
-              end
-              item
-                Items = <
-                  item
-                    Action = MaUserDefLoad
-                    Caption = '&Load..'
-                  end
-                  item
-                    Action = MaUserDefSave
-                    Caption = '&Save...'
-                  end>
-                Caption = '&File lists definition file'
-                UsageCount = 1
-              end
-              item
-                Items = <
-                  item
-                    Action = MaCustomViewLoad
-                    Caption = '&Load..'
-                  end
-                  item
-                    Action = MaCustomViewSave
-                    Caption = '&Save...'
-                  end>
-                Caption = '&Custom view definition file'
-                UsageCount = 1
-              end
-              item
-                Items = <
-                  item
-                    Action = MaPredefinedLoad
-                    Caption = '&Load..'
-                  end
-                  item
-                    Action = MaPredefinedSave
-                    Caption = '&Save...'
-                  end>
-                Caption = 'P&redefined tags definition file'
-                UsageCount = 1
+                Action = MaSaveSettings
+                Caption = 'S&ave settings'
               end
               item
                 Caption = '-'
@@ -1412,6 +1350,16 @@ object FMain: TFMain
       Caption = 'Workspace manager...'
       OnExecute = MQuickManagerClick
     end
+    object MaLoadSettings: TAction
+      Category = 'Program'
+      Caption = 'Load settings'
+      OnExecute = MaLoadSettingsExecute
+    end
+    object MaSaveSettings: TAction
+      Category = 'Program'
+      Caption = 'Save settings'
+      OnExecute = MaSaveSettingsExecute
+    end
     object MaGUIStyle: TAction
       Category = 'Program'
       Caption = 'Style...'
@@ -1426,12 +1374,10 @@ object FMain: TFMain
     object MaWorkspaceLoad: TAction
       Category = 'Program_Workspace'
       Caption = 'Load..'
-      OnExecute = MWorkspaceLoadClick
     end
     object MaWorkspaceSave: TAction
       Category = 'Program_Workspace'
       Caption = 'Save...'
-      OnExecute = MWorkspaceSaveClick
     end
     object MaDontBackup: TAction
       Tag = 10
@@ -1656,42 +1602,34 @@ object FMain: TFMain
     object MaETDirectLoad: TAction
       Category = 'Program_ETDirect'
       Caption = 'Load..'
-      OnExecute = MaETDirectLoadExecute
     end
     object MaEtDirectSave: TAction
       Category = 'Program_ETDirect'
       Caption = 'Save...'
-      OnExecute = MaEtDirectSaveExecute
     end
     object MaUserDefLoad: TAction
       Category = 'Program_FileLists'
       Caption = 'Load..'
-      OnExecute = MaUserDefLoadExecute
     end
     object MaUserDefSave: TAction
       Category = 'Program_FileLists'
       Caption = 'Save...'
-      OnExecute = MaUserDefSaveExecute
     end
     object MaCustomViewLoad: TAction
       Category = 'Program_CustomView'
       Caption = 'Load..'
-      OnExecute = MaCustomViewLoadExecute
     end
     object MaCustomViewSave: TAction
       Category = 'Program_CustomView'
       Caption = 'Save...'
-      OnExecute = MaCustomViewSaveExecute
     end
     object MaPredefinedLoad: TAction
       Category = 'Program_Predefined'
       Caption = 'Load..'
-      OnExecute = MaPredefinedLoadExecute
     end
     object MaPredefinedSave: TAction
       Category = 'Program_Predefined'
       Caption = 'Save...'
-      OnExecute = MaPredefinedSaveExecute
     end
     object MaSelectDiff: TAction
       Tag = 40
@@ -1724,11 +1662,6 @@ object FMain: TFMain
       Category = 'Various_FileDate'
       Caption = 'QuickTime'
       OnExecute = MaFDateFromQuickTimeExecute
-    end
-    object Action1: TAction
-      Category = 'Program_Workspace'
-      Caption = 'SaveAll'
-      OnExecute = Action1Execute
     end
   end
   object QuickPopUpMenu: TPopupMenu
