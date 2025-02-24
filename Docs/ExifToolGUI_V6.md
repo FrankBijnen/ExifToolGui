@@ -22,7 +22,7 @@
         <li><a href="#m_reqs_exiftoolgui">ExifToolGUI</a></li>
         <li><a href="#m_reqs_edge">Edge browser needed for OSM map</a></li>
         <li><a href="#m_reqs_thumbnails">Wish to see thumbnails of raw image files?</a></li>
-        <li><a href="#m_reqs_jhead_jtran">jhead.exe &amp; jpegtran.exe</a></li>
+        <li><a href="#m_reqs_translations">Translations Language DLL's</a></li>
     </ol>
 </ul>
 
@@ -287,9 +287,14 @@ It is very fast, covers many raw formats and is free for personal use.<br>
 <u>Note:</u> For recent Windows versions the Raw Image Extension obtainable in the Microsoft Store may be enough.<br><br>
 <a href="Readme Using Codecs.txt"><b>Readme Using Codecs.txt</b></a>
 
-<h3><a name="m_reqs_jhead_jtran">5. jhead.exe &amp; jpegtran.exe</a></h3>
-These files are no longer needed.<br><br><br>
-
+<h3><a name="m_reqs_translations">5. Translations Language DLL's</a></h3>
+If you want to use a different language for GUI, you need to download and install the appropriate DLL from
+<a href="https://github.com/FrankBijnen/ExifToolGui/tree/main/Translation"><b>Translation</b></a> and install it alongside the EXE.<br>
+Be sure to download the same version (V6.x.y) and platform (32, 64 bits _X64) as the EXE.<br><br>
+Example:
+<li>32 bits version German: <b>ExifToolGUI.DEU</b></li>
+<li>64 bits version French: <b>ExifToolGUI_X64.FRA</b></li>
+<br><br>
 That's all you need. And when a new ExifTool or GUI version is available, you only need to repeat process as described above.<br>
 <br>
 
@@ -859,7 +864,7 @@ are capable of:<br>
 <img src="ExifToolGUI_V6_files/metadatapreview.jpg"><br><br>
 <br>
 
-<h4><a name="p_predefined_lists">Managing pre defined lists</a></h3>
+<h3><a name="p_predefined_lists">Managing pre defined lists</a></h3>
 <ul>
     <li>You can customize the tags, by clicking on the button <b>Predefined</b>.<br>
     This will open the form <b>Predefined Tags</b>.</li>
@@ -1561,7 +1566,10 @@ Jpg usually works, raw formats likely not.<br><br>
 Tries to get the location (City, Province and Country) from the currently selected center of the map.<br>
 <u>Notes:</u>
 <ul>
-    <li>Ctrl Left-click will also retrieve the location.</li>
+    <li>Ctrl Left-click will also retrieve the location.<br>
+It defines the point on which you click as the new current position
+(which therefore becomes the new center of the map), and also retrieves the location.<br>
+    </li>
     <li>You can customize how City and Province are shown by using the <a href="#m_geotag_setup"><b>Setup Geo</b></a> button in the <b>Geotag files</b> function.<br>
     <li>The coordinates of the map, and the bounds, are updated automatically when you zoom or move the map.</li>
 </ul>
