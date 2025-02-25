@@ -1265,6 +1265,16 @@ begin
       MetadataList.Row := MetadataList.FixedRows;
     VK_END:
       MetadataList.Row := MetadataList.RowCount -1;
+    VK_LEFT:
+    begin
+      PrevWord(ExifToolsGui_ValEdit.TValueListEditor(Sender).InplaceEdit, [' ', ET.Options.GetSeparatorChar] );
+      Key := 0;
+    end;
+    VK_RIGHT:
+    begin
+      NextWord(ExifToolsGui_ValEdit.TValueListEditor(Sender).InplaceEdit, [' ', ET.Options.GetSeparatorChar] );
+      Key := 0;
+    end;
     VK_UP, VK_DOWN:
       begin
         SelectPrevNext(Key = VK_DOWN);
@@ -2509,34 +2519,50 @@ var
   Index: integer;
 begin
   Index := MetadataList.Row;
-
-  if (Key = VK_Return) then
+  if (ssCtrl in Shift) then
   begin
-    if (QuickTags[Index - 1].NoEdit = false) then
-    begin
-      MetadataList.Cells[1, Index] := Trim(TEdit(Sender).Text);
-      AutoComplete.Lines.Add(MetadataList.Cells[1, Index]);
-      if TEdit(Sender).Modified then
-        MarkLineModified(Index);
-      MetadataList.Refresh;
-      MetadataList.SetFocus;
-      SpeedBtnQuickSave.Enabled := true;
+    case Key of
+      VK_LEFT:
+      begin
+        PrevWord(TCustomEdit(Sender), [' ', ET.Options.GetSeparatorChar] );
+        Key := 0;
+      end;
+      VK_RIGHT:
+      begin
+        NextWord(TCustomEdit(Sender), [' ', ET.Options.GetSeparatorChar] );
+        Key := 0;
+      end;
     end;
-    AutoIncLine(Index);
   end;
 
-  if Key = VK_ESCAPE then
-  begin
-    if QuickTags[Index - 1].NoEdit then
-      TCustomEdit(Sender).Text := ''
-    else
+  case Key of
+    VK_RETURN:
     begin
-      if RightStr(MetadataList.Keys[Index], 1) = #177 then
-        TCustomEdit(Sender).Text := '+'
-      else
-        TCustomEdit(Sender).Text := MetadataList.Cells[1, Index];
+      if (QuickTags[Index - 1].NoEdit = false) then
+      begin
+        MetadataList.Cells[1, Index] := Trim(TEdit(Sender).Text);
+        AutoComplete.Lines.Add(MetadataList.Cells[1, Index]);
+        if TEdit(Sender).Modified then
+          MarkLineModified(Index);
+        MetadataList.Refresh;
+        MetadataList.SetFocus;
+        SpeedBtnQuickSave.Enabled := true;
+      end;
+      AutoIncLine(Index);
     end;
-    MetadataList.SetFocus;
+    VK_ESCAPE:
+    begin
+      if QuickTags[Index - 1].NoEdit then
+        TCustomEdit(Sender).Text := ''
+      else
+      begin
+        if RightStr(MetadataList.Keys[Index], 1) = #177 then
+          TCustomEdit(Sender).Text := '+'
+        else
+          TCustomEdit(Sender).Text := MetadataList.Cells[1, Index];
+      end;
+      MetadataList.SetFocus;
+    end;
   end;
 end;
 

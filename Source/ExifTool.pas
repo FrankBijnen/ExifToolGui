@@ -50,6 +50,7 @@ type
     function GetCustomOptions: string;
     function GetOptions(Charset: boolean = true): string;
     function GetSeparator: string;
+    function GetSeparatorChar: Char;
   end;
 
   TExifTool = class(TObject)
@@ -283,6 +284,16 @@ begin
   ETSep := ETSeparator;
   result := NextField(ETSep, #10);
   result := NextField(ETSep, #13);
+end;
+
+function TET_OptionsRec.GetSeparatorChar: Char;
+var
+  Sep: string;
+begin
+  result := ' ';
+  Sep := GetSeparator;
+  if (Length(Sep) > 0) then
+    result := Sep[1];
 end;
 
 procedure TET_OptionsRec.SetSeparator(const Sep: string);

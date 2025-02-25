@@ -89,6 +89,10 @@ function DirectCmdFromArgsCMD(const ArgsIn: string): string;
 function DirectCmdFromArgsPS(const ArgsIn: string): string;
 procedure WriteArgsFile(const ETInp, ArgsFile: string; Preamble: boolean = false);
 
+// TCustomEdit
+procedure PrevWord(const CustomEdit: TCustomEdit; const SkipChars: TSysCharSet);
+procedure NextWord(const CustomEdit: TCustomEdit; const SkipChars: TSysCharSet);
+
 // Date
 function DateDiff(ODate, NDate: TDateTime; var Increment: boolean): string;
 
@@ -749,6 +753,43 @@ begin
   finally
     CloseHandle(Handle);
   end;
+end;
+
+// TCustomEdit
+procedure PrevWord(const CustomEdit: TCustomEdit; const SkipChars: TSysCharSet);
+var
+  S: integer;
+  T: string;
+begin
+  S := CustomEdit.SelStart;
+  T := CustomEdit.Text;
+  while (S > 0) and
+        (CharInSet(T[S], SkipChars)) do
+    Dec(S);
+  while (S > 0) and
+        not (CharInSet(T[S], SkipChars)) do
+    Dec(S);
+  CustomEdit.SelStart := S;
+  CustomEdit.SelLength := 0;
+end;
+
+procedure NextWord(const CustomEdit: TCustomEdit; const SkipChars: TSysCharSet);
+var
+  S: integer;
+  L: integer;
+  T: string;
+begin
+  S := CustomEdit.SelStart;
+  T := CustomEdit.Text;
+  L := Length(T);
+  while (S < L) and
+        (CharInSet(T[S], SkipChars)) do
+    Inc(S);
+  while (S < L) and
+        not (CharInSet(T[S], SkipChars)) do
+    Inc(S);
+  CustomEdit.SelStart := S;
+  CustomEdit.SelLength := 0;
 end;
 
 // Date
