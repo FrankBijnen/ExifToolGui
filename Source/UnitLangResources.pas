@@ -137,12 +137,12 @@ resourcestring
   StrCustomView             = 'Custom view';
   StrPredefinedTags         = 'Predefined tags (Marked, Remove/Copy Metadata)';
 
-  StrLoadIniDefine          = 'Load definition file';
-  StrIniDefLoaded           = 'Ini file: %s loaded.';
+  StrImportIni              = 'Import ini file';
+  StrIniImported            = 'Ini file: %s imported.';
   StrIniFileNotChanged      = 'Ini file does not contain data -nothing changed.';
-  StrSaveIniDefine          = 'Save definition file';
-  StrUseAnotherNameForIni   = 'Use another name for definition file!';
-  StrIniDefSaved            = 'Ini file: %s saved.';
+  StrExportIni              = 'Export ini file';
+  StrUseAnotherNameForIni   = 'Use another name for ini file!';
+  StrIniExported            = 'Ini file: %s exported.';
   StrIniDefContaining       = 'Containing settings for: %s';
   StrIniDefNotSaved         = 'Ini file: %s file couldn''t be saved!';
 

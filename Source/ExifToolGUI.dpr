@@ -76,7 +76,7 @@ uses
   UFrmTagNames in 'UFrmTagNames.pas' {FrmTagNames},
   UFrmPredefinedTags in 'UFrmPredefinedTags.pas' {FrmPredefinedTags},
   UFrmDiff in 'UFrmDiff.pas' {FrmDiff},
-  UFrmSaveSettings in 'UFrmSaveSettings.pas' {FrmSaveSettings};
+  UFrmExportSettings in 'UFrmExportSettings.pas' {FrmExportSettings};
 
 {$R *.res}
 
@@ -128,6 +128,6 @@ begin
   Application.CreateForm(TFrmTagNames, FrmTagNames);
   Application.CreateForm(TFrmPredefinedTags, FrmPredefinedTags);
   Application.CreateForm(TFrmPlaces, FrmPlaces);
-  Application.CreateForm(TFrmSaveSettings, FrmSaveSettings);
+  Application.CreateForm(TFrmExportSettings, FrmExportSettings);
   Application.Run;
 end.

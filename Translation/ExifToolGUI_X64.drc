@@ -239,12 +239,12 @@
 #define UnitLangResources_StrFileLists 64342
 #define UnitLangResources_StrCustomView 64343
 #define UnitLangResources_StrPredefinedTags 64344
-#define UnitLangResources_StrLoadIniDefine 64345
-#define UnitLangResources_StrIniDefLoaded 64346
+#define UnitLangResources_StrImportIni 64345
+#define UnitLangResources_StrIniImported 64346
 #define UnitLangResources_StrIniFileNotChanged 64347
-#define UnitLangResources_StrSaveIniDefine 64348
+#define UnitLangResources_StrExportIni 64348
 #define UnitLangResources_StrUseAnotherNameForIni 64349
-#define UnitLangResources_StrIniDefSaved 64350
+#define UnitLangResources_StrIniExported 64350
 #define UnitLangResources_StrIniDefContaining 64351
 #define UnitLangResources_StrSelectedDestination 64352
 #define UnitLangResources_ImportMetaSingle1 64353
@@ -1663,12 +1663,12 @@ BEGIN
 	UnitLangResources_StrFileLists,	L"File lists"
 	UnitLangResources_StrCustomView,	L"Custom view"
 	UnitLangResources_StrPredefinedTags,	L"Predefined tags (Marked, Remove/Copy Metadata)"
-	UnitLangResources_StrLoadIniDefine,	L"Load definition file"
-	UnitLangResources_StrIniDefLoaded,	L"Ini file: %s loaded."
+	UnitLangResources_StrImportIni,	L"Import ini file"
+	UnitLangResources_StrIniImported,	L"Ini file: %s imported."
 	UnitLangResources_StrIniFileNotChanged,	L"Ini file does not contain data -nothing changed."
-	UnitLangResources_StrSaveIniDefine,	L"Save definition file"
-	UnitLangResources_StrUseAnotherNameForIni,	L"Use another name for definition file!"
-	UnitLangResources_StrIniDefSaved,	L"Ini file: %s saved."
+	UnitLangResources_StrExportIni,	L"Export ini file"
+	UnitLangResources_StrUseAnotherNameForIni,	L"Use another name for ini file!"
+	UnitLangResources_StrIniExported,	L"Ini file: %s exported."
 	UnitLangResources_StrIniDefContaining,	L"Containing settings for: %s"
 	UnitLangResources_StrSelectedDestination,	L"Selected destination file must be JPG or TIF!"
 	UnitLangResources_ImportMetaSingle1,	L"This will copy metadata from single source file,"
@@ -2896,7 +2896,7 @@ END
 /* D:\user\ExifToolGUI.rad12\Source\UFrmLossLessRotate.dfm */
 /* D:\user\ExifToolGUI.rad12\Source\UFrmGeoTagFiles.dfm */
 /* D:\user\ExifToolGUI.rad12\Source\UFrmDiff.dfm */
-/* D:\user\ExifToolGUI.rad12\Source\UFrmSaveSettings.dfm */
+/* D:\user\ExifToolGUI.rad12\Source\UFrmExportSettings.dfm */
 /* D:\user\ExifToolGUI.rad12\Source\Main.dfm */
 /* D:\user\ExifToolGUI.rad12\Source\UFrmGeoSearch.dfm */
 /* c:\program files (x86)\embarcadero\studio\23.0\lib\Win64\release\midas64.res */
