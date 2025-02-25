@@ -2357,11 +2357,13 @@ end;
 
 procedure TFMain.EditETdirectKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
 var
-  IsRecursive, ETResult: boolean;
+  ETResult: boolean;
   I: integer;
-  ETtx, ETout, ETerr: string;
+  IsRecursive, HasExt: boolean;
+  Ext, ETout, ETerr: string;
   ETprm: string;
   SelectedFiles: string;
+  ArgsList: TStringList;
 begin
   if (Key = VK_ESCAPE) and
      (SpeedBtn_ETdirect.Down) then
@@ -2371,52 +2373,69 @@ begin
     exit;
   end;
 
-  ETtx := EditETdirect.Text;
-  if (Key = VK_Return) and
-     (Length(ETtx) > 1) then
+  if (ssCtrl in Shift) then
   begin
-    ETprm := ETtx;
-//For tests on '-r ' and '-ext '.
-//TODO: Review code. ArgsFromDirectCmd?
-    ETtx := LowerCase(ETprm) + ' ';
-    IsRecursive :=(Pos('-r ', ETtx) > 0);
-    if IsRecursive then
-    begin
-      // init ETcounter
-      ETprm := ETprm + ' "' + ExcludeTrailingPathDelimiter(ShellList.Path) + '"'; // If pathname ends with \, it would be escaping a "
-      I := Pos('-ext ', ETtx); // ie. '-ext jpg ...'
-      if I = 0 then
-        ETtx := '*.*'
-      else
-      begin
-        Inc(I, 4);
-        Delete(ETtx, 1, I);
-        ETtx := TrimLeft(ETtx); // ='jpg ...'
-        I := Pos(' ', ETtx);
-        if I > 0 then
-          ETtx := LeftStr(ETtx, I - 1);
-        ETtx := '*.' + ETtx;
-      end;
-      ET.SetCounter(CounterETEvent, GetNrOfFiles(ShellList.Path, ETtx, true));
-      SelectedFiles := '';
-    end
-    else
-      SelectedFiles := GetSelectedFiles;
-
-    // Call TExifTool.ExecET or ET.OpenExec
-    case CmbETDirectMode.ItemIndex of
-      0: ETResult := ET.OpenExec(ArgsFromDirectCmd(ETprm), SelectedFiles, ETout, ETerr);
-      1: ETResult := TExifTool.ExecET(ETprm, SelectedFiles, ShellList.Path, ETout, ETerr);
-      else
-        ETResult := false; // Make compiler happy
+    case Key of
+      VK_LEFT:
+        begin
+          PrevWord(TCustomEdit(Sender), [' ', ET.Options.GetSeparatorChar]);
+          Key := 0;
+        end;
+      VK_RIGHT:
+        begin
+          NextWord(TCustomEdit(Sender), [' ', ET.Options.GetSeparatorChar]);
+          Key := 0;
+        end;
     end;
+  end;
 
-    if not ETResult then
-      ShowMessage(StrExifToolNotExecute);
+  if (Key = VK_Return) then
+  begin
+    ETprm := EditETdirect.Text;
+    ArgsList := TStringList.Create;
+    ArgsList.CaseSensitive := false;
+    ArgsList.Text := ArgsFromDirectCmd(ETprm);
+    try
+      if (ArgsList.Count < 1) then
+        exit;
 
-    RefreshSelected(Sender);
-    ShowMetadata;
-    ShowPreview;
+      IsRecursive := (ArgsList.IndexOf('-r') > -1);
+
+      Ext := '*.*';
+      I := ArgsList.IndexOf('-ext');
+      HasExt := (I > -1) and
+                (I < ArgsList.Count -1);
+      if (HasExt) then
+        Ext := '*.' + ArgsList[I + 1];
+
+      if (IsRecursive) or
+         (HasExt) then
+      begin
+        // init ETcounter
+        ET.SetCounter(CounterETEvent, GetNrOfFiles(ShellList.Path, Ext, IsRecursive));
+        ETprm := ETprm + ' "' + ExcludeTrailingPathDelimiter(ShellList.Path) + '"'; // If pathname ends with \, it would be escaping a "
+        SelectedFiles := '';
+      end
+      else
+        SelectedFiles := GetSelectedFiles;
+
+      // Call TExifTool.ExecET or ET.OpenExec
+      case CmbETDirectMode.ItemIndex of
+        0: ETResult := ET.OpenExec(ArgsFromDirectCmd(ETprm), SelectedFiles, ETout, ETerr);
+        1: ETResult := TExifTool.ExecET(ETprm, SelectedFiles, ShellList.Path, ETout, ETerr);
+        else
+          ETResult := false; // Make compiler happy
+      end;
+
+      if not ETResult then
+        ShowMessage(StrExifToolNotExecute);
+
+      RefreshSelected(Sender);
+      ShowMetadata;
+      ShowPreview;
+    finally
+      ArgsList.Free;
+    end;
   end;
 end;
 
