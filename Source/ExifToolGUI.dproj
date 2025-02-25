@@ -248,8 +248,8 @@
         <DCCReference Include="UFrmDiff.pas">
             <Form>FrmDiff</Form>
         </DCCReference>
-        <DCCReference Include="UFrmSaveSettings.pas">
-            <Form>FrmSaveSettings</Form>
+        <DCCReference Include="UFrmExportSettings.pas">
+            <Form>FrmExportSettings</Form>
             <FormType>dfm</FormType>
         </DCCReference>
         <BuildConfiguration Include="Base">

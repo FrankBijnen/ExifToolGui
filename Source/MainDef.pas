@@ -1151,7 +1151,7 @@ begin
   begin
     InitialDir := WrkIniDir;
     Filter := 'Ini file|*.ini';
-    Title := StrLoadIniDefine;
+    Title := StrImportIni;
     if Execute then
     begin
       HrIniData := '';
@@ -1178,7 +1178,7 @@ begin
           HrIniData := HRiniData + #10 + GetHrIniData(AIniData);
       end;
       if (HrIniData <> '') then
-        ShowMessage(Format('%s%s%s', [Format(StrIniDefLoaded, [FileName]),
+        ShowMessage(Format('%s%s%s', [Format(StrIniImported, [FileName]),
                                       #10,
                                       Format(StrIniDefContaining, [HrIniData])]))
       else
@@ -1199,7 +1199,7 @@ begin
     DefaultExt := 'ini';
     InitialDir := WrkIniDir;
     Filter := 'Ini file|*.ini';
-    Title := StrSaveIniDefine;
+    Title := StrExportIni;
     repeat
       IsOK := false;
       DoSave := Execute;
@@ -1289,7 +1289,7 @@ begin
 
   result := SaveIni(FileName, AllIniData);
   if result then
-    ShowMessage(Format('%s%s%s', [Format(StrIniDefSaved, [FileName]),
+    ShowMessage(Format('%s%s%s', [Format(StrIniExported, [FileName]),
                                   #10,
                                   Format(StrIniDefContaining, [HrIniData])]))
   else

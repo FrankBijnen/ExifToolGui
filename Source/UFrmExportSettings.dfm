@@ -1,8 +1,8 @@
-object FrmSaveSettings: TFrmSaveSettings
+object FrmExportSettings: TFrmExportSettings
   Left = 0
   Top = 0
   BorderStyle = bsDialog
-  Caption = 'Save settings'
+  Caption = 'Export settings'
   ClientHeight = 334
   ClientWidth = 530
   Color = clBtnFace
@@ -61,8 +61,8 @@ object FrmSaveSettings: TFrmSaveSettings
     Font.Style = []
     Lines.Strings = (
       
-        'Select the settings to save. All selected settings will be saved' +
-        ' in one (1) ini file.'
+        'Select the settings to export. All selected settings will be exp' +
+        'orted to one (1) ini file.'
       '')
     ParentFont = False
     ReadOnly = True
@@ -77,7 +77,7 @@ object FrmSaveSettings: TFrmSaveSettings
     Checkboxes = True
     Columns = <
       item
-        Caption = 'Select setting to save'
+        Caption = 'Select setting to export'
         Width = 525
       end>
     TabOrder = 2

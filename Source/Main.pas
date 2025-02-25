@@ -458,7 +458,7 @@ uses System.StrUtils, System.Math, System.Masks, System.Types, System.UITypes,
   MainDef, LogWin, Preferences, EditFFilter, EditFCol, UFrmStyle, UFrmAbout, UFrmCheckVersions,
   QuickMngr, DateTimeShift, DateTimeEqual, CopyMeta, RemoveMeta, Geotag, Geomap, CopyMetaSingle, FileDateTime,
   UFrmGenericExtract, UFrmGenericImport, UFrmLossLessRotate, UFrmGeoTagFiles, UFrmGeoSetup, UFrmGenerate,
-  UFrmDiff, UFrmSaveSettings;
+  UFrmDiff, UFrmExportSettings;
 
 {$R *.dfm}
 
@@ -986,7 +986,7 @@ end;
 
 procedure TFMain.MaExportSettingsExecute(Sender: TObject);
 begin
-  if (FrmSaveSettings.ShowModal = IDOK) then
+  if (FrmExportSettings.ShowModal = IDOK) then
     SaveIniDialog(SaveFileDlg, GuiSettings.SelIniData);
 end;
 

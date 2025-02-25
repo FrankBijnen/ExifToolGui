@@ -1,4 +1,4 @@
-unit UFrmSaveSettings;
+unit UFrmExportSettings;
 
 interface
 
@@ -8,7 +8,7 @@ uses
   UnitScaleForm;
 
 type
-  TFrmSaveSettings = class(TScaleForm)
+  TFrmExportSettings = class(TScaleForm)
     PnlBot: TPanel;
     BtnCancel: TBitBtn;
     BtnOK: TBitBtn;
@@ -26,7 +26,7 @@ type
   end;
 
 var
-  FrmSaveSettings: TFrmSaveSettings;
+  FrmExportSettings: TFrmExportSettings;
 
 implementation
 
@@ -35,7 +35,7 @@ uses
 
 {$R *.dfm}
 
-procedure TFrmSaveSettings.SetPrefs;
+procedure TFrmExportSettings.SetPrefs;
 
   procedure AddItem(Caption: string; Id: TIniData);
   var
@@ -61,7 +61,7 @@ begin
   end;
 end;
 
-procedure TFrmSaveSettings.StorePrefs;
+procedure TFrmExportSettings.StorePrefs;
 var
   AnItem: TListItem;
 begin
@@ -73,13 +73,13 @@ begin
   end;
 end;
 
-procedure TFrmSaveSettings.FormClose(Sender: TObject; var Action: TCloseAction);
+procedure TFrmExportSettings.FormClose(Sender: TObject; var Action: TCloseAction);
 begin
   if ModalResult = ID_Ok then
     StorePrefs;
 end;
 
-procedure TFrmSaveSettings.FormShow(Sender: TObject);
+procedure TFrmExportSettings.FormShow(Sender: TObject);
 begin
   SetPrefs;
 end;
