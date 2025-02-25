@@ -783,10 +783,10 @@ begin
   T := CustomEdit.Text;
   L := Length(T);
   while (S < L) and
-        (CharInSet(T[S], SkipChars)) do
+        not (CharInSet(T[S +1], SkipChars)) do
     Inc(S);
   while (S < L) and
-        not (CharInSet(T[S], SkipChars)) do
+        (CharInSet(T[S +1], SkipChars)) do
     Inc(S);
   CustomEdit.SelStart := S;
   CustomEdit.SelLength := 0;
