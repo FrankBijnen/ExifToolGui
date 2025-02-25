@@ -1062,12 +1062,12 @@ object FMain: TFMain
                 Caption = '-'
               end
               item
-                Action = MaLoadSettings
-                Caption = '&Load settings'
+                Action = MaImportSettings
+                Caption = '&Import settings'
               end
               item
-                Action = MaSaveSettings
-                Caption = 'S&ave settings'
+                Action = MaExportSettings
+                Caption = 'E&xport settings'
               end
               item
                 Caption = '-'
@@ -1350,15 +1350,15 @@ object FMain: TFMain
       Caption = 'Workspace manager...'
       OnExecute = MQuickManagerClick
     end
-    object MaLoadSettings: TAction
+    object MaImportSettings: TAction
       Category = 'Program'
-      Caption = 'Load settings'
-      OnExecute = MaLoadSettingsExecute
+      Caption = 'Import settings'
+      OnExecute = MaImportSettingsExecute
     end
-    object MaSaveSettings: TAction
+    object MaExportSettings: TAction
       Category = 'Program'
-      Caption = 'Save settings'
-      OnExecute = MaSaveSettingsExecute
+      Caption = 'Export settings'
+      OnExecute = MaExportSettingsExecute
     end
     object MaGUIStyle: TAction
       Category = 'Program'
@@ -1370,14 +1370,6 @@ object FMain: TFMain
       Category = 'Program'
       Caption = 'Exit'
       OnExecute = MExitClick
-    end
-    object MaWorkspaceLoad: TAction
-      Category = 'Program_Workspace'
-      Caption = 'Load..'
-    end
-    object MaWorkspaceSave: TAction
-      Category = 'Program_Workspace'
-      Caption = 'Save...'
     end
     object MaDontBackup: TAction
       Tag = 10
@@ -1598,38 +1590,6 @@ object FMain: TFMain
       Category = 'Help'
       Caption = 'Check Versions'
       OnExecute = MaCheckVersionsExecute
-    end
-    object MaETDirectLoad: TAction
-      Category = 'Program_ETDirect'
-      Caption = 'Load..'
-    end
-    object MaEtDirectSave: TAction
-      Category = 'Program_ETDirect'
-      Caption = 'Save...'
-    end
-    object MaUserDefLoad: TAction
-      Category = 'Program_FileLists'
-      Caption = 'Load..'
-    end
-    object MaUserDefSave: TAction
-      Category = 'Program_FileLists'
-      Caption = 'Save...'
-    end
-    object MaCustomViewLoad: TAction
-      Category = 'Program_CustomView'
-      Caption = 'Load..'
-    end
-    object MaCustomViewSave: TAction
-      Category = 'Program_CustomView'
-      Caption = 'Save...'
-    end
-    object MaPredefinedLoad: TAction
-      Category = 'Program_Predefined'
-      Caption = 'Load..'
-    end
-    object MaPredefinedSave: TAction
-      Category = 'Program_Predefined'
-      Caption = 'Save...'
     end
     object MaSelectDiff: TAction
       Tag = 40

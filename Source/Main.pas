@@ -119,8 +119,6 @@ type
     MaQuickManager: TAction;
     MaGUIStyle: TAction;
     MaExit: TAction;
-    MaWorkspaceLoad: TAction;
-    MaWorkspaceSave: TAction;
     ActionMainMenuBar: TActionMainMenuBar;
     MaDontBackup: TAction;
     MaPreserveDateMod: TAction;
@@ -180,14 +178,6 @@ type
     TaskBarResetWindow: TAction;
     MaAPILargeFileSupport: TAction;
     MaCheckVersions: TAction;
-    MaETDirectLoad: TAction;
-    MaEtDirectSave: TAction;
-    MaUserDefSave: TAction;
-    MaUserDefLoad: TAction;
-    MaCustomViewSave: TAction;
-    MaCustomViewLoad: TAction;
-    MaPredefinedSave: TAction;
-    MaPredefinedLoad: TAction;
     AdvPanelBrowser: TPanel;
     TbFileList: TToolBar;
     TbFlRefresh: TToolButton;
@@ -219,8 +209,8 @@ type
     N3: TMenuItem;
     QuickPopUp_InsertETDirect: TMenuItem;
     CmbAutoComplete: TComboBox;
-    MaSaveSettings: TAction;
-    MaLoadSettings: TAction;
+    MaExportSettings: TAction;
+    MaImportSettings: TAction;
     procedure ShellListClick(Sender: TObject);
     procedure ShellListKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
     procedure SpeedBtnExifClick(Sender: TObject);
@@ -363,8 +353,8 @@ type
     procedure QuickPopUp_CopyTagNameClick(Sender: TObject);
     procedure QuickPopUp_InsertETDirectClick(Sender: TObject);
     procedure CmbAutoCompleteClick(Sender: TObject);
-    procedure MaSaveSettingsExecute(Sender: TObject);
-    procedure MaLoadSettingsExecute(Sender: TObject);
+    procedure MaExportSettingsExecute(Sender: TObject);
+    procedure MaImportSettingsExecute(Sender: TObject);
   private
     { Private declarations }
     ETBarSeriesFocal: TBarSeries;
@@ -994,7 +984,7 @@ begin
     SetApiLargeFileSupport(MaAPILargeFileSupport.Checked);
 end;
 
-procedure TFMain.MaSaveSettingsExecute(Sender: TObject);
+procedure TFMain.MaExportSettingsExecute(Sender: TObject);
 begin
   if (FrmSaveSettings.ShowModal = IDOK) then
     SaveIniDialog(SaveFileDlg, GuiSettings.SelIniData);
@@ -2732,21 +2722,8 @@ begin
   FileDateFromMetaData(1);
 end;
 
-procedure TFMain.MaLoadSettingsExecute(Sender: TObject);
+procedure TFMain.MaImportSettingsExecute(Sender: TObject);
 begin
-//  if (LoadIniDialog(OpenFileDlg, SpeedBtn_ETdirect.Down = false)) then
-//    SpeedBtn_ETdirect.Down := true;
-//  if (LoadIniDialog(OpenFileDlg, false)) then
-//    EditFileLists(Sender)
-//  if (LoadIniDialog(OpenFileDlg, false)) then
-//    EditFileLists(Sender)
-//  if (LoadIniDialog(OpenFileDlg, SpeedBtnCustom.Down = false)) then
-//    ShowMetadata;
-//  if (LoadIniDialog(OpenFileDlg, false)) then
-//    ShowMetadata;
-//  if (LoadIniDialog(OpenFileDlg, SpeedBtnQuick.Down = false)) then
-//    ShowMetadata;
-
   if (LoadIniDialog(OpenFileDlg)) then
     ShowMetadata;
 end;
