@@ -12,11 +12,12 @@ uses
 type
   TValueListEditor = class;
 
-  TETGuiInplaceEdit = class(Vcl.Grids.TInplaceEdit)
+  TETGuiInplaceEdit = class(Vcl.Grids.TInplaceEdit, IShiftEdit)
   private
     FAutoCompleteMode: TAutoCompleteMode;
     IAutoComplete: IAutoComplete;
     FEnableAutoComplete: boolean;
+    FSelDirection: TSelDirection;
     procedure ConvertToGridPoint(var X, Y: integer);
     function ValueListEditor: TValueListEditor;
   protected
@@ -28,6 +29,8 @@ type
     procedure KeyDown(var Key: Word; Shift: TShiftState); override;
     procedure KeyUp(var Key: Word; Shift: TShiftState); override;
   public
+    procedure SetSelDirection(ASelDirection: TSelDirection);
+    function GetSelDirection: TSelDirection;
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
     property AutoCompleteMode: TAutoCompleteMode read FAutoCompleteMode write SetAutoCompleteMode;
@@ -143,6 +146,9 @@ end;
 // Disabling and Enabling fixes this
 procedure TETGuiInplaceEdit.KeyDown(var Key: Word; Shift: TShiftState);
 begin
+  if (Key = VK_END) then
+    SelLength := 0;
+
   if (AutoCompleteMode in [TAutoCompleteMode.acAppend, TAutoCompleteMode.acAppendDropDown]) then
   begin
     case Key of
@@ -150,12 +156,12 @@ begin
       VK_DOWN:
         EnableAutoComplete(false);
       else
-        if (Shift <> [ssCtrl]) then
+        if (not (ssCtrl in Shift)) then
           EnableAutoComplete(true);
     end;
   end;
 
-  if (Shift = [ssCtrl]) then
+  if (ssCtrl in Shift) then
     ValueListEditor.KeyDown(Key, Shift);
 
   inherited KeyDown(Key, Shift);
@@ -164,6 +170,7 @@ end;
 
 procedure TETGuiInplaceEdit.KeyUp(var Key: Word; Shift: TShiftState);
 begin
+
   inherited KeyUp(Key, Shift);
 
   if (AutoCompleteMode in [TAutoCompleteMode.acAppend, TAutoCompleteMode.acAppendDropDown]) then
@@ -185,6 +192,16 @@ begin
   end;
 
   inherited MouseDown(Button, Shift, X, Y);
+end;
+
+procedure TETGuiInplaceEdit.SetSelDirection(ASelDirection: TSelDirection);
+begin
+  FSelDirection := ASelDirection;
+end;
+
+function TETGuiInplaceEdit.GetSelDirection: TSelDirection;
+begin
+  result := FSelDirection;
 end;
 
 constructor TValueListEditor.Create(AOwner: TComponent);
@@ -216,7 +233,7 @@ end;
 procedure TValueListEditor.KeyDown(var Key: Word; Shift: TShiftState);
 begin
   if (Assigned(FOnCtrlKeyDown)) and
-     (Shift = [ssCtrl]) then
+     (ssCtrl in Shift) then
     FOnCtrlKeyDown(Self, Key, Shift);
 
   inherited KeyDown(Key, Shift);

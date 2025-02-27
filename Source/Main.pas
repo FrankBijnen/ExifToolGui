@@ -70,13 +70,13 @@ type
     Splitter1: TSplitter;
     Splitter2: TSplitter;
     Splitter3: TSplitter;
-    EditETdirect: TLabeledEdit;
+    EditETdirect: ExifToolsGui_AutoEdit.TLabeledEdit; // Need our own version
     SpeedBtn_ETdirect: TSpeedButton;
     CBoxETdirect: TComboBox;
     SpeedBtn_ETedit: TSpeedButton;
     EditETcmdName: TLabeledEdit;
     SpeedBtnQuick: TSpeedButton;
-    MemoQuick: TMemo;
+    MemoQuick: ExifToolsGui_AutoEdit.TMemo;  // Need our own version
     SpeedBtnLarge: TSpeedButton;
     EditQuick: ExifToolsGui_AutoEdit.TEdit;  // Need our own version
     SpeedBtnShowLog: TSpeedButton;
@@ -1257,12 +1257,16 @@ begin
       MetadataList.Row := MetadataList.RowCount -1;
     VK_LEFT:
     begin
-      PrevWord(ExifToolsGui_ValEdit.TValueListEditor(Sender).InplaceEdit, [' ', ET.Options.GetSeparatorChar] );
+      PrevWord(ExifToolsGui_ValEdit.TValueListEditor(Sender).InplaceEdit,
+              [' ', ET.Options.GetSeparatorChar],
+              (ssShift in Shift));
       Key := 0;
     end;
     VK_RIGHT:
     begin
-      NextWord(ExifToolsGui_ValEdit.TValueListEditor(Sender).InplaceEdit, [' ', ET.Options.GetSeparatorChar] );
+      NextWord(ExifToolsGui_ValEdit.TValueListEditor(Sender).InplaceEdit,
+              [' ', ET.Options.GetSeparatorChar],
+              (ssShift in Shift));
       Key := 0;
     end;
     VK_UP, VK_DOWN:
@@ -2368,12 +2372,16 @@ begin
     case Key of
       VK_LEFT:
         begin
-          PrevWord(TCustomEdit(Sender), [' ', ET.Options.GetSeparatorChar]);
+          PrevWord(TCustomEdit(Sender),
+                  [' ', ET.Options.GetSeparatorChar],
+                  (ssShift in Shift));
           Key := 0;
         end;
       VK_RIGHT:
         begin
-          NextWord(TCustomEdit(Sender), [' ', ET.Options.GetSeparatorChar]);
+          NextWord(TCustomEdit(Sender),
+                   [' ', ET.Options.GetSeparatorChar],
+                   (ssShift in Shift));
           Key := 0;
         end;
     end;
@@ -2533,12 +2541,16 @@ begin
     case Key of
       VK_LEFT:
       begin
-        PrevWord(TCustomEdit(Sender), [' ', ET.Options.GetSeparatorChar] );
+        PrevWord(TCustomEdit(Sender),
+                [' ', ET.Options.GetSeparatorChar] ,
+                (ssShift in Shift) );
         Key := 0;
       end;
       VK_RIGHT:
       begin
-        NextWord(TCustomEdit(Sender), [' ', ET.Options.GetSeparatorChar] );
+        NextWord(TCustomEdit(Sender),
+                 [' ', ET.Options.GetSeparatorChar],
+                 (ssShift in Shift) );
         Key := 0;
       end;
     end;

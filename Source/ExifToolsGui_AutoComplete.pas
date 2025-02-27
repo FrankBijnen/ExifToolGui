@@ -5,7 +5,18 @@ interface
 uses
   WinApi.Windows, Winapi.ActiveX, Winapi.ShlObj, System.Classes;
 
+const
+  IID_IShiftEdit = '{60D05E0B-40F2-439A-BE00-83B3084D789A}';
+
 type
+  TSelDirection = (sdLeft, sdRight);
+
+  IShiftEdit = interface
+    [IID_IShiftEdit]
+    procedure SetSelDirection(ASelDirection: TSelDirection);
+    function GetSelDirection: TSelDirection;
+  end;
+
   TAutoCompleteMode = (acNone, acAppend, acDropDown, acAppendDropDown);
 
   TAutoComplete = class(TInterfacedObject, IEnumString)
