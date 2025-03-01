@@ -1706,7 +1706,7 @@ var
 begin
   if FQuickManager.ShowModal = mrOK then
   begin
-    Indx := FQuickManager.StringGrid1.Row + 1;
+    Indx := FQuickManager.SgWorkSpace.Row + 1;
     if SpeedBtnQuick.Down then
     begin
       ShowMetadata;
