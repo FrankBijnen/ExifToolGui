@@ -5,23 +5,14 @@ interface
 uses
   WinApi.Windows, Winapi.ActiveX, Winapi.ShlObj, System.Classes;
 
-const
-  IID_IShiftEdit = '{60D05E0B-40F2-439A-BE00-83B3084D789A}';
-
 type
-  TSelDirection = (sdLeft, sdRight);
-
-  IShiftEdit = interface
-    [IID_IShiftEdit]
-    procedure SetSelDirection(ASelDirection: TSelDirection);
-    function GetSelDirection: TSelDirection;
-  end;
 
   TAutoCompleteMode = (acNone, acAppend, acDropDown, acAppendDropDown);
 
   TAutoComplete = class(TInterfacedObject, IEnumString)
   private
     FLines: TStringList;
+    FCurrentList: TStringList;
     FIndex: Integer;
   protected
     { IEnumString }
@@ -36,7 +27,8 @@ type
     function InitAutoComplete(EditHandle: HWND): IAutoComplete;
     procedure SetAutoCompleteMode(AutoComplete: IAutoComplete;
                                   AutoCompleteMode: TAutoCompleteMode);
-    property Lines: TStringList read FLines write FLines;
+    procedure AddHist(ALine: string);
+    procedure SetLines(const [ref] ALines: TStringList);
   end;
 
   var
@@ -58,12 +50,28 @@ begin
   FLines := TStringList.Create;
   FLines.Sorted := true;
   Flines.Duplicates := TDuplicates.dupIgnore;
+
+  FCurrentList := Flines;
 end;
 
 destructor TAutoComplete.Destroy;
 begin
   FLines.Free;
   inherited Destroy;
+end;
+
+procedure TAutoComplete.AddHist(ALine: string);
+begin
+  if (FCurrentList = Flines) then
+    Flines.Add(ALine);
+end;
+
+procedure TAutoComplete.SetLines(const [ref] ALines: TStringList);
+begin
+  if (ALines <> nil) then
+    FCurrentList := ALines
+  else
+    FCurrentList := FLines;
 end;
 
 function TAutoComplete.Next(celt: Integer; out elt; pceltFetched: PLongint): HRESULT;
@@ -74,9 +82,9 @@ var
 begin
   I := 0;
   while (I < celt) and
-        (FIndex < FLines.Count) do
+        (FIndex < FCurrentList.Count) do
   begin
-    W := FLines[FIndex];
+    W := FCurrentList[FIndex];
     Size := Length(W) * SizeOf(WideChar);
     TPtrArray(elt)[I] := CoTaskMemAlloc(Size + SizeOf(WideChar));
     FillChar(TPtrArray(elt)[I]^, Size + SizeOf(WideChar), 0);
@@ -94,14 +102,14 @@ end;
 
 function TAutoComplete.Skip(celt: Longint): HResult;
 begin
-  if (FIndex + celt) <= FLines.Count then
+  if (FIndex + celt) <= FCurrentList.Count then
   begin
     Inc(FIndex, celt);
     Result := S_OK;
   end
   else
   begin
-    FIndex := FLines.Count;
+    FIndex := FCurrentList.Count;
     Result := S_FALSE;
   end;
 end;
