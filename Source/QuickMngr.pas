@@ -6,7 +6,8 @@ uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants,
   System.Classes, Vcl.Graphics,
   Vcl.Controls, Vcl.Forms, UnitScaleForm, Vcl.Dialogs, Vcl.Grids, Vcl.ExtCtrls,
-  Vcl.StdCtrls, Vcl.ComCtrls, Vcl.Mask, Vcl.Buttons;
+  Vcl.StdCtrls, Vcl.ComCtrls, Vcl.Mask, Vcl.Buttons,
+  MainDef;
 
 type
   // TODO separate unit?
@@ -22,9 +23,6 @@ type
     SgWorkSpace: TStringGrid;
     StatusBar1: TStatusBar;
     PnlDetail: TPanel;
-    EdTagDesc: TLabeledEdit;
-    EdTagDef: TLabeledEdit;
-    EdTagHint: TLabeledEdit;
     PnlBottom: TPanel;
     PnlFuncTop: TPanel;
     Splitter1: TSplitter;
@@ -32,18 +30,28 @@ type
     BtnOK: TBitBtn;
     SpbAddTag: TSpeedButton;
     SpbDelTag: TSpeedButton;
+    PnlAutoComplete: TPanel;
+    MemoAutoLines: TMemo;
+    PnlAutoOptions: TPanel;
+    PnlQuickTags: TPanel;
+    EdTagDesc: TLabeledEdit;
+    EdTagDef: TLabeledEdit;
+    EdTagHint: TLabeledEdit;
     procedure FormShow(Sender: TObject);
     procedure SgWorkSpaceSelectCell(Sender: TObject; ACol, ARow: Integer; var CanSelect: Boolean);
-    procedure LabeledEditKeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure SpbAddTagClick(Sender: TObject);
     procedure SpbDelTagClick(Sender: TObject);
     procedure PnlDetailResize(Sender: TObject);
+    procedure EdTagKeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
+    procedure MemoAutoLinesKeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
+    procedure SgWorkSpaceDrawCell(Sender: TObject; ACol, ARow: LongInt; Rect: TRect; State: TGridDrawState);
   private
     { Private declarations }
     procedure DisplayHint(Sender: TObject);
     procedure UpdateButtons;
     procedure UpdateLabels(const ARow: integer);
+    function QuickRec(ARow: Longint): QuickTagRec;
     procedure SaveSettings;
   public
     { Public declarations }
@@ -55,7 +63,8 @@ var
 implementation
 
 uses
-  StrUtils, Main, MainDef, ExifToolsGUI_Utils, UFrmTagNames;
+  Vcl.Themes,
+  StrUtils, Main, ExifToolsGUI_Utils, UFrmTagNames;
 
 {$R *.dfm}
 
@@ -125,35 +134,46 @@ begin
   SpbDelTag.Enabled := (SgWorkSpace.RowCount > 1);
 end;
 
-procedure TFQuickManager.UpdateLabels(const ARow: integer);
+function TFQuickManager.QuickRec(ARow: Longint): QuickTagRec;
 begin
-  EdTagDesc.Text    := SgWorkSpace.Cells[0, ARow];
-  EdTagDef.Text     := SgWorkSpace.Cells[1, ARow];
-  EdTagHint.Text    := SgWorkSpace.Cells[2, ARow];
+  result.Caption    := SgWorkSpace.Cells[0, ARow];
+  result.Command    := SgWorkSpace.Cells[1, ARow];
+  result.NoEdit     := (RightStr(result.Caption, 1) = '?') or
+                       (SameText(LeftStr(result.Command, 4), '-GUI'));
+  result.Help       := SgWorkSpace.Cells[2, ARow];
+  result.AcOptions  := word(SgWorkSpace.Objects[3, ARow]);
+  result.AcList     := SgWorkSpace.Cells[3, ARow];
+end;
+
+procedure TFQuickManager.UpdateLabels(const ARow: integer);
+var
+  AQuickRec: QuickTagRec;
+begin
+  AQuickRec := QuickRec(ARow);
+
+  EdTagDesc.Text    := AQuickRec.Caption;
+  EdTagDef.Text     := AQuickRec.Command;
+  EdTagHint.Text    := AQuickRec.Help;
+  MemoAutoLines.Lines.BeginUpdate;
+  try
+    AQuickRec.GetAcList(MemoAutoLines.Lines);
+  finally
+    MemoAutoLines.Lines.EndUpdate;
+  end;
 end;
 
 procedure TFQuickManager.SaveSettings;
 var
-  I, N: integer;
-  Tx: string;
+  N: integer;
 begin
-  I := SgWorkSpace.RowCount;
-  SetLength(QuickTags, I);
-  for N := 0 to I - 1 do
-  begin
-    Tx := SgWorkSpace.Cells[0, N];
-    QuickTags[N].Caption := Tx;
-    QuickTags[N].NoEdit := (RightStr(Tx, 1) = '?');
-    Tx := SgWorkSpace.Cells[1, N];
-    QuickTags[N].Command := Tx;
-    Tx := UpperCase(LeftStr(Tx, 4));
-    QuickTags[N].NoEdit := QuickTags[N].NoEdit or (Tx = '-GUI');
-    QuickTags[N].Help := SgWorkSpace.Cells[2, N];
-  end;
+  SetLength(QuickTags, SgWorkSpace.RowCount);
+  for N := 0 to SgWorkSpace.RowCount - 1 do
+    QuickTags[N] := QuickRec(N);
 end;
 
 procedure TFQuickManager.SpbAddTagClick(Sender: TObject);
 var
+  P: integer;
   S: string;
 begin
   FrmTagNames.SetSample(Fmain.GetFirstSelectedFile);
@@ -169,6 +189,9 @@ begin
   begin
     SgWorkSpace.Row := SgWorkSpace.InsertRow(SgWorkSpace.Row +1);
     SgWorkSpace.Cells[0, SgWorkSpace.Row] := FrmTagNames.SelectedTag(false);
+    P := Pos(':', SgWorkSpace.Cells[0, SgWorkSpace.Row] );
+    if (P > 0) then
+      SgWorkSpace.Cells[0, SgWorkSpace.Row] := Copy(SgWorkSpace.Cells[0, SgWorkSpace.Row], P +  1);
     SgWorkSpace.Cells[1, SgWorkSpace.Row] := '-' + FrmTagNames.SelectedTag(false);
     SgWorkSpace.Cells[2, SgWorkSpace.Row] := '';
 
@@ -186,6 +209,27 @@ begin
 
   UpdateButtons;
   UpdateLabels(SgWorkSpace.Row);
+end;
+
+procedure TFQuickManager.EdTagKeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
+var
+  Tx: string;
+begin
+  Tx := Trim(EdTagDesc.Text);
+  // Tag would always be marked as modified
+  if (LeftStr(Tx, 1) = '*') then
+    Tx := Copy(Tx, 2);
+  SgWorkSpace.Cells[0, SgWorkSpace.Row] := Tx;
+
+  // Tag would trigger a modification
+  Tx := RemoveInvalidTags(Trim(EdTagDef.Text), true);
+  EdTagDef.Text := Tx;
+  // Needs to start with a hypen
+  if (Leftstr(Tx, 1) <> '-') then
+    Tx := '-' + Tx;
+  SgWorkSpace.Cells[1, SgWorkSpace.Row] := Tx;
+
+  SgWorkSpace.Cells[2, SgWorkSpace.Row] := Trim(EdTagHint.Text);
 end;
 
 procedure TFQuickManager.FormClose(Sender: TObject; var Action: TCloseAction);
@@ -218,6 +262,8 @@ begin
       SgWorkSpace.Cells[0, N] := QuickTags[N].Caption;
       SgWorkSpace.Cells[1, N] := QuickTags[N].Command;
       SgWorkSpace.Cells[2, N] := QuickTags[N].Help;
+      SgWorkSpace.Cells[3, N] := QuickTags[N].AcList;
+      SgWorkSpace.Objects[3, N] := pointer(QuickTags[N].AcOptions);
     end;
     SgWorkSpace.Row := X;
   finally
@@ -228,25 +274,9 @@ begin
   UpdateLabels(SgWorkSpace.Row);
 end;
 
-procedure TFQuickManager.LabeledEditKeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
-var
-  Tx: string;
+procedure TFQuickManager.MemoAutoLinesKeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
 begin
-  Tx := Trim(EdTagDesc.Text);
-  // Tag would always be marked as modified
-  if (LeftStr(Tx, 1) = '*') then
-    Tx := Copy(Tx, 2);
-  SgWorkSpace.Cells[0, SgWorkSpace.Row] := Tx;
-
-  // Tag would trigger a modification
-  Tx := RemoveInvalidTags(Trim(EdTagDef.Text), true);
-  EdTagDef.Text := Tx;
-  // Needs to start with a hypen
-  if (Leftstr(Tx, 1) <> '-') then
-    Tx := '-' + Tx;
-  SgWorkSpace.Cells[1, SgWorkSpace.Row] := Tx;
-
-  SgWorkSpace.Cells[2, SgWorkSpace.Row] := Trim(EdTagHint.Text);
+  SgWorkSpace.Cells[3, SgWorkSpace.Row] := ReplaceAll(MemoAutoLines.Lines.Text, [#13#10, #10], ['/n', '/n'], [rfReplaceAll]);
 end;
 
 procedure TFQuickManager.PnlDetailResize(Sender: TObject);
@@ -256,6 +286,25 @@ begin
   EdTagDesc.Width := PnlDetail.Width - Margin;
   EdTagDef.Width  := PnlDetail.Width - Margin;
   EdTagHint.Width := PnlDetail.Width - Margin;
+end;
+
+procedure TFQuickManager.SgWorkSpaceDrawCell(Sender: TObject; ACol, ARow: LongInt; Rect: TRect; State: TGridDrawState);
+var
+  ACanvas: TCanvas;
+  AText: string;
+begin
+  AText := TStringGrid(Sender).Cells[1, ARow];
+  if (SameText(LeftStr(AText, 4), '-GUI')) then
+  begin
+    ACanvas := TStringGrid(Sender).Canvas;
+    // See MetadataListDrawCell in Main
+    ACanvas.Brush.Color := clWindow;
+    ACanvas.Font.Style := [fsBold];
+    ACanvas.Font.Color := clWindowText;
+    // Draw ourselves
+    AText := TStringGrid(Sender).Cells[ACol, ARow];
+    ACanvas.TextRect(Rect, Rect.Left + 4, Rect.Top + 2, AText);
+  end;
 end;
 
 procedure TFQuickManager.SgWorkSpaceSelectCell(Sender: TObject; ACol, ARow: Integer; var CanSelect: Boolean);

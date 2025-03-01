@@ -42,8 +42,6 @@ object FCopyMetadata: TFCopyMetadata
     ParentDoubleBuffered = False
     ParentFont = False
     TabOrder = 0
-    ExplicitWidth = 340
-    ExplicitHeight = 433
     object Label2: TLabel
       Left = 1
       Top = 1
@@ -109,7 +107,6 @@ object FCopyMetadata: TFCopyMetadata
       Margins.Left = 10
       Align = alTop
       TabOrder = 0
-      ExplicitWidth = 325
       object SpbPredefined: TSpeedButton
         Left = 237
         Top = 1
@@ -131,7 +128,6 @@ object FCopyMetadata: TFCopyMetadata
         TabOrder = 0
         Text = 'CmbPredefined'
         OnChange = CmbPredefinedChange
-        ExplicitWidth = 228
       end
     end
   end
@@ -143,8 +139,6 @@ object FCopyMetadata: TFCopyMetadata
     Align = alRight
     BevelOuter = bvNone
     TabOrder = 2
-    ExplicitLeft = 340
-    ExplicitHeight = 433
     DesignSize = (
       117
       445)

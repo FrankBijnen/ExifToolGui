@@ -44,8 +44,6 @@ uses
 
 {$R *.dfm}
 
-var FStyleServices: TCustomStyleServices;
-
 procedure TFrmCheckVersions.OpenUrl(Sender: TObject);
 begin
   ShellExecute(0, 'Open', PWideChar(LvVersions.Items[LvVersions.ItemIndex].SubItems[0]), '', '', SW_SHOWNORMAL);
@@ -127,7 +125,6 @@ end;
 
 procedure TFrmCheckVersions.FormShow(Sender: TObject);
 begin
-  FStyleServices := TStyleManager.Style[GUIsettings.GuiStyle];
   Left := FMain.GetFormOffset.X;
   Top := FMain.GetFormOffset.Y;
   GetVersions;
@@ -136,7 +133,7 @@ end;
 procedure TFrmCheckVersions.LvVersionsCustomDrawItem(Sender: TCustomListView; Item: TListItem; State: TCustomDrawState;
   var DefaultDraw: Boolean);
 begin
-  StyledDrawListviewItem(FStyleServices, Sender, Item, State);
+  StyledDrawListviewItem(Fmain.FStyleServices, Sender, Item, State);
 end;
 
 procedure TFrmCheckVersions.LvVersionsDblClick(Sender: TObject);

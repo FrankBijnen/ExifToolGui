@@ -101,7 +101,6 @@ object FCopyMetaSingle: TFCopyMetaSingle
         TabOrder = 0
         Text = 'CmbPredefined'
         OnChange = CmbPredefinedChange
-        ExplicitWidth = 213
       end
     end
     object LvTagNames: TListView

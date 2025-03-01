@@ -78,8 +78,6 @@ implementation
 uses
   Vcl.Themes, ExifToolsGUI_Utils, UFrmTagNames, UnitLangResources, Main;
 
-var FStyleServices: TCustomStyleServices;
-
 {$R *.dfm}
 
 procedure TFrmPredefinedTags.SetColumnWidths;
@@ -307,13 +305,13 @@ end;
 
 procedure TFrmPredefinedTags.SGPredefinedTagsDrawCell(Sender: TObject; ACol, ARow: Integer; Rect: TRect; State: TGridDrawState);
 begin
-  if not Assigned(FStyleServices) then
+  if not Assigned(FMain.FStyleServices) then
     exit;
 
   if (ARow = SGPredefinedTags.Row) then
-    SGPredefinedTags.Canvas.Brush.Color := FStyleServices.GetSystemColor(clHighlight)
+    SGPredefinedTags.Canvas.Brush.Color := FMain.FStyleServices.GetSystemColor(clHighlight)
   else
-    SGPredefinedTags.Canvas.Brush.Color := FStyleServices.GetSystemColor(clWindow);
+    SGPredefinedTags.Canvas.Brush.Color := FMain.FStyleServices.GetSystemColor(clWindow);
 end;
 
 procedure TFrmPredefinedTags.SGPredefinedTagsExit(Sender: TObject);
@@ -333,7 +331,7 @@ end;
 procedure TFrmPredefinedTags.LvTagNamesCustomDrawItem(Sender: TCustomListView; Item: TListItem; State: TCustomDrawState;
   var DefaultDraw: Boolean);
 begin
-  StyledDrawListviewItem(FStyleServices, Sender, Item, State);
+  StyledDrawListviewItem(FMain.FStyleServices, Sender, Item, State);
 end;
 
 procedure TFrmPredefinedTags.LvTagNamesEdited(Sender: TObject; Item: TListItem; var S: string);
@@ -427,7 +425,6 @@ begin
   Left := FMain.GetFormOffset.X;
   Top := FMain.GetFormOffset.Y;
 
-  FStyleServices := TStyleManager.Style[GUIsettings.GuiStyle];
   if (PredefinedTagList.Count = 0) then
     CreateDefaults
   else

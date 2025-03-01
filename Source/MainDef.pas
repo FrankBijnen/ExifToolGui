@@ -134,11 +134,24 @@ type
     function Fast3(const FileExt: string): string;
   end;
 
+const
+  acAutoCorrect         = $0010;
+  acAutoPopulate        = $0020;
+
+type
+  TAcMode = (acNone = $0000, acAutoAppend = $0001, acAutoSuggest = $0002, acAutoSuggestAppend = $0003);
+
   QuickTagRec = record
-    Caption: string;
-    Command: string;
-    Help: string;
-    NoEdit: boolean;
+    Caption:    string;
+    Command:    string;
+    Help:       string;
+    NoEdit:     boolean;
+    AcOptions:  word;
+    AcList:     string;
+    procedure SetAcList(InAclist: TStrings);
+    procedure GetAcList(OutAcList: TStrings);
+    procedure SetAcOptions(AcMode: TAcMode; AutoCorrect: boolean; AutoPopulate: boolean);
+    procedure GetAcOptions(var AcMode: TAcMode; var AutoCorrect: boolean; var AutoPopulate: boolean);
   end;
 
 var
@@ -317,7 +330,37 @@ begin
     result := '-fast3' + CRLF;
 end;
 
-function SetQuickTag(const AIndex: integer; const ACaption, ACommand: string; const AHelp: string = ''): integer;
+procedure QuickTagRec.SetAcList(InAcList: TStrings);
+begin
+  AcList := ReplaceAll(InAcList.Text, [#10], ['/n'], [rfReplaceAll]);
+end;
+
+procedure QuickTagRec.GetAcList(OutAcList: TStrings);
+begin
+  OutAcList.Text := ReplaceAll(AcList, ['/n'], [#10], [rfReplaceAll]);
+end;
+
+procedure QuickTagRec.SetAcOptions(AcMode: TAcMode; AutoCorrect: boolean; AutoPopulate: boolean);
+begin
+  AcOptions := Ord(AcMode);
+  if (AutoCorrect) then
+    AcOptions := AcOptions + acAutoCorrect;
+  if (AutoPopulate) then
+    AcOptions := AcOptions + acAutoPopulate;
+end;
+
+procedure QuickTagRec.GetAcOptions(var AcMode: TAcMode; var AutoCorrect: boolean; var AutoPopulate: boolean);
+begin
+  AcMode := TAcMode(AcOptions and $0f);
+  AutoCorrect := (AcOptions and acAutoCorrect) = acAutoCorrect;
+  AutoPopulate := (AcOptions and acAutoPopulate) = acAutoPopulate;
+end;
+
+function SetQuickTag(const AIndex: integer;
+                     const ACaption, ACommand: string;
+                     const AHelp: string = '';
+                     const AOptions: word = 0;
+                     const AcList: string = ''): integer;
 begin
   result := AIndex +1;
 
@@ -325,21 +368,23 @@ begin
   if (result > Length(QuickTags)) then
     SetLength(QuickTags, result);
 
-  QuickTags[AIndex].Caption := ACaption;
-  QuickTags[AIndex].Command := Trim(ACommand);
-  QuickTags[AIndex].Help := AHelp;
-
+  QuickTags[AIndex].Caption   := ACaption;
+  QuickTags[AIndex].Command   := Trim(ACommand);
+  QuickTags[AIndex].Help      := AHelp;
+  QuickTags[AIndex].AcOptions := AOptions;
+  QuickTags[AIndex].AcList    := AcList;
   // Set NoEdit
-  QuickTags[AIndex].NoEdit := (RightStr(ACaption, 1) = '?');
-  QuickTags[AIndex].NoEdit := QuickTags[result -1].NoEdit or
-                             (UpperCase(LeftStr(ACommand, 4)) = '-GUI');
-
+  QuickTags[AIndex].NoEdit    := (RightStr(ACaption, 1) = '?');
+  QuickTags[AIndex].NoEdit    := QuickTags[result -1].NoEdit or
+                                 (SameText(LeftStr(ACommand, 4), '-GUI'));
 end;
 
 function ReadWorkSpaceTags(GUIini: TMemIniFile):integer;
 var
   Indx, WSCnt: integer;
-  Name, Cmd, Help : string;
+  Name, Cmd, Help, Tmp: string;
+  AcOptions: Word;
+  AcList: string;
   TmpItems: TStringList;
 begin
   TmpItems := TStringList.Create;
@@ -347,7 +392,6 @@ begin
     GUIini.ReadSectionValues(WorkSpaceTags, TmpItems);
     WSCnt := TmpItems.Count;
     result := WSCnt;
-    SetLength(QuickTags, WSCnt);
 
     if (WSCnt = 0) and
        (GUIini.SectionExists(WorkSpaceTags) = false) then
@@ -356,10 +400,14 @@ begin
       WSCnt :=  SetQuickTag(WSCnt, 'Make', '-exif:Make');
       WSCnt :=  SetQuickTag(WSCnt, 'Model', '-exif:Model');
       WSCnt :=  SetQuickTag(WSCnt, 'LensModel', '-exif:LensModel');
-      WSCnt :=  SetQuickTag(WSCnt, 'ExposureTime', '-exif:ExposureTime', '[1/50] or [0.02]');
-      WSCnt :=  SetQuickTag(WSCnt, 'FNumber', '-exif:FNumber');
-      WSCnt :=  SetQuickTag(WSCnt, 'ISO', '-exif:ISO');
-      WSCnt :=  SetQuickTag(WSCnt, 'FocalLength', '-exif:FocalLength', '[28] -mm not necessary');
+      WSCnt :=  SetQuickTag(WSCnt, 'ExposureTime', '-exif:ExposureTime', '[1/50] or [0.02]',
+                Ord(acAutoSuggestAppend), '1/15/n1/30/n1/60/n1/90/n1/125/n/1/250/n1/500/n1/1000/n1/2000/n1/4000/n');
+      WSCnt :=  SetQuickTag(WSCnt, 'FNumber', '-exif:FNumber','',
+                Ord(acAutoSuggestAppend), '1.4/n2.0/n2.8/n4.0/n5.6/n8.0/n11.0/n16.0/n22.0/n');
+      WSCnt :=  SetQuickTag(WSCnt, 'ISO', '-exif:ISO', '',
+                Ord(acAutoSuggestAppend), '25/n50/n100/n200/n400/n800/n1600/n3200/n6400/n');
+      WSCnt :=  SetQuickTag(WSCnt, 'FocalLength', '-exif:FocalLength', '[28] -mm not necessary',
+                Ord(acAutoSuggestAppend), '15/n18/n20/n28/n35/n40/n50/n70/n85/n100/n135/n150/n200/n300/n400/n');
       WSCnt :=  SetQuickTag(WSCnt, 'Flash#', '-exif:Flash', '[ 0 ]=No flash, [ 1 ]=Flash fired');
       WSCnt :=  SetQuickTag(WSCnt, 'Orientation#', '-exif:Orientation', '[ 1 ]=0°, [ 3 ]=180°, [ 6 ]=+90°, [ 8 ]=-90°');
       WSCnt :=  SetQuickTag(WSCnt, 'DateTimeOriginal', '-exif:DateTimeOriginal', '[2012:01:14 20:00:00]');
@@ -385,10 +433,21 @@ begin
     begin
       for Indx := 0 to WSCnt - 1 do
       begin
-        Help :=  TmpItems[Indx];
-        Name := NextField(Help, '=');
-        Cmd := NextField(Help, '^');
-        SetQuickTag(Indx, Name, Cmd, Help);
+        Tmp   := TmpItems[Indx];
+        Name  := NextField(Tmp, '=');
+        Cmd   := NextField(Tmp, '^');
+        Help  := NextField(Tmp, '^');
+        // AutoComplete options available?
+        if (Pos('^', Tmp) > 0) then
+          AcOptions := StrToIntDef(NextField(Tmp, '^'), 0)
+        else
+          AcOptions := 0;
+        // AutoComplete list available?
+        if (Pos('^', Tmp) > 0) then
+          AcList := NextField(Tmp, '^')
+        else
+          AcList := Tmp;
+        SetQuickTag(Indx, Name, Cmd, Help, AcOptions, AcList);
       end;
     end;
  finally
@@ -562,7 +621,11 @@ begin
     TmpItems.Add(Format('[%s]', [WorkSpaceTags]));
     for Indx := 0 to Length(QuickTags) - 1 do
     begin
-      Tx := Format('%s=%s^%s', [QuickTags[Indx].Caption, QuickTags[Indx].Command, QuickTags[Indx].Help]);
+      Tx := Format('%s=%s^%s^%d^%s', [QuickTags[Indx].Caption,
+                                      QuickTags[Indx].Command,
+                                      QuickTags[Indx].Help,
+                                      QuickTags[Indx].AcOptions,
+                                      QuickTags[Indx].AcList]);
       TmpItems.Add(Tx);
     end;
     GUIini.SetStrings(TmpItems);

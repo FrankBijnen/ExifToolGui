@@ -16,7 +16,7 @@ interface
 uses
   System.SysUtils, System.Variants, System.Classes, System.ImageList, System.Win.TaskbarCore, System.Actions,
   Winapi.Windows, Winapi.Messages,
-  Vcl.Graphics, Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.Grids, Vcl.Mask, Vcl.ValEdit, Vcl.ImgList,
+  Vcl.Graphics, Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.Grids, Vcl.Mask, Vcl.ValEdit, Vcl.ImgList, Vcl.Themes,
   VclTee.TeeGDIPlus, VclTee.TeEngine, VclTee.TeeProcs, VclTee.Chart,
   Vcl.ActnMan, Vcl.ActnCtrls, Vcl.ActnMenus, Vcl.ActnList, Vcl.PlatformDefaultStyleActnCtrls,
   Vcl.ActnPopup, Vcl.BaseImageCollection, Vcl.ImageCollection, Vcl.VirtualImageList,
@@ -428,6 +428,7 @@ type
     GUIColorWindow: TColor;
     GUIColorShellTree: TColor;
     GUIColorShellList: TColor;
+    FStyleServices: TCustomStyleServices;
 
     { Public declarations }
     function GetFirstSelectedFile: string;
@@ -452,7 +453,7 @@ var
 implementation
 
 uses System.StrUtils, System.Math, System.Masks, System.Types, System.UITypes,
-  Vcl.ClipBrd, Winapi.ShellAPI, Winapi.CommCtrl, Vcl.Shell.ShellConsts, Vcl.Themes, Vcl.Styles,
+  Vcl.ClipBrd, Winapi.ShellAPI, Winapi.CommCtrl, Vcl.Shell.ShellConsts, Vcl.Styles,
   ExifTool, ExifInfo, ExifToolsGui_LossLess, ExifTool_PipeStream, ExifToolsGui_ResourceStrings, UnitLangResources,
   ExifToolsGUI_MultiContextMenu, ExifToolsGUI_StringList, ExifToolsGui_FileListColumns, UDmFileLists,
   MainDef, LogWin, Preferences, EditFFilter, EditFCol, UFrmStyle, UFrmAbout, UFrmCheckVersions,
@@ -461,8 +462,6 @@ uses System.StrUtils, System.Math, System.Masks, System.Types, System.UITypes,
   UFrmDiff, UFrmExportSettings;
 
 {$R *.dfm}
-
-var FStyleServices: TCustomStyleServices;
 
 function TFMain.GetDefWindowSizes: TRect;
 begin
@@ -2045,15 +2044,15 @@ begin
         Insert('*', Tx, 1);
         Keys[I + 1] := Tx;
         Cells[1, I + 1] := QuickTags[I].Help;
+        SpeedBtnQuickSave.Enabled := true;
       end;
     end;
-    SpeedBtnQuickSave.Enabled := true;
   end;
 end;
 
 procedure TFMain.QuickPopUp_InsertETDirectClick(Sender: TObject);
 begin
-  if (TmenuItem(Sender).Visible) then
+  if (TMenuItem(Sender).Visible) then
     EditETdirect.Text := EditETdirect.Text + TagCmd + ' ';
 end;
 
