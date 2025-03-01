@@ -73,8 +73,6 @@ uses
 
 {$R *.dfm}
 
-var FStyleServices: TCustomStyleServices;
-
 function TFCopyMetaSingle.GetDefWindowSizes: TRect;
 begin
   result := DesignRect;
@@ -276,7 +274,6 @@ end;
 procedure TFCopyMetaSingle.FormShow(Sender: TObject);
 begin
   Application.OnHint := DisplayHint;
-  FStyleServices := TStyleManager.Style[GUIsettings.GuiStyle];
   Left := FMain.GetFormOffset.X;
   Top := FMain.GetFormOffset.Y;
 
@@ -299,7 +296,7 @@ end;
 procedure TFCopyMetaSingle.LvTagNamesCustomDrawItem(Sender: TCustomListView; Item: TListItem; State: TCustomDrawState;
   var DefaultDraw: Boolean);
 begin
-  StyledDrawListviewItem(FStyleServices, Sender, Item, State);
+  StyledDrawListviewItem(Fmain.FStyleServices, Sender, Item, State);
 end;
 
 procedure TFCopyMetaSingle.LvTagNamesItemChecked(Sender: TObject; Item: TListItem);

@@ -96,8 +96,6 @@ uses
 
 const DefTagWidth = 150;
 
-var FStyleServices: TCustomStyleServices;
-
 function TFrmDiff.TagSelection: string;
 var
   ATag, AllTags: string;
@@ -199,7 +197,7 @@ procedure TFrmDiff.LVCompareCustomDrawItem(Sender: TCustomListView; Item: TListI
 begin
   if (Item.ImageIndex > -1) then
     Sender.Canvas.Font.Style := [TFontStyle.fsBold];
-  StyledDrawListviewItem(FStyleServices, Sender, Item, State);
+  StyledDrawListviewItem(FMain.FStyleServices, Sender, Item, State);
 end;
 
 procedure TFrmDiff.ResizePanels;
@@ -655,8 +653,6 @@ var
 begin
   if (LVCompare.Columns[0].Width < DefTagWidth) then
     LVCompare.Columns[0].Width := DefTagWidth;
-
-  FStyleServices := TStyleManager.Style[GUIsettings.GuiStyle];
 
   SetupPredefined;
 

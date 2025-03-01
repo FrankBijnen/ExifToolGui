@@ -74,8 +74,6 @@ uses
 
 {$R *.dfm}
 
-var FStyleServices: TCustomStyleServices;
-
 function TFRemoveMeta.GetDefWindowSizes: TRect;
 begin
   result := DesignRect;
@@ -274,7 +272,6 @@ end;
 procedure TFRemoveMeta.FormShow(Sender: TObject);
 begin
   Application.OnHint := DisplayHint;
-  FStyleServices := TStyleManager.Style[GUIsettings.GuiStyle];
   Left := FMain.GetFormOffset.X;
   Top := FMain.GetFormOffset.Y;
 
@@ -295,7 +292,7 @@ end;
 procedure TFRemoveMeta.LvTagNamesCustomDrawItem(Sender: TCustomListView; Item: TListItem; State: TCustomDrawState;
   var DefaultDraw: Boolean);
 begin
-  StyledDrawListviewItem(FStyleServices, Sender, Item, State);
+  StyledDrawListviewItem(FMain.FStyleServices, Sender, Item, State);
 end;
 
 procedure TFRemoveMeta.LvTagNamesItemChecked(Sender: TObject; Item: TListItem);

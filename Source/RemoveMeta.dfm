@@ -41,8 +41,6 @@ object FRemoveMeta: TFRemoveMeta
     ParentDoubleBuffered = False
     ParentFont = False
     TabOrder = 0
-    ExplicitWidth = 333
-    ExplicitHeight = 430
     object LvTagNames: TListView
       AlignWithMargins = True
       Left = 11
@@ -77,7 +75,6 @@ object FRemoveMeta: TFRemoveMeta
       Margins.Left = 10
       Align = alTop
       TabOrder = 0
-      ExplicitWidth = 318
       object SpbPredefined: TSpeedButton
         Left = 228
         Top = 1
@@ -98,7 +95,6 @@ object FRemoveMeta: TFRemoveMeta
         TabOrder = 0
         Text = 'CmbPredefined'
         OnChange = CmbPredefinedChange
-        ExplicitWidth = 221
       end
     end
     object PnlRemoveAll: TPanel
