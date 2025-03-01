@@ -1178,9 +1178,9 @@ begin
       begin
         if (EditLineActive) then
         begin
-          AutoComplete.Lines.Add(MetadataList.Cells[1, CurrentLine]);
+          AutoComplete.AddHist(MetadataList.Cells[1, CurrentLine]);
           AutoIncLine(CurrentLine);
-          if (MetadataList.EditorMode = false) then //TODO: Check
+          if (MetadataList.EditorMode = false) then
             MetadataList.EditorMode := true;
         end
         else
@@ -1327,6 +1327,9 @@ begin
   if SpeedBtnQuick.Down and
      not(QuickTags[ARow - 1].NoEdit) then
   begin
+    if (Supports(TValueListEditor(Sender).InplaceEdit, IAutoCompleteEdit)) then
+      (TValueListEditor(Sender).InplaceEdit as IAutoCompleteEdit).SetAutoCompleteList(nil);
+
     if RightStr(TValueListEditor(Sender).Keys[ARow], 1) = #177 then
       EditText := '+'
     else
@@ -2562,7 +2565,7 @@ begin
       if (QuickTags[Index - 1].NoEdit = false) then
       begin
         MetadataList.Cells[1, Index] := Trim(TEdit(Sender).Text);
-        AutoComplete.Lines.Add(MetadataList.Cells[1, Index]);
+        AutoComplete.AddHist(MetadataList.Cells[1, Index]);
         if TEdit(Sender).Modified then
           MarkLineModified(Index);
         MetadataList.Refresh;
@@ -3386,6 +3389,8 @@ end;
 
 procedure TFMain.ShellListBeforeEnumColumns(Sender: TObject; var ReadModeOptions: TReadModeOptions; var ColumnDefs: TColumnsArray);
 begin
+  if (GUIsettings.DetailsSel > GetFileListDefCount -1) then
+    GUIsettings.DetailsSel := GetFileListDefCount -1;
   ReadModeOptions := GetFileListDefs[GUIsettings.DetailsSel].ReadMode;
   ColumnDefs := GetFileListDefs[GUIsettings.DetailsSel].ColumnDefs;
 end;
@@ -3831,9 +3836,18 @@ begin
     Include(GridOptions, goAlwaysShowEditor);
   end;
   MetadataList.Options := GridOptions;
-  if (MetadataList.InplaceEdit <> nil) then
-    MetadataList.InplaceEdit.AutoCompleteMode := AutoCompleteMode;
-  EditQuick.AutoCompleteMode := AutoCompleteMode;
+
+  if (Supports(MetadataList.InplaceEdit, IAutoCompleteEdit)) then
+    (MetadataList.InplaceEdit as IAutoCompleteEdit).SetAutoCompleteMode(AutoCompleteMode);
+
+  if (Supports(EditQuick, IAutoCompleteEdit)) then
+    (EditQuick as IAutoCompleteEdit).SetAutoCompleteMode(AutoCompleteMode);
+
+  if (Supports(EditETdirect, IAutoCompleteEdit)) then
+  begin
+    (EditETdirect as IAutoCompleteEdit).SetAutoCompleteMode(AutoCompleteMode);
+    (EditETdirect as IAutoCompleteEdit).SetAutoCompleteList(ETdirectCmdList);
+  end;
 
   if (MetadataList.ColWidths[0] > MetadataList.ClientWidth - Margin) then
     MetadataList.ColWidths[0] := MetadataList.ClientWidth - Margin;
@@ -3913,7 +3927,7 @@ begin
           if (QuickTags[E].NoEdit) then
             MetadataList.ItemProps[E].ReadOnly := true
           else
-            AutoComplete.Lines.Add(ETResult[E]);
+            AutoComplete.AddHist(ETResult[E]);
         end;
       finally
         MetadataList.Strings.EndUpdate;

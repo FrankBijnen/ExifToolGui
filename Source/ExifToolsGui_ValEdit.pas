@@ -7,33 +7,27 @@ interface
 
 uses
   System.Classes, Winapi.Messages, Vcl.ValEdit, Vcl.Controls, Vcl.Grids,
-  Winapi.ShlObj, Winapi.ActiveX, ExifToolsGui_AutoComplete;
+  Winapi.ShlObj, Winapi.ActiveX, ExifToolsGui_AutoEdit, ExifToolsGui_AutoComplete;
 
 type
   TValueListEditor = class;
 
-  TETGuiInplaceEdit = class(Vcl.Grids.TInplaceEdit, IShiftEdit)
+  TETGuiInplaceEdit = class(Vcl.Grids.TInplaceEdit, IWordSelEdit, IAutoCompleteEdit)
   private
-    FAutoCompleteMode: TAutoCompleteMode;
-    IAutoComplete: IAutoComplete;
-    FEnableAutoComplete: boolean;
-    FSelDirection: TSelDirection;
+    FAutoCompleteEdit: IAutoCompleteEdit;
+    FWordSelEdit: IWordSelEdit;
     procedure ConvertToGridPoint(var X, Y: integer);
     function ValueListEditor: TValueListEditor;
   protected
     procedure CreateWnd; override;
-    procedure EnableAutoComplete(Enable: boolean);
-    procedure SetAutoComplete;
-    procedure SetAutoCompleteMode(Value: TAutoCompleteMode);
     procedure MouseDown(Button: TMouseButton; Shift: TShiftState; X, Y: integer); override;
     procedure KeyDown(var Key: Word; Shift: TShiftState); override;
     procedure KeyUp(var Key: Word; Shift: TShiftState); override;
   public
-    procedure SetSelDirection(ASelDirection: TSelDirection);
-    function GetSelDirection: TSelDirection;
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
-    property AutoCompleteMode: TAutoCompleteMode read FAutoCompleteMode write SetAutoCompleteMode;
+    property WordSelEdit: IWordSelEdit read FWordSelEdit implements IWordSelEdit;
+    property AutoCompleteEdit: IAutoCompleteEdit read FAutoCompleteEdit implements IAutoCompleteEdit;
   end;
 
   TValueListEditor = class(Vcl.ValEdit.TValueListEditor)
@@ -51,6 +45,7 @@ type
     function GetRowsPossible: integer;
     procedure SetProportionalVScroll(Value: boolean);
     procedure UpdateScrollBar;
+    procedure CMEnter(var Message: TCMEnter); message CM_ENTER;
     procedure WMVScroll(var Msg: TWMVScroll); message WM_VSCROLL;
     procedure WMSize(var Msg: TWMSize); message WM_SIZE;
     procedure SizeChanged(OldColCount, OldRowCount: Longint); override;
@@ -70,60 +65,25 @@ type
 implementation
 
 uses
-  System.Types, System.UITypes, System.Win.ComObj, Winapi.Windows;
+  System.Types, System.UITypes, System.Win.ComObj, System.SysUtils, Winapi.Windows;
 
 constructor TETGuiInplaceEdit.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
 
-  FAutoCompleteMode := TAutoCompleteMode.acNone;
-  IAutoComplete := nil;
-  FEnableAutoComplete := false;
+  FWordSelEdit := TWordSelEdit.Create;
+  FAutoCompleteEdit := TAutoCompleteEdit.Create;
 end;
 
 destructor TETGuiInplaceEdit.Destroy;
 begin
-  EnableAutoComplete(false);
-  IAutoComplete := nil;
-
   inherited Destroy;
 end;
 
 procedure TETGuiInplaceEdit.CreateWnd;
 begin
   inherited CreateWnd;
-
-  SetAutoComplete;
-end;
-
-procedure TETGuiInplaceEdit.EnableAutoComplete(Enable: boolean);
-begin
-  if (FEnableAutoComplete <> Enable) then
-  begin
-    FEnableAutoComplete := Enable;
-    if (IAutoComplete <> nil) then
-      IAutoComplete.Enable(FEnableAutoComplete);
-  end;
-end;
-
-procedure TETGuiInplaceEdit.SetAutoComplete;
-begin
-  if (HandleAllocated) then
-  begin
-    IAutoComplete := AutoComplete.InitAutoComplete(Handle);
-    AutoComplete.SetAutoCompleteMode(IAutoComplete, FAutoCompleteMode);
-  end;
-end;
-
-procedure TETGuiInplaceEdit.SetAutoCompleteMode(Value: TAutoCompleteMode);
-begin
-  if (IAutoComplete <> nil) and
-     (FAutoCompleteMode <> Value) then
-  begin
-    FAutoCompleteMode := Value;
-    AutoComplete.SetAutoCompleteMode(IAutoComplete, FAutoCompleteMode);
-    EnableAutoComplete(FAutoCompleteMode <> TAutoCompleteMode.acNone);
-  end;
+  FAutoCompleteEdit.SetAutoComplete(Handle);
 end;
 
 procedure TETGuiInplaceEdit.ConvertToGridPoint(var X, Y: integer);
@@ -145,19 +105,22 @@ end;
 // in stead of focusing the prev/next stringgrid row.
 // Disabling and Enabling fixes this
 procedure TETGuiInplaceEdit.KeyDown(var Key: Word; Shift: TShiftState);
+var
+  AutoCompleteMode: TAutoCompleteMode;
 begin
   if (Key = VK_END) then
     SelLength := 0;
 
+  AutoCompleteMode := FAutoCompleteEdit.GetAutoCompleteMode;
   if (AutoCompleteMode in [TAutoCompleteMode.acAppend, TAutoCompleteMode.acAppendDropDown]) then
   begin
     case Key of
       VK_UP,
       VK_DOWN:
-        EnableAutoComplete(false);
+        FAutoCompleteEdit.EnableAutoComplete(false);
       else
         if (not (ssCtrl in Shift)) then
-          EnableAutoComplete(true);
+          FAutoCompleteEdit.EnableAutoComplete(true);
     end;
   end;
 
@@ -169,16 +132,19 @@ begin
 end;
 
 procedure TETGuiInplaceEdit.KeyUp(var Key: Word; Shift: TShiftState);
+var
+  AutoCompleteMode: TAutoCompleteMode;
 begin
 
   inherited KeyUp(Key, Shift);
 
+  AutoCompleteMode := FAutoCompleteEdit.GetAutoCompleteMode;
   if (AutoCompleteMode in [TAutoCompleteMode.acAppend, TAutoCompleteMode.acAppendDropDown]) then
   begin
     case Key of
       VK_RETURN,
       VK_ESCAPE:
-        EnableAutoComplete(false);
+        FAutoCompleteEdit.EnableAutoComplete(false);
     end;
   end;
 end;
@@ -192,16 +158,6 @@ begin
   end;
 
   inherited MouseDown(Button, Shift, X, Y);
-end;
-
-procedure TETGuiInplaceEdit.SetSelDirection(ASelDirection: TSelDirection);
-begin
-  FSelDirection := ASelDirection;
-end;
-
-function TETGuiInplaceEdit.GetSelDirection: TSelDirection;
-begin
-  result := FSelDirection;
 end;
 
 constructor TValueListEditor.Create(AOwner: TComponent);
@@ -402,6 +358,15 @@ begin
 
   Strings.Clear;
   Strings.Text := StringOfChar(#10, NewCount);
+end;
+
+// Failsafe if no SelectCell is fired
+procedure TValueListEditor.CMEnter(var Message: TCMEnter);
+begin
+  if (Supports(FInplaceEdit,IAutoCompleteEdit)) then
+    (FInplaceEdit as IAutoCompleteEdit).SetAutoCompleteList(nil);
+
+  inherited;
 end;
 
 end.
