@@ -1,23 +1,32 @@
 object FQuickManager: TFQuickManager
   Left = 0
   Top = 0
-  BorderStyle = bsDialog
+  BorderStyle = bsSizeToolWin
   Caption = 'Workspace manager'
-  ClientHeight = 501
-  ClientWidth = 771
+  ClientHeight = 662
+  ClientWidth = 944
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
   Font.Height = -11
   Font.Name = 'Tahoma'
   Font.Style = []
+  OnClose = FormClose
   OnShow = FormShow
   TextHeight = 13
+  object Splitter1: TSplitter
+    Left = 617
+    Top = 0
+    Height = 608
+    ExplicitLeft = 712
+    ExplicitTop = 152
+    ExplicitHeight = 100
+  end
   object AdvPanel1: TPanel
     Left = 0
     Top = 0
-    Width = 665
-    Height = 482
+    Width = 617
+    Height = 608
     Align = alLeft
     DoubleBuffered = True
     Font.Charset = DEFAULT_CHARSET
@@ -28,122 +37,154 @@ object FQuickManager: TFQuickManager
     ParentDoubleBuffered = False
     ParentFont = False
     TabOrder = 0
-    ExplicitHeight = 481
-    object StringGrid1: TStringGrid
-      Left = 16
-      Top = 8
-      Width = 633
-      Height = 385
+    object SgWorkSpace: TStringGrid
+      Left = 1
+      Top = 36
+      Width = 615
+      Height = 571
+      Align = alClient
       ColCount = 3
       DefaultColWidth = 160
+      FixedCols = 0
       RowCount = 1
       FixedRows = 0
       Options = [goFixedVertLine, goFixedHorzLine, goVertLine, goHorzLine, goDrawFocusSelected, goRowMoving, goRowSelect]
       ScrollBars = ssVertical
-      TabOrder = 0
-      OnSelectCell = StringGrid1SelectCell
-    end
-    object Button1: TButton
-      Left = 16
-      Top = 456
-      Width = 155
-      Height = 25
-      Caption = 'Delete selected line'
       TabOrder = 1
-      OnClick = Button1Click
+      OnSelectCell = SgWorkSpaceSelectCell
+      ExplicitWidth = 608
     end
-    object LabeledEdit1: TLabeledEdit
-      Left = 16
-      Top = 421
-      Width = 155
+    object PnlFuncTop: TPanel
+      Left = 1
+      Top = 1
+      Width = 615
+      Height = 35
+      Align = alTop
+      TabOrder = 0
+      ExplicitWidth = 663
+      object SpbAddTag: TSpeedButton
+        Left = 11
+        Top = 3
+        Width = 100
+        Height = 25
+        Caption = 'Add'
+        OnClick = SpbAddTagClick
+      end
+      object SpbDelTag: TSpeedButton
+        Left = 113
+        Top = 3
+        Width = 100
+        Height = 25
+        Caption = 'Delete'
+        OnClick = SpbDelTagClick
+      end
+    end
+  end
+  object StatusBar1: TStatusBar
+    Left = 0
+    Top = 643
+    Width = 944
+    Height = 19
+    Panels = <>
+    SimplePanel = True
+    ExplicitWidth = 1010
+  end
+  object PnlDetail: TPanel
+    Left = 620
+    Top = 0
+    Width = 324
+    Height = 608
+    Align = alClient
+    Constraints.MinWidth = 300
+    TabOrder = 1
+    OnResize = PnlDetailResize
+    ExplicitLeft = 616
+    ExplicitWidth = 352
+    object EdTagDesc: TLabeledEdit
+      Left = 10
+      Top = 42
+      Width = 300
       Height = 21
       Hint = 
         'Name ending: ['#177' =multi-value tag (Alt+0177)]  [? =Check for tag ' +
         '(Yes/No)]  [* =Fill in value defined in Hint]  [# =Allow numeric' +
         ' editing]'
+      AutoSize = False
       EditLabel.Width = 100
       EditLabel.Height = 13
       EditLabel.Caption = 'Tag name to display:'
       MaxLength = 60
-      TabOrder = 2
+      TabOrder = 0
       Text = ''
+      OnKeyUp = LabeledEditKeyUp
     end
-    object LabeledEdit2: TLabeledEdit
-      Left = 175
-      Top = 421
-      Width = 226
+    object EdTagDef: TLabeledEdit
+      Left = 10
+      Top = 80
+      Width = 300
       Height = 21
       Hint = 
         'Example: [-exif:Artist] or [-xmp-dc:Creator] .. For separator, u' +
         'se [-GUI-SEP] and put caption in Tag name.'
+      AutoSize = False
       EditLabel.Width = 69
       EditLabel.Height = 13
       EditLabel.Caption = 'Tag definition:'
       MaxLength = 120
-      TabOrder = 3
+      TabOrder = 1
       Text = ''
+      OnKeyUp = LabeledEditKeyUp
     end
-    object Button2: TButton
-      Left = 407
-      Top = 456
-      Width = 114
-      Height = 25
-      Caption = 'Save changes'
-      TabOrder = 4
-      OnClick = Button2Click
-    end
-    object Button3: TButton
-      Left = 536
-      Top = 456
-      Width = 113
-      Height = 25
-      Caption = 'Insert into new line'
-      TabOrder = 5
-      OnClick = Button3Click
-    end
-    object LabeledEdit3: TLabeledEdit
-      Left = 407
-      Top = 421
-      Width = 242
+    object EdTagHint: TLabeledEdit
+      Left = 10
+      Top = 125
+      Width = 300
       Height = 21
       Hint = 
         'Used as default (Fill in) tag value in case Tag name ends with *' +
         '.'
+      AutoSize = False
       EditLabel.Width = 46
       EditLabel.Height = 13
       EditLabel.Caption = 'Hint text:'
       MaxLength = 120
-      TabOrder = 6
+      TabOrder = 2
       Text = ''
+      OnKeyUp = LabeledEditKeyUp
     end
   end
-  object Button4: TButton
-    Left = 675
-    Top = 419
-    Width = 83
-    Height = 25
-    Caption = 'Cancel'
-    ModalResult = 2
-    TabOrder = 1
-  end
-  object Button5: TButton
-    Left = 675
-    Top = 456
-    Width = 83
-    Height = 25
-    Caption = 'Save'
-    Default = True
-    TabOrder = 2
-    OnClick = Button5Click
-  end
-  object StatusBar1: TStatusBar
+  object PnlBottom: TPanel
     Left = 0
-    Top = 482
-    Width = 771
-    Height = 19
-    Panels = <>
-    SimplePanel = True
-    ExplicitTop = 481
-    ExplicitWidth = 746
+    Top = 608
+    Width = 944
+    Height = 35
+    Align = alBottom
+    TabOrder = 2
+    ExplicitWidth = 1010
+    DesignSize = (
+      944
+      35)
+    object BtnCancel: TBitBtn
+      Left = 849
+      Top = 3
+      Width = 75
+      Height = 25
+      Anchors = [akRight, akBottom]
+      Kind = bkCancel
+      NumGlyphs = 2
+      TabOrder = 0
+      ExplicitLeft = 915
+    end
+    object BtnOK: TBitBtn
+      Left = 768
+      Top = 4
+      Width = 75
+      Height = 25
+      Anchors = [akRight, akBottom]
+      Kind = bkOK
+      NumGlyphs = 2
+      TabOrder = 1
+      ExplicitLeft = 834
+    end
   end
 end
