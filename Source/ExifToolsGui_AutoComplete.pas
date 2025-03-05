@@ -16,10 +16,10 @@ type
     AcOptions:  word;
     AcString:   string;
     AcList:     TStringList;
-    procedure SetAcList(InAclist: TStringList);
-    procedure SetAcListStr(const [ref] InAclist: string);
-    procedure GetAcList(AList: TStringList);
-    function GetAcListStr: string;
+    procedure SetAcList(const InAclist: TStringList); overload;
+    procedure SetAcList(const InAclist: string); overload;
+    procedure GetAcList(AList: TStrings); overload;
+    function GetAcList: string; overload;
     procedure SetAcOptions(AcMode: TAutoCompleteMode;
                            AutoCorrect: boolean;
                            AutoPopulate: boolean);
@@ -35,7 +35,6 @@ type
 
   TAutoComplete = class(TInterfacedObject, IEnumString)
   private
-    FLines: TStringList;
     FCurrentList: TStringList;
     FAutoCompList: TStringList;
     FAutoComp: TAutoCompRec;
@@ -55,8 +54,6 @@ type
     function InitAutoComplete(EditHandle: HWND): IAutoComplete;
     procedure SetAutoCompOptions(AutoComplete: IAutoComplete;
                                  const [ref] AutoComp: TAutoCompRec);
-    procedure AddHist(ALine: string);
-    property Lines: TStringList read FLines;
   end;
 
   var
@@ -69,27 +66,27 @@ uses
 
 { TAutoCompRec }
 
-procedure TAutoCompRec.SetAcListStr(const [ref] InAcList: string);
+procedure TAutoCompRec.SetAcList(const InAcList: string);
 begin
   AcString := InAcList;
   AcList := nil;
 end;
 
-procedure TAutoCompRec.SetAcList(InAcList: TStringList);
+procedure TAutoCompRec.SetAcList(const InAcList: TStringList);
 begin
   AcList := InAclist;
   AcString := '';
 end;
 
-procedure TAutoCompRec.GetAcList(AList: TStringList);
+procedure TAutoCompRec.GetAcList(AList: TStrings);
 begin
   if Assigned(AcList) then
     Alist.Text := AcList.Text
   else
-    Alist.Text := GetAcListStr;
+    Alist.Text := GetAcList;
 end;
 
-function TAutoCompRec.GetAcListStr: string;
+function TAutoCompRec.GetAcList: string;
 begin
   result := ReplaceAll(AcString, ['/n'], [#10],  [rfReplaceAll]);
 end;
@@ -129,6 +126,7 @@ begin
   AutoPopulate := GetAutoPopulate;
 end;
 
+// Process entered line. Case correction, and auto populating
 function TAutoCompRec.ProcessResult(ALine: string): string;
 var
   AList: TStringList;
@@ -149,16 +147,21 @@ begin
         result := AList[P];
     end;
 
-    if (GetAutoPopulate) and
-       (AcList = nil) then
+    if (GetAutoPopulate) then
     begin
-      AList.Add(result);
-      AcString := ReplaceAll(Alist.Text, [#13#10, #10], ['/n','/n'], [rfReplaceAll]);
+      if(AcList <> nil) then
+        AcList.Add(result)
+      else
+      begin
+        AList.Add(result);
+        AcString := ReplaceAll(Alist.Text, [#13#10, #10], ['/n','/n'], [rfReplaceAll]);
+      end;
     end;
   finally
     AList.Free;
   end;
 end;
+
 { TAutoComplete }
 
 // See Vcl.ComCtrls.pas, for implementation of TAutoComplete
@@ -169,20 +172,15 @@ constructor TAutoComplete.Create;
 begin
   inherited Create;
 
-  FLines := TStringList.Create;
-  FLines.Sorted := true;
-  Flines.Duplicates := TDuplicates.dupIgnore;
-
   FAutoCompList := TStringList.Create;
   FAutoCompList.Sorted := true;
   FAutoCompList.Duplicates := TDuplicates.dupIgnore;
 
-  FCurrentList := Flines;
+  FCurrentList := FAutoCompList;
 end;
 
 destructor TAutoComplete.Destroy;
 begin
-  FLines.Free;
   FAutoCompList.Free;
   inherited Destroy;
 end;
@@ -194,18 +192,10 @@ begin
   FCurrentList := FAutoComp.AcList;
   if not Assigned(FCurrentList) then
   begin
-    FAutoCompList.Text := FAutoComp.GetAcListStr;
-    if (FAutoCompList.Count > 0) then
-      FCurrentList := FAutoCompList
-    else
-      FCurrentList := FLines;
+    FAutoCompList.Text := FAutoComp.GetAcList;
+    FCurrentList := FAutoCompList
   end;
   SetAutoCompleteMode(AutoComplete, FAutoComp.GetAutoCompleteMode);
-end;
-
-procedure TAutoComplete.AddHist(ALine: string);
-begin
-  FLines.Add(ALine);
 end;
 
 function TAutoComplete.Next(celt: Integer; out elt; pceltFetched: PLongint): HRESULT;
@@ -264,6 +254,7 @@ function TAutoComplete.InitAutoComplete(EditHandle: HWND): IAutoComplete;
 begin
   CoCreateInstance(CLSID_AutoComplete, nil, CLSCTX_INPROC_SERVER, IAutoComplete, result);
   result.Init(EditHandle, Self, nil, nil);
+  result.Enable(false); // Default disabled !
 end;
 
 procedure TAutoComplete.SetAutoCompleteMode(AutoComplete: IAutoComplete;
@@ -275,7 +266,7 @@ begin
   if (AutoComplete <> nil) and
      (Supports(AutoComplete, IAutoComplete2, Auto2)) then
   begin
-    Auto2.SetOptions(0);
+    Options := 0;
     case AutoCompleteMode of
       TAutoCompleteMode.acNone:
         Options := ACO_NONE;
@@ -285,13 +276,12 @@ begin
         Options := ACO_AUTOSUGGEST or ACO_USETAB;
       TAutoCompleteMode.acAutoSuggestAppend:
         Options := ACO_AUTOAPPEND or ACO_AUTOSUGGEST or ACO_USETAB;
-      else
-        exit;
     end;
     Auto2.SetOptions(Options);
+    Auto2.Enable(false);  // Default disabled, Enabling must be done manually
   end
   else
-    AutoComplete.Enable(AutoCompleteMode <> TAutoCompleteMode.acNone);
+    AutoComplete.Enable(false);
 end;
 
 initialization

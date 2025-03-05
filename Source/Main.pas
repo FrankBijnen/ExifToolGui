@@ -372,6 +372,7 @@ type
     procedure AutoIncLine(const LineNum: integer; const Advance: boolean = true);
     procedure MarkLineModified(const LineNum: integer);
     procedure InstallAutoComp;
+    procedure SetupWSAutoComp(ARow: integer);
     function ActiveAutoComp(ARow: integer): PAutoCompRec;
     procedure SetGridEditor(const Enable: boolean);
     procedure ShowMetadata;
@@ -672,9 +673,24 @@ begin
   ShowMetadata;
 end;
 
-procedure TFMain.InstallAutoComp;
+procedure TFMain.SetupWSAutoComp(ARow: integer);
+var
+  CurrentAutoComp: PAutoCompRec;
 begin
-  GUIsettings.WSAutoComp.SetAcList(AutoComplete.Lines);
+  CurrentAutoComp := ActiveAutoComp(ARow);
+  if (Supports(MetadataList.InplaceEdit, IAutoCompleteEdit)) then
+    (MetadataList.InplaceEdit as IAutoCompleteEdit).SetAutoCompOptions(CurrentAutoComp^);
+//TODO?    MetadataList.EditorMode := true; //  Ensures text is selected
+  if (Supports(EditQuick, IAutoCompleteEdit)) then
+    (EditQuick as IAutoCompleteEdit).SetAutoCompOptions(CurrentAutoComp^);
+end;
+
+procedure TFMain.InstallAutoComp;
+var
+  GridOptions: TGridOptions;
+begin
+  GUIsettings.WSAutoComp.SetAcList(MetaDatalist.HistoryList);
+  SetupWSAutoComp(MetadataList.Row -1);
 
   GUIsettings.ETDAutoComp.SetAcList(ETdirectCmdList);
   if (Supports(EditETdirect, IAutoCompleteEdit)) then
@@ -684,6 +700,9 @@ end;
 function TFMain.ActiveAutoComp(ARow: integer): PAutoCompRec;
 begin
   result := @GUIsettings.WSAutoComp;
+  if (ARow < Low(QuickTags)) or
+     (ARow > High(QuickTags)) then
+    exit;
   if (QuickTags[ARow].AutoComp.GetAutoCompleteMode <> TAutoCompleteMode.acNone) then
     result := @QuickTags[ARow].AutoComp;
 end;
@@ -1343,7 +1362,6 @@ end;
 procedure TFMain.MetadataListSelectCell(Sender: TObject; ACol, ARow: integer; var CanSelect: boolean);
 var
   EditText: string;
-  CurrentAutoComp: PAutoCompRec;
 begin
   EditQuick.Text := '';
   MemoQuick.Text := '';
@@ -1353,16 +1371,7 @@ begin
   if SpeedBtnQuick.Down and
      not(QuickTags[ARow - 1].NoEdit) then
   begin
-    // Update Autocomplete definitions
-    CurrentAutoComp := ActiveAutoComp(ARow -1);
-    if (Supports(TValueListEditor(Sender).InplaceEdit, IAutoCompleteEdit)) then
-    begin
-      (TValueListEditor(Sender).InplaceEdit as IAutoCompleteEdit).SetAutoCompOptions(CurrentAutoComp^);
-      (TValueListEditor(Sender).InplaceEdit as IAutoCompleteEdit).EnableAutoComplete(false);
-    end;
-    if (Supports(EditQuick, IAutoCompleteEdit)) then
-      (EditQuick as IAutoCompleteEdit).SetAutoCompOptions(CurrentAutoComp^);
-    // Update Autocomplete definitions
+    SetupWSAutoComp(ARow - 1);
 
     if RightStr(TValueListEditor(Sender).Keys[ARow], 1) = #177 then
       EditText := '+'
@@ -1739,13 +1748,16 @@ procedure TFMain.MQuickManagerClick(Sender: TObject);
 var
   Indx: integer;
 begin
+  SetGridEditor(false);
+
   if FQuickManager.ShowModal = mrOK then
   begin
     InstallAutoComp;
-    Indx := FQuickManager.SgWorkSpace.Row + 1;
     if SpeedBtnQuick.Down then
     begin
+      SetGridEditor(true);
       ShowMetadata;
+      Indx := FQuickManager.SgWorkSpace.Row + 1;
       if (MetadataList.RowCount > Indx) then
         MetadataList.Row := Indx;
     end;
@@ -3954,7 +3966,7 @@ begin
           if (QuickTags[E].NoEdit) then
             MetadataList.ItemProps[E].ReadOnly := true
           else
-            AutoComplete.AddHist(ETResult[E]);
+            MetadataList.HistoryList.Add(ETResult[E]);
         end;
       finally
         MetadataList.Strings.EndUpdate;

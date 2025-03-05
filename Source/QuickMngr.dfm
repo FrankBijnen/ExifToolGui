@@ -1,6 +1,7 @@
 object FQuickManager: TFQuickManager
   Left = 0
   Top = 0
+  ActiveControl = SgWorkSpace
   BorderStyle = bsSizeToolWin
   Caption = 'Workspace manager'
   ClientHeight = 662
@@ -63,21 +64,27 @@ object FQuickManager: TFQuickManager
       Align = alTop
       TabOrder = 0
       object GrpDefAutoComplete: TGroupBox
-        Left = 233
-        Top = 1
-        Width = 381
-        Height = 61
+        AlignWithMargins = True
+        Left = 236
+        Top = 2
+        Width = 375
+        Height = 59
+        Margins.Top = 1
+        Margins.Bottom = 1
         Align = alClient
         Caption = 'Default auto complete options'
         TabOrder = 0
         object CmbDefAutoCompleteMode: TComboBox
           AlignWithMargins = True
           Left = 5
-          Top = 18
-          Width = 371
+          Top = 16
+          Width = 365
           Height = 21
+          Margins.Top = 1
+          Margins.Bottom = 1
           Align = alTop
           TabOrder = 0
+          TabStop = False
           Text = 'CmbDefAutoCompleteMode'
           OnChange = CmbDefAutoCompleteModeChange
           Items.Strings = (
@@ -87,10 +94,14 @@ object FQuickManager: TFQuickManager
             'Auto append + suggest')
         end
         object ChkDefAutoCorrect: TCheckBox
-          Left = 2
-          Top = 42
-          Width = 377
+          AlignWithMargins = True
+          Left = 5
+          Top = 39
+          Width = 365
           Height = 17
+          Margins.Top = 1
+          Margins.Bottom = 1
+          TabStop = False
           Align = alTop
           Caption = 'Auto correct'
           TabOrder = 1
