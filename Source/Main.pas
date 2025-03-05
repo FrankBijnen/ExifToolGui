@@ -686,8 +686,6 @@ begin
 end;
 
 procedure TFMain.InstallAutoComp;
-var
-  GridOptions: TGridOptions;
 begin
   GUIsettings.WSAutoComp.SetAcList(MetaDatalist.HistoryList);
   SetupWSAutoComp(MetadataList.Row -1);
@@ -3933,8 +3931,8 @@ begin
       N := Min(N, ETResult.Count - 1);
 
       MetadataList.Strings.BeginUpdate;
-      MetadataList.SetStringsCount(N +1);
       try
+        MetadataList.SetStringsCount(N +1);
         if (ETResult.Count < Length(QuickTags)) and
            (ETResult.Count > 0) then
           MetadataList.Strings.Append(Format('=' + StrWarningOnlyDRes,
