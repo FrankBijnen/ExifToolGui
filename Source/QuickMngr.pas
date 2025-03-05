@@ -28,15 +28,24 @@ type
     Splitter1: TSplitter;
     BtnCancel: TBitBtn;
     BtnOK: TBitBtn;
-    SpbAddTag: TSpeedButton;
-    SpbDelTag: TSpeedButton;
     PnlAutoComplete: TPanel;
-    MemoAutoLines: TMemo;
-    PnlAutoOptions: TPanel;
     PnlQuickTags: TPanel;
     EdTagDesc: TLabeledEdit;
     EdTagDef: TLabeledEdit;
     EdTagHint: TLabeledEdit;
+    PctAutoOptions: TPageControl;
+    TabAutoCompleteOptions: TTabSheet;
+    CmbAutoCompleteMode: TComboBox;
+    ChkAutoPopulate: TCheckBox;
+    ChkAutoCorrect: TCheckBox;
+    GrpCustomList: TGroupBox;
+    MemoAutoLines: TMemo;
+    GrpDefAutoComplete: TGroupBox;
+    PnlAddDel: TPanel;
+    SpbAddTag: TSpeedButton;
+    SpbDelTag: TSpeedButton;
+    CmbDefAutoCompleteMode: TComboBox;
+    ChkDefAutoCorrect: TCheckBox;
     procedure FormShow(Sender: TObject);
     procedure SgWorkSpaceSelectCell(Sender: TObject; ACol, ARow: Integer; var CanSelect: Boolean);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
@@ -46,12 +55,19 @@ type
     procedure EdTagKeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
     procedure MemoAutoLinesKeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
     procedure SgWorkSpaceDrawCell(Sender: TObject; ACol, ARow: LongInt; Rect: TRect; State: TGridDrawState);
+    procedure CmbAutoCompleteModeChange(Sender: TObject);
+    procedure ChkAutoCorrectClick(Sender: TObject);
+    procedure ChkAutoOptionsClick(Sender: TObject);
+    procedure ChkDefAutoCorrectClick(Sender: TObject);
+    procedure CmbDefAutoCompleteModeChange(Sender: TObject);
   private
     { Private declarations }
     procedure DisplayHint(Sender: TObject);
     procedure UpdateButtons;
     procedure UpdateLabels(const ARow: integer);
-    function QuickRec(ARow: Longint): QuickTagRec;
+    procedure SetAutoCompleteOptions;
+    procedure SetDefAutoCompleteOptions;
+    function QuickRec(ARow: Longint): TQuickTagRec;
     procedure SaveSettings;
   public
     { Public declarations }
@@ -64,7 +80,7 @@ implementation
 
 uses
   Vcl.Themes,
-  StrUtils, Main, ExifToolsGUI_Utils, UFrmTagNames;
+  StrUtils, Main, ExifToolsGUI_Utils, UFrmTagNames, ExifToolsGui_AutoComplete;
 
 {$R *.dfm}
 
@@ -124,6 +140,58 @@ begin
 end;
 
 { QuickManager }
+
+procedure TFQuickManager.SetAutoCompleteOptions;
+var
+  AQuickRec: TQuickTagRec;
+begin
+  AQuickRec := QuickRec(SgWorkSpace.Row);
+  if (AQuickRec.NoEdit) then
+    SgWorkSpace.Objects[3, SgWorkSpace.Row] := nil
+  else
+  begin
+    AQuickRec.AutoComp.SetAcOptions(TAutoCompleteMode(CmbAutoCompleteMode.ItemIndex),
+                                    ChkAutoCorrect.Checked,
+                                    ChkAutoPopulate.Checked);
+    SgWorkSpace.Objects[3, SgWorkSpace.Row] := pointer(AQuickRec.AutoComp.AcOptions);
+  end;
+end;
+
+procedure TFQuickManager.SetDefAutoCompleteOptions;
+begin
+  GUIsettings.WSAutoComp.SetAcOptions(TAutoCompleteMode(CmbDefAutoCompleteMode.ItemIndex),
+                                      ChkDefAutoCorrect.Checked,
+                                      false);
+end;
+
+procedure TFQuickManager.ChkAutoCorrectClick(Sender: TObject);
+begin
+  SetAutoCompleteOptions;
+end;
+
+procedure TFQuickManager.ChkAutoOptionsClick(Sender: TObject);
+begin
+  if (TCheckBox(Sender).Tag = 0) then
+    SetAutoCompleteOptions;
+end;
+
+procedure TFQuickManager.ChkDefAutoCorrectClick(Sender: TObject);
+begin
+  GUIsettings.WSAutoComp.SetAcOptions(TAutoCompleteMode(CmbDefAutoCompleteMode.ItemIndex),
+                                                 ChkDefAutoCorrect.Checked,
+                                                 false);
+end;
+
+procedure TFQuickManager.CmbAutoCompleteModeChange(Sender: TObject);
+begin
+  SetAutoCompleteOptions;
+end;
+
+procedure TFQuickManager.CmbDefAutoCompleteModeChange(Sender: TObject);
+begin
+  SetDefAutoCompleteOptions;
+end;
+
 procedure TFQuickManager.DisplayHint(Sender: TObject);
 begin
   StatusBar1.SimpleText := GetShortHint(Application.Hint);
@@ -134,31 +202,40 @@ begin
   SpbDelTag.Enabled := (SgWorkSpace.RowCount > 1);
 end;
 
-function TFQuickManager.QuickRec(ARow: Longint): QuickTagRec;
+function TFQuickManager.QuickRec(ARow: Longint): TQuickTagRec;
 begin
-  result.Caption    := SgWorkSpace.Cells[0, ARow];
-  result.Command    := SgWorkSpace.Cells[1, ARow];
-  result.NoEdit     := (RightStr(result.Caption, 1) = '?') or
-                       (SameText(LeftStr(result.Command, 4), '-GUI'));
-  result.Help       := SgWorkSpace.Cells[2, ARow];
-  result.AcOptions  := word(SgWorkSpace.Objects[3, ARow]);
-  result.AcList     := SgWorkSpace.Cells[3, ARow];
+  result.Caption            := SgWorkSpace.Cells[0, ARow];
+  result.Command            := SgWorkSpace.Cells[1, ARow];
+  result.NoEdit             := (RightStr(result.Caption, 1) = '?') or
+                               (SameText(LeftStr(result.Command, 4), '-GUI'));
+  result.Help               := SgWorkSpace.Cells[2, ARow];
+  result.AutoComp.AcOptions := word(SgWorkSpace.Objects[3, ARow]);
+  result.AutoComp.SetAcListStr(SgWorkSpace.Cells[3, ARow]);
 end;
 
 procedure TFQuickManager.UpdateLabels(const ARow: integer);
 var
-  AQuickRec: QuickTagRec;
+  AQuickRec: TQuickTagRec;
 begin
+  CmbDefAutoCompleteMode.ItemIndex := Ord(GUIsettings.WSAutoComp.GetAutoCompleteMode);
+  ChkDefAutoCorrect.Checked        := GUIsettings.WSAutoComp.GetAutoCorrect;
   AQuickRec := QuickRec(ARow);
 
-  EdTagDesc.Text    := AQuickRec.Caption;
-  EdTagDef.Text     := AQuickRec.Command;
-  EdTagHint.Text    := AQuickRec.Help;
   MemoAutoLines.Lines.BeginUpdate;
+  ChkAutoCorrect.Tag := 1;
+  ChkAutoPopulate.Tag := 1;
   try
-    AQuickRec.GetAcList(MemoAutoLines.Lines);
+    EdTagDesc.Text          := AQuickRec.Caption;
+    EdTagDef.Text           := AQuickRec.Command;
+    EdTagHint.Text          := AQuickRec.Help;
+    CmbAutoCompleteMode.ItemIndex := Ord(AQuickRec.AutoComp.GetAutoCompleteMode);
+    ChkAutoCorrect.Checked  := AQuickRec.AutoComp.GetAutoCorrect;
+    ChkAutoPopulate.Checked := AQuickRec.AutoComp.GetAutoPopulate;
+    MemoAutoLines.Lines.Text:= AQuickRec.AutoComp.GetAcListStr;
   finally
     MemoAutoLines.Lines.EndUpdate;
+    ChkAutoCorrect.Tag := 0;
+    ChkAutoPopulate.Tag := 0;
   end;
 end;
 
@@ -256,14 +333,15 @@ begin
   try
     SgWorkSpace.ColWidths[1] := 220;
     SgWorkSpace.ColWidths[2] := 220;
+    SgWorkSpace.ColWidths[3] := 0;
     SgWorkSpace.RowCount := I;
     for N := 0 to I - 1 do
     begin
       SgWorkSpace.Cells[0, N] := QuickTags[N].Caption;
       SgWorkSpace.Cells[1, N] := QuickTags[N].Command;
       SgWorkSpace.Cells[2, N] := QuickTags[N].Help;
-      SgWorkSpace.Cells[3, N] := QuickTags[N].AcList;
-      SgWorkSpace.Objects[3, N] := pointer(QuickTags[N].AcOptions);
+      SgWorkSpace.Cells[3, N] := QuickTags[N].AutoComp.AcString;
+      SgWorkSpace.Objects[3, N] := pointer(QuickTags[N].AutoComp.AcOptions);
     end;
     SgWorkSpace.Row := X;
   finally

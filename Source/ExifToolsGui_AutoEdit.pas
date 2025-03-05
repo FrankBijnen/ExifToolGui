@@ -29,25 +29,22 @@ type
 
   IAutoCompleteEdit = interface
     [IID_AutoCompleteEdit]
+    procedure InstallAutoComplete(AHandle: HWND);
     procedure EnableAutoComplete(Enable: boolean);
-    procedure SetAutoComplete(AHandle: HWND);
-    procedure SetAutoCompleteMode(Value: TAutoCompleteMode);
-    procedure SetAutoCompleteList; overload;
-    procedure SetAutoCompleteList(const [ref] Value: TStringList); overload;
+    procedure UpdateAutoComplete;
+    procedure SetAutoCompOptions(const [ref] Value: TAutoCompRec);
     function GetAutoCompleteMode: TAutoCompleteMode;
   end;
 
   TAutoCompleteEdit = class(TInterfacedObject, IAutoCompleteEdit)
     IAutoComplete: IAutoComplete;
     FHandle: HWND;
-    FAutoCompleteMode: TAutoCompleteMode;
-    FAutoCompleteList: TStringList;
     FEnableAutoComplete: boolean;
+    FAutoComp: TAutoCompRec;
+    procedure InstallAutoComplete(AHandle: HWND);
     procedure EnableAutoComplete(Enable: boolean);
-    procedure SetAutoComplete(AHandle: HWND);
-    procedure SetAutoCompleteMode(Value: TAutoCompleteMode);
-    procedure SetAutoCompleteList; overload;
-    procedure SetAutoCompleteList(const [ref] Value: TStringList); overload;
+    procedure UpdateAutoComplete;
+    procedure SetAutoCompOptions(const [ref] Value: TAutoCompRec);
     function GetAutoCompleteMode: TAutoCompleteMode;
   public
     constructor Create;
@@ -75,7 +72,7 @@ type
     property AutoCompleteEdit: IAutoCompleteEdit read FAutoCompleteEdit implements IAutoCompleteEdit;
   end;
 
-  TlabeledEdit = class(Vcl.ExtCtrls.TlabeledEdit, IWordSelEdit, IAutoCompleteEdit)
+  TLabeledEdit = class(Vcl.ExtCtrls.TLabeledEdit, IWordSelEdit, IAutoCompleteEdit)
   private
     FWordSelEdit: IWordSelEdit;
     FAutoCompleteEdit: IAutoCompleteEdit;
@@ -198,10 +195,11 @@ begin
   inherited Create;
 
   FHandle := 0;
-  FAutoCompleteMode := TAutoCompleteMode.acNone;
   IAutoComplete := nil;
+  FAutoComp.AcOptions := 0;
+  FAutoComp.AcList := nil;
+  FAutoComp.AcString := '';
   FEnableAutoComplete := false;
-  FAutoCompleteList := nil;
 end;
 
 destructor TAutoCompleteEdit.Destroy;
@@ -222,41 +220,38 @@ begin
   end;
 end;
 
-procedure TAutoCompleteEdit.SetAutoComplete(AHandle: HWND);
+procedure TAutoCompleteEdit.InstallAutoComplete(AHandle: HWND);
 begin
   if (AHandle <> 0) then
   begin
     FHandle := AHandle;
     IAutoComplete := AutoComplete.InitAutoComplete(FHandle);
-    AutoComplete.SetAutoCompleteMode(IAutoComplete, FAutoCompleteMode);
+    IAutoComplete.Enable(FEnableAutoComplete);
   end;
 end;
 
-procedure TAutoCompleteEdit.SetAutoCompleteMode(Value: TAutoCompleteMode);
+procedure TAutoCompleteEdit.UpdateAutoComplete;
+var
+  Enable: boolean;
 begin
-  if (IAutoComplete <> nil) and
-     (FAutoCompleteMode <> Value) then
+  if (IAutoComplete <> nil) then
   begin
-    FAutoCompleteMode := Value;
-    AutoComplete.SetAutoCompleteMode(IAutoComplete, FAutoCompleteMode);
-    EnableAutoComplete(FAutoCompleteMode <> TAutoCompleteMode.acNone);
+    EnableAutoComplete(false);
+    Enable := FAutoComp.GetAutoCompleteMode <> TAutoCompleteMode.acNone;
+    AutoComplete.SetAutoCompOptions(IAutoComplete, FAutoComp);
+    EnableAutoComplete(Enable);
   end;
 end;
 
-procedure TAutoCompleteEdit.SetAutoCompleteList(const [ref] Value: TStringList);
+procedure TAutoCompleteEdit.SetAutoCompOptions(const [ref] Value: TAutoCompRec);
 begin
-  FAutoCompleteList := Value;
-  SetAutoCompleteList;
-end;
-
-procedure TAutoCompleteEdit.SetAutoCompleteList;
-begin
-  AutoComplete.SetLines(FAutoCompleteList);
+  FAutoComp := Value;
+  UpdateAutoComplete;
 end;
 
 function TAutoCompleteEdit.GetAutoCompleteMode: TAutoCompleteMode;
 begin
-  result := FAutoCompleteMode;
+  result := FAutoComp.GetAutoCompleteMode;
 end;
 
 { TMemo }
@@ -267,22 +262,22 @@ begin
 end;
 
 { TlabeledEdit }
- constructor TlabeledEdit.Create(AOwner: TComponent);
+ constructor TLabeledEdit.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
   FWordSelEdit := TWordSelEdit.Create;
   FAutoCompleteEdit := TAutoCompleteEdit.Create;
 end;
 
-procedure TlabeledEdit.CreateWnd;
+procedure TLabeledEdit.CreateWnd;
 begin
   inherited CreateWnd;
-  FAutoCompleteEdit.SetAutoComplete(Handle);
+  FAutoCompleteEdit.InstallAutoComplete(Handle);
 end;
 
-procedure TlabeledEdit.CMEnter(var Message: TCMEnter);
+procedure TLabeledEdit.CMEnter(var Message: TCMEnter);
 begin
-  FAutoCompleteEdit.SetAutoCompleteList;
+  FAutoCompleteEdit.UpdateAutoComplete;
 
   inherited;
 end;
@@ -298,12 +293,12 @@ end;
 procedure TEdit.CreateWnd;
 begin
   inherited CreateWnd;
-  FAutoCompleteEdit.SetAutoComplete(Handle);
+  FAutoCompleteEdit.InstallAutoComplete(Handle);
 end;
 
 procedure TEdit.CMEnter(var Message: TCMEnter);
 begin
-  FAutoCompleteEdit.SetAutoCompleteList;
+  FAutoCompleteEdit.UpdateAutoComplete;
 
   inherited;
 end;

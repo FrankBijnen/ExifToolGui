@@ -208,7 +208,6 @@ type
     QuickPopUp_CopyTag: TMenuItem;
     N3: TMenuItem;
     QuickPopUp_InsertETDirect: TMenuItem;
-    CmbAutoComplete: TComboBox;
     MaExportSettings: TAction;
     MaImportSettings: TAction;
     procedure ShellListClick(Sender: TObject);
@@ -372,6 +371,8 @@ type
     procedure SetCaption(AnItem: string = '');
     procedure AutoIncLine(const LineNum: integer; const Advance: boolean = true);
     procedure MarkLineModified(const LineNum: integer);
+    procedure InstallAutoComp;
+    function ActiveAutoComp(ARow: integer): PAutoCompRec;
     procedure SetGridEditor(const Enable: boolean);
     procedure ShowMetadata;
     procedure ShowPreview;
@@ -671,13 +672,30 @@ begin
   ShowMetadata;
 end;
 
+procedure TFMain.InstallAutoComp;
+begin
+  GUIsettings.WSAutoComp.SetAcList(AutoComplete.Lines);
+
+  GUIsettings.ETDAutoComp.SetAcList(ETdirectCmdList);
+  if (Supports(EditETdirect, IAutoCompleteEdit)) then
+    (EditETdirect as IAutoCompleteEdit).SetAutoCompOptions(GUIsettings.ETDAutoComp);
+end;
+
+function TFMain.ActiveAutoComp(ARow: integer): PAutoCompRec;
+begin
+  result := @GUIsettings.WSAutoComp;
+  if (QuickTags[ARow].AutoComp.GetAutoCompleteMode <> TAutoCompleteMode.acNone) then
+    result := @QuickTags[ARow].AutoComp;
+end;
+
 procedure TFMain.BtnETdirectAddClick(Sender: TObject);
 begin
   EditETdirect.Text := Trim(EditETdirect.Text);
   ETdirectCmdList.Append(EditETdirect.Text); // store command
   EditETcmdName.Text := trim(EditETcmdName.Text);
   CBoxETdirect.ItemIndex := CBoxETdirect.Items.Add(EditETcmdName.Text);
-  // store name
+  if (Supports(EditETdirect, IAutoCompleteEdit)) then
+    (EditETdirect as IAutoCompleteEdit).UpdateAutoComplete;
   CBoxETdirectChange(Sender);
 end;
 
@@ -692,6 +710,8 @@ begin
   EditETcmdName.Text := '';
   EditETcmdName.Modified := false;
   EditETdirect.Modified := true;
+  if (Supports(EditETdirect, IAutoCompleteEdit)) then
+    (EditETdirect as IAutoCompleteEdit).UpdateAutoComplete;
   CBoxETdirectChange(Sender);
 end;
 
@@ -706,6 +726,8 @@ begin
   EditETcmdName.Text := Trim(EditETcmdName.Text);
   CBoxETdirect.Items[Indx] := EditETcmdName.Text;
   CBoxETdirect.ItemIndex := Indx;
+  if (Supports(EditETdirect, IAutoCompleteEdit)) then
+    (EditETdirect as IAutoCompleteEdit).UpdateAutoComplete;
   CBoxETdirectChange(Sender);
 end;
 
@@ -1150,6 +1172,7 @@ procedure TFMain.MetadataListKeyDown(Sender: TObject; var Key: Word; Shift: TShi
 var
   CurrentLine: integer;
   InplaceEdit: TETGuiInplaceEdit;
+  CurrentAutoComp: PAutoCompRec;
 begin
   if (SpeedBtnQuick.Down = false) then
     exit;
@@ -1177,10 +1200,13 @@ begin
       begin
         if (EditLineActive) then
         begin
-          AutoComplete.AddHist(MetadataList.Cells[1, CurrentLine]);
+          if (MetadataList.InplaceEdit.Modified) then
+          begin
+            CurrentAutoComp := ActiveAutoComp(CurrentLine -1);
+            MetadataList.Cells[1, CurrentLine] := CurrentAutoComp.ProcessResult(MetadataList.InplaceEdit.Text);
+          end;
           AutoIncLine(CurrentLine);
-          if (MetadataList.EditorMode = false) then
-            MetadataList.EditorMode := true;
+          MetadataList.EditorMode := true; //  Ensures text is selected
         end
         else
         begin
@@ -1317,6 +1343,7 @@ end;
 procedure TFMain.MetadataListSelectCell(Sender: TObject; ACol, ARow: integer; var CanSelect: boolean);
 var
   EditText: string;
+  CurrentAutoComp: PAutoCompRec;
 begin
   EditQuick.Text := '';
   MemoQuick.Text := '';
@@ -1326,8 +1353,16 @@ begin
   if SpeedBtnQuick.Down and
      not(QuickTags[ARow - 1].NoEdit) then
   begin
+    // Update Autocomplete definitions
+    CurrentAutoComp := ActiveAutoComp(ARow -1);
     if (Supports(TValueListEditor(Sender).InplaceEdit, IAutoCompleteEdit)) then
-      (TValueListEditor(Sender).InplaceEdit as IAutoCompleteEdit).SetAutoCompleteList(nil);
+    begin
+      (TValueListEditor(Sender).InplaceEdit as IAutoCompleteEdit).SetAutoCompOptions(CurrentAutoComp^);
+      (TValueListEditor(Sender).InplaceEdit as IAutoCompleteEdit).EnableAutoComplete(false);
+    end;
+    if (Supports(EditQuick, IAutoCompleteEdit)) then
+      (EditQuick as IAutoCompleteEdit).SetAutoCompOptions(CurrentAutoComp^);
+    // Update Autocomplete definitions
 
     if RightStr(TValueListEditor(Sender).Keys[ARow], 1) = #177 then
       EditText := '+'
@@ -1685,6 +1720,7 @@ procedure TFMain.MPreferencesClick(Sender: TObject);
 begin
   if FPreferences.ShowModal = mrOK then
   begin
+    InstallAutoComp;
     ET.OpenExit(true); // Force restart of ExifTool. CustomConfig could have changed
     EnableMenus(ET.StayOpen(ShellList.Path)); // Recheck Exiftool.exe.
     SetGridEditor(SpeedBtnQuick.Down);
@@ -1705,6 +1741,7 @@ var
 begin
   if FQuickManager.ShowModal = mrOK then
   begin
+    InstallAutoComp;
     Indx := FQuickManager.SgWorkSpace.Row + 1;
     if SpeedBtnQuick.Down then
     begin
@@ -2536,6 +2573,7 @@ end;
 procedure TFMain.EditQuickKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
 var
   Index: integer;
+  CurrentAutoComp: PAutoCompRec;
 begin
   Index := MetadataList.Row;
   if (ssCtrl in Shift) then
@@ -2563,10 +2601,12 @@ begin
     begin
       if (QuickTags[Index - 1].NoEdit = false) then
       begin
-        MetadataList.Cells[1, Index] := Trim(TEdit(Sender).Text);
-        AutoComplete.AddHist(MetadataList.Cells[1, Index]);
         if TEdit(Sender).Modified then
+        begin
+          CurrentAutoComp := ActiveAutoComp(Index -1);
+          MetadataList.Cells[1, Index] := CurrentAutoComp.ProcessResult(Trim(TEdit(Sender).Text));
           MarkLineModified(Index);
+        end;
         MetadataList.Refresh;
         MetadataList.SetFocus;
         SpeedBtnQuickSave.Enabled := true;
@@ -3258,6 +3298,8 @@ begin
     end
   end;
 
+  InstallAutoComp;
+
   SetGridEditor(SpeedBtnQuick.Down);
   if (ShellList.ItemIndex < 0) then
     ShellTree.SetFocus  // No files available to focus.
@@ -3818,14 +3860,12 @@ const
   Margin = 100;
 var
   GridOptions: TGridOptions;
-  AutoCompleteMode: TAutoCompleteMode;
 begin
   EditLineActive := false;
   GridOptions := MetadataList.Options;
   Exclude(GridOptions, goEditing);
   Exclude(GridOptions, goAlwaysShowEditor);
   Include(GridOptions, goRowSelect);
-  AutoCompleteMode := TAutoCompleteMode(CmbAutoComplete.ItemIndex);
   if GUIsettings.EditLine and
      Enable then
   begin
@@ -3835,18 +3875,6 @@ begin
     Include(GridOptions, goAlwaysShowEditor);
   end;
   MetadataList.Options := GridOptions;
-
-  if (Supports(MetadataList.InplaceEdit, IAutoCompleteEdit)) then
-    (MetadataList.InplaceEdit as IAutoCompleteEdit).SetAutoCompleteMode(AutoCompleteMode);
-
-  if (Supports(EditQuick, IAutoCompleteEdit)) then
-    (EditQuick as IAutoCompleteEdit).SetAutoCompleteMode(AutoCompleteMode);
-
-  if (Supports(EditETdirect, IAutoCompleteEdit)) then
-  begin
-    (EditETdirect as IAutoCompleteEdit).SetAutoCompleteMode(AutoCompleteMode);
-    (EditETdirect as IAutoCompleteEdit).SetAutoCompleteList(ETdirectCmdList);
-  end;
 
   if (MetadataList.ColWidths[0] > MetadataList.ClientWidth - Margin) then
     MetadataList.ColWidths[0] := MetadataList.ClientWidth - Margin;

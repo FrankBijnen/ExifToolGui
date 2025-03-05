@@ -39,9 +39,9 @@ object FQuickManager: TFQuickManager
     TabOrder = 0
     object SgWorkSpace: TStringGrid
       Left = 1
-      Top = 36
+      Top = 64
       Width = 615
-      Height = 571
+      Height = 543
       Align = alClient
       ColCount = 4
       DefaultColWidth = 160
@@ -59,24 +59,67 @@ object FQuickManager: TFQuickManager
       Left = 1
       Top = 1
       Width = 615
-      Height = 35
+      Height = 63
       Align = alTop
       TabOrder = 0
-      object SpbAddTag: TSpeedButton
-        Left = 11
-        Top = 3
-        Width = 100
-        Height = 25
-        Caption = 'Add'
-        OnClick = SpbAddTagClick
+      object GrpDefAutoComplete: TGroupBox
+        Left = 233
+        Top = 1
+        Width = 381
+        Height = 61
+        Align = alClient
+        Caption = 'Default auto complete options'
+        TabOrder = 0
+        object CmbDefAutoCompleteMode: TComboBox
+          AlignWithMargins = True
+          Left = 5
+          Top = 18
+          Width = 371
+          Height = 21
+          Align = alTop
+          TabOrder = 0
+          Text = 'CmbDefAutoCompleteMode'
+          OnChange = CmbDefAutoCompleteModeChange
+          Items.Strings = (
+            'None'
+            'Auto append'
+            'Auto suggest'
+            'Auto append + suggest')
+        end
+        object ChkDefAutoCorrect: TCheckBox
+          Left = 2
+          Top = 42
+          Width = 377
+          Height = 17
+          Align = alTop
+          Caption = 'Auto correct'
+          TabOrder = 1
+          OnClick = ChkDefAutoCorrectClick
+        end
       end
-      object SpbDelTag: TSpeedButton
-        Left = 113
-        Top = 3
-        Width = 100
-        Height = 25
-        Caption = 'Delete'
-        OnClick = SpbDelTagClick
+      object PnlAddDel: TPanel
+        Left = 1
+        Top = 1
+        Width = 232
+        Height = 61
+        Align = alLeft
+        TabOrder = 1
+        object SpbAddTag: TSpeedButton
+          Left = 5
+          Top = 29
+          Width = 100
+          Height = 25
+          Caption = 'Add'
+          OnClick = SpbAddTagClick
+        end
+        object SpbDelTag: TSpeedButton
+          Left = 111
+          Top = 29
+          Width = 100
+          Height = 25
+          Caption = 'Delete'
+          OnClick = SpbDelTagClick
+        end
       end
     end
   end
@@ -104,33 +147,75 @@ object FQuickManager: TFQuickManager
       Height = 438
       Align = alClient
       TabOrder = 0
-      ExplicitTop = 224
-      ExplicitHeight = 383
-      object MemoAutoLines: TMemo
-        AlignWithMargins = True
-        Left = 16
-        Top = 96
-        Width = 290
-        Height = 338
-        Margins.Left = 15
-        Margins.Top = 15
-        Margins.Right = 15
-        Align = alClient
-        Lines.Strings = (
-          'Memo1')
-        TabOrder = 0
-        OnKeyUp = MemoAutoLinesKeyUp
-        ExplicitTop = 62
-        ExplicitWidth = 289
-        ExplicitHeight = 321
-      end
-      object PnlAutoOptions: TPanel
+      object PctAutoOptions: TPageControl
         Left = 1
         Top = 1
         Width = 320
-        Height = 80
+        Height = 96
+        ActivePage = TabAutoCompleteOptions
         Align = alTop
+        TabOrder = 0
+        object TabAutoCompleteOptions: TTabSheet
+          Caption = 'Auto complete options'
+          object CmbAutoCompleteMode: TComboBox
+            AlignWithMargins = True
+            Left = 3
+            Top = 3
+            Width = 306
+            Height = 21
+            Align = alTop
+            TabOrder = 0
+            Text = 'CmbAutoCompleteMode'
+            OnChange = CmbAutoCompleteModeChange
+            Items.Strings = (
+              'None'
+              'Auto append'
+              'Auto suggest'
+              'Auto append + suggest')
+          end
+          object ChkAutoPopulate: TCheckBox
+            Left = 0
+            Top = 44
+            Width = 312
+            Height = 17
+            Align = alTop
+            Caption = 'Auto populate'
+            TabOrder = 2
+            OnClick = ChkAutoOptionsClick
+          end
+          object ChkAutoCorrect: TCheckBox
+            Left = 0
+            Top = 27
+            Width = 312
+            Height = 17
+            Align = alTop
+            Caption = 'Auto correct'
+            TabOrder = 1
+            OnClick = ChkAutoOptionsClick
+          end
+        end
+      end
+      object GrpCustomList: TGroupBox
+        Left = 1
+        Top = 97
+        Width = 320
+        Height = 340
+        Align = alClient
+        Caption = 'Custom list'
         TabOrder = 1
+        object MemoAutoLines: TMemo
+          AlignWithMargins = True
+          Left = 17
+          Top = 30
+          Width = 286
+          Height = 305
+          Margins.Left = 15
+          Margins.Top = 15
+          Margins.Right = 15
+          Align = alClient
+          TabOrder = 0
+          OnKeyUp = MemoAutoLinesKeyUp
+        end
       end
     end
     object PnlQuickTags: TPanel
