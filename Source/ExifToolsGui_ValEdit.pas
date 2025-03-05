@@ -335,6 +335,9 @@ begin
   if (Strings.Count = NewCount) then
     exit;
 
+  if (NewCount < FixedRows) then
+    NewCount := FixedRows;
+
   if (Row > NewCount) then
   begin
     Row := NewCount;
