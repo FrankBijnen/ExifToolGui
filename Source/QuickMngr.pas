@@ -161,7 +161,7 @@ procedure TFQuickManager.SetDefAutoCompleteOptions;
 begin
   GUIsettings.WSAutoComp.SetAcOptions(TAutoCompleteMode(CmbDefAutoCompleteMode.ItemIndex),
                                       ChkDefAutoCorrect.Checked,
-                                      false);
+                                      true);
 end;
 
 procedure TFQuickManager.ChkAutoCorrectClick(Sender: TObject);
@@ -177,9 +177,7 @@ end;
 
 procedure TFQuickManager.ChkDefAutoCorrectClick(Sender: TObject);
 begin
-  GUIsettings.WSAutoComp.SetAcOptions(TAutoCompleteMode(CmbDefAutoCompleteMode.ItemIndex),
-                                                 ChkDefAutoCorrect.Checked,
-                                                 false);
+  SetDefAutoCompleteOptions;
 end;
 
 procedure TFQuickManager.CmbAutoCompleteModeChange(Sender: TObject);
@@ -210,7 +208,7 @@ begin
                                (SameText(LeftStr(result.Command, 4), '-GUI'));
   result.Help               := SgWorkSpace.Cells[2, ARow];
   result.AutoComp.AcOptions := word(SgWorkSpace.Objects[3, ARow]);
-  result.AutoComp.SetAcListStr(SgWorkSpace.Cells[3, ARow]);
+  result.AutoComp.SetAcList(SgWorkSpace.Cells[3, ARow]);
 end;
 
 procedure TFQuickManager.UpdateLabels(const ARow: integer);
@@ -231,7 +229,7 @@ begin
     CmbAutoCompleteMode.ItemIndex := Ord(AQuickRec.AutoComp.GetAutoCompleteMode);
     ChkAutoCorrect.Checked  := AQuickRec.AutoComp.GetAutoCorrect;
     ChkAutoPopulate.Checked := AQuickRec.AutoComp.GetAutoPopulate;
-    MemoAutoLines.Lines.Text:= AQuickRec.AutoComp.GetAcListStr;
+    AQuickRec.AutoComp.GetAcList(MemoAutoLines.Lines);
   finally
     MemoAutoLines.Lines.EndUpdate;
     ChkAutoCorrect.Tag := 0;

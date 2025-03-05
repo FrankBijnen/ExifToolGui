@@ -338,7 +338,7 @@ begin
   QuickTags[AIndex].Command   := Trim(ACommand);
   QuickTags[AIndex].Help      := AHelp;
   QuickTags[AIndex].AutoComp.AcOptions := AOptions;
-  QuickTags[AIndex].AutoComp.SetAcListStr(AcList);
+  QuickTags[AIndex].AutoComp.SetAcList(AcList);
   // Set NoEdit
   QuickTags[AIndex].NoEdit    := (RightStr(ACaption, 1) = '?');
   QuickTags[AIndex].NoEdit    := QuickTags[result -1].NoEdit or

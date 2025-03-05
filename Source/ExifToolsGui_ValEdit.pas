@@ -38,6 +38,7 @@ type
     FOnCtrlKeyDown: TkeyEvent;
     FInplaceEdit: TETGuiInplaceEdit;
     FEditRow: integer;
+    FHistoryList: TStringList;
   protected
     procedure SetEditText(ACol, ARow: Longint; const Value: string); override;
     function CreateEditor: TInplaceEdit; override;
@@ -60,6 +61,7 @@ type
     property FixedRows;
     property InplaceEdit: TETGuiInplaceEdit read FInplaceEdit;
     property EditRow: integer read FEditRow;
+    property HistoryList: TStringList read FHistoryList;
   end;
 
 implementation
@@ -148,10 +150,14 @@ begin
   FProportionalVScroll := false;
   FDataRows := 0;
   FRowsPossible := 0;
+  FHistoryList := TStringList.Create;
+  FHistoryList.Sorted := true;
+  FHistoryList.Duplicates := TDuplicates.dupIgnore;
 end;
 
 destructor TValueListEditor.Destroy;
 begin
+  FHistoryList.Free;
   inherited Destroy;
 end;
 

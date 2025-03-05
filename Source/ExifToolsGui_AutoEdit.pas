@@ -38,8 +38,8 @@ type
 
   TAutoCompleteEdit = class(TInterfacedObject, IAutoCompleteEdit)
     IAutoComplete: IAutoComplete;
+    FEnabled: boolean;
     FHandle: HWND;
-    FEnableAutoComplete: boolean;
     FAutoComp: TAutoCompRec;
     procedure InstallAutoComplete(AHandle: HWND);
     procedure EnableAutoComplete(Enable: boolean);
@@ -199,7 +199,7 @@ begin
   FAutoComp.AcOptions := 0;
   FAutoComp.AcList := nil;
   FAutoComp.AcString := '';
-  FEnableAutoComplete := false;
+  FEnabled := false;
 end;
 
 destructor TAutoCompleteEdit.Destroy;
@@ -212,12 +212,16 @@ end;
 
 procedure TAutoCompleteEdit.EnableAutoComplete(Enable: boolean);
 begin
-  if (FEnableAutoComplete <> Enable) then
+  if (IAutoComplete <> nil) then
   begin
-    FEnableAutoComplete := Enable;
-    if (IAutoComplete <> nil) then
-      IAutoComplete.Enable(FEnableAutoComplete);
-  end;
+    if (FEnabled <> Enable) then
+    begin
+      FEnabled := Enable;
+      IAutoComplete.Enable(FEnabled);
+    end;
+  end
+  else
+    FEnabled := false;
 end;
 
 procedure TAutoCompleteEdit.InstallAutoComplete(AHandle: HWND);
@@ -226,21 +230,15 @@ begin
   begin
     FHandle := AHandle;
     IAutoComplete := AutoComplete.InitAutoComplete(FHandle);
-    IAutoComplete.Enable(FEnableAutoComplete);
+    FEnabled := false;
   end;
 end;
 
 procedure TAutoCompleteEdit.UpdateAutoComplete;
-var
-  Enable: boolean;
 begin
   if (IAutoComplete <> nil) then
-  begin
-    EnableAutoComplete(false);
-    Enable := FAutoComp.GetAutoCompleteMode <> TAutoCompleteMode.acNone;
     AutoComplete.SetAutoCompOptions(IAutoComplete, FAutoComp);
-    EnableAutoComplete(Enable);
-  end;
+  FEnabled := false;
 end;
 
 procedure TAutoCompleteEdit.SetAutoCompOptions(const [ref] Value: TAutoCompRec);
@@ -278,6 +276,7 @@ end;
 procedure TLabeledEdit.CMEnter(var Message: TCMEnter);
 begin
   FAutoCompleteEdit.UpdateAutoComplete;
+  FAutoCompleteEdit.EnableAutoComplete(FAutoCompleteEdit.GetAutoCompleteMode <> acNone);
 
   inherited;
 end;
@@ -299,6 +298,7 @@ end;
 procedure TEdit.CMEnter(var Message: TCMEnter);
 begin
   FAutoCompleteEdit.UpdateAutoComplete;
+  FAutoCompleteEdit.EnableAutoComplete(FAutoCompleteEdit.GetAutoCompleteMode <> acNone);
 
   inherited;
 end;
