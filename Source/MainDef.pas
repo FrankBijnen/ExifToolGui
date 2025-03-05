@@ -3,7 +3,8 @@ unit MainDef;
 interface
 
 uses
-  System.Classes, Winapi.Windows, Vcl.Dialogs, Vcl.ComCtrls, ExifTool, GEOMap, UnitLangResources, UnitScaleForm;
+  System.Classes, Winapi.Windows, Vcl.Dialogs, Vcl.ComCtrls, ExifTool, GEOMap, UnitLangResources, UnitScaleForm,
+  ExifToolsGui_AutoComplete;
 
 const
 
@@ -127,6 +128,8 @@ type
     ShowBalloon: boolean;
     AllowNonMSWicCodec: boolean;
     SelIniData: TSelIniData;
+    ETDAutoComp: TAutoCompRec;
+    WSAutoComp: TAutoCompRec;
     function FileFilter: string;
     function SaveFileFilter: string;
     function CanShowHidden: boolean;
@@ -134,31 +137,20 @@ type
     function Fast3(const FileExt: string): string;
   end;
 
-const
-  acAutoCorrect         = $0010;
-  acAutoPopulate        = $0020;
-
 type
-  TAcMode = (acNone = $0000, acAutoAppend = $0001, acAutoSuggest = $0002, acAutoSuggestAppend = $0003);
-
-  QuickTagRec = record
+  TQuickTagRec = record
     Caption:    string;
     Command:    string;
     Help:       string;
     NoEdit:     boolean;
-    AcOptions:  word;
-    AcList:     string;
-    procedure SetAcList(InAclist: TStrings);
-    procedure GetAcList(OutAcList: TStrings);
-    procedure SetAcOptions(AcMode: TAcMode; AutoCorrect: boolean; AutoPopulate: boolean);
-    procedure GetAcOptions(var AcMode: TAcMode; var AutoCorrect: boolean; var AutoPopulate: boolean);
+    AutoComp:   TAutoCompRec;
   end;
 
 var
-
   GUIsettings: GUIsettingsRec;
   ETdirectCmdList: TStringList;
-  QuickTags: array of QuickTagRec;
+
+  QuickTags: array of TQuickTagRec;
   MarkedTagList: string;
   CustomViewTagList: string;
   GpsXmpDir: string = '';
@@ -330,32 +322,6 @@ begin
     result := '-fast3' + CRLF;
 end;
 
-procedure QuickTagRec.SetAcList(InAcList: TStrings);
-begin
-  AcList := ReplaceAll(InAcList.Text, [#10], ['/n'], [rfReplaceAll]);
-end;
-
-procedure QuickTagRec.GetAcList(OutAcList: TStrings);
-begin
-  OutAcList.Text := ReplaceAll(AcList, ['/n'], [#10], [rfReplaceAll]);
-end;
-
-procedure QuickTagRec.SetAcOptions(AcMode: TAcMode; AutoCorrect: boolean; AutoPopulate: boolean);
-begin
-  AcOptions := Ord(AcMode);
-  if (AutoCorrect) then
-    AcOptions := AcOptions + acAutoCorrect;
-  if (AutoPopulate) then
-    AcOptions := AcOptions + acAutoPopulate;
-end;
-
-procedure QuickTagRec.GetAcOptions(var AcMode: TAcMode; var AutoCorrect: boolean; var AutoPopulate: boolean);
-begin
-  AcMode := TAcMode(AcOptions and $0f);
-  AutoCorrect := (AcOptions and acAutoCorrect) = acAutoCorrect;
-  AutoPopulate := (AcOptions and acAutoPopulate) = acAutoPopulate;
-end;
-
 function SetQuickTag(const AIndex: integer;
                      const ACaption, ACommand: string;
                      const AHelp: string = '';
@@ -371,8 +337,8 @@ begin
   QuickTags[AIndex].Caption   := ACaption;
   QuickTags[AIndex].Command   := Trim(ACommand);
   QuickTags[AIndex].Help      := AHelp;
-  QuickTags[AIndex].AcOptions := AOptions;
-  QuickTags[AIndex].AcList    := AcList;
+  QuickTags[AIndex].AutoComp.AcOptions := AOptions;
+  QuickTags[AIndex].AutoComp.SetAcListStr(AcList);
   // Set NoEdit
   QuickTags[AIndex].NoEdit    := (RightStr(ACaption, 1) = '?');
   QuickTags[AIndex].NoEdit    := QuickTags[result -1].NoEdit or
@@ -389,6 +355,9 @@ var
 begin
   TmpItems := TStringList.Create;
   try
+    GUIsettings.WSAutoComp.AcOptions := GUIini.ReadInteger('WorkSpaceAutoComplete',
+                                                           'Options',
+                                                           Ord(TAutoCompleteMode.acAutoSuggestAppend) + acAutoCorrect + acAutoPopulate);
     GUIini.ReadSectionValues(WorkSpaceTags, TmpItems);
     WSCnt := TmpItems.Count;
     result := WSCnt;
@@ -459,6 +428,9 @@ function ReadETdirectCmds(CbETDirect: TComboBox; GUIini: TMemIniFile): integer;
 var
   Indx, ETcnt: integer;
 begin
+  GUIsettings.ETDAutoComp.AcOptions := GUIini.ReadInteger('ETDirectAutoComplete',
+                                                          'Options',
+                                                          Ord(TAutoCompleteMode.acAutoSuggestAppend) + acAutoCorrect);
 
   ETdirectCmdList.Clear;
   GUIini.ReadSection(ETDirectCmd, CbETDirect.Items);
@@ -617,6 +589,10 @@ var
 begin
   TmpItems := TStringList.Create;
   try
+    GUIini.WriteInteger('WorkSpaceAutoComplete',
+                        'Options',
+                        GUIsettings.WSAutoComp.AcOptions);
+
     GUIini.GetStrings(TmpItems); // Get strings written so far.
     TmpItems.Add(Format('[%s]', [WorkSpaceTags]));
     for Indx := 0 to Length(QuickTags) - 1 do
@@ -624,8 +600,8 @@ begin
       Tx := Format('%s=%s^%s^%d^%s', [QuickTags[Indx].Caption,
                                       QuickTags[Indx].Command,
                                       QuickTags[Indx].Help,
-                                      QuickTags[Indx].AcOptions,
-                                      QuickTags[Indx].AcList]);
+                                      QuickTags[Indx].AutoComp.AcOptions,
+                                      QuickTags[Indx].AutoComp.AcString]);
       TmpItems.Add(Tx);
     end;
     GUIini.SetStrings(TmpItems);
@@ -641,6 +617,10 @@ var
   Tx: string;
   TmpItems: TStringList;
 begin
+  GUIini.WriteInteger('ETDirectAutoComplete',
+                      'Options',
+                      GUIsettings.ETDAutoComp.AcOptions);
+
   TmpItems := TStringList.Create;
   try
     GUIini.GetStrings(TmpItems); // Get strings written so far.

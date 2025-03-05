@@ -977,6 +977,40 @@ object FPreferences: TFPreferences
         Caption = '-Workspace: Enable line editing'
         TabOrder = 11
       end
+      object GrpETAutoComplete: TGroupBox
+        Left = 16
+        Top = 308
+        Width = 556
+        Height = 61
+        Caption = 'ExifTool direct auto complete options'
+        TabOrder = 12
+        object CmbETAutoCompleteMode: TComboBox
+          AlignWithMargins = True
+          Left = 5
+          Top = 18
+          Width = 546
+          Height = 21
+          Align = alTop
+          TabOrder = 0
+          Text = 'CmbDefAutoCompleteMode'
+          Items.Strings = (
+            'None'
+            'Auto append'
+            'Auto suggest'
+            'Auto append + suggest')
+          ExplicitWidth = 371
+        end
+        object ChkDefAutoCorrect: TCheckBox
+          Left = 2
+          Top = 42
+          Width = 552
+          Height = 17
+          Align = alTop
+          Caption = 'Auto correct'
+          TabOrder = 1
+          ExplicitWidth = 594
+        end
+      end
     end
   end
 end

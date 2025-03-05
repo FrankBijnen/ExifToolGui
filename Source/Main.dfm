@@ -340,27 +340,11 @@ object FMain: TFMain
           OnKeyPress = EditQuickKeyPress
         end
       end
-      object CmbAutoComplete: TComboBox
+      object MetadataList: TValueListEditor
         Left = 0
         Top = 57
         Width = 312
-        Height = 21
-        Align = alTop
-        ItemIndex = 0
-        TabOrder = 3
-        Text = 'acNone'
-        OnClick = CmbAutoCompleteClick
-        Items.Strings = (
-          'acNone'
-          'acAutoAppend'
-          'acAutoSuggest'
-          'acAutoAppendSuggest')
-      end
-      object MetadataList: TValueListEditor
-        Left = 0
-        Top = 78
-        Width = 312
-        Height = 324
+        Height = 345
         Align = alClient
         BorderStyle = bsNone
         DefaultRowHeight = 19
@@ -707,7 +691,7 @@ object FMain: TFMain
           OnClick = BtnETdirectReplaceClick
         end
         object SpeedBtnETdirectAdd: TSpeedButton
-          Left = 138
+          Left = 134
           Top = 114
           Width = 66
           Height = 25
@@ -1006,6 +990,7 @@ object FMain: TFMain
     Top = 0
     Width = 940
     Height = 25
+    UseSystemFont = False
     ActionManager = MainActionManager
     Caption = 'ActionMainMenuBar'
     Color = clMenuBar
@@ -1014,7 +999,7 @@ object FMain: TFMain
     ColorMap.BtnSelectedFont = clBlack
     ColorMap.UnusedColor = clWhite
     Font.Charset = DEFAULT_CHARSET
-    Font.Color = clWindowText
+    Font.Color = clBlack
     Font.Height = -12
     Font.Name = 'Segoe UI'
     Font.Style = []

@@ -83,7 +83,7 @@ end;
 procedure TETGuiInplaceEdit.CreateWnd;
 begin
   inherited CreateWnd;
-  FAutoCompleteEdit.SetAutoComplete(Handle);
+  FAutoCompleteEdit.InstallAutoComplete(Handle);
 end;
 
 procedure TETGuiInplaceEdit.ConvertToGridPoint(var X, Y: integer);
@@ -101,51 +101,33 @@ begin
   result := TValueListEditor(Grid);
 end;
 
-// In these 2 modes, using the up/down keys scrolls thru the dropdown list,
-// in stead of focusing the prev/next stringgrid row.
-// Disabling and Enabling fixes this
 procedure TETGuiInplaceEdit.KeyDown(var Key: Word; Shift: TShiftState);
-var
-  AutoCompleteMode: TAutoCompleteMode;
 begin
-  if (Key = VK_END) then
-    SelLength := 0;
-
-  AutoCompleteMode := FAutoCompleteEdit.GetAutoCompleteMode;
-  if (AutoCompleteMode in [TAutoCompleteMode.acAppend, TAutoCompleteMode.acAppendDropDown]) then
-  begin
-    case Key of
-      VK_UP,
-      VK_DOWN:
-        FAutoCompleteEdit.EnableAutoComplete(false);
-      else
-        if (not (ssCtrl in Shift)) then
-          FAutoCompleteEdit.EnableAutoComplete(true);
-    end;
+  case Key of
+    VK_END:
+      SelLength := 0;
+    VK_UP,
+    VK_DOWN:
+      FAutoCompleteEdit.EnableAutoComplete(false);
+    else
+      if (not (ssCtrl in Shift)) then
+        FAutoCompleteEdit.EnableAutoComplete(FAutoCompleteEdit.GetAutoCompleteMode <> TAutoCompleteMode.acNone);
   end;
 
   if (ssCtrl in Shift) then
     ValueListEditor.KeyDown(Key, Shift);
 
   inherited KeyDown(Key, Shift);
-
 end;
 
 procedure TETGuiInplaceEdit.KeyUp(var Key: Word; Shift: TShiftState);
-var
-  AutoCompleteMode: TAutoCompleteMode;
 begin
-
   inherited KeyUp(Key, Shift);
 
-  AutoCompleteMode := FAutoCompleteEdit.GetAutoCompleteMode;
-  if (AutoCompleteMode in [TAutoCompleteMode.acAppend, TAutoCompleteMode.acAppendDropDown]) then
-  begin
-    case Key of
-      VK_RETURN,
-      VK_ESCAPE:
-        FAutoCompleteEdit.EnableAutoComplete(false);
-    end;
+  case Key of
+    VK_RETURN,
+    VK_ESCAPE:
+      FAutoCompleteEdit.EnableAutoComplete(false);
   end;
 end;
 
@@ -364,7 +346,7 @@ end;
 procedure TValueListEditor.CMEnter(var Message: TCMEnter);
 begin
   if (Supports(FInplaceEdit,IAutoCompleteEdit)) then
-    (FInplaceEdit as IAutoCompleteEdit).SetAutoCompleteList(nil);
+    (FInplaceEdit as IAutoCompleteEdit).EnableAutoComplete(false);
 
   inherited;
 end;

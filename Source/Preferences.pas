@@ -79,6 +79,9 @@ type
     BtnGeoLocation500Dir: TButton;
     ChkWorkLineEdit: TCheckBox;
     ChkAllowNonMSWicCodec: TCheckBox;
+    GrpETAutoComplete: TGroupBox;
+    CmbETAutoCompleteMode: TComboBox;
+    ChkDefAutoCorrect: TCheckBox;
     procedure FormShow(Sender: TObject);
     procedure BtnSaveClick(Sender: TObject);
     procedure BtnBrowseFolder(Sender: TObject);
@@ -103,7 +106,7 @@ var
 implementation
 
 uses Main, ExifTool, MainDef, GeoMap,
-     ExifToolsGUI_Utils, ExifToolsGUI_Thumbnails, UnitLangResources;
+     ExifToolsGUI_Utils, ExifToolsGUI_Thumbnails, ExifToolsGui_AutoComplete, UnitLangResources;
 
 {$R *.dfm}
 
@@ -157,7 +160,10 @@ begin
   GUIsettings.MinimizeToTray := CheckBox9.Checked;
   GUIsettings.SingleInstanceApp := CheckBox10.Checked;
   Application.HintHidePause := UpDHintPause.Position;
-
+  // Exiftool Direct
+  GUIsettings.ETDAutoComp.SetAcOptions(TAutoCompleteMode(CmbETAutoCompleteMode.ItemIndex),
+                                       ChkDefAutoCorrect.Checked,
+                                       false);
   //GeoCode
   GeoSettings.GeoCodeUrl := EdGeoCodeUrl.Text;
   GeoSettings.GeoCodeApiKey := EdGeoCodeApiKey.Text;
@@ -341,7 +347,9 @@ begin
   CheckBox9.Checked := GUIsettings.MinimizeToTray;
   CheckBox10.Checked := GUIsettings.SingleInstanceApp;
   UpDHintPause.Position := Application.HintHidePause;
-
+  // Exiftool Direct
+  CmbETAutoCompleteMode.ItemIndex := Ord(GUIsettings.ETDAutoComp.GetAutoCompleteMode);
+  ChkDefAutoCorrect.Checked := GUIsettings.ETDAutoComp.GetAutoCorrect;
   // GeoCode
   EdGeoCodeUrl.Text := GeoSettings.GeoCodeUrl;
   EdGeoCodeApiKey.Text := GeoSettings.GeoCodeApiKey;

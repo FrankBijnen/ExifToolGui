@@ -5,15 +5,43 @@ interface
 uses
   WinApi.Windows, Winapi.ActiveX, Winapi.ShlObj, System.Classes;
 
-type
+const
+  acAutoCorrect         = $0010;
+  acAutoPopulate        = $0020;
 
-  TAutoCompleteMode = (acNone, acAppend, acDropDown, acAppendDropDown);
+type
+  TAutoCompleteMode = (acNone = $0000, acAutoAppend = $0001, acAutoSuggest = $0002, acAutoSuggestAppend = $0003);
+
+  TAutoCompRec = record
+    AcOptions:  word;
+    AcString:   string;
+    AcList:     TStringList;
+    procedure SetAcList(InAclist: TStringList);
+    procedure SetAcListStr(const [ref] InAclist: string);
+    procedure GetAcList(AList: TStringList);
+    function GetAcListStr: string;
+    procedure SetAcOptions(AcMode: TAutoCompleteMode;
+                           AutoCorrect: boolean;
+                           AutoPopulate: boolean);
+    function GetAutoCompleteMode: TAutoCompleteMode;
+    function GetAutoCorrect: boolean;
+    function GetAutoPopulate: boolean;
+    procedure GetAcOptions(var AcMode: TAutoCompleteMode;
+                           var AutoCorrect: boolean;
+                           var AutoPopulate: boolean);
+    function ProcessResult(ALine: string): string;
+  end;
+  PAutoCompRec = ^TAutoCompRec;
 
   TAutoComplete = class(TInterfacedObject, IEnumString)
   private
     FLines: TStringList;
     FCurrentList: TStringList;
+    FAutoCompList: TStringList;
+    FAutoComp: TAutoCompRec;
     FIndex: Integer;
+    procedure SetAutoCompleteMode(AutoComplete: IAutoComplete;
+                                  AutoCompleteMode: TAutoCompleteMode);
   protected
     { IEnumString }
     function Next(celt: Longint; out elt; pceltFetched: PLongint): HResult; stdcall;
@@ -25,10 +53,10 @@ type
     constructor Create;
     destructor Destroy; override;
     function InitAutoComplete(EditHandle: HWND): IAutoComplete;
-    procedure SetAutoCompleteMode(AutoComplete: IAutoComplete;
-                                  AutoCompleteMode: TAutoCompleteMode);
+    procedure SetAutoCompOptions(AutoComplete: IAutoComplete;
+                                 const [ref] AutoComp: TAutoCompRec);
     procedure AddHist(ALine: string);
-    procedure SetLines(const [ref] ALines: TStringList);
+    property Lines: TStringList read FLines;
   end;
 
   var
@@ -37,7 +65,101 @@ type
 implementation
 
 uses
-  System.SysUtils;
+  System.SysUtils, ExifToolsGUI_Utils;
+
+{ TAutoCompRec }
+
+procedure TAutoCompRec.SetAcListStr(const [ref] InAcList: string);
+begin
+  AcString := InAcList;
+  AcList := nil;
+end;
+
+procedure TAutoCompRec.SetAcList(InAcList: TStringList);
+begin
+  AcList := InAclist;
+  AcString := '';
+end;
+
+procedure TAutoCompRec.GetAcList(AList: TStringList);
+begin
+  if Assigned(AcList) then
+    Alist.Text := AcList.Text
+  else
+    Alist.Text := GetAcListStr;
+end;
+
+function TAutoCompRec.GetAcListStr: string;
+begin
+  result := ReplaceAll(AcString, ['/n'], [#10],  [rfReplaceAll]);
+end;
+
+procedure TAutoCompRec.SetAcOptions(AcMode: TAutoCompleteMode;
+                                    AutoCorrect: boolean;
+                                    AutoPopulate: boolean);
+begin
+  AcOptions := Ord(AcMode);
+  if (AutoCorrect) then
+    AcOptions := AcOptions + acAutoCorrect;
+  if (AutoPopulate) then
+    AcOptions := AcOptions + acAutoPopulate;
+end;
+
+function TAutoCompRec.GetAutoCompleteMode: TAutoCompleteMode;
+begin
+  result := TAutoCompleteMode(AcOptions and $0f);
+end;
+
+function TAutoCompRec.GetAutoCorrect: boolean;
+begin
+  result := (AcOptions and acAutoCorrect) = acAutoCorrect;
+end;
+
+function TAutoCompRec.GetAutoPopulate: boolean;
+begin
+  result := (AcOptions and acAutoPopulate) = acAutoPopulate;
+end;
+
+procedure TAutoCompRec.GetAcOptions(var AcMode: TAutoCompleteMode;
+                                    var AutoCorrect: boolean;
+                                    var AutoPopulate: boolean);
+begin
+  AcMode := GetAutoCompleteMode;
+  AutoCorrect := GetAutoCorrect;
+  AutoPopulate := GetAutoPopulate;
+end;
+
+function TAutoCompRec.ProcessResult(ALine: string): string;
+var
+  AList: TStringList;
+  P: integer;
+begin
+  result := Aline;
+
+  AList := TStringList.Create;
+  try
+    AList.CaseSensitive := false;
+    AList.Sorted := true;
+    AList.Duplicates := TDuplicates.dupIgnore;
+    if (GetAutoCorrect) then
+    begin
+      GetAcList(AList);
+      P := AList.IndexOf(Aline);
+      if (P > -1) then
+        result := AList[P];
+    end;
+
+    if (GetAutoPopulate) and
+       (AcList = nil) then
+    begin
+      AList.Add(result);
+      AcString := ReplaceAll(Alist.Text, [#13#10, #10], ['/n','/n'], [rfReplaceAll]);
+    end;
+  finally
+    AList.Free;
+  end;
+end;
+{ TAutoComplete }
 
 // See Vcl.ComCtrls.pas, for implementation of TAutoComplete
 type
@@ -51,27 +173,39 @@ begin
   FLines.Sorted := true;
   Flines.Duplicates := TDuplicates.dupIgnore;
 
+  FAutoCompList := TStringList.Create;
+  FAutoCompList.Sorted := true;
+  FAutoCompList.Duplicates := TDuplicates.dupIgnore;
+
   FCurrentList := Flines;
 end;
 
 destructor TAutoComplete.Destroy;
 begin
   FLines.Free;
+  FAutoCompList.Free;
   inherited Destroy;
+end;
+
+procedure TAutoComplete.SetAutoCompOptions(AutoComplete: IAutoComplete;
+                                           const [ref] AutoComp: TAutoCompRec);
+begin
+  FAutoComp := AutoComp;
+  FCurrentList := FAutoComp.AcList;
+  if not Assigned(FCurrentList) then
+  begin
+    FAutoCompList.Text := FAutoComp.GetAcListStr;
+    if (FAutoCompList.Count > 0) then
+      FCurrentList := FAutoCompList
+    else
+      FCurrentList := FLines;
+  end;
+  SetAutoCompleteMode(AutoComplete, FAutoComp.GetAutoCompleteMode);
 end;
 
 procedure TAutoComplete.AddHist(ALine: string);
 begin
-  if (FCurrentList = Flines) then
-    Flines.Add(ALine);
-end;
-
-procedure TAutoComplete.SetLines(const [ref] ALines: TStringList);
-begin
-  if (ALines <> nil) then
-    FCurrentList := ALines
-  else
-    FCurrentList := FLines;
+  FLines.Add(ALine);
 end;
 
 function TAutoComplete.Next(celt: Integer; out elt; pceltFetched: PLongint): HRESULT;
@@ -145,11 +279,11 @@ begin
     case AutoCompleteMode of
       TAutoCompleteMode.acNone:
         Options := ACO_NONE;
-      TAutoCompleteMode.acAppend:
+      TAutoCompleteMode.acAutoAppend:
         Options := ACO_AUTOAPPEND or ACO_USETAB;
-      TAutoCompleteMode.acDropDown:
+      TAutoCompleteMode.acAutoSuggest:
         Options := ACO_AUTOSUGGEST or ACO_USETAB;
-      TAutoCompleteMode.acAppendDropDown:
+      TAutoCompleteMode.acAutoSuggestAppend:
         Options := ACO_AUTOAPPEND or ACO_AUTOSUGGEST or ACO_USETAB;
       else
         exit;
@@ -157,7 +291,7 @@ begin
     Auto2.SetOptions(Options);
   end
   else
-    Auto2.Enable(AutoCompleteMode <> TAutoCompleteMode.acNone);
+    AutoComplete.Enable(AutoCompleteMode <> TAutoCompleteMode.acNone);
 end;
 
 initialization
