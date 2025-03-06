@@ -8,9 +8,11 @@ uses System.Classes, System.Types, System.SyncObjs, Winapi.Windows,
 const
   CRLF = #13#10;
 
-  GUI_SEP = '-GUI-SEP';
-
-  CmdStr = '-';
+  GUI_PREF = '-GUI';
+  GUI_SEP  = '-GUI-SEP';
+  GUI_INV  = '-GUI-INV';
+  VetoTags: array of string = ['-', '--'];
+  CmdStr   = '-';
 
 type
   TExecETEvent = procedure(ExecNum: word; EtCmds, EtOuts, EtErrs, StatusLine: string; PopupOnError: boolean) of object;
@@ -103,6 +105,7 @@ type
 function CmdDateTimeOriginal(const Group: string): string;
 function CmdCreateDate(const Group: string): string;
 function CmdModifyDate(const Group: string): string;
+function ReplaceVetoTag(ATag: string): string;
 
 var
    ET: TExifTool;
@@ -127,6 +130,17 @@ end;
 function CmdModifyDate(const Group: string): string;
 begin
   result := Group + ':ModifyDate';
+end;
+
+function ReplaceVetoTag(ATag: string): string;
+var
+  CurTag: string;
+begin
+  for CurTag in VetoTags do
+    if CurTag = ATag then
+      exit(GUI_INV);
+
+  exit(ATag);
 end;
 
 const

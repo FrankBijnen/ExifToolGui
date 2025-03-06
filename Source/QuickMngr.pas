@@ -80,7 +80,7 @@ implementation
 
 uses
   Vcl.Themes,
-  StrUtils, Main, ExifToolsGUI_Utils, UFrmTagNames, ExifToolsGui_AutoComplete;
+  StrUtils, Main, ExifToolsGUI_Utils, UFrmTagNames, ExifToolsGui_AutoComplete, ExifTool;
 
 {$R *.dfm}
 
@@ -203,9 +203,9 @@ end;
 function TFQuickManager.QuickRec(ARow: Longint): TQuickTagRec;
 begin
   result.Caption            := SgWorkSpace.Cells[0, ARow];
-  result.Command            := SgWorkSpace.Cells[1, ARow];
+  result.Command            := ReplaceVetoTag(SgWorkSpace.Cells[1, ARow]);
   result.NoEdit             := (RightStr(result.Caption, 1) = '?') or
-                               (SameText(LeftStr(result.Command, 4), '-GUI'));
+                               (StartsText(GUI_PREF, result.Command));
   result.Help               := SgWorkSpace.Cells[2, ARow];
   result.AutoComp.AcOptions := word(SgWorkSpace.Objects[3, ARow]);
   result.AutoComp.SetAcList(SgWorkSpace.Cells[3, ARow]);
@@ -370,7 +370,7 @@ var
   AText: string;
 begin
   AText := TStringGrid(Sender).Cells[1, ARow];
-  if (SameText(LeftStr(AText, 4), '-GUI')) then
+  if (StartsText(GUI_PREF, AText)) then
   begin
     ACanvas := TStringGrid(Sender).Canvas;
     // See MetadataListDrawCell in Main
