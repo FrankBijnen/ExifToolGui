@@ -678,15 +678,18 @@ var
   CurrentAutoComp: PAutoCompRec;
 begin
   CurrentAutoComp := ActiveAutoComp(ARow);
-  if (Supports(MetadataList.InplaceEdit, IAutoCompleteEdit)) then
-    (MetadataList.InplaceEdit as IAutoCompleteEdit).SetAutoCompOptions(CurrentAutoComp^);
-//TODO?    MetadataList.EditorMode := true; //  Ensures text is selected
   if (Supports(EditQuick, IAutoCompleteEdit)) then
     (EditQuick as IAutoCompleteEdit).SetAutoCompOptions(CurrentAutoComp^);
+  if (Supports(MetadataList.InplaceEdit, IAutoCompleteEdit)) then
+    (MetadataList.InplaceEdit as IAutoCompleteEdit).SetAutoCompOptions(CurrentAutoComp^);
 end;
 
 procedure TFMain.InstallAutoComp;
 begin
+  // Focus the ShellList, so the user is forced to enter the control.
+  // Needed when changing from acNone to acAppend or acSuggest
+  ShellList.SetFocus;
+
   GUIsettings.WSAutoComp.SetAcList(MetaDatalist.HistoryList);
   SetupWSAutoComp(MetadataList.Row -1);
 
@@ -701,7 +704,7 @@ begin
   if (ARow < Low(QuickTags)) or
      (ARow > High(QuickTags)) then
     exit;
-  if (QuickTags[ARow].AutoComp.GetAutoCompleteMode <> TAutoCompleteMode.acNone) then
+  if (QuickTags[ARow].AutoComp.GetAutoCompleteMode <> TAutoCompleteMode.acDefault) then
     result := @QuickTags[ARow].AutoComp;
 end;
 
@@ -1746,14 +1749,11 @@ procedure TFMain.MQuickManagerClick(Sender: TObject);
 var
   Indx: integer;
 begin
-  SetGridEditor(false);
-
-  if FQuickManager.ShowModal = mrOK then
+  if (FQuickManager.ShowModal = mrOK) then
   begin
     InstallAutoComp;
-    if SpeedBtnQuick.Down then
+    if (SpeedBtnQuick.Down) then
     begin
-      SetGridEditor(true);
       ShowMetadata;
       Indx := FQuickManager.SgWorkSpace.Row + 1;
       if (MetadataList.RowCount > Indx) then

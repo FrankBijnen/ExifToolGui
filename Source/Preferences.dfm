@@ -992,13 +992,12 @@ object FPreferences: TFPreferences
           Height = 21
           Align = alTop
           TabOrder = 0
-          Text = 'CmbDefAutoCompleteMode'
+          Text = 'Default'
           Items.Strings = (
             'None'
             'Auto append'
             'Auto suggest'
             'Auto append + suggest')
-          ExplicitWidth = 371
         end
         object ChkDefAutoCorrect: TCheckBox
           Left = 2
@@ -1008,7 +1007,6 @@ object FPreferences: TFPreferences
           Align = alTop
           Caption = 'Auto correct'
           TabOrder = 1
-          ExplicitWidth = 594
         end
       end
     end

@@ -10,7 +10,11 @@ const
   acAutoPopulate        = $0020;
 
 type
-  TAutoCompleteMode = (acNone = $0000, acAutoAppend = $0001, acAutoSuggest = $0002, acAutoSuggestAppend = $0003);
+  TAutoCompleteMode = (acDefault = $0000,
+                       acNone = $0001,
+                       acAutoAppend = $0002,
+                       acAutoSuggest = $0003,
+                       acAutoSuggestAppend = $0004);
 
   TAutoCompRec = record
     AcOptions:  word;
@@ -266,7 +270,6 @@ begin
   if (AutoComplete <> nil) and
      (Supports(AutoComplete, IAutoComplete2, Auto2)) then
   begin
-    Options := 0;
     case AutoCompleteMode of
       TAutoCompleteMode.acNone:
         Options := ACO_NONE;
@@ -276,6 +279,8 @@ begin
         Options := ACO_AUTOSUGGEST or ACO_USETAB;
       TAutoCompleteMode.acAutoSuggestAppend:
         Options := ACO_AUTOAPPEND or ACO_AUTOSUGGEST or ACO_USETAB;
+      else
+        exit;
     end;
     Auto2.SetOptions(Options);
     Auto2.Enable(false);  // Default disabled, Enabling must be done manually

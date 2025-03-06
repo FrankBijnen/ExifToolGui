@@ -30,6 +30,7 @@ uses
   UnitFilesOnClipBoard in 'UnitFilesOnClipBoard.pas',
   UnitColumnDefs in 'UnitColumnDefs.pas',
   ExifToolsGui_AutoComplete in 'ExifToolsGui_AutoComplete.pas',
+  ExifToolsGUI_StringGrid in 'ExifToolsGUI_StringGrid.pas',
   ExifToolsGui_ValEdit in 'ExifToolsGui_ValEdit.pas',
   ExifToolsGui_ThreadPool in 'ExifToolsGui_ThreadPool.pas',
   ExifToolsGui_ShellList in 'ExifToolsGui_ShellList.pas',

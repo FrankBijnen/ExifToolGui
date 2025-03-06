@@ -276,7 +276,7 @@ end;
 procedure TLabeledEdit.CMEnter(var Message: TCMEnter);
 begin
   FAutoCompleteEdit.UpdateAutoComplete;
-  FAutoCompleteEdit.EnableAutoComplete(FAutoCompleteEdit.GetAutoCompleteMode <> acNone);
+  FAutoCompleteEdit.EnableAutoComplete(FAutoCompleteEdit.GetAutoCompleteMode > TAutoCompleteMode.acNone);
 
   inherited;
 end;
@@ -298,7 +298,7 @@ end;
 procedure TEdit.CMEnter(var Message: TCMEnter);
 begin
   FAutoCompleteEdit.UpdateAutoComplete;
-  FAutoCompleteEdit.EnableAutoComplete(FAutoCompleteEdit.GetAutoCompleteMode <> acNone);
+  FAutoCompleteEdit.EnableAutoComplete(FAutoCompleteEdit.GetAutoCompleteMode > TAutoCompleteMode.acNone);
 
   inherited;
 end;
