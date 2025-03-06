@@ -145,6 +145,7 @@
         <DCCReference Include="UnitFilesOnClipBoard.pas"/>
         <DCCReference Include="UnitColumnDefs.pas"/>
         <DCCReference Include="ExifToolsGui_AutoComplete.pas"/>
+        <DCCReference Include="ExifToolsGUI_StringGrid.pas"/>
         <DCCReference Include="ExifToolsGui_ValEdit.pas"/>
         <DCCReference Include="ExifToolsGui_ThreadPool.pas"/>
         <DCCReference Include="ExifToolsGui_ShellList.pas"/>
@@ -250,7 +251,6 @@
         </DCCReference>
         <DCCReference Include="UFrmExportSettings.pas">
             <Form>FrmExportSettings</Form>
-            <FormType>dfm</FormType>
         </DCCReference>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>

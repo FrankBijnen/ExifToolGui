@@ -4,7 +4,7 @@ object FQuickManager: TFQuickManager
   ActiveControl = SgWorkSpace
   BorderStyle = bsSizeToolWin
   Caption = 'Workspace manager'
-  ClientHeight = 662
+  ClientHeight = 620
   ClientWidth = 944
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
@@ -18,7 +18,7 @@ object FQuickManager: TFQuickManager
   object Splitter1: TSplitter
     Left = 617
     Top = 0
-    Height = 608
+    Height = 566
     ExplicitLeft = 712
     ExplicitTop = 152
     ExplicitHeight = 100
@@ -27,7 +27,7 @@ object FQuickManager: TFQuickManager
     Left = 0
     Top = 0
     Width = 617
-    Height = 608
+    Height = 566
     Align = alLeft
     DoubleBuffered = True
     Font.Charset = DEFAULT_CHARSET
@@ -38,11 +38,12 @@ object FQuickManager: TFQuickManager
     ParentDoubleBuffered = False
     ParentFont = False
     TabOrder = 0
+    ExplicitHeight = 608
     object SgWorkSpace: TStringGrid
       Left = 1
       Top = 64
       Width = 615
-      Height = 543
+      Height = 501
       Align = alClient
       ColCount = 4
       DefaultColWidth = 160
@@ -55,6 +56,7 @@ object FQuickManager: TFQuickManager
       TabOrder = 1
       OnDrawCell = SgWorkSpaceDrawCell
       OnSelectCell = SgWorkSpaceSelectCell
+      ExplicitHeight = 543
     end
     object PnlFuncTop: TPanel
       Left = 1
@@ -85,7 +87,7 @@ object FQuickManager: TFQuickManager
           Align = alTop
           TabOrder = 0
           TabStop = False
-          Text = 'CmbDefAutoCompleteMode'
+          Text = 'Default'
           OnChange = CmbDefAutoCompleteModeChange
           Items.Strings = (
             'None'
@@ -136,28 +138,31 @@ object FQuickManager: TFQuickManager
   end
   object StatusBar1: TStatusBar
     Left = 0
-    Top = 643
+    Top = 601
     Width = 944
     Height = 19
     Panels = <>
     SimplePanel = True
+    ExplicitTop = 643
   end
   object PnlDetail: TPanel
     Left = 620
     Top = 0
     Width = 324
-    Height = 608
+    Height = 566
     Align = alClient
     Constraints.MinWidth = 300
     TabOrder = 1
     OnResize = PnlDetailResize
+    ExplicitHeight = 608
     object PnlAutoComplete: TPanel
       Left = 1
       Top = 169
       Width = 322
-      Height = 438
+      Height = 396
       Align = alClient
       TabOrder = 0
+      ExplicitHeight = 438
       object PctAutoOptions: TPageControl
         Left = 1
         Top = 1
@@ -176,9 +181,10 @@ object FQuickManager: TFQuickManager
             Height = 21
             Align = alTop
             TabOrder = 0
-            Text = 'CmbAutoCompleteMode'
+            Text = 'Default'
             OnChange = CmbAutoCompleteModeChange
             Items.Strings = (
+              'Default'
               'None'
               'Auto append'
               'Auto suggest'
@@ -210,22 +216,24 @@ object FQuickManager: TFQuickManager
         Left = 1
         Top = 97
         Width = 320
-        Height = 340
+        Height = 298
         Align = alClient
         Caption = 'Custom list'
         TabOrder = 1
+        ExplicitHeight = 340
         object MemoAutoLines: TMemo
           AlignWithMargins = True
           Left = 17
           Top = 30
           Width = 286
-          Height = 305
+          Height = 263
           Margins.Left = 15
           Margins.Top = 15
           Margins.Right = 15
           Align = alClient
           TabOrder = 0
           OnKeyUp = MemoAutoLinesKeyUp
+          ExplicitHeight = 305
         end
       end
     end
@@ -292,11 +300,12 @@ object FQuickManager: TFQuickManager
   end
   object PnlBottom: TPanel
     Left = 0
-    Top = 608
+    Top = 566
     Width = 944
     Height = 35
     Align = alBottom
     TabOrder = 2
+    ExplicitTop = 608
     DesignSize = (
       944
       35)

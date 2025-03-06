@@ -113,7 +113,7 @@ begin
       FAutoCompleteEdit.EnableAutoComplete(false);
     else
       if (not (ssCtrl in Shift)) then
-        FAutoCompleteEdit.EnableAutoComplete(FAutoCompleteEdit.GetAutoCompleteMode <> TAutoCompleteMode.acNone);
+        FAutoCompleteEdit.EnableAutoComplete(FAutoCompleteEdit.GetAutoCompleteMode > TAutoCompleteMode.acNone);
   end;
 
   if (ssCtrl in Shift) then
@@ -354,8 +354,11 @@ end;
 // Failsafe if no SelectCell is fired
 procedure TValueListEditor.CMEnter(var Message: TCMEnter);
 begin
-  if (Supports(FInplaceEdit,IAutoCompleteEdit)) then
-    (FInplaceEdit as IAutoCompleteEdit).EnableAutoComplete(false);
+  if (Supports(FInplaceEdit, IAutoCompleteEdit)) then
+  begin
+    FInplaceEdit.AutoCompleteEdit.UpdateAutoComplete;
+    FInplaceEdit.AutoCompleteEdit.EnableAutoComplete(FInplaceEdit.AutoCompleteEdit.GetAutoCompleteMode > TAutoCompleteMode.acNone);
+  end;
 
   inherited;
 end;

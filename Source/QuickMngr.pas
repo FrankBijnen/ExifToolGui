@@ -3,24 +3,16 @@ unit QuickMngr;
 interface
 
 uses
-  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants,
-  System.Classes, Vcl.Graphics,
-  Vcl.Controls, Vcl.Forms, UnitScaleForm, Vcl.Dialogs, Vcl.Grids, Vcl.ExtCtrls,
+  System.SysUtils, System.Variants, System.Classes,
+  Winapi.Windows, Winapi.Messages,
+  Vcl.Graphics, Vcl.Controls, Vcl.Forms, Vcl.Grids, Vcl.Dialogs, Vcl.ExtCtrls,
   Vcl.StdCtrls, Vcl.ComCtrls, Vcl.Mask, Vcl.Buttons,
-  MainDef;
+  MainDef, UnitScaleForm, ExifToolsGUI_StringGrid;
 
 type
-  // TODO separate unit?
-  TStringGrid = class(Vcl.Grids.TStringGrid)
-  public // because DeleteRow isn't published in TStringGrid
-    procedure DeleteRow(ARow: longint); override;
-    function InsertRow(ARow: longint): longint;
-    procedure MakeRowVisible(ARow: longint);
-  end;
-
   TFQuickManager = class(TScaleForm)
     AdvPanel1: TPanel;
-    SgWorkSpace: TStringGrid;
+    SgWorkSpace: ExifToolsGUI_StringGrid.TStringGrid; // Need our own version
     StatusBar1: TStatusBar;
     PnlDetail: TPanel;
     PnlBottom: TPanel;
@@ -79,67 +71,10 @@ var
 implementation
 
 uses
-  Vcl.Themes,
-  StrUtils, Main, ExifToolsGUI_Utils, UFrmTagNames, ExifToolsGui_AutoComplete, ExifTool;
+  System. StrUtils, Vcl.Themes,
+  Main, ExifTool, ExifToolsGUI_Utils, ExifToolsGui_AutoComplete, UFrmTagNames;
 
 {$R *.dfm}
-
-{ TStringGrid }
-
-procedure TStringGrid.DeleteRow(ARow: longint);
-var
-  SavedSelect: TSelectCellEvent;
-  SavedTopRow: integer;
-  SavedRow: integer;
-begin
-  SavedSelect := Self.OnSelectCell;
-  SavedTopRow := TopRow;
-  SavedRow := Row;
-  OnSelectCell := nil;
-  try
-    inherited DeleteRow(ARow);
-  finally
-    TopRow := SavedTopRow;
-    if (SavedRow > RowCount -1) then
-      SavedRow := RowCount -1;
-    Row := SavedRow;
-    OnSelectCell := SavedSelect;
-  end;
-end;
-
-function TStringGrid.InsertRow(ARow: longint): longint;
-var
-  SavedSelect: TSelectCellEvent;
-begin
-  SavedSelect := Self.OnSelectCell;
-  OnSelectCell := nil;
-  try
-    while ARow < FixedRows do
-      Inc(ARow);
-    RowCount := RowCount + 1;
-    MoveRow(RowCount - 1, ARow);
-    result := ARow;
-  finally
-    OnSelectCell := SavedSelect;
-  end;
-end;
-
-procedure TStringGrid.MakeRowVisible(ARow: longint);
-var
-  T, N: integer;
-begin
-  T := TopRow;
-  if (ARow < TopRow) then
-    TopRow := ARow
-  else
-  begin
-    N := Height div RowHeights[0]; // how many rows fit into grid
-    if (ARow > T + N) then
-      TopRow := ARow;
-  end;
-end;
-
-{ QuickManager }
 
 procedure TFQuickManager.SetAutoCompleteOptions;
 var
@@ -159,7 +94,8 @@ end;
 
 procedure TFQuickManager.SetDefAutoCompleteOptions;
 begin
-  GUIsettings.WSAutoComp.SetAcOptions(TAutoCompleteMode(CmbDefAutoCompleteMode.ItemIndex),
+// acDefault not used
+  GUIsettings.WSAutoComp.SetAcOptions(TAutoCompleteMode(CmbDefAutoCompleteMode.ItemIndex +1),
                                       ChkDefAutoCorrect.Checked,
                                       true);
 end;
@@ -215,7 +151,8 @@ procedure TFQuickManager.UpdateLabels(const ARow: integer);
 var
   AQuickRec: TQuickTagRec;
 begin
-  CmbDefAutoCompleteMode.ItemIndex := Ord(GUIsettings.WSAutoComp.GetAutoCompleteMode);
+// acDefault not used
+  CmbDefAutoCompleteMode.ItemIndex := Ord(GUIsettings.WSAutoComp.GetAutoCompleteMode) -1;
   ChkDefAutoCorrect.Checked        := GUIsettings.WSAutoComp.GetAutoCorrect;
   AQuickRec := QuickRec(ARow);
 

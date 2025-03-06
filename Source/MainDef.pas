@@ -325,7 +325,7 @@ end;
 function SetQuickTag(const AIndex: integer;
                      const ACaption, ACommand: string;
                      const AHelp: string = '';
-                     const AOptions: word = 0;
+                     const AOptions: word = Ord(TAutoCompleteMode.acDefault);
                      const AcList: string = ''): integer;
 begin
   result := AIndex +1;
@@ -342,7 +342,7 @@ begin
   // Set NoEdit
   QuickTags[AIndex].NoEdit    := (RightStr(ACaption, 1) = '?');
   QuickTags[AIndex].NoEdit    := QuickTags[result -1].NoEdit or
-                                 (SameText(LeftStr(ACommand, 4), '-GUI'));
+                                 (StartsText(GUI_PREF, QuickTags[AIndex].Command));
 end;
 
 function ReadWorkSpaceTags(GUIini: TMemIniFile):integer;
@@ -430,7 +430,7 @@ var
 begin
   GUIsettings.ETDAutoComp.AcOptions := GUIini.ReadInteger('ETDirectAutoComplete',
                                                           'Options',
-                                                          Ord(TAutoCompleteMode.acAutoSuggestAppend) + acAutoCorrect);
+                                                          Ord(TAutoCompleteMode.acNone));
 
   ETdirectCmdList.Clear;
   GUIini.ReadSection(ETDirectCmd, CbETDirect.Items);

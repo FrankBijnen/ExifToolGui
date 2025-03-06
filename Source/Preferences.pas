@@ -160,8 +160,8 @@ begin
   GUIsettings.MinimizeToTray := CheckBox9.Checked;
   GUIsettings.SingleInstanceApp := CheckBox10.Checked;
   Application.HintHidePause := UpDHintPause.Position;
-  // Exiftool Direct
-  GUIsettings.ETDAutoComp.SetAcOptions(TAutoCompleteMode(CmbETAutoCompleteMode.ItemIndex),
+  // Exiftool Direct (acDefault not used)
+  GUIsettings.ETDAutoComp.SetAcOptions(TAutoCompleteMode(CmbETAutoCompleteMode.ItemIndex +1),
                                        ChkDefAutoCorrect.Checked,
                                        false);
   //GeoCode
@@ -347,8 +347,8 @@ begin
   CheckBox9.Checked := GUIsettings.MinimizeToTray;
   CheckBox10.Checked := GUIsettings.SingleInstanceApp;
   UpDHintPause.Position := Application.HintHidePause;
-  // Exiftool Direct
-  CmbETAutoCompleteMode.ItemIndex := Ord(GUIsettings.ETDAutoComp.GetAutoCompleteMode);
+  // Exiftool Direct (acDefault not used)
+  CmbETAutoCompleteMode.ItemIndex := Ord(GUIsettings.ETDAutoComp.GetAutoCompleteMode) -1;
   ChkDefAutoCorrect.Checked := GUIsettings.ETDAutoComp.GetAutoCorrect;
   // GeoCode
   EdGeoCodeUrl.Text := GeoSettings.GeoCodeUrl;
