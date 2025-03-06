@@ -650,7 +650,7 @@ begin
       while not CdsColumnSet.Eof do
       begin
         AColumnSet[CdsColumnSet.RecNo -1].SetCaption(CdsColumnSetCaption.AsString);
-        AColumnSet[CdsColumnSet.RecNo -1].Command := CdsColumnSetCommand.AsString;
+        AColumnSet[CdsColumnSet.RecNo -1].Command := ReplaceVetoTag(CdsColumnSetCommand.AsString);
         AColumnSet[CdsColumnSet.RecNo -1].Width   := CdsColumnSetWidth.AsInteger;
         AColumnSet[CdsColumnSet.RecNo -1].AlignR  := CdsColumnSetAlignR.AsInteger;
         // Merge options from fields Backup and Option

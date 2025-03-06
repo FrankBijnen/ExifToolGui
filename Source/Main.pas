@@ -2446,6 +2446,15 @@ begin
       if (ArgsList.Count < 1) then
         exit;
 
+      for Ext in ArgsList do
+      begin
+        if (Ext <> ReplaceVetoTag(Ext)) then
+        begin
+          ShowMessage(StrExifToolNotExecute);
+          exit;
+        end;
+      end;
+
       IsRecursive := (ArgsList.IndexOf('-r') > -1);
 
       Ext := '*.*';
