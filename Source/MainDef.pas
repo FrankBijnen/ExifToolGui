@@ -201,7 +201,11 @@ const
   IniVersion = 'V6';
   PrevIniVersion = 'V5';
   WorkSpaceTags = 'WorkSpaceTags';
+  WorkSpaceTagsV6 = 'WorkSpaceTagsV6';
+  WorkSpaceAutoComplete = 'WorkSpaceAutoComplete';
   ETDirectCmd = 'ETdirectCmd';
+  ETDirectAutoComplete = 'ETDirectAutoComplete';
+  AutoCompOptions = 'AutoCompOptions';
   FormSizes = 'FormSizes';
   TagList = 'TagList';
   CustomView = 'CustomView';
@@ -345,25 +349,37 @@ begin
                                  (StartsText(GUI_PREF, QuickTags[AIndex].Command));
 end;
 
-function ReadWorkSpaceTags(GUIini: TMemIniFile):integer;
+function ReadWorkSpaceTags(GUIini: TMemIniFile; CreateEmpty: boolean):integer;
 var
   Indx, WSCnt: integer;
   Name, Cmd, Help, Tmp: string;
   AcOptions: Word;
+  WorkSpaceTagsVersion: string;
   AcList: string;
   TmpItems: TStringList;
 begin
   TmpItems := TStringList.Create;
   try
-    GUIsettings.WSAutoComp.AcOptions := GUIini.ReadInteger('WorkSpaceAutoComplete',
-                                                           'Options',
+    // Version to read. Import pre V6.3.8?
+    WorkSpaceTagsVersion := WorkSpaceTags;
+    if (GUIini.SectionExists(WorkSpaceTagsV6)) then
+      WorkSpaceTagsVersion := WorkSpaceTagsV6;
+
+    // Create empty ?
+    if (not CreateEmpty) and
+       (not GUIini.SectionExists(WorkSpaceTagsVersion)) then
+      exit(0);
+
+    GUIsettings.WSAutoComp.AcOptions := GUIini.ReadInteger(WorkSpaceAutoComplete,
+                                                           AutoCompOptions,
                                                            Ord(TAutoCompleteMode.acAutoSuggestAppend) + acAutoCorrect + acAutoPopulate);
-    GUIini.ReadSectionValues(WorkSpaceTags, TmpItems);
+
+    GUIini.ReadSectionValues(WorkSpaceTagsVersion, TmpItems);
     WSCnt := TmpItems.Count;
     result := WSCnt;
 
     if (WSCnt = 0) and
-       (GUIini.SectionExists(WorkSpaceTags) = false) then
+       (GUIini.SectionExists(WorkSpaceTagsVersion) = false) then
     begin
       WSCnt :=  SetQuickTag(WSCnt, 'EXIF', GUI_SEP);
       WSCnt :=  SetQuickTag(WSCnt, 'Make', '-exif:Make');
@@ -424,12 +440,17 @@ begin
   end;
 end;
 
-function ReadETdirectCmds(CbETDirect: TComboBox; GUIini: TMemIniFile): integer;
+function ReadETdirectCmds(CbETDirect: TComboBox; GUIini: TMemIniFile; CreateEmpty: boolean): integer;
 var
   Indx, ETcnt: integer;
 begin
-  GUIsettings.ETDAutoComp.AcOptions := GUIini.ReadInteger('ETDirectAutoComplete',
-                                                          'Options',
+  // Create empty ?
+  if (not CreateEmpty) and
+     (not GUIini.SectionExists(ETDirectCmd)) then
+    exit(0);
+
+  GUIsettings.ETDAutoComp.AcOptions := GUIini.ReadInteger(ETDirectAutoComplete,
+                                                          AutoCompOptions,
                                                           Ord(TAutoCompleteMode.acNone));
 
   ETdirectCmdList.Clear;
@@ -454,16 +475,23 @@ begin
   CbETDirect.OnChange(CbETDirect);
 end;
 
-function ReadCustomViewTags(GUIini: TMemIniFile): integer;
+function ReadCustomViewTags(GUIini: TMemIniFile; CreateEmpty: boolean): integer;
 begin
+  if (not CreateEmpty) and
+     (not GUIini.SectionExists(TagList)) then
+    exit(0);
   CustomViewTagList := ReplaceLastChar(GUIini.ReadString(TagList, CustomView, '<'), '<', ' ');
-  result := Length(CustomViewTagList);
+  result := Length(Trim(CustomViewTagList));
 end;
 
-function ReadPredefinedTags(GUIini: TMemIniFile): integer;
+function ReadPredefinedTags(GUIini: TMemIniFile; CreateEmpty: boolean): integer;
 var
   Indx: integer;
 begin
+  if (not CreateEmpty) and
+     (not GUIini.SectionExists(PredefinedTags)) then
+    exit(0);
+
   GUIini.ReadSectionValues(PredefinedTags, PredefinedTagList);
   for Indx := 0 to PredefinedTagList.Count -1 do
     PredefinedTagList[Indx] := ReplaceLastChar(PredefinedTagList[Indx], '<', ' ');
@@ -475,14 +503,21 @@ begin
   result := PredefinedTagList.Count;
 end;
 
-function ReadMarkedTags(GUIini: TMemIniFile): integer;
+function ReadMarkedTags(GUIini: TMemIniFile; CreateEmpty: boolean): integer;
 begin
+  if (not CreateEmpty) and
+     (not GUIini.SectionExists(TagList)) then
+    exit(0);
   MarkedTagList := ReplaceLastChar(GUIini.ReadString(TagList, MarkedTags, '<'), '<', ' ');
   result := Length(MarkedTagList);
 end;
 
-function ReadCopyTags(GUIini: TMemIniFile): integer;
+function ReadCopyTags(GUIini: TMemIniFile; CreateEmpty: boolean): integer;
 begin
+  if (not CreateEmpty) and
+     (not GUIini.SectionExists(TagList)) then
+    exit(0);
+
   ExcludeCopyTagListName := GUIini.ReadString(TagList, ExcludeCopyTags, '');
 
   ExcludeCopyTagList := ReplaceLastChar(PredefinedTagList.Values[ExcludeCopyTagListName], '<', ' ');
@@ -500,8 +535,12 @@ begin
   end;
 end;
 
-function ReadRemoveTags(GUIini: TMemIniFile): integer;
+function ReadRemoveTags(GUIini: TMemIniFile; CreateEmpty: boolean): integer;
 begin
+  if (not CreateEmpty) and
+     (not GUIini.SectionExists(TagList)) then
+    exit(0);
+
   RemoveTagListName := GUIini.ReadString(TagList, RemoveTags, '');
 
   RemoveTagList := ReplaceLastChar(PredefinedTagList.Values[RemoveTagListName], '<', ' ');
@@ -519,8 +558,12 @@ begin
   end;
 end;
 
-function ReadCopySingleTags(GUIini: TMemIniFile): integer;
+function ReadCopySingleTags(GUIini: TMemIniFile; CreateEmpty: boolean): integer;
 begin
+  if (not CreateEmpty) and
+     (not GUIini.SectionExists(TagList)) then
+    exit(0);
+
   CopySingleTagListName := GUIini.ReadString(TagList, CopySingleTags, '');
 
   CopySingleTagList := ReplaceLastChar(PredefinedTagList.Values[CopySingleTagListName], '<', ' ');
@@ -538,8 +581,12 @@ begin
   end;
 end;
 
-function ReadDiffTags(GUIini: TMemIniFile): integer;
+function ReadDiffTags(GUIini: TMemIniFile; CreateEmpty: boolean): integer;
 begin
+  if (not CreateEmpty) and
+     (not GUIini.SectionExists(TagList)) then
+    exit(0);
+
   DiffTagListName := GUIini.ReadString(TagList, DiffTags, '');
 
   DiffTagList := ReplaceLastChar(PredefinedTagList.Values[DiffTagListName], '<', ' ');
@@ -589,12 +636,24 @@ var
 begin
   TmpItems := TStringList.Create;
   try
-    GUIini.WriteInteger('WorkSpaceAutoComplete',
-                        'Options',
+    GUIini.WriteInteger(WorkSpaceAutoComplete,
+                        AutoCompOptions,
                         GUIsettings.WSAutoComp.AcOptions);
 
     GUIini.GetStrings(TmpItems); // Get strings written so far.
+
+    // For compatibility with Pre V6.3.8 write also the old format
     TmpItems.Add(Format('[%s]', [WorkSpaceTags]));
+    for Indx := 0 to Length(QuickTags) - 1 do
+    begin
+      Tx := Format('%s=%s^%s', [QuickTags[Indx].Caption,
+                                      QuickTags[Indx].Command,
+                                      QuickTags[Indx].Help]);
+      TmpItems.Add(Tx);
+    end;
+
+    // Write the new format, in a new section
+    TmpItems.Add(Format('[%s]', [WorkSpaceTagsV6]));
     for Indx := 0 to Length(QuickTags) - 1 do
     begin
       Tx := Format('%s=%s^%s^%d^%s', [QuickTags[Indx].Caption,
@@ -604,6 +663,7 @@ begin
                                       QuickTags[Indx].AutoComp.AcString]);
       TmpItems.Add(Tx);
     end;
+
     GUIini.SetStrings(TmpItems);
   finally
     TmpItems.Free;
@@ -617,8 +677,8 @@ var
   Tx: string;
   TmpItems: TStringList;
 begin
-  GUIini.WriteInteger('ETDirectAutoComplete',
-                      'Options',
+  GUIini.WriteInteger(ETDirectAutoComplete,
+                      AutoCompOptions,
                       GUIsettings.ETDAutoComp.AcOptions);
 
   TmpItems := TStringList.Create;
@@ -872,34 +932,34 @@ begin
       end;
 
       // Standard, Camera, Location, About and UserDef settings
-      ReadFileLists(FMain.ShellList.Handle, GUIini);
+      ReadFileLists(FMain.ShellList.Handle, GUIini, true);
 
       // --- ETdirect commands---
-      ReadEtDirectCmds(CBoxETdirect, GUIini);
+      ReadEtDirectCmds(CBoxETdirect, GUIini, true);
 
       // --- WorkSpace tags---
-      ReadWorkSpaceTags(GUIini);
+      ReadWorkSpaceTags(GUIini, true);
 
       // --- CustomView tags---
-      ReadCustomViewTags(GUIini);
+      ReadCustomViewTags(GUIini, true);
 
       // --- Predefined tags---
-      ReadPredefinedTags(GUIini);
+      ReadPredefinedTags(GUIini, true);
 
       // --- Marked tags---
-      ReadMarkedTags(GUIini);
+      ReadMarkedTags(GUIini, true);
 
       // -- ExcludeCopyTags & SelExcludeCopyTags
-      ReadCopyTags(GUIini);
+      ReadCopyTags(GUIini, true);
 
       // -- RemoveTags & SelRemoveTags
-      ReadRemoveTags(GUIini);
+      ReadRemoveTags(GUIini, true);
 
       // -- CopySingleTags & SelCopySingleTags
-      ReadCopySingleTags(GUIini);
+      ReadCopySingleTags(GUIini, true);
 
       // -- Diff
-      ReadDiffTags(GUIini);
+      ReadDiffTags(GUIini, true);
 
       // ---GeoCode
       ReadGeoCodeSettings(GUIini);
@@ -1161,16 +1221,16 @@ begin
     for ThisIniTag in AIniData do
     begin
       case ThisIniTag of
-        TIniTagsData.idtWorkSpace:        LoadOK := (ReadWorkSpaceTags(GuiIni) <> 0);
-        TIniTagsData.idtETDirect:         LoadOK := (ReadETdirectCmds(Fmain.CBoxETdirect, GuiIni) <> 0);
-        TIniTagsData.idtFileLists:        LoadOK := (ReadFileLists(FMain.ShellList.Handle, GuiIni));
-        TIniTagsData.idtCustomView:       LoadOK := (ReadCustomViewTags(GuiIni) <> 0);
-        TIniTagsData.idtMarked:           LoadOK := (ReadMarkedTags(GuiIni) <> 0);
-        TIniTagsData.idtPredefinedTags:   LoadOK := (ReadPredefinedTags(GUIini) <> 0);
-        TIniTagsData.idtRemoveTags:       LoadOK := (ReadRemoveTags(GuiIni) <> 0);
-        TIniTagsData.idtCopySingleTags:   LoadOK := (ReadCopySingleTags(GuiIni) <> 0);
-        TIniTagsData.idtCopyTags:         LoadOK := (ReadCopyTags(GuiIni) <> 0);
-        TIniTagsData.idtDiffTags:         LoadOK := (ReadDiffTags(GuiIni) <> 0);
+        TIniTagsData.idtWorkSpace:        LoadOK := (ReadWorkSpaceTags(GuiIni, false) <> 0);
+        TIniTagsData.idtETDirect:         LoadOK := (ReadETdirectCmds(Fmain.CBoxETdirect, GuiIni, false) <> 0);
+        TIniTagsData.idtFileLists:        LoadOK := (ReadFileLists(FMain.ShellList.Handle, GuiIni, false));
+        TIniTagsData.idtCustomView:       LoadOK := (ReadCustomViewTags(GuiIni, false) <> 0);
+        TIniTagsData.idtMarked:           LoadOK := (ReadMarkedTags(GuiIni, false) <> 0);
+        TIniTagsData.idtPredefinedTags:   LoadOK := (ReadPredefinedTags(GUIini, false) <> 0);
+        TIniTagsData.idtRemoveTags:       LoadOK := (ReadRemoveTags(GuiIni, false) <> 0);
+        TIniTagsData.idtCopySingleTags:   LoadOK := (ReadCopySingleTags(GuiIni, false) <> 0);
+        TIniTagsData.idtCopyTags:         LoadOK := (ReadCopyTags(GuiIni, false) <> 0);
+        TIniTagsData.idtDiffTags:         LoadOK := (ReadDiffTags(GuiIni, false) <> 0);
       else
         LoadOK := false;
       end;
@@ -1188,7 +1248,6 @@ var
   AIniData: TIniData;
 begin
   result := false;
-  IniLoaded := false;
 
   with OpenFileDlg do
   begin
@@ -1200,6 +1259,7 @@ begin
       HrIniData := '';
       for AIniData := Low(TIniData) to High(TIniData) do
       begin
+        IniLoaded := false;
         case AIniData of
           TIniData.idWorkSpace:
             IniLoaded := LoadIni(FileName, [TIniTagsData.idtWorkSpace]);
@@ -1219,6 +1279,7 @@ begin
         end;
         if (IniLoaded) then
           HrIniData := HRiniData + #10 + GetHrIniData(AIniData);
+        result := result or IniLoaded;
       end;
       if (HrIniData <> '') then
         ShowMessage(Format('%s%s%s', [Format(StrIniImported, [FileName]),

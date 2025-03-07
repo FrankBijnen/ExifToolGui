@@ -138,7 +138,7 @@ var
 begin
   GUIini := TMemIniFile.Create('NUL', TEncoding.UTF8);
   try
-    ReadFileLists(FMain.ShellList.Handle, GUIini);
+    ReadFileLists(FMain.ShellList.Handle, GUIini, true);
     DmFileLists.LoadFromColumnSets(FSample);
   finally
     GUIini.Free;

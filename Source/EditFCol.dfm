@@ -373,13 +373,12 @@ object FEditFColumn: TFEditFColumn
             Left = 11
             Top = 4
             Width = 85
-            Height = 14
+            Height = 13
             Margins.Left = 10
             Margins.Right = 5
             Align = alLeft
             Caption = 'Search tag name:'
             Layout = tlCenter
-            ExplicitHeight = 13
           end
           object EdSearchTag: TEdit
             Left = 101
