@@ -74,7 +74,7 @@ type
   end;
   TColumnSetList = TObjectlist<TColumnSet>;
 
-function ReadFileLists(LVHandle: HWND; GUIini: TMemIniFile): boolean;
+function ReadFileLists(LVHandle: HWND; GUIini: TMemIniFile; CreateEmpty: boolean): boolean;
 procedure WriteFileLists(GUIini: TMemIniFile);
 procedure ResetAllColumnWidths(LVHandle: HWND);
 function GetFileListDefCount: integer;
@@ -342,52 +342,60 @@ begin
   end;
 end;
 
-function ReadStandardTags(LVHandle: HWND; GUIini: TMemIniFile): TColumnsArray;
+function ReadStandardTags(LVHandle: HWND; GUIini: TMemIniFile): boolean;
 var
   ReadMode: TReadModeOptions;
+  ColumnsRead: TColumnsArray;
 begin
+  result := GUIini.SectionExists(StdColDef + StandardId);
   ReadMode := [];
-  result := ReadColumnDefs(LVHandle, GUIini, StdColDef + StandardId, StandardDefaults, ReadMode);
+  ColumnsRead := ReadColumnDefs(LVHandle, GUIini, StdColDef + StandardId, StandardDefaults, ReadMode);
   FColumnSetList.Add(TColumnSet.Create(StrStandardList,
                                        floSystem,
                                        ReadMode,
-                                       result));
+                                       ColumnsRead));
 end;
 
-function ReadCameraTags(LVHandle: HWND; GUIini: TMemIniFile): TColumnsArray;
+function ReadCameraTags(LVHandle: HWND; GUIini: TMemIniFile): boolean;
 var
   ReadMode: TReadModeOptions;
+  ColumnsRead: TColumnsArray;
 begin
+  result := GUIini.SectionExists(StdColDef + CameraId);
   ReadMode := DefInternalMode;
-  result := ReadColumnDefs(LVHandle, GUIini, StdColDef + CameraId, CameraDefaults, ReadMode);
+  ColumnsRead := ReadColumnDefs(LVHandle, GUIini, StdColDef + CameraId, CameraDefaults, ReadMode);
   FColumnSetList.Add(TColumnSet.Create(StrCameraList,
                                        floInternal,
                                        ReadMode,
-                                       result));
+                                       ColumnsRead));
 end;
 
-function ReadLocationTags(LVHandle: HWND; GUIini: TMemIniFile): TColumnsArray;
+function ReadLocationTags(LVHandle: HWND; GUIini: TMemIniFile): boolean;
 var
   ReadMode: TReadModeOptions;
+  ColumnsRead: TColumnsArray;
 begin
+  result := GUIini.SectionExists(StdColDef + LocationId);
   ReadMode := DefInternalMode;
-  result := ReadColumnDefs(LVHandle, GUIini, StdColDef + LocationId, LocationDefaults, ReadMode);
+  ColumnsRead := ReadColumnDefs(LVHandle, GUIini, StdColDef + LocationId, LocationDefaults, ReadMode);
   FColumnSetList.Add(TColumnSet.Create(StrLocationList,
                                        floInternal,
                                        ReadMode,
-                                       result));
+                                       ColumnsRead));
 end;
 
-function ReadAboutTags(LVHandle: HWND; GUIini: TMemIniFile): TColumnsArray;
+function ReadAboutTags(LVHandle: HWND; GUIini: TMemIniFile): boolean;
 var
   ReadMode: TReadModeOptions;
+  ColumnsRead: TColumnsArray;
 begin
+  result := GUIini.SectionExists(StdColDef + AboutId);
   ReadMode := DefInternalMode;
-  result := ReadColumnDefs(LVHandle, GUIini, StdColDef + AboutId, AboutDefaults, ReadMode);
+  ColumnsRead := ReadColumnDefs(LVHandle, GUIini, StdColDef + AboutId, AboutDefaults, ReadMode);
   FColumnSetList.Add(TColumnSet.Create(StrAboutList,
                                        floInternal,
                                        ReadMode,
-                                       result));
+                                       ColumnsRead));
 end;
 
 function ReadUserDefTags(LVHandle: HWND; GUIini: TMemIniFile): integer;
@@ -432,14 +440,14 @@ begin
     UserDefList := TStringList.Create;
     try
       GUIini.ReadSectionValues(UserDefLists, UserDefList);
-      if (UserDefList.Count = 0) then
+      result := UserDefList.Count;
+      if (result = 0) then
         UserDefList.AddPair('0', StrUserList);
       for Indx := 0 to UserDefList.Count -1 do
       begin
         AUserDefName := UserDefList.ValueFromIndex[Indx];
         ReadMode := [rmExifTool];
         AColumnDefs := ReadColumnDefs(LVHandle, GUIini, UsrColDef + UserDefList.KeyNames[Indx], DefaultUserDef, ReadMode);
-        result := result + Length(AColumnDefs);
         FColumnSetList.Add(TColumnSet.Create(AUserDefName,
                                              floUserDef,
                                              ReadMode,
@@ -451,14 +459,31 @@ begin
   end;
 end;
 
-function ReadFileLists(LVHandle: HWND; GUIini: TMemIniFile): boolean;
+function ReadFileLists(LVHandle: HWND; GUIini: TMemIniFile; CreateEmpty: boolean): boolean;
+var
+  ReadTags: boolean;
 begin
+  result := false;
+
+  if (not CreateEmpty) and
+     (not GUIini.SectionExists(StdColDef + StandardId)) then // Only Check for standard tags in INI. Should always be there.
+    exit;
+
   FColumnSetList.Clear;
-  ReadStandardTags(LVHandle, GUIini);
-  ReadCameraTags(LVHandle, GUIini);
-  ReadLocationTags(LVHandle, GUIini);
-  ReadAboutTags(LVHandle, GUIini);
-  result := (ReadUserDefTags(LVHandle, GUIini) > 0);
+  ReadTags := ReadStandardTags(LVHandle, GUIini);
+  result := result or ReadTags;
+
+  ReadTags := ReadCameraTags(LVHandle, GUIini);
+  result := result or ReadTags;
+
+  ReadTags := ReadLocationTags(LVHandle, GUIini);
+  result := result or ReadTags;
+
+  ReadTags := ReadAboutTags(LVHandle, GUIini);
+  result := result or ReadTags;
+
+  ReadTags := (ReadUserDefTags(LVHandle, GUIini) > 0);
+  result := result or ReadTags;
 end;
 
 procedure WriteFileLists(GUIini: TMemIniFile);
