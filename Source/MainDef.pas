@@ -376,8 +376,8 @@ begin
 
     GUIini.ReadSectionValues(WorkSpaceTagsVersion, TmpItems);
     WSCnt := TmpItems.Count;
+    SetLength(QuickTags, WSCnt);
     result := WSCnt;
-
     if (WSCnt = 0) and
        (GUIini.SectionExists(WorkSpaceTagsVersion) = false) then
     begin
@@ -386,7 +386,7 @@ begin
       WSCnt :=  SetQuickTag(WSCnt, 'Model', '-exif:Model');
       WSCnt :=  SetQuickTag(WSCnt, 'LensModel', '-exif:LensModel');
       WSCnt :=  SetQuickTag(WSCnt, 'ExposureTime', '-exif:ExposureTime', '[1/50] or [0.02]',
-                Ord(acAutoSuggestAppend), '1/15/n1/30/n1/60/n1/90/n1/125/n/1/250/n1/500/n1/1000/n1/2000/n1/4000/n');
+                Ord(acAutoSuggestAppend), '1/15/n1/30/n1/50/n1/60/n1/90/n1/125/n/1/250/n1/500/n1/1000/n1/2000/n1/4000/n');
       WSCnt :=  SetQuickTag(WSCnt, 'FNumber', '-exif:FNumber','',
                 Ord(acAutoSuggestAppend), '1.4/n2.0/n2.8/n4.0/n5.6/n8.0/n11.0/n16.0/n22.0/n');
       WSCnt :=  SetQuickTag(WSCnt, 'ISO', '-exif:ISO', '',
@@ -444,7 +444,6 @@ function ReadETdirectCmds(CbETDirect: TComboBox; GUIini: TMemIniFile; CreateEmpt
 var
   Indx, ETcnt: integer;
 begin
-  // Create empty ?
   if (not CreateEmpty) and
      (not GUIini.SectionExists(ETDirectCmd)) then
     exit(0);
@@ -478,10 +477,10 @@ end;
 function ReadCustomViewTags(GUIini: TMemIniFile; CreateEmpty: boolean): integer;
 begin
   if (not CreateEmpty) and
-     (not GUIini.SectionExists(TagList)) then
+     (not GUIini.ValueExists(TagList, CustomView)) then
     exit(0);
   CustomViewTagList := ReplaceLastChar(GUIini.ReadString(TagList, CustomView, '<'), '<', ' ');
-  result := Length(Trim(CustomViewTagList));
+  result := Length(CustomViewTagList);
 end;
 
 function ReadPredefinedTags(GUIini: TMemIniFile; CreateEmpty: boolean): integer;
@@ -506,7 +505,7 @@ end;
 function ReadMarkedTags(GUIini: TMemIniFile; CreateEmpty: boolean): integer;
 begin
   if (not CreateEmpty) and
-     (not GUIini.SectionExists(TagList)) then
+     (not GUIini.ValueExists(TagList, MarkedTags)) then
     exit(0);
   MarkedTagList := ReplaceLastChar(GUIini.ReadString(TagList, MarkedTags, '<'), '<', ' ');
   result := Length(MarkedTagList);
@@ -515,7 +514,7 @@ end;
 function ReadCopyTags(GUIini: TMemIniFile; CreateEmpty: boolean): integer;
 begin
   if (not CreateEmpty) and
-     (not GUIini.SectionExists(TagList)) then
+     (not GUIini.ValueExists(TagList, ExcludeCopyTags)) then
     exit(0);
 
   ExcludeCopyTagListName := GUIini.ReadString(TagList, ExcludeCopyTags, '');
@@ -538,7 +537,7 @@ end;
 function ReadRemoveTags(GUIini: TMemIniFile; CreateEmpty: boolean): integer;
 begin
   if (not CreateEmpty) and
-     (not GUIini.SectionExists(TagList)) then
+     (not GUIini.ValueExists(TagList, RemoveTags)) then
     exit(0);
 
   RemoveTagListName := GUIini.ReadString(TagList, RemoveTags, '');
@@ -561,7 +560,7 @@ end;
 function ReadCopySingleTags(GUIini: TMemIniFile; CreateEmpty: boolean): integer;
 begin
   if (not CreateEmpty) and
-     (not GUIini.SectionExists(TagList)) then
+     (not GUIini.ValueExists(TagList, CopySingleTags)) then
     exit(0);
 
   CopySingleTagListName := GUIini.ReadString(TagList, CopySingleTags, '');
@@ -584,7 +583,7 @@ end;
 function ReadDiffTags(GUIini: TMemIniFile; CreateEmpty: boolean): integer;
 begin
   if (not CreateEmpty) and
-     (not GUIini.SectionExists(TagList)) then
+     (not GUIini.ValueExists(TagList, DiffTags)) then
     exit(0);
 
   DiffTagListName := GUIini.ReadString(TagList, DiffTags, '');
