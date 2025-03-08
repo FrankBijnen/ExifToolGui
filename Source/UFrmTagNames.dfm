@@ -57,8 +57,6 @@ object FrmTagNames: TFrmTagNames
     Height = 29
     Align = alBottom
     TabOrder = 6
-    ExplicitTop = 288
-    ExplicitWidth = 556
     DesignSize = (
       560
       29)

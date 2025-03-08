@@ -3,7 +3,8 @@ unit MainDef;
 interface
 
 uses
-  System.Classes, Winapi.Windows, Vcl.Dialogs, Vcl.ComCtrls, ExifTool, GEOMap, UnitLangResources, UnitScaleForm,
+  System.Classes, System.IniFiles,
+  Winapi.Windows, Vcl.Dialogs, Vcl.ComCtrls, ExifTool, GEOMap, UnitLangResources, UnitScaleForm,
   ExifToolsGui_AutoComplete;
 
 const
@@ -185,11 +186,12 @@ procedure ReadGUIini;
 function SaveGUIini: boolean;
 function LoadIniDialog(OpenFileDlg: TOpenDialog): boolean;
 function SaveIniDialog(SaveFileDlg: TSaveDialog; SelIniData: TSelIniData): boolean;
+function ReadWorkSpaceTags(GUIini: TMemIniFile; CreateEmpty: boolean):integer;
 
 implementation
 
 uses
-  System.SysUtils, System.StrUtils, System.IniFiles,
+  System.SysUtils, System.StrUtils,
   Vcl.Forms, Vcl.StdCtrls,
   Main, UnitColumnDefs, ExifToolsGUI_Utils, ExifToolsGui_FileListColumns, ExifInfo, LogWin;
 

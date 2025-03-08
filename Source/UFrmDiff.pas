@@ -7,7 +7,8 @@ uses
   Winapi.Windows, Winapi.Messages,
   Vcl.StdCtrls, Vcl.Buttons, Vcl.Controls, Vcl.ExtCtrls, Vcl.BaseImageCollection, Vcl.ImageCollection,
   Vcl.ImgList, Vcl.VirtualImageList, Vcl.Dialogs, Vcl.ComCtrls,
-  ExifToolsGui_Listview, UnitScaleForm, Vcl.Forms;
+  UnitScaleForm,
+  ExifToolsGui_Listview;  // TListView
 
 type
   TFrmDiff = class(TScaleForm)
