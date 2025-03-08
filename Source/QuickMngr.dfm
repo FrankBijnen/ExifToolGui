@@ -38,11 +38,10 @@ object FQuickManager: TFQuickManager
     ParentDoubleBuffered = False
     ParentFont = False
     TabOrder = 0
-    ExplicitHeight = 608
     object SgWorkSpace: TStringGrid
-      Left = 1
+      Left = 41
       Top = 64
-      Width = 615
+      Width = 575
       Height = 501
       Align = alClient
       ColCount = 4
@@ -56,7 +55,6 @@ object FQuickManager: TFQuickManager
       TabOrder = 1
       OnDrawCell = SgWorkSpaceDrawCell
       OnSelectCell = SgWorkSpaceSelectCell
-      ExplicitHeight = 543
     end
     object PnlFuncTop: TPanel
       Left = 1
@@ -67,23 +65,25 @@ object FQuickManager: TFQuickManager
       TabOrder = 0
       object GrpDefAutoComplete: TGroupBox
         AlignWithMargins = True
-        Left = 236
+        Left = 308
         Top = 2
-        Width = 375
+        Width = 303
         Height = 59
         Margins.Top = 1
         Margins.Bottom = 1
         Align = alClient
         Caption = 'Default auto complete options'
         TabOrder = 0
+        ExplicitLeft = 236
+        ExplicitWidth = 375
         object CmbDefAutoCompleteMode: TComboBox
           AlignWithMargins = True
           Left = 5
-          Top = 16
-          Width = 365
+          Top = 17
+          Width = 293
           Height = 21
-          Margins.Top = 1
-          Margins.Bottom = 1
+          Margins.Top = 2
+          Margins.Bottom = 2
           Align = alTop
           TabOrder = 0
           TabStop = False
@@ -94,12 +94,14 @@ object FQuickManager: TFQuickManager
             'Auto append'
             'Auto suggest'
             'Auto append + suggest')
+          ExplicitTop = 16
+          ExplicitWidth = 365
         end
         object ChkDefAutoCorrect: TCheckBox
           AlignWithMargins = True
           Left = 5
-          Top = 39
-          Width = 365
+          Top = 41
+          Width = 293
           Height = 17
           Margins.Top = 1
           Margins.Bottom = 1
@@ -108,17 +110,19 @@ object FQuickManager: TFQuickManager
           Caption = 'Auto correct'
           TabOrder = 1
           OnClick = ChkDefAutoCorrectClick
+          ExplicitTop = 39
+          ExplicitWidth = 365
         end
       end
       object PnlAddDel: TPanel
         Left = 1
         Top = 1
-        Width = 232
+        Width = 304
         Height = 61
         Align = alLeft
         TabOrder = 1
         object SpbAddTag: TSpeedButton
-          Left = 5
+          Left = 3
           Top = 29
           Width = 100
           Height = 25
@@ -126,13 +130,59 @@ object FQuickManager: TFQuickManager
           OnClick = SpbAddTagClick
         end
         object SpbDelTag: TSpeedButton
-          Left = 111
+          Left = 101
           Top = 29
           Width = 100
           Height = 25
           Caption = 'Delete'
           OnClick = SpbDelTagClick
         end
+        object SpbDefaults: TSpeedButton
+          Left = 199
+          Top = 29
+          Width = 100
+          Height = 25
+          Caption = 'Defaults'
+          OnClick = SpbDefaultsClick
+        end
+      end
+    end
+    object PnlSort: TPanel
+      Left = 1
+      Top = 64
+      Width = 40
+      Height = 501
+      Align = alLeft
+      TabOrder = 2
+      object BtnColumnDown: TButton
+        Left = 7
+        Top = 82
+        Width = 25
+        Height = 57
+        Caption = '6'
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clWindowText
+        Font.Height = -15
+        Font.Name = 'Webdings'
+        Font.Style = []
+        ParentFont = False
+        TabOrder = 0
+        OnClick = BtnColumnDownClick
+      end
+      object BtnColumnUp: TButton
+        Left = 7
+        Top = 6
+        Width = 25
+        Height = 52
+        Caption = '5'
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clWindowText
+        Font.Height = -15
+        Font.Name = 'Webdings'
+        Font.Style = []
+        ParentFont = False
+        TabOrder = 1
+        OnClick = BtnColumnUpClick
       end
     end
   end
@@ -143,7 +193,6 @@ object FQuickManager: TFQuickManager
     Height = 19
     Panels = <>
     SimplePanel = True
-    ExplicitTop = 643
   end
   object PnlDetail: TPanel
     Left = 620
@@ -154,15 +203,13 @@ object FQuickManager: TFQuickManager
     Constraints.MinWidth = 300
     TabOrder = 1
     OnResize = PnlDetailResize
-    ExplicitHeight = 608
     object PnlAutoComplete: TPanel
       Left = 1
-      Top = 169
+      Top = 139
       Width = 322
-      Height = 396
+      Height = 426
       Align = alClient
       TabOrder = 0
-      ExplicitHeight = 438
       object PctAutoOptions: TPageControl
         Left = 1
         Top = 1
@@ -216,24 +263,22 @@ object FQuickManager: TFQuickManager
         Left = 1
         Top = 97
         Width = 320
-        Height = 298
+        Height = 328
         Align = alClient
         Caption = 'Custom list'
         TabOrder = 1
-        ExplicitHeight = 340
         object MemoAutoLines: TMemo
           AlignWithMargins = True
           Left = 17
           Top = 30
           Width = 286
-          Height = 263
+          Height = 293
           Margins.Left = 15
           Margins.Top = 15
           Margins.Right = 15
           Align = alClient
           TabOrder = 0
           OnKeyUp = MemoAutoLinesKeyUp
-          ExplicitHeight = 305
         end
       end
     end
@@ -241,12 +286,12 @@ object FQuickManager: TFQuickManager
       Left = 1
       Top = 1
       Width = 322
-      Height = 168
+      Height = 138
       Align = alTop
       TabOrder = 1
       object EdTagDesc: TLabeledEdit
         Left = 10
-        Top = 42
+        Top = 18
         Width = 300
         Height = 21
         Hint = 
@@ -264,7 +309,7 @@ object FQuickManager: TFQuickManager
       end
       object EdTagDef: TLabeledEdit
         Left = 10
-        Top = 80
+        Top = 56
         Width = 300
         Height = 21
         Hint = 
@@ -281,7 +326,7 @@ object FQuickManager: TFQuickManager
       end
       object EdTagHint: TLabeledEdit
         Left = 10
-        Top = 125
+        Top = 101
         Width = 300
         Height = 21
         Hint = 
@@ -305,7 +350,6 @@ object FQuickManager: TFQuickManager
     Height = 35
     Align = alBottom
     TabOrder = 2
-    ExplicitTop = 608
     DesignSize = (
       944
       35)

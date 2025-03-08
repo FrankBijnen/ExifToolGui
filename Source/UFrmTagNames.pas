@@ -5,7 +5,7 @@ interface
 uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
   Vcl.Controls, Vcl.Forms, UnitScaleForm, Vcl.Dialogs, Vcl.StdCtrls, Vcl.Buttons, Vcl.ExtCtrls,
-  ExifToolsGui_ComboBox;
+  ExifToolsGui_ComboBox; // TComboBox
 
 type
   TFrmTagNames = class(TScaleForm)

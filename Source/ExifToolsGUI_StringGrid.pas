@@ -11,6 +11,8 @@ type
     procedure DeleteRow(ARow: longint); override;
     function InsertRow(ARow: longint): longint;
     procedure MakeRowVisible(ARow: longint);
+    procedure MoveUp(ARow: longint);
+    procedure MoveDown(ARow: longint);
   end;
 
 implementation
@@ -68,6 +70,18 @@ begin
     if (ARow > T + N) then
       TopRow := ARow;
   end;
+end;
+
+procedure TStringGrid.MoveUp(ARow: longint);
+begin
+  if (ARow > 0) then
+    MoveRow(ARow - 1, ARow);
+end;
+
+procedure TStringGrid.MoveDown(ARow: longint);
+begin
+  if (ARow < RowCount -1) then
+    MoveRow(ARow + 1, ARow);
 end;
 
 end.

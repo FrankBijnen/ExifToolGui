@@ -3,11 +3,12 @@ unit UFrmPredefinedTags;
 interface
 
 uses
-  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
-  Vcl.Controls, Vcl.Forms, UnitScaleForm, Vcl.Dialogs, Vcl.StdCtrls, Vcl.Buttons, Vcl.ExtCtrls,
-  Vcl.Grids, Vcl.ValEdit,
-  ExifToolsGui_ValEdit, MainDef, System.ImageList, Vcl.ImgList, Vcl.VirtualImageList, Vcl.BaseImageCollection, Vcl.ImageCollection,
-  Vcl.ComCtrls;
+  System.SysUtils, System.Variants, System.Classes, Vcl.Graphics, System.ImageList,
+  Winapi.Windows, Winapi.Messages,
+  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, Vcl.Buttons, Vcl.ExtCtrls,
+  Vcl.Grids, Vcl.ImgList, Vcl.VirtualImageList, Vcl.BaseImageCollection,
+  Vcl.ImageCollection, Vcl.ComCtrls,
+  UnitScaleForm, MainDef;
 
 const
   UnNamed = 'UnNamed';

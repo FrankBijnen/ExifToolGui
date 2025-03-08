@@ -7,7 +7,8 @@ uses
   System.Classes, Vcl.Graphics,
   Vcl.Controls, UnitScaleForm, Vcl.Dialogs, Vcl.StdCtrls, Vcl.Mask, Vcl.ExtCtrls,
   Vcl.ComCtrls, Vcl.Grids, Vcl.ValEdit,
-  ExifToolsGui_ComboBox, Geomap;
+  Geomap,
+  ExifToolsGui_ComboBox; // TComboBox
 
 type
 

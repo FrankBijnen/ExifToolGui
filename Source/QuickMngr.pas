@@ -7,7 +7,8 @@ uses
   Winapi.Windows, Winapi.Messages,
   Vcl.Graphics, Vcl.Controls, Vcl.Forms, Vcl.Grids, Vcl.Dialogs, Vcl.ExtCtrls,
   Vcl.StdCtrls, Vcl.ComCtrls, Vcl.Mask, Vcl.Buttons,
-  MainDef, UnitScaleForm, ExifToolsGUI_StringGrid;
+  MainDef, UnitScaleForm,
+  ExifToolsGUI_StringGrid;    // StringGrid
 
 type
   TFQuickManager = class(TScaleForm)
@@ -38,6 +39,10 @@ type
     SpbDelTag: TSpeedButton;
     CmbDefAutoCompleteMode: TComboBox;
     ChkDefAutoCorrect: TCheckBox;
+    PnlSort: TPanel;
+    BtnColumnDown: TButton;
+    BtnColumnUp: TButton;
+    SpbDefaults: TSpeedButton;
     procedure FormShow(Sender: TObject);
     procedure SgWorkSpaceSelectCell(Sender: TObject; ACol, ARow: Integer; var CanSelect: Boolean);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
@@ -52,11 +57,16 @@ type
     procedure ChkAutoOptionsClick(Sender: TObject);
     procedure ChkDefAutoCorrectClick(Sender: TObject);
     procedure CmbDefAutoCompleteModeChange(Sender: TObject);
+    procedure BtnColumnDownClick(Sender: TObject);
+    procedure BtnColumnUpClick(Sender: TObject);
+    procedure SpbDefaultsClick(Sender: TObject);
   private
     { Private declarations }
     procedure DisplayHint(Sender: TObject);
+    procedure CreateDefaults;
     procedure UpdateButtons;
     procedure UpdateLabels(const ARow: integer);
+    procedure UpdateGrid(FocusRow: integer);
     procedure SetAutoCompleteOptions;
     procedure SetDefAutoCompleteOptions;
     function QuickRec(ARow: Longint): TQuickTagRec;
@@ -71,10 +81,23 @@ var
 implementation
 
 uses
-  System. StrUtils, Vcl.Themes,
-  Main, ExifTool, ExifToolsGUI_Utils, ExifToolsGui_AutoComplete, UFrmTagNames;
+  System.StrUtils, System.IniFiles, Vcl.Themes,
+  Main, ExifTool, ExifToolsGUI_Utils, ExifToolsGui_AutoComplete, UFrmTagNames, UnitLangResources;
 
 {$R *.dfm}
+
+procedure TFQuickManager.CreateDefaults;
+var
+  GUIini: TMemIniFile;
+begin
+  GUIini := TMemIniFile.Create('NUL', TEncoding.UTF8);
+  try
+    ReadWorkSpaceTags(GUIini, true);
+    UpdateGrid(1);
+  finally
+    GUIini.Free;
+  end;
+end;
 
 procedure TFQuickManager.SetAutoCompleteOptions;
 var
@@ -98,6 +121,16 @@ begin
   GUIsettings.WSAutoComp.SetAcOptions(TAutoCompleteMode(CmbDefAutoCompleteMode.ItemIndex +1),
                                       ChkDefAutoCorrect.Checked,
                                       true);
+end;
+
+procedure TFQuickManager.BtnColumnUpClick(Sender: TObject);
+begin
+  SgWorkSpace.MoveUp(SgWorkSpace.Row);
+end;
+
+procedure TFQuickManager.BtnColumnDownClick(Sender: TObject);
+begin
+  SgWorkSpace.MoveDown(SgWorkSpace.Row);
 end;
 
 procedure TFQuickManager.ChkAutoCorrectClick(Sender: TObject);
@@ -174,6 +207,30 @@ begin
   end;
 end;
 
+procedure TFQuickManager.UpdateGrid(FocusRow: integer);
+var
+  Index: integer;
+begin
+  SgWorkSpace.BeginUpdate;
+  try
+    SgWorkSpace.RowCount := Length(QuickTags);
+    for Index := 0 to SgWorkSpace.RowCount - 1 do
+    begin
+      SgWorkSpace.Cells[0, Index] := QuickTags[Index].Caption;
+      SgWorkSpace.Cells[1, Index] := QuickTags[Index].Command;
+      SgWorkSpace.Cells[2, Index] := QuickTags[Index].Help;
+      SgWorkSpace.Cells[3, Index] := QuickTags[Index].AutoComp.AcString;
+      SgWorkSpace.Objects[3, Index] := pointer(QuickTags[Index].AutoComp.AcOptions);
+    end;
+    if (FocusRow < SgWorkSpace.RowCount) then
+      SgWorkSpace.Row := FocusRow
+    else
+      SgWorkSpace.Row := SgWorkSpace.RowCount;
+  finally
+    SgWorkSpace.EndUpdate;
+  end;
+end;
+
 procedure TFQuickManager.SaveSettings;
 var
   N: integer;
@@ -214,6 +271,14 @@ begin
   end;
 end;
 
+procedure TFQuickManager.SpbDefaultsClick(Sender: TObject);
+begin
+  if (MessageDlgEx(StrDeleteCustom, '', TMsgDlgType.mtConfirmation, [TMsgDlgBtn.mbOK, TMsgDlgBtn.mbCancel]) = IdCancel) then
+    exit;
+
+  CreateDefaults;
+end;
+
 procedure TFQuickManager.SpbDelTagClick(Sender: TObject);
 begin
   if (SgWorkSpace.RowCount > 1) then
@@ -252,37 +317,21 @@ end;
 
 procedure TFQuickManager.FormShow(Sender: TObject);
 var
-  I, N, X: integer;
+  X: integer;
 begin
   Application.OnHint := DisplayHint;
   Left := FMain.GetFormOffset(false).X;
   Top := FMain.GetFormOffset(false).Y;
+  SgWorkSpace.ColWidths[1] := 220;
+  SgWorkSpace.ColWidths[2] := 220;
+  SgWorkSpace.ColWidths[3] := 0;
 
   if FMain.SpeedBtnQuick.Down then
     X := FMain.MetadataList.Row - 1
   else
     X := 0;
-  I := Length(QuickTags);
 
-  SgWorkSpace.BeginUpdate;
-  try
-    SgWorkSpace.ColWidths[1] := 220;
-    SgWorkSpace.ColWidths[2] := 220;
-    SgWorkSpace.ColWidths[3] := 0;
-    SgWorkSpace.RowCount := I;
-    for N := 0 to I - 1 do
-    begin
-      SgWorkSpace.Cells[0, N] := QuickTags[N].Caption;
-      SgWorkSpace.Cells[1, N] := QuickTags[N].Command;
-      SgWorkSpace.Cells[2, N] := QuickTags[N].Help;
-      SgWorkSpace.Cells[3, N] := QuickTags[N].AutoComp.AcString;
-      SgWorkSpace.Objects[3, N] := pointer(QuickTags[N].AutoComp.AcOptions);
-    end;
-    SgWorkSpace.Row := X;
-  finally
-    SgWorkSpace.EndUpdate;
-  end;
-
+  UpdateGrid(X);
   UpdateButtons;
   UpdateLabels(SgWorkSpace.Row);
 end;

@@ -32,7 +32,7 @@ uses
   ExifToolsGUI_ShellTree,     // Extension of ShellTreeView
   ExifToolsGUI_ShellList,     // Extension of ShellListView
   ExifToolsGUI_Thumbnails,    // Thumbnails
-  ExifToolsGUI_ValEdit,       // MetaData
+  ExifToolsGUI_ValEdit,       // TValueListeditor Metadata
   ExifToolsGUI_OpenPicture,   // OpenPicture dialog
   ExifToolsGUI_Utils,         // Various
   ExifToolsGui_AutoEdit,      // AutoEdit
