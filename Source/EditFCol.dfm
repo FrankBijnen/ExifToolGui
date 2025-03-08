@@ -22,8 +22,6 @@ object FEditFColumn: TFEditFColumn
     Height = 533
     Align = alClient
     TabOrder = 1
-    ExplicitWidth = 1064
-    ExplicitHeight = 532
     object HSplitter: TSplitter
       Left = 1
       Top = 231
@@ -52,7 +50,6 @@ object FEditFColumn: TFEditFColumn
       Height = 30
       Align = alTop
       TabOrder = 0
-      ExplicitWidth = 1062
       object SpbAddPred: TSpeedButton
         Left = 61
         Top = 3
@@ -110,7 +107,6 @@ object FEditFColumn: TFEditFColumn
       Height = 200
       Align = alTop
       TabOrder = 1
-      ExplicitWidth = 1062
       object DbgFileListDef: TDBGrid
         Left = 41
         Top = 1
@@ -268,7 +264,6 @@ object FEditFColumn: TFEditFColumn
       Height = 30
       Align = alTop
       TabOrder = 3
-      ExplicitWidth = 1062
       object SpbAddTag: TSpeedButton
         Left = 55
         Top = 3
@@ -311,8 +306,6 @@ object FEditFColumn: TFEditFColumn
       Align = alRight
       TabOrder = 4
       Visible = False
-      ExplicitLeft = 715
-      ExplicitHeight = 265
       object DbgTagNames: TDBGrid
         Left = 1
         Top = 66
@@ -373,12 +366,13 @@ object FEditFColumn: TFEditFColumn
             Left = 11
             Top = 4
             Width = 85
-            Height = 13
+            Height = 14
             Margins.Left = 10
             Margins.Right = 5
             Align = alLeft
             Caption = 'Search tag name:'
             Layout = tlCenter
+            ExplicitHeight = 13
           end
           object EdSearchTag: TEdit
             Left = 101
@@ -416,7 +410,8 @@ object FEditFColumn: TFEditFColumn
       Height = 266
       Align = alLeft
       TabOrder = 5
-      ExplicitHeight = 265
+      ExplicitLeft = -5
+      ExplicitTop = 270
       object BtnColumnUp: TButton
         Left = 7
         Top = 6
@@ -434,7 +429,7 @@ object FEditFColumn: TFEditFColumn
       end
       object BtnColumnDown: TButton
         Left = 7
-        Top = 82
+        Top = 68
         Width = 25
         Height = 57
         Caption = '6'
@@ -456,8 +451,6 @@ object FEditFColumn: TFEditFColumn
     Height = 29
     Align = alBottom
     TabOrder = 0
-    ExplicitTop = 532
-    ExplicitWidth = 1064
     DesignSize = (
       1068
       29)
