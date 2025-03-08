@@ -1096,15 +1096,30 @@ end;
 
 procedure TFMain.MetadataListDrawCell(Sender: TObject; ACol, ARow: integer; Rect: TRect; State: TGridDrawState);
 var
-  CellTx, KeyTx, WorkTx: string;
+  CellTx, KeyTx: string;
   NewColor, TxtColor: TColor;
-  I, N, X: integer;
+  Group0, Group1: string;
+
+  procedure GetGroupNames;
+  var
+    GroupNr: integer;
+  begin
+    Group0 := '';
+    Group1 := '';
+    GroupNr := Integer(MetadataList.Strings.Objects[ARow -1]);
+    if (GroupNr > -1) and
+       (GroupNr < MetadataList.Strings.Count) then
+    begin
+      Group1 := ReplaceAll(MetadataList.Strings.ValueFromIndex[GroupNr], ['---- ', ' ----'], ['', '']);
+      Group0 := NextField(Group1, ':');
+    end;
+  end;
+
 begin
   if (ARow < 1) or
      ((State <> []) and (not (gdSelected in State))) then
     exit;
 
-  N := Length(QuickTags) - 1;
   with MetadataList do
   begin
     CellTx := Cells[ACol, ARow];
@@ -1149,23 +1164,15 @@ begin
       else
       begin
         Delete(KeyTx, 1, Pos(' ', KeyTx)); // -in case of Show HexID prefix
+        GetGroupNames;
+
         TxtColor := clWindowText;
         if Pos(KeyTx + ' ', MarkedTagList) > 0 then
           TxtColor := $0000FF; // tag is marked
-        // check if tag is defined in Workspace
-        KeyTx := UpperCase(KeyTx);
-        for I := 0 to N do
-        begin
-          WorkTx := UpperCase(QuickTags[I].Command);
-          X := pos(':', WorkTx);
-          if X > 0 then
-            Delete(WorkTx, 1, X);
-          if KeyTx = WorkTx then
-          begin
-            NewColor := $EEFFDD;
-            break;
-          end;
-        end;
+
+        if (TagInWorkSpace(Group0, Group1, KeyTx)) then
+          NewColor := $EEFFDD;
+
         if (NewColor <> clWindow) or
            (TxtColor <> clWindowText) then
         begin
@@ -2013,6 +2020,7 @@ begin
       Help := 'No Hint defined';
     end;
 
+    UpdateQuickTagsLists;
   finally
     MetadataList.Refresh;
     SetCursor(CrNormal);
@@ -2072,6 +2080,7 @@ begin
     inc(N);
   end;
   SetLength(QuickTags, I);
+  UpdateQuickTagsLists;
   ShowMetadata;
 end;
 
@@ -3903,6 +3912,7 @@ end;
 procedure TFMain.ShowMetadata;
 var
   E, N: integer;
+  CurrentGroup: integer;
   ETcmd, Item, Value, Tx: string;
   ETResult: TStringList;
   NoChars:  TSysCharSet;
@@ -3985,7 +3995,7 @@ begin
       if MaGroup_g4.Checked then
         ETcmd := ETcmd + '-g4' + CRLF
       else
-        ETcmd := ETcmd + '-g1' + CRLF;
+        ETcmd := ETcmd + '-g0:1' + CRLF;
       if not MaNotDuplicated.Checked then
         ETcmd := ETcmd + '-a' + CRLF;
       if MaShowSorted.Checked then
@@ -4050,8 +4060,14 @@ begin
       MetadataList.Strings.BeginUpdate;
       MetadataList.SetStringsCount(ETResult.Count);
       try
+        CurrentGroup := -1;
         for E := 0 to ETResult.Count -1 do
+        begin
+          if (LeftStr(ETResult[E], 1) = '=') then
+            CurrentGroup := E;
           MetadataList.Strings[E] := ETResult[E];
+          MetadataList.Strings.Objects[E] := pointer(CurrentGroup);
+        end;
       finally
         MetadataList.Strings.EndUpdate;
       end;

@@ -150,7 +150,6 @@ type
 var
   GUIsettings: GUIsettingsRec;
   ETdirectCmdList: TStringList;
-
   QuickTags: array of TQuickTagRec;
   MarkedTagList: string;
   CustomViewTagList: string;
@@ -187,6 +186,8 @@ function SaveGUIini: boolean;
 function LoadIniDialog(OpenFileDlg: TOpenDialog): boolean;
 function SaveIniDialog(SaveFileDlg: TSaveDialog; SelIniData: TSelIniData): boolean;
 function ReadWorkSpaceTags(GUIini: TMemIniFile; CreateEmpty: boolean):integer;
+procedure UpdateQuickTagsLists;
+function TagInWorkSpace(const Group0, Group1, Tag: string): boolean;
 
 implementation
 
@@ -228,6 +229,8 @@ const
 
 var
   GUIini: TMemIniFile;
+  QuickGroupTagNames: TStringList;
+  QuickTagNames: TStringList;
 
 function GetParmIniPath: string;
 begin
@@ -439,6 +442,7 @@ begin
     end;
  finally
     TmpItems.Free;
+    UpdateQuickTagsLists;
   end;
 end;
 
@@ -1401,12 +1405,49 @@ begin
     ShowMessage(Format(StrIniDefNotSaved, [Filename]));
 end;
 
+function TagInWorkSpace(const Group0, Group1, Tag: string): boolean;
+begin
+  result := false;
+  if (QuickGroupTagNames.IndexOf(Group1 + ':' + Tag) > -1) then
+    exit(true);
+  if (QuickGroupTagNames.IndexOf(Group0 + ':' + Tag) > -1) then
+    exit(true);
+  if (QuickTagNames.IndexOf(Tag) > -1) then
+    exit(true);
+end;
+
+procedure UpdateQuickTagsLists;
+var
+  Tag: string;
+  Index: integer;
+begin
+  QuickGroupTagNames.Clear;
+  QuickTagNames.Clear;
+  for Index := Low(QuickTags) to High(QuickTags) do
+  begin
+    if (QuickTags[Index].NoEdit) then
+      continue;
+
+    Tag := Copy(QuickTags[Index].Command, 2);
+    if (Pos(':', Tag) > 0) then
+      QuickGroupTagNames.Add(Tag)
+    else
+      QuickTagNames.Add(Tag);
+  end;
+end;
+
 initialization
 
 begin
   ETdirectCmdList := TStringList.Create;
   PredefinedTagList := TStringList.Create;
   SelPredefinedTagList := TStringList.Create;
+  QuickGroupTagNames := TStringList.Create;
+  QuickGroupTagNames.Sorted := true;
+  QuickGroupTagNames.CaseSensitive := false;
+  QuickTagNames := TStringList.Create;
+  QuickTagNames.Sorted := true;
+  QuickTagNames.CaseSensitive := false;
   ParmIniPath := GetParmIniPath;
 end;
 
@@ -1416,6 +1457,8 @@ begin
   ETdirectCmdList.Free;
   PredefinedTagList.Free;
   SelPredefinedTagList.Free;
+  QuickGroupTagNames.Free;
+  QuickTagNames.Free;
 end;
 
 end.
