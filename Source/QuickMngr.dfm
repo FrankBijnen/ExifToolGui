@@ -55,7 +55,6 @@ object FQuickManager: TFQuickManager
       TabOrder = 1
       OnDrawCell = SgWorkSpaceDrawCell
       OnSelectCell = SgWorkSpaceSelectCell
-      ExplicitTop = 65
     end
     object PnlFuncTop: TPanel
       Left = 1
@@ -75,8 +74,6 @@ object FQuickManager: TFQuickManager
         Align = alClient
         Caption = 'Default auto complete options'
         TabOrder = 0
-        ExplicitLeft = 360
-        ExplicitWidth = 251
         object CmbDefAutoCompleteMode: TComboBox
           AlignWithMargins = True
           Left = 5
@@ -95,7 +92,6 @@ object FQuickManager: TFQuickManager
             'Auto append'
             'Auto suggest'
             'Auto append + suggest')
-          ExplicitWidth = 293
         end
         object ChkDefAutoCorrect: TCheckBox
           AlignWithMargins = True
@@ -110,7 +106,6 @@ object FQuickManager: TFQuickManager
           Caption = 'Auto correct'
           TabOrder = 1
           OnClick = ChkDefAutoCorrectClick
-          ExplicitWidth = 293
         end
       end
       object PnlAddDel: TPanel
@@ -120,7 +115,6 @@ object FQuickManager: TFQuickManager
         Height = 61
         Align = alLeft
         TabOrder = 1
-        ExplicitLeft = 80
         object SpbAddTag: TSpeedButton
           Left = 3
           Top = 30
@@ -154,8 +148,6 @@ object FQuickManager: TFQuickManager
         Align = alLeft
         BevelEdges = [beLeft, beTop, beRight]
         TabOrder = 2
-        ExplicitLeft = -2
-        ExplicitTop = 2
       end
     end
     object PnlSort: TPanel

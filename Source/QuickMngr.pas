@@ -239,6 +239,7 @@ begin
   SetLength(QuickTags, SgWorkSpace.RowCount);
   for N := 0 to SgWorkSpace.RowCount - 1 do
     QuickTags[N] := QuickRec(N);
+  UpdateQuickTagsLists;
 end;
 
 procedure TFQuickManager.SpbAddTagClick(Sender: TObject);
