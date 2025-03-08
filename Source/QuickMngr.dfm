@@ -55,6 +55,7 @@ object FQuickManager: TFQuickManager
       TabOrder = 1
       OnDrawCell = SgWorkSpaceDrawCell
       OnSelectCell = SgWorkSpaceSelectCell
+      ExplicitTop = 65
     end
     object PnlFuncTop: TPanel
       Left = 1
@@ -65,22 +66,22 @@ object FQuickManager: TFQuickManager
       TabOrder = 0
       object GrpDefAutoComplete: TGroupBox
         AlignWithMargins = True
-        Left = 308
+        Left = 348
         Top = 2
-        Width = 303
+        Width = 263
         Height = 59
         Margins.Top = 1
         Margins.Bottom = 1
         Align = alClient
         Caption = 'Default auto complete options'
         TabOrder = 0
-        ExplicitLeft = 236
-        ExplicitWidth = 375
+        ExplicitLeft = 360
+        ExplicitWidth = 251
         object CmbDefAutoCompleteMode: TComboBox
           AlignWithMargins = True
           Left = 5
           Top = 17
-          Width = 293
+          Width = 253
           Height = 21
           Margins.Top = 2
           Margins.Bottom = 2
@@ -94,14 +95,13 @@ object FQuickManager: TFQuickManager
             'Auto append'
             'Auto suggest'
             'Auto append + suggest')
-          ExplicitTop = 16
-          ExplicitWidth = 365
+          ExplicitWidth = 293
         end
         object ChkDefAutoCorrect: TCheckBox
           AlignWithMargins = True
           Left = 5
           Top = 41
-          Width = 293
+          Width = 253
           Height = 17
           Margins.Top = 1
           Margins.Bottom = 1
@@ -110,20 +110,20 @@ object FQuickManager: TFQuickManager
           Caption = 'Auto correct'
           TabOrder = 1
           OnClick = ChkDefAutoCorrectClick
-          ExplicitTop = 39
-          ExplicitWidth = 365
+          ExplicitWidth = 293
         end
       end
       object PnlAddDel: TPanel
-        Left = 1
+        Left = 41
         Top = 1
         Width = 304
         Height = 61
         Align = alLeft
         TabOrder = 1
+        ExplicitLeft = 80
         object SpbAddTag: TSpeedButton
           Left = 3
-          Top = 29
+          Top = 30
           Width = 100
           Height = 25
           Caption = 'Add'
@@ -131,7 +131,7 @@ object FQuickManager: TFQuickManager
         end
         object SpbDelTag: TSpeedButton
           Left = 101
-          Top = 29
+          Top = 30
           Width = 100
           Height = 25
           Caption = 'Delete'
@@ -139,12 +139,23 @@ object FQuickManager: TFQuickManager
         end
         object SpbDefaults: TSpeedButton
           Left = 199
-          Top = 29
+          Top = 30
           Width = 100
           Height = 25
           Caption = 'Defaults'
           OnClick = SpbDefaultsClick
         end
+      end
+      object PnlFiller: TPanel
+        Left = 1
+        Top = 1
+        Width = 40
+        Height = 61
+        Align = alLeft
+        BevelEdges = [beLeft, beTop, beRight]
+        TabOrder = 2
+        ExplicitLeft = -2
+        ExplicitTop = 2
       end
     end
     object PnlSort: TPanel
@@ -153,10 +164,11 @@ object FQuickManager: TFQuickManager
       Width = 40
       Height = 501
       Align = alLeft
+      BevelEdges = [beLeft, beRight, beBottom]
       TabOrder = 2
       object BtnColumnDown: TButton
         Left = 7
-        Top = 82
+        Top = 74
         Width = 25
         Height = 57
         Caption = '6'

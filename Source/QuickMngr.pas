@@ -43,6 +43,7 @@ type
     BtnColumnDown: TButton;
     BtnColumnUp: TButton;
     SpbDefaults: TSpeedButton;
+    PnlFiller: TPanel;
     procedure FormShow(Sender: TObject);
     procedure SgWorkSpaceSelectCell(Sender: TObject; ACol, ARow: Integer; var CanSelect: Boolean);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
