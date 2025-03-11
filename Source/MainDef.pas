@@ -391,7 +391,7 @@ begin
       WSCnt :=  SetQuickTag(WSCnt, 'Model', '-exif:Model');
       WSCnt :=  SetQuickTag(WSCnt, 'LensModel', '-exif:LensModel');
       WSCnt :=  SetQuickTag(WSCnt, 'ExposureTime', '-exif:ExposureTime', '[1/50] or [0.02]',
-                Ord(acAutoSuggestAppend), '1/15/n1/30/n1/50/n1/60/n1/90/n1/125/n/1/250/n1/500/n1/1000/n1/2000/n1/4000/n');
+                Ord(acAutoSuggestAppend), '1/15/n1/30/n1/50/n1/60/n1/90/n1/125/n1/250/n1/500/n1/1000/n1/2000/n1/4000/n');
       WSCnt :=  SetQuickTag(WSCnt, 'FNumber', '-exif:FNumber','',
                 Ord(acAutoSuggestAppend), '1.4/n2.0/n2.8/n4.0/n5.6/n8.0/n11.0/n16.0/n22.0/n');
       WSCnt :=  SetQuickTag(WSCnt, 'ISO', '-exif:ISO', '',
@@ -1442,12 +1442,17 @@ begin
   ETdirectCmdList := TStringList.Create;
   PredefinedTagList := TStringList.Create;
   SelPredefinedTagList := TStringList.Create;
+
   QuickGroupTagNames := TStringList.Create;
   QuickGroupTagNames.Sorted := true;
+  QuickGroupTagNames.Duplicates := TDuplicates.dupIgnore;
   QuickGroupTagNames.CaseSensitive := false;
+
   QuickTagNames := TStringList.Create;
   QuickTagNames.Sorted := true;
+  QuickTagNames.Duplicates := TDuplicates.dupIgnore;
   QuickTagNames.CaseSensitive := false;
+
   ParmIniPath := GetParmIniPath;
 end;
 

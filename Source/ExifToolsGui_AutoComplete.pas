@@ -143,9 +143,9 @@ begin
     AList.CaseSensitive := false;
     AList.Sorted := true;
     AList.Duplicates := TDuplicates.dupIgnore;
+    GetAcList(AList);
     if (GetAutoCorrect) then
     begin
-      GetAcList(AList);
       P := AList.IndexOf(Aline);
       if (P > -1) then
         result := AList[P];
