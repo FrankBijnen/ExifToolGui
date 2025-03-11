@@ -326,7 +326,7 @@ begin
   Top := FMain.GetFormOffset(false).Y;
   SgWorkSpace.ColWidths[1] := 220;
   SgWorkSpace.ColWidths[2] := 220;
-  SgWorkSpace.ColWidths[3] := 0;
+  SgWorkSpace.ColWidths[3] := 0; // Contains the autocomplete settings. Dont show
 
   if FMain.SpeedBtnQuick.Down then
     X := FMain.MetadataList.Row - 1
@@ -344,12 +344,10 @@ begin
 end;
 
 procedure TFQuickManager.PnlDetailResize(Sender: TObject);
-const
-  Margin = 25;
 begin
-  EdTagDesc.Width := PnlDetail.Width - Margin;
-  EdTagDef.Width  := PnlDetail.Width - Margin;
-  EdTagHint.Width := PnlDetail.Width - Margin;
+  EdTagDesc.Width := MemoAutoLines.Width;
+  EdTagDef.Width  := MemoAutoLines.Width;
+  EdTagHint.Width := MemoAutoLines.Width;
 end;
 
 procedure TFQuickManager.SgWorkSpaceDrawCell(Sender: TObject; ACol, ARow: LongInt; Rect: TRect; State: TGridDrawState);

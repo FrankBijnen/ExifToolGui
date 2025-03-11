@@ -1129,14 +1129,11 @@ begin
       with Canvas do
       begin // =Group line
         Brush.Style := bsSolid;
+        Brush.Color := clWindow;
         if ACol = 0 then
-        begin
-          Brush.Color := clWindow; // $F0F0F0;
-          FillRect(Rect);
-        end
+          FillRect(Rect)
         else
         begin // ACol=1
-          Brush.Color := clWindow;
           Font.Style := [fsBold];
           Font.Color := clWindowText;
           TextRect(Rect, Rect.Left + 4, Rect.Top + 2, CellTx);

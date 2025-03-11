@@ -50,7 +50,7 @@ object FQuickManager: TFQuickManager
       FixedCols = 0
       RowCount = 1
       FixedRows = 0
-      Options = [goFixedVertLine, goFixedHorzLine, goVertLine, goHorzLine, goDrawFocusSelected, goRowMoving, goRowSelect]
+      Options = [goFixedVertLine, goFixedHorzLine, goVertLine, goHorzLine, goDrawFocusSelected, goRowSelect]
       ScrollBars = ssVertical
       TabOrder = 1
       OnDrawCell = SgWorkSpaceDrawCell
@@ -226,10 +226,12 @@ object FQuickManager: TFQuickManager
           Caption = 'Auto complete options'
           object CmbAutoCompleteMode: TComboBox
             AlignWithMargins = True
-            Left = 3
+            Left = 10
             Top = 3
-            Width = 306
+            Width = 292
             Height = 21
+            Margins.Left = 10
+            Margins.Right = 10
             Align = alTop
             TabOrder = 0
             Text = 'Default'
@@ -242,20 +244,30 @@ object FQuickManager: TFQuickManager
               'Auto append + suggest')
           end
           object ChkAutoPopulate: TCheckBox
-            Left = 0
-            Top = 44
-            Width = 312
+            AlignWithMargins = True
+            Left = 10
+            Top = 47
+            Width = 292
             Height = 17
+            Margins.Left = 10
+            Margins.Top = 1
+            Margins.Right = 10
+            Margins.Bottom = 1
             Align = alTop
             Caption = 'Auto populate'
             TabOrder = 2
             OnClick = ChkAutoOptionsClick
           end
           object ChkAutoCorrect: TCheckBox
-            Left = 0
-            Top = 27
-            Width = 312
+            AlignWithMargins = True
+            Left = 10
+            Top = 28
+            Width = 292
             Height = 17
+            Margins.Left = 10
+            Margins.Top = 1
+            Margins.Right = 10
+            Margins.Bottom = 1
             Align = alTop
             Caption = 'Auto correct'
             TabOrder = 1
@@ -273,14 +285,15 @@ object FQuickManager: TFQuickManager
         TabOrder = 1
         object MemoAutoLines: TMemo
           AlignWithMargins = True
-          Left = 17
-          Top = 30
-          Width = 286
-          Height = 293
-          Margins.Left = 15
-          Margins.Top = 15
-          Margins.Right = 15
+          Left = 12
+          Top = 25
+          Width = 296
+          Height = 298
+          Margins.Left = 10
+          Margins.Top = 10
+          Margins.Right = 10
           Align = alClient
+          ScrollBars = ssVertical
           TabOrder = 0
           OnKeyUp = MemoAutoLinesKeyUp
         end
