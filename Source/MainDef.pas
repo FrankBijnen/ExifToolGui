@@ -492,20 +492,28 @@ end;
 function ReadPredefinedTags(GUIini: TMemIniFile; CreateEmpty: boolean): integer;
 var
   Indx: integer;
+  TmpList: TStringList;
 begin
   if (not CreateEmpty) and
      (not GUIini.SectionExists(PredefinedTags)) then
     exit(0);
 
-  GUIini.ReadSectionValues(PredefinedTags, PredefinedTagList);
-  for Indx := 0 to PredefinedTagList.Count -1 do
-    PredefinedTagList[Indx] := ReplaceLastChar(PredefinedTagList[Indx], '<', ' ');
+  TmpList := TStringList.Create;
+  try
+    PredefinedTagList.Clear;
+    GUIini.ReadSectionValues(PredefinedTags, TmpList);
+    for Indx := 0 to TmpList.Count -1 do
+      PredefinedTagList.AddPair(TmpList.Names[Indx], ReplaceLastChar(TmpList.ValueFromIndex[Indx], '<', ' '));
 
-  GUIini.ReadSectionValues(SelPredefinedTags, SelPredefinedTagList);
-  for Indx := 0 to SelPredefinedTagList.Count -1 do
-    SelPredefinedTagList[Indx] := ReplaceLastChar(SelPredefinedTagList[Indx], '<', ' ');
+    SelPredefinedTagList.Clear;
+    GUIini.ReadSectionValues(SelPredefinedTags, TmpList);
+    for Indx := 0 to TmpList.Count -1 do
+      SelPredefinedTagList.AddPair(TmpList.Names[Indx], ReplaceLastChar(TmpList.ValueFromIndex[Indx], '<', ' '));
 
-  result := PredefinedTagList.Count;
+    result := PredefinedTagList.Count;
+  finally
+    TmpList.Free;
+  end;
 end;
 
 function ReadMarkedTags(GUIini: TMemIniFile; CreateEmpty: boolean): integer;
@@ -1436,22 +1444,23 @@ begin
   end;
 end;
 
+function GetSortedStringList: TStringList;
+begin
+  result := TStringList.Create;
+  result.Sorted := true;
+  result.Duplicates := TDuplicates.dupIgnore;
+  result.CaseSensitive := false;
+end;
+
 initialization
 
 begin
   ETdirectCmdList := TStringList.Create;
-  PredefinedTagList := TStringList.Create;
-  SelPredefinedTagList := TStringList.Create;
 
-  QuickGroupTagNames := TStringList.Create;
-  QuickGroupTagNames.Sorted := true;
-  QuickGroupTagNames.Duplicates := TDuplicates.dupIgnore;
-  QuickGroupTagNames.CaseSensitive := false;
-
-  QuickTagNames := TStringList.Create;
-  QuickTagNames.Sorted := true;
-  QuickTagNames.Duplicates := TDuplicates.dupIgnore;
-  QuickTagNames.CaseSensitive := false;
+  PredefinedTagList := GetSortedStringList;
+  SelPredefinedTagList := GetSortedStringList;
+  QuickGroupTagNames := GetSortedStringList;
+  QuickTagNames := GetSortedStringList;
 
   ParmIniPath := GetParmIniPath;
 end;

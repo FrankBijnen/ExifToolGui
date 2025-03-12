@@ -127,6 +127,8 @@ begin
   SelPredefinedTagList.Clear;
   for Indx := SGPredefinedTags.FixedRows to SGPredefinedTags.RowCount -1 do
   begin
+    if (PredefinedTagList.IndexOfName(SGPredefinedTags.Cells[0, Indx]) > -1) then
+      continue; // Silently skip duplicates.
     PredefinedTagList.AddPair(SGPredefinedTags.Cells[0, Indx], SGPredefinedTags.Cells[1, Indx]);
     SelPredefinedTagList.AddPair(SGPredefinedTags.Cells[0, Indx], SGPredefinedTags.Cells[2, Indx]);
   end;
