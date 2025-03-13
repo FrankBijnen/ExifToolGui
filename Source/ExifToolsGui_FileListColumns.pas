@@ -73,7 +73,7 @@ procedure ExportToJson(AShellList: ExifToolsGui_ShellList.TShellListView;
 implementation
 
 uses
-  System.SysUtils, System.JSON,
+  System.SysUtils, System.JSON, System.Math,
   Winapi.Windows, Winapi.CommCtrl,
   Vcl.ComCtrls,
   ExifToolsGUI_Utils, ExifToolsGui_ThreadPool, MainDef;
@@ -547,6 +547,7 @@ var
   JSONObj: TJSONObject;
   Index: integer;
   Column: integer;
+  MaxColumn: integer;
   First: boolean;
 begin
   Writer := TStreamWriter.Create(FileName, false, TEncoding.UTF8);
@@ -556,11 +557,14 @@ begin
     for Index := 0 to AShellList.Items.Count -1 do
     begin
       if (ListView_GetItemState(AShellList.Handle, Index, LVIS_SELECTED) = LVIS_SELECTED) and
-           (TSubShellFolder.GetIsFolder(AShellList.Folders[Index]) = false) then
+         (TSubShellFolder.GetIsFolder(AShellList.Folders[Index]) = false) then
       begin
         JSONObj := TJSONObject.Create;
         try
-          for Column := 0 to AShellList.Columns.Count -1 do
+          // In thumbnail mode, DetailStrings is not populated
+          MaxColumn := Min(AShellList.Columns.Count -1,
+                           AShellList.Folders[Index].DetailStrings.Count);
+          for Column := 0 to MaxColumn do
           begin
             if (Column = 0) then
               JSONObj.AddPair(AShellList.Columns[Column].Caption,
