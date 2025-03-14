@@ -33,7 +33,7 @@
     <ul>
         <li><a href="#m_prog_prefs">Preferences</a></li>
         <li><a href="#m_workspace">Workspace manager</a></li>
-        <li><a href="#m_load_save">Saving and loading settings</a></li>
+        <li><a href="#m_export_import">Exporting and importing settings</a></li>
         <li><a href="#m_style">Style</a></li>
     </ul>
     <li><a href="#m_options">Options</a></li>
@@ -186,7 +186,9 @@ are essential for majority of users.<br>
     <a href="https://exiftool.org/ExifTool.html#WindowsLongPath"><b>WindowsLongPath</b></a> for more info.
     </li>
     <li>Added support for <a href="#show_diff_metadata"><b>-diff</b></a> feature of ExifTool.</li>
-    <li>Improving <a href="Readme%20keyboard%20shortcuts.txt">keyboard-based</a> working</li>
+    <li>Improved <a href="Readme%20keyboard%20shortcuts.txt">keyboard-based</a> working</li>
+    <li>Added autocomplete to editing in Workspace and ExifTool direct. Including CTRL/SHIFT + Arrows to select words.</li>
+    <li>Reviewed Saving and Loading settings. Renamed to Export and Import, allowing multiple settings.</li>
 </ul>
 <br>
 <a href="changelog.txt"><b>See changelog.txt for a complete list of issues.</b></a>
@@ -434,16 +436,65 @@ Hovering over the metadata panel will display the complete metadata value as a h
 This was added because long values are often not completely visible.<br>
 Setting this value to 0 (zero) will effectively disable the hints.
 <br><br>
+<b>ExifTool direct auto complete options</b><br>
+Here you setup auto appending, or suggesting, in the edit box of ExifTool direct.<br>
+<ul>
+<li>None: Dont use this feature.</li>
+<li>Auto append: Appends characters as you type</li>
+<li>Auto suggest: Suggests options as you type, by showing a dropdown list</li>
+<li>Auto append+ suggest: Combines appending and suggesting</li>
+</ul>
+<ul><li>Auto correct: When the value entered matches a value from the list, corrects the casing (UPPER/lower case)</li></ul>
 
-<h3><a name="m_workspace">Workspace manager</a></h3>
-Here you define what will be shown in <font class="blue">Metadata</font> panel when <font class="blue">Workspace</font> is selected.
+<u>Note:</u>To find the matches, the commands in the predefined list are used.
+<br><br>
+Example showing enabled auto complete:<br>
+<img src="ExifToolGUI_V6_files/preferences_other_etauto.jpg"><br>
+<br><br>
+
+<h3><a name="m_workspace">Workspace manager</a></h3><br>
+Here you define what will be shown in the <font class="blue">Metadata</font> panel when <font class="blue">Workspace</font> is selected.
 Besides <font class="blue">ExifTool direct</font> option, this is the most powerfull GUI feature.<br>
 <br>
 <img src="ExifToolGUI_V6_files/workspace.jpg"><br>
 <br>
 <br>
+<b>Buttons</b><br>
+<ul>
+<li>Add</li><br>
+Use this button to add a new line. The select tag name dialog pops up, where you can select a tag name.<br><br>
+<img src="ExifToolGUI_V6_files/predefinedadd.jpg"><br>
+The tag is inserted after the currently selected line.<br><br>
+
+<li>Delete</li><br>
+Deletes the currently selected line.<br><br>
+
+<li>Defaults</li><br>
+Resets the settings to default. Warning. This removes all your current settings.<br>
+With GUI V6.3.8 some autocomplete defaults were added. You may need this button to see them, when upgrading from a previous version.<br>
+You can create a backup first using <a href="#m_export_import">Exporting and importing settings</a><br><br>
+
+<li>Arrow Up/Down</li><br>
+Use these buttons to move the selected line up, or down.<br>
+Note: These buttons replace the dragging in previous versions.<br>
+</ul>
+<br>
+<b>Default auto complete options</b><br><br>
+Here you specify the default auto complete options. These options will be used for all tags that have the auto complete option
+set to <b>default</b>.
+<br>
+<ul>
+<li>None: Dont use this feature.</li>
+<li>Auto append: Appends characters as you type</li>
+<li>Auto suggest: Suggests options as you type, by showing a dropdown list</li>
+<li>Auto append + suggest: Combines appending and suggesting</li> <br>
+<li>Auto correct: When the value entered matches a value from the list, corrects the casing (UPPER/lower case)</li><br>
+</ul>
+<u>Note:</u>To find the matches for the default list, a list is built from all values loaded in the workspace.<br>
+This list is not saved, and thus reset every startup of GUI.<br><br>
+
 <b>Tag name column</b><br>
-Here you define tag name you prefer to be displayed for a particular metadata tag. These tag names don't have any influence on the
+Here you define the tag name to be displayed for a particular metadata tag. These tag names don't have any influence on the
 actual tag names and you can write anything here, i.e. instead of "ISO", you can have "Noise maker" here.<br>
 Tag names written here, can have different "behaviour" in case special character is used for their ending. For now,
 GUI uses following ending characters:<br>
@@ -475,44 +526,66 @@ numerical tag value (try with <font class="brown">-exif:Orientation#</font> to s
 Of course, only one single tag can be defined per line.<br>
 To separate group of tags in <font class="blue">Workspace</font> view, special "fake" tag is used: <font class="brown">-GUI-SEP</font>
 (see "About photo" on above screenshot).<br>
-<br>
+Note: It is recommended to prefix the tag names with a family 0, or 1, group name.
+(EG: <b>-Exif:ISO</b>, or <b>-ExifIfd:ISO</b>, not just <b>-ISO</b>).This ensures that <a href="#m_popup_meta">marking</a> the lines defined in the workspace works best.<br><br>
 
 <b>Hint text column</b><br>
-Text entered here is your <u>short</u> "private" help, which will be displayed in GUI's status bar when you start modifying tag value:<br>
-<img src="ExifToolGUI_V6_files/hint.jpg"><br>
+Text entered here is your <u>short</u> "private" help, which will be displayed in GUI's status bar when you start modifying tag value:<br><br>
+<img src="ExifToolGUI_V6_files/hint.jpg"><br><br>
+
+<b>Auto complete options</b><br><br>
+You can override the auto complete options for a specific tag, by setting a value different from <b>default</b>.
+Additionally you can specify a custom dropdown list, only used for this tag. Contrary to the default dropdown list, the
+custom dropdown list is saved to disk.<br>
+<br>
+<ul>
+<li>Default: Use the default setting of the Workspace.</li>
+<li>None: Dont use this feature.</li>
+<li>Auto append: Appends characters as you type</li>
+<li>Auto suggest: Suggests options as you type, by showing a dropdown list</li>
+<li>Auto append + suggest: Combines appending and suggesting</li> <br>
+<li>Auto correct: When the value entered matches a value from the list, corrects the casing (UPPER/lower case)</li>
+<li>Auto populate: Any value typed in manually in the Workspace will be added to this list.</li><br>
+</ul>
+Auto complete example of <b>FNumber</b>:<br><br>
+<img src="ExifToolGUI_V6_files/workspace_autodef.jpg"><br><br>
+How it looks in the Workspace by just typing a '1':<br><br>
+<img src="ExifToolGUI_V6_files/workspace_autosample.jpg"><br><br>
+
 <br>
 I hope you can recognize the power of <font class="blue">Workspace manager</font>:
- YOU define any metadata tag you wish to change regularly. Btw. you can move defined tags up/down by clicking &amp;
- moving the tag name in the first (Tag name) column.<br><br>
+ YOU define any metadata tag you wish to change regularly.<br><br>
 
-<h3><a name="m_load_save">Saving and loading settings</a></h3>
-<h4>Workspace definition file: Load/Save</h4>
-All tags defined for <font class="blue">Workspace</font> are automatically saved into <b>ExifToolGUIv6.ini</b> file.
-So, when you start GUI, <font class="blue">Workspace</font> content is the same as it was when you used GUI the last time.
-If for whatever reason, you might wish to save your <u>current</u> <font class="blue">Workspace</font>
-content -to create a backup of your Workspace, so to speak.
-And when needed, you just load previously saved Workspace definition file again.<br>
+<h3><a name="m_export_import">Exporting and importing settings</a></h3><br>
+The settings you make for the <font class="blue">Workspace, ExifTool direct, File list, Custom view and predefined tags</font>
+are automatically saved into <b>ExifToolGUIv6.ini</b> file when GUI is closed.
+So, next time you start GUI, those settings are preserved.<br>
+Using the export and import functions, you can create a backup of your settings, to transfer them to another computer,
+or switch the view when switching media types. EG Camera RAW to Video.<br><br>
+<img src="ExifToolGUI_V6_files/program_export_import.jpg"><br><br>
+
+<h4>Program/Export</h4><br>
+<img src="ExifToolGUI_V6_files/program_export_select.jpg"><br><br>
+Check the settings to include in the ini file.<br>
 <br>
-When you choose <font class="blue">Save</font>, you'll be asked where to save the file and you'll need to set the filename.
-By default, save directory will allways be the directory where ExifToolGUI.exe is saved;
+When you choose <font class="blue">OK</font>, you'll be asked where to save the file and you'll need to set the filename.
+By default, save directory will allways be the directory where ExifToolGUIV6.ini is saved;
 however, you can choose any other directory.<br>
-When you choose <font class="blue">Load</font>, again, default starting directory will be the one, where ExifToolGUI.exe is.
-And if you've messed with your Workspace inbetween, you can choose to load Workspace from ExifToolGUIV6.ini file.
-Which simply reloads Workspace from last GUI session.<br>
+And if you've messed with your Workspace inbetween, you can choose to import the settings from ExifToolGUIV6.ini file.
+Which simply imports all settings from last GUI session.<br>
 <br>
-However, when saving, name of Workspace definition file can not be ExifToolGUIv6.ini.
+When saving, the name of the Workspace definition file can not be ExifToolGUIV6.ini.
 You should use any name that reminds you on content, for example: MyWorkspace_XMP.ini.<br>
 <br>
 
-Starting with V6.3.1 these definitions can also be Loaded and Saved. Its workings are analogous to the <b>Workspace</b>:<br>
-<h4>ExifTool direct definition file: Load/Save</h4>
-- The available commands in <a href="#p_etdirect">ExifTool direct</a><br>
-<h4>File lists definition file: Load/Save</h4>
-- The configuration of the <a href="#p_config_file_list">file list</a><br>
-<h4>Custom view definition file: Load/Save</h4>
-- The tags in the Custom view of the <a href="#p_metadata">Metadata panel</a><br>
-<h4><a name="m_predefinedfile">Predefined tags definition file: Load/Save</a></h4>
-- The <a href="#p_managemetadata">predefined tags</a> available for copying, removing and show diff metadata.<br>
+<h4>Program/Import</h4><br>
+When you choose <font class="blue">Import</font>, again, the default starting directory will be the one, where ExifToolGUIV6.ini
+is located. Starting with V6.3.8 all selected settings are exported in one (1) ini file. The Import function imports all settings
+found in the ini file.<br>
+Upon succesful import a dialog is displayed, showing the settings imported from the file.<br><br>
+<img src="ExifToolGUI_V6_files/program_import_message.jpg"><br><br>
+
+
 <br><br>
 <h3><a name="m_style">Style</a></h3>
 <br>

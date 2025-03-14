@@ -3,13 +3,12 @@
 
 This is an updated version of the ExifToolGui program created by Bogdan Hrastnik. Many thanks go out to him.
 
-<b>Released version: <b>V6.3.7</b> updated February 14, 2025</b><br>
+<b>Released version: <b>V6.3.8</b> updated March 15, 2025</b><br>
 
-- Added ExifTool -diff feature. Allows comparing metadata of files and merging the differences.
-- Drag and drop enhancements. Allow multiple files to be dropped in GUI. GUI can act as a drag source.
-- Improved keyboard-based working. Allow line editing in Workspace.
-- Added Quicktime in date time functions.
-- Updated compiler to Rad 12.1 Community Edition, and installer to InnoSetup 6.4.0.
+- More keyboard usage improvements. In the workspace manager you can define auto complete + drop down lists. 
+  CTRL + (SHIFT) Left, Right arrow moves to/selects the previous/next word in the Workspace and ExifTool direct.
+  Redesigned the Workspace manager, to support this new feature.<br>
+- Exporting, importing setting has been revised. Allowing to save a selection of settings to export and import.<br>
 - Various bugfixes.<br>
 - For the complete info see the [changelog](Docs/changelog.txt).<br>
 

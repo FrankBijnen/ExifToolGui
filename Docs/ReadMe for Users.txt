@@ -198,4 +198,11 @@ Changed with version 6.3.7
 - Removed MessageBeep, or Bell, when using the Enter key on input fields.
 - Small bug fixes.
 
+Changed with version 6.3.8
+- More keyboard usage improvements. In the workspace manager you can define auto complete + drop down lists. 
+  CTRL + (SHIFT) Left, Right arrow moves to/selects the previous/next word in the Workspace and ExifTool direct.
+  Redesigned the Workspace manager, to support this new feature.
+- Exporting, importing setting has been revised. Allowing to save a selection of settings to export and import.
+
+
 Frank
