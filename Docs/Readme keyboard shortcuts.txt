@@ -48,6 +48,8 @@ In ExifTool direct.
 - Esc                   Closes ExifTool direct
 - Enter                 Executes command
 - Tab                   Focuses the predefined list
+- CTRL Cursor L/R       Moves to the previous/next word
+- CTRL SHIFT Cursor L/R Moves and selects the previous/next word
 
 In the predefined list of ExifTool Direct
 - Cursor Up/Down        Selects the previous/next item in the list.
@@ -67,8 +69,12 @@ Line editing NOT enabled in Preferences
 Line editing enabled in Preferences
 - You can enter the new value directly in the grid. 
   Moving to another line marks the line as modified. (EG Cursor or Page keys)
+  Note: When autocomplete is enabled, Cursor Up/Down selects another value in the list 
+
 - Enter                 Marks the line as modified and moves to the next line.
 - Esc                   Reverts the pending change of the current line
+- CTRL Cursor L/R       Moves to the previous/next word
+- CTRL SHIFT Cursor L/R Moves and selects the previous/next word
 
 In the OSM map holding the Ctrl key together with
 - Left click            Sets the exact location

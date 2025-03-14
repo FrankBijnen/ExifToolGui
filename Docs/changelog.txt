@@ -153,4 +153,12 @@ Version:        Description             Issue
                 Fix Issue #739          Adding Quicktime tag group in DateTime shift/equalize
                 Fix Issue #754          Support simple visual comparison in Metadata window. (Fix Scrollbar issue)
                 Fix Issue #760          Dont show dialog 'ExifTool could not be started', only disable metadata if working dir is invalid
+                Fix Issue #765          Fix issues for V6.3.7
                 Fix Issue #768          Ease the use of "ExifTool direct" window by connecting it with Metadata panel
+6.3.8.0         Fix Issue #757          Autocomplete functionality in workspace
+                Fix Issue #771          Possibility to Link (open) sets of Workspace/Filelist/ExifTool Direct/Filter together
+                Fix Issue #783          Highlighting of tags that are supposed to be part of "Workspace" is confusing
+                Fix Issue #789          [feature request] enabling CTRL+arrow right/left in workspace
+                Fix Issue #799          Green coloring of Tags present in Workspace does not work any more with V6.3.7
+                Fix Issue #805          Prevent invalid tags in Workspace, ExifTool direct and Filelists
+                Fix Issue #815          Fix issues for V6.3.8
