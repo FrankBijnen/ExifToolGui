@@ -3,7 +3,7 @@
 
 This is an updated version of the ExifToolGui program created by Bogdan Hrastnik. Many thanks go out to him.
 
-<b>Released version: <b>V6.3.8</b> updated March 15, 2025</b><br>
+<b>Released version: <b>V6.3.8</b> updated March 14, 2025</b><br>
 
 - More keyboard usage improvements. In the workspace manager you can define auto complete + drop down lists. 
   CTRL + (SHIFT) Left, Right arrow moves to/selects the previous/next word in the Workspace and ExifTool direct.
