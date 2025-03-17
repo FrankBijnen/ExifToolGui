@@ -762,7 +762,7 @@ begin
     Href := '';
     for PlaceCnt := 0 to PLace.Value.Count -1 do
     begin
-      ImgName := Place.Value[PlaceCnt];
+      ImgName := ReplaceAll(Place.Value[PlaceCnt], [''''], ['&#39;'], [rfReplaceAll]);
       if (ImgName = '') then
         continue;
       if (boolean(Place.Value.Objects[PlaceCnt]) = true) then
