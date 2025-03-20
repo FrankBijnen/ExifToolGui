@@ -140,6 +140,11 @@ type
     procedure Clear;
   end;
 
+const
+  RDFLI = 'rdf:li';
+  RDFBAG = 'rdf:Bag';
+
+type
   XMPrec = packed record
     HasData: boolean;
     Creator, Rights: string;
@@ -152,7 +157,7 @@ type
     Rating: string[1];
     function GetRDF(const Xml: TXmlVerySimple): TXmlNode;
     function DetectEncoding(TmpStream: TMemoryStream): string;
-    function ChangeETPrefix(const SubNode: string): string;
+    function Change2ETname(const SubNode: string): string;
     function GetNodeKey(ThisNode, SubNode: string; var ParmIsList: boolean): string;
     procedure Add2Xmp(const AMetaInfo: TMetaInfo; AKey: string);
 
@@ -465,15 +470,19 @@ begin
     exit(XMPEncoding_utf16);
 end;
 
-function XMPRec.ChangeETPrefix(const SubNode: string): string;
+function XMPRec.Change2ETname(const SubNode: string): string;
 const
-  ETPrefixes : array[0..1, 0..1] of string =
-    (('Iptc4xmpExt:','iptcExt:'),
-     ('Iptc4xmpCore:','iptcCore:'));
+  ETPrefixes : array[0..3, 0..1] of string =
+
+    (('mwg-rs:RegionRegionList', 'mwg-rs:Region'),
+     ('Iptc4xmpExt:','iptcExt:'),
+     ('Iptc4xmpCore:','iptcCore:'),
+     ('mwg-rs:Regions', 'mwg-rs:Region')
+     );
 var
   Index: integer;
 begin
-  result := SubNode;
+  result := Trim(SubNode);
   for Index := 0 to High(ETPrefixes) do
   begin
     if (StartsText(ETPrefixes[Index, 0], result)) then
@@ -488,16 +497,20 @@ begin
   result := ThisNode;
 
   if (Trim(result) = '') then
-    result := ChangeETPrefix(SubNode)
+    result := SubNode
   else if (ParmIsList) then
   begin
-    P := Pos(':', SubNode);
-    if (P > 0) then
-      result := result + Copy(SubNode, P +1);
+    if (SubNode <> RDFBAG) and
+       (SubNode <> RDFLI) then
+    begin
+      P := Pos(':', SubNode);
+      if (P > 0) then
+        result := result + Copy(SubNode, P +1);
+    end;
   end;
 
   ParmIsList := ParmIsList or
-                SameText('rdf:li', SubNode);
+                SameText(RDFLI, SubNode);
 end;
 
 procedure XMPRec.Add2Xmp(const AMetaInfo: TMetaInfo; AKey: string);
@@ -2135,12 +2148,14 @@ var
   SelNode: string;
   NodeKey: string;
   ThisIsList: boolean;
+  ParseResource: boolean;
 begin
-  SelNode := Trim(AParent);
+  SelNode := XMP.Change2ETname(AParent);
 
   if (ANode.NodeValue <> '') then
     XMP.Add2Xmp(Add2Xmp(SelNode, ANode.NodeValue), SelNode);
 
+  ParseResource := false;
   // Look in Attributes of Node
   for Attribute in ANode.AttributeList do
   begin
@@ -2151,6 +2166,11 @@ begin
       continue;
     if StartsText('rdf:About', Attribute.Name) then
       continue;
+    if StartsText('rdf:parseType', Attribute.Name) then
+    begin
+      ParseResource := (Attribute.Value = 'Resource');
+      continue;
+    end;
 
     ThisIsList := false; // Attribute cant be a list
     NodeKey := XMP.GetNodeKey(SelNode, Attribute.Name, ThisIsList);
@@ -2161,7 +2181,8 @@ begin
   ANodeList := ANode.ChildNodes;
   for ASubNode in ANodeList do
   begin
-    ThisIsList := ParentIsList;
+    ThisIsList := ParentIsList or
+                  ParseResource;
     NodeKey := XMP.GetNodeKey(SelNode, ASubNode.NodeName, ThisIsList);
     LevelDeeper(ASubNode, NodeKey, ThisIsList);
   end;

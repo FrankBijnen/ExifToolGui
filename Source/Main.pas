@@ -1,4 +1,5 @@
 unit Main;
+{.$DEFINE DEBUG_META}
 // Note all code formatted with Delphi formatter, Right margin 80->150
 
 // Note about the Path.
