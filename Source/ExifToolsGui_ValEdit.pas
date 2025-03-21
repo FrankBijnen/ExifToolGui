@@ -39,6 +39,7 @@ type
     FInplaceEdit: TETGuiInplaceEdit;
     FEditRow: integer;
     FHistoryList: TStringList;
+    FStandardMouseWheelScroll: boolean;
   protected
     procedure SetEditText(ACol, ARow: Longint; const Value: string); override;
     function CreateEditor: TInplaceEdit; override;
@@ -64,6 +65,7 @@ type
     property InplaceEdit: TETGuiInplaceEdit read FInplaceEdit;
     property EditRow: integer read FEditRow;
     property HistoryList: TStringList read FHistoryList;
+    property StandardMouseWheelScroll: boolean read FStandardMouseWheelScroll write FStandardMouseWheelScroll;
   end;
 
 implementation
@@ -155,6 +157,7 @@ begin
   FHistoryList := TStringList.Create;
   FHistoryList.Sorted := true;
   FHistoryList.Duplicates := TDuplicates.dupIgnore;
+  FStandardMouseWheelScroll := true;
 end;
 
 destructor TValueListEditor.Destroy;
@@ -288,6 +291,9 @@ begin
   // TopleftChanged is called, updating the scrollbar
   TopRow := Si.nPos;
 
+  if (EditorMode) then
+    InvalidateEditor;
+
   Msg.Result := 0; // Handled
 end;
 
@@ -367,26 +373,28 @@ end;
 
 function TValueListEditor.DoMouseWheelDown(Shift: TShiftState; MousePos: TPoint): Boolean;
 begin
-  if (TopRow < RowCount - FRowsPossible) then
+  if (FStandardMouseWheelScroll) then
+    result := inherited DoMouseWheelDown(Shift, MousePos)
+  else
   begin
-    Perform(WM_VSCROLL, SB_LINEDOWN, 0);
-    if (EditorMode) then
-      InvalidateEditor;
-  end;
+    if (TopRow < RowCount - FRowsPossible) then
+      Perform(WM_VSCROLL, SB_LINEDOWN, 0);
 
-  result := true;
+    result := true;
+  end;
 end;
 
 function TValueListEditor.DoMouseWheelUp(Shift: TShiftState; MousePos: TPoint): Boolean;
 begin
-  if (TopRow > 1) then
+  if (FStandardMouseWheelScroll) then
+    result := inherited DoMouseWheelUp(Shift, MousePos)
+  else
   begin
-    Perform(WM_VSCROLL, SB_LINEUP, 0);
-    if (EditorMode) then
-      InvalidateEditor;
-  end;
+    if (TopRow > 1) then
+      Perform(WM_VSCROLL, SB_LINEUP, 0);
 
-  result := true;
+    result := true;
+  end;
 end;
 
 end.
