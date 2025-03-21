@@ -3099,6 +3099,7 @@ begin
   // Metadatalist Ctrl handler
   MetadataList.OnCtrlKeyDown := MetadataListCtrlKeyDown;
   MetadataList.ProportionalVScroll := true;
+  MetadataList.StandardMouseWheelScroll := false;
 
   ET.ExecETEvent := ExecETEvent_Done;
   Geomap.ExecRestEvent := ExecRestEvent_Done;
