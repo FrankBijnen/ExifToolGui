@@ -1457,7 +1457,7 @@ begin
     GpsLatitude := AddGpsData('GpsLatitude', LatCoords.GpsDegrees);
     GeoLat := AddGpsData('GeoLat',  LatCoords.GpsDecimal(StartsText('S', GpsLatitudeRef)));
 
-    GpsLongitude := AddGpsData('GpsLaGpsLongitudetitude', LonCoords.GpsDegrees);
+    GpsLongitude := AddGpsData('GpsLongitude', LonCoords.GpsDegrees);
     GeoLon := AddGpsData('GeoLon',  LonCoords.GpsDecimal(StartsText('W', GpsLongitudeRef)));
 
     if (GeoLat <> '') or
