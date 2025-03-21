@@ -6,7 +6,7 @@ unit ExifToolsGui_ValEdit;
 interface
 
 uses
-  System.Classes, Winapi.Messages, Vcl.ValEdit, Vcl.Controls, Vcl.Grids,
+  System.Classes, System.Types, Winapi.Messages, Vcl.ValEdit, Vcl.Controls, Vcl.Grids,
   Winapi.ShlObj, Winapi.ActiveX, ExifToolsGui_AutoEdit, ExifToolsGui_AutoComplete;
 
 type
@@ -51,6 +51,8 @@ type
     procedure WMSize(var Msg: TWMSize); message WM_SIZE;
     procedure SizeChanged(OldColCount, OldRowCount: Longint); override;
     procedure TopLeftChanged; override;
+    function DoMouseWheelDown(Shift: TShiftState; MousePos: TPoint): Boolean; override;
+    function DoMouseWheelUp(Shift: TShiftState; MousePos: TPoint): Boolean; override;
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
@@ -67,7 +69,7 @@ type
 implementation
 
 uses
-  System.Types, System.UITypes, System.Win.ComObj, System.SysUtils, Winapi.Windows;
+  System.UITypes, System.Win.ComObj, System.SysUtils, Winapi.Windows;
 
 constructor TETGuiInplaceEdit.Create(AOwner: TComponent);
 begin
@@ -361,6 +363,30 @@ begin
   end;
 
   inherited;
+end;
+
+function TValueListEditor.DoMouseWheelDown(Shift: TShiftState; MousePos: TPoint): Boolean;
+begin
+  if (TopRow < RowCount - FRowsPossible) then
+  begin
+    Perform(WM_VSCROLL, SB_LINEDOWN, 0);
+    if (EditorMode) then
+      InvalidateEditor;
+  end;
+
+  result := true;
+end;
+
+function TValueListEditor.DoMouseWheelUp(Shift: TShiftState; MousePos: TPoint): Boolean;
+begin
+  if (TopRow > 1) then
+  begin
+    Perform(WM_VSCROLL, SB_LINEUP, 0);
+    if (EditorMode) then
+      InvalidateEditor;
+  end;
+
+  result := true;
 end;
 
 end.
