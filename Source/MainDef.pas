@@ -99,6 +99,7 @@ type
     ThumbAutoGenerate: boolean;
     ThumbCleanSet: string[4];
     DetailsSel: integer;
+    MetadataSel: integer;
     FileFilters: string;
     FilterStartup: integer;
     FilterSel: integer;
@@ -884,12 +885,14 @@ begin
         if UseExitDetails then
         begin
           DetailsSel := ReadInteger(Ini_Settings, 'DetailsSel', 0);
+          MetadataSel := ReadInteger(Ini_Settings, 'MetadataSel', 0);
           FilterSel := FilterStartup;
           FMain.ShellList.ViewStyle := TviewStyle(ReadInteger(Ini_Settings, 'ViewStyle', 3));
         end
         else
         begin
           DetailsSel := 0;
+          MetadataSel := 0;
           FilterSel := 0;
           FMain.ShellList.ViewStyle := TViewStyle.vsReport;
         end;
@@ -1105,6 +1108,7 @@ begin
 
           WriteBool(Ini_Settings, 'UseExitDetails', UseExitDetails);
           WriteInteger(Ini_Settings, 'DetailsSel', DetailsSel);
+          WriteInteger(Ini_Settings, 'MetadataSel', MetadataSel);
           WriteInteger(Ini_Settings, 'ViewStyle', Ord(Fmain.ShellList.ViewStyle));
           WriteBool(Ini_Settings, 'AutoIncLine', AutoIncLine);
           WriteBool(Ini_Settings, 'EditLine', EditLine);

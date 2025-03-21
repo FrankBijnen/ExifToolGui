@@ -43,6 +43,7 @@ const
   CM_ActivateWindow = WM_USER + 100;
 
 type
+  TMetaDataTab = (mtQuick, mtExif, mtXMP, mtIPTC, mtMaker, mtALL, mtCustom);
 
   TFMain = class(TScaleForm)
     StatusBar: TStatusBar;
@@ -448,6 +449,8 @@ type
     procedure GetColorsFromStyle;
     procedure SetColorsFromStyle;
     function GetFormOffset(AddFileList: boolean = true): TPoint;
+    procedure SetMetadataTab(ATab: TMetaDataTab);
+    function GetMetadataTab: TMetaDataTab;
   end;
 
 var
@@ -3326,8 +3329,8 @@ begin
   end;
 
   InstallAutoComp;
+  SetMetadataTab(TMetaDataTab(GUIsettings.MetadataSel));
 
-  SetGridEditor(SpeedBtnQuick.Down);
   if (ShellList.ItemIndex < 0) then
     ShellTree.SetFocus  // No files available to focus.
   else
@@ -3908,6 +3911,50 @@ begin
   MetadataList.Col := 1;
 end;
 
+procedure TFMain.SetMetadataTab(ATab: TMetaDataTab);
+
+  procedure SelectButton(AButton: TSpeedButton);
+  begin
+    AButton.Down := true;
+    AButton.OnClick(AButton);
+  end;
+
+begin
+  case ATab of
+    TMetaDataTab.mtExif:
+      SelectButton(SpeedBtnExif);
+    TMetaDataTab.mtXMP:
+      SelectButton(SpeedBtnXmp);
+    TMetaDataTab.mtIPTC:
+      SelectButton(SpeedBtnIptc);
+    TMetaDataTab.mtMaker:
+      SelectButton(SpeedBtnMaker);
+    TMetaDataTab.mtALL:
+      SelectButton(SpeedBtnAll);
+    TMetaDataTab.mtCustom:
+      SelectButton(SpeedBtnCustom);
+    else
+      SelectButton(SpeedBtnQuick);
+  end;
+end;
+
+function TFMain.GetMetadataTab: TMetaDataTab;
+begin
+  result := TMetaDataTab.mtQuick;
+  if (SpeedBtnExif.Down) then
+    exit(TMetaDataTab.mtExif);
+  if (SpeedBtnXmp.Down) then
+    exit(TMetaDataTab.mtXMP);
+  if (SpeedBtnIptc.Down) then
+    exit(TMetaDataTab.mtIPTC);
+  if (SpeedBtnMaker.Down) then
+    exit(TMetaDataTab.mtMaker);
+  if (SpeedBtnALL.Down) then
+    exit(TMetaDataTab.mtALL);
+  if (SpeedBtnCustom.Down) then
+    exit(TMetaDataTab.mtCustom);
+end;
+
 procedure TFMain.ShowMetadata;
 var
   E, N: integer;
@@ -3926,8 +3973,8 @@ begin
     if (Item = '') then
     begin
       MetadataList.Row := 1;
-      MetadataList.ItemProps[0].ReadOnly := true;
       MetadataList.Strings.Text := '-';
+      MetadataList.ItemProps[0].ReadOnly := true;
       EditQuick.Text := '';
       MemoQuick.Text := '';
       exit;
@@ -4171,6 +4218,7 @@ end;
 
 procedure TFMain.SpeedBtnExifClick(Sender: TObject);
 begin
+  GUIsettings.MetadataSel := Ord(GetMetadataTab);
   AdvPanelMetaBottom.Visible := SpeedBtnQuick.Down;
   SpeedBtnQuickSave.Enabled := false;
 
