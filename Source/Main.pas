@@ -3925,8 +3925,9 @@ begin
 
     if (Item = '') then
     begin
-      MetadataList.Strings.Text := '-';
+      MetadataList.Row := 1;
       MetadataList.ItemProps[0].ReadOnly := true;
+      MetadataList.Strings.Text := '-';
       EditQuick.Text := '';
       MemoQuick.Text := '';
       exit;
