@@ -169,7 +169,6 @@ Filename: "{code:OBetzInstaller|{app}}";Description: {code:InstallOBetzMsg};    
 [Code]
 
 var
-
   DownloadPageET: TDownloadWizardPage;
   GeoLocationDirPage: TInputDirWizardPage;
   CURVer: AnsiString;
@@ -558,6 +557,7 @@ begin
     Height := ScaleY(241);
     ReadOnly := True;
   end;
+  
   CURver := '';
   ETVerPH := '';
   ETVerOBetz := '';
@@ -718,6 +718,7 @@ var
   ETDir: AnsiString;
 begin
   ETFile := PHURL + ETZipFile('') + ZIP;
+  
   if (NeverDownload) then
   begin
     result := true;
@@ -737,11 +738,17 @@ begin
       // unzip has no result. Check if file exists.
       ETDir := ETZipFile(ExpandConstant('{tmp}')) + '\';
       if not FileExists(ETDir + ET_K + EXE) then
-        RaiseException('Unzipping ' + ETDir + ZIP + ' failed');
+      begin
+        MsgBox('Unzipping ' + ETDir + ZIP + ' failed', mbCriticalError, MB_OK);
+        exit;
+      end;  
 
       // Rename
       if not RenameFile(ETDir + ET_K + EXE,  ETDir + ET + EXE) then
-        RaiseException('Rename to ' +  ET + EXE + ' failed');
+      begin
+        MsgBox('Rename to ' +  ET + EXE + ' failed', mbCriticalError, MB_OK);
+        exit;
+      end;  
 
       result := true;
     end;
@@ -772,8 +779,11 @@ begin
 
       // unzip has no result. Check if file exists.
       if not DirExists(ExpandConstant('{tmp}\{#GeoLocationDir}')) then
-        RaiseException('Unzipping ' + ExpandConstant('{tmp}\{#GeoLocationDir}') + ' failed');
-
+      begin
+        MsgBox('Unzipping ' + ExpandConstant('{tmp}\{#GeoLocationDir}') + ' failed', mbCriticalError, MB_OK);
+        exit;
+      end;
+        
        result := true;
     end;
   finally
@@ -825,20 +835,25 @@ begin
       GeoLocationDirPage.Values[0] := ExpandConstant('{app}\{#GeoLocationDir}');
     end;
   end;
-
-  if (CurPageID = wpReady) then
-  begin
-    if OBetzSelected then
-      result := DownLoadETOBetz
-    else if PHSelected then
-      result := DownLoadETPH;
-    if AltDbSelected then
-      result := DownloadAltDb;
-  end;
 end;
 
 procedure CurStepChanged(CurStep: TSetupStep);
+var 
+  DownLoadsOK: Boolean;
 begin
+  if (CurStep = ssInstall) then
+  begin
+    DownLoadsOK := true;
+    if OBetzSelected then
+      DownLoadsOK := DownLoadsOK and DownLoadETOBetz
+    else if PHSelected then
+      DownLoadsOK := DownLoadsOK and DownLoadETPH;
+    if AltDbSelected then
+      DownLoadsOK := DownLoadsOK and DownloadAltDb; 
+    if not DownLoadsOK then
+      RaiseException('Could not download, or unzip, all requested selections. Aborting installation.');
+  end;
+  
   if (CurStep = ssPostInstall) and
      (AddToPathSelected) then 
     EnvAddPath(ExpandConstant('{app}'));
