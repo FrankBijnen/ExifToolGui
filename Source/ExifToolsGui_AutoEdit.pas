@@ -85,13 +85,13 @@ type
     property AutoCompleteEdit: IAutoCompleteEdit read FAutoCompleteEdit implements IAutoCompleteEdit;
   end;
 
-  // Shif/Ctrl Cursor
+  // Shift/Ctrl Cursor
   procedure PrevWord(const CustomEdit: TCustomEdit; const SkipChars: TSysCharSet; const UseSel: boolean);
   procedure NextWord(const CustomEdit: TCustomEdit; const SkipChars: TSysCharSet; const UseSel: boolean);
 
 implementation
 
-// Shif/Ctrl Cursor Left
+// Shift/Ctrl Cursor Left
 procedure PrevWord(const CustomEdit: TCustomEdit; const SkipChars: TSysCharSet; const UseSel: boolean);
 var
   NewS, OldS, OldSel: integer;
@@ -133,7 +133,7 @@ begin
     CustomEdit.SelLength := 0;
 end;
 
-// Shif/Ctrl Cursor Right
+// Shift/Ctrl Cursor Right
 procedure NextWord(const CustomEdit: TCustomEdit; const SkipChars: TSysCharSet; const UseSel: boolean);
 var
   OldS, NewS, OldSel: integer;

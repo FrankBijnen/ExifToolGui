@@ -144,6 +144,7 @@
         <DCCReference Include="ExifToolsGUI_Utils.pas"/>
         <DCCReference Include="UnitFilesOnClipBoard.pas"/>
         <DCCReference Include="UnitColumnDefs.pas"/>
+        <DCCReference Include="UnitRegion.pas"/>
         <DCCReference Include="ExifToolsGui_AutoComplete.pas"/>
         <DCCReference Include="ExifToolsGUI_StringGrid.pas"/>
         <DCCReference Include="ExifToolsGui_ValEdit.pas"/>
