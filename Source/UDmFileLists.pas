@@ -169,7 +169,8 @@ begin
   if (LeftStr(Sender.AsString, 1) <> '-') then
   begin
     CdsColumnSetOption.AsInteger := Ord(toSys);
-    CdsColumnSetCaption.AsString := FSystemTagNames.Values[Sender.AsString];
+    if (FSystemTagNames.Values[Sender.AsString] <> '') then
+      CdsColumnSetCaption.AsString := FSystemTagNames.Values[Sender.AsString];
   end
   else
   begin
