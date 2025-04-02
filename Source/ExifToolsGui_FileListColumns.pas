@@ -73,7 +73,7 @@ procedure ExportToJson(AShellList: ExifToolsGui_ShellList.TShellListView;
 implementation
 
 uses
-  System.SysUtils, System.JSON, System.Math,
+  System.SysUtils, System.JSON, System.Math, System.Hash,
   Winapi.Windows, Winapi.CommCtrl,
   Vcl.ComCtrls,
   ExifToolsGUI_Utils, ExifToolsGui_ThreadPool, MainDef;
@@ -142,9 +142,19 @@ begin
 
     // SysField ?
     if ((ATag.Options and toSys) = toSys) then
-      DetailStrings[Index] := TSubShellFolder.GetSystemField_MT(Folder.Parent,
-                                                                Folder.RelativeID,
-                                                                ATag.SysColumn);
+    begin
+      if (ATag.SysColumn > -1) then
+        DetailStrings[Index] := TSubShellFolder.GetSystemField_MT(Folder.Parent,
+                                                                  Folder.RelativeID,
+                                                                  ATag.SysColumn)
+      else if (Sametext(ATag.Command, 'md5')) then
+        DetailStrings[Index] := THashMD5.GetHashStringFromFile(Folder.PathName)
+      else if (Sametext(ATag.Command, 'sha1')) then
+        DetailStrings[Index] := THashSHA1.GetHashStringFromFile(Folder.PathName)
+      else if (Sametext(ATag.Command, 'sha2')) then
+        DetailStrings[Index] := THashSHA2.GetHashStringFromFile(Folder.PathName)
+
+    end;
 
     // Yes/No
     if ((ATag.Options and toYesNo) = toYesNo) then

@@ -584,7 +584,8 @@ begin
       if ((ColumnDefs[Index].Options and toSys) = toSys) then
       begin
         ColumnDefs[Index].SysColumn := ColumnDefs[Index].GetSysColumn;
-        ColumnDefs[Index].SetCaption(TSubShellFolder.GetSystemField(ARootFolder.Parent, nil, ColumnDefs[Index].SysColumn));
+        if (ColumnDefs[Index].SysColumn > -1) then
+          ColumnDefs[Index].SetCaption(TSubShellFolder.GetSystemField(ARootFolder.Parent, nil, ColumnDefs[Index].SysColumn));
       end;
     end;
   end;
