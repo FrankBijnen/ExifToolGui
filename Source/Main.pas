@@ -323,7 +323,7 @@ type
     procedure ShellListKeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
     procedure TbFlRefreshClick(Sender: TObject);
     procedure StyledDraw(Sender: TObject; ACanvas: TCanvas; ARect: TRect; Selected: Boolean);
-    procedure Small1MeasureItem(Sender: TObject; ACanvas: TCanvas; var Width, Height: Integer);
+//    procedure Small1MeasureItem(Sender: TObject; ACanvas: TCanvas; var Width, Height: Integer);
     procedure FileListViewMenuPopup(Sender: TObject);
     procedure SpeedBtnFilterEditClick(Sender: TObject);
     procedure FileListFilterMenuPopup(Sender: TObject);
@@ -465,7 +465,7 @@ uses System.StrUtils, System.Math, System.Masks, System.Types, System.UITypes,
   MainDef, LogWin, Preferences, EditFFilter, EditFCol, UFrmStyle, UFrmAbout, UFrmCheckVersions,
   QuickMngr, DateTimeShift, DateTimeEqual, CopyMeta, RemoveMeta, Geotag, Geomap, CopyMetaSingle, FileDateTime,
   UFrmGenericExtract, UFrmGenericImport, UFrmLossLessRotate, UFrmGeoTagFiles, UFrmGeoSetup, UFrmGenerate,
-  UFrmDiff, UFrmExportSettings;
+  UFrmDiff, UFrmExportSettings, UnitRegion;
 
 {$R *.dfm}
 
@@ -2698,6 +2698,9 @@ begin
             Rotate := 270;
         end;
  {$IFDEF DEBUG_META}
+        //TODO
+        TRegions.LoadFromFile(FPath).Free;
+
         MetaData := TMetaData.Create;
         try
           MetaData.ReadMeta(FPath, [gmXMP, gmGPS]);
@@ -2724,10 +2727,11 @@ begin
   end;
 end;
 
-procedure TFMain.Small1MeasureItem(Sender: TObject; ACanvas: TCanvas; var Width, Height: Integer);
-begin
-  Height := 1;
-end;
+////TODO used?
+//procedure TFMain.Small1MeasureItem(Sender: TObject; ACanvas: TCanvas; var Width, Height: Integer);
+//begin
+//  Height := 1;
+//end;
 
 procedure TFMain.ViewPopupDrawItem(Sender: TObject; ACanvas: TCanvas; ARect: TRect; Selected: Boolean);
 begin
@@ -2987,7 +2991,7 @@ begin
   begin
     if (ImageIndex < Img_LastDetail) then
       Inc(ImageIndex);
-    NewMenuItem(AColumnSet.Name,       Index, 2, ImageIndex, (ShellList.ViewStyle = vsReport) and (GUIsettings.DetailsSel = Index));
+    NewMenuItem(AColumnSet.Name, Index, 2, ImageIndex, (ShellList.ViewStyle = vsReport) and (GUIsettings.DetailsSel = Index));
     Inc(Index);
   end;
 
@@ -3334,10 +3338,12 @@ begin
   if (ShellList.ItemIndex < 0) then
     ShellTree.SetFocus  // No files available to focus.
   else
-  begin
     ShellList.SetFocus;
-    ShellListClick(Sender);
-  end;
+//  begin
+//    ShellList.SetFocus;
+//    ShellListClick(Sender);
+//  end;
+//
 
   // Scroll in view. Select initial
   if (ShellTree.Selected <> nil) then

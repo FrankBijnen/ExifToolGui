@@ -29,6 +29,7 @@ uses
   ExifToolsGUI_Utils in 'ExifToolsGUI_Utils.pas',
   UnitFilesOnClipBoard in 'UnitFilesOnClipBoard.pas',
   UnitColumnDefs in 'UnitColumnDefs.pas',
+  UnitRegion in 'UnitRegion.pas',
   ExifToolsGui_AutoComplete in 'ExifToolsGui_AutoComplete.pas',
   ExifToolsGUI_StringGrid in 'ExifToolsGUI_StringGrid.pas',
   ExifToolsGui_ValEdit in 'ExifToolsGui_ValEdit.pas',
