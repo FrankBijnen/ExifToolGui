@@ -990,7 +990,6 @@ object FMain: TFMain
     Top = 0
     Width = 940
     Height = 25
-    UseSystemFont = False
     ActionManager = MainActionManager
     Caption = 'ActionMainMenuBar'
     Color = clMenuBar
@@ -999,7 +998,7 @@ object FMain: TFMain
     ColorMap.BtnSelectedFont = clBlack
     ColorMap.UnusedColor = clWhite
     Font.Charset = DEFAULT_CHARSET
-    Font.Color = clBlack
+    Font.Color = clWindowText
     Font.Height = -12
     Font.Name = 'Segoe UI'
     Font.Style = []
@@ -1264,6 +1263,26 @@ object FMain: TFMain
               item
                 Action = MaJPGGenericlosslessautorotate
                 Caption = '&JPG:  Lossless rotate + crop...'
+              end
+              item
+                Caption = '-'
+              end
+              item
+                Items = <
+                  item
+                    Action = MaCreateMD5
+                    Caption = '&MD5'
+                  end
+                  item
+                    Action = MaCreateSHA1
+                    Caption = '&SHA1'
+                  end
+                  item
+                    Action = MaCreateSHA2
+                    Caption = 'S&HA2'
+                  end>
+                Caption = 'Create Hash files'
+                UsageCount = 1
               end
               item
                 Caption = '-'
@@ -1606,6 +1625,24 @@ object FMain: TFMain
       Category = 'Various_FileDate'
       Caption = 'QuickTime'
       OnExecute = MaFDateFromQuickTimeExecute
+    end
+    object MaCreateMD5: TAction
+      Tag = 40
+      Category = 'Various_Hash'
+      Caption = 'MD5'
+      OnExecute = MaCreateMD5Execute
+    end
+    object MaCreateSHA1: TAction
+      Tag = 40
+      Category = 'Various_Hash'
+      Caption = 'SHA1'
+      OnExecute = MaCreateSHA1Execute
+    end
+    object MaCreateSHA2: TAction
+      Tag = 40
+      Category = 'Various_Hash'
+      Caption = 'SHA2'
+      OnExecute = MaCreateSHA2Execute
     end
   end
   object QuickPopUpMenu: TPopupMenu

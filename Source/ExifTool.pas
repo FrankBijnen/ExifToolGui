@@ -11,6 +11,10 @@ const
   GUI_PREF = '-GUI';
   GUI_SEP  = '-GUI-SEP';
   GUI_INV  = '-GUI-INV';
+  GUI_HASH_MD5 = '-GUI-HASH-MD5';
+  GUI_HASH_SHA1 = '-GUI-HASH-SHA1';
+  GUI_HASH_SHA2 = '-GUI-HASH-SHA2';
+
   VetoTags: array of string = ['-', '--'];
   CmdStr   = '-';
 

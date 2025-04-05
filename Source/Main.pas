@@ -212,6 +212,9 @@ type
     QuickPopUp_InsertETDirect: TMenuItem;
     MaExportSettings: TAction;
     MaImportSettings: TAction;
+    MaCreateMD5: TAction;
+    MaCreateSHA1: TAction;
+    MaCreateSHA2: TAction;
     procedure ShellListClick(Sender: TObject);
     procedure ShellListKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
     procedure SpeedBtnExifClick(Sender: TObject);
@@ -356,6 +359,9 @@ type
     procedure CmbAutoCompleteClick(Sender: TObject);
     procedure MaExportSettingsExecute(Sender: TObject);
     procedure MaImportSettingsExecute(Sender: TObject);
+    procedure MaCreateMD5Execute(Sender: TObject);
+    procedure MaCreateSHA1Execute(Sender: TObject);
+    procedure MaCreateSHA2Execute(Sender: TObject);
   private
     { Private declarations }
     ETBarSeriesFocal: TBarSeries;
@@ -422,6 +428,7 @@ type
     procedure EditFileLists(Sender: TObject);
     procedure EditFileFilter(Sender: TObject);
     procedure FileDateFromMetaData(GroupId: integer);
+    procedure CreateHashFiles(HashType: integer);
 
   protected
     procedure CreateWnd; override;
@@ -458,7 +465,7 @@ var
 
 implementation
 
-uses System.StrUtils, System.Math, System.Masks, System.Types, System.UITypes,
+uses System.StrUtils, System.Math, System.Masks, System.Types, System.UITypes, System.Hash, System.IOUtils,
   Vcl.ClipBrd, Winapi.ShellAPI, Winapi.CommCtrl, Vcl.Shell.ShellConsts, Vcl.Styles,
   ExifTool, ExifInfo, ExifToolsGui_LossLess, ExifTool_PipeStream, ExifToolsGui_ResourceStrings, UnitLangResources,
   ExifToolsGUI_MultiContextMenu, ExifToolsGUI_StringList, ExifToolsGui_FileListColumns, UDmFileLists,
@@ -700,6 +707,54 @@ begin
   GUIsettings.ETDAutoComp.SetAcList(ETdirectCmdList);
   if (Supports(EditETdirect, IAutoCompleteEdit)) then
     (EditETdirect as IAutoCompleteEdit).SetAutoCompOptions(GUIsettings.ETDAutoComp);
+end;
+
+procedure TFMain.CreateHashFiles(HashType: integer);
+var
+  Index: integer;
+  Org, Ext: string;
+  CrWait, CrNormal: HCURSOR;
+begin
+  CrWait := LoadCursor(0, IDC_WAIT);
+  CrNormal := SetCursor(CrWait);
+  try
+  for Index := 0 to ShellList.Items.Count -1 do
+  begin
+    if (ListView_GetItemState(ShellList.Handle, Index, LVIS_SELECTED) = LVIS_SELECTED) then
+    begin
+      Org := ShellList.Folders[Index].PathName;
+      Ext := ExtractFileExt(Org);
+      if (SameText(Ext, '.md5')) or
+         (SameText(Ext, '.sha1')) or
+         (SameText(Ext, '.sha2')) then
+        continue;   // Dont create Hashes on HasFiles
+
+      case HashType of
+        0: TFile.WriteAllText(ChangeFileExt(Org, '.md5'),   THashMD5.GetHashStringFromFile(Org));
+        1: TFile.WriteAllText(ChangeFileExt(Org, '.sha1'), THashSHA1.GetHashStringFromFile(Org));
+        2: TFile.WriteAllText(ChangeFileExt(Org, '.sha2'), THashSHA2.GetHashStringFromFile(Org));
+      end;
+    end;
+  end;
+  finally
+    ShellList.Refresh;
+    SetCursor(CrNormal);
+  end;
+end;
+
+procedure TFMain.MaCreateMD5Execute(Sender: TObject);
+begin
+  CreateHashFiles(0);
+end;
+
+procedure TFMain.MaCreateSHA1Execute(Sender: TObject);
+begin
+  CreateHashFiles(1);
+end;
+
+procedure TFMain.MaCreateSHA2Execute(Sender: TObject);
+begin
+  CreateHashFiles(2);
 end;
 
 function TFMain.ActiveAutoComp(ARow: integer): PAutoCompRec;
@@ -3992,12 +4047,7 @@ begin
       ETcmd := GUIsettings.Fast3(ShellList.FileExt) + '-s3' + CRLF + '-f';
 
       for E := 0 to N do
-      begin
-        Tx := QuickTags[E].Command;
-        if UpperCase(LeftStr(tx, Length(GUI_SEP))) = GUI_SEP then
-          Tx := GUI_SEP;
-        ETcmd := ETcmd + CRLF + Tx;
-      end;
+        ETcmd := ETcmd + CRLF + QuickTags[E].Command;
 
       ET.OpenExec(ETcmd, Item, ETResult, false);
       N := Min(N, ETResult.Count - 1);
@@ -4012,8 +4062,14 @@ begin
         for E := 0 to N do
         begin
           Tx := QuickTags[E].Command;
-          if UpperCase(LeftStr(Tx, Length(GUI_SEP))) = GUI_SEP then
+          if (Startstext(GUI_SEP, Tx)) then
             Tx := '=' + QuickTags[E].Caption
+          else if (Startstext(GUI_HASH_MD5, Tx)) then
+            Tx := QuickTags[E].Caption + '=' + THashMD5.GetHashStringFromFile(ShellList.FilePath)
+          else if (Startstext(GUI_HASH_SHA1, Tx)) then
+            Tx := QuickTags[E].Caption + '=' + THashSHA1.GetHashStringFromFile(ShellList.FilePath)
+          else if (Startstext(GUI_HASH_SHA2, Tx)) then
+            Tx := QuickTags[E].Caption + '=' + THashSHA2.GetHashStringFromFile(ShellList.FilePath)
           else
           begin
             Tx := QuickTags[E].Caption;
