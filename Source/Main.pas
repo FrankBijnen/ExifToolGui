@@ -37,7 +37,8 @@ uses
   ExifToolsGUI_OpenPicture,   // OpenPicture dialog
   ExifToolsGUI_Utils,         // Various
   ExifToolsGui_AutoEdit,      // AutoEdit
-  ExifToolsGui_AutoComplete;  // AutoComplete
+  ExifToolsGui_AutoComplete,  // AutoComplete
+  UnitRegion, Vcl.NumberBox;
 
 const
   CM_ActivateWindow = WM_USER + 100;
@@ -50,8 +51,7 @@ type
     AdvPanelBrowse: TPanel;
     AdvPageBrowse: TPageControl;
     AdvTabBrowse: TTabSheet;
-    AdvPagePreview: TPageControl;
-    AdvTabPreview: TTabSheet;
+    AdvPagePreview: TTabControl;
     AdvPageMetadata: TPageControl;
     AdvTabMetadata: TTabSheet;
     AdvPageFilelist: TPageControl;
@@ -215,6 +215,20 @@ type
     MaCreateMD5: TAction;
     MaCreateSHA1: TAction;
     MaCreateSHA2: TAction;
+    PnlRegion: TPanel;
+    SplitPreviewRegion: TSplitter;
+    CmbRegionNames: TComboBox;
+    EdRegionType: TLabeledEdit;
+    EdRegionDescription: TLabeledEdit;
+    Label1: TLabel;
+    PnlRegionWH: TPanel;
+    NumBoxW: TNumberBox;
+    LblRegionX: TLabel;
+    NumBoxH: TNumberBox;
+    PnlRegionXY: TPanel;
+    NumBoxX: TNumberBox;
+    NumBoxY: TNumberBox;
+    BtnSaveRegion: TButton;
     procedure ShellListClick(Sender: TObject);
     procedure ShellListKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
     procedure SpeedBtnExifClick(Sender: TObject);
@@ -326,7 +340,6 @@ type
     procedure ShellListKeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
     procedure TbFlRefreshClick(Sender: TObject);
     procedure StyledDraw(Sender: TObject; ACanvas: TCanvas; ARect: TRect; Selected: Boolean);
-//    procedure Small1MeasureItem(Sender: TObject; ACanvas: TCanvas; var Width, Height: Integer);
     procedure FileListViewMenuPopup(Sender: TObject);
     procedure SpeedBtnFilterEditClick(Sender: TObject);
     procedure FileListFilterMenuPopup(Sender: TObject);
@@ -362,6 +375,12 @@ type
     procedure MaCreateMD5Execute(Sender: TObject);
     procedure MaCreateSHA1Execute(Sender: TObject);
     procedure MaCreateSHA2Execute(Sender: TObject);
+    procedure AdvPagePreviewChange(Sender: TObject);
+    procedure SplitPreviewRegionMoved(Sender: TObject);
+    procedure CmbRegionNamesChange(Sender: TObject);
+    procedure FormDestroy(Sender: TObject);
+    procedure PnlRegionResize(Sender: TObject);
+    procedure BtnSaveRegionClick(Sender: TObject);
   private
     { Private declarations }
     ETBarSeriesFocal: TBarSeries;
@@ -374,6 +393,7 @@ type
     MetadataLoading: boolean;
     EditLineActive: boolean;
     CustomTabStops: array of TWinControl;
+    Regions: TRegions;
     procedure AlignStatusBar;
     procedure ImageDrop(var Msg: TWMDROPFILES); message WM_DROPFILES;
     procedure SetCaption(AnItem: string = '');
@@ -383,6 +403,8 @@ type
     procedure SetupWSAutoComp(ARow: integer);
     function ActiveAutoComp(ARow: integer): PAutoCompRec;
     procedure SetGridEditor(const Enable: boolean);
+    procedure ShowRegions(Item: string);
+    procedure ShowRegionInfo;
     procedure ShowMetadata;
     procedure ShowPreview;
     procedure RestoreGUI;
@@ -472,7 +494,7 @@ uses System.StrUtils, System.Math, System.Masks, System.Types, System.UITypes, S
   MainDef, LogWin, Preferences, EditFFilter, EditFCol, UFrmStyle, UFrmAbout, UFrmCheckVersions,
   QuickMngr, DateTimeShift, DateTimeEqual, CopyMeta, RemoveMeta, Geotag, Geomap, CopyMetaSingle, FileDateTime,
   UFrmGenericExtract, UFrmGenericImport, UFrmLossLessRotate, UFrmGeoTagFiles, UFrmGeoSetup, UFrmGenerate,
-  UFrmDiff, UFrmExportSettings, UnitRegion;
+  UFrmDiff, UFrmExportSettings;
 
 {$R *.dfm}
 
@@ -928,6 +950,12 @@ end;
 procedure TFMain.BtnShowLogClick(Sender: TObject);
 begin
   FLogWin.Show;
+end;
+
+procedure TFMain.BtnSaveRegionClick(Sender: TObject);
+begin
+  if (Assigned(Regions)) then
+    Regions.SaveToFile(GetSelectedFile(ShellList.RelFileName));
 end;
 
 procedure TFMain.GenericExtractPreviewsClick(Sender: TObject);
@@ -1858,6 +1886,12 @@ begin
   ShellExecute(0, 'Open', PWideChar(StringResource(ETD_Online_Doc)), '', '', SW_SHOWNORMAL);
 end;
 
+procedure TFMain.PnlRegionResize(Sender: TObject);
+begin
+  NumBoxX.Width := TPanel(Sender).ClientWidth div 2;
+  NumBoxW.Width := TPanel(Sender).ClientWidth div 2;
+end;
+
 procedure TFMain.QuickPopUpMenuPopup(Sender: TObject);
 var
   I: integer;
@@ -2463,6 +2497,11 @@ begin
   GUIsettings.ETdirMode := CmbETDirectMode.ItemIndex;
 end;
 
+procedure TFMain.CmbRegionNamesChange(Sender: TObject);
+begin
+  ShowRegionInfo;
+end;
+
 procedure TFMain.EditETdirectKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
 var
   ETResult: boolean;
@@ -2753,9 +2792,6 @@ begin
             Rotate := 270;
         end;
  {$IFDEF DEBUG_META}
-        //TODO
-        TRegions.LoadFromFile(FPath).Free;
-
         MetaData := TMetaData.Create;
         try
           MetaData.ReadMeta(FPath, [gmXMP, gmGPS]);
@@ -2781,12 +2817,6 @@ begin
     end;
   end;
 end;
-
-////TODO used?
-//procedure TFMain.Small1MeasureItem(Sender: TObject; ACanvas: TCanvas; var Width, Height: Integer);
-//begin
-//  Height := 1;
-//end;
 
 procedure TFMain.ViewPopupDrawItem(Sender: TObject; ACanvas: TCanvas; ARect: TRect; Selected: Boolean);
 begin
@@ -2873,6 +2903,17 @@ end;
 procedure TFMain.MaFDateFromQuickTimeExecute(Sender: TObject);
 begin
   FileDateFromMetaData(2);
+end;
+
+procedure TFMain.AdvPagePreviewChange(Sender: TObject);
+begin
+  with TTabControl(Sender) do
+  begin
+    PnlRegion.Visible := (TabIndex = 1);
+    SplitPreviewRegion.Visible := PnlRegion.Visible;
+    ShowPreview;
+    ShowMetadata;
+  end;
 end;
 
 procedure TFMain.AdvPagePreviewResize(Sender: TObject);
@@ -3167,6 +3208,12 @@ begin
   Geomap.ExecRestEvent := ExecRestEvent_Done;
 end;
 
+procedure TFMain.FormDestroy(Sender: TObject);
+begin
+  if Assigned(Regions) then
+    FreeAndNil(Regions);
+end;
+
 procedure TFMain.FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
 begin
   if (ssCTRL in Shift) then
@@ -3386,6 +3433,7 @@ begin
       end;
     end
   end;
+  AdvPagePreviewChange(AdvPagePreview);
 
   InstallAutoComp;
   SetMetadataTab(TMetaDataTab(GUIsettings.MetadataSel));
@@ -4016,6 +4064,45 @@ begin
     exit(TMetaDataTab.mtCustom);
 end;
 
+procedure TFMain.ShowRegionInfo;
+var
+  Region: TRegion;
+begin
+  if not Assigned(Regions) then
+    exit;
+  Region := Regions.Items[CmbRegionNames.ItemIndex];
+  EdRegionType.Text := Region.RegionType;
+  EdRegionDescription.Text := Region.Description;
+  NumBoxX.Value := Region.RegionRect.X;
+  NumBoxY.Value := Region.RegionRect.Y;
+  NumBoxW.Value := Region.RegionRect.W;
+  NumBoxH.Value := Region.RegionRect.H;
+end;
+
+procedure TFMain.ShowRegions(Item: string);
+var
+  Region: TRegion;
+begin
+  if (PnlRegion.Visible = false) then
+    exit;
+
+  FreeAndNil(Regions);
+  Regions := TRegions.LoadFromFile(Item);
+
+  CmbRegionNames.Items.BeginUpdate;
+  try
+    CmbRegionNames.Items.Clear;
+    for Region in Regions.Items do
+      CmbRegionNames.Items.Add(Region.Name);
+  finally
+    CmbRegionNames.Items.EndUpdate;
+    CmbRegionNames.Text := '-';
+    if (CmbRegionNames.Items.Count > 0) then
+      CmbRegionNames.ItemIndex := 0;
+    ShowRegionInfo;
+  end;
+end;
+
 procedure TFMain.ShowMetadata;
 var
   E, N: integer;
@@ -4040,6 +4127,8 @@ begin
       MemoQuick.Text := '';
       exit;
     end;
+
+    ShowRegions(Item);
 
     if SpeedBtnQuick.Down then
     begin
@@ -4415,6 +4504,11 @@ begin
     ShowImagesOnMap(EdgeBrowser1, ShellList.Path, GetGpsCoordinates(GetSelectedFiles))
   else
     ShowMessage(StrNoFilesSelected);
+end;
+
+procedure TFMain.SplitPreviewRegionMoved(Sender: TObject);
+begin
+  ShowPreview;
 end;
 
 procedure TFMain.Splitter1CanResize(Sender: TObject; var NewSize: integer; var Accept: boolean);
