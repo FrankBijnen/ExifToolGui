@@ -149,7 +149,7 @@ are essential for majority of users.<br>
     <li>Option added to show folders in the File list panel.</li>
     <li>Option added to show a Breadcrumb (Address bar) in the File list panel.</li>
     <li>Possibility to add Custom options to Exiftool.</li>
-    <li>Support for<a href="Readme%204K%20monitor.txt"><b>4K monitors.</b></a></li>
+    <li>Support for <a href="Readme%204K%20monitor.txt"><b>4K monitors.</b></a></li>
     <li>Option added to show hidden files and folders. <b>Admins only</b></li>
     <li>Enhanced Windows integration. Add to Context menu in Windows explorer, Single instance App and minimize to Tray</b></li>
     <li>Camera settings, Location info and About photo in File list detail support more File types</b></li>
