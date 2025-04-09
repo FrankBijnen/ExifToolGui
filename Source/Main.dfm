@@ -2,7 +2,7 @@ object FMain: TFMain
   Left = 0
   Top = 0
   Caption = 'FMain'
-  ClientHeight = 580
+  ClientHeight = 693
   ClientWidth = 940
   Color = clBtnFace
   Constraints.MinHeight = 480
@@ -18,6 +18,7 @@ object FMain: TFMain
   OnCanResize = FormCanResize
   OnClose = FormClose
   OnCreate = FormCreate
+  OnDestroy = FormDestroy
   OnKeyDown = FormKeyDown
   OnKeyPress = FormKeyPress
   OnShow = FormShow
@@ -26,7 +27,7 @@ object FMain: TFMain
     Left = 240
     Top = 25
     Width = 5
-    Height = 536
+    Height = 649
     AutoSnap = False
     Color = clBtnFace
     MinSize = 160
@@ -41,7 +42,7 @@ object FMain: TFMain
     Left = 615
     Top = 25
     Width = 5
-    Height = 536
+    Height = 649
     Align = alRight
     AutoSnap = False
     MinSize = 320
@@ -54,7 +55,7 @@ object FMain: TFMain
   end
   object StatusBar: TStatusBar
     Left = 0
-    Top = 561
+    Top = 674
     Width = 940
     Height = 19
     Panels = <
@@ -72,7 +73,7 @@ object FMain: TFMain
     Left = 0
     Top = 25
     Width = 240
-    Height = 536
+    Height = 649
     Align = alLeft
     DoubleBuffered = True
     Font.Charset = DEFAULT_CHARSET
@@ -85,7 +86,7 @@ object FMain: TFMain
     TabOrder = 1
     object Splitter3: TSplitter
       Left = 1
-      Top = 310
+      Top = 423
       Width = 238
       Height = 4
       Cursor = crVSplit
@@ -99,7 +100,7 @@ object FMain: TFMain
       Left = 1
       Top = 1
       Width = 238
-      Height = 309
+      Height = 422
       ActivePage = AdvTabBrowse
       Align = alClient
       TabOrder = 0
@@ -109,7 +110,7 @@ object FMain: TFMain
           Left = 0
           Top = 0
           Width = 230
-          Height = 281
+          Height = 394
           ObjectTypes = [otFolders]
           Root = 'rfDesktop'
           ShellListView = ShellList
@@ -135,25 +136,185 @@ object FMain: TFMain
         end
       end
     end
-    object AdvPagePreview: TPageControl
+    object AdvPagePreview: TTabControl
       Left = 1
-      Top = 314
+      Top = 427
       Width = 238
       Height = 221
-      ActivePage = AdvTabPreview
       Align = alBottom
+      MultiLine = True
       TabOrder = 1
+      Tabs.Strings = (
+        'Preview'
+        'Regions')
+      TabIndex = 0
+      OnChange = AdvPagePreviewChange
       OnResize = AdvPagePreviewResize
-      object AdvTabPreview: TTabSheet
-        Caption = 'Preview '
-        object RotateImg: TImage
-          Left = 0
-          Top = 0
-          Width = 230
-          Height = 193
-          Align = alClient
-          ExplicitLeft = -1
-          ExplicitTop = -1
+      object RotateImg: TImage
+        Left = 4
+        Top = 24
+        Width = 127
+        Height = 193
+        Align = alClient
+        ExplicitWidth = 101
+      end
+      object SplitPreviewRegion: TSplitter
+        Left = 131
+        Top = 24
+        Width = 5
+        Height = 193
+        Align = alRight
+        OnMoved = SplitPreviewRegionMoved
+        ExplicitLeft = 133
+      end
+      object PnlRegion: TPanel
+        Left = 136
+        Top = 24
+        Width = 98
+        Height = 193
+        Align = alRight
+        TabOrder = 0
+        OnResize = PnlRegionResize
+        ExplicitLeft = 137
+        ExplicitTop = 25
+        object Label1: TLabel
+          Left = 1
+          Top = 124
+          Width = 96
+          Height = 12
+          Align = alTop
+          Caption = 'X/Y'
+        end
+        object LblRegionX: TLabel
+          Left = 1
+          Top = 160
+          Width = 96
+          Height = 12
+          Align = alTop
+          Caption = 'W/H'
+        end
+        object CmbRegionNames: TComboBox
+          Left = 1
+          Top = 21
+          Width = 96
+          Height = 21
+          Align = alTop
+          TabOrder = 0
+          Text = 'CmbRegionNames'
+          OnChange = CmbRegionNamesChange
+        end
+        object EdRegionType: TLabeledEdit
+          AlignWithMargins = True
+          Left = 4
+          Top = 101
+          Width = 90
+          Height = 20
+          Margins.Top = 18
+          Align = alTop
+          EditLabel.Width = 24
+          EditLabel.Height = 13
+          EditLabel.Caption = 'Type'
+          TabOrder = 1
+          Text = ''
+        end
+        object EdRegionDescription: TLabeledEdit
+          AlignWithMargins = True
+          Left = 4
+          Top = 60
+          Width = 90
+          Height = 20
+          Margins.Top = 18
+          Align = alTop
+          EditLabel.Width = 53
+          EditLabel.Height = 13
+          EditLabel.Caption = 'Description'
+          TabOrder = 2
+          Text = ''
+          ExplicitTop = 62
+        end
+        object PnlRegionWH: TPanel
+          Left = 1
+          Top = 172
+          Width = 96
+          Height = 24
+          Align = alTop
+          TabOrder = 3
+          ExplicitTop = 156
+          object NumBoxW: TNumberBox
+            Left = 1
+            Top = 1
+            Width = 48
+            Height = 22
+            Align = alLeft
+            Decimal = 4
+            Mode = nbmFloat
+            MaxValue = 1.000000000000000000
+            SmallStep = 0.005000000000000000
+            TabOrder = 0
+            UseMouseWheel = True
+            ExplicitHeight = 20
+          end
+          object NumBoxH: TNumberBox
+            Left = 49
+            Top = 1
+            Width = 46
+            Height = 22
+            Align = alClient
+            Decimal = 4
+            Mode = nbmFloat
+            MaxValue = 1.000000000000000000
+            SmallStep = 0.005000000000000000
+            TabOrder = 1
+            UseMouseWheel = True
+            ExplicitHeight = 20
+          end
+        end
+        object PnlRegionXY: TPanel
+          Left = 1
+          Top = 136
+          Width = 96
+          Height = 24
+          Align = alTop
+          TabOrder = 4
+          ExplicitTop = 119
+          object NumBoxX: TNumberBox
+            Left = 1
+            Top = 1
+            Width = 40
+            Height = 22
+            Align = alLeft
+            Decimal = 4
+            Mode = nbmFloat
+            MaxValue = 1.000000000000000000
+            SmallStep = 0.005000000000000000
+            TabOrder = 0
+            UseMouseWheel = True
+            ExplicitHeight = 20
+          end
+          object NumBoxY: TNumberBox
+            Left = 41
+            Top = 1
+            Width = 54
+            Height = 22
+            Align = alClient
+            Decimal = 4
+            Mode = nbmFloat
+            MaxValue = 1.000000000000000000
+            SmallStep = 0.005000000000000000
+            TabOrder = 1
+            UseMouseWheel = True
+            ExplicitHeight = 20
+          end
+        end
+        object BtnSaveRegion: TButton
+          Left = 1
+          Top = 1
+          Width = 96
+          Height = 20
+          Align = alTop
+          Caption = 'Save'
+          TabOrder = 5
+          OnClick = BtnSaveRegionClick
         end
       end
     end
@@ -162,7 +323,7 @@ object FMain: TFMain
     Left = 620
     Top = 25
     Width = 320
-    Height = 536
+    Height = 649
     ActivePage = AdvTabMetadata
     Align = alRight
     DoubleBuffered = True
@@ -266,7 +427,7 @@ object FMain: TFMain
       end
       object AdvPanelMetaBottom: TPanel
         Left = 0
-        Top = 402
+        Top = 515
         Width = 312
         Height = 106
         Align = alBottom
@@ -344,7 +505,7 @@ object FMain: TFMain
         Left = 0
         Top = 57
         Width = 312
-        Height = 345
+        Height = 458
         Align = alClient
         BorderStyle = bsNone
         DefaultRowHeight = 19
@@ -384,7 +545,7 @@ object FMain: TFMain
         Left = 0
         Top = 57
         Width = 312
-        Height = 419
+        Height = 532
         Align = alClient
         Caption = 'Internet access not enabled in preferences'
         Font.Charset = DEFAULT_CHARSET
@@ -398,7 +559,7 @@ object FMain: TFMain
           Left = 1
           Top = 1
           Width = 310
-          Height = 417
+          Height = 530
           Align = alClient
           TabOrder = 0
           AllowSingleSignOnUsingOSPrimaryAccount = False
@@ -412,7 +573,7 @@ object FMain: TFMain
       end
       object AdvPanel_MapBottom: TPanel
         Left = 0
-        Top = 476
+        Top = 589
         Width = 312
         Height = 32
         Align = alBottom
@@ -553,7 +714,7 @@ object FMain: TFMain
     Left = 245
     Top = 25
     Width = 370
-    Height = 536
+    Height = 649
     ActivePage = AdvTabFilelist
     Align = alClient
     Constraints.MinWidth = 364
@@ -629,7 +790,7 @@ object FMain: TFMain
       end
       object AdvPanelETdirect: TPanel
         Left = 0
-        Top = 324
+        Top = 437
         Width = 362
         Height = 184
         Align = alBottom
@@ -807,7 +968,7 @@ object FMain: TFMain
         Left = 0
         Top = 50
         Width = 362
-        Height = 274
+        Height = 387
         ObjectTypes = [otNonFolders]
         Root = 'rfDesktop'
         ShellTreeView = ShellTree
@@ -949,7 +1110,7 @@ object FMain: TFMain
         Left = 0
         Top = 121
         Width = 362
-        Height = 387
+        Height = 500
         Legend.Visible = False
         Title.Font.Color = clBlack
         Title.Font.Height = -19
@@ -1281,7 +1442,7 @@ object FMain: TFMain
                     Action = MaCreateSHA2
                     Caption = 'S&HA2'
                   end>
-                Caption = 'Create Hash files'
+                Caption = '&Create Hash files'
                 UsageCount = 1
               end
               item
@@ -10025,25 +10186,25 @@ object FMain: TFMain
     Width = 20
     Height = 20
     Left = 57
-    Top = 372
+    Top = 380
   end
   object FileListViewMenu: TPopupMenu
     Images = VirtualImageListFileList
     OwnerDraw = True
     OnPopup = FileListViewMenuPopup
-    Left = 169
+    Left = 105
     Top = 372
   end
   object FileListFilterMenu: TPopupMenu
     Images = VirtualImageListFileList
     OwnerDraw = True
     OnPopup = FileListFilterMenuPopup
-    Left = 167
-    Top = 427
+    Left = 95
+    Top = 435
   end
   object ExportMenu: TPopupMenu
     Images = VirtualImageListFileList
-    Left = 169
+    Left = 105
     Top = 484
     object Csv1: TMenuItem
       Caption = 'Csv'
