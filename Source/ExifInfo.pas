@@ -97,6 +97,8 @@ type
     LensInfo: string;
     LensMake: string;
     LensModel: string;
+    ExifImageWidth: word;
+    ExifImageHeight: word;
     procedure Clear;
   end;
 
@@ -1374,6 +1376,10 @@ begin
           end;
           AddExifIFDData('ColorSpace', ColorSpace);
         end;
+      $A002:
+        ExifImageWidth := AddExifIFDData('ExifImageWidth', DecodeWord(IFDentry));
+      $A003:
+        ExifImageHeight := AddExifIFDData('ExifImageHeight', DecodeWord(IFDentry));
       $A005:
         InteropOffset := IFDentry.ValueOffs;
       $A405:
