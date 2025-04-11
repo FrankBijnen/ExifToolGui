@@ -187,7 +187,6 @@ object FMain: TFMain
           Height = 13
           Align = alTop
           Caption = 'X/Y'
-          ExplicitTop = 124
           ExplicitWidth = 16
         end
         object LblRegionX: TLabel
@@ -197,7 +196,6 @@ object FMain: TFMain
           Height = 13
           Align = alTop
           Caption = 'W/H'
-          ExplicitTop = 161
           ExplicitWidth = 21
         end
         object Label2: TLabel
@@ -207,7 +205,6 @@ object FMain: TFMain
           Height = 13
           Align = alTop
           Caption = 'Type'
-          ExplicitTop = 84
           ExplicitWidth = 24
         end
         object CmbRegionNames: TComboBox
@@ -219,7 +216,6 @@ object FMain: TFMain
           TabOrder = 0
           Text = 'CmbRegionNames'
           OnChange = CmbRegionNamesChange
-          ExplicitTop = 21
         end
         object CmbRegionType: TComboBox
           AlignWithMargins = True
@@ -253,7 +249,6 @@ object FMain: TFMain
           TabOrder = 2
           Text = ''
           OnChange = RegionChange
-          ExplicitTop = 60
         end
         object PnlRegionWH: TPanel
           Left = 1
@@ -262,7 +257,6 @@ object FMain: TFMain
           Height = 24
           Align = alTop
           TabOrder = 3
-          ExplicitTop = 174
           object NumBoxW: TNumberBox
             Left = 1
             Top = 1
@@ -301,7 +295,6 @@ object FMain: TFMain
           Height = 24
           Align = alTop
           TabOrder = 4
-          ExplicitTop = 137
           object NumBoxX: TNumberBox
             Left = 1
             Top = 1
@@ -352,8 +345,6 @@ object FMain: TFMain
             Images = VirtualImageRegions
             TabOrder = 0
             OnClick = BtnRegionSaveClick
-            ExplicitLeft = 64
-            ExplicitTop = -4
           end
           object BtnRegionAdd: TButton
             Left = 1
@@ -367,8 +358,6 @@ object FMain: TFMain
             Images = VirtualImageRegions
             TabOrder = 1
             OnClick = BtnRegionAddClick
-            ExplicitLeft = 0
-            ExplicitTop = -4
           end
           object BtnRegionDel: TButton
             Left = 33
@@ -382,6 +371,8 @@ object FMain: TFMain
             Images = VirtualImageRegions
             TabOrder = 2
             OnClick = BtnRegionDelClick
+            ExplicitLeft = 27
+            ExplicitTop = -4
           end
         end
       end
