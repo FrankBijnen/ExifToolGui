@@ -50,9 +50,10 @@ type
   private
     FCurRect: TRect;
     FFocusDrawn: boolean;
+    FImageDimensions: TPoint;
   public
-    ExcludeBorder: TPoint;
     procedure DrawFocusRect(ARect: TRegionRect);
+    property ImageDimensions: TPoint read FImageDimensions write FImageDimensions;
     property FocusDrawn: boolean read FFocusDrawn write FFocusDrawn;
   end;
 
@@ -520,11 +521,21 @@ uses System.StrUtils, System.Math, System.Masks, System.Types, System.UITypes, S
 procedure TImage.DrawFocusRect(ARect: TRegionRect);
 begin
   if FFocusDrawn then
+  begin
     Canvas.DrawFocusRect(FCurRect);
-  FCurRect.Left  := Round(ExcludeBorder.X * ARect.X) + ((Width - ExcludeBorder.X) div 2);
-  FCurRect.Top   := Round(ExcludeBorder.Y * ARect.Y) + ((Height - ExcludeBorder.Y) div 2);;
-  FCurRect.Width := Round(ExcludeBorder.X * ARect.W);
-  FCurRect.Height:= Round(ExcludeBorder.Y * ARect.H);
+    InflateRect(FCurRect, 1, 1);
+    Canvas.DrawFocusRect(FCurRect);
+    InflateRect(FCurRect, 1, 1);
+    Canvas.DrawFocusRect(FCurRect);
+  end;
+  FCurRect.Left  := Round(FImageDimensions.X * ARect.X) + ((Width  - FImageDimensions.X) div 2);
+  FCurRect.Top   := Round(FImageDimensions.Y * ARect.Y) + ((Height - FImageDimensions.Y) div 2);
+  FCurRect.Width := Round(FImageDimensions.X * ARect.W);
+  FCurRect.Height:= Round(FImageDimensions.Y * ARect.H);
+  Canvas.DrawFocusRect(FCurRect);
+  InflateRect(FCurRect, -1, -1);
+  Canvas.DrawFocusRect(FCurRect);
+  InflateRect(FCurRect, -1, -1);
   Canvas.DrawFocusRect(FCurRect);
   FFocusDrawn := true;
 end;
@@ -2906,14 +2917,14 @@ begin
         end;
  {$ENDIF}
       end;
-      RotateImg.ExcludeBorder := Point(RotateImg.Width, RotateImg.Height);
+      RotateImg.ImageDimensions := Point(RotateImg.Width, RotateImg.Height);
       if (FPath <> '') then // Directory?
-      begin
         ABitMap := GetBitmapFromWic(WicPreview(FPath, Rotate, RotateImg.Width, RotateImg.Height));
-        RotateImg.ExcludeBorder := Point(ABitMap.Width, ABitMap.Height);
-      end;
       if (ABitMap <> nil) then
-        ResizeBitmapCanvas(ABitMap, RotateImg.Width, RotateImg.Height, GUIColorWindow)
+      begin
+        RotateImg.ImageDimensions := Point(ABitMap.Width, ABitMap.Height);
+        ResizeBitmapCanvas(ABitMap, RotateImg.Width, RotateImg.Height, GUIColorWindow);
+      end
       else
         ABitMap := ShellList.GetThumbNail(ShellList.Selected.Index, RotateImg.Width, RotateImg.Height);
       RotateImg.FocusDrawn := false;

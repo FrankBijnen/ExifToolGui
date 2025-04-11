@@ -371,8 +371,6 @@ object FMain: TFMain
             Images = VirtualImageRegions
             TabOrder = 2
             OnClick = BtnRegionDelClick
-            ExplicitLeft = 27
-            ExplicitTop = -4
           end
         end
       end
@@ -1210,7 +1208,6 @@ object FMain: TFMain
     Top = 0
     Width = 940
     Height = 25
-    UseSystemFont = False
     ActionManager = MainActionManager
     Caption = 'ActionMainMenuBar'
     Color = clMenuBar
@@ -1219,7 +1216,7 @@ object FMain: TFMain
     ColorMap.BtnSelectedFont = clBlack
     ColorMap.UnusedColor = clWhite
     Font.Charset = DEFAULT_CHARSET
-    Font.Color = clBlack
+    Font.Color = clWindowText
     Font.Height = -12
     Font.Name = 'Segoe UI'
     Font.Style = []
