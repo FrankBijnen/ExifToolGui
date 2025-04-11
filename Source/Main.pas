@@ -46,6 +46,16 @@ const
 type
   TMetaDataTab = (mtQuick, mtExif, mtXMP, mtIPTC, mtMaker, mtALL, mtCustom);
 
+  TImage = class(Vcl.ExtCtrls.TImage)
+  private
+    FCurRect: TRect;
+    FFocusDrawn: boolean;
+  public
+    ExcludeBorder: TPoint;
+    procedure DrawFocusRect(ARect: TRegionRect);
+    property FocusDrawn: boolean read FFocusDrawn write FFocusDrawn;
+  end;
+
   TFMain = class(TScaleForm)
     StatusBar: TStatusBar;
     AdvPanelBrowse: TPanel;
@@ -506,6 +516,18 @@ uses System.StrUtils, System.Math, System.Masks, System.Types, System.UITypes, S
   UFrmDiff, UFrmExportSettings;
 
 {$R *.dfm}
+
+procedure TImage.DrawFocusRect(ARect: TRegionRect);
+begin
+  if FFocusDrawn then
+    Canvas.DrawFocusRect(FCurRect);
+  FCurRect.Left  := Round(ExcludeBorder.X * ARect.X) + ((Width - ExcludeBorder.X) div 2);
+  FCurRect.Top   := Round(ExcludeBorder.Y * ARect.Y) + ((Height - ExcludeBorder.Y) div 2);;
+  FCurRect.Width := Round(ExcludeBorder.X * ARect.W);
+  FCurRect.Height:= Round(ExcludeBorder.Y * ARect.H);
+  Canvas.DrawFocusRect(FCurRect);
+  FFocusDrawn := true;
+end;
 
 function TFMain.GetDefWindowSizes: TRect;
 begin
@@ -968,7 +990,6 @@ end;
 procedure TFMain.BtnRegionAddClick(Sender: TObject);
 var
   ARegionRect: TRegionRect;
-
 begin
   if (Assigned(Regions)) then
   begin
@@ -977,6 +998,7 @@ begin
     ARegionRect.W := NumBoxW.Value;
     ARegionRect.H := NumBoxH.Value;
     Regions.Add(TRegion.Create(ARegionRect, 'Normalized', CmbRegionNames.Text, EdRegionDescription.Text, CmbRegionType.Text));
+    CmbRegionNames.ItemIndex := CmbRegionNames.Items.Add(CmbRegionNames.Text);
   end;
 end;
 
@@ -1928,6 +1950,9 @@ var
 begin
   if not Assigned(Regions) then
     exit;
+  if Regions.Loading then
+    exit;
+
   if (CmbRegionNames.ItemIndex < 0) or
      (CmbRegionNames.ItemIndex > Regions.Items.Count -1) then
     exit;
@@ -1938,23 +1963,17 @@ begin
   Region.RegionType := CmbRegionType.Text;
 
   // Description used?
-  if (EdRegionDescription.Modified) then
-    Region.RegionDescription := EdRegionDescription.Text;
+  Region.RegionDescription := EdRegionDescription.Text;
 
   // Rectangle
   Rect := Region.RegionRect;
-  if (NumBoxW.Modified) then
-    Rect.W := NumBoxW.Value;
-
-  if (NumBoxH.Modified) then
-    Rect.H := NumBoxH.Value;
-
-  if (NumBoxX.Modified) then
-    Rect.X := NumBoxX.Value;
-
-  if (NumBoxY.Modified) then
-    Rect.Y := NumBoxY.Value;
+  Rect.W := NumBoxW.Value;
+  Rect.H := NumBoxH.Value;
+  Rect.X := NumBoxX.Value;
+  Rect.Y := NumBoxY.Value;
   Region.RegionRect := Rect;
+
+  RotateImg.DrawFocusRect(Region.RegionRect);
 end;
 
 procedure TFMain.MCustomOptionsClick(Sender: TObject);
@@ -2887,12 +2906,17 @@ begin
         end;
  {$ENDIF}
       end;
+      RotateImg.ExcludeBorder := Point(RotateImg.Width, RotateImg.Height);
       if (FPath <> '') then // Directory?
+      begin
         ABitMap := GetBitmapFromWic(WicPreview(FPath, Rotate, RotateImg.Width, RotateImg.Height));
+        RotateImg.ExcludeBorder := Point(ABitMap.Width, ABitMap.Height);
+      end;
       if (ABitMap <> nil) then
         ResizeBitmapCanvas(ABitMap, RotateImg.Width, RotateImg.Height, GUIColorWindow)
       else
         ABitMap := ShellList.GetThumbNail(ShellList.Selected.Index, RotateImg.Width, RotateImg.Height);
+      RotateImg.FocusDrawn := false;
       RotateImg.Picture.Bitmap := ABitMap;
     finally
       ABitMap.Free;
@@ -4146,27 +4170,34 @@ procedure TFMain.ShowRegionInfo;
 var
   Region: TRegion;
 begin
-  CmbRegionType.Text := '-';
-  EdRegionDescription.Text := '-';
-  NumBoxX.Value := 0;
-  NumBoxY.Value := 0;
-  NumBoxW.Value := 0;
-  NumBoxH.Value := 0;
+  Regions.Loading := true;
+  try
+    CmbRegionType.Text := '-';
+    EdRegionDescription.Text := '-';
+    NumBoxX.Value := 0;
+    NumBoxY.Value := 0;
+    NumBoxW.Value := 0;
+    NumBoxH.Value := 0;
 
-  if not Assigned(Regions) then
-    exit;
-  if (CmbRegionNames.ItemIndex < 0) or
-     (CmbRegionNames.ItemIndex > Regions.Items.Count -1) then
-    exit;
+    if not Assigned(Regions) then
+      exit;
+    if (CmbRegionNames.ItemIndex < 0) or
+       (CmbRegionNames.ItemIndex > Regions.Items.Count -1) then
+      exit;
 
-  Region := Regions.Items[CmbRegionNames.ItemIndex];
-  Region.RegionName := CmbRegionNames.Text;
-  CmbRegionType.Text := Region.RegionType;
-  EdRegionDescription.Text := Region.RegionDescription;
-  NumBoxX.Value := Region.RegionRect.X;
-  NumBoxY.Value := Region.RegionRect.Y;
-  NumBoxW.Value := Region.RegionRect.W;
-  NumBoxH.Value := Region.RegionRect.H;
+    Region := Regions.Items[CmbRegionNames.ItemIndex];
+    Region.RegionName := CmbRegionNames.Text;
+    CmbRegionType.Text := Region.RegionType;
+    EdRegionDescription.Text := Region.RegionDescription;
+    NumBoxX.Value := Region.RegionRect.X;
+    NumBoxY.Value := Region.RegionRect.Y;
+    NumBoxW.Value := Region.RegionRect.W;
+    NumBoxH.Value := Region.RegionRect.H;
+
+    RotateImg.DrawFocusRect(Region.RegionRect)
+  finally
+    Regions.Loading := false;
+  end;
 end;
 
 procedure TFMain.ShowRegions(Item: string);

@@ -38,6 +38,7 @@ type
     FDimW: integer;
     FDimH: integer;
     FUnits: string;
+    FLoading: boolean;
   public
     constructor Create(ADimW, AImgW, ADimH, AImgH: integer; AUnits: string);
     destructor Destroy; override;
@@ -46,6 +47,7 @@ type
     class function LoadFromFile(AFile: string): TRegions;
     procedure SaveToFile(AFile: string);
     property Items: TRegionList read FItems;
+    property Loading: boolean read FLoading write FLoading;
   end;
 
 implementation
@@ -95,6 +97,8 @@ end;
 constructor TRegions.Create(ADimW, AImgW, ADimH, AImgH: integer; AUnits: string);
 begin
   inherited Create;
+  Floading := true;
+
   if (ADimW <> 0) then
     FDimW := ADimW
   else
