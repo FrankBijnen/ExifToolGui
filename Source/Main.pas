@@ -218,7 +218,7 @@ type
     PnlRegion: TPanel;
     SplitPreviewRegion: TSplitter;
     CmbRegionNames: TComboBox;
-    EdRegionType: TLabeledEdit;
+    CmbRegionType: TComboBox;
     EdRegionDescription: TLabeledEdit;
     Label1: TLabel;
     PnlRegionWH: TPanel;
@@ -228,7 +228,13 @@ type
     PnlRegionXY: TPanel;
     NumBoxX: TNumberBox;
     NumBoxY: TNumberBox;
-    BtnSaveRegion: TButton;
+    Label2: TLabel;
+    ImageCollectionRegions: TImageCollection;
+    PnlRegionButtons: TPanel;
+    BtnRegionSave: TButton;
+    BtnRegionAdd: TButton;
+    BtnRegionDel: TButton;
+    VirtualImageRegions: TVirtualImageList;
     procedure ShellListClick(Sender: TObject);
     procedure ShellListKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
     procedure SpeedBtnExifClick(Sender: TObject);
@@ -380,7 +386,10 @@ type
     procedure CmbRegionNamesChange(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure PnlRegionResize(Sender: TObject);
-    procedure BtnSaveRegionClick(Sender: TObject);
+    procedure BtnRegionSaveClick(Sender: TObject);
+    procedure RegionChange(Sender: TObject);
+    procedure BtnRegionAddClick(Sender: TObject);
+    procedure BtnRegionDelClick(Sender: TObject);
   private
     { Private declarations }
     ETBarSeriesFocal: TBarSeries;
@@ -543,6 +552,10 @@ procedure TFMain.SetupCustomTabStops;
 begin
   SetLength(CustomTabStops, 0);
   CustomTabStops := CustomTabStops + [ShellTree];
+//Regions
+  CustomTabStops := CustomTabStops + [CmbRegionNames, EdRegionDescription, CmbRegionType];
+  CustomTabStops := CustomTabStops + [NumBoxX, NumBoxY, NumBoxW, NumBoxH];
+
   CustomTabStops := CustomTabStops + [ShellList];
   CustomTabStops := CustomTabStops + [EditETdirect];
   CustomTabStops := CustomTabStops + [CBoxETdirect];
@@ -952,7 +965,41 @@ begin
   FLogWin.Show;
 end;
 
-procedure TFMain.BtnSaveRegionClick(Sender: TObject);
+procedure TFMain.BtnRegionAddClick(Sender: TObject);
+var
+  ARegionRect: TRegionRect;
+
+begin
+  if (Assigned(Regions)) then
+  begin
+    ARegionRect.X := NumBoxX.Value;
+    ARegionRect.Y := NumBoxY.Value;
+    ARegionRect.W := NumBoxW.Value;
+    ARegionRect.H := NumBoxH.Value;
+    Regions.Add(TRegion.Create(ARegionRect, 'Normalized', CmbRegionNames.Text, EdRegionDescription.Text, CmbRegionType.Text));
+  end;
+end;
+
+procedure TFMain.BtnRegionDelClick(Sender: TObject);
+var
+  Index: integer;
+begin
+  if (Assigned(Regions)) then
+  begin
+    Index := CmbRegionNames.ItemIndex;
+    if (Index > -1) and
+       (Index < Regions.Items.Count) then
+    begin
+      Regions.Items[Index].Free;
+      Regions.Items.Delete(Index);
+      CmbRegionNames.Items.Delete(Index);
+    end;
+    CmbRegionNames.Text := '';
+    CmbRegionNames.ItemIndex := Min(Index, CmbRegionNames.Items.Count -1);
+  end;
+end;
+
+procedure TFMain.BtnRegionSaveClick(Sender: TObject);
 begin
   if (Assigned(Regions)) then
     Regions.SaveToFile(GetSelectedFile(ShellList.RelFileName));
@@ -1872,6 +1919,42 @@ begin
   // + used by MaShowHexID, MaGroup_g4, MaShowComposite, MaShowSorted, MaNotDuplicated
   RefreshSelected(Sender);
   ShowMetadata;
+end;
+
+procedure TFMain.RegionChange(Sender: TObject);
+var
+  Region: TRegion;
+  Rect: TRegionRect;
+begin
+  if not Assigned(Regions) then
+    exit;
+  if (CmbRegionNames.ItemIndex < 0) or
+     (CmbRegionNames.ItemIndex > Regions.Items.Count -1) then
+    exit;
+
+  Region := Regions.Items[CmbRegionNames.ItemIndex];
+
+  // Type, usual Face
+  Region.RegionType := CmbRegionType.Text;
+
+  // Description used?
+  if (EdRegionDescription.Modified) then
+    Region.RegionDescription := EdRegionDescription.Text;
+
+  // Rectangle
+  Rect := Region.RegionRect;
+  if (NumBoxW.Modified) then
+    Rect.W := NumBoxW.Value;
+
+  if (NumBoxH.Modified) then
+    Rect.H := NumBoxH.Value;
+
+  if (NumBoxX.Modified) then
+    Rect.X := NumBoxX.Value;
+
+  if (NumBoxY.Modified) then
+    Rect.Y := NumBoxY.Value;
+  Region.RegionRect := Rect;
 end;
 
 procedure TFMain.MCustomOptionsClick(Sender: TObject);
@@ -3377,6 +3460,7 @@ begin
 
   AdvPageMetadata.ActivePage := AdvTabMetadata;
   AdvPageFilelist.ActivePage := AdvTabFilelist;
+  AdvPagePreviewChange(AdvPagePreview);
 
   MaUpdateLocationfromGPScoordinates.Enabled := false;
   AdvTabOSMMap.Enabled := false;
@@ -3433,7 +3517,6 @@ begin
       end;
     end
   end;
-  AdvPagePreviewChange(AdvPagePreview);
 
   InstallAutoComp;
   SetMetadataTab(TMetaDataTab(GUIsettings.MetadataSel));
@@ -3442,11 +3525,6 @@ begin
     ShellTree.SetFocus  // No files available to focus.
   else
     ShellList.SetFocus;
-//  begin
-//    ShellList.SetFocus;
-//    ShellListClick(Sender);
-//  end;
-//
 
   // Scroll in view. Select initial
   if (ShellTree.Selected <> nil) then
@@ -4068,11 +4146,23 @@ procedure TFMain.ShowRegionInfo;
 var
   Region: TRegion;
 begin
+  CmbRegionType.Text := '-';
+  EdRegionDescription.Text := '-';
+  NumBoxX.Value := 0;
+  NumBoxY.Value := 0;
+  NumBoxW.Value := 0;
+  NumBoxH.Value := 0;
+
   if not Assigned(Regions) then
     exit;
+  if (CmbRegionNames.ItemIndex < 0) or
+     (CmbRegionNames.ItemIndex > Regions.Items.Count -1) then
+    exit;
+
   Region := Regions.Items[CmbRegionNames.ItemIndex];
-  EdRegionType.Text := Region.RegionType;
-  EdRegionDescription.Text := Region.Description;
+  Region.RegionName := CmbRegionNames.Text;
+  CmbRegionType.Text := Region.RegionType;
+  EdRegionDescription.Text := Region.RegionDescription;
   NumBoxX.Value := Region.RegionRect.X;
   NumBoxY.Value := Region.RegionRect.Y;
   NumBoxW.Value := Region.RegionRect.W;
@@ -4093,7 +4183,7 @@ begin
   try
     CmbRegionNames.Items.Clear;
     for Region in Regions.Items do
-      CmbRegionNames.Items.Add(Region.Name);
+      CmbRegionNames.Items.Add(Region.RegionName);
   finally
     CmbRegionNames.Items.EndUpdate;
     CmbRegionNames.Text := '-';
