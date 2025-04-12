@@ -46,6 +46,7 @@ const
 type
   TMetaDataTab = (mtQuick, mtExif, mtXMP, mtIPTC, mtMaker, mtALL, mtCustom);
 
+//TODO Separate unit
   TImage = class(Vcl.ExtCtrls.TImage)
   private
     FCurRect: TRect;
@@ -1029,6 +1030,7 @@ begin
     end;
     CmbRegionNames.Text := '';
     CmbRegionNames.ItemIndex := Min(Index, CmbRegionNames.Items.Count -1);
+    ShowRegionInfo;
   end;
 end;
 
@@ -2929,6 +2931,7 @@ begin
         ABitMap := ShellList.GetThumbNail(ShellList.Selected.Index, RotateImg.Width, RotateImg.Height);
       RotateImg.FocusDrawn := false;
       RotateImg.Picture.Bitmap := ABitMap;
+      RegionChange(CmbRegionNames);
     finally
       ABitMap.Free;
       SetCursor(CrNormal);

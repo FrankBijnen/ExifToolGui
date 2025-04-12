@@ -154,14 +154,15 @@ object FMain: TFMain
       TabIndex = 0
       OnChange = AdvPagePreviewChange
       OnResize = AdvPagePreviewResize
+      ExplicitTop = 421
       object RotateImg: TImage
         Left = 4
         Top = 24
         Width = 129
         Height = 197
         Align = alClient
-        ExplicitWidth = 101
-        ExplicitHeight = 193
+        ExplicitLeft = 3
+        ExplicitTop = 25
       end
       object SplitPreviewRegion: TSplitter
         Left = 133
@@ -213,6 +214,7 @@ object FMain: TFMain
           Width = 96
           Height = 21
           Align = alTop
+          DropDownCount = 12
           TabOrder = 0
           Text = 'CmbRegionNames'
           OnChange = CmbRegionNamesChange
