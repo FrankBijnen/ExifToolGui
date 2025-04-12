@@ -154,7 +154,6 @@ object FMain: TFMain
       TabIndex = 0
       OnChange = AdvPagePreviewChange
       OnResize = AdvPagePreviewResize
-      ExplicitTop = 421
       object RotateImg: TImage
         Left = 4
         Top = 24

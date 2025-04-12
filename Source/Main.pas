@@ -2931,7 +2931,9 @@ begin
         ABitMap := ShellList.GetThumbNail(ShellList.Selected.Index, RotateImg.Width, RotateImg.Height);
       RotateImg.FocusDrawn := false;
       RotateImg.Picture.Bitmap := ABitMap;
-      RegionChange(CmbRegionNames);
+
+      ShowRegions(GetSelectedFile(ShellList.RelFileName));
+
     finally
       ABitMap.Free;
       SetCursor(CrNormal);
@@ -4217,6 +4219,8 @@ end;
 procedure TFMain.ShowRegions(Item: string);
 var
   Region: TRegion;
+  Index: integer;
+  CurRegionName: string;
 begin
   if (PnlRegion.Visible = false) then
     exit;
@@ -4224,6 +4228,7 @@ begin
   FreeAndNil(Regions);
   Regions := TRegions.LoadFromFile(Item);
 
+  CurRegionName := CmbRegionNames.Text;
   CmbRegionNames.Items.BeginUpdate;
   try
     CmbRegionNames.Items.Clear;
@@ -4231,9 +4236,16 @@ begin
       CmbRegionNames.Items.Add(Region.RegionName);
   finally
     CmbRegionNames.Items.EndUpdate;
-    CmbRegionNames.Text := '-';
-    if (CmbRegionNames.Items.Count > 0) then
-      CmbRegionNames.ItemIndex := 0;
+
+    Index := CmbRegionNames.Items.IndexOf(CurRegionName);
+    if (Index < 0) and
+       (CmbRegionNames.Items.Count > 0) then
+      Index := 0;
+
+    CmbRegionNames.ItemIndex := Index;
+    if (Index < 0) then
+      CmbRegionNames.Text := '-';
+
     ShowRegionInfo;
   end;
 end;
@@ -4262,8 +4274,6 @@ begin
       MemoQuick.Text := '';
       exit;
     end;
-
-    ShowRegions(Item);
 
     if SpeedBtnQuick.Down then
     begin
