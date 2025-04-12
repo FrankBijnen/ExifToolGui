@@ -9,8 +9,8 @@ type
   TRegionRect = record
     W,H,Y,X: double;
     function IsEmpty: boolean;
-    procedure SetCenterX(CX: Double);
-    procedure SetCenterY(CY: Double);
+    procedure SetFromCenterX(CX: Double);
+    procedure SetFromCenterY(CY: Double);
     function GetCenterX: Double;
     function GetCenterY: Double;
   end;
@@ -56,19 +56,21 @@ uses
   System.SysUtils,
   ExifTool, ExifToolsGUI_Utils;
 
-const ListSep = #255; // Dont want a separator char that can be in a string. Like *, or :, #255 is unlikely
+// Dont want a separator char that can be in a string. Like *, or :, #255 is unlikely
+const
+  ListSep = #255;
 
 function TRegionRect.IsEmpty: boolean;
 begin
   result := (X < 0) or (Y < 0) or (W < 0) or (H < 0);
 end;
 
-procedure TRegionRect.SetCenterX(CX: Double);
+procedure TRegionRect.SetFromCenterX(CX: Double);
 begin
   X := CX - (W / 2);
 end;
 
-procedure TRegionRect.SetCenterY(CY: Double);
+procedure TRegionRect.SetFromCenterY(CY: Double);
 begin
   Y := CY - (H / 2);
 end;
@@ -169,11 +171,12 @@ begin
     ET.Options.SetSeparator(ListSep);
     ETCmd := '-f' + CRLF + '-s3' + CRLF +
              '-RegionAppliedToDimensionsW' + CRLF +
-             '-ImageWidth' + CRLF +
+             '-ImageWidth' + CRLF +               // Fallback
              '-RegionAppliedToDimensionsH' + CRLF +
-             '-ImageHeight' + CRLF +
+             '-ImageHeight' + CRLF +              // Fallback
              '-RegionAppliedToDimensionsUnit' + CRLF +
              '-RegionName' + CRLF +
+             '-RegionPersonDisplayName' + CRLF +  // Fallback
              '-RegionDescription' + CRLF +
              '-RegionType' + CRLF +
              '-RegionAreaUnit' + CRLF +
@@ -181,17 +184,24 @@ begin
              '-RegionAreaH' + CRLF +
              '-RegionAreaX' + CRLF +
              '-RegionAreaY' + CRLF +
-             '-RegionRectangle' + CRLF;
+             '-RegionRectangle' + CRLF;           // Fallback
     if (not ET.OpenExec(ETcmd, AFile, ETouts, false)) then
       exit;
-    if (Etouts.Count < 14) then
+    if (Etouts.Count < 15) then
       exit;
 
+    // Create
     result := TRegions.Create(StrToIntDef(ETOuts[0], 0),
-                              StrToIntDef(ETOuts[1], 0),
+                              StrToIntDef(ETOuts[1], 0),  // Fallback
                               StrToIntDef(ETOuts[2], 0),
-                              StrToIntDef(ETOuts[3], 0),
+                              StrToIntDef(ETOuts[3], 0),  // Fallback
                               ETOuts[4]);
+
+    // Take RegionName if avail, else RegionPersonDisplayName
+    if (ETOuts[5] = '-') then
+      ETOuts.Delete(5)
+    else
+      ETOuts.Delete(6);
 
     while (ETouts[5] <> '') do // Name is mandatory. For us.
     begin
@@ -199,11 +209,15 @@ begin
       ADescription    := NextItem(ETOuts, 6);
       ARegionType     := NextItem(ETOuts, 7);
       AUnit           := NextItem(ETOuts, 8);
-      // Prefer RegionAreax, but fallback to RegionRectangle
-      ARegion.W       := StrToFloatDef(NextItem(ETOuts,  9), -1, ExifToolsGUI_Utils.FloatFormatSettings);
-      ARegion.H       := StrToFloatDef(NextItem(ETOuts, 10), -1, ExifToolsGUI_Utils.FloatFormatSettings);
-      ARegion.SetCenterX(StrToFloatDef(NextItem(ETOuts, 11), -1, ExifToolsGUI_Utils.FloatFormatSettings));
-      ARegion.SetCenterY(StrToFloatDef(NextItem(ETOuts, 12), -1, ExifToolsGUI_Utils.FloatFormatSettings));
+
+      // Prefer RegionAreaW, H, X and Y
+      // Note: RegionAreaY and X are the center of the Rectangle. The record uses Top Left.
+      ARegion.W       := StrToFloatDef(     NextItem(ETOuts,  9), -1, ExifToolsGUI_Utils.FloatFormatSettings);
+      ARegion.H       := StrToFloatDef(     NextItem(ETOuts, 10), -1, ExifToolsGUI_Utils.FloatFormatSettings);
+      ARegion.SetFromCenterX(StrToFloatDef( NextItem(ETOuts, 11), -1, ExifToolsGUI_Utils.FloatFormatSettings));
+      ARegion.SetFromCenterY(StrToFloatDef( NextItem(ETOuts, 12), -1, ExifToolsGUI_Utils.FloatFormatSettings));
+
+      // Fallback to RegionRectangle ?
       RegionRectangle := NextItem(ETOuts, 13);
       if (ARegion.IsEmpty) then
       begin
@@ -212,6 +226,8 @@ begin
         ARegion.W       := StrToFloatDef(NextField(RegionRectangle, ','), -1, ExifToolsGUI_Utils.FloatFormatSettings);
         ARegion.H       := StrToFloatDef(RegionRectangle, -1, ExifToolsGUI_Utils.FloatFormatSettings);
       end;
+
+      // Add Region
       if (ARegion.IsEmpty = false) then
         result.Add(TRegion.Create(ARegion, AUnit, AName, ADescription, ARegionType));
     end;
@@ -226,12 +242,11 @@ procedure TRegions.SaveToFile(AFile: string);
 var
   ETcmd: string;
   Region: TRegion;
+  Sep: string;
   SavedSep: string;
-
   AName, APersonName, ADescription, ARegionType, AUnit: string;
   ARegionW, ARegionH, ARegionX, ARegionY: string;
   RegionRect: string;
-  Sep: string;
   Index: integer;
 begin
   SavedSep := ET.Options.GetSeparatorChar;
@@ -271,8 +286,8 @@ begin
                        FloatToStr(Region.RegionRect.H, ExifToolsGUI_Utils.FloatFormatSettings) + Sep;
     end;
 
-    ETCmd :=
-             '-RegionAppliedToDimensionsW='     + IntToStr(FDimW) + CRLF +
+    // Write both XMP-MP:Region* and XMP-mwg-rs:region*
+    ETCmd := '-RegionAppliedToDimensionsW='     + IntToStr(FDimW) + CRLF +
              '-RegionAppliedToDimensionsH='     + IntToStr(FDimH) + CRLF +
              '-RegionAppliedToDimensionsUnit='  + FUnits + CRLF +
              APersonName + CRLF +
