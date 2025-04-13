@@ -395,13 +395,14 @@ type
     procedure MaCreateSHA2Execute(Sender: TObject);
     procedure AdvPagePreviewChange(Sender: TObject);
     procedure SplitPreviewRegionMoved(Sender: TObject);
-    procedure CmbRegionNamesChange(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure PnlRegionResize(Sender: TObject);
     procedure BtnRegionSaveClick(Sender: TObject);
     procedure RegionChange(Sender: TObject);
     procedure BtnRegionAddClick(Sender: TObject);
     procedure BtnRegionDelClick(Sender: TObject);
+    procedure CmbRegionNamesSelect(Sender: TObject);
+    procedure CmbRegionNamesChange(Sender: TObject);
   private
     { Private declarations }
     ETBarSeriesFocal: TBarSeries;
@@ -415,6 +416,7 @@ type
     EditLineActive: boolean;
     CustomTabStops: array of TWinControl;
     Regions: TRegions;
+    CurRegion: integer;
     procedure AlignStatusBar;
     procedure ImageDrop(var Msg: TWMDROPFILES); message WM_DROPFILES;
     procedure SetCaption(AnItem: string = '');
@@ -425,7 +427,8 @@ type
     function ActiveAutoComp(ARow: integer): PAutoCompRec;
     procedure SetGridEditor(const Enable: boolean);
     procedure ShowRegions(Item: string);
-    procedure ShowRegionInfo;
+    procedure SetRegionName(ARegion: integer);
+    procedure ShowRegionInfo(ARegion: integer);
     procedure ShowMetadata;
     procedure ShowPreview;
     procedure RestoreGUI;
@@ -1010,7 +1013,8 @@ begin
     ARegionRect.W := NumBoxW.Value;
     ARegionRect.H := NumBoxH.Value;
     Regions.Add(TRegion.Create(ARegionRect, 'Normalized', CmbRegionNames.Text, EdRegionDescription.Text, CmbRegionType.Text));
-    CmbRegionNames.ItemIndex := CmbRegionNames.Items.Add(CmbRegionNames.Text);
+
+    ShowRegionInfo(CmbRegionNames.Items.Add(CmbRegionNames.Text));
   end;
 end;
 
@@ -1020,7 +1024,7 @@ var
 begin
   if (Assigned(Regions)) then
   begin
-    Index := CmbRegionNames.ItemIndex;
+    Index := CurRegion;
     if (Index > -1) and
        (Index < Regions.Items.Count) then
     begin
@@ -1028,9 +1032,9 @@ begin
       Regions.Items.Delete(Index);
       CmbRegionNames.Items.Delete(Index);
     end;
-    CmbRegionNames.Text := '';
-    CmbRegionNames.ItemIndex := Min(Index, CmbRegionNames.Items.Count -1);
-    ShowRegionInfo;
+    Index := Min(Index, CmbRegionNames.Items.Count -1);
+    SetRegionName(Index);
+    ShowRegionInfo(Index);
   end;
 end;
 
@@ -1966,13 +1970,14 @@ begin
   if Regions.Loading then
     exit;
 
-  if (CmbRegionNames.ItemIndex < 0) or
-     (CmbRegionNames.ItemIndex > Regions.Items.Count -1) then
+  if (CurRegion < 0) or
+     (CurRegion > Regions.Items.Count -1) then
     exit;
 
-  Region := Regions.Items[CmbRegionNames.ItemIndex];
+  Region := Regions.Items[CurRegion];
+  Region.RegionName := CmbRegionNames.Text;
 
-  // Type, usual Face
+  // Type, usually Face
   Region.RegionType := CmbRegionType.Text;
 
   // Description used?
@@ -2614,7 +2619,18 @@ end;
 
 procedure TFMain.CmbRegionNamesChange(Sender: TObject);
 begin
-  ShowRegionInfo;
+  // Add typed in Dropdown list
+  if (CurRegion > -1) and
+     (CurRegion < CmbRegionNames.Items.Count) then
+    CmbRegionNames.Items[CurRegion] := CmbRegionNames.Text;
+
+  // Update Regions
+  RegionChange(Sender);
+end;
+
+procedure TFMain.CmbRegionNamesSelect(Sender: TObject);
+begin
+  ShowRegionInfo(CmbRegionNames.ItemIndex);
 end;
 
 procedure TFMain.EditETdirectKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
@@ -4182,7 +4198,15 @@ begin
     exit(TMetaDataTab.mtCustom);
 end;
 
-procedure TFMain.ShowRegionInfo;
+procedure TFMain.SetRegionName(ARegion: integer);
+begin
+  if (ARegion < CmbRegionNames.Items.Count) then
+    CmbRegionNames.ItemIndex := ARegion;
+  if (CmbRegionNames.ItemIndex < 0) then
+    CmbRegionNames.Text := '-'
+end;
+
+procedure TFMain.ShowRegionInfo(ARegion: integer);
 var
   Region: TRegion;
 begin
@@ -4197,14 +4221,17 @@ begin
 
     if not Assigned(Regions) then
       exit;
-    if (CmbRegionNames.ItemIndex < 0) or
-       (CmbRegionNames.ItemIndex > Regions.Items.Count -1) then
+    if (ARegion < 0) or
+       (ARegion > Regions.Items.Count -1) then
       exit;
 
-    Region := Regions.Items[CmbRegionNames.ItemIndex];
+    CurRegion := ARegion;
+    Region := Regions.Items[CurRegion];
+
     Region.RegionName := CmbRegionNames.Text;
-    CmbRegionType.Text := Region.RegionType;
+    CmbRegionType.ItemIndex := CmbRegionType.Items.IndexOf(Region.RegionType);
     EdRegionDescription.Text := Region.RegionDescription;
+
     NumBoxX.Value := Region.RegionRect.X;
     NumBoxY.Value := Region.RegionRect.Y;
     NumBoxW.Value := Region.RegionRect.W;
@@ -4241,12 +4268,11 @@ begin
     if (Index < 0) and
        (CmbRegionNames.Items.Count > 0) then
       Index := 0;
-
     CmbRegionNames.ItemIndex := Index;
     if (Index < 0) then
       CmbRegionNames.Text := '-';
 
-    ShowRegionInfo;
+    ShowRegionInfo(Index);
   end;
 end;
 

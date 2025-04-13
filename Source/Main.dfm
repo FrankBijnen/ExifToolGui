@@ -213,10 +213,12 @@ object FMain: TFMain
           Width = 96
           Height = 21
           Align = alTop
+          AutoComplete = False
           DropDownCount = 12
           TabOrder = 0
           Text = 'CmbRegionNames'
           OnChange = CmbRegionNamesChange
+          OnSelect = CmbRegionNamesSelect
         end
         object CmbRegionType: TComboBox
           AlignWithMargins = True
@@ -1209,6 +1211,7 @@ object FMain: TFMain
     Top = 0
     Width = 940
     Height = 25
+    UseSystemFont = False
     ActionManager = MainActionManager
     Caption = 'ActionMainMenuBar'
     Color = clMenuBar
@@ -1217,7 +1220,7 @@ object FMain: TFMain
     ColorMap.BtnSelectedFont = clBlack
     ColorMap.UnusedColor = clWhite
     Font.Charset = DEFAULT_CHARSET
-    Font.Color = clWindowText
+    Font.Color = clBlack
     Font.Height = -12
     Font.Name = 'Segoe UI'
     Font.Style = []
