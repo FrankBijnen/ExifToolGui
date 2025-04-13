@@ -4210,17 +4210,18 @@ procedure TFMain.ShowRegionInfo(ARegion: integer);
 var
   Region: TRegion;
 begin
+  CmbRegionType.Text := '-';
+  EdRegionDescription.Text := '-';
+  NumBoxX.Value := 0;
+  NumBoxY.Value := 0;
+  NumBoxW.Value := 0;
+  NumBoxH.Value := 0;
+
+  if not Assigned(Regions) then
+    exit;
+
   Regions.Loading := true;
   try
-    CmbRegionType.Text := '-';
-    EdRegionDescription.Text := '-';
-    NumBoxX.Value := 0;
-    NumBoxY.Value := 0;
-    NumBoxW.Value := 0;
-    NumBoxH.Value := 0;
-
-    if not Assigned(Regions) then
-      exit;
     if (ARegion < 0) or
        (ARegion > Regions.Items.Count -1) then
       exit;
@@ -4259,8 +4260,11 @@ begin
   CmbRegionNames.Items.BeginUpdate;
   try
     CmbRegionNames.Items.Clear;
-    for Region in Regions.Items do
-      CmbRegionNames.Items.Add(Region.RegionName);
+    if (Regions <> nil) then
+    begin
+      for Region in Regions.Items do
+        CmbRegionNames.Items.Add(Region.RegionName);
+    end;
   finally
     CmbRegionNames.Items.EndUpdate;
 
