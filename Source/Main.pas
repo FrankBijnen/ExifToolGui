@@ -1005,16 +1005,18 @@ end;
 procedure TFMain.BtnRegionAddClick(Sender: TObject);
 var
   ARegionRect: TRegionRect;
+  NewRegion: string;
 begin
   if (Assigned(Regions)) then
   begin
+    NewRegion := Format('#%d', [Regions.Items.Count +1]);
     ARegionRect.X := NumBoxX.Value;
     ARegionRect.Y := NumBoxY.Value;
     ARegionRect.W := NumBoxW.Value;
     ARegionRect.H := NumBoxH.Value;
-    Regions.Add(TRegion.Create(ARegionRect, 'Normalized', CmbRegionNames.Text, EdRegionDescription.Text, CmbRegionType.Text));
-
-    ShowRegionInfo(CmbRegionNames.Items.Add(CmbRegionNames.Text));
+    Regions.Add(TRegion.Create(ARegionRect, 'Normalized', NewRegion, EdRegionDescription.Text, CmbRegionType.Text));
+    SetRegionName(CmbRegionNames.Items.Add(NewRegion));
+    ShowRegionInfo(CmbRegionNames.ItemIndex);
   end;
 end;
 
@@ -4210,6 +4212,8 @@ procedure TFMain.ShowRegionInfo(ARegion: integer);
 var
   Region: TRegion;
 begin
+  Regions.Loading := true;
+
   CmbRegionType.Text := '-';
   EdRegionDescription.Text := '-';
   NumBoxX.Value := 0;
@@ -4217,11 +4221,10 @@ begin
   NumBoxW.Value := 0;
   NumBoxH.Value := 0;
 
-  if not Assigned(Regions) then
-    exit;
-
-  Regions.Loading := true;
   try
+    if not Assigned(Regions) then
+      exit;
+
     if (ARegion < 0) or
        (ARegion > Regions.Items.Count -1) then
       exit;
@@ -4337,14 +4340,14 @@ begin
           else
           begin
             Tx := QuickTags[E].Caption;
-            if (Pos('?', Tx) > 0) then
+            if (EndsText('?', Tx)) then
             begin
-              Include(NoChars, '-');
-              if (Pos('??', Tx) > 0) then
+              NoChars := ['-'];
+              if (EndsText('??', Tx)) then    // '0', also means NO
                 Include(NoChars, '0');
-
-              if (Length(ETResult[E]) < 1) or
-                 (CharInSet(ETResult[E][1], NoChars)) then
+              if (Length(ETResult[E]) = 0) or // Because of -f this should never happen.
+                 ((Length(ETResult[E]) = 1) and
+                  (CharInSet(ETResult[E][1], NoChars))) then
                 Tx := Tx + '=' + StrNOAst
               else
                 Tx := Tx + '=' + StrYESAst;
