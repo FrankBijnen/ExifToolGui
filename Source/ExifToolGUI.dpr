@@ -45,6 +45,7 @@ uses
   ExifToolsGUI_StringList in 'ExifToolsGUI_StringList.pas',
   ExifToolsGui_ComboBox in 'ExifToolsGui_ComboBox.pas',
   ExifToolsGui_Listview in 'ExifToolsGui_Listview.pas',
+  ExifToolsGui_Image in 'ExifToolsGui_Image.pas',
   ExifToolsGui_AutoEdit in 'ExifToolsGui_AutoEdit.pas',
   ExifInfo in 'ExifInfo.pas',
   ExifTool in 'ExifTool.pas',

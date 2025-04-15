@@ -32,6 +32,7 @@ uses
   UnitColumnDefs,             // Columndefs for file list
   ExifToolsGUI_ShellTree,     // Extension of ShellTreeView
   ExifToolsGUI_ShellList,     // Extension of ShellListView
+  ExifToolsGui_Image,         // Extension of Image
   ExifToolsGUI_Thumbnails,    // Thumbnails
   ExifToolsGUI_ValEdit,       // TValueListeditor Metadata
   ExifToolsGUI_OpenPicture,   // OpenPicture dialog
@@ -45,18 +46,6 @@ const
 
 type
   TMetaDataTab = (mtQuick, mtExif, mtXMP, mtIPTC, mtMaker, mtALL, mtCustom);
-
-//TODO Separate unit
-  TImage = class(Vcl.ExtCtrls.TImage)
-  private
-    FCurRect: TRect;
-    FFocusDrawn: boolean;
-    FImageDimensions: TPoint;
-  public
-    procedure DrawFocusRect(ARect: TRegionRect);
-    property ImageDimensions: TPoint read FImageDimensions write FImageDimensions;
-    property FocusDrawn: boolean read FFocusDrawn write FFocusDrawn;
-  end;
 
   TFMain = class(TScaleForm)
     StatusBar: TStatusBar;
@@ -116,7 +105,7 @@ type
     AdvRadioGroup2: TRadioGroup;
     SpeedBtn_ETdSetDef: TSpeedButton;
     SpeedBtn_ETclear: TSpeedButton;
-    RotateImg: TImage;
+    RotateImg: ExifToolsGui_Image.TImage;
     ETChart: TChart;
     Series1: TBarSeries;
     EdgeBrowser1: TEdgeBrowser;
@@ -475,7 +464,7 @@ type
     procedure EditFileFilter(Sender: TObject);
     procedure FileDateFromMetaData(GroupId: integer);
     procedure CreateHashFiles(HashType: integer);
-
+    procedure SelectionDone(Sender: TObject);
   protected
     procedure CreateWnd; override;
     procedure DestroyWnd; override;
@@ -521,28 +510,6 @@ uses System.StrUtils, System.Math, System.Masks, System.Types, System.UITypes, S
   UFrmDiff, UFrmExportSettings;
 
 {$R *.dfm}
-
-procedure TImage.DrawFocusRect(ARect: TRegionRect);
-begin
-  if FFocusDrawn then
-  begin
-    Canvas.DrawFocusRect(FCurRect);
-    InflateRect(FCurRect, 1, 1);
-    Canvas.DrawFocusRect(FCurRect);
-    InflateRect(FCurRect, 1, 1);
-    Canvas.DrawFocusRect(FCurRect);
-  end;
-  FCurRect.Left  := Round(FImageDimensions.X * ARect.X) + ((Width  - FImageDimensions.X) div 2);
-  FCurRect.Top   := Round(FImageDimensions.Y * ARect.Y) + ((Height - FImageDimensions.Y) div 2);
-  FCurRect.Width := Round(FImageDimensions.X * ARect.W);
-  FCurRect.Height:= Round(FImageDimensions.Y * ARect.H);
-  Canvas.DrawFocusRect(FCurRect);
-  InflateRect(FCurRect, -1, -1);
-  Canvas.DrawFocusRect(FCurRect);
-  InflateRect(FCurRect, -1, -1);
-  Canvas.DrawFocusRect(FCurRect);
-  FFocusDrawn := true;
-end;
 
 function TFMain.GetDefWindowSizes: TRect;
 begin
@@ -1000,6 +967,22 @@ end;
 procedure TFMain.BtnShowLogClick(Sender: TObject);
 begin
   FLogWin.Show;
+end;
+
+procedure TFMain.SelectionDone(Sender: TObject);
+var
+  Index: integer;
+begin
+  if (Assigned(Regions)) then
+  begin
+    Index := CurRegion;
+    if (Index > -1) and
+       (Index < Regions.Items.Count) then
+    begin
+      Regions.Items[Index].RegionRect := RotateImg.RegionRect;
+      ShowRegionInfo(Index);
+    end;
+  end;
 end;
 
 procedure TFMain.BtnRegionAddClick(Sender: TObject);
@@ -1993,7 +1976,7 @@ begin
   Rect.Y := NumBoxY.Value;
   Region.RegionRect := Rect;
 
-  RotateImg.DrawFocusRect(Region.RegionRect);
+  RotateImg.DrawSelection(Region.RegionRect);
 end;
 
 procedure TFMain.MCustomOptionsClick(Sender: TObject);
@@ -2947,7 +2930,7 @@ begin
       end
       else
         ABitMap := ShellList.GetThumbNail(ShellList.Selected.Index, RotateImg.Width, RotateImg.Height);
-      RotateImg.FocusDrawn := false;
+      RotateImg.SelectionDrawn := false;
       RotateImg.Picture.Bitmap := ABitMap;
 
       ShowRegions(GetSelectedFile(ShellList.RelFileName));
@@ -3052,6 +3035,8 @@ begin
   begin
     PnlRegion.Visible := (TabIndex = 1);
     SplitPreviewRegion.Visible := PnlRegion.Visible;
+    RotateImg.SelectionEnabled := PnlRegion.Visible;
+
     ShowPreview;
     ShowMetadata;
   end;
@@ -3338,6 +3323,7 @@ begin
   Shelllist.IncludeSubFolders := ContainsText(GUIsettings.FileFilter, '/s');
   Shelllist.DragSource := true;
 
+  RotateImg.OnSelectionDone := SelectionDone;
   SetCaptionAndImage;
 
   // Metadatalist Ctrl handler
@@ -4241,7 +4227,7 @@ begin
     NumBoxW.Value := Region.RegionRect.W;
     NumBoxH.Value := Region.RegionRect.H;
 
-    RotateImg.DrawFocusRect(Region.RegionRect)
+    RotateImg.DrawSelection(Region.RegionRect)
   finally
     Regions.Loading := false;
   end;
