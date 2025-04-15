@@ -160,6 +160,7 @@
         <DCCReference Include="ExifToolsGUI_StringList.pas"/>
         <DCCReference Include="ExifToolsGui_ComboBox.pas"/>
         <DCCReference Include="ExifToolsGui_Listview.pas"/>
+        <DCCReference Include="ExifToolsGui_Image.pas"/>
         <DCCReference Include="ExifToolsGui_AutoEdit.pas"/>
         <DCCReference Include="ExifInfo.pas"/>
         <DCCReference Include="ExifTool.pas"/>
