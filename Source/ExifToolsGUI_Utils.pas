@@ -686,8 +686,8 @@ function DirectCmdFromArgsPS(const ArgsIn: string): string;
 begin
   result := DirectCmdFromArgs(ArgsIn);
   result := ReplaceAll(result,
-                       ['{',  '}',  '\"'],
-                       ['`{', '`}', '\`"']
+                       ['{',  '}',  '\"',  '$'],
+                       ['`{', '`}', '\`"', '`$']
                       );
 end;
 
@@ -703,7 +703,7 @@ end;
 
 function EscapeArgsForPS(const Cmd: string): string;
 begin
-  result := ReplaceAll(Cmd, ['"'], ['""']);
+  result := ReplaceAll(Cmd, ['"', '$'], ['""', '`$']);
 end;
 
 

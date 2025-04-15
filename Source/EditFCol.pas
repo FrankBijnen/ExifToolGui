@@ -345,7 +345,7 @@ end;
 
 procedure TFEditFColumn.SpbAddTagClick(Sender: TObject);
 begin
-  DmFileLists.CdsColumnSet.Insert;
+  DmFileLists.CdsColumnSet.Append;
   TagNameLookup;
 end;
 
