@@ -4198,6 +4198,9 @@ procedure TFMain.ShowRegionInfo(ARegion: integer);
 var
   Region: TRegion;
 begin
+  if Assigned(Regions) then
+    Regions.Loading := true;
+
   CmbRegionType.Text := '-';
   EdRegionDescription.Text := '-';
   NumBoxX.Value := 0;
@@ -4207,9 +4210,8 @@ begin
 
   if not Assigned(Regions) then
     exit;
-  Regions.Loading := true;
-  try
 
+  try
     if (ARegion < 0) or
        (ARegion > Regions.Items.Count -1) then
       exit;
