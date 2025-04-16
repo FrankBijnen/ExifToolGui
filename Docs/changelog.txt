@@ -162,3 +162,11 @@ Version:        Description             Issue
                 Fix Issue #799          Green coloring of Tags present in Workspace does not work any more with V6.3.7
                 Fix Issue #805          Prevent invalid tags in Workspace, ExifTool direct and Filelists
                 Fix Issue #815          Fix issues for V6.3.8
+6.3.9.0         Fix Issue #724          Support tagging facial regions (RegionPersonDisplayName)
+                Fix Issue #818          File paths with apostrophes break the map view
+                Fix Issue #821          Download error for automatic download of Exiftool by Phil Harvey and alternate Geolocation database
+                Fix Issue #822          [Feature request] Remembering last used tab in Metadata panel
+                Fix Issue #823          [Feature request] Scrolling content of Metadata panel when cursor pointer is above Metadata and I scrolling by mouse wheel (instead of moving highlight of rows)
+                Fix Issue #830          Hash functions
+                Fix Issue #847          GeoTagged? in Workspace produces unpredictable results
+                Fix Issue #848          Fix issues for V6.3.9
