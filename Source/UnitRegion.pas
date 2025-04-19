@@ -151,6 +151,7 @@ var
   AName, ADescription, ARegionType, AUnit: string;
   RegionRectangle: string;
   ARegion: TRegionRect;
+  Cnt: integer;
 
   function NextItem(AList: TStringList; Index: integer): string;
   var
@@ -203,9 +204,14 @@ begin
     else
       ETOuts.Delete(6);
 
-    while (ETouts[5] <> '') do // Name is mandatory. For us.
+    Cnt := 0;
+    while (ETouts[7] <> '') do // RegionType is mandatory. For us.
     begin
+      Inc(Cnt);
       AName           := NextItem(ETOuts, 5);
+      if (AName = '-') then
+        AName := Format('#%d', [Cnt]);
+
       ADescription    := NextItem(ETOuts, 6);
       ARegionType     := NextItem(ETOuts, 7);
       AUnit           := NextItem(ETOuts, 8);
