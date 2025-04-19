@@ -474,13 +474,13 @@ end;
 
 function XMPRec.Change2ETname(const SubNode: string): string;
 const
-  ETPrefixes : array[0..3, 0..1] of string =
-
+  ETPrefixes : array[0..4, 0..1] of string =
     (('mwg-rs:RegionRegionList', 'mwg-rs:Region'),
      ('Iptc4xmpExt:','iptcExt:'),
      ('Iptc4xmpCore:','iptcCore:'),
-     ('mwg-rs:Regions', 'mwg-rs:Region')
-     );
+     ('mwg-rs:Regions', 'mwg-rs:Region'),
+     ('mp:RegionInfoRegions', 'mp:Region')
+    );
 var
   Index: integer;
 begin
