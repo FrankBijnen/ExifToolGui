@@ -29,9 +29,9 @@ type
     procedure WMLButtonUp(var Message: TWMLButtonUp); message WM_LBUTTONUP;
     function RegionPtX(Message: TWMMouse): double;
     function RegionPtY(Message: TWMMouse): double;
-    procedure RemoveSelection;
   public
     constructor Create(AOwner: TComponent); override;
+    procedure RemoveSelection;
     procedure DrawSelection(ARect: TRegionRect);
     property ImageDimensions: TPoint read FImageDimensions write FImageDimensions;
     property SelectionDrawn: boolean read FSelectionDrawn write FSelectionDrawn;

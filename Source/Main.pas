@@ -1007,6 +1007,7 @@ procedure TFMain.BtnRegionDelClick(Sender: TObject);
 var
   Index: integer;
 begin
+  Index := -1;
   if (Assigned(Regions)) then
   begin
     Index := CurRegion;
@@ -1019,8 +1020,8 @@ begin
     end;
     Index := Min(Index, CmbRegionNames.Items.Count -1);
     SetRegionName(Index);
-    ShowRegionInfo(Index);
   end;
+  ShowRegionInfo(Index);
 end;
 
 procedure TFMain.BtnRegionSaveClick(Sender: TObject);
@@ -3035,7 +3036,6 @@ begin
   begin
     PnlRegion.Visible := (TabIndex = 1);
     SplitPreviewRegion.Visible := PnlRegion.Visible;
-    RotateImg.SelectionEnabled := PnlRegion.Visible;
 
     ShowPreview;
     ShowMetadata;
@@ -4191,7 +4191,8 @@ begin
   if (ARegion < CmbRegionNames.Items.Count) then
     CmbRegionNames.ItemIndex := ARegion;
   if (CmbRegionNames.ItemIndex < 0) then
-    CmbRegionNames.Text := '-'
+    CmbRegionNames.Text := StrNoRegions;
+  CmbRegionNames.ShowHint := (CmbRegionNames.ItemIndex  < 0);
 end;
 
 procedure TFMain.ShowRegionInfo(ARegion: integer);
@@ -4207,6 +4208,8 @@ begin
   NumBoxY.Value := 0;
   NumBoxW.Value := 0;
   NumBoxH.Value := 0;
+  RotateImg.SelectionEnabled := false;
+  RotateImg.RemoveSelection;
 
   if not Assigned(Regions) then
     exit;
@@ -4228,6 +4231,7 @@ begin
     NumBoxW.Value := Region.RegionRect.W;
     NumBoxH.Value := Region.RegionRect.H;
 
+    RotateImg.SelectionEnabled := true;
     RotateImg.DrawSelection(Region.RegionRect)
   finally
     Regions.Loading := false;
@@ -4240,6 +4244,7 @@ var
   Index: integer;
   CurRegionName: string;
 begin
+
   if (PnlRegion.Visible = false) then
     exit;
 
@@ -4263,8 +4268,9 @@ begin
        (CmbRegionNames.Items.Count > 0) then
       Index := 0;
     CmbRegionNames.ItemIndex := Index;
+    CmbRegionNames.ShowHint := (Index < 0);
     if (Index < 0) then
-      CmbRegionNames.Text := '-';
+      CmbRegionNames.Text := StrNoRegions;
 
     ShowRegionInfo(Index);
   end;
@@ -4718,6 +4724,7 @@ begin
   ShellTree.Color := GUIColorShellTree;
   ShellList.Color := GUIColorShellList;
   ShellList.BkColor := GUIColorWindow;
+  PnlRegion.Color := GUIColorWindow;
 end;
 
 procedure TFMain.ShellistThumbError(Sender: TObject; Item: TListItem; E: Exception);

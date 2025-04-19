@@ -235,6 +235,8 @@ resourcestring
   StrUseStandardSeq         = 'Use standard sequence';
   StrUseCustomSeq           = 'Use custom sequence';
 
+  StrNoRegions              = '(No regions)';
+
 implementation
 
 end.
