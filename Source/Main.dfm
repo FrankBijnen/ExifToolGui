@@ -106,7 +106,6 @@ object FMain: TFMain
       ActivePage = AdvTabBrowse
       Align = alClient
       TabOrder = 0
-      ExplicitHeight = 418
       object AdvTabBrowse: TTabSheet
         Caption = 'Folders'
         object ShellTree: TShellTreeView
@@ -136,7 +135,6 @@ object FMain: TFMain
           OnKeyDown = ShellTreeKeyDown
           OnChanging = ShellTreeChanging
           OnEdited = ShellTreeEdited
-          ExplicitHeight = 390
         end
       end
     end
@@ -156,7 +154,6 @@ object FMain: TFMain
       TabIndex = 0
       OnChange = AdvPagePreviewChange
       OnResize = AdvPagePreviewResize
-      ExplicitTop = 423
       object RotateImg: TImage
         Left = 4
         Top = 24
@@ -184,7 +181,6 @@ object FMain: TFMain
         Align = alRight
         TabOrder = 0
         OnResize = PnlRegionResize
-        ExplicitHeight = 197
         object Label1: TLabel
           Left = 1
           Top = 136
@@ -1218,6 +1214,7 @@ object FMain: TFMain
     Top = 0
     Width = 940
     Height = 25
+    UseSystemFont = False
     ActionManager = MainActionManager
     Caption = 'ActionMainMenuBar'
     Color = clMenuBar
@@ -1226,7 +1223,7 @@ object FMain: TFMain
     ColorMap.BtnSelectedFont = clBlack
     ColorMap.UnusedColor = clWhite
     Font.Charset = DEFAULT_CHARSET
-    Font.Color = clWindowText
+    Font.Color = clBlack
     Font.Height = -12
     Font.Name = 'Segoe UI'
     Font.Style = []

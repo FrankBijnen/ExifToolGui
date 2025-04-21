@@ -1976,8 +1976,8 @@ begin
   Rect.X := NumBoxX.Value;
   Rect.Y := NumBoxY.Value;
   Region.RegionRect := Rect;
-
-  RotateImg.DrawSelection(Region.RegionRect);
+  RotateImg.RegionRect := Region.RegionRect;
+  RotateImg.DrawSelection;
 end;
 
 procedure TFMain.MCustomOptionsClick(Sender: TObject);
@@ -2881,7 +2881,6 @@ var
   Tag: string;
 {$ENDIF}
   Foto: FotoRec;
-  Rotate: integer;
   FPath: string;
   ABitMap: TBitmap;
   CrWait, CrNormal: HCURSOR;
@@ -2894,19 +2893,19 @@ begin
     CrNormal := SetCursor(CrWait);
     try
       FPath := ShellList.FilePath;
-      Rotate := 0;
+      RotateImg.Rotate := 0;
       if GUIsettings.AutoRotatePreview then
       begin
         Foto := GetMetadata(FPath, []);
         case Foto.IFD0.OrientationValue of
           0, 1:
-            Rotate := 0; // no tag or don't rotate
+            RotateImg.Rotate := 0; // no tag or don't rotate
           3:
-            Rotate := 180;
+            RotateImg.Rotate := 180;
           6:
-            Rotate := 90;
+            RotateImg.Rotate := 90;
           8:
-            Rotate := 270;
+            RotateImg.Rotate := 270;
         end;
  {$IFDEF DEBUG_META}
         MetaData := TMetaData.Create;
@@ -2923,7 +2922,7 @@ begin
       end;
       RotateImg.ImageDimensions := Point(RotateImg.Width, RotateImg.Height);
       if (FPath <> '') then // Directory?
-        ABitMap := GetBitmapFromWic(WicPreview(FPath, Rotate, RotateImg.Width, RotateImg.Height));
+        ABitMap := GetBitmapFromWic(WicPreview(FPath, RotateImg.Rotate, RotateImg.Width, RotateImg.Height));
       if (ABitMap <> nil) then
       begin
         RotateImg.ImageDimensions := Point(ABitMap.Width, ABitMap.Height);
@@ -2931,7 +2930,6 @@ begin
       end
       else
         ABitMap := ShellList.GetThumbNail(ShellList.Selected.Index, RotateImg.Width, RotateImg.Height);
-      RotateImg.SelectionDrawn := false;
       RotateImg.Picture.Bitmap := ABitMap;
 
       ShowRegions(GetSelectedFile(ShellList.RelFileName));
@@ -4232,7 +4230,8 @@ begin
     NumBoxH.Value := Region.RegionRect.H;
 
     RotateImg.SelectionEnabled := true;
-    RotateImg.DrawSelection(Region.RegionRect)
+    RotateImg.RegionRect := Region.RegionRect;
+    RotateImg.DrawSelection;
   finally
     Regions.Loading := false;
   end;
