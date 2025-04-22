@@ -415,11 +415,12 @@ type
     procedure SetupWSAutoComp(ARow: integer);
     function ActiveAutoComp(ARow: integer): PAutoCompRec;
     procedure SetGridEditor(const Enable: boolean);
-    procedure ShowRegions(Item: string);
+    procedure LoadRegions(Item: string);
+    procedure ShowRegions;
     procedure SetRegionName(ARegion: integer);
     procedure ShowRegionInfo(ARegion: integer);
     procedure ShowMetadata;
-    procedure ShowPreview;
+    procedure ShowPreview(const FromResize: boolean = false);
     procedure RestoreGUI;
     procedure ShellListSetFolders;
     procedure RefreshSelected(Sender: TObject);
@@ -2874,7 +2875,7 @@ begin
   NoBell(Key);
 end;
 
-procedure TFMain.ShowPreview;
+procedure TFMain.ShowPreview(const FromResize: boolean = false);
 var
 {$IFDEF DEBUG_META}
   MetaData: TMetaData;
@@ -2932,7 +2933,9 @@ begin
         ABitMap := ShellList.GetThumbNail(ShellList.Selected.Index, RotateImg.Width, RotateImg.Height);
       RotateImg.Picture.Bitmap := ABitMap;
 
-      ShowRegions(GetSelectedFile(ShellList.RelFileName));
+      if (FromResize = false) then // False if called from Rezize
+        LoadRegions(GetSelectedFile(ShellList.RelFileName));
+      ShowRegions;
 
     finally
       ABitMap.Free;
@@ -3042,7 +3045,7 @@ end;
 
 procedure TFMain.AdvPagePreviewResize(Sender: TObject);
 begin
-  ShowPreview;
+  ShowPreview(true);
 end;
 
 procedure TFMain.CBoxETdirectChange(Sender: TObject);
@@ -4237,7 +4240,17 @@ begin
   end;
 end;
 
-procedure TFMain.ShowRegions(Item: string);
+procedure TFMain.LoadRegions(Item: string);
+begin
+
+  if (PnlRegion.Visible = false) then
+    exit;
+
+  FreeAndNil(Regions);
+  Regions := TRegions.LoadFromFile(Item);
+end;
+
+procedure TFMain.ShowRegions;
 var
   Region: TRegion;
   Index: integer;
@@ -4246,9 +4259,6 @@ begin
 
   if (PnlRegion.Visible = false) then
     exit;
-
-  FreeAndNil(Regions);
-  Regions := TRegions.LoadFromFile(Item);
 
   CurRegionName := CmbRegionNames.Text;
   CmbRegionNames.Items.BeginUpdate;
