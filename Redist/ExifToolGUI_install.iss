@@ -501,14 +501,18 @@ var
 begin
   if FileExists(ZipFile) then
   begin
-    ForceDirectories(TargetFldr);
-    shellobj := CreateOleObject('Shell.Application');
-    ZipFileV := string(ZipFile);
-    TargetFldrV := string(TargetFldr);
-    SrcFldr := shellobj.NameSpace(ZipFileV);
-    DestFldr := shellobj.NameSpace(TargetFldrV);
-    shellfldritems := SrcFldr.Items;
-    DestFldr.CopyHere(shellfldritems, SHCONTCH_NOPROGRESSBOX or SHCONTCH_RESPONDYESTOALL);
+    try
+      ForceDirectories(TargetFldr);
+      shellobj := CreateOleObject('Shell.Application');
+      ZipFileV := string(ZipFile);
+      TargetFldrV := string(TargetFldr);
+      SrcFldr := shellobj.NameSpace(ZipFileV);
+      DestFldr := shellobj.NameSpace(TargetFldrV);
+      shellfldritems := SrcFldr.Items;
+      DestFldr.CopyHere(shellfldritems, SHCONTCH_NOPROGRESSBOX or SHCONTCH_RESPONDYESTOALL);
+    except
+      MsgBox('Error unzipping ' + ZipFile, mbCriticalError, MB_OK);
+    end;
   end;
 end;
 
