@@ -420,7 +420,7 @@ type
     procedure SetRegionName(ARegion: integer);
     procedure ShowRegionInfo(ARegion: integer);
     procedure ShowMetadata;
-    procedure ShowPreview(const FromResize: boolean = false);
+    procedure ShowPreview;
     procedure RestoreGUI;
     procedure ShellListSetFolders;
     procedure RefreshSelected(Sender: TObject);
@@ -2875,7 +2875,7 @@ begin
   NoBell(Key);
 end;
 
-procedure TFMain.ShowPreview(const FromResize: boolean = false);
+procedure TFMain.ShowPreview;
 var
 {$IFDEF DEBUG_META}
   MetaData: TMetaData;
@@ -2933,8 +2933,6 @@ begin
         ABitMap := ShellList.GetThumbNail(ShellList.Selected.Index, RotateImg.Width, RotateImg.Height);
       RotateImg.Picture.Bitmap := ABitMap;
 
-      if (FromResize = false) then // False if called from Rezize
-        LoadRegions(GetSelectedFile(ShellList.RelFileName));
       ShowRegions;
 
     finally
@@ -3038,14 +3036,14 @@ begin
     PnlRegion.Visible := (TabIndex = 1);
     SplitPreviewRegion.Visible := PnlRegion.Visible;
 
-    ShowPreview;
     ShowMetadata;
+    ShowPreview;
   end;
 end;
 
 procedure TFMain.AdvPagePreviewResize(Sender: TObject);
 begin
-  ShowPreview(true);
+  ShowPreview;
 end;
 
 procedure TFMain.CBoxETdirectChange(Sender: TObject);
@@ -3470,8 +3468,8 @@ begin
       ShellList.Items[Index].Selected := (FNames.IndexOf(ShellList.Folders[Index].PathName) > -1);
 
     // Show data of first selected file
-    ShowPreview;
     ShowMetadata;
+    ShowPreview;
     Application.BringToFront;
 
   finally
@@ -3644,8 +3642,8 @@ end;
 
 procedure TFMain.ShellListClick(Sender: TObject);
 begin
-  ShowPreview;
   ShowMetadata;
+  ShowPreview;
   SpeedBtnQuickSave.Enabled := false;
 
   EnableMenuItems;
@@ -4450,6 +4448,8 @@ begin
         MetadataList.Strings.EndUpdate;
       end;
     end;
+
+    LoadRegions(GetSelectedFile(Item));
 
   finally
     ETResult.Free;
