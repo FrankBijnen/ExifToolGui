@@ -1820,14 +1820,13 @@ object FMain: TFMain
       OnExecute = MaCheckVersionsExecute
     end
     object MaSelectDiff: TAction
-      Tag = 40
+      Tag = 1
       Category = 'Various'
       Caption = 'Select left diff'
       OnExecute = MaSelectDiffExecute
       OnUpdate = MaEnableDiff
     end
     object MaShowDiff: TAction
-      Tag = 40
       Category = 'Various'
       Caption = 'Show diff metadata'
       OnExecute = MaShowDiffExecute
