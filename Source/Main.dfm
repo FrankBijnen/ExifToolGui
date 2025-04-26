@@ -2,7 +2,7 @@ object FMain: TFMain
   Left = 0
   Top = 0
   Caption = 'FMain'
-  ClientHeight = 693
+  ClientHeight = 567
   ClientWidth = 940
   Color = clBtnFace
   Constraints.MinHeight = 480
@@ -27,7 +27,7 @@ object FMain: TFMain
     Left = 242
     Top = 25
     Width = 5
-    Height = 649
+    Height = 523
     AutoSnap = False
     Color = clBtnFace
     MinSize = 160
@@ -43,7 +43,7 @@ object FMain: TFMain
     Left = 615
     Top = 25
     Width = 5
-    Height = 649
+    Height = 523
     Align = alRight
     AutoSnap = False
     MinSize = 320
@@ -56,7 +56,7 @@ object FMain: TFMain
   end
   object StatusBar: TStatusBar
     Left = 0
-    Top = 674
+    Top = 548
     Width = 940
     Height = 19
     Panels = <
@@ -74,7 +74,7 @@ object FMain: TFMain
     Left = 0
     Top = 25
     Width = 242
-    Height = 649
+    Height = 523
     Align = alLeft
     DoubleBuffered = True
     Font.Charset = DEFAULT_CHARSET
@@ -87,7 +87,7 @@ object FMain: TFMain
     TabOrder = 1
     object Splitter3: TSplitter
       Left = 1
-      Top = 404
+      Top = 150
       Width = 240
       Height = 4
       Cursor = crVSplit
@@ -102,7 +102,7 @@ object FMain: TFMain
       Left = 1
       Top = 1
       Width = 240
-      Height = 403
+      Height = 149
       ActivePage = AdvTabBrowse
       Align = alClient
       TabOrder = 0
@@ -112,7 +112,7 @@ object FMain: TFMain
           Left = 0
           Top = 0
           Width = 232
-          Height = 375
+          Height = 121
           ObjectTypes = [otFolders]
           Root = 'rfDesktop'
           ShellListView = ShellList
@@ -140,9 +140,9 @@ object FMain: TFMain
     end
     object AdvPagePreview: TTabControl
       Left = 1
-      Top = 408
+      Top = 154
       Width = 240
-      Height = 240
+      Height = 368
       Align = alBottom
       Constraints.MinHeight = 240
       Constraints.MinWidth = 240
@@ -157,115 +157,54 @@ object FMain: TFMain
       object RotateImg: TImage
         Left = 4
         Top = 24
-        Width = 129
-        Height = 212
+        Width = 117
+        Height = 340
         Align = alClient
         ExplicitLeft = 3
         ExplicitTop = 25
+        ExplicitWidth = 129
         ExplicitHeight = 197
       end
       object SplitPreviewRegion: TSplitter
-        Left = 133
+        Left = 121
         Top = 24
         Width = 5
-        Height = 212
+        Height = 340
         Align = alRight
         OnMoved = SplitPreviewRegionMoved
+        ExplicitLeft = 133
         ExplicitHeight = 193
       end
       object PnlRegion: TPanel
-        Left = 138
+        Left = 126
         Top = 24
-        Width = 98
-        Height = 212
+        Width = 110
+        Height = 340
         Align = alRight
         TabOrder = 0
         OnResize = PnlRegionResize
-        object Label1: TLabel
-          Left = 1
-          Top = 136
-          Width = 96
-          Height = 13
-          Align = alTop
-          Caption = 'X/Y'
-          ExplicitWidth = 16
-        end
-        object LblRegionX: TLabel
-          Left = 1
-          Top = 173
-          Width = 96
-          Height = 13
-          Align = alTop
-          Caption = 'W/H'
-          ExplicitWidth = 21
-        end
-        object Label2: TLabel
-          Left = 1
-          Top = 96
-          Width = 96
-          Height = 13
-          Align = alTop
-          Caption = 'Type'
-          ExplicitWidth = 24
-        end
-        object CmbRegionNames: TComboBox
-          Left = 1
-          Top = 33
-          Width = 96
-          Height = 21
-          Hint = 'Click + to define a region.'
-          Align = alTop
-          AutoComplete = False
-          DropDownCount = 12
-          TabOrder = 0
-          Text = 'CmbRegionNames'
-          OnChange = CmbRegionNamesChange
-          OnSelect = CmbRegionNamesSelect
-        end
-        object CmbRegionType: TComboBox
-          AlignWithMargins = True
-          Left = 4
-          Top = 112
-          Width = 90
-          Height = 21
-          Align = alTop
-          Style = csDropDownList
-          ItemIndex = 0
-          TabOrder = 1
-          Text = 'Face'
-          OnChange = RegionChange
-          Items.Strings = (
-            'Face'
-            'Pet'
-            'Focus'
-            'BarCode')
-        end
-        object EdRegionDescription: TLabeledEdit
-          AlignWithMargins = True
-          Left = 4
-          Top = 72
-          Width = 90
-          Height = 21
-          Margins.Top = 18
-          Align = alTop
-          EditLabel.Width = 53
-          EditLabel.Height = 13
-          EditLabel.Caption = 'Description'
-          TabOrder = 2
-          Text = ''
-          OnChange = RegionChange
-        end
         object PnlRegionWH: TPanel
           Left = 1
-          Top = 186
-          Width = 96
+          Top = 315
+          Width = 108
           Height = 24
-          Align = alTop
-          TabOrder = 3
-          object NumBoxW: TNumberBox
+          Align = alBottom
+          TabOrder = 0
+          object LblRegionWH: TLabel
             Left = 1
             Top = 1
-            Width = 50
+            Width = 24
+            Height = 22
+            Align = alLeft
+            Alignment = taCenter
+            AutoSize = False
+            Caption = 'W/H'
+            Layout = tlCenter
+          end
+          object NumBoxW: TNumberBox
+            Left = 25
+            Top = 1
+            Width = 45
             Height = 22
             Align = alLeft
             Decimal = 4
@@ -278,9 +217,9 @@ object FMain: TFMain
             ExplicitHeight = 21
           end
           object NumBoxH: TNumberBox
-            Left = 51
+            Left = 70
             Top = 1
-            Width = 44
+            Width = 37
             Height = 22
             Align = alClient
             Decimal = 4
@@ -295,15 +234,26 @@ object FMain: TFMain
         end
         object PnlRegionXY: TPanel
           Left = 1
-          Top = 149
-          Width = 96
+          Top = 291
+          Width = 108
           Height = 24
-          Align = alTop
-          TabOrder = 4
-          object NumBoxX: TNumberBox
+          Align = alBottom
+          TabOrder = 1
+          object LblRegionXY: TLabel
             Left = 1
             Top = 1
-            Width = 50
+            Width = 24
+            Height = 22
+            Align = alLeft
+            Alignment = taCenter
+            AutoSize = False
+            Caption = 'X/Y'
+            Layout = tlCenter
+          end
+          object NumBoxX: TNumberBox
+            Left = 25
+            Top = 1
+            Width = 45
             Height = 22
             Align = alLeft
             Decimal = 4
@@ -316,9 +266,9 @@ object FMain: TFMain
             ExplicitHeight = 21
           end
           object NumBoxY: TNumberBox
-            Left = 51
+            Left = 70
             Top = 1
-            Width = 44
+            Width = 37
             Height = 22
             Align = alClient
             Decimal = 4
@@ -334,16 +284,21 @@ object FMain: TFMain
         object PnlRegionButtons: TPanel
           Left = 1
           Top = 1
-          Width = 96
+          Width = 108
           Height = 32
           Align = alTop
           ParentColor = True
-          TabOrder = 5
+          TabOrder = 2
           object BtnRegionSave: TButton
-            Left = 65
-            Top = 1
+            AlignWithMargins = True
+            Left = 75
+            Top = 3
             Width = 32
-            Height = 30
+            Height = 26
+            Margins.Left = 2
+            Margins.Top = 2
+            Margins.Right = 2
+            Margins.Bottom = 2
             Align = alLeft
             ImageAlignment = iaCenter
             ImageIndex = 2
@@ -353,10 +308,15 @@ object FMain: TFMain
             OnClick = BtnRegionSaveClick
           end
           object BtnRegionAdd: TButton
-            Left = 1
-            Top = 1
+            AlignWithMargins = True
+            Left = 3
+            Top = 3
             Width = 32
-            Height = 30
+            Height = 26
+            Margins.Left = 2
+            Margins.Top = 2
+            Margins.Right = 2
+            Margins.Bottom = 2
             Align = alLeft
             ImageAlignment = iaCenter
             ImageIndex = 0
@@ -366,10 +326,15 @@ object FMain: TFMain
             OnClick = BtnRegionAddClick
           end
           object BtnRegionDel: TButton
-            Left = 33
-            Top = 1
+            AlignWithMargins = True
+            Left = 39
+            Top = 3
             Width = 32
-            Height = 30
+            Height = 26
+            Margins.Left = 2
+            Margins.Top = 2
+            Margins.Right = 2
+            Margins.Bottom = 2
             Align = alLeft
             ImageAlignment = iaCenter
             ImageIndex = 1
@@ -379,6 +344,102 @@ object FMain: TFMain
             OnClick = BtnRegionDelClick
           end
         end
+        object LvRegions: TListView
+          Left = 1
+          Top = 33
+          Width = 108
+          Height = 131
+          Hint = 'Click + to define a region.'
+          Align = alClient
+          Checkboxes = True
+          Columns = <
+            item
+              Caption = 'Region'
+              Width = 90
+            end>
+          ColumnClick = False
+          Constraints.MinHeight = 50
+          Constraints.MinWidth = 50
+          GridLines = True
+          HideSelection = False
+          ParentShowHint = False
+          ShowColumnHeaders = False
+          ShowHint = True
+          TabOrder = 3
+          ViewStyle = vsReport
+          OnCustomDrawItem = LvRegionsCustomDrawItem
+          OnDblClick = LvRegionsDblClick
+          OnEdited = LvRegionsEdited
+          OnKeyUp = LvRegionsKeyUp
+          OnResize = LvRegionsResize
+          OnSelectItem = LvRegionsSelectItem
+          OnItemChecked = LvRegionsItemChecked
+        end
+        object PnlRegionData: TPanel
+          Left = 1
+          Top = 164
+          Width = 108
+          Height = 127
+          Align = alBottom
+          TabOrder = 4
+          object LblRegionType: TLabel
+            Left = 1
+            Top = 86
+            Width = 106
+            Height = 13
+            Align = alBottom
+            Caption = 'Type'
+            ExplicitWidth = 24
+          end
+          object CmbRegionType: TComboBox
+            AlignWithMargins = True
+            Left = 4
+            Top = 102
+            Width = 100
+            Height = 21
+            Align = alBottom
+            Style = csDropDownList
+            ItemIndex = 0
+            TabOrder = 0
+            Text = 'Face'
+            OnChange = RegionChange
+            Items.Strings = (
+              'Face'
+              'Pet'
+              'Focus'
+              'BarCode')
+          end
+          object EdRegionDescription: TLabeledEdit
+            AlignWithMargins = True
+            Left = 4
+            Top = 62
+            Width = 100
+            Height = 21
+            Margins.Top = 18
+            Align = alBottom
+            EditLabel.Width = 53
+            EditLabel.Height = 13
+            EditLabel.Caption = 'Description'
+            TabOrder = 1
+            Text = ''
+            OnChange = RegionChange
+          end
+          object EdRegionName: TLabeledEdit
+            AlignWithMargins = True
+            Left = 4
+            Top = 20
+            Width = 100
+            Height = 21
+            Margins.Top = 18
+            Align = alBottom
+            EditLabel.Width = 27
+            EditLabel.Height = 13
+            EditLabel.Caption = 'Name'
+            TabOrder = 2
+            Text = ''
+            OnChange = RegionChange
+          end
+        end
       end
     end
   end
@@ -386,7 +447,7 @@ object FMain: TFMain
     Left = 620
     Top = 25
     Width = 320
-    Height = 649
+    Height = 523
     ActivePage = AdvTabMetadata
     Align = alRight
     DoubleBuffered = True
@@ -490,7 +551,7 @@ object FMain: TFMain
       end
       object AdvPanelMetaBottom: TPanel
         Left = 0
-        Top = 515
+        Top = 389
         Width = 312
         Height = 106
         Align = alBottom
@@ -568,7 +629,7 @@ object FMain: TFMain
         Left = 0
         Top = 57
         Width = 312
-        Height = 458
+        Height = 332
         Align = alClient
         BorderStyle = bsNone
         DefaultRowHeight = 19
@@ -608,7 +669,7 @@ object FMain: TFMain
         Left = 0
         Top = 57
         Width = 312
-        Height = 532
+        Height = 406
         Align = alClient
         Caption = 'Internet access not enabled in preferences'
         Font.Charset = DEFAULT_CHARSET
@@ -622,7 +683,7 @@ object FMain: TFMain
           Left = 1
           Top = 1
           Width = 310
-          Height = 530
+          Height = 404
           Align = alClient
           TabOrder = 0
           AllowSingleSignOnUsingOSPrimaryAccount = False
@@ -636,7 +697,7 @@ object FMain: TFMain
       end
       object AdvPanel_MapBottom: TPanel
         Left = 0
-        Top = 589
+        Top = 463
         Width = 312
         Height = 32
         Align = alBottom
@@ -777,7 +838,7 @@ object FMain: TFMain
     Left = 247
     Top = 25
     Width = 368
-    Height = 649
+    Height = 523
     ActivePage = AdvTabFilelist
     Align = alClient
     Constraints.MinWidth = 364
@@ -853,7 +914,7 @@ object FMain: TFMain
       end
       object AdvPanelETdirect: TPanel
         Left = 0
-        Top = 437
+        Top = 311
         Width = 360
         Height = 184
         Align = alBottom
@@ -1031,7 +1092,7 @@ object FMain: TFMain
         Left = 0
         Top = 50
         Width = 360
-        Height = 387
+        Height = 261
         ObjectTypes = [otNonFolders]
         Root = 'rfDesktop'
         ShellTreeView = ShellTree
@@ -1173,7 +1234,7 @@ object FMain: TFMain
         Left = 0
         Top = 121
         Width = 360
-        Height = 500
+        Height = 374
         Legend.Visible = False
         Title.Font.Color = clBlack
         Title.Font.Height = -19
@@ -1249,8 +1310,8 @@ object FMain: TFMain
   end
   object SaveFileDlg: TSaveDialog
     Options = [ofHideReadOnly, ofEnableSizing, ofDontAddToRecent]
-    Left = 163
-    Top = 245
+    Left = 171
+    Top = 301
   end
   object MainActionManager: TActionManager
     ActionBars = <

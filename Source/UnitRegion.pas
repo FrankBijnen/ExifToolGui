@@ -22,6 +22,8 @@ type
     FDescription: string;
     FRegionType: string;
     FUnit: string;
+    FShow: boolean;
+    FSelected: boolean;
   public
     constructor Create(ARegionRect: TRegionRect; AUnit, AName, ADescription, ARegionType: string);
     property RegionRect: TRegionRect read FRegionRect write FRegionRect;
@@ -29,6 +31,8 @@ type
     property RegionDescription: string read FDescription write FDescription;
     property RegionType: string read FRegionType write FRegionType;
     property RegionUnit: string read FUnit write FUnit;
+    property Show: boolean read FShow write FShow;
+    property Selected: boolean read FSelected write FSelected;
   end;
   TRegionList = TList<TRegion>;
 
@@ -94,6 +98,7 @@ begin
   FName := AName;
   FDescription := ADescription;
   FRegionType := ARegionType;
+  FShow := true;
 end;
 
 constructor TRegions.Create(ADimW, AImgW, ADimH, AImgH: integer; AUnits: string);

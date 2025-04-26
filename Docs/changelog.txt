@@ -170,3 +170,4 @@ Version:        Description             Issue
                 Fix Issue #830          Hash functions
                 Fix Issue #847          GeoTagged? in Workspace produces unpredictable results
                 Fix Issue #848          Fix issues for V6.3.9
+                Fix Issue #857          Various/Show diff metadata not enabled correctly
