@@ -22,7 +22,7 @@ uses
   Vcl.ActnMan, Vcl.ActnCtrls, Vcl.ActnMenus, Vcl.ActnList, Vcl.PlatformDefaultStyleActnCtrls,
   Vcl.ActnPopup, Vcl.BaseImageCollection, Vcl.ImageCollection, Vcl.VirtualImageList,
   Vcl.Taskbar, Vcl.ToolWin,
-  Vcl.ComCtrls, Vcl.ExtCtrls, Vcl.Menus, Vcl.Buttons, Vcl.StdCtrls, Vcl.ExtDlgs,
+  Vcl.ComCtrls, Vcl.ExtCtrls, Vcl.Menus, Vcl.Buttons, Vcl.StdCtrls, Vcl.ExtDlgs, Vcl.NumberBox,
   Vcl.Shell.ShellCtrls,       // Embarcadero ShellTreeView and ShellListView
   Winapi.WebView2, Winapi.ActiveX, Winapi.EdgeUtils, Vcl.Edge, // Edgebrowser
   VclTee.Series,              // Chart
@@ -39,7 +39,7 @@ uses
   ExifToolsGUI_Utils,         // Various
   ExifToolsGui_AutoEdit,      // AutoEdit
   ExifToolsGui_AutoComplete,  // AutoComplete
-  UnitRegion, Vcl.NumberBox;
+  UnitRegion;
 
 const
   CM_ActivateWindow = WM_USER + 100;
@@ -218,24 +218,26 @@ type
     MaCreateSHA2: TAction;
     PnlRegion: TPanel;
     SplitPreviewRegion: TSplitter;
-    CmbRegionNames: TComboBox;
     CmbRegionType: TComboBox;
     EdRegionDescription: TLabeledEdit;
-    Label1: TLabel;
     PnlRegionWH: TPanel;
     NumBoxW: TNumberBox;
-    LblRegionX: TLabel;
     NumBoxH: TNumberBox;
     PnlRegionXY: TPanel;
     NumBoxX: TNumberBox;
     NumBoxY: TNumberBox;
-    Label2: TLabel;
+    LblRegionType: TLabel;
     ImageCollectionRegions: TImageCollection;
     PnlRegionButtons: TPanel;
     BtnRegionSave: TButton;
     BtnRegionAdd: TButton;
     BtnRegionDel: TButton;
     VirtualImageRegions: TVirtualImageList;
+    LvRegions: TListView;
+    LblRegionXY: TLabel;
+    LblRegionWH: TLabel;
+    EdRegionName: TLabeledEdit;
+    PnlRegionData: TPanel;
     procedure ShellListClick(Sender: TObject);
     procedure ShellListKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
     procedure SpeedBtnExifClick(Sender: TObject);
@@ -390,8 +392,13 @@ type
     procedure RegionChange(Sender: TObject);
     procedure BtnRegionAddClick(Sender: TObject);
     procedure BtnRegionDelClick(Sender: TObject);
-    procedure CmbRegionNamesSelect(Sender: TObject);
-    procedure CmbRegionNamesChange(Sender: TObject);
+    procedure LvRegionsSelectItem(Sender: TObject; Item: TListItem; Selected: Boolean);
+    procedure LvRegionsEdited(Sender: TObject; Item: TListItem; var S: string);
+    procedure LvRegionsKeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
+    procedure LvRegionsCustomDrawItem(Sender: TCustomListView; Item: TListItem; State: TCustomDrawState; var DefaultDraw: Boolean);
+    procedure LvRegionsResize(Sender: TObject);
+    procedure LvRegionsDblClick(Sender: TObject);
+    procedure LvRegionsItemChecked(Sender: TObject; Item: TListItem);
   private
     { Private declarations }
     ETBarSeriesFocal: TBarSeries;
@@ -417,7 +424,6 @@ type
     procedure SetGridEditor(const Enable: boolean);
     procedure LoadRegions(Item: string);
     procedure ShowRegions;
-    procedure SetRegionName(ARegion: integer);
     procedure ShowRegionInfo(ARegion: integer);
     procedure ShowMetadata;
     procedure ShowPreview;
@@ -465,7 +471,7 @@ type
     procedure EditFileFilter(Sender: TObject);
     procedure FileDateFromMetaData(GroupId: integer);
     procedure CreateHashFiles(HashType: integer);
-    procedure SelectionDone(Sender: TObject);
+    procedure SelectionDone(Sender: TObject; Rect: TRegionRect);
   protected
     procedure CreateWnd; override;
     procedure DestroyWnd; override;
@@ -558,7 +564,7 @@ begin
   SetLength(CustomTabStops, 0);
   CustomTabStops := CustomTabStops + [ShellTree];
 //Regions
-  CustomTabStops := CustomTabStops + [CmbRegionNames, EdRegionDescription, CmbRegionType];
+  CustomTabStops := CustomTabStops + [LvRegions, EdRegionName, EdRegionDescription, CmbRegionType];
   CustomTabStops := CustomTabStops + [NumBoxX, NumBoxY, NumBoxW, NumBoxH];
 
   CustomTabStops := CustomTabStops + [ShellList];
@@ -970,19 +976,20 @@ begin
   FLogWin.Show;
 end;
 
-procedure TFMain.SelectionDone(Sender: TObject);
+procedure TFMain.SelectionDone(Sender: TObject; Rect: TRegionRect);
 var
   Index: integer;
 begin
-  if (Assigned(Regions)) then
+  if not (Assigned(Regions)) then
+    exit;
+  Index := CurRegion;
+  if (Index > -1) and
+     (Index < Regions.Items.Count) then
   begin
-    Index := CurRegion;
-    if (Index > -1) and
-       (Index < Regions.Items.Count) then
-    begin
-      Regions.Items[Index].RegionRect := RotateImg.RegionRect;
-      ShowRegionInfo(Index);
-    end;
+    if (Rect.W > 0.001) and
+       (Rect.H > 0.001) then
+      Regions.Items[Index].RegionRect := Rect;
+    ShowRegionInfo(Index);
   end;
 end;
 
@@ -990,18 +997,25 @@ procedure TFMain.BtnRegionAddClick(Sender: TObject);
 var
   ARegionRect: TRegionRect;
   NewRegion: string;
+  AnItem: TlistItem;
 begin
-  if (Assigned(Regions)) then
-  begin
-    NewRegion := Format('#%d', [Regions.Items.Count +1]);
-    ARegionRect.X := NumBoxX.Value;
-    ARegionRect.Y := NumBoxY.Value;
-    ARegionRect.W := NumBoxW.Value;
-    ARegionRect.H := NumBoxH.Value;
-    Regions.Add(TRegion.Create(ARegionRect, 'Normalized', NewRegion, EdRegionDescription.Text, CmbRegionType.Text));
-    SetRegionName(CmbRegionNames.Items.Add(NewRegion));
-    ShowRegionInfo(CmbRegionNames.ItemIndex);
-  end;
+  if not (Assigned(Regions)) then
+    exit;
+
+  NewRegion := Format('#%d', [Regions.Items.Count +1]);
+  FillChar(ARegionRect, SizeOf(ARegionRect), 0);
+  Regions.Add(TRegion.Create(ARegionRect, 'Normalized', NewRegion, EdRegionDescription.Text, CmbRegionType.Text));
+
+  for AnItem in LvRegions.Items do
+    AnItem.Selected := false;
+
+  AnItem := LvRegions.Items.Add;
+  AnItem.Caption := NewRegion;
+  AnItem.Checked := true;
+  AnItem.Selected := true;
+  AnItem.Focused := true;
+
+  ShowRegionInfo(AnItem.Index);
 end;
 
 procedure TFMain.BtnRegionDelClick(Sender: TObject);
@@ -1017,10 +1031,9 @@ begin
     begin
       Regions.Items[Index].Free;
       Regions.Items.Delete(Index);
-      CmbRegionNames.Items.Delete(Index);
+      LvRegions.Items.Delete(Index);
     end;
-    Index := Min(Index, CmbRegionNames.Items.Count -1);
-    SetRegionName(Index);
+    Index := Min(Index, LvRegions.Items.Count -1);
   end;
   ShowRegionInfo(Index);
 end;
@@ -1962,7 +1975,13 @@ begin
     exit;
 
   Region := Regions.Items[CurRegion];
-  Region.RegionName := CmbRegionNames.Text;
+
+  // Name also in LvRegions
+  if (EdRegionName.Modified) then
+  begin
+    Region.RegionName := EdRegionName.Text;
+    LvRegions.Items[CurRegion].Caption := Region.RegionName;
+  end;
 
   // Type, usually Face
   Region.RegionType := CmbRegionType.Text;
@@ -1977,8 +1996,8 @@ begin
   Rect.X := NumBoxX.Value;
   Rect.Y := NumBoxY.Value;
   Region.RegionRect := Rect;
-  RotateImg.RegionRect := Region.RegionRect;
-  RotateImg.DrawSelection;
+  Region.Show := LvRegions.Items[CurRegion].Checked;
+  RotateImg.DrawSelectionRects(Regions.Items);
 end;
 
 procedure TFMain.MCustomOptionsClick(Sender: TObject);
@@ -1995,8 +2014,8 @@ end;
 
 procedure TFMain.PnlRegionResize(Sender: TObject);
 begin
-  NumBoxX.Width := TPanel(Sender).ClientWidth div 2;
-  NumBoxW.Width := TPanel(Sender).ClientWidth div 2;
+  NumBoxX.Width := (TPanel(Sender).ClientWidth - LblRegionXY.Width) div 2;
+  NumBoxW.Width := (TPanel(Sender).ClientWidth - LblRegionWH.Width) div 2;
 end;
 
 procedure TFMain.QuickPopUpMenuPopup(Sender: TObject);
@@ -2602,22 +2621,6 @@ end;
 procedure TFMain.CmbETDirectModeChange(Sender: TObject);
 begin
   GUIsettings.ETdirMode := CmbETDirectMode.ItemIndex;
-end;
-
-procedure TFMain.CmbRegionNamesChange(Sender: TObject);
-begin
-  // Add typed in Dropdown list
-  if (CurRegion > -1) and
-     (CurRegion < CmbRegionNames.Items.Count) then
-    CmbRegionNames.Items[CurRegion] := CmbRegionNames.Text;
-
-  // Update Regions
-  RegionChange(Sender);
-end;
-
-procedure TFMain.CmbRegionNamesSelect(Sender: TObject);
-begin
-  ShowRegionInfo(CmbRegionNames.ItemIndex);
 end;
 
 procedure TFMain.EditETdirectKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
@@ -4185,15 +4188,6 @@ begin
     exit(TMetaDataTab.mtCustom);
 end;
 
-procedure TFMain.SetRegionName(ARegion: integer);
-begin
-  if (ARegion < CmbRegionNames.Items.Count) then
-    CmbRegionNames.ItemIndex := ARegion;
-  if (CmbRegionNames.ItemIndex < 0) then
-    CmbRegionNames.Text := StrNoRegions;
-  CmbRegionNames.ShowHint := (CmbRegionNames.ItemIndex  < 0);
-end;
-
 procedure TFMain.ShowRegionInfo(ARegion: integer);
 var
   Region: TRegion;
@@ -4203,44 +4197,52 @@ begin
 
   CmbRegionType.Text := '-';
   EdRegionDescription.Text := '-';
+  EdRegionName.Text := '-';
   NumBoxX.Value := 0;
   NumBoxY.Value := 0;
   NumBoxW.Value := 0;
   NumBoxH.Value := 0;
-  RotateImg.SelectionEnabled := false;
-  RotateImg.RemoveSelection;
+  RotateImg.RemoveSelectionRects;
+
+  PnlRegionData.Enabled := Assigned(Regions) and
+                           (Regions.Items.Count > 0);
+  PnlRegionXY.Enabled := PnlRegionData.Enabled;
+  PnlRegionWH.Enabled := PnlRegionData.Enabled;
+  RotateImg.SelectionEnabled := PnlRegionData.Enabled;
 
   if not Assigned(Regions) then
     exit;
 
   try
+    for Region in Regions.Items do
+      Region.Selected := false;
+
+    // ARegion can be -1, if nothing is selected
     if (ARegion < 0) or
        (ARegion > Regions.Items.Count -1) then
       exit;
 
     CurRegion := ARegion;
     Region := Regions.Items[CurRegion];
+    Region.Selected := true;
+    Region.Show := LvRegions.Items[CurRegion].Checked;
 
-    Region.RegionName := CmbRegionNames.Text;
+    EdRegionName.Text := Region.RegionName;
     CmbRegionType.ItemIndex := CmbRegionType.Items.IndexOf(Region.RegionType);
     EdRegionDescription.Text := Region.RegionDescription;
-
     NumBoxX.Value := Region.RegionRect.X;
     NumBoxY.Value := Region.RegionRect.Y;
     NumBoxW.Value := Region.RegionRect.W;
     NumBoxH.Value := Region.RegionRect.H;
 
-    RotateImg.SelectionEnabled := true;
-    RotateImg.RegionRect := Region.RegionRect;
-    RotateImg.DrawSelection;
   finally
+    RotateImg.DrawSelectionRects(Regions.Items);
     Regions.Loading := false;
   end;
 end;
 
 procedure TFMain.LoadRegions(Item: string);
 begin
-
   if (PnlRegion.Visible = false) then
     exit;
 
@@ -4251,36 +4253,113 @@ end;
 procedure TFMain.ShowRegions;
 var
   Region: TRegion;
+  NewIndex: integer;
   Index: integer;
   CurRegionName: string;
+  AnItem: TlistItem;
 begin
-
   if (PnlRegion.Visible = false) then
     exit;
 
-  CurRegionName := CmbRegionNames.Text;
-  CmbRegionNames.Items.BeginUpdate;
+  NewIndex := -1;
+  CurRegionName := '';
+  if (CurRegion < LvRegions.Items.Count) then
+    CurRegionName := LvRegions.Items[CurRegion].Caption;
+
+  LvRegions.Tag := 1;  // Defer Checked and Select events
+  LvRegions.Items.BeginUpdate;
   try
-    CmbRegionNames.Items.Clear;
+    LvRegions.Items.Clear;
+
     if (Regions <> nil) then
     begin
       for Region in Regions.Items do
-        CmbRegionNames.Items.Add(Region.RegionName);
+      begin
+        AnItem := LvRegions.Items.Add;
+        AnItem.Caption := Region.RegionName;
+        AnItem.Checked := true;
+        AnItem.Selected := false;
+      end;
     end;
+    LvRegions.ShowHint := (LvRegions.Items.Count = 0);
+
+    // Try to select the last used region name
+    NewIndex := Min(0, LvRegions.Items.Count -1);
+    for Index := 0 to LvRegions.Items.Count -1 do
+    begin
+      if (SameStr(CurRegionName, LvRegions.Items[Index].Caption)) then
+      begin
+        NewIndex := Index;
+        break;
+      end;
+    end;
+    if (NewIndex > -1) then
+      LvRegions.Items[NewIndex].Selected := true;
+
   finally
-    CmbRegionNames.Items.EndUpdate;
+    ShowRegionInfo(NewIndex);
 
-    Index := CmbRegionNames.Items.IndexOf(CurRegionName);
-    if (Index < 0) and
-       (CmbRegionNames.Items.Count > 0) then
-      Index := 0;
-    CmbRegionNames.ItemIndex := Index;
-    CmbRegionNames.ShowHint := (Index < 0);
-    if (Index < 0) then
-      CmbRegionNames.Text := StrNoRegions;
-
-    ShowRegionInfo(Index);
+    LvRegions.Items.EndUpdate;
+    LvRegions.Tag := 0;
   end;
+end;
+
+procedure TFMain.LvRegionsCustomDrawItem(Sender: TCustomListView; Item: TListItem; State: TCustomDrawState;
+  var DefaultDraw: Boolean);
+begin
+  StyledDrawListviewItem(FStyleServices, Sender, Item, State);
+end;
+
+procedure TFMain.LvRegionsDblClick(Sender: TObject);
+begin
+  if (LvRegions.Selected <> nil) then
+    LvRegions.Selected.EditCaption;
+end;
+
+procedure TFMain.LvRegionsEdited(Sender: TObject; Item: TListItem; var S: string);
+var
+  Region: TRegion;
+begin
+  if not Assigned(Regions) then
+    exit;
+
+  if (Item.Index < 0) or
+     (Item.Index > Regions.Items.Count -1) then
+    exit;
+
+  // Update Region Name
+  Region := Regions.Items[Item.Index];
+  Item.Caption := S;
+  Region.RegionName := S;
+  EdRegionName.Text := Region.RegionName;
+end;
+
+procedure TFMain.LvRegionsItemChecked(Sender: TObject; Item: TListItem);
+begin
+  if (TListView(Sender).Tag <> 0) then
+    exit;
+  ShowRegionInfo(Item.Index);
+end;
+
+procedure TFMain.LvRegionsKeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
+begin
+  if (Key = VK_F2) and (LvRegions.Selected <> nil) then
+    LvRegions.Selected.EditCaption;
+end;
+
+procedure TFMain.LvRegionsResize(Sender: TObject);
+begin
+  LvRegions.Columns[0].Width := TlistView(Sender).ClientWidth - GetSystemMetrics(SM_CXVSCROLL);
+end;
+
+procedure TFMain.LvRegionsSelectItem(Sender: TObject; Item: TListItem; Selected: Boolean);
+begin
+  if (TListView(Sender).Tag <> 0) then
+    exit;
+  if (Selected = false) then
+    ShowRegionInfo(-1)
+  else
+    ShowRegionInfo(Item.Index);
 end;
 
 procedure TFMain.ShowMetadata;
@@ -4291,6 +4370,9 @@ var
   ETResult: TStringList;
   NoChars:  TSysCharSet;
 begin
+  // Clear regions
+  FreeAndNil(Regions);
+
   MetadataList.Tag := -1;             // Reset hint row
   MetadataLoading := true;
   ETResult := TStringList.Create;
@@ -4305,6 +4387,7 @@ begin
       MetadataList.ItemProps[0].ReadOnly := true;
       EditQuick.Text := '';
       MemoQuick.Text := '';
+
       exit;
     end;
 
