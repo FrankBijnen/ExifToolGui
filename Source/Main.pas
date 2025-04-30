@@ -229,15 +229,16 @@ type
     LblRegionType: TLabel;
     ImageCollectionRegions: TImageCollection;
     PnlRegionButtons: TPanel;
-    BtnRegionSave: TButton;
-    BtnRegionAdd: TButton;
-    BtnRegionDel: TButton;
+    BtnRegionSave: TSpeedButton;
+    BtnRegionAdd: TSpeedButton;
+    BtnRegionDel: TSpeedButton;
     VirtualImageRegions: TVirtualImageList;
     LvRegions: TListView;
     LblRegionXY: TLabel;
     LblRegionWH: TLabel;
     EdRegionName: TLabeledEdit;
     PnlRegionData: TPanel;
+    BtnRegionMaximize: TSpeedButton;
     procedure ShellListClick(Sender: TObject);
     procedure ShellListKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
     procedure SpeedBtnExifClick(Sender: TObject);
@@ -399,6 +400,8 @@ type
     procedure LvRegionsResize(Sender: TObject);
     procedure LvRegionsDblClick(Sender: TObject);
     procedure LvRegionsItemChecked(Sender: TObject; Item: TListItem);
+    procedure BtnRegionMaximizeClick(Sender: TObject);
+    procedure FormResize(Sender: TObject);
   private
     { Private declarations }
     ETBarSeriesFocal: TBarSeries;
@@ -472,11 +475,13 @@ type
     procedure FileDateFromMetaData(GroupId: integer);
     procedure CreateHashFiles(HashType: integer);
     procedure SelectionDone(Sender: TObject; Rect: TRegionRect);
+    procedure ResizePreview;
   protected
     procedure CreateWnd; override;
     procedure DestroyWnd; override;
     function GetDefWindowSizes: TRect; override;
   public
+    NormalPreviewHeight: integer;
     GUIBorderWidth, GUIBorderHeight: integer;
     GUIColorWindow: TColor;
     GUIColorShellTree: TColor;
@@ -1038,10 +1043,44 @@ begin
   ShowRegionInfo(Index);
 end;
 
+procedure TFMain.ResizePreview;
+begin
+  if (BtnRegionMaximize.Down) then
+    AdvPagePreview.Height := Self.ClientHeight
+  else
+  begin
+    if (NormalPreviewHeight > Self.ClientHeight - AdvTabBrowse.Height) then
+      NormalPreviewHeight := Self.ClientHeight - AdvTabBrowse.Height;
+    AdvPagePreview.Height := NormalPreviewHeight;
+    AdvPagePreview.Align := alBottom;
+  end;
+end;
+
+procedure TFMain.BtnRegionMaximizeClick(Sender: TObject);
+begin
+  if (BtnRegionMaximize.Down) then
+  begin
+    AdvPagePreview.Parent := Self;
+    NormalPreviewHeight := AdvPagePreview.Height;
+  end
+  else
+    AdvPagePreview.Parent := AdvPanelBrowse;
+  ResizePreview;
+end;
+
 procedure TFMain.BtnRegionSaveClick(Sender: TObject);
+var
+  FName: string;
 begin
   if (Assigned(Regions)) then
-    Regions.SaveToFile(GetSelectedFile(ShellList.RelFileName));
+  begin
+    FName := GetSelectedFile(ShellList.RelFileName);
+    if (FName = '') then
+      exit;
+    Regions.SaveToFile(FName);
+    ShowMetadata;
+    RefreshSelected(Sender);
+  end;
 end;
 
 procedure TFMain.GenericExtractPreviewsClick(Sender: TObject);
@@ -3038,7 +3077,6 @@ begin
   begin
     PnlRegion.Visible := (TabIndex = 1);
     SplitPreviewRegion.Visible := PnlRegion.Visible;
-
     ShowMetadata;
     ShowPreview;
   end;
@@ -3344,7 +3382,43 @@ begin
 end;
 
 procedure TFMain.FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
+var
+  MaximizeState: boolean;
 begin
+
+  if (PnlRegion.Visible) then
+  begin
+    MaximizeState := BtnRegionMaximize.Down;
+    case Key of
+      VK_ESCAPE:
+          MaximizeState := false;
+    end;
+
+    if (ssCTRL in Shift) then
+    begin
+      case Key of
+        Ord('S'):
+          BtnRegionSaveClick(BtnRegionSave);
+      end;
+    end;
+
+    if (ssAlt in Shift) then
+    begin
+      case Key of
+        VK_UP:
+          MaximizeState := true;
+        VK_DOWN:
+          MaximizeState := false;
+      end;
+    end;
+
+    if (MaximizeState <> BtnRegionMaximize.Down) then
+    begin
+      BtnRegionMaximize.Down := MaximizeState;
+      BtnRegionMaximizeClick(BtnRegionMaximize);
+    end;
+  end;
+
   if (ssCTRL in Shift) then
   begin
     case Key of
@@ -3405,6 +3479,12 @@ begin
     23:     // CTRL/W
       Key := #0;  // No Bell
   end;
+end;
+
+procedure TFMain.FormResize(Sender: TObject);
+begin
+  if (BtnRegionMaximize.Down) then
+    ResizePreview;
 end;
 
 procedure TFMain.ShellListMouseWheel(Sender: TObject; Shift: TShiftState; WheelDelta: Integer; MousePos: TPoint; var Handled: Boolean);

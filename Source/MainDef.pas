@@ -1074,7 +1074,10 @@ begin
         // Main form settings, Except Form self
         WriteBool(Ini_ETGUI, 'StartMax', (WindowState = wsMaximized));
         WriteInteger(Ini_ETGUI, 'BrowseWidth', AdvPanelBrowse.Width);
-        WriteInteger(Ini_ETGUI, 'PreviewHeight', AdvPagePreview.Height);
+        if (BtnRegionMaximize.Down) then
+          WriteInteger(Ini_ETGUI, 'PreviewHeight', NormalPreviewHeight)
+        else
+          WriteInteger(Ini_ETGUI, 'PreviewHeight', AdvPagePreview.Height);
         WriteInteger(Ini_ETGUI, 'MetadataWidth', AdvPageMetadata.Width);
         WriteInteger(Ini_ETGUI, 'MetadataTagWidth', MetadataList.ColWidths[0]);
         WriteString(Ini_ETGUI, 'DefaultDir', ShellList.ShellPath);
