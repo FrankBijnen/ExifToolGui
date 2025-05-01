@@ -70,7 +70,6 @@ object FMain: TFMain
       item
         Width = 50
       end>
-    ExplicitTop = 623
   end
   object AdvPanelBrowse: TPanel
     Left = 0
@@ -87,7 +86,6 @@ object FMain: TFMain
     ParentDoubleBuffered = False
     ParentFont = False
     TabOrder = 1
-    ExplicitHeight = 598
     object Splitter3: TSplitter
       Left = 1
       Top = 217
@@ -109,7 +107,6 @@ object FMain: TFMain
       ActivePage = AdvTabBrowse
       Align = alClient
       TabOrder = 0
-      ExplicitHeight = 224
       object AdvTabBrowse: TTabSheet
         Caption = 'Folders'
         object ShellTree: TShellTreeView
@@ -139,7 +136,6 @@ object FMain: TFMain
           OnKeyDown = ShellTreeKeyDown
           OnChanging = ShellTreeChanging
           OnEdited = ShellTreeEdited
-          ExplicitHeight = 196
         end
       end
     end
@@ -159,7 +155,6 @@ object FMain: TFMain
       TabIndex = 0
       OnChange = AdvPagePreviewChange
       OnResize = AdvPagePreviewResize
-      ExplicitTop = 360
       object RotateImg: TImage
         Left = 4
         Top = 24
@@ -188,7 +183,6 @@ object FMain: TFMain
         Constraints.MinWidth = 140
         TabOrder = 0
         OnResize = PnlRegionResize
-        ExplicitHeight = 340
         object PnlRegionWH: TPanel
           Left = 1
           Top = 234
@@ -196,7 +190,6 @@ object FMain: TFMain
           Height = 24
           Align = alBottom
           TabOrder = 0
-          ExplicitTop = 315
           object LblRegionWH: TLabel
             Left = 1
             Top = 1
@@ -221,6 +214,7 @@ object FMain: TFMain
             TabOrder = 0
             UseMouseWheel = True
             OnChangeValue = RegionChange
+            ExplicitHeight = 21
           end
           object NumBoxH: TNumberBox
             Left = 79
@@ -235,7 +229,7 @@ object FMain: TFMain
             TabOrder = 1
             UseMouseWheel = True
             OnChangeValue = RegionChange
-            ExplicitWidth = 50
+            ExplicitHeight = 21
           end
         end
         object PnlRegionXY: TPanel
@@ -245,7 +239,6 @@ object FMain: TFMain
           Height = 24
           Align = alBottom
           TabOrder = 1
-          ExplicitTop = 291
           object LblRegionXY: TLabel
             Left = 1
             Top = 1
@@ -270,6 +263,7 @@ object FMain: TFMain
             TabOrder = 0
             UseMouseWheel = True
             OnChangeValue = RegionChange
+            ExplicitHeight = 21
           end
           object NumBoxY: TNumberBox
             Left = 79
@@ -284,7 +278,7 @@ object FMain: TFMain
             TabOrder = 1
             UseMouseWheel = True
             OnChangeValue = RegionChange
-            ExplicitWidth = 50
+            ExplicitHeight = 21
           end
         end
         object PnlRegionButtons: TPanel
@@ -400,7 +394,6 @@ object FMain: TFMain
           OnResize = LvRegionsResize
           OnSelectItem = LvRegionsSelectItem
           OnItemChecked = LvRegionsItemChecked
-          ExplicitHeight = 131
         end
         object PnlRegionData: TPanel
           Left = 1
@@ -409,7 +402,6 @@ object FMain: TFMain
           Height = 127
           Align = alBottom
           TabOrder = 4
-          ExplicitTop = 164
           object LblRegionType: TLabel
             Left = 1
             Top = 86
@@ -481,7 +473,6 @@ object FMain: TFMain
     DoubleBuffered = True
     ParentDoubleBuffered = False
     TabOrder = 2
-    ExplicitHeight = 598
     object AdvTabMetadata: TTabSheet
       Caption = 'Metadata'
       object AdvPanelMetaTop: TPanel
@@ -592,7 +583,6 @@ object FMain: TFMain
         Font.Style = []
         ParentFont = False
         TabOrder = 2
-        ExplicitTop = 464
         DesignSize = (
           312
           106)
@@ -688,7 +678,6 @@ object FMain: TFMain
         OnMouseUp = MetadataListMouseUp
         OnSelectCell = MetadataListSelectCell
         OnStringsChange = MetadataListStringsChange
-        ExplicitHeight = 407
         ColWidths = (
           150
           160)
@@ -710,7 +699,6 @@ object FMain: TFMain
         Font.Style = []
         ParentFont = False
         TabOrder = 1
-        ExplicitHeight = 481
         object EdgeBrowser1: TEdgeBrowser
           Left = 1
           Top = 1
@@ -725,7 +713,6 @@ object FMain: TFMain
           OnNavigationStarting = EdgeBrowser1NavigationStarting
           OnWebMessageReceived = EdgeBrowser1WebMessageReceived
           OnZoomFactorChanged = EdgeBrowser1ZoomFactorChanged
-          ExplicitHeight = 479
         end
       end
       object AdvPanel_MapBottom: TPanel
@@ -742,7 +729,6 @@ object FMain: TFMain
         Font.Style = []
         ParentFont = False
         TabOrder = 2
-        ExplicitTop = 538
         object SpeedBtn_Geotag: TSpeedButton
           AlignWithMargins = True
           Left = 1
@@ -879,7 +865,6 @@ object FMain: TFMain
     DoubleBuffered = True
     ParentDoubleBuffered = False
     TabOrder = 3
-    ExplicitHeight = 598
     object AdvTabFilelist: TTabSheet
       Caption = 'File list'
       object TbFileList: TToolBar
@@ -961,7 +946,6 @@ object FMain: TFMain
         Font.Style = []
         ParentFont = False
         TabOrder = 3
-        ExplicitTop = 386
         DesignSize = (
           360
           184)
@@ -1158,7 +1142,6 @@ object FMain: TFMain
         ViewStyle = vsReport
         OnKeyDown = ShellListKeyDown
         OnKeyUp = ShellListKeyUp
-        ExplicitHeight = 336
       end
       object PnlBreadCrumb: TPanel
         Left = 0
@@ -1283,7 +1266,6 @@ object FMain: TFMain
         LeftAxis.Maximum = 15.000000000000000000
         Align = alClient
         TabOrder = 1
-        ExplicitHeight = 449
         DefaultCanvas = 'TGDIPlusCanvas'
         PrintMargins = (
           24

@@ -462,6 +462,7 @@ type
     procedure ShellListOwnerDataFetch(Sender: TObject; Item: TListItem; Request: TItemRequest; AFolder: TShellFolder);
     procedure ShellListColumnResized(Sender: TObject);
     procedure ShellListMouseWheel(Sender: TObject; Shift: TShiftState; WheelDelta: Integer; MousePos: TPoint; var Handled: Boolean);
+    procedure SelectPrevNext(const Down: boolean);
 
     procedure CounterETEvent(Counter: integer);
     procedure ResetRootShowAll;
@@ -898,7 +899,7 @@ var
   ETcmd, TagValue, Tx: string;
   ETout, ETerr: string;
 begin
-  if (SpeedBtnQuickSave.Enabled = false) then // If called from CTRL+S from metadatalist
+  if (SpeedBtnQuickSave.Enabled = false) then // If called from CTRL+S from metadatalist, or regions
     exit;
 
   SavedRow := MetadataList.Row;
@@ -969,6 +970,10 @@ begin
   if (ET.OpenExec(ETcmd, GetSelectedFiles, ETout, ETerr)) then
   begin
     RefreshSelected(Sender);
+////TODO Save Regions?
+//    if (Sender <> BtnRegionSave) then
+//      BtnRegionSaveClick(SpeedBtnQuickSave);
+
     ShowMetadata;
     ShowPreview;
   end;
@@ -993,7 +998,10 @@ begin
   begin
     if (Rect.W > 0.001) and
        (Rect.H > 0.001) then
+    begin
       Regions.Items[Index].RegionRect := Rect;
+      Regions.Modified := true;
+    end;
     ShowRegionInfo(Index);
   end;
 end;
@@ -1031,13 +1039,8 @@ begin
   if (Assigned(Regions)) then
   begin
     Index := CurRegion;
-    if (Index > -1) and
-       (Index < Regions.Items.Count) then
-    begin
-      Regions.Items[Index].Free;
-      Regions.Items.Delete(Index);
+    if (Regions.Delete(Index)) then
       LvRegions.Items.Delete(Index);
-    end;
     Index := Min(Index, LvRegions.Items.Count -1);
   end;
   ShowRegionInfo(Index);
@@ -1072,12 +1075,21 @@ procedure TFMain.BtnRegionSaveClick(Sender: TObject);
 var
   FName: string;
 begin
+  if (BtnRegionSave.Enabled = false) then
+    exit;
+
   if (Assigned(Regions)) then
   begin
     FName := GetSelectedFile(ShellList.RelFileName);
     if (FName = '') then
       exit;
+
+////TODO Save Metadata first?
+//    if (Sender <> SpeedBtnQuickSave) then
+//      BtnQuickSaveClick(BtnRegionSave);
+
     Regions.SaveToFile(FName);
+    ShowRegionInfo(CurRegion);
     ShowMetadata;
     RefreshSelected(Sender);
   end;
@@ -1469,45 +1481,6 @@ end;
 // Event handler for CTRL Keydown.
 // Allows intercepting CTRL/VK_UP CTRL/VK_DOWN
 procedure TFMain.MetadataListCtrlKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
-
-  function CheckIndex(var Indx: integer): boolean;
-  begin
-    result := (ShellList.Items.Count > 0);
-    if (Indx < 0) then
-      Indx := 0;
-    if (Indx > ShellList.Items.Count -1) then
-      Indx := ShellList.Items.Count -1;
-  end;
-
-  procedure SelectPrevNext(const Down: boolean);
-  var
-    Old: integer;
-    New: integer;
-  begin
-    // Current
-    if Assigned(ShellList.Selected) then
-      Old := ShellList.Selected.Index
-    else
-      Old := ShellList.ItemIndex;
-    if not CheckIndex(Old) then
-      exit;
-
-    If (Down) then
-      New := Old + 1
-    else
-      New := Old - 1;
-    if not CheckIndex(New) then
-      exit;
-
-    // Select only the item, and make that visible
-    ShellList.ClearSelection;
-    ShellList.Items[New].Selected := true;
-    ShellList.Items[New].MakeVisible(false);
-
-    // Simulate a click on the new item, will load Metadata etc.
-    ShellListClick(ShellList);
-  end;
-
 begin
   case Key of
     Ord('S'):
@@ -1535,7 +1508,7 @@ begin
         SelectPrevNext(Key = VK_DOWN);
         Key := 0; // Dont want the inherited code. Scrolls to begin/end of Metadatalist
       end;
-    end;
+  end;
 end;
 
 procedure TFMain.MetadataListMouseDown(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: integer);
@@ -2037,6 +2010,7 @@ begin
   Region.RegionRect := Rect;
   Region.Show := LvRegions.Items[CurRegion].Checked;
   RotateImg.DrawSelectionRects(Regions.Items);
+  Regions.Modified := true;
 end;
 
 procedure TFMain.MCustomOptionsClick(Sender: TObject);
@@ -3308,6 +3282,9 @@ begin
   MinFileListWidth := AdvPageFilelist.Constraints.MinWidth;
   AdvPageFilelist.Constraints.MinWidth := 0;
 
+  // Check Preview height
+  ResizePreview;
+
   // Tray Icon
   TrayIcon.Hint := GetFileVersionNumberPlatForm(Application.ExeName);
 
@@ -3399,6 +3376,11 @@ begin
       case Key of
         Ord('S'):
           BtnRegionSaveClick(BtnRegionSave);
+      VK_UP, VK_DOWN:
+        begin
+          SelectPrevNext(Key = VK_DOWN);
+          Key := 0; // Dont want the inherited code. BtnRegionMaximize.down is reset
+        end;
       end;
     end;
 
@@ -3461,6 +3443,14 @@ begin
         SpeedBtn_ETdirect.Down := not SpeedBtn_ETdirect.Down;
         SpeedBtn_ETdirectClick(SpeedBtn_ETdirect);
       end;
+      Ord('R'): //Edit regions
+      begin
+        if (AdvPagePreview.TabIndex = 0) then
+          AdvPagePreview.TabIndex := 1
+        else
+          AdvPagePreview.TabIndex := 0;
+        AdvPagePreviewChange(AdvPagePreview);
+      end;
       // datetime shift     = ALT/M, E
       // datetime equalize  = ALT/M, X
       // remove metadata    = ALT/M, R
@@ -3475,6 +3465,7 @@ begin
     1,      // CTRL/A
     4,      // CTRL/D
     12,     // CTRL/L
+    18,     // CTRL/R
     20,     // CTRL/T
     23:     // CTRL/W
       Key := #0;  // No Bell
@@ -3495,6 +3486,46 @@ begin
   if (ssAlt in shift) then
     ShellList.SetIconSpacing(0, 0);
 end;
+
+procedure TFMain.SelectPrevNext(const Down: boolean);
+var
+  Old: integer;
+  New: integer;
+
+  function CheckIndex(var Indx: integer): boolean;
+  begin
+    result := (ShellList.Items.Count > 0);
+    if (Indx < 0) then
+      Indx := 0;
+    if (Indx > ShellList.Items.Count -1) then
+      Indx := ShellList.Items.Count -1;
+  end;
+
+begin
+  // Current
+  if Assigned(ShellList.Selected) then
+    Old := ShellList.Selected.Index
+  else
+    Old := ShellList.ItemIndex;
+  if not CheckIndex(Old) then
+    exit;
+
+  If (Down) then
+    New := Old + 1
+  else
+    New := Old - 1;
+  if not CheckIndex(New) then
+    exit;
+
+  // Select only the item, and make that visible
+  ShellList.ClearSelection;
+  ShellList.Items[New].Selected := true;
+  ShellList.Items[New].MakeVisible(false);
+
+  // Simulate a click on the new item, will load Metadata etc.
+  ShellListClick(ShellList);
+end;
+
 
 // ---------------Drag_Drop procs --------------------
 procedure TFMain.CreateWnd;
@@ -4290,6 +4321,13 @@ begin
   PnlRegionWH.Enabled := PnlRegionData.Enabled;
   RotateImg.SelectionEnabled := PnlRegionData.Enabled;
 
+  BtnRegionAdd.Enabled  := (ShellList.SelectedFolder <> nil) and
+                           (ShellList.SelectedFolder.IsFolder = false);
+  BtnRegionDel.Enabled  := (Assigned(Regions)) and
+                           (Regions.Items.Count > 0);
+  BtnRegionSave.Enabled := (Assigned(Regions)) and
+                           (Regions.Modified = true);
+
   if not Assigned(Regions) then
     exit;
 
@@ -4412,6 +4450,7 @@ begin
   Item.Caption := S;
   Region.RegionName := S;
   EdRegionName.Text := Region.RegionName;
+  Regions.Modified := true;
 end;
 
 procedure TFMain.LvRegionsItemChecked(Sender: TObject; Item: TListItem);
