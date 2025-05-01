@@ -43,15 +43,18 @@ type
     FDimH: integer;
     FUnits: string;
     FLoading: boolean;
+    FModified: boolean;
   public
     constructor Create(ADimW, AImgW, ADimH, AImgH: integer; AUnits: string);
     destructor Destroy; override;
     procedure Clear;
     function Add(ARegion: TRegion): TRegion;
+    function Delete(Index: integer): boolean;
     class function LoadFromFile(AFile: string): TRegions;
     procedure SaveToFile(AFile: string);
     property Items: TRegionList read FItems;
     property Loading: boolean read FLoading write FLoading;
+    property Modified: boolean read FModified write FModified;
   end;
 
 implementation
@@ -105,6 +108,7 @@ constructor TRegions.Create(ADimW, AImgW, ADimH, AImgH: integer; AUnits: string)
 begin
   inherited Create;
   Floading := true;
+  FModified := false;
 
   if (ADimW <> 0) then
     FDimW := ADimW
@@ -144,8 +148,23 @@ end;
 
 function TRegions.Add(ARegion: TRegion): TRegion;
 begin
+  FModified := true;
+
   Items.Add(ARegion);
   result := ARegion;
+end;
+
+function TRegions.Delete(Index: integer): boolean;
+begin
+  result := false;
+  if (Index > -1) and
+   (Index < Items.Count) then
+  begin
+    Items[Index].Free;
+    Items.Delete(Index);
+    result := true;
+    FModified := true;
+  end;
 end;
 
 class function TRegions.LoadFromFile(AFile: string): TRegions;
@@ -242,6 +261,7 @@ begin
       if (ARegion.IsEmpty = false) then
         result.Add(TRegion.Create(ARegion, AUnit, AName, ADescription, ARegionType));
     end;
+    result.Modified := false;
 
   finally
     ET.Options.SetSeparator(SavedSep);
@@ -313,6 +333,7 @@ begin
              RegionRect + CRLF;
 
     ET.OpenExec(ETcmd, AFile);
+    FModified := false;
 
   finally
     ET.Options.SetSeparator(SavedSep);
