@@ -321,11 +321,11 @@ object FMain: TFMain
             Margins.Bottom = 1
             Align = alLeft
             AllowAllUp = True
-            GroupIndex = 10
             ImageIndex = 2
             ImageName = 'freepik_region_save'
             Images = VirtualImageRegions
             OnClick = BtnRegionSaveClick
+            ExplicitTop = 0
           end
           object BtnRegionAdd: TSpeedButton
             AlignWithMargins = True
@@ -339,7 +339,6 @@ object FMain: TFMain
             Margins.Bottom = 1
             Align = alLeft
             AllowAllUp = True
-            GroupIndex = 10
             ImageIndex = 0
             ImageName = 'freepik_region_add'
             Images = VirtualImageRegions
@@ -357,7 +356,6 @@ object FMain: TFMain
             Margins.Bottom = 1
             Align = alLeft
             AllowAllUp = True
-            GroupIndex = 10
             ImageIndex = 1
             ImageName = 'freepik_region_remove'
             Images = VirtualImageRegions
