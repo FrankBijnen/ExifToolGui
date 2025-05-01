@@ -2011,6 +2011,7 @@ begin
   Region.Show := LvRegions.Items[CurRegion].Checked;
   RotateImg.DrawSelectionRects(Regions.Items);
   Regions.Modified := true;
+  BtnRegionSave.Enabled := true;
 end;
 
 procedure TFMain.MCustomOptionsClick(Sender: TObject);
@@ -3362,20 +3363,33 @@ procedure TFMain.FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState)
 var
   MaximizeState: boolean;
 begin
+  MaximizeState := BtnRegionMaximize.Down;
 
-  if (PnlRegion.Visible) then
+  if (ssAlt in Shift) then
   begin
-    MaximizeState := BtnRegionMaximize.Down;
+    case Key of
+      VK_UP:
+        begin
+          MaximizeState := true;
+          Key := 0;
+        end;
+      VK_DOWN:
+        begin
+          MaximizeState := false;
+          Key := 0;
+        end;
+    end;
+  end;
+
+  if (BtnRegionMaximize.Down) then
+  begin
     case Key of
       VK_ESCAPE:
           MaximizeState := false;
     end;
-
     if (ssCTRL in Shift) then
     begin
       case Key of
-        Ord('S'):
-          BtnRegionSaveClick(BtnRegionSave);
       VK_UP, VK_DOWN:
         begin
           SelectPrevNext(Key = VK_DOWN);
@@ -3383,22 +3397,21 @@ begin
         end;
       end;
     end;
+  end;
 
-    if (ssAlt in Shift) then
-    begin
-      case Key of
-        VK_UP:
-          MaximizeState := true;
-        VK_DOWN:
-          MaximizeState := false;
-      end;
+  if (PnlRegion.Visible) and
+     (ssCTRL in Shift) then
+  begin
+    case Key of
+      Ord('S'):
+        BtnRegionSaveClick(BtnRegionSave);
     end;
+  end;
 
-    if (MaximizeState <> BtnRegionMaximize.Down) then
-    begin
-      BtnRegionMaximize.Down := MaximizeState;
-      BtnRegionMaximizeClick(BtnRegionMaximize);
-    end;
+  if (MaximizeState <> BtnRegionMaximize.Down) then
+  begin
+    BtnRegionMaximize.Down := MaximizeState;
+    BtnRegionMaximizeClick(BtnRegionMaximize);
   end;
 
   if (ssCTRL in Shift) then
@@ -3520,6 +3533,7 @@ begin
   // Select only the item, and make that visible
   ShellList.ClearSelection;
   ShellList.Items[New].Selected := true;
+  ShellList.Items[New].Focused := true;
   ShellList.Items[New].MakeVisible(false);
 
   // Simulate a click on the new item, will load Metadata etc.
