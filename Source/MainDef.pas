@@ -804,7 +804,7 @@ begin
   begin
     // First do the Panels
     AdvPanelBrowse.Width := ReadInteger(Ini_ETGUI, 'BrowseWidth', ScaleDesignDpi(240));
-    AdvPagePreview.Height := ReadInteger(Ini_ETGUI, 'PreviewHeight', 220);
+    NormalPreviewHeight := ReadInteger(Ini_ETGUI, 'PreviewHeight', ScaleDesignDpi(220));
     AdvPageMetadata.Width := ReadInteger(Ini_ETGUI, 'MetadataWidth', ScaleDesignDpi(322));
     MetadataList.ColWidths[0] := ReadInteger(Ini_ETGUI, 'MetadataTagWidth', ScaleDesignDpi(144));
 

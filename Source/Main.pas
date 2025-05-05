@@ -1059,11 +1059,11 @@ begin
     AdvPagePreview.Height := Self.ClientHeight
   else
   begin
-    if (NormalPreviewHeight > Self.ClientHeight - AdvTabBrowse.Height) then
-      NormalPreviewHeight := Self.ClientHeight - AdvTabBrowse.Height;
+    if (ClientHeight - NormalPreviewHeight < Splitter3.MinSize) then
+      NormalPreviewHeight := ClientHeight - Splitter3.MinSize;
     AdvPagePreview.Height := NormalPreviewHeight;
-    AdvPagePreview.Align := alBottom;
   end;
+  AdvPagePreview.Align := alBottom;
 end;
 
 procedure TFMain.MaximizeOrRestoreImage;
@@ -3289,13 +3289,13 @@ begin
   ReadFormSizes(Self, Self.DefWindowSizes);
   ReadGUIini;
 
+  // Check Preview height. ReadGUIini reads NormalPreviewHeight
+  ResizePreview;
+
   // AdvPageFilelist.Constraints.MinWidth only used at design time. Form does not align well.
   // We check for MinFileListWidth in code.
   MinFileListWidth := AdvPageFilelist.Constraints.MinWidth;
   AdvPageFilelist.Constraints.MinWidth := 0;
-
-  // Check Preview height
-  ResizePreview;
 
   // Tray Icon
   TrayIcon.Hint := GetFileVersionNumberPlatForm(Application.ExeName);
