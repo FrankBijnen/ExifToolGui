@@ -1038,6 +1038,8 @@ begin
   AnItem.Focused := true;
 
   ShowRegionInfo(AnItem.Index);
+
+  EdRegionName.SetFocus;
 end;
 
 procedure TFMain.BtnRegionDelClick(Sender: TObject);
@@ -3387,6 +3389,8 @@ begin
      (ssCTRL in Shift) then
   begin
     case Key of
+      Ord('I'):
+        BtnRegionAddClick(BtnRegionAdd);
       Ord('S'):
         BtnRegionSaveClick(BtnRegionSave);
     end;
