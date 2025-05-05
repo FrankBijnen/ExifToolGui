@@ -4352,7 +4352,7 @@ begin
   RotateImg.SelectionEnabled := PnlRegionData.Enabled;
 
   BtnRegionAdd.Enabled  := (ShellList.SelectedFolder <> nil) and
-                           (ShellList.SelectedFolder.IsFolder = false);
+                           (TSubShellFolder.GetIsFolder((ShellList.SelectedFolder)) = false);
   BtnRegionDel.Enabled  := (Assigned(Regions)) and
                            (Regions.Items.Count > 0);
   BtnRegionSave.Enabled := (Assigned(Regions)) and
