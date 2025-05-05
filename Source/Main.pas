@@ -3374,7 +3374,17 @@ procedure TFMain.FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState)
 var
   MaximizeState: boolean;
 begin
-// Key handlers for Regions
+  // Save region data?
+  if (PnlRegion.Visible) and
+     (ssCTRL in Shift) then
+  begin
+    case Key of
+      Ord('S'):
+        BtnRegionSaveClick(BtnRegionSave);
+    end;
+  end;
+
+  // Key handlers for Regions
   MaximizeState := BtnRegionMaximize.Down;
 
   if (ssAlt in Shift) then
@@ -3415,17 +3425,8 @@ begin
   if (MaximizeState <> BtnRegionMaximize.Down) then
   begin
     BtnRegionMaximize.Down := MaximizeState;
+    // Calling MaximizeOrRestore directly can cause AV when used with Escape and inline editing of LvRegions.
     PostMessage(Handle, CM_MaximizeWindow, 0 ,0);
-  end;
-
-  // Save region data?
-  if (PnlRegion.Visible) and
-     (ssCTRL in Shift) then
-  begin
-    case Key of
-      Ord('S'):
-        BtnRegionSaveClick(BtnRegionSave);
-    end;
   end;
 
   // CTRL Key handlers for setting focus
