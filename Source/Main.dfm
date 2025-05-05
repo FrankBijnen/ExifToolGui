@@ -96,6 +96,7 @@ object FMain: TFMain
       AutoSnap = False
       MinSize = 128
       ResizeStyle = rsLine
+      OnMoved = Splitter3Moved
       ExplicitTop = 362
       ExplicitWidth = 238
     end
@@ -134,6 +135,7 @@ object FMain: TFMain
           ShowRoot = False
           TabOrder = 0
           OnKeyDown = ShellTreeKeyDown
+          OnKeyPress = ShellTreeKeyPress
           OnChanging = ShellTreeChanging
           OnEdited = ShellTreeEdited
         end
@@ -1293,7 +1295,6 @@ object FMain: TFMain
     Top = 0
     Width = 980
     Height = 25
-    UseSystemFont = False
     ActionManager = MainActionManager
     Caption = 'ActionMainMenuBar'
     Color = clMenuBar
@@ -1302,7 +1303,7 @@ object FMain: TFMain
     ColorMap.BtnSelectedFont = clBlack
     ColorMap.UnusedColor = clWhite
     Font.Charset = DEFAULT_CHARSET
-    Font.Color = clBlack
+    Font.Color = clWindowText
     Font.Height = -12
     Font.Name = 'Segoe UI'
     Font.Style = []
