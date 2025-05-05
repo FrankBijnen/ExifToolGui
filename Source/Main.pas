@@ -403,6 +403,8 @@ type
     procedure LvRegionsItemChecked(Sender: TObject; Item: TListItem);
     procedure BtnRegionMaximizeClick(Sender: TObject);
     procedure FormResize(Sender: TObject);
+    procedure Splitter3Moved(Sender: TObject);
+    procedure ShellTreeKeyPress(Sender: TObject; var Key: Char);
   private
     { Private declarations }
     ETBarSeriesFocal: TBarSeries;
@@ -1055,27 +1057,36 @@ end;
 
 procedure TFMain.ResizePreview;
 begin
-  if (BtnRegionMaximize.Down) then
-    AdvPagePreview.Height := Self.ClientHeight
-  else
+  if (WindowState <> wsMinimized) and
+     (Showing) then
   begin
-    if (ClientHeight - NormalPreviewHeight < Splitter3.MinSize) then
-      NormalPreviewHeight := ClientHeight - Splitter3.MinSize;
-    AdvPagePreview.Height := NormalPreviewHeight;
+    if (BtnRegionMaximize.Down) then
+      AdvPagePreview.Height := Self.ClientHeight
+    else
+    begin
+      if (ClientHeight - NormalPreviewHeight < Splitter3.MinSize) then
+        NormalPreviewHeight := ClientHeight - Splitter3.MinSize;
+      AdvPagePreview.Height := NormalPreviewHeight;
+    end;
+    AdvPagePreview.Align := alBottom;
   end;
-  AdvPagePreview.Align := alBottom;
 end;
 
 procedure TFMain.MaximizeOrRestoreImage;
 begin
-  if (BtnRegionMaximize.Down) then
-  begin
-    AdvPagePreview.Parent := Self;
-    NormalPreviewHeight := AdvPagePreview.Height;
-  end
-  else
-    AdvPagePreview.Parent := AdvPanelBrowse;
-  ResizePreview;
+  LockDrawing;
+  try
+    if (BtnRegionMaximize.Down) then
+    begin
+      NormalPreviewHeight := AdvPagePreview.Height;
+      AdvPagePreview.Parent := Self;
+    end
+    else
+      AdvPagePreview.Parent := AdvPanelBrowse;
+    ResizePreview;
+  finally
+    UnlockDrawing;
+  end;
 end;
 
 procedure TFMain.BtnRegionMaximizeClick(Sender: TObject);
@@ -3289,9 +3300,6 @@ begin
   ReadFormSizes(Self, Self.DefWindowSizes);
   ReadGUIini;
 
-  // Check Preview height. ReadGUIini reads NormalPreviewHeight
-  ResizePreview;
-
   // AdvPageFilelist.Constraints.MinWidth only used at design time. Form does not align well.
   // We check for MinFileListWidth in code.
   MinFileListWidth := AdvPageFilelist.Constraints.MinWidth;
@@ -3503,8 +3511,7 @@ end;
 
 procedure TFMain.FormResize(Sender: TObject);
 begin
-  if (BtnRegionMaximize.Down) then
-    ResizePreview;
+  ResizePreview;
 end;
 
 procedure TFMain.ShellListMouseWheel(Sender: TObject; Shift: TShiftState; WheelDelta: Integer; MousePos: TPoint; var Handled: Boolean);
@@ -4197,6 +4204,14 @@ begin
   if (Key = VK_F2) and
      (Shelltree.Selected <> nil) then
     ShellTree.Selected.EditText;
+end;
+
+procedure TFMain.ShellTreeKeyPress(Sender: TObject; var Key: Char);
+begin
+  case Ord(Key) of
+    VK_ESCAPE:
+      Key := #0;  // No Bell
+  end;
 end;
 
 procedure TFMain.RefreshSelected(Sender: TObject);
@@ -4941,6 +4956,12 @@ end;
 procedure TFMain.Splitter2Moved(Sender: TObject);
 begin
   AlignStatusBar;
+end;
+
+procedure TFMain.Splitter3Moved(Sender: TObject);
+begin
+  if (BtnRegionMaximize.Down = false) then
+    NormalPreviewHeight := AdvPagePreview.Height;
 end;
 
 procedure TFMain.GetColorsFromStyle;
