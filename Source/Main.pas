@@ -43,6 +43,7 @@ uses
 
 const
   CM_ActivateWindow = WM_USER + 100;
+  CM_MaximizeWindow = WM_USER + 101;
 
 type
   TMetaDataTab = (mtQuick, mtExif, mtXMP, mtIPTC, mtMaker, mtALL, mtCustom);
@@ -440,6 +441,7 @@ type
     function SetCustomTabStop: boolean;
     procedure CMDialogKey(var AMessage: TCMDialogKey); message CM_DIALOGKEY;
     procedure CMActivateWindow(var Message: TMessage); message CM_ActivateWindow;
+    procedure CMMaximizeWindow(var Message: TMessage); message CM_MaximizeWindow;
     procedure WMEndSession(var Msg: TWMEndSession); message WM_ENDSESSION;
     function TranslateTagName(xMeta, xName: string): string;
     function TagCmd: string;
@@ -477,6 +479,7 @@ type
     procedure CreateHashFiles(HashType: integer);
     procedure SelectionDone(Sender: TObject; Rect: TRegionRect);
     procedure ResizePreview;
+    procedure MaximizeOrRestoreImage;
   protected
     procedure CreateWnd; override;
     procedure DestroyWnd; override;
@@ -637,6 +640,14 @@ begin
 
   NewSharedDir := FSharedMem.NewDirectory;
   ShellTree.Path := NewSharedDir;
+
+  Message.Result := 0;
+  inherited;
+end;
+
+procedure TFMain.CMMaximizeWindow(var Message: TMessage);
+begin
+  MaximizeOrRestoreImage;
 
   Message.Result := 0;
   inherited;
@@ -970,10 +981,6 @@ begin
   if (ET.OpenExec(ETcmd, GetSelectedFiles, ETout, ETerr)) then
   begin
     RefreshSelected(Sender);
-////TODO Save Regions?
-//    if (Sender <> BtnRegionSave) then
-//      BtnRegionSaveClick(SpeedBtnQuickSave);
-
     ShowMetadata;
     ShowPreview;
   end;
@@ -1059,7 +1066,7 @@ begin
   end;
 end;
 
-procedure TFMain.BtnRegionMaximizeClick(Sender: TObject);
+procedure TFMain.MaximizeOrRestoreImage;
 begin
   if (BtnRegionMaximize.Down) then
   begin
@@ -1069,6 +1076,11 @@ begin
   else
     AdvPagePreview.Parent := AdvPanelBrowse;
   ResizePreview;
+end;
+
+procedure TFMain.BtnRegionMaximizeClick(Sender: TObject);
+begin
+  MaximizeOrRestoreImage;
 end;
 
 procedure TFMain.BtnRegionSaveClick(Sender: TObject);
@@ -1083,10 +1095,6 @@ begin
     FName := GetSelectedFile(ShellList.RelFileName);
     if (FName = '') then
       exit;
-
-////TODO Save Metadata first?
-//    if (Sender <> SpeedBtnQuickSave) then
-//      BtnQuickSaveClick(BtnRegionSave);
 
     Regions.SaveToFile(FName);
     ShowRegionInfo(CurRegion);
@@ -2947,7 +2955,10 @@ begin
         ResizeBitmapCanvas(ABitMap, RotateImg.Width, RotateImg.Height, GUIColorWindow);
       end
       else
+      begin
+        RotateImg.ImageDimensions := ShellList.GetThumbNailSize(ShellList.Selected.Index, RotateImg.Width, RotateImg.Height);
         ABitMap := ShellList.GetThumbNail(ShellList.Selected.Index, RotateImg.Width, RotateImg.Height);
+      end;
       RotateImg.Picture.Bitmap := ABitMap;
 
       ShowRegions;
@@ -3363,6 +3374,7 @@ procedure TFMain.FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState)
 var
   MaximizeState: boolean;
 begin
+// Key handlers for Regions
   MaximizeState := BtnRegionMaximize.Down;
 
   if (ssAlt in Shift) then
@@ -3385,20 +3397,28 @@ begin
   begin
     case Key of
       VK_ESCAPE:
+        if (LvRegions.IsEditing = false) then
+        begin
           MaximizeState := false;
-    end;
-    if (ssCTRL in Shift) then
-    begin
-      case Key of
+          Key := 0;
+        end;
       VK_UP, VK_DOWN:
+        if (ssCTRL in Shift) then
         begin
           SelectPrevNext(Key = VK_DOWN);
-          Key := 0; // Dont want the inherited code. BtnRegionMaximize.down is reset
+          Key := 0;
         end;
-      end;
     end;
   end;
 
+  // Need to resize the image?
+  if (MaximizeState <> BtnRegionMaximize.Down) then
+  begin
+    BtnRegionMaximize.Down := MaximizeState;
+    PostMessage(Handle, CM_MaximizeWindow, 0 ,0);
+  end;
+
+  // Save region data?
   if (PnlRegion.Visible) and
      (ssCTRL in Shift) then
   begin
@@ -3408,12 +3428,7 @@ begin
     end;
   end;
 
-  if (MaximizeState <> BtnRegionMaximize.Down) then
-  begin
-    BtnRegionMaximize.Down := MaximizeState;
-    BtnRegionMaximizeClick(BtnRegionMaximize);
-  end;
-
+  // CTRL Key handlers for setting focus
   if (ssCTRL in Shift) then
   begin
     case Key of

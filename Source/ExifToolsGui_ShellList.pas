@@ -164,6 +164,7 @@ type
     function GetIconSpacing: dword;
     procedure SetIconSpacing(Cx, Cy: word); overload;
     procedure SetIconSpacing(Cx, Cy: integer); overload;
+    function GetThumbNailSize(ItemIndex, W, H: integer): TPoint;
     function GetThumbNail(ItemIndex, W, H: integer): TBitmap;
     procedure SetFocus; override;
 
@@ -1546,6 +1547,21 @@ begin
 // Avoid cannot focus a disabled or invisible window
   if Enabled then
     inherited SetFocus;
+end;
+
+function TShellListView.GetThumbNailSize(ItemIndex, W, H: integer): TPoint;
+var
+  Hr: HRESULT;
+  HBmp: HBITMAP;
+  Bm: BITMAP;
+begin
+  result := Point(W, H);
+  Hr := GetThumbCache(Folders[ItemIndex].AbsoluteID, TThumbType.ttThumbBiggerCache, W, H, HBmp);
+  if (HR = S_OK) then
+  begin
+    GetObject(HBmp, sizeof(BITMAP), @Bm);
+    NewSizeRetainRatio(Bm.bmWidth, Bm.bmHeight, W, H, result.X, result.Y);
+  end;
 end;
 
 function TShellListView.GetThumbNail(ItemIndex, W, H: integer): TBitmap;

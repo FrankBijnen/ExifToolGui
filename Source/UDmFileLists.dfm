@@ -9,13 +9,7 @@ object DmFileLists: TDmFileLists
     Top = 32
   end
   object CdsFileListDef: TClientDataSet
-    Aggregates = <
-      item
-        Visible = False
-      end
-      item
-        Visible = False
-      end>
+    Aggregates = <>
     Params = <>
     BeforeInsert = CdsFileListDefBeforeInsert
     AfterInsert = CdsFileListDefAfterInsert
