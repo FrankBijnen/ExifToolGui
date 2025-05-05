@@ -42,7 +42,7 @@ type
     FDimW: integer;
     FDimH: integer;
     FUnits: string;
-    FLoading: boolean;
+    FUpdating: boolean;
     FModified: boolean;
   public
     constructor Create(ADimW, AImgW, ADimH, AImgH: integer; AUnits: string);
@@ -53,7 +53,7 @@ type
     class function LoadFromFile(AFile: string): TRegions;
     procedure SaveToFile(AFile: string);
     property Items: TRegionList read FItems;
-    property Loading: boolean read FLoading write FLoading;
+    property Updating: boolean read FUpdating write FUpdating;
     property Modified: boolean read FModified write FModified;
   end;
 
@@ -107,7 +107,7 @@ end;
 constructor TRegions.Create(ADimW, AImgW, ADimH, AImgH: integer; AUnits: string);
 begin
   inherited Create;
-  Floading := true;
+  FUpdating := true;
   FModified := false;
 
   if (ADimW <> 0) then
@@ -262,6 +262,7 @@ begin
         result.Add(TRegion.Create(ARegion, AUnit, AName, ADescription, ARegionType));
     end;
     result.Modified := false;
+    result.Updating := false;
 
   finally
     ET.Options.SetSeparator(SavedSep);
@@ -333,7 +334,9 @@ begin
              RegionRect + CRLF;
 
     ET.OpenExec(ETcmd, AFile);
-    FModified := false;
+
+    Modified := false;
+    Updating := false;
 
   finally
     ET.Options.SetSeparator(SavedSep);
