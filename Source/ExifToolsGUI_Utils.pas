@@ -101,6 +101,7 @@ function FormatExifDecimal(const AFloat: single; No_Decimals: integer): string; 
 function IsJpeg(Filename: string): boolean;
 function GetBitmapFromWic(const FWicBitmapSource: IWICBitmapSource): TBitmap;
 function WicPreview(AImg: string; Rotate, MaxW, MaxH: cardinal): IWICBitmapSource;
+procedure NewSizeRetainRatio(W, H, MaxW, MaxH: integer; var NewW, NewH: integer; Portrait: boolean = false);
 procedure ResizeBitmapCanvas(Bitmap: TBitmap; MaxW, MaxH: integer;
                              BackColor: TColor; Stretch: boolean = true);
 function BitMapFromHBitMap(ABmp: HBITMAP; W, H: Integer; BkColor: TColor): TBitMap;
@@ -1099,6 +1100,8 @@ var
   Left, Top: integer;
   ActualW, ActualH: integer;
 begin
+  ActualW := 0;
+  ActualH := 0;
   if (Stretch) then
   begin
     NewSizeRetainRatio(Bitmap.Width, Bitmap.Height, MaxW, MaxH, ActualW, ActualH);
