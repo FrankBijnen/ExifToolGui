@@ -1108,9 +1108,9 @@ begin
       exit;
 
     Regions.SaveToFile(FName);
-    ShowRegionInfo(CurRegion);
     ShowMetadata;
     RefreshSelected(Sender);
+    ShowRegionInfo(CurRegion);
   end;
 end;
 
@@ -1998,7 +1998,7 @@ var
 begin
   if not Assigned(Regions) then
     exit;
-  if Regions.Loading then
+  if Regions.Updating then
     exit;
 
   if (CurRegion < 0) or
@@ -4349,7 +4349,7 @@ var
   Region: TRegion;
 begin
   if Assigned(Regions) then
-    Regions.Loading := true;
+    Regions.Updating := true;
 
   CmbRegionType.Text := '-';
   EdRegionDescription.Text := '-';
@@ -4400,7 +4400,7 @@ begin
 
   finally
     RotateImg.DrawSelectionRects(Regions.Items);
-    Regions.Loading := false;
+    Regions.Updating := false;
   end;
 end;
 
