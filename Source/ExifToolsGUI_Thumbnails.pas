@@ -26,7 +26,7 @@ const
   CM_ThumbRefresh = WM_USER + 4;
 
 type
-  TThumbType = (ttIcon, ttThumb, ttThumbCache, ttThumbBiggerCache);
+  TThumbType = (ttIcon, ttThumb, ttThumbCache, ttThumbBiggerCache, ttThumbBiggerNoCache);
 
   TThumbTask = class(TTask, ITask)
   private
@@ -199,6 +199,8 @@ begin
       Flags := SIIGBF_THUMBNAILONLY or SIIGBF_INCACHEONLY;
     TThumbType.ttThumbBiggerCache:
       Flags := SIIGBF_THUMBNAILONLY or SIIGBF_BIGGERSIZEOK or SIIGBF_INCACHEONLY;
+    TThumbType.ttThumbBiggerNoCache:
+      Flags := SIIGBF_THUMBNAILONLY or SIIGBF_BIGGERSIZEOK;
     else
       exit;
   end;

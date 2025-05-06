@@ -14,6 +14,8 @@ type
     procedure IncValue(const Key: string);
   end;
 
+function GetSortedStringList: TStringList;
+
 implementation
 
 uses
@@ -69,6 +71,14 @@ begin
     Indx := IndexOfName(Key);
     Values[Key] := IntToStr(GetValue(Indx) + 1);
   end;
+end;
+
+function GetSortedStringList: TStringList;
+begin
+  result := TStringList.Create;
+  result.Sorted := true;
+  result.Duplicates := TDuplicates.dupIgnore;
+  result.CaseSensitive := false;
 end;
 
 end.

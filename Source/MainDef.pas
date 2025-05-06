@@ -195,7 +195,7 @@ implementation
 uses
   System.SysUtils, System.StrUtils,
   Vcl.Forms, Vcl.StdCtrls,
-  Main, UnitColumnDefs, ExifToolsGUI_Utils, ExifToolsGui_FileListColumns, ExifInfo, LogWin;
+  Main, ExifInfo, LogWin, UnitColumnDefs, ExifToolsGUI_Utils, ExifToolsGui_FileListColumns, ExifToolsGUI_StringList;
 
 const
   CRLF = #13#10;
@@ -1451,16 +1451,7 @@ begin
   end;
 end;
 
-function GetSortedStringList: TStringList;
-begin
-  result := TStringList.Create;
-  result.Sorted := true;
-  result.Duplicates := TDuplicates.dupIgnore;
-  result.CaseSensitive := false;
-end;
-
 initialization
-
 begin
   ETdirectCmdList := TStringList.Create;
 
@@ -1473,7 +1464,6 @@ begin
 end;
 
 finalization
-
 begin
   ETdirectCmdList.Free;
   PredefinedTagList.Free;
