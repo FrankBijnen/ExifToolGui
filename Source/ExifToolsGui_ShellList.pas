@@ -164,8 +164,8 @@ type
     function GetIconSpacing: dword;
     procedure SetIconSpacing(Cx, Cy: word); overload;
     procedure SetIconSpacing(Cx, Cy: integer); overload;
-    function GetThumbNailSize(ItemIndex, W, H: integer): TPoint;
-    function GetThumbNail(ItemIndex, W, H: integer): TBitmap;
+    function GetThumbNailSize(ItemIndex, W, H: integer; DefThumbType: TThumbType = ttThumbBiggerCache): TPoint;
+    function GetThumbNail(ItemIndex, W, H: integer; DefThumbType: TThumbType = ttThumbBiggerCache): TBitmap;
     procedure SetFocus; override;
 
     property OnColumnResized: TNotifyEvent read FOnColumnResized write FOnColumnResized;
@@ -1549,22 +1549,23 @@ begin
     inherited SetFocus;
 end;
 
-function TShellListView.GetThumbNailSize(ItemIndex, W, H: integer): TPoint;
+function TShellListView.GetThumbNailSize(ItemIndex, W, H: integer; DefThumbType: TThumbType = ttThumbBiggerCache): TPoint;
 var
   Hr: HRESULT;
   HBmp: HBITMAP;
   Bm: BITMAP;
 begin
   result := Point(W, H);
-  Hr := GetThumbCache(Folders[ItemIndex].AbsoluteID, TThumbType.ttThumbBiggerCache, W, H, HBmp);
+  Hr := GetThumbCache(Folders[ItemIndex].AbsoluteID, DefThumbType, W, H, HBmp);
   if (HR = S_OK) then
   begin
     GetObject(HBmp, sizeof(BITMAP), @Bm);
     NewSizeRetainRatio(Bm.bmWidth, Bm.bmHeight, W, H, result.X, result.Y);
+    DeleteObject(HBmp);
   end;
 end;
 
-function TShellListView.GetThumbNail(ItemIndex, W, H: integer): TBitmap;
+function TShellListView.GetThumbNail(ItemIndex, W, H: integer; DefThumbType: TThumbType = ttThumbBiggerCache): TBitmap;
 var
   Hr: HRESULT;
   HBmp: HBITMAP;
@@ -1575,7 +1576,7 @@ begin
     exit;
 
   // Get the cached (by Windows) thumbnail if avail
-  Hr := GetThumbCache(Folders[ItemIndex].AbsoluteID, TThumbType.ttThumbBiggerCache, W, H, HBmp);
+  Hr := GetThumbCache(Folders[ItemIndex].AbsoluteID, DefThumbType, W, H, HBmp);
   if (HR = S_OK) then
   begin
     result := BitMapFromHBitMap(HBmp, W, H, FBkColor);

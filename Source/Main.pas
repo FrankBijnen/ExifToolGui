@@ -1,5 +1,7 @@
 unit Main;
+
 {.$DEFINE DEBUG_META}
+
 // Note all code formatted with Delphi formatter, Right margin 80->150
 
 // Note about the Path.
@@ -237,7 +239,7 @@ type
     LvRegions: TListView;
     LblRegionXY: TLabel;
     LblRegionWH: TLabel;
-    EdRegionName: TLabeledEdit;
+    EdRegionName: ExifToolsGui_AutoEdit.TLabeledEdit;  // Need our own
     PnlRegionData: TPanel;
     BtnRegionMaximize: TSpeedButton;
     procedure ShellListClick(Sender: TObject);
@@ -405,6 +407,8 @@ type
     procedure FormResize(Sender: TObject);
     procedure Splitter3Moved(Sender: TObject);
     procedure ShellTreeKeyPress(Sender: TObject; var Key: Char);
+    procedure MetadataListKeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
+    procedure ShellTreeKeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
   private
     { Private declarations }
     ETBarSeriesFocal: TBarSeries;
@@ -419,6 +423,7 @@ type
     CustomTabStops: array of TWinControl;
     Regions: TRegions;
     CurRegion: integer;
+    RegionAutoComp: TAutoCompRec;
     procedure AlignStatusBar;
     procedure ImageDrop(var Msg: TWMDROPFILES); message WM_DROPFILES;
     procedure SetCaption(AnItem: string = '');
@@ -480,6 +485,7 @@ type
     procedure FileDateFromMetaData(GroupId: integer);
     procedure CreateHashFiles(HashType: integer);
     procedure SelectionDone(Sender: TObject; Rect: TRegionRect);
+    function ImageMaximized(var Key: word): boolean;
     procedure ResizePreview;
     procedure MaximizeOrRestoreImage;
   protected
@@ -772,6 +778,11 @@ begin
   GUIsettings.ETDAutoComp.SetAcList(ETdirectCmdList);
   if (Supports(EditETdirect, IAutoCompleteEdit)) then
     (EditETdirect as IAutoCompleteEdit).SetAutoCompOptions(GUIsettings.ETDAutoComp);
+
+  RegionAutoComp.SetAcOptions(TAutoCompleteMode.acAutoSuggest, true, false);
+  RegionAutoComp.SetAcList(RegionNameList);
+  if (Supports(EdRegionName, IAutoCompleteEdit)) then
+    (EdRegionName as IAutoCompleteEdit).SetAutoCompOptions(RegionAutoComp);
 end;
 
 procedure TFMain.CreateHashFiles(HashType: integer);
@@ -1040,6 +1051,7 @@ begin
   ShowRegionInfo(AnItem.Index);
 
   EdRegionName.SetFocus;
+  EdRegionName.SelectAll;
 end;
 
 procedure TFMain.BtnRegionDelClick(Sender: TObject);
@@ -1057,6 +1069,13 @@ begin
   ShowRegionInfo(Index);
 end;
 
+function TFMain.ImageMaximized(var Key: word): boolean;
+begin
+  result := BtnRegionMaximize.Down;
+  if (result) then
+    Key := 0;
+end;
+
 procedure TFMain.ResizePreview;
 begin
   if (WindowState <> wsMinimized) and
@@ -1069,6 +1088,10 @@ begin
       if (ClientHeight - NormalPreviewHeight < Splitter3.MinSize) then
         NormalPreviewHeight := ClientHeight - Splitter3.MinSize;
       AdvPagePreview.Height := NormalPreviewHeight;
+
+      if (ActiveControl = nil) then
+        ShellList.SetFocus;
+
     end;
     AdvPagePreview.Align := alBottom;
   end;
@@ -1085,7 +1108,9 @@ begin
     end
     else
       AdvPagePreview.Parent := AdvPanelBrowse;
+
     ResizePreview;
+
   finally
     UnlockDrawing;
   end;
@@ -1099,6 +1124,7 @@ end;
 procedure TFMain.BtnRegionSaveClick(Sender: TObject);
 var
   FName: string;
+  AnItem: TlistItem;
 begin
   if (BtnRegionSave.Enabled = false) then
     exit;
@@ -1110,8 +1136,18 @@ begin
       exit;
 
     Regions.SaveToFile(FName);
-    ShowMetadata;
+
     RefreshSelected(Sender);
+
+    ShowMetadata; // ShowMetadata reloads the regions
+    // Keep the checked state of the items
+    for AnItem in LvRegions.Items do
+    begin
+      if (AnItem.Index > -1) and
+         (AnItem.Index < Regions.Items.Count) then
+        Regions.Items[AnItem.Index].Show := AnItem.Checked;
+    end;
+
     ShowRegionInfo(CurRegion);
   end;
 end;
@@ -1443,6 +1479,9 @@ var
   InplaceEdit: TETGuiInplaceEdit;
   CurrentAutoComp: PAutoCompRec;
 begin
+  if (ImageMaximized(Key)) then
+    exit;
+
   if (SpeedBtnQuick.Down = false) then
     exit;
 
@@ -1497,6 +1536,12 @@ procedure TFMain.MetadataListKeyPress(Sender: TObject; var Key: Char);
 begin
   if (Key = Chr_Pause) then  // Only CTRL/S wanted
     NoBell(Key);             // no bell
+end;
+
+procedure TFMain.MetadataListKeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
+begin
+  if (ImageMaximized(Key)) then
+    exit;
 end;
 
 // Event handler for CTRL Keydown.
@@ -2002,7 +2047,6 @@ begin
     exit;
   if Regions.Updating then
     exit;
-
   if (CurRegion < 0) or
      (CurRegion > Regions.Items.Count -1) then
     exit;
@@ -2010,11 +2054,8 @@ begin
   Region := Regions.Items[CurRegion];
 
   // Name also in LvRegions
-  if (EdRegionName.Modified) then
-  begin
-    Region.RegionName := EdRegionName.Text;
-    LvRegions.Items[CurRegion].Caption := Region.RegionName;
-  end;
+  Region.RegionName := EdRegionName.Text;
+  LvRegions.Items[CurRegion].Caption := Region.RegionName;
 
   // Type, usually Face
   Region.RegionType := CmbRegionType.Text;
@@ -2915,71 +2956,63 @@ end;
 
 procedure TFMain.ShowPreview;
 var
-{$IFDEF DEBUG_META}
-  MetaData: TMetaData;
-  Tag: string;
-{$ENDIF}
   Foto: FotoRec;
   FPath: string;
   ABitMap: TBitmap;
+  ThumbType: TThumbType;
   CrWait, CrNormal: HCURSOR;
 begin
   RotateImg.Picture.Bitmap := nil;
+  if ShellList.SelCount = 0 then
+    exit;
+
+  CrWait := LoadCursor(0, IDC_WAIT);
+  CrNormal := SetCursor(CrWait);
   ABitMap := nil;
-  if ShellList.SelCount > 0 then
-  begin
-    CrWait := LoadCursor(0, IDC_WAIT);
-    CrNormal := SetCursor(CrWait);
-    try
-      FPath := ShellList.FilePath;
-      RotateImg.Rotate := 0;
-      if GUIsettings.AutoRotatePreview then
-      begin
-        Foto := GetMetadata(FPath, []);
-        case Foto.IFD0.OrientationValue of
-          0, 1:
-            RotateImg.Rotate := 0; // no tag or don't rotate
-          3:
-            RotateImg.Rotate := 180;
-          6:
-            RotateImg.Rotate := 90;
-          8:
-            RotateImg.Rotate := 270;
-        end;
- {$IFDEF DEBUG_META}
-        MetaData := TMetaData.Create;
-        try
-          MetaData.ReadMeta(FPath, [gmXMP, gmGPS]);
-          DebugMsg(['***', FPath, '***']);
-          for Tag in MetaData.FieldNames do
-            DebugMsg([Tag, MetaData.FieldData(Tag)]);
-          DebugMsg(['=====================================']);
-        finally
-        MetaData.Free;
-        end;
- {$ENDIF}
+  try
+    FPath := ShellList.FilePath;
+    RotateImg.Rotate := 0;
+    if GUIsettings.AutoRotatePreview then
+    begin
+      Foto := GetMetadata(FPath, []);
+      case Foto.IFD0.OrientationValue of
+        0, 1:
+          RotateImg.Rotate := 0; // no tag or don't rotate
+        3:
+          RotateImg.Rotate := 180;
+        6:
+          RotateImg.Rotate := 90;
+        8:
+          RotateImg.Rotate := 270;
       end;
-      RotateImg.ImageDimensions := Point(RotateImg.Width, RotateImg.Height);
-      if (FPath <> '') then // Directory?
-        ABitMap := GetBitmapFromWic(WicPreview(FPath, RotateImg.Rotate, RotateImg.Width, RotateImg.Height));
-      if (ABitMap <> nil) then
-      begin
-        RotateImg.ImageDimensions := Point(ABitMap.Width, ABitMap.Height);
-        ResizeBitmapCanvas(ABitMap, RotateImg.Width, RotateImg.Height, GUIColorWindow);
-      end
-      else
-      begin
-        RotateImg.ImageDimensions := ShellList.GetThumbNailSize(ShellList.Selected.Index, RotateImg.Width, RotateImg.Height);
-        ABitMap := ShellList.GetThumbNail(ShellList.Selected.Index, RotateImg.Width, RotateImg.Height);
-      end;
-      RotateImg.Picture.Bitmap := ABitMap;
-
-      ShowRegions;
-
-    finally
-      ABitMap.Free;
-      SetCursor(CrNormal);
     end;
+    RotateImg.ImageDimensions := Point(RotateImg.Width, RotateImg.Height);
+    if (FPath <> '') then // Directory?
+      ABitMap := GetBitmapFromWic(WicPreview(FPath, RotateImg.Rotate, RotateImg.Width, RotateImg.Height));
+    if (ABitMap <> nil) then
+    begin
+      RotateImg.ImageDimensions := Point(ABitMap.Width, ABitMap.Height);
+      ResizeBitmapCanvas(ABitMap, RotateImg.Width, RotateImg.Height, GUIColorWindow);
+    end
+    else
+    begin
+      ThumbType := ttThumbBiggerCache;
+      if (PnlRegion.Visible) then
+        ThumbType := ttThumbBiggerNoCache; // For Regions dont use the cache
+      RotateImg.ImageDimensions := ShellList.GetThumbNailSize(ShellList.Selected.Index,
+                                                              RotateImg.Width, RotateImg.Height,
+                                                              ThumbType);
+      ABitMap := ShellList.GetThumbNail(ShellList.Selected.Index,
+                                        RotateImg.Width, RotateImg.Height,
+                                        ThumbType);
+    end;
+    RotateImg.Picture.Bitmap := ABitMap;
+
+    ShowRegions;
+
+  finally
+    ABitMap.Free;
+    SetCursor(CrNormal);
   end;
 end;
 
@@ -4199,6 +4232,9 @@ end;
 
 procedure TFMain.ShellTreeKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
 begin
+  if (ImageMaximized(Key)) then
+    exit;
+
   if (ssCtrl in Shift) and (Key = Ord('C')) then
     ShellTree.FileNamesToClipboard(false);
   if (ssCtrl in Shift) and (Key = Ord('X')) then
@@ -4216,6 +4252,12 @@ begin
     VK_ESCAPE:
       Key := #0;  // No Bell
   end;
+end;
+
+procedure TFMain.ShellTreeKeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
+begin
+  if (ImageMaximized(Key)) then
+    exit;
 end;
 
 procedure TFMain.RefreshSelected(Sender: TObject);
@@ -4484,22 +4526,8 @@ begin
 end;
 
 procedure TFMain.LvRegionsEdited(Sender: TObject; Item: TListItem; var S: string);
-var
-  Region: TRegion;
 begin
-  if not Assigned(Regions) then
-    exit;
-
-  if (Item.Index < 0) or
-     (Item.Index > Regions.Items.Count -1) then
-    exit;
-
-  // Update Region Name
-  Region := Regions.Items[Item.Index];
-  Item.Caption := S;
-  Region.RegionName := S;
-  EdRegionName.Text := Region.RegionName;
-  Regions.Modified := true;
+  EdRegionName.Text := S;
 end;
 
 procedure TFMain.LvRegionsItemChecked(Sender: TObject; Item: TListItem);
@@ -4537,6 +4565,10 @@ var
   ETcmd, Item, Value, Tx: string;
   ETResult: TStringList;
   NoChars:  TSysCharSet;
+{$IFDEF DEBUG_META}
+  MetaData: TMetaData;
+  Tag: string;
+{$ENDIF}
 begin
   // Clear regions
   FreeAndNil(Regions);
@@ -4700,7 +4732,20 @@ begin
       end;
     end;
 
-    LoadRegions(GetSelectedFile(Item));
+    LoadRegions(Item);
+
+{$IFDEF DEBUG_META}
+    MetaData := TMetaData.Create;
+    try
+      MetaData.ReadMeta(GetSelectedFile(ShellList.RelFileName, true), [gmXMP, gmGPS]);
+      DebugMsg(['***', GetSelectedFile(ShellList.RelFileName, true), '***']);
+      for Tag in MetaData.FieldNames do
+        DebugMsg([Tag, MetaData.FieldData(Tag)]);
+      DebugMsg(['=====================================']);
+    finally
+      MetaData.Free;
+    end;
+{$ENDIF}
 
   finally
     ETResult.Free;

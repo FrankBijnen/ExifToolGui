@@ -136,6 +136,7 @@ object FMain: TFMain
           TabOrder = 0
           OnKeyDown = ShellTreeKeyDown
           OnKeyPress = ShellTreeKeyPress
+          OnKeyUp = ShellTreeKeyUp
           OnChanging = ShellTreeChanging
           OnEdited = ShellTreeEdited
         end
@@ -673,6 +674,7 @@ object FMain: TFMain
         OnExit = MetadataListExit
         OnKeyDown = MetadataListKeyDown
         OnKeyPress = MetadataListKeyPress
+        OnKeyUp = MetadataListKeyUp
         OnMouseDown = MetadataListMouseDown
         OnMouseMove = MetadataListMouseMove
         OnMouseUp = MetadataListMouseUp
@@ -1295,6 +1297,7 @@ object FMain: TFMain
     Top = 0
     Width = 980
     Height = 25
+    UseSystemFont = False
     ActionManager = MainActionManager
     Caption = 'ActionMainMenuBar'
     Color = clMenuBar
@@ -1303,7 +1306,7 @@ object FMain: TFMain
     ColorMap.BtnSelectedFont = clBlack
     ColorMap.UnusedColor = clWhite
     Font.Charset = DEFAULT_CHARSET
-    Font.Color = clWindowText
+    Font.Color = clBlack
     Font.Height = -12
     Font.Name = 'Segoe UI'
     Font.Style = []

@@ -57,11 +57,14 @@ type
     property Modified: boolean read FModified write FModified;
   end;
 
+var
+  RegionNameList: TStringList;
+
 implementation
 
 uses
   System.SysUtils,
-  ExifTool, ExifToolsGUI_Utils;
+  ExifTool, ExifToolsGUI_Utils, ExifToolsGUI_StringList;
 
 // Dont want a separator char that can be in a string. Like *, or :, #255 is unlikely
 const
@@ -149,7 +152,6 @@ end;
 function TRegions.Add(ARegion: TRegion): TRegion;
 begin
   FModified := true;
-
   Items.Add(ARegion);
   result := ARegion;
 end;
@@ -233,7 +235,10 @@ begin
     begin
       Inc(Cnt);
       AName           := NextItem(ETOuts, 5);
-      if (AName = '-') then
+
+      if (AName <> '-') then
+        RegionNameList.Add(AName)
+      else
         AName := Format('#%d', [Cnt]);
 
       ADescription    := NextItem(ETOuts, 6);
@@ -341,6 +346,16 @@ begin
   finally
     ET.Options.SetSeparator(SavedSep);
   end;
+end;
+
+initialization
+begin
+  RegionNameList := GetSortedStringList;
+end;
+
+finalization
+begin
+  RegionNameList.Free;
 end;
 
 end.
