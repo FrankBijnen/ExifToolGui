@@ -3,12 +3,10 @@
 
 This is an updated version of the ExifToolGui program created by Bogdan Hrastnik. Many thanks go out to him.
 
-<b>Released version: <b>V6.3.8</b> updated March 14, 2025</b><br>
+<b>Released version: <b>V6.3.9</b> updated May 9, 2025</b><br>
 
-- More keyboard usage improvements. In the workspace manager you can define auto complete + drop down lists. 
-  CTRL + (SHIFT) Left, Right arrow moves to/selects the previous/next word in the Workspace and ExifTool direct.
-  Redesigned the Workspace manager, to support this new feature.<br>
-- Exporting, importing setting has been revised. Allowing to save a selection of settings to export and import.<br>
+- Support tagging facial regions (RegionPersonDisplayName)<br>
+- Hash functions. (MD5, SHA1, SHA2)<br>
 - Various bugfixes.<br>
 - For the complete info see the [changelog](Docs/changelog.txt).<br>
 
