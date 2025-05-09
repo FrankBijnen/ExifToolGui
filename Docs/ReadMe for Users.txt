@@ -204,5 +204,10 @@ Changed with version 6.3.8
   Redesigned the Workspace manager, to support this new feature.
 - Exporting, importing setting has been revised. Allowing to save a selection of settings to export and import.
 
+Changed with version 6.3.9
+- Scrolling of the Metadata panel changed. It now works the same as the File list.
+- Last selected tab of the Metadata panel is saved and restored.
+- Added computing a Hash of selected files in the filelist and Workspace. Added menu item in Various to create Hash files.
+- Added support for displaying and editing regions in the preview.
 
 Frank
