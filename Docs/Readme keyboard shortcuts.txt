@@ -11,9 +11,9 @@ A summary of the most well known.
 
 Navigating in an input field, or list.
 
-- Home, End             Move to first, last item
-- Page Up, Down         Move to the previous, next page
-- Cursor Up, Down       Move to the previous, next line
+- Home, End             Move to first, last item.
+- Page Up, Down         Move to the previous, next page.
+- Cursor Up, Down       Move to the previous, next line.
 
 
 In addition some specific shortcuts are worth mentioning.
@@ -34,7 +34,7 @@ In the Directory treeview:
 
 In the File list
 
-- Cursor Left, Right    Move to the previous, next item in thumbnail mode
+- Cursor Left, Right    Move to the previous, next item in thumbnail mode.
 - CTRL A                Select all items.
 - CTRL X,C,V            Cut, Copy, Paste directory. Note: After using CTRL/X make sure to move to another directory, before pasting.
                         If you dont, deleting will fail, because ExifTool locks the directory.
@@ -45,37 +45,48 @@ In the File list
 
 In ExifTool direct.
 
-- Esc                   Closes ExifTool direct
-- Enter                 Executes command
-- Tab                   Focuses the predefined list
-- CTRL Cursor L/R       Moves to the previous/next word
-- CTRL SHIFT Cursor L/R Moves and selects the previous/next word
+- Esc                   Closes ExifTool direct.
+- Enter                 Executes command.
+- Tab                   Focuses the predefined list.
+- CTRL Cursor L/R       Moves to the previous/next word.
+- CTRL SHIFT Cursor L/R Moves and selects the previous/next word.
 
 In the predefined list of ExifTool Direct
 - Cursor Up/Down        Selects the previous/next item in the list.
-- Shift Tab, Enter      Focuses on the ExifTool command
-- Tab                   Focuses on the Workspace, or OSM map
+- Shift Tab, Enter      Focuses on the ExifTool command.
+- Tab                   Focuses on the Workspace, or OSM map.
 
 In the Workspace
-- CTRL C                Copies the metadata value to the clipboard
-- CTRL/ALT C            Copies the metadata tag name to the clipboard
-- CTRL S                Saves pending changes
-- CTRL I                Inserts the tag name in the ExifTool direct command
-- CTRL Cursor Up/Down   Loads the previous/next file from the file list
+- CTRL C                Copies the metadata value to the clipboard.
+- CTRL/ALT C            Copies the metadata tag name to the clipboard.
+- CTRL S                Saves pending changes.
+- CTRL I                Inserts the tag name in the ExifTool direct command.
+- CTRL Cursor Up/Down   Loads the previous/next file from the file list.
 
 Line editing NOT enabled in Preferences
-- Enter                 Focuses the Edit box at the bottom, to edit the current line
+- Enter                 Focuses the Edit box at the bottom, to edit the current line.
 
 Line editing enabled in Preferences
 - You can enter the new value directly in the grid. 
-  Moving to another line marks the line as modified. (EG Cursor or Page keys)
-  Note: When autocomplete is enabled, Cursor Up/Down selects another value in the list 
+  Moving to another line marks the line as modified. (EG Cursor or Page keys).
+  Note: When autocomplete is enabled, Cursor Up/Down selects another value in the list.
 
 - Enter                 Marks the line as modified and moves to the next line.
-- Esc                   Reverts the pending change of the current line
-- CTRL Cursor L/R       Moves to the previous/next word
-- CTRL SHIFT Cursor L/R Moves and selects the previous/next word
+- Esc                   Reverts the pending change of the current line.
+- CTRL Cursor L/R       Moves to the previous/next word.
+- CTRL SHIFT Cursor L/R Moves and selects the previous/next word.
 
 In the OSM map holding the Ctrl key together with
 - Left click            Sets the exact location
 - Mouse wheel           To (in)(de)crease the font the map uses.
+
+In the Regions panel of the preview
+- CTRL R          	Switches between the Preview and the Region panel.
+- CTRL S          	Saves changes to the file.
+- CTRL I 		Adds a new region to the file.
+- CTRL Up/Down		Selects the Previous/Next file.
+- ALT Up/Down		Maximizes/Restores the size of the image.
+- ESC     		Restores the size of the image.
+When the X/Y W/H edit boxes are focused:
+- Cursor Up/Down        Increments, or decrements the X/Y and W/H values.
+- Mouse wheel           Increments, or decrements the X/Y and W/H values.

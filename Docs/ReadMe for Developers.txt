@@ -200,8 +200,12 @@ Version 6.3.7
 
 Version 6.3.8
 - Added Word selection and navigating. CTRL/SHIFT Left Right.
-- Added auto complete options.	
+- Added auto complete options.  
   Using the IAutoComplete2 interface. https://learn.microsoft.com/en-us/windows/win32/api/shldisp/nn-shldisp-iautocomplete2
   See: ExifToolsGui_AutoComplete.pas, ExifToolsGui_AutoEdit.pas and ExifToolsGui_ValEdit.pas
+
+Version 6.3.9
+- Added THashMD5.GetHashStringFromFile, THashSHA1, ThashSHA2 to compute hashes.
+- Added rectangle selection to TImage in ExifToolsGui_Image.pas
 
 Frank

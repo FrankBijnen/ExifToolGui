@@ -64,9 +64,10 @@
     </ul>
     <li><a href="#m_various">Various</a></li>
     <ul>
-        <li><a href="#file_datecremod_as_exif">File: Date created and modified as in</a></li>
+        <li><a href="#file_datecremod_as_exif">File: Date created and modified as in...</a></li>
         <li><a href="#name_datetime">File: Name=DateTime+Name</a></li>
         <li><a href="#jpg_lossless_rotate">JPG: Lossless autorotate + crop</a></li>
+        <li><a href="#create_hash_files">Create Hash files...</a></li>
         <li><a href="#select_left_diff">Select left diff</a></li>
         <li><a href="#show_diff_metadata">Show_diff_metadata</a></li>
     </ul>
@@ -74,6 +75,7 @@
 </ul>
 <br><b>Panels:</b><br>
 <ul>
+    <li><a href="#p_preview_regions">Preview/Regions</a></li>
     <li><a href="#p_filelist">File list</a></li>
     <ul>
         <li><a href="#p_subfolder">Scanning and displaying sub folders in the file list</a></li>
@@ -189,6 +191,9 @@ are essential for majority of users.<br>
     <li>Improved <a href="Readme%20keyboard%20shortcuts.txt">keyboard-based</a> working</li>
     <li>Added autocomplete to editing in Workspace and ExifTool direct. Including CTRL/SHIFT + Arrows to select words.</li>
     <li>Reviewed Saving and Loading settings. Renamed to Export and Import, allowing multiple settings.</li>
+    <li>Added Hash functions. Available in the <a href="#m_workspace">Workspace</a>, the <a href="#p_config_file_list">File list</a>,
+    and a menu function to create <a href="#create_hash_files">Hash files</a>.</li>
+    <li>Added support for displaying and editing <a href="#p_preview_regions">regions</a> in the preview window.</li>
 </ul>
 <br>
 <a href="changelog.txt"><b>See changelog.txt for a complete list of issues.</b></a>
@@ -317,7 +322,7 @@ or when exporting metadata to external TXT files.<br>
 In most cases, you will need to check this option, because Windows doesn't automatically rotate JPG images according to
 the Exif:Orientation tag value. Anyway, if this option is checked, then GUI won't change/rotate your JPG files physically:
 rotation (if needed) is applied in GUI's memory after the image has been loaded for displaying.
-If checked, GUI will only rotate image in <font class="blue">Preview</font> panel -thumbnails aren't rotated.<br>
+If checked, GUI will only rotate image in the <font class="blue">Preview</font> panel. Thumbnails aren't rotated.<br>
 <br>
 <b>Enabling internet access</b><br>
 By default, this option is unchecked and if you are a bit paranoid, then keep it that way. In that case however,
@@ -525,9 +530,18 @@ also add # character at the end of tag name -this will force displaying
 numerical tag value (try with <font class="brown">-exif:Orientation#</font> to see the difference).
 Of course, only one single tag can be defined per line.<br>
 To separate group of tags in <font class="blue">Workspace</font> view, special "fake" tag is used: <font class="brown">-GUI-SEP</font>
-(see "About photo" on above screenshot).<br>
+(see "About photo" on above screenshot, and "Special tag names").<br>
 Note: It is recommended to prefix the tag names with a family 0, or 1, group name.
 (EG: <b>-Exif:ISO</b>, or <b>-ExifIfd:ISO</b>, not just <b>-ISO</b>).This ensures that <a href="#m_popup_meta">marking</a> the lines defined in the workspace works best.<br><br>
+
+Special tag names:
+<ul>
+<li><b>-GUI-SEP</b></li>Separate group of tags.<br>
+<li><b>-GUI-INV</b></li>GUI detected an invalid tag, causing unpredictable results.<br>
+<li><b>-GUI-HASH-MD5</b></li>Compute the MD5 hash of the file. Read only.<br>
+<li><b>-GUI-HASH-SHA1</b></li>Compute the SHA1 hash of the file. Read only.<br>
+<li><b>-GUI-HASH-SHA2</b></li>Compute the SHA2 hash of the file. Read only.<br>
+</ul><br>
 
 <b>Hint text column</b><br>
 Text entered here is your <u>short</u> "private" help, which will be displayed in GUI's status bar when you start modifying tag value:<br><br>
@@ -1024,6 +1038,16 @@ In addition you have more control over how the function is performed.<br><br>
 <br>
 <br>
 
+<h3><a name="create_hash_files">Create Hash files...</a></h3>
+For all selected files Hashes will be computed and saved in a separate file with the extension of the selected Hash method.<br>
+Gui supports these methods:
+<ul>
+<li>MD5</li>
+<li>SHA1</li>
+<li>SHA2</li>
+</ul>
+<br>
+
 <h3><a name="select_left_diff">Select left diff</a></h3>
 This option allows you to specify the file, or directory to use on the left side of the compare window.<br>
 <br>
@@ -1034,13 +1058,13 @@ This option allows you to specify the file, or directory to use on the left side
 <li>Select 1 file or directory, and click on <b>Show diff metadata</b>, from the various menu, or the context menu of the file list.<br>
 The selected file/directory is used on the <b>left side</b>. You will be prompted for a <b>right side</b>.
 </li>
+<li>Select 2 files or directories. Clicking on <b>Show diff metadata</b> opens the <b>Show diff metadata</b> form directly.</li>
+<li>Select 3 or more files. Clicking on <b>show diff metadata</b> prompts for the <b>right</b> directory</li>
 </ul><br>
 <img src="ExifToolGUI_V6_files/show_diff1.jpg"><br><br>
 <img src="ExifToolGUI_V6_files/show_diff2.jpg"><br><br>
 <ul>
-<li>Select 2 files or directories. Clicking on <b>Show diff metadata</b> opens the <b>Show diff metadata</b> form directly.</li>
-<li>Select 3 or more files. Clicking on <b>show diff metadata</b> prompts for the <b>right</b> directory</li>
-<li>You can control the <b>left side</b> by clicking that first.</li>
+<li>You can control what is shown on the left side, by clicking <b>Select left diff</b> first.</li>
 </ul>
 <br><br>
 
@@ -1071,7 +1095,6 @@ or <b>right</b> to the <b>left</b> file.<br>
 </li>
 </ul>
 
-
 <h2><a name="m_help">Help menu</a></h2>
 <h3>Online Documentation</h3>
 -Opens this document<br>
@@ -1082,6 +1105,72 @@ or <b>right</b> to the <b>left</b> file.<br>
 <h3>About</h3>
 -Displays ExifTool and GUI versions and links.<br>
 <br>
+
+<h2><a name="p_preview_regions">Preview/Regions</a></h2>
+<h3>The preview tab</h3>
+The preview tab shows a preview of the selected file. The preview is generated by W(indows) I(maging) C(omponent).
+WIC needs a codec to be able to generate the preview. For most commonly used file types Windows (11) provides codecs.<br><br>
+
+<h3>The regions tab></h3>
+Clicking on the <b>regions</b> tab allows you to display and edit the regions, provided that a preview can be shown.<br><br>
+
+<img src="ExifToolGUI_V6_files/preview_regions.jpg"><br><br>
+<b>Viewing:</b><br>
+<ul>
+<li>Select a region from the list.</li>
+<li>The selected region will be displayed with solid lines, not selected regions will be displayed dotted.</li>
+<li>Only checked items will be shown on the image.</li>
+<li>Info on the selected region will be displayed at the bottom, and can be edited.</li>
+<li>Use the Maximize button (The rightmost button, right from the Save button) to show the image maximized within the GUI window.</li>
+</ul><br>
+
+<b>Adding/Editing:</b><br>
+<ul>
+<li>If a region is available and selected, you can edit that right away.</li>
+<li>To add a new region, and start editing that, click on the <b>+</b> to define a new region. A number <b>#1, #2</b> etc. appears.</li>
+</ul><br>
+
+<ul>
+<li>You can define a region by selecting a rectangle with the mouse while holding the left button.</li>
+<li>Alternatively you can enter values for the X/Y W/H fields. Either by typing a value, using cursor up/down, or mouse wheel.</li>
+
+<li>You can assign a Name, Description and Type.</li>
+Name and Description are optional, and may not be provided, or recognized, by other software.<br>
+Type is mandatory. Valid values are <b>Face</b>, <b>Pet</b>, <b>Focus</b> and <b>BarCode</b>.<br>
+</ul><br>
+
+<b>Notes:</b><br>
+The X and Y values define the top left corner of the region.<br>
+The W and H values define the width and height of the region.<br>
+<ul>
+<li>As a percentage divided by 100, of the Width and Height of the image in pixels.</li>
+<li>All values should be in the range 0 to 1.</li>
+<li>The decimal separator used on-screen conforms to your Windows regional settings.</li>
+<li>The decimal separator read from, and written to, the file conforms to XML standards. (always a period .)</li>
+<li><b>Before</b> rotation is performed.</li>
+</ul><br>
+
+<b>Deleting:</b><br>
+<ul>
+<li>Simply click on the bucket.</li>
+</ul><br>
+
+<b>Saving your changes:</b><br>
+<ul>
+<li>When done press the <b>Floppy</b> icon to save your changes.</li>
+<li>Selecting another, or the same, file discards the changes, without a warning!</li>
+</ul>
+<br>
+
+<b>Keyboard shortcuts</b><br>
+<ul>
+<li><b>CTRL/R</b> Switches between the <b>Preview</b> and the <b>Region</b> tab.</li>
+<li><b>CTRL/S</b> Saves changes to the file.</li>
+<li><b>CTRL/I</b> Adds a new region to the file.</li>
+<li><b>CTRL/Up Down</b> Selects the Previous/Next file.</li>
+<li><b>ALT/Up Down</b> Maximizes/Restores the size of the image.</li>
+<li><b>ESC</b> Restores the size of the image.</li>
+</ul>
 
 <h2><a name="p_filelist">File list panel</a></h2>
 <h3>Changed with Version 6.3.6.</h3>
@@ -1313,8 +1402,18 @@ But only the first 6 have a unique icon. <br>
 For other read modes, a panel on the right pops up, showing all the available internal fields.<br><br>
 <img src="ExifToolGUI_V6_files/newdesignselectinttag.jpg"><br><br>
 <br>
-Note: It helps a great deal if you have a sample file containing Metadata you know.
-Select that file first, before you start configuring.<br>
+Notes:
+<ul>
+<li>It helps a great deal if you have a sample file containing Metadata you know.
+Select that file first, before you start configuring.</li>
+<li>You can have GUI compute a Hash value and display it in the file list. These special values are recognised in the <b>Command</b> column.<br>
+    <ul>
+    <li><b>md5</b></li>
+    <li><b>sha1</b></li>
+    <li><b>sha2</b></li>
+    </ul>
+</li>
+</ul>
 <br>
 The Columns <B>Option</B> and <B>Align Right</B> are used to specify formatting. See 'Camera Details' for examples.<br>
 <br>
@@ -1486,12 +1585,11 @@ With the buttons <b>Cmd prompt</b> and <b>PowerShell</b> you can generate a <b>.
 <h2><a name="p_metadata">Metadata panel</a></h2>
 <img src="ExifToolGUI_V6_files/metadataworkspace.jpg"><br>
 <br>
-By clicking on any button on top row, relevant metadata will be shown -that is, top row is for displaying metadata only.<br>
-<br>
-In the second row, there's only one button: <font class="blue">Workspace</font>. This button is "pressed" by default on every GUI startup and this can't be changed by user.<br>
-And where are the "good old" <font class="blue"><b>[ ^ ]</b></font> edit buttons, known from previous GUI versions? They're gone.. they aren't needed anymore.<br>
+By clicking on any button on top row, relevant metadata will be shown. That is, the top row is for displaying metadata only.<br>
+In the second row, there's only one button: <font class="blue">Workspace</font>.<br>
 As explained above (see <font class="blue">Workspace manager</font> menu), <font class="blue">Workspace</font> is fully customizable: user can define which tags he wishes to be listed here.<br>
-And the value of any tag listed in <font class="blue">Workspace</font> can be edited at will.<br><br>
+And the value of any tag listed in <font class="blue">Workspace</font> can be edited at will.<br>
+Note: The last selected button (Tab) will be remembered and restored at next startup. If selected in preferences.<br><br>
 
 <img src="ExifToolGUI_V6_files/metadataworkspacefind.jpg"><br><br>
 In the <b>Find</b> edit box you can enter a text, press Enter and the first line containing that text in 'Tag name' or 'Value' is highlighted.<br>
