@@ -176,7 +176,7 @@ procedure TValueListEditor.SetEditText(ACol, ARow: Longint; const Value: string)
 begin
   FEditRow := ARow;
 
-  inherited SetEditText(Acol, Arow, Value);
+  inherited SetEditText(ACol, ARow, Value);
 end;
 
 procedure TValueListEditor.KeyDown(var Key: Word; Shift: TShiftState);

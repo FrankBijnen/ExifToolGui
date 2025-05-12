@@ -10367,15 +10367,15 @@ object FMain: TFMain
     Images = VirtualImageListFileList
     Left = 38
     Top = 48
-    object Selectall2: TMenuItem
+    object MnuSelectAll: TMenuItem
       Caption = 'Select all'
       ImageIndex = 20
-      OnClick = Selectall2Click
+      OnClick = MnuSelectAllClick
     end
-    object Selectnone2: TMenuItem
+    object MnuSelectNone: TMenuItem
       Caption = 'Select none'
       ImageIndex = 21
-      OnClick = Selectnone2Click
+      OnClick = MnuSelectNoneClick
     end
   end
   object ImageCollectionRegions: TImageCollection
