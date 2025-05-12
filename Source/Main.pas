@@ -200,8 +200,8 @@ type
     Json1: TMenuItem;
     TbFlSelect: TToolButton;
     SelectMenu: TPopupMenu;
-    Selectall2: TMenuItem;
-    Selectnone2: TMenuItem;
+    MnuSelectAll: TMenuItem;
+    MnuSelectNone: TMenuItem;
     AdvCheckBox_Zeroes: TCheckBox;
     BvlChartFunc: TBevel;
     AdvCheckBox_Legend: TCheckBox;
@@ -359,8 +359,8 @@ type
     procedure Csv1Click(Sender: TObject);
     procedure SpbRecordClick(Sender: TObject);
     procedure Json1Click(Sender: TObject);
-    procedure Selectall2Click(Sender: TObject);
-    procedure Selectnone2Click(Sender: TObject);
+    procedure MnuSelectAllClick(Sender: TObject);
+    procedure MnuSelectNoneClick(Sender: TObject);
     procedure ChartCheckClick(Sender: TObject);
     procedure MaAPIWindowsLongPathExecute(Sender: TObject);
     procedure EditETdirectKeyPress(Sender: TObject; var Key: Char);
@@ -3150,9 +3150,10 @@ begin
     CBoxETdirectCloseUp(Sender);
 end;
 
-procedure TFMain.Selectnone2Click(Sender: TObject);
+procedure TFMain.MnuSelectNoneClick(Sender: TObject);
 begin
   ShellList.ClearSelection;
+  EnableMenuItems;
 end;
 
 procedure TFMain.AlignStatusBar;
@@ -4299,9 +4300,11 @@ begin
 
   if not ClosedByUser then
     ShellList.SelectAll;
+
+  EnableMenuItems;
 end;
 
-procedure TFMain.Selectall2Click(Sender: TObject);
+procedure TFMain.MnuSelectAllClick(Sender: TObject);
 begin
   SelectAll;
 end;
