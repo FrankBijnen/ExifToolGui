@@ -1584,9 +1584,12 @@ begin
   if Button <> mbRight then
     exit;
 
-  SetGridEditor(false);
   MetadataList.MouseToCell(X, Y, XCol, XRow); //Right Click selects cell
+  if (XRow < MetadataList.FixedRows) then
+    XRow := MetadataList.FixedRows;
+
   MetadataList.Row := XRow;
+  SetGridEditor(false);
 end;
 
 procedure TFMain.MetadataListMouseUp(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
@@ -2171,6 +2174,8 @@ var
   IsVRD: boolean;
 begin
   Index := MetadataList.Row;
+  if (Index < MetadataList.FixedRows) then
+    exit;
 
   // For Workspace return the command specified in QuickTags
   if SpeedBtnQuick.Down then
