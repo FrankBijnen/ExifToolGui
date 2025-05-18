@@ -1,4 +1,4 @@
-unit ExifToolsGui_ValEdit;
+unit ExifToolsGUI_ValEdit;
 
 // Allow all Ctrl+Key events to be used by the app.
 // If the app eventhandler sets Key to 0, that disables standard processing
@@ -12,10 +12,9 @@ uses
 type
   TValueListEditor = class;
 
-  TETGuiInplaceEdit = class(Vcl.Grids.TInplaceEdit, IWordSelEdit, IAutoCompleteEdit)
+  TETGuiInplaceEdit = class(Vcl.Grids.TInplaceEdit, IAutoCompleteEdit)
   private
     FAutoCompleteEdit: IAutoCompleteEdit;
-    FWordSelEdit: IWordSelEdit;
     procedure ConvertToGridPoint(var X, Y: integer);
     function ValueListEditor: TValueListEditor;
   protected
@@ -26,7 +25,6 @@ type
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
-    property WordSelEdit: IWordSelEdit read FWordSelEdit implements IWordSelEdit;
     property AutoCompleteEdit: IAutoCompleteEdit read FAutoCompleteEdit implements IAutoCompleteEdit;
   end;
 
@@ -77,7 +75,6 @@ constructor TETGuiInplaceEdit.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
 
-  FWordSelEdit := TWordSelEdit.Create;
   FAutoCompleteEdit := TAutoCompleteEdit.Create;
 end;
 
@@ -109,20 +106,35 @@ end;
 
 procedure TETGuiInplaceEdit.KeyDown(var Key: Word; Shift: TShiftState);
 begin
+
   case Key of
+    // Caret at end.
     VK_END:
       SelLength := 0;
+
+    // Dont forward keydown VK_LEFT, VK_RIGHT to grid.
+    VK_LEFT,
+    VK_RIGHT:
+      exit;
+
+    // Disable AutoComplete on Ctrl/S (save), Up and Down
+    Ord('S'),
     VK_UP,
     VK_DOWN:
       FAutoCompleteEdit.EnableAutoComplete(false);
+
     else
+      // (Re)enable AutoComplete on any other key
       if (not (ssCtrl in Shift)) then
         FAutoCompleteEdit.EnableAutoComplete(FAutoCompleteEdit.GetAutoCompleteMode > TAutoCompleteMode.acNone);
   end;
 
-  if (ssCtrl in Shift) then
-    ValueListEditor.KeyDown(Key, Shift);
+  // Fire Ctrl key event of Grid?
+  if (ssCtrl in Shift) and
+     (Assigned(ValueListEditor.OnCtrlKeyDown)) then
+    ValueListEditor.OnCtrlKeyDown(ValueListEditor, Key, Shift);
 
+  // Default Key Down
   inherited KeyDown(Key, Shift);
 end;
 

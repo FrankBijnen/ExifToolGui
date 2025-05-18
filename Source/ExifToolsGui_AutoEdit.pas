@@ -13,20 +13,6 @@ const
 type
   TSelDirection = (sdLeft, sdRight);
 
-  IWordSelEdit = interface
-    [IID_WordSelEdit]
-    procedure SetSelDirection(ASelDirection: TSelDirection);
-    function GetSelDirection: TSelDirection;
-  end;
-
-  TWordSelEdit = class(TInterfacedObject, IWordSelEdit)
-  private
-    FSelDirection: TSelDirection;
-  public
-    procedure SetSelDirection(ASelDirection: TSelDirection);
-    function GetSelDirection: TSelDirection;
-  end;
-
   IAutoCompleteEdit = interface
     [IID_AutoCompleteEdit]
     procedure InstallAutoComplete(AHandle: HWND);
@@ -51,143 +37,29 @@ type
     destructor Destroy; override;
   end;
 
-  TMemo = class(Vcl.StdCtrls.TMemo, IWordSelEdit)
+  TEdit = class(Vcl.StdCtrls.TEdit, IAutoCompleteEdit)
   private
-    FWordSelEdit: IWordSelEdit;
-  public
-    constructor Create(AOwner: TComponent); override;
-    property WordSelEdit: IWordSelEdit read FWordSelEdit implements IWordSelEdit;
-  end;
-
-  TEdit = class(Vcl.StdCtrls.TEdit, IWordSelEdit, IAutoCompleteEdit)
-  private
-    FWordSelEdit: IWordSelEdit;
     FAutoCompleteEdit: IAutoCompleteEdit;
   protected
     procedure CMEnter(var Message: TCMEnter); message CM_ENTER;
     procedure CreateWnd; override;
   public
     constructor Create(AOwner: TComponent); override;
-    property WordSelEdit: IWordSelEdit read FWordSelEdit implements IWordSelEdit;
     property AutoCompleteEdit: IAutoCompleteEdit read FAutoCompleteEdit implements IAutoCompleteEdit;
   end;
 
-  TLabeledEdit = class(Vcl.ExtCtrls.TLabeledEdit, IWordSelEdit, IAutoCompleteEdit)
+  TLabeledEdit = class(Vcl.ExtCtrls.TLabeledEdit, IAutoCompleteEdit)
   private
-    FWordSelEdit: IWordSelEdit;
     FAutoCompleteEdit: IAutoCompleteEdit;
   protected
     procedure CMEnter(var Message: TCMEnter); message CM_ENTER;
     procedure CreateWnd; override;
   public
     constructor Create(AOwner: TComponent); override;
-    property WordSelEdit: IWordSelEdit read FWordSelEdit implements IWordSelEdit;
     property AutoCompleteEdit: IAutoCompleteEdit read FAutoCompleteEdit implements IAutoCompleteEdit;
   end;
-
-  // Shift/Ctrl Cursor
-  procedure PrevWord(const CustomEdit: TCustomEdit; const SkipChars: TSysCharSet; const UseSel: boolean);
-  procedure NextWord(const CustomEdit: TCustomEdit; const SkipChars: TSysCharSet; const UseSel: boolean);
 
 implementation
-
-// Shift/Ctrl Cursor Left
-procedure PrevWord(const CustomEdit: TCustomEdit; const SkipChars: TSysCharSet; const UseSel: boolean);
-var
-  NewS, OldS, OldSel: integer;
-  SelDir: TSelDirection;
-  T: string;
-begin
-  OldSel := CustomEdit.SelLength;
-
-  SelDir := TSelDirection.sdLeft;
-  if (Supports(CustomEdit, IWordSelEdit)) then
-  begin
-    if (OldSel = 0) then
-      (CustomEdit as IWordSelEdit).SetSelDirection(SelDir);
-    SelDir := (CustomEdit as IWordSelEdit).GetSelDirection;
-  end;
-
-  OldS := CustomEdit.SelStart;
-  if (SelDir = TSelDirection.sdLeft) then
-    NewS := OldS
-  else
-    NewS := OldS + CustomEdit.SelLength;
-  T := CustomEdit.Text;
-  while (NewS > 0) and
-        (CharInSet(T[NewS], SkipChars)) do
-    Dec(NewS);
-  while (NewS > 0) and
-        not (CharInSet(T[NewS], SkipChars)) do
-    Dec(NewS);
-  CustomEdit.SelStart := NewS;
-
-  if (UseSel) then
-  begin
-    if (SelDir = TSelDirection.sdLeft) then
-      CustomEdit.SelLength := OldSel + (OldS - NewS)
-    else
-      CustomEdit.SelLength := OldS - NewS;
-  end
-  else
-    CustomEdit.SelLength := 0;
-end;
-
-// Shift/Ctrl Cursor Right
-procedure NextWord(const CustomEdit: TCustomEdit; const SkipChars: TSysCharSet; const UseSel: boolean);
-var
-  OldS, NewS, OldSel: integer;
-  L: integer;
-  SelDir: TSelDirection;
-  T: string;
-begin
-  OldSel := CustomEdit.SelLength;
-
-  SelDir := TSelDirection.sdRight;
-  if (Supports(CustomEdit, IWordSelEdit)) then
-  begin
-    if (OldSel = 0) then
-      (CustomEdit as IWordSelEdit).SetSelDirection(SelDir);
-    SelDir := (CustomEdit as IWordSelEdit).GetSelDirection;
-  end;
-
-  OldS := CustomEdit.SelStart;
-  if (SelDir = TSelDirection.sdRight) then
-    NewS := OldS + CustomEdit.SelLength
-  else
-    NewS := OldS;
-
-  T := CustomEdit.Text;
-  L := Length(T);
-  while (NewS < L) and
-        not (CharInSet(T[NewS +1], SkipChars)) do
-    Inc(NewS);
-  while (NewS < L) and
-        (CharInSet(T[NewS +1], SkipChars)) do
-    Inc(NewS);
-  CustomEdit.SelStart := NewS;
-
-  if (UseSel) then
-  begin
-    if (SelDir = TSelDirection.sdRight) then
-      CustomEdit.SelLength := OldS - NewS
-    else
-      CustomEdit.SelLength := OldSel - (NewS - Olds);
-  end
-  else
-    CustomEdit.SelLength := 0;
-end;
-
-{ TWordSelEdit }
-procedure TWordSelEdit.SetSelDirection(ASelDirection: TSelDirection);
-begin
-  FSelDirection := ASelDirection;
-end;
-
-function TWordSelEdit.GetSelDirection: TSelDirection;
-begin
-  result := FSelDirection;
-end;
 
 { TAutoCompleteEdit }
 constructor TAutoCompleteEdit.Create;
@@ -252,18 +124,10 @@ begin
   result := FAutoComp.GetAutoCompleteMode;
 end;
 
-{ TMemo }
-constructor TMemo.Create(AOwner: TComponent);
-begin
-  inherited Create(AOwner);
-  FWordSelEdit := TWordSelEdit.Create;
-end;
-
 { TlabeledEdit }
  constructor TLabeledEdit.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
-  FWordSelEdit := TWordSelEdit.Create;
   FAutoCompleteEdit := TAutoCompleteEdit.Create;
 end;
 
@@ -285,7 +149,6 @@ end;
  constructor TEdit.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
-  FWordSelEdit := TWordSelEdit.Create;
   FAutoCompleteEdit := TAutoCompleteEdit.Create;
 end;
 
