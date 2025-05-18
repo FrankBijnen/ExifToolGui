@@ -10,11 +10,11 @@ const
   acAutoPopulate        = $0020;
 
 type
-  TAutoCompleteMode = (acDefault = $0000,
-                       acNone = $0001,
-                       acAutoAppend = $0002,
-                       acAutoSuggest = $0003,
-                       acAutoSuggestAppend = $0004);
+  TAutoCompleteMode = (acDefault            = $0000,
+                       acNone               = $0001,
+                       acAutoAppend         = $0002,
+                       acAutoSuggest        = $0003,
+                       acAutoSuggestAppend  = $0004);
 
   TAutoCompRec = record
     AcOptions:  word;

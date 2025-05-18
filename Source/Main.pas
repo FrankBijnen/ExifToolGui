@@ -65,7 +65,7 @@ type
     AdvPanelMetaBottom: TPanel;
     ShellTree: ExifToolsGUI_ShellTree.TShellTreeView; // Need to create our own version!
     ShellList: ExifToolsGUI_ShellList.TShellListView; // Need to create our own version!
-    MetadataList: ExifToolsGui_ValEdit.TValueListEditor; // Need to create our own version!
+    MetadataList: ExifToolsGUI_ValEdit.TValueListEditor; // Need to create our own version!
     OpenPictureDlg: ExifToolsGUI_OpenPicture.TOpenPictureDialog; // Need to create our own version!
     SpeedBtnExif: TSpeedButton;
     SpeedBtnIptc: TSpeedButton;
@@ -82,7 +82,7 @@ type
     SpeedBtn_ETedit: TSpeedButton;
     EditETcmdName: TLabeledEdit;
     SpeedBtnQuick: TSpeedButton;
-    MemoQuick: ExifToolsGui_AutoEdit.TMemo;  // Need our own version
+    MemoQuick: TMemo;
     SpeedBtnLarge: TSpeedButton;
     EditQuick: ExifToolsGui_AutoEdit.TEdit;  // Need our own version
     SpeedBtnShowLog: TSpeedButton;
@@ -1555,20 +1555,6 @@ begin
       MetadataList.Row := MetadataList.FixedRows;
     VK_END:
       MetadataList.Row := MetadataList.RowCount -1;
-    VK_LEFT:
-    begin
-      PrevWord(ExifToolsGui_ValEdit.TValueListEditor(Sender).InplaceEdit,
-              [' ', ET.Options.GetSeparatorChar],
-              (ssShift in Shift));
-      Key := 0;
-    end;
-    VK_RIGHT:
-    begin
-      NextWord(ExifToolsGui_ValEdit.TValueListEditor(Sender).InplaceEdit,
-              [' ', ET.Options.GetSeparatorChar],
-              (ssShift in Shift));
-      Key := 0;
-    end;
     VK_UP, VK_DOWN:
       begin
         SelectPrevNext(Key = VK_DOWN);
@@ -2722,26 +2708,6 @@ begin
     exit;
   end;
 
-  if (ssCtrl in Shift) then
-  begin
-    case Key of
-      VK_LEFT:
-        begin
-          PrevWord(TCustomEdit(Sender),
-                  [' ', ET.Options.GetSeparatorChar],
-                  (ssShift in Shift));
-          Key := 0;
-        end;
-      VK_RIGHT:
-        begin
-          NextWord(TCustomEdit(Sender),
-                   [' ', ET.Options.GetSeparatorChar],
-                   (ssShift in Shift));
-          Key := 0;
-        end;
-    end;
-  end;
-
   if (Key = VK_Return) then
   begin
     ETprm := EditETdirect.Text;
@@ -2901,25 +2867,6 @@ var
   CurrentAutoComp: PAutoCompRec;
 begin
   Index := MetadataList.Row;
-  if (ssCtrl in Shift) then
-  begin
-    case Key of
-      VK_LEFT:
-      begin
-        PrevWord(TCustomEdit(Sender),
-                [' ', ET.Options.GetSeparatorChar] ,
-                (ssShift in Shift) );
-        Key := 0;
-      end;
-      VK_RIGHT:
-      begin
-        NextWord(TCustomEdit(Sender),
-                 [' ', ET.Options.GetSeparatorChar],
-                 (ssShift in Shift) );
-        Key := 0;
-      end;
-    end;
-  end;
 
   case Key of
     VK_RETURN:

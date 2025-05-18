@@ -2209,8 +2209,8 @@ begin
     except on E:Exception do
       begin
 {$IFDEF DEBUG_XMP}
-        allocconsole;
-        writeln('File:', FileName, ' Error:', e.Message);
+        AllocConsole;
+        Writeln('File:', FileName, ' Error:', e.Message);
 {$ENDIF}
         exit;
       end;
