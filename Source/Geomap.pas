@@ -855,6 +855,14 @@ begin
     result := result and (Countrylist.Values[CountryCode] <> '');
 end;
 
+procedure Throttle(const Delay: Int64);
+var Diff: Int64;
+begin
+  Diff := Delay - MilliSecondsBetween(Now, LastQuery);
+  if (Diff > 0) then
+    Sleep(Diff);
+end;
+
 function ExecuteRest(const RESTRequest: TRESTRequest): boolean;
 var
   ARestParm: TRESTRequestParameter;
@@ -863,6 +871,7 @@ begin
   try
     try
       RESTRequest.Execute;
+      LastQuery := Now;
       if (RESTRequest.Response.StatusCode >= 400) then
         raise exception.Create(StrRequestFailedWith + #10 + RESTRequest.Response.StatusText);
     except
@@ -885,15 +894,6 @@ begin
       ExecRestEvent(RESTRequest.GetFullRequestURL(true) + #10, RESTRequest.Response.Content, result);
     end;
   end;
-end;
-
-procedure Throttle(const Delay: Int64);
-var Diff: Int64;
-begin
-  Diff := Delay - MilliSecondsBetween(Now, LastQuery);
-  if (Diff > 0) then
-    Sleep(Diff);
-  LastQuery := Now;
 end;
 
 // ==============================================================================
