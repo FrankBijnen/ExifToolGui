@@ -113,12 +113,18 @@ begin
       SelLength := 0;
 
     // Dont forward keydown VK_LEFT, VK_RIGHT to grid.
+    // The inherited KeyDown calls Grid.SendToParent if GoAlwaysShowEditor in Options and Ctrl
+    // SendToParent then sets Key to 0, preventing skipping to Previous/Next word.
     VK_LEFT,
     VK_RIGHT:
-      exit;
+      if (ssCtrl in Shift) and
+         (goAlwaysShowEditor in ValueListEditor.Options) then
+        exit;
 
     // Disable AutoComplete on Ctrl/S (save), Up and Down
-    Ord('S'),
+    Ord('S'):
+      if (ssCtrl in Shift) then
+        FAutoCompleteEdit.EnableAutoComplete(false);
     VK_UP,
     VK_DOWN:
       FAutoCompleteEdit.EnableAutoComplete(false);
