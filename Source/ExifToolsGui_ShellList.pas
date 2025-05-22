@@ -127,7 +127,9 @@ type
     procedure Edit(const Item: TLVItem); override;
     procedure Populate; override;
     function OwnerDataFetch(Item: TListItem; Request: TItemRequest): boolean; override;
-
+    function OwnerDataFind(Find: TItemFind; const FindString: string;
+      const FindPosition: TPoint; FindData: Pointer; StartIndex: Integer;
+      Direction: TSearchDirection; Wrap: Boolean): Integer; override;
     procedure Add2ThumbNails(ABitMap: TBitmap; ANitemIndex: integer; NeedsGenerating: boolean); overload;
     procedure Add2ThumbNails(ABmp: HBITMAP; ANitemIndex: integer; NeedsGenerating: boolean); overload;
     procedure CancelThumbTasks;
@@ -1243,6 +1245,37 @@ begin
 
   if (ViewStyle = vsIcon) then
     DoIcon;
+end;
+
+// The inherited has 2 problems.
+// 1. The last item is not found
+// 2. It does not check if StartIndex > Folders.Count -1
+function TShellListView.OwnerDataFind(Find: TItemFind; const FindString: string;
+  const FindPosition: TPoint; FindData: Pointer; StartIndex: Integer;
+  Direction: TSearchDirection; Wrap: Boolean): Integer;
+var
+  I: Integer;
+  Found: Boolean;
+begin
+  Result := -1;
+  I := StartIndex;
+  if (Find = ifExactString) or
+     (Find = ifPartialString) then
+  begin
+    repeat
+      if (I > FoldersList.Count -1) then // The inherited checks for =
+      begin
+        if Wrap then
+          I := 0
+        else
+          Exit;
+      end;
+      Found := StartsText(FindString, TSubShellFolder.GetRelativeDisplayName(Folders[I]));
+      Inc(I);
+    until Found or (I = StartIndex);
+    if Found then
+      Result := I -1;
+  end;
 end;
 
 constructor TShellListView.Create(AOwner: TComponent);
