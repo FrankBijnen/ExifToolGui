@@ -234,6 +234,7 @@ resourcestring
   StrUseNone                = 'None (Show error)';
   StrUseStandardSeq         = 'Use standard sequence';
   StrUseCustomSeq           = 'Use custom sequence';
+  StrItemsSelected          = ' (%d items selected)';
 
 implementation
 
