@@ -147,7 +147,7 @@
         <DCCReference Include="UnitRegion.pas"/>
         <DCCReference Include="ExifToolsGui_AutoComplete.pas"/>
         <DCCReference Include="ExifToolsGUI_StringGrid.pas"/>
-        <DCCReference Include="ExifToolsGui_ValEdit.pas"/>
+        <DCCReference Include="ExifToolsGUI_ValEdit.pas"/>
         <DCCReference Include="ExifToolsGui_ThreadPool.pas"/>
         <DCCReference Include="ExifToolsGui_ShellList.pas"/>
         <DCCReference Include="ExifToolsGui_FileListColumns.pas"/>

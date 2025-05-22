@@ -1654,7 +1654,7 @@ procedure TFMain.MExifDateTimeshiftClick(Sender: TObject);
 begin
   if FDateTimeShift.ShowModal = mrOK then
   begin
-    ShellList.RefreshSelected;
+    RefreshSelected(Sender);
     ShowMetadata;
   end;
 end;
@@ -1737,7 +1737,7 @@ end;
 procedure TFMain.MFileNameDateTimeClick(Sender: TObject);
 begin
   if (FFileDateTime.ShowModal = idOK) then
-    ShellList.RefreshSelected;
+    RefreshSelected(Sender);
 end;
 
 procedure TFMain.MDontBackupClick(Sender: TObject);
@@ -3342,6 +3342,7 @@ begin
   ShellList.OnThumbGenerate := ShellistThumbGenerate;
   ShellList.OnThumbError := ShellistThumbError;
   ShellList.OnMouseWheel := ShellListMouseWheel;
+
   // Enable Column sorting if Sorted = true. Disables Sorted.
   ShellList.ColumnSorted := ShellList.Sorted;
   ShellList.OnCustomDrawItem := ShellListCustomDrawItem;
@@ -4271,6 +4272,8 @@ begin
   NewCaption := NewCaption + Application.Title;
   if (AnItem <> '') then
     NewCaption := NewCaption + ' - ' + AnItem;
+  if (ShellList.SelCount > 1) then
+     NewCaption := NewCaption + Format(StrItemsSelected, [ShellList.SelCount]);
   Caption := NewCaption
 end;
 
@@ -4424,6 +4427,7 @@ var
 begin
   if (PnlRegion.Visible = false) then
     exit;
+  PnlRegion.Enabled := (ShellList.SelCount = 1);
 
   NewIndex := -1;
   CurRegionName := '';

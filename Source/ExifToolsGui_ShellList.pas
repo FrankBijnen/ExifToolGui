@@ -98,6 +98,7 @@ type
     ICM2: IContextMenu2;
     FDragStartPos: TPoint;
     FDragSource: boolean;
+    FFirstSel: integer;
     function GiveFeedback(dwEffect: Longint): HResult; stdcall;
     function QueryContinueDrag(fEscapePressed: BOOL; grfKeyState: Longint): HResult; stdcall;
 
@@ -135,6 +136,11 @@ type
     procedure CancelThumbTasks;
     procedure RemoveThumbTask(ItemIndex: integer);
     procedure ShowMultiContextMenu(MousePos: TPoint);
+
+    function GetSelected: TListItem;
+    procedure SetSelected(Value: TListItem);
+    procedure DoSelectItem(Item: TListItem; Selected: Boolean); override;
+
     procedure WndProc(var Message: TMessage); override;
   public
     constructor Create(AOwner: TComponent); override;
@@ -192,6 +198,7 @@ type
     property OnCustomDrawItem;
     property IncludeSubFolders: boolean read FIncludeSubFolders write FIncludeSubFolders;
     property DragSource: boolean read FDragSource write FDragSource;
+    property Selected: TlistItem read GetSelected write SetSelected;
   end;
 
 implementation
@@ -811,6 +818,13 @@ procedure TShellListView.SelectAll;
 var
   Indx: integer;
 begin
+  if (Selected = nil) and
+     (Items.Count > 0) then
+  begin
+    Items[0].Selected := true;
+    if (Assigned(OnClick)) then
+      OnClick(Self);
+  end;
   for Indx := 0 to Items.Count -1 do
     ListView_SetItemState(Handle, Indx, LVIS_SELECTED, LVIS_SELECTED);
 end;
@@ -1388,6 +1402,39 @@ end;
 function TShellListView.ShellPath: string;
 begin
   result := TSubShellFolder.GetRelativeName(RootFolder, TRelativeNameType.rnShellPath);
+end;
+
+function TShellListView.GetSelected: TListItem;
+begin
+  result := inherited Selected;
+
+  if not (ListView_GetItemState(Handle, FFirstSel, LVIS_SELECTED) = LVIS_SELECTED) and
+     (result <> nil) then
+    FFirstSel := result.Index // First selected is no longer selected, but the inherited is.
+  else
+  begin
+    if (result <> nil) and    // Must have a selection
+       (FFirstSel > -1) and
+       (FFirstSel < Items.Count) then
+      result := Items[FFirstSel];
+  end;
+end;
+
+procedure TShellListView.SetSelected(Value: TListItem);
+begin
+  inherited Selected := Value;
+end;
+
+// FFirstSel remains the first selected item.
+// First means 'in order', not 'on top'
+procedure TShellListView.DoSelectItem(Item: TListItem; Selected: Boolean);
+begin
+  inherited DoSelectItem(Item, Selected);
+
+  if(Selected) and
+    (Assigned(Item)) and
+     not (ListView_GetItemState(Handle, FFirstSel, LVIS_SELECTED) = LVIS_SELECTED) then
+    FFirstSel := Item.Index;
 end;
 
 function TShellListView.GetSelectedFolder(ItemIndex: integer): TShellFolder;

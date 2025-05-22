@@ -32,7 +32,7 @@ uses
   UnitRegion in 'UnitRegion.pas',
   ExifToolsGui_AutoComplete in 'ExifToolsGui_AutoComplete.pas',
   ExifToolsGUI_StringGrid in 'ExifToolsGUI_StringGrid.pas',
-  ExifToolsGui_ValEdit in 'ExifToolsGui_ValEdit.pas',
+  ExifToolsGUI_ValEdit in 'ExifToolsGUI_ValEdit.pas',
   ExifToolsGui_ThreadPool in 'ExifToolsGui_ThreadPool.pas',
   ExifToolsGui_ShellList in 'ExifToolsGui_ShellList.pas',
   ExifToolsGui_FileListColumns in 'ExifToolsGui_FileListColumns.pas',
