@@ -4255,6 +4255,7 @@ begin
     ShellList.SelectAll;
 
   EnableMenuItems;
+  SetCaption(GetSelectedFile(ShellList.RelFileName));
 end;
 
 procedure TFMain.MnuSelectAllClick(Sender: TObject);
