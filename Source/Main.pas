@@ -3435,6 +3435,7 @@ begin
       Ord('A'):
       begin
         ShellListKeyDown(Sender, Key, Shift);
+        Key := 0;
       end;
       Ord('D'): //Focus Dir ShellTree
       begin
@@ -4254,8 +4255,7 @@ begin
   if not ClosedByUser then
     ShellList.SelectAll;
 
-  EnableMenuItems;
-  SetCaption(GetSelectedFile(ShellList.RelFileName));
+  ShellListClick(ShellList);
 end;
 
 procedure TFMain.MnuSelectAllClick(Sender: TObject);
