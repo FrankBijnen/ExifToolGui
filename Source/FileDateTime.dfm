@@ -3,7 +3,7 @@ object FFileDateTime: TFFileDateTime
   Top = 0
   BorderStyle = bsDialog
   Caption = 'Rename files'
-  ClientHeight = 542
+  ClientHeight = 566
   ClientWidth = 718
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
@@ -15,7 +15,7 @@ object FFileDateTime: TFFileDateTime
   TextHeight = 13
   object StatusBar1: TStatusBar
     Left = 0
-    Top = 523
+    Top = 547
     Width = 718
     Height = 19
     Panels = <>
@@ -25,7 +25,7 @@ object FFileDateTime: TFFileDateTime
     Left = 0
     Top = 0
     Width = 631
-    Height = 523
+    Height = 547
     Align = alLeft
     DoubleBuffered = True
     Font.Charset = DEFAULT_CHARSET
@@ -35,12 +35,12 @@ object FFileDateTime: TFFileDateTime
     Font.Style = []
     ParentDoubleBuffered = False
     ParentFont = False
-    TabOrder = 1
+    TabOrder = 0
     object AdvPanel2: TPanel
       Left = 16
       Top = 16
       Width = 600
-      Height = 416
+      Height = 437
       Hint = 'Note: No backup files are created when renaming!'
       BevelOuter = bvLowered
       Font.Charset = DEFAULT_CHARSET
@@ -56,7 +56,7 @@ object FFileDateTime: TFFileDateTime
         Width = 567
         Height = 81
         Caption = 'Use date and time from'
-        TabOrder = 10
+        TabOrder = 0
         object LblSampleDate: TLabel
           Left = 157
           Top = 20
@@ -105,11 +105,11 @@ object FFileDateTime: TFFileDateTime
           'YYYYMMDD_HHMMSS Filename'
           'YYYYMMDD_HHMM Filename'
           'YYYYMMDD Filename')
-        TabOrder = 0
+        TabOrder = 1
       end
       object RadioGroup3: TRadioGroup
         Left = 16
-        Top = 197
+        Top = 221
         Width = 324
         Height = 65
         Caption = 'Change Filename'
@@ -117,12 +117,12 @@ object FFileDateTime: TFFileDateTime
         Items.Strings = (
           'keep as is'
           'into')
-        TabOrder = 1
+        TabOrder = 4
         OnClick = RadioGroup3Click
       end
       object RadioGroup4: TRadioGroup
         Left = 357
-        Top = 197
+        Top = 221
         Width = 227
         Height = 65
         Caption = 'Save existing Filename to'
@@ -130,7 +130,7 @@ object FFileDateTime: TFFileDateTime
         Items.Strings = (
           'Exif:DocumentName'
           'Don'#39't save')
-        TabOrder = 2
+        TabOrder = 5
       end
       object CheckBox1: TCheckBox
         Left = 357
@@ -138,7 +138,7 @@ object FFileDateTime: TFFileDateTime
         Width = 208
         Height = 17
         Caption = '-set separator in Date field'
-        TabOrder = 3
+        TabOrder = 2
         OnClick = CheckBox1Click
       end
       object CheckBox2: TCheckBox
@@ -147,42 +147,42 @@ object FFileDateTime: TFFileDateTime
         Width = 208
         Height = 17
         Caption = '-set separator in Time field'
-        TabOrder = 4
+        TabOrder = 3
         OnClick = CheckBox1Click
       end
       object Edit1: TEdit
         Left = 115
-        Top = 234
+        Top = 258
         Width = 219
         Height = 22
         Color = clBtnFace
         MaxLength = 64
-        TabOrder = 5
+        TabOrder = 6
         OnChange = EdPreviewChange
       end
       object Button2: TButton
         Left = 505
-        Top = 384
+        Top = 405
         Width = 75
         Height = 25
         Caption = 'Rename'
-        TabOrder = 6
+        TabOrder = 7
         OnClick = Button2Click
       end
       object ChkDateFirst: TCheckBox
         Left = 16
-        Top = 271
+        Top = 293
         Width = 324
         Height = 17
         Caption = '-DateTime first'
         Checked = True
         State = cbChecked
-        TabOrder = 7
+        TabOrder = 8
         OnClick = CheckBox1Click
       end
       object RadDuplicates: TRadioGroup
         Left = 16
-        Top = 295
+        Top = 316
         Width = 568
         Height = 82
         Caption = 'Action on duplicate filename (Custom requires Exiftool V12.97)'
@@ -191,15 +191,15 @@ object FFileDateTime: TFFileDateTime
           'None (Show error)'
           'Use standard sequence %-c'
           'Use custom sequence')
-        TabOrder = 8
+        TabOrder = 9
         OnClick = RadDuplicatesClick
       end
       object PnlCustomSeq: TPanel
         Left = 383
-        Top = 342
+        Top = 350
         Width = 196
         Height = 31
-        TabOrder = 9
+        TabOrder = 10
         object EdSeqPref: TEdit
           Left = 3
           Top = 4
@@ -277,10 +277,19 @@ object FFileDateTime: TFFileDateTime
           OnChange = EdPreviewChange
         end
       end
+      object ChkSeparate: TCheckBox
+        Left = 16
+        Top = 196
+        Width = 324
+        Height = 17
+        Caption = 'Separate Date/Time and Filename'
+        TabOrder = 11
+        OnClick = ChkSeparateClick
+      end
     end
     object AdvPanel3: TPanel
       Left = 16
-      Top = 437
+      Top = 459
       Width = 600
       Height = 35
       Hint = 'Files will only be renamed where Exif:DocumentName is defined.'
@@ -314,7 +323,7 @@ object FFileDateTime: TFFileDateTime
     end
     object AdvPanel4: TPanel
       Left = 16
-      Top = 478
+      Top = 502
       Width = 600
       Height = 35
       Hint = 'DateTime part must be separated by SPACE!'
@@ -354,6 +363,6 @@ object FFileDateTime: TFFileDateTime
     Height = 25
     Caption = 'Cancel'
     ModalResult = 2
-    TabOrder = 2
+    TabOrder = 1
   end
 end

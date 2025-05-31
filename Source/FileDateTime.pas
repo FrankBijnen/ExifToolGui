@@ -42,6 +42,7 @@ type
     CmbGroup: TComboBox;
     GroupBox1: TGroupBox;
     LblSampleDate: TLabel;
+    ChkSeparate: TCheckBox;
     procedure FormShow(Sender: TObject);
     procedure CheckBox1Click(Sender: TObject);
     procedure RadioGroup3Click(Sender: TObject);
@@ -52,8 +53,11 @@ type
     procedure RadDuplicatesClick(Sender: TObject);
     procedure CmbGroupClick(Sender: TObject);
     procedure RadioGroup1Click(Sender: TObject);
+    procedure EdSeparateChange(Sender: TObject);
+    procedure ChkSeparateClick(Sender: TObject);
   private
     { Private declarations }
+    Separator: string;
     FSample: string;
     Group: string;
     YYYY, MM, DD, HH, MIN, SS: string;
@@ -150,13 +154,13 @@ begin
   if ChkDateFirst.Checked then
   begin
     AddDateTime;
-    ETcmd := ETcmd + ' ';
+    ETcmd := ETcmd + Separator;
     AddName;
   end
   else
   begin
     AddName;
-    ETcmd := ETcmd + ' ';
+    ETcmd := ETcmd + Separator;
     AddDateTime;
   end;
 
@@ -276,9 +280,9 @@ begin
       Items[2] := '';
       if not ChkDateFirst.Checked then
       begin
-        Items[0] := SampleFileName + ' ';
-        Items[1] := SampleFileName + ' ';
-        Items[2] := SampleFileName + ' ';
+        Items[0] := SampleFileName + Separator;
+        Items[1] := SampleFileName + Separator;
+        Items[2] := SampleFileName + Separator;
       end;
       if CheckBox1.Checked then
       begin
@@ -310,9 +314,9 @@ begin
       end;
       if ChkDateFirst.Checked then
       begin
-        Items[0] := Items[0] + ' ' + SampleFileName;
-        Items[1] := Items[1] + ' ' + SampleFileName;
-        Items[2] := Items[2] + ' ' + SampleFileName;
+        Items[0] := Items[0] + Separator + SampleFileName;
+        Items[1] := Items[1] + Separator + SampleFileName;
+        Items[2] := Items[2] + Separator + SampleFileName;
       end;
       case RadDuplicates.ItemIndex of
         1:
@@ -350,6 +354,15 @@ begin
   UpdatePreview;
 end;
 
+procedure TFFileDateTime.ChkSeparateClick(Sender: TObject);
+begin
+  if (ChkSeparate.Checked) then
+    Separator := ' '
+  else
+    Separator := '';
+  UpdatePreview;
+end;
+
 procedure TFFileDateTime.CmbGroupClick(Sender: TObject);
 begin
   UpdatePreview;
@@ -365,6 +378,11 @@ begin
   UpdatePreview;
 end;
 
+procedure TFFileDateTime.EdSeparateChange(Sender: TObject);
+begin
+  UpdatePreview;
+end;
+
 procedure TFFileDateTime.FormShow(Sender: TObject);
 begin
   Left := FMain.GetFormOffset.X;
@@ -373,6 +391,7 @@ begin
   PnlCustomSeq.Visible := (RadDuplicates.ItemIndex = 2);
   Edit1.Enabled := (RadioGroup3.ItemIndex <> 0);
   CmbGroup.ItemIndex := 0;
+  ChkSeparate.Checked := true;
   UpdatePreview;
   Application.OnHint := DisplayHint;
 end;
