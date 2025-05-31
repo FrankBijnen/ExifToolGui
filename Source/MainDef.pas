@@ -96,6 +96,7 @@ type
     DefStartupDir: string;
     DefExportUse: boolean;
     DefExportDir: string;
+    WrkIniDir: string;
     UseExitDetails: boolean;
     ThumbAutoGenerate: boolean;
     ThumbCleanSet: string[4];
@@ -156,7 +157,6 @@ var
   MarkedTagList: string;
   CustomViewTagList: string;
   GpsXmpDir: string = '';
-  WrkIniDir: string = '';
   ParmIniPath: string = '';
   DontSaveIni: boolean;
   PredefinedTagList: TStringList;
@@ -894,6 +894,7 @@ begin
         GUIsettings.ETTimeOut := ReadInteger(Ini_Settings, 'ETTimeOut', 5000);
         DefExportUse := ReadBool(Ini_Settings, 'DefExportUse', false);
         DefExportDir := ReadString(Ini_Settings, 'DefExportDir', '');
+        WrkIniDir := ReadString(Ini_Settings, 'WrkIniDir', '');
         FMain.ShellList.ThumbNailSize := ReadInteger(Ini_Settings, 'ThumbsSize', 96);
         ThumbAutoGenerate := ReadBool(Ini_Settings, 'ThumbAutoGenerate', True);
         FMain.ShellList.ThumbAutoGenerate := ThumbAutoGenerate;
@@ -1126,6 +1127,7 @@ begin
           WriteInteger(Ini_Settings, 'ETTimeOut', ETTimeOut);
           WriteBool(Ini_Settings, 'DefExportUse', DefExportUse);
           WriteString(Ini_Settings, 'DefExportDir', DefExportDir);
+          WriteString(Ini_Settings, 'WrkIniDir', WrkIniDir);
           WriteInteger(Ini_Settings, 'ThumbsSize', FMain.ShellList.ThumbNailSize);
           WriteBool(Ini_Settings, 'ThumbAutoGenerate', ThumbAutoGenerate);
           WriteString(Ini_Settings, 'ThumbCleanSet', ThumbCleanSet);
@@ -1356,7 +1358,7 @@ begin
   with SaveFileDlg do
   begin
     DefaultExt := 'ini';
-    InitialDir := WrkIniDir;
+    InitialDir := GUIsettings.WrkIniDir;
     Filter := 'Ini file|*.ini';
     Title := StrExportIni;
     repeat

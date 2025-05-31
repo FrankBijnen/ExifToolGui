@@ -3678,7 +3678,14 @@ begin
   // Init Chart
   AdvRadioGroup2Click(Sender);
 
-  WrkIniDir := GetINIPath(false);
+  // Ini settings
+  if not DirectoryExists(GUIsettings.WrkIniDir) then
+  begin
+    if (ParmIniPath <> '') then
+      GUIsettings.WrkIniDir := ParmIniPath
+    else
+      GUIsettings.WrkIniDir := GetINIPath(false);
+  end;
   DontSaveIni := FindCmdLineSwitch('DontSaveIni', true);
 
   // The shellList is initially disabled. Now enable and refresh
