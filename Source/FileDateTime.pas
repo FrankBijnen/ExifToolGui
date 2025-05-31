@@ -372,7 +372,7 @@ begin
   FSample := ReplaceAll(FMain.GetFirstSelectedFile, [CRLF], ['']);
   PnlCustomSeq.Visible := (RadDuplicates.ItemIndex = 2);
   Edit1.Enabled := (RadioGroup3.ItemIndex <> 0);
-
+  CmbGroup.ItemIndex := 0;
   UpdatePreview;
   Application.OnHint := DisplayHint;
 end;
