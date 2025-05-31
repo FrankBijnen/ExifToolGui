@@ -83,9 +83,10 @@ const
 
 type
   TIniTagsData = (idtWorkSpace, idtETDirect, idtFileLists, idtCustomView, idtPredefinedTags,
-                  idtMarked, idtRemoveTags, idtCopySingleTags, idtCopyTags, idtDiffTags);
+                  idtMarked, idtRemoveTags, idtCopySingleTags, idtCopyTags, idtDiffTags,
+                  idtFileFilters);
 
-  TIniData = (idWorkSpace, idETDirect, idFileLists, idCustomView, idPredefinedTags);
+  TIniData = (idWorkSpace, idETDirect, idFileLists, idCustomView, idPredefinedTags, idFileFilters);
   TSelIniData = set of TIniData;
 
   GUIsettingsRec = record
@@ -294,7 +295,8 @@ begin
   with TStringList.Create do
   begin
     Text := FileFilters;
-    if (FilterSel < Count) then
+    if (FilterSel > -1) and
+       (FilterSel < Count) then
       result := Strings[FilterSel];
     Free;
   end;
@@ -353,6 +355,20 @@ begin
   QuickTags[AIndex].NoEdit    := (RightStr(ACaption, 1) = '?');
   QuickTags[AIndex].NoEdit    := QuickTags[result -1].NoEdit or
                                  (StartsText(GUI_PREF, QuickTags[AIndex].Command));
+end;
+
+function ReadFileFilters(GUIini: TMemIniFile; CreateEmpty: boolean): integer;
+begin
+  // Create empty ?
+  if (not CreateEmpty) and
+     (not GUIini.SectionExists(Ini_Settings)) then
+    exit(0);
+
+  GUIsettings.FileFilters := StrShowAllFiles + #10 +
+    ReplaceAll(GUIini.ReadString(Ini_Settings, 'FileFilters', DefFileFilter), ['|'], [#10]);
+  GUIsettings.FilterStartup := GUIini.ReadInteger(Ini_Settings, 'FilterStartup', 0);
+  GUIsettings.FilterSel := GUIsettings.FilterStartup;
+  result := 2;
 end;
 
 function ReadWorkSpaceTags(GUIini: TMemIniFile; CreateEmpty: boolean):integer;
@@ -767,6 +783,12 @@ begin
   end;
 end;
 
+procedure WriteFileFilters(GUIini: TMemIniFile);
+begin
+  GUIini.WriteString(Ini_Settings, 'FileFilters', GUIsettings.SaveFileFilter);
+  GUIini.WriteInteger(Ini_Settings, 'FilterStartup', GUIsettings.FilterStartup);
+end;
+
 procedure WriteMarkedTags(GUIini: TMemIniFile);
 begin
   WriteTagList(GUIini, MarkedTags, MarkedTagList);
@@ -858,9 +880,10 @@ begin
         Language := ReadString(Ini_Settings, 'Language', '');
         ET.Options.SetLangDef(Language);
         AutoRotatePreview := ReadBool(Ini_Settings, 'AutoRotatePreview', false);
-        FileFilters := StrShowAllFiles + #10 +
-                       ReplaceAll(ReadString(Ini_Settings, 'FileFilters', DefFileFilter), ['|'], [#10]);
-        FilterStartup := ReadInteger(Ini_Settings, 'FilterStartup', 0);
+
+        // File Filters;
+        ReadFileFilters(GUIini, true);
+
         DefStartupUse := ReadBool(Ini_Settings, 'DefStartupUse', false);
         DefStartupDir := ReadString(Ini_Settings, 'DefStartupDir', 'c:\');
         if DefStartupUse then
@@ -1091,8 +1114,10 @@ begin
 
           WriteString(Ini_Settings, 'Language', Language);
           WriteBool(Ini_Settings, 'AutoRotatePreview', AutoRotatePreview);
-          WriteString(Ini_Settings, 'FileFilters', SaveFileFilter);
-          WriteInteger(Ini_Settings, 'FilterStartup', FilterStartup);
+
+          // FileFilters
+          WriteFileFilters(GUIini);
+
           WriteBool(Ini_Settings, 'DefStartupUse', DefStartupUse);
           WriteString(Ini_Settings, 'DefStartupDir', DefStartupDir);
           WriteString(Ini_Settings, 'ETOverrideDir', ETOverrideDir);
@@ -1223,6 +1248,8 @@ begin
         result := result + StrCustomView;
       TIniData.idPredefinedTags:
         result := result + StrPredefinedTags;
+      TIniData.idFileFilters:
+        result := result + StrFileFilters;
     end;
   end;
 end;
@@ -1251,6 +1278,7 @@ begin
         TIniTagsData.idtCopySingleTags:   LoadOK := (ReadCopySingleTags(GuiIni, false) <> 0);
         TIniTagsData.idtCopyTags:         LoadOK := (ReadCopyTags(GuiIni, false) <> 0);
         TIniTagsData.idtDiffTags:         LoadOK := (ReadDiffTags(GuiIni, false) <> 0);
+        TIniTagsData.idtFileFilters:      LoadOK := (ReadFileFilters(GuiIni, false) <> 0);
       else
         LoadOK := false;
       end;
@@ -1261,7 +1289,7 @@ begin
   end;
 end;
 
-function LoadIniDialog(OpenFileDlg: TOpenDialog): boolean;
+function LoadIniFile(IniFile: string): boolean;
 var
   HrIniData: string;
   IniLoaded: boolean;
@@ -1269,46 +1297,53 @@ var
 begin
   result := false;
 
+  HrIniData := '';
+  for AIniData := Low(TIniData) to High(TIniData) do
+  begin
+    IniLoaded := false;
+    case AIniData of
+      TIniData.idWorkSpace:
+        IniLoaded := LoadIni(IniFile, [TIniTagsData.idtWorkSpace]);
+      TIniData.idETDirect:
+        IniLoaded := LoadIni(IniFile, [TIniTagsData.idtETDirect]);
+      TIniData.idFileLists:
+        IniLoaded := LoadIni(IniFile, [TIniTagsData.idtFileLists]);
+      TIniData.idCustomView:
+        IniLoaded := LoadIni(IniFile, [TIniTagsData.idtCustomView]);
+      TIniData.idPredefinedTags:
+        IniLoaded := LoadIni(IniFile, [TIniTagsData.idtPredefinedTags,
+                                        TIniTagsData.idtMarked,
+                                        TIniTagsData.idtRemoveTags,
+                                        TIniTagsData.idtCopySingleTags,
+                                        TIniTagsData.idtCopyTags,
+                                        TIniTagsData.idtDiffTags]);
+      TIniData.idFileFilters:
+        IniLoaded := LoadIni(IniFile, [TIniTagsData.idtFileFilters]);
+    end;
+    if (IniLoaded) then
+      HrIniData := HRiniData + #10 + GetHrIniData(AIniData);
+    result := result or IniLoaded;
+  end;
+  if (HrIniData <> '') then
+    ShowMessage(Format('%s%s%s', [Format(StrIniImported, [IniFile]),
+                                  #10,
+                                  Format(StrIniDefContaining, [HrIniData])]))
+  else
+    ShowMessage(StrIniFileNotChanged);
+  GUIsettings.WrkIniDir := ExtractFileDir(IniFile);
+end;
+
+function LoadIniDialog(OpenFileDlg: TOpenDialog): boolean;
+begin
+  result := false;
+
   with OpenFileDlg do
   begin
-    InitialDir := WrkIniDir;
+    InitialDir := GUIsettings.WrkIniDir;
     Filter := 'Ini file|*.ini';
     Title := StrImportIni;
     if Execute then
-    begin
-      HrIniData := '';
-      for AIniData := Low(TIniData) to High(TIniData) do
-      begin
-        IniLoaded := false;
-        case AIniData of
-          TIniData.idWorkSpace:
-            IniLoaded := LoadIni(FileName, [TIniTagsData.idtWorkSpace]);
-          TIniData.idETDirect:
-            IniLoaded := LoadIni(FileName, [TIniTagsData.idtETDirect]);
-          TIniData.idFileLists:
-            IniLoaded := LoadIni(FileName, [TIniTagsData.idtFileLists]);
-          TIniData.idCustomView:
-            IniLoaded := LoadIni(FileName, [TIniTagsData.idtCustomView]);
-          TIniData.idPredefinedTags:
-            IniLoaded := LoadIni(FileName, [TIniTagsData.idtPredefinedTags,
-                                            TIniTagsData.idtMarked,
-                                            TIniTagsData.idtRemoveTags,
-                                            TIniTagsData.idtCopySingleTags,
-                                            TIniTagsData.idtCopyTags,
-                                            TIniTagsData.idtDiffTags]);
-        end;
-        if (IniLoaded) then
-          HrIniData := HRiniData + #10 + GetHrIniData(AIniData);
-        result := result or IniLoaded;
-      end;
-      if (HrIniData <> '') then
-        ShowMessage(Format('%s%s%s', [Format(StrIniImported, [FileName]),
-                                      #10,
-                                      Format(StrIniDefContaining, [HrIniData])]))
-      else
-        ShowMessage(StrIniFileNotChanged);
-      WrkIniDir := ExtractFileDir(FileName);
-    end;
+      LoadIniFile(FileName);
   end;
 end;
 
@@ -1362,6 +1397,7 @@ begin
           TIniTagsData.idtCopySingleTags: WriteCopySingleTags(GuiIni);
           TIniTagsData.idtCopyTags:       WriteCopyTags(GuiIni);
           TIniTagsData.idtDiffTags:       WriteDiffTags(GuiIni);
+          TIniTagsData.idtFileFilters:    WriteFileFilters(GUIini);
         end;
       end;
       GUIini.UpdateFile;
@@ -1407,6 +1443,8 @@ begin
                                       TIniTagsData.idtRemoveTags,
                                       TIniTagsData.idtCopySingleTags,
                                       TIniTagsData.idtCopyTags];
+        TIniData.idFileFilters:
+          AllIniData := AllIniData + [TIniTagsData.idtFileFilters];
       end;
     end;
   end;

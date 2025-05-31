@@ -56,6 +56,7 @@ begin
     AddItem(StrFileLists,       idFileLists);
     AddItem(StrCustomView,      idCustomView);
     AddItem(StrPredefinedTags,  idPredefinedTags);
+    AddItem(StrFileFilters,     idFileFilters);
   finally
     LvSelections.Items.EndUpdate;
   end;

@@ -3610,6 +3610,16 @@ begin
     for Index := 0 to ShellList.Items.Count -1 do
       ShellList.Items[Index].Selected := (FNames.IndexOf(ShellList.Folders[Index].PathName) > -1);
 
+    if (FNames.Count > 0) then
+    begin
+      if (SameText(ExtractFileExt(FNames[0]), '.ini')) then
+      begin
+        GUIsettings.WrkIniDir := ExtractFileDir(FNames[0]);
+        OpenFileDlg.FileName := FNames[0];
+        LoadIniDialog(OpenFileDlg);
+      end;
+    end;
+
     // Show data of first selected file
     ShowMetadata;
     ShowPreview;
@@ -3671,7 +3681,7 @@ begin
   WrkIniDir := GetINIPath(false);
   DontSaveIni := FindCmdLineSwitch('DontSaveIni', true);
 
-  // The shellList is initally disabled. Now enable and refresh
+  // The shellList is initially disabled. Now enable and refresh
   SetColorsFromStyle;
   ShellListSetFolders;
   ShellList.Enabled := true;
