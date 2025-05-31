@@ -3047,7 +3047,10 @@ end;
 procedure TFMain.MaImportSettingsExecute(Sender: TObject);
 begin
   if (LoadIniDialog(OpenFileDlg)) then
+  begin
+    SetCaptionAndImage;
     ShowMetadata;
+  end;
 end;
 
 procedure TFMain.MaFDateFromQuickTimeExecute(Sender: TObject);
@@ -3616,7 +3619,8 @@ begin
       begin
         GUIsettings.WrkIniDir := ExtractFileDir(FNames[0]);
         OpenFileDlg.FileName := FNames[0];
-        LoadIniDialog(OpenFileDlg);
+        if LoadIniDialog(OpenFileDlg) then
+          SetCaptionAndImage;
       end;
     end;
 

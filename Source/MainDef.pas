@@ -1345,7 +1345,7 @@ begin
     Filter := 'Ini file|*.ini';
     Title := StrImportIni;
     if Execute then
-      LoadIniFile(FileName);
+      result := LoadIniFile(FileName);
   end;
 end;
 
@@ -1373,7 +1373,10 @@ begin
       end;
     until not DoSave or IsOK;
     if (DoSave) and (IsOk) then
+    begin
       result := FileName;
+      GUIsettings.WrkIniDir := ExtractFileDir(result);
+    end;
   end;
 end;
 
