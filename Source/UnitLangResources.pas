@@ -136,6 +136,7 @@ resourcestring
   StrFileLists              = 'File lists';
   StrCustomView             = 'Custom view';
   StrPredefinedTags         = 'Predefined tags (Marked, Remove/Copy Metadata)';
+  StrFileFilters            = 'File filters';
 
   StrImportIni              = 'Import ini file';
   StrIniImported            = 'Ini file: %s imported.';
