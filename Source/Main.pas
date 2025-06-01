@@ -496,6 +496,7 @@ type
     NormalPreviewHeight: integer;
     GUIBorderWidth, GUIBorderHeight: integer;
     GUIColorWindow: TColor;
+    GUIColorWindowDisabled: TColor;
     GUIColorShellTree: TColor;
     GUIColorShellList: TColor;
     FStyleServices: TCustomStyleServices;
@@ -4387,17 +4388,27 @@ begin
   RotateImg.RemoveSelectionRects;
 
   PnlRegionData.Enabled := Assigned(Regions) and
+                           (PnlRegion.Enabled) and
                            (Regions.Items.Count > 0);
+  if (PnlRegion.Enabled) then
+    PnlRegionButtons.Color := GUIColorWindow
+  else
+    PnlRegionButtons.Color := GUIColorWindowDisabled;
+
   PnlRegionXY.Enabled := PnlRegionData.Enabled;
   PnlRegionWH.Enabled := PnlRegionData.Enabled;
   RotateImg.SelectionEnabled := PnlRegionData.Enabled;
 
-  BtnRegionAdd.Enabled  := (ShellList.SelectedFolder <> nil) and
+  BtnRegionAdd.Enabled  := (PnlRegionData.Enabled) and
+                           (ShellList.SelectedFolder <> nil) and
                            (TSubShellFolder.GetIsFolder((ShellList.SelectedFolder)) = false);
-  BtnRegionDel.Enabled  := (Assigned(Regions)) and
+  BtnRegionDel.Enabled  := (PnlRegionData.Enabled) and
+                           (Assigned(Regions)) and
                            (Regions.Items.Count > 0);
-  BtnRegionSave.Enabled := (Assigned(Regions)) and
+  BtnRegionSave.Enabled := (PnlRegionData.Enabled) and
+                           (Assigned(Regions)) and
                            (Regions.Modified = true);
+  BtnRegionMaximize.Enabled := (PnlRegionData.Enabled);
 
   if not Assigned(Regions) then
     exit;
@@ -4450,7 +4461,6 @@ begin
   if (PnlRegion.Visible = false) then
     exit;
   PnlRegion.Enabled := (ShellList.SelCount = 1);
-
   NewIndex := -1;
   CurRegionName := '';
   if (CurRegion < LvRegions.Items.Count) then
@@ -4997,6 +5007,7 @@ end;
 procedure TFMain.GetColorsFromStyle;
 begin
   GUIColorWindow := clWhite;
+  GUIColorWindowDisabled := clSilver;
   GUIColorShellTree := GUIColorWindow;
   GUIColorShellList := GUIColorWindow;
 
@@ -5004,6 +5015,7 @@ begin
   if Assigned(FStyleServices) then
   begin
     GUIColorWindow := FStyleServices.GetStyleColor(scWindow);
+    GUIColorWindowDisabled := FStyleServices.GetStyleColor(scButtonDisabled);
     GUIColorShellTree := FStyleServices.GetStyleColor(scTreeView);;
     GUIColorShellList :=  FStyleServices.GetStyleColor(scListView);
   end;
@@ -5016,7 +5028,6 @@ begin
   ShellTree.Color := GUIColorShellTree;
   ShellList.Color := GUIColorShellList;
   ShellList.BkColor := GUIColorWindow;
-  PnlRegion.Color := GUIColorWindow;
 end;
 
 procedure TFMain.ShellistThumbError(Sender: TObject; Item: TListItem; E: Exception);
