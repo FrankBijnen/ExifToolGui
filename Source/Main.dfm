@@ -88,7 +88,7 @@ object FMain: TFMain
     TabOrder = 1
     object Splitter3: TSplitter
       Left = 1
-      Top = 217
+      Top = 215
       Width = 280
       Height = 4
       Cursor = crVSplit
@@ -104,17 +104,18 @@ object FMain: TFMain
       Left = 1
       Top = 1
       Width = 280
-      Height = 216
+      Height = 214
       ActivePage = AdvTabBrowse
       Align = alClient
       TabOrder = 0
+      ExplicitHeight = 216
       object AdvTabBrowse: TTabSheet
         Caption = 'Folders'
         object ShellTree: TShellTreeView
           Left = 0
           Top = 0
           Width = 272
-          Height = 188
+          Height = 186
           ObjectTypes = [otFolders]
           Root = 'rfDesktop'
           ShellListView = ShellList
@@ -139,14 +140,15 @@ object FMain: TFMain
           OnKeyUp = ShellTreeKeyUp
           OnChanging = ShellTreeChanging
           OnEdited = ShellTreeEdited
+          ExplicitHeight = 188
         end
       end
     end
     object AdvPagePreview: TTabControl
       Left = 1
-      Top = 221
+      Top = 219
       Width = 280
-      Height = 287
+      Height = 289
       Align = alBottom
       Constraints.MinHeight = 240
       Constraints.MinWidth = 280
@@ -158,41 +160,44 @@ object FMain: TFMain
       TabIndex = 0
       OnChange = AdvPagePreviewChange
       OnResize = AdvPagePreviewResize
+      ExplicitTop = 221
       object RotateImg: TImage
         Left = 4
         Top = 24
-        Width = 127
-        Height = 259
+        Width = 119
+        Height = 261
         Align = alClient
         ExplicitWidth = 125
         ExplicitHeight = 340
       end
       object SplitPreviewRegion: TSplitter
-        Left = 131
+        Left = 123
         Top = 24
         Width = 5
-        Height = 259
+        Height = 261
         Align = alRight
         OnMoved = SplitPreviewRegionMoved
         ExplicitLeft = 133
         ExplicitHeight = 193
       end
       object PnlRegion: TPanel
-        Left = 136
+        Left = 128
         Top = 24
-        Width = 140
-        Height = 259
+        Width = 148
+        Height = 261
         Align = alRight
         Constraints.MinWidth = 140
         TabOrder = 0
         OnResize = PnlRegionResize
         object PnlRegionWH: TPanel
           Left = 1
-          Top = 234
-          Width = 138
+          Top = 236
+          Width = 146
           Height = 24
           Align = alBottom
           TabOrder = 0
+          ExplicitTop = 234
+          ExplicitWidth = 138
           object LblRegionWH: TLabel
             Left = 1
             Top = 1
@@ -222,7 +227,7 @@ object FMain: TFMain
           object NumBoxH: TNumberBox
             Left = 79
             Top = 1
-            Width = 58
+            Width = 66
             Height = 22
             Align = alClient
             Decimal = 4
@@ -232,16 +237,19 @@ object FMain: TFMain
             TabOrder = 1
             UseMouseWheel = True
             OnChangeValue = RegionChange
+            ExplicitWidth = 58
             ExplicitHeight = 21
           end
         end
         object PnlRegionXY: TPanel
           Left = 1
-          Top = 210
-          Width = 138
+          Top = 212
+          Width = 146
           Height = 24
           Align = alBottom
           TabOrder = 1
+          ExplicitTop = 210
+          ExplicitWidth = 138
           object LblRegionXY: TLabel
             Left = 1
             Top = 1
@@ -271,7 +279,7 @@ object FMain: TFMain
           object NumBoxY: TNumberBox
             Left = 79
             Top = 1
-            Width = 58
+            Width = 66
             Height = 22
             Align = alClient
             Decimal = 4
@@ -281,94 +289,115 @@ object FMain: TFMain
             TabOrder = 1
             UseMouseWheel = True
             OnChangeValue = RegionChange
+            ExplicitWidth = 58
             ExplicitHeight = 21
           end
         end
         object PnlRegionButtons: TPanel
           Left = 1
           Top = 1
-          Width = 138
-          Height = 32
+          Width = 146
+          Height = 34
           Align = alTop
-          ParentColor = True
+          ParentBackground = False
           TabOrder = 2
+          StyleElements = [seFont, seBorder]
           object BtnRegionMaximize: TSpeedButton
             AlignWithMargins = True
-            Left = 104
-            Top = 2
+            Left = 111
+            Top = 3
             Width = 32
             Height = 28
-            Margins.Left = 1
-            Margins.Top = 1
-            Margins.Right = 1
-            Margins.Bottom = 1
+            Margins.Left = 2
+            Margins.Top = 2
+            Margins.Right = 2
+            Margins.Bottom = 2
             Align = alLeft
             AllowAllUp = True
             GroupIndex = 10
+            DisabledImageIndex = 8
+            DisabledImageName = 'freepik_region_maximize_Disabled'
             ImageIndex = 3
             ImageName = 'freepik_region_maximize'
             Images = VirtualImageRegions
+            NumGlyphs = 2
             SelectedImageIndex = 4
             SelectedImageName = 'freepik_region_minimize'
             OnClick = BtnRegionMaximizeClick
+            ExplicitLeft = 104
+            ExplicitTop = 2
           end
           object BtnRegionSave: TSpeedButton
             AlignWithMargins = True
-            Left = 70
-            Top = 2
+            Left = 75
+            Top = 3
             Width = 32
             Height = 28
-            Margins.Left = 1
-            Margins.Top = 1
-            Margins.Right = 1
-            Margins.Bottom = 1
+            Margins.Left = 2
+            Margins.Top = 2
+            Margins.Right = 2
+            Margins.Bottom = 2
             Align = alLeft
             AllowAllUp = True
+            DisabledImageIndex = 7
+            DisabledImageName = 'freepik_region_save_Disabled'
             ImageIndex = 2
             ImageName = 'freepik_region_save'
             Images = VirtualImageRegions
+            NumGlyphs = 2
             OnClick = BtnRegionSaveClick
+            ExplicitLeft = 70
             ExplicitTop = 0
           end
           object BtnRegionAdd: TSpeedButton
             AlignWithMargins = True
-            Left = 2
-            Top = 2
+            Left = 3
+            Top = 3
             Width = 32
             Height = 28
-            Margins.Left = 1
-            Margins.Top = 1
-            Margins.Right = 1
-            Margins.Bottom = 1
+            Margins.Left = 2
+            Margins.Top = 2
+            Margins.Right = 2
+            Margins.Bottom = 2
             Align = alLeft
             AllowAllUp = True
+            DisabledImageIndex = 5
+            DisabledImageName = 'freepik_region_add_Disabled'
             ImageIndex = 0
             ImageName = 'freepik_region_add'
             Images = VirtualImageRegions
+            NumGlyphs = 2
             OnClick = BtnRegionAddClick
+            ExplicitLeft = 2
+            ExplicitTop = 2
           end
           object BtnRegionDel: TSpeedButton
             AlignWithMargins = True
-            Left = 36
-            Top = 2
+            Left = 39
+            Top = 3
             Width = 32
             Height = 28
-            Margins.Left = 1
-            Margins.Top = 1
-            Margins.Right = 1
-            Margins.Bottom = 1
+            Margins.Left = 2
+            Margins.Top = 2
+            Margins.Right = 2
+            Margins.Bottom = 2
             Align = alLeft
             AllowAllUp = True
+            DisabledImageIndex = 6
+            DisabledImageName = 'freepik_region_remove_Disabled'
             ImageIndex = 1
             ImageName = 'freepik_region_remove'
             Images = VirtualImageRegions
+            NumGlyphs = 2
             OnClick = BtnRegionDelClick
+            ExplicitLeft = 36
+            ExplicitTop = 2
           end
         end
         object LvRegions: TListView
           Left = 1
-          Top = 33
-          Width = 138
+          Top = 35
+          Width = 146
           Height = 50
           Hint = 'Click + to define a region.'
           Align = alClient
@@ -395,18 +424,23 @@ object FMain: TFMain
           OnResize = LvRegionsResize
           OnSelectItem = LvRegionsSelectItem
           OnItemChecked = LvRegionsItemChecked
+          ExplicitTop = 33
+          ExplicitWidth = 138
         end
         object PnlRegionData: TPanel
           Left = 1
-          Top = 83
-          Width = 138
+          Top = 85
+          Width = 146
           Height = 127
           Align = alBottom
+          ParentColor = True
           TabOrder = 4
+          ExplicitTop = 83
+          ExplicitWidth = 138
           object LblRegionType: TLabel
             Left = 1
             Top = 86
-            Width = 136
+            Width = 144
             Height = 13
             Align = alBottom
             Caption = 'Type'
@@ -416,7 +450,7 @@ object FMain: TFMain
             AlignWithMargins = True
             Left = 4
             Top = 102
-            Width = 130
+            Width = 138
             Height = 21
             Align = alBottom
             Style = csDropDownList
@@ -429,12 +463,13 @@ object FMain: TFMain
               'Pet'
               'Focus'
               'BarCode')
+            ExplicitWidth = 130
           end
           object EdRegionDescription: TLabeledEdit
             AlignWithMargins = True
             Left = 4
             Top = 62
-            Width = 130
+            Width = 138
             Height = 21
             Margins.Top = 18
             Align = alBottom
@@ -444,12 +479,13 @@ object FMain: TFMain
             TabOrder = 1
             Text = ''
             OnChange = RegionChange
+            ExplicitWidth = 130
           end
           object EdRegionName: TLabeledEdit
             AlignWithMargins = True
             Left = 4
             Top = 20
-            Width = 130
+            Width = 138
             Height = 21
             Margins.Top = 18
             Align = alBottom
@@ -459,6 +495,7 @@ object FMain: TFMain
             TabOrder = 2
             Text = ''
             OnChange = RegionChange
+            ExplicitWidth = 130
           end
         end
       end
@@ -12100,9 +12137,39 @@ object FMain: TFMain
         CollectionIndex = 4
         CollectionName = 'freepik_region_minimize'
         Name = 'freepik_region_minimize'
+      end
+      item
+        CollectionIndex = 0
+        CollectionName = 'freepik_region_add'
+        Disabled = True
+        Name = 'freepik_region_add_Disabled'
+      end
+      item
+        CollectionIndex = 1
+        CollectionName = 'freepik_region_remove'
+        Disabled = True
+        Name = 'freepik_region_remove_Disabled'
+      end
+      item
+        CollectionIndex = 2
+        CollectionName = 'freepik_region_save'
+        Disabled = True
+        Name = 'freepik_region_save_Disabled'
+      end
+      item
+        CollectionIndex = 3
+        CollectionName = 'freepik_region_maximize'
+        Disabled = True
+        Name = 'freepik_region_maximize_Disabled'
+      end
+      item
+        CollectionIndex = 4
+        CollectionName = 'freepik_region_minimize'
+        Disabled = True
+        Name = 'freepik_region_minimize_Disabled'
       end>
     ImageCollection = ImageCollectionRegions
-    Left = 45
-    Top = 570
+    Left = 37
+    Top = 497
   end
 end
