@@ -4390,25 +4390,25 @@ begin
   PnlRegionData.Enabled := Assigned(Regions) and
                            (PnlRegion.Enabled) and
                            (Regions.Items.Count > 0);
+  PnlRegionButtons.Enabled := PnlRegion.Enabled;
   if (PnlRegion.Enabled) then
     PnlRegionButtons.Color := GUIColorWindow
   else
     PnlRegionButtons.Color := GUIColorWindowDisabled;
-
   PnlRegionXY.Enabled := PnlRegionData.Enabled;
   PnlRegionWH.Enabled := PnlRegionData.Enabled;
   RotateImg.SelectionEnabled := PnlRegionData.Enabled;
 
-  BtnRegionAdd.Enabled  := (PnlRegionData.Enabled) and
-                           (ShellList.SelectedFolder <> nil) and
-                           (TSubShellFolder.GetIsFolder((ShellList.SelectedFolder)) = false);
-  BtnRegionDel.Enabled  := (PnlRegionData.Enabled) and
-                           (Assigned(Regions)) and
-                           (Regions.Items.Count > 0);
-  BtnRegionSave.Enabled := (PnlRegionData.Enabled) and
-                           (Assigned(Regions)) and
-                           (Regions.Modified = true);
-  BtnRegionMaximize.Enabled := (PnlRegionData.Enabled);
+  BtnRegionAdd.Enabled  :=      (PnlRegion.Enabled) and
+                                (ShellList.SelectedFolder <> nil) and
+                                (TSubShellFolder.GetIsFolder((ShellList.SelectedFolder)) = false);
+  BtnRegionDel.Enabled  :=      (PnlRegion.Enabled) and
+                                (Assigned(Regions)) and
+                                (Regions.Items.Count > 0);
+  BtnRegionSave.Enabled :=      (PnlRegion.Enabled) and
+                                (Assigned(Regions)) and
+                                (Regions.Modified = true);
+  BtnRegionMaximize.Enabled :=  (PnlRegion.Enabled);
 
   if not Assigned(Regions) then
     exit;

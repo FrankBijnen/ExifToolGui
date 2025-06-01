@@ -108,7 +108,6 @@ object FMain: TFMain
       ActivePage = AdvTabBrowse
       Align = alClient
       TabOrder = 0
-      ExplicitHeight = 216
       object AdvTabBrowse: TTabSheet
         Caption = 'Folders'
         object ShellTree: TShellTreeView
@@ -140,7 +139,6 @@ object FMain: TFMain
           OnKeyUp = ShellTreeKeyUp
           OnChanging = ShellTreeChanging
           OnEdited = ShellTreeEdited
-          ExplicitHeight = 188
         end
       end
     end
@@ -160,7 +158,6 @@ object FMain: TFMain
       TabIndex = 0
       OnChange = AdvPagePreviewChange
       OnResize = AdvPagePreviewResize
-      ExplicitTop = 221
       object RotateImg: TImage
         Left = 4
         Top = 24
@@ -196,8 +193,6 @@ object FMain: TFMain
           Height = 24
           Align = alBottom
           TabOrder = 0
-          ExplicitTop = 234
-          ExplicitWidth = 138
           object LblRegionWH: TLabel
             Left = 1
             Top = 1
@@ -237,7 +232,6 @@ object FMain: TFMain
             TabOrder = 1
             UseMouseWheel = True
             OnChangeValue = RegionChange
-            ExplicitWidth = 58
             ExplicitHeight = 21
           end
         end
@@ -248,8 +242,6 @@ object FMain: TFMain
           Height = 24
           Align = alBottom
           TabOrder = 1
-          ExplicitTop = 210
-          ExplicitWidth = 138
           object LblRegionXY: TLabel
             Left = 1
             Top = 1
@@ -289,7 +281,6 @@ object FMain: TFMain
             TabOrder = 1
             UseMouseWheel = True
             OnChangeValue = RegionChange
-            ExplicitWidth = 58
             ExplicitHeight = 21
           end
         end
@@ -299,7 +290,6 @@ object FMain: TFMain
           Width = 146
           Height = 34
           Align = alTop
-          ParentBackground = False
           TabOrder = 2
           StyleElements = [seFont, seBorder]
           object BtnRegionMaximize: TSpeedButton
@@ -424,8 +414,6 @@ object FMain: TFMain
           OnResize = LvRegionsResize
           OnSelectItem = LvRegionsSelectItem
           OnItemChecked = LvRegionsItemChecked
-          ExplicitTop = 33
-          ExplicitWidth = 138
         end
         object PnlRegionData: TPanel
           Left = 1
@@ -435,8 +423,6 @@ object FMain: TFMain
           Align = alBottom
           ParentColor = True
           TabOrder = 4
-          ExplicitTop = 83
-          ExplicitWidth = 138
           object LblRegionType: TLabel
             Left = 1
             Top = 86
@@ -463,7 +449,6 @@ object FMain: TFMain
               'Pet'
               'Focus'
               'BarCode')
-            ExplicitWidth = 130
           end
           object EdRegionDescription: TLabeledEdit
             AlignWithMargins = True
@@ -479,7 +464,6 @@ object FMain: TFMain
             TabOrder = 1
             Text = ''
             OnChange = RegionChange
-            ExplicitWidth = 130
           end
           object EdRegionName: TLabeledEdit
             AlignWithMargins = True
@@ -495,7 +479,6 @@ object FMain: TFMain
             TabOrder = 2
             Text = ''
             OnChange = RegionChange
-            ExplicitWidth = 130
           end
         end
       end
