@@ -145,6 +145,9 @@ type
   end;
 
 var
+  UseOl2Local: boolean;
+  Ol2Installed: boolean;
+
   GeoSettings: GEOsettingsRec;
   GeoProvinceList: TStringList;
   GeoCityList: TStringList;
@@ -614,9 +617,16 @@ begin
   Html.Add('<Html>');
   Html.Add('<head>');
   Html.Add('<title></title>');
-//TODO Create resources
-  Html.Add('<script type="text/javascript"  src="http://openlayers.org/api/OpenLayers.js"></script>');
-  Html.Add('<script src="http://www.openstreetmap.org/openlayers/OpenStreetMap.js"></script>');
+  if (UseOl2Local) then
+  begin
+    Html.Add('<script type="text/javascript" src="OpenLayers.js"></script>');
+    Html.Add('<script src="OpenStreetMap.js"></script>');
+  end
+  else
+  begin
+    Html.Add('<script type="text/javascript"  src="http://openlayers.org/api/OpenLayers.js"></script>');
+    Html.Add('<script src="http://www.openstreetmap.org/openlayers/OpenStreetMap.js"></script>');
+  end;
   Html.Add('<script type="text/javascript">');
   Html.Add('var map;');
   Html.Add('var allpoints;');     // Needed for CreateExtent
@@ -821,11 +831,63 @@ begin
 end;
 
 // ==============================================================================
+
+function InstallOpenLayers2: boolean;
+const Ol2Files: array[0..14,0..1] of string  = (
+    ('OL2_OpenLayers',      'OpenLayers.js'),
+    ('OL2_OpenStreetMap',   'OpenStreetMap.js'),
+    ('OL2_img_cpr',         'img\cloud-popup-relative.png'),
+    ('OL2_img_em',          'img\east-mini.png'),
+    ('OL2_img_lsmax',       'img\layer-switcher-maximize.png'),
+    ('OL2_img_lsmin',       'img\layer-switcher-minimize.png'),
+    ('OL2_img_nm',          'img\north-mini.png'),
+    ('OL2_img_s',           'img\slider.png'),
+    ('OL2_img_sm',          'img\south-mini.png'),
+    ('OL2_img_wm',          'img\west-mini.png'),
+    ('OL2_img_zmm',         'img\zoom-minus-mini.png'),
+    ('OL2_img_zpm',         'img\zoom-plus-mini.png'),
+    ('OL2_img_zb',          'img\zoombar.png'),
+    ('OL2_thm_def_close',   'theme\default\img\close.gif'),
+    ('OL2_thm_def_style',   'theme\default\style.css')
+  );
+
+var
+  ResStream: TResourceStream;
+  Index: integer;
+begin
+  result := false;
+  try
+    ForceDirectories(IncludeTrailingPathDelimiter(GetTempDirectory) + 'img');
+    ForceDirectories(IncludeTrailingPathDelimiter(GetTempDirectory) + 'theme\default\img');
+    for Index := 0 to High(Ol2Files) do
+    begin
+      ResStream := TResourceStream.Create(hInstance, Ol2Files[Index, 0], RT_RCDATA);
+      try
+        ResStream.Position := 0;
+        ResStream.SaveToFile(IncludeTrailingPathDelimiter(GetTempDirectory) + Ol2Files[Index, 1]);
+      finally
+        ResStream.Free;
+      end;
+    end;
+    result := true;
+  except on E:Exception do
+    ShowMessage(E.Message);
+  end;
+end;
+
 procedure OsmMapInit(Browser: TEdgeBrowser;
                      const Lat, Lon, Desc, InitialZoom: string);
 var
   OsmHelper: TOSMHelper;
 begin
+  if UseOl2Local then
+  begin
+    if not Ol2Installed then
+      Ol2Installed := InstallOpenLayers2;
+    if not Ol2Installed then
+      UseOl2Local := false;
+  end;
+
   OsmHelper := TOSMHelper.Create(GetHtmlTmp, InitialZoom);
   try
     OsmHelper.Scaled := Browser.ScaleValue(100);
@@ -1714,6 +1776,9 @@ end;
 
 initialization
 begin
+  UseOl2Local := true;
+  Ol2Installed := false;
+
   IgnoreGeoProvider := false;
   GeoCityList := TStringList.Create;
   GeoProvinceList := TStringList.Create;

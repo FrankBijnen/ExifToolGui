@@ -9,6 +9,7 @@ program ExifToolGUI;
 // CommandLine example: /Lang=NLD
 
 {$R 'ExifToolsGui_Files.res' 'Resources\ExifToolsGui_Files.rc'}
+{$R 'OpenLayers2.res' 'Resources\OpenLayers\OpenLayers2.rc'}
 
 uses
   {$IFDEF STACKTRACE}
