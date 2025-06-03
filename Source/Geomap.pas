@@ -620,12 +620,12 @@ begin
   if (UseOl2Local) then
   begin
     Html.Add('<script type="text/javascript" src="OpenLayers.js"></script>');
-    Html.Add('<script src="OpenStreetMap.js"></script>');
+    Html.Add('<script type="text/javascript" src="OpenStreetMap.js"></script>');
   end
   else
   begin
-    Html.Add('<script type="text/javascript"  src="http://openlayers.org/api/OpenLayers.js"></script>');
-    Html.Add('<script src="http://www.openstreetmap.org/openlayers/OpenStreetMap.js"></script>');
+    Html.Add('<script type="text/javascript" src="http://openlayers.org/api/OpenLayers.js"></script>');
+    Html.Add('<script type="text/javascript" src="http://www.openstreetmap.org/openlayers/OpenStreetMap.js"></script>');
   end;
   Html.Add('<script type="text/javascript">');
   Html.Add('var map;');
@@ -863,7 +863,6 @@ begin
     begin
       ResStream := TResourceStream.Create(hInstance, Ol2Files[Index, 0], RT_RCDATA);
       try
-        ResStream.Position := 0;
         ResStream.SaveToFile(IncludeTrailingPathDelimiter(GetTempDirectory) + Ol2Files[Index, 1]);
       finally
         ResStream.Free;
