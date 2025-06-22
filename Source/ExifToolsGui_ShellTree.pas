@@ -134,7 +134,7 @@ begin
 
   // RightClickSelect needs to be disabled within this method.
   // 'Selected' will be set to FRClickNode, leading to all kind of AV's (Especially WIN64)
-  // See Vcl.ComCtrls at around line 12240 CNNotify, Case NM_RCLICK:
+  // See Vcl.ComCtrls at around line 12551 CNNotify, Case NM_RCLICK:
   RightClickSave := RightClickSelect;
   RightClickSelect := false;
   try
