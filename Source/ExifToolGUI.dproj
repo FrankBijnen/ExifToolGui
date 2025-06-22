@@ -138,6 +138,9 @@
         <RcCompile Include="Resources\ExifToolsGui_Files.rc">
             <Form>ExifToolsGui_Files.res</Form>
         </RcCompile>
+        <RcCompile Include="Resources\OpenLayers\OpenLayers2.rc">
+            <Form>OpenLayers2.res</Form>
+        </RcCompile>
         <DCCReference Include="MainDef.pas"/>
         <DCCReference Include="ExifToolsGui_ResourceStrings.pas"/>
         <DCCReference Include="UnitLangResources.pas"/>

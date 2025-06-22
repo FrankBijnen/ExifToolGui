@@ -239,15 +239,6 @@ begin
   if not Showing then
     exit;
 
-  Group := CmbGroup.Text;
-  RadioGroup1.Buttons[0].Enabled := CmbGroup.ItemIndex <> 2;            // QuickTime
-  RadioGroup1.Buttons[0].Checked := RadioGroup1.Buttons[0].Enabled;     // QuickTime
-  RadioGroup1.Buttons[1].Checked := not RadioGroup1.Buttons[0].Enabled; // QuickTime
-
-  // Xmp:DocumentName does not exist
-  RadioGroup4.Enabled := (CmbGroup.ItemIndex = 0);
-  Button3.Enabled := (CmbGroup.ItemIndex = 0);
-
   ETcmd := '-s3' + CRLF + '-f';
   case RadioGroup1.ItemIndex of
     0: ETcmd := ETcmd + CRLF + CmdStr + CmdDateTimeOriginal(Group);
@@ -365,6 +356,15 @@ end;
 
 procedure TFFileDateTime.CmbGroupClick(Sender: TObject);
 begin
+  RadioGroup1.Buttons[0].Enabled := CmbGroup.ItemIndex <> 2;            // QuickTime
+  RadioGroup1.Buttons[0].Checked := RadioGroup1.Buttons[0].Enabled;     // QuickTime
+  RadioGroup1.Buttons[1].Checked := not RadioGroup1.Buttons[0].Enabled; // QuickTime
+  Group := CmbGroup.Text;
+
+  // Xmp:DocumentName does not exist
+  RadioGroup4.Enabled := (CmbGroup.ItemIndex = 0);
+  Button3.Enabled := (CmbGroup.ItemIndex = 0);
+
   UpdatePreview;
 end;
 
@@ -391,7 +391,9 @@ begin
   PnlCustomSeq.Visible := (RadDuplicates.ItemIndex = 2);
   Edit1.Enabled := (RadioGroup3.ItemIndex <> 0);
   CmbGroup.ItemIndex := 0;
+  CmbGroupClick(CmbGroup);
   ChkSeparate.Checked := true;
+
   UpdatePreview;
   Application.OnHint := DisplayHint;
 end;
