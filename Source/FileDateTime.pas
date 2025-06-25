@@ -146,8 +146,7 @@ begin
   if (ET.Options.ETBackupMode = '') then  // Dont add twice!
     ETcmd := '-overwrite_original' + CRLF;
 
-  if (RadioGroup4.Enabled) and
-     (RadioGroup4.ItemIndex = 0) then
+  if (RadioGroup4.ItemIndex = 0) then
     ETcmd := ETcmd + '-Exif:DocumentName<filename' + CRLF;
 
   ETcmd := ETcmd + '-filename<';
@@ -362,7 +361,6 @@ begin
   Group := CmbGroup.Text;
 
   // Xmp:DocumentName does not exist
-  RadioGroup4.Enabled := (CmbGroup.ItemIndex = 0);
   Button3.Enabled := (CmbGroup.ItemIndex = 0);
 
   UpdatePreview;

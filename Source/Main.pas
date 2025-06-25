@@ -3600,10 +3600,13 @@ begin
       end;
 
       // First file sets path, and refreshes shellList
-      if (FileNum = 0) then
-        ShellTree.Path := ExtractFileDir(FName)
-      else if (ShellTree.Path <> ExtractFileDir(FName)) then // all files should be in same dir!
-        break;
+      if (SameText(ExtractFileExt(FName), '.ini') = false) then
+      begin
+        if (FileNum = 0) then
+          ShellTree.Path := ExtractFileDir(FName)
+        else if (ShellTree.Path <> ExtractFileDir(FName)) then // all files should be in same dir!
+          break;
+      end;
 
       // Add to selection
       FNames.Add(FName);
