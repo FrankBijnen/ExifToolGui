@@ -3335,6 +3335,7 @@ begin
   ShellTree.OnCustomDrawItem := ShellTreeCustomDrawItem;
   ShellTree.OnEditingEnded := ShellTreeEditingEnded;
   ShellTree.PreferredRoot := ShellTree.Root;
+  ShellTree.DeferSubFolderCheck := true;
 
   // Set properties of Shelllist in code.
   ShellList.OnEnumColumnsBeforeEvent := ShellListBeforeEnumColumns;

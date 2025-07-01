@@ -11,9 +11,10 @@ uses System.Classes, System.SysUtils,
      ExifToolsGUI_MultiContextMenu;
 
 type
-
+  TSubFolderStateIndex = (sfsNeedsCheck = -2, sfsInitial = -1);
   TShellTreeView = class(Vcl.Shell.ShellCtrls.TShellTreeView, IShellCommandVerbExifTool)
   private
+    FDeferSubFolderCheck: boolean;
     FPreferredRoot: string;
     FPaths2Refresh: TStringList;
     ICM2: IContextMenu2;
@@ -23,6 +24,8 @@ type
   protected
     procedure Edit(const Item: TTVItem); override;
     procedure InitNode(NewNode: TTreeNode; ID: PItemIDList; ParentNode: TTreeNode); override;
+    function CustomDrawItem(Node: TTreeNode; State: TCustomDrawState;
+      Stage: TCustomDrawStage; var PaintImages: Boolean): Boolean; override;
     procedure DoContextPopup(MousePos: TPoint; var Handled: boolean); override;
     procedure ShowMultiContextMenu(MousePos: TPoint);
     procedure WndProc(var Message: TMessage); override;
@@ -48,6 +51,7 @@ type
     property OnEditingEnded: TTVEditedEvent read FOnEditingEnded write FOnEditingEnded;
     property Path: string read GetPath write SetPath;
     property PreferredRoot: string read FPreferredRoot write FPreferredRoot;
+    property DeferSubFolderCheck: boolean read FDeferSubFolderCheck write FDeferSubFolderCheck;
  end;
 
 implementation
@@ -69,6 +73,7 @@ begin
   FPaths2Refresh.Duplicates := TDuplicates.dupIgnore;
   ICM2 := nil;
   FPreferredRoot := '';
+  FDeferSubFolderCheck := false;
 end;
 
 destructor TShellTreeView.Destroy;
@@ -122,9 +127,31 @@ begin
     finally
       TempFolder.Free;
     end;
+    if (FDeferSubFolderCheck) then
+      NewNode.StateIndex := Ord(TSubFolderStateIndex.sfsNeedsCheck); // Dont call 'SubFolders' on create
   end;
 
   inherited InitNode(NewNode, ID, ParentNode);
+end;
+
+function TShellTreeView.CustomDrawItem(Node: TTreeNode; State: TCustomDrawState;
+  Stage: TCustomDrawStage; var PaintImages: Boolean): Boolean;
+var
+  prc: Trect;
+begin
+  result := inherited CustomDrawItem(Node, State, Stage, PaintImages);
+
+  if (FDeferSubFolderCheck) and
+     (Stage = TCustomDrawStage.cdPrePaint) and
+     (Node.Data <> nil) and
+     (Node.StateIndex < Ord(TSubFolderStateIndex.sfsInitial)) then
+  begin
+    if TreeView_GetItemRect(Handle, Node.ItemId, prc, false) then  // Inview ?
+    begin
+      Node.StateIndex := Ord(TSubFolderStateIndex.sfsInitial);
+      Node.HasChildren := TShellFolder(Node.Data).SubFolders;
+    end;
+  end;
 end;
 
 procedure TShellTreeView.DoContextPopup(MousePos: TPoint; var Handled: boolean);

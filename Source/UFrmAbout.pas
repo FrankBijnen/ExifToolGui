@@ -34,7 +34,9 @@ var
 
 implementation
 
-uses Main, ExifTool, ExifToolsGUI_Utils, ExifToolsGui_ResourceStrings, ExifToolsGui_LossLess, ShellAPI, UnitLangResources;
+uses
+  Winapi.ShellAPI,
+  Main, ExifTool, ExifToolsGUI_Utils, ExifToolsGui_ResourceStrings, ExifToolsGui_LossLess,  UnitLangResources;
 
 {$R *.dfm}
 
