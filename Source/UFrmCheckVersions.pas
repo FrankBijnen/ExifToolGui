@@ -38,9 +38,10 @@ var
 implementation
 
 uses
-  Main, MainDef, ExifTool, ExifToolsGUI_Utils, ShellAPI, UnitLangResources, ExifToolsGui_Versions,
-  ExifToolsGui_ResourceStrings,
-  Vcl.Themes;
+  Winapi.ShellAPI,
+  Vcl.Themes,
+  Main, MainDef, ExifTool, ExifToolsGUI_Utils, UnitLangResources, ExifToolsGui_Versions,
+  ExifToolsGui_ResourceStrings;
 
 {$R *.dfm}
 

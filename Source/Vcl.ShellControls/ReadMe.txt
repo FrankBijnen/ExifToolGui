@@ -60,9 +60,63 @@ add this block
         CoTaskMemFree(ID);
 //ExifTool_Leak_x
 
+Performance fixes
+8) In procedure TCustomShellTreeView.Refresh(Node: TTreeNode);    
+
+After these lines:
+    ThisLevel := Node.Level;
+    OldNode := Node;
+
+Before these lines:
+   if Assigned(Node.Data) then
+   begin
+
+
+You find this repeat until:
+    repeat
+      Temp := FolderExists(TShellFolder(OldNode.Data).AbsoluteID, NewNode);
+      if (Temp <> nil) and OldNode.Expanded then
+        Temp.Expand(False);
+      OldNode := OldNode.GetNext;
+    until (OldNode = nil) or (OldNode.Level = ThisLevel);
+
+
+Replace it with:
+//Performance
+// Refreshing folder with many folder takes very long.
+// Check OldNode.Expanded first before calling expensive FolderExists
+(*
+    repeat
+      Temp := FolderExists(TShellFolder(OldNode.Data).AbsoluteID, NewNode);
+      if (Temp <> nil) and OldNode.Expanded then
+        Temp.Expand(False);
+      OldNode := OldNode.GetNext;
+    until (OldNode = nil) or (OldNode.Level = ThisLevel);
+*)
+    repeat
+      if (OldNode.Expanded) then
+      begin
+        Temp := FolderExists(TShellFolder(OldNode.Data).AbsoluteID, NewNode);
+        if (Temp <> nil) then
+          Temp.Expand(False);
+      end;
+      OldNode := OldNode.GetNext;
+    until (OldNode = nil) or (OldNode.Level = ThisLevel);
+//Performance_X
+
+9) In procedure TCustomShellTreeView.InitNode(NewNode: TTreeNode; ID: PItemIDList; ParentNode: TTreeNode);
+Note: Need to set property DeferSubFolderCheck from ExifToolsGui_ShellTree to true, 
+
+//Performance
+//    NewNode.HasChildren := SubFolders;
+    if (NewNode.StateIndex >= -1) then
+      NewNode.HasChildren := SubFolders;
+//Performance_x
+
+
 Note: For documentation purposes the original line is kept, but commented. 
 
-- Open the ShellControls.groupproj in Delphi, Compile and Install the 32 Bits version. The 64 Bits also works, but is not needed for ExifToolGUI.
+- Open the ShellControls.groupproj in Delphi, Compile and Install the 32 Bits version. The 64 Bits also works, but is not needed for the IDE.
 
 Notes:
 
