@@ -104,15 +104,6 @@ Replace it with:
     until (OldNode = nil) or (OldNode.Level = ThisLevel);
 //Performance_X
 
-9) In procedure TCustomShellTreeView.InitNode(NewNode: TTreeNode; ID: PItemIDList; ParentNode: TTreeNode);
-Note: Need to set property DeferSubFolderCheck from ExifToolsGui_ShellTree to true, 
-
-//Performance
-//    NewNode.HasChildren := SubFolders;
-    if (NewNode.StateIndex >= -1) then
-      NewNode.HasChildren := SubFolders;
-//Performance_x
-
 
 Note: For documentation purposes the original line is kept, but commented. 
 
