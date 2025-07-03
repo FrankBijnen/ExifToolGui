@@ -2,6 +2,7 @@ unit ExifToolsGui_ShellTree;
 
 // Create eventhandlers Before and After contextmenu.
 // Stop and start Exiftool, else it's impossible to remove the Directory
+// Performance improvements
 
 interface
 
@@ -120,6 +121,7 @@ begin
     exit;
   end;
 
+  // Init the node with Data
   AFolder := TShellFolder(ParentNode.Data);
   NewFolder := GetIShellFolder(AFolder.ShellFolder, ID);
   NewNode.Data := TShellFolder.Create(AFolder, ID, NewFolder);
@@ -131,14 +133,28 @@ begin
     NewNode.Delete // AFolder does not have Directory Attribute. Dont show in Treeview
   else
   begin
+    // Set text
     NewNode.Text := NewShellFolder.DisplayName;
+
     // Use StateIndex as a flag to indicate that this node needs to be examined
     // StateIndex is not used in TShellTreeview
     NewNode.StateIndex := sfsNeedsCheck;
+
+    // Image and selected index
+    // Dont care for SHGFI_OPENICON, rarely used
+    if UseShellImages and
+       not Assigned(Images) then
+    begin
+      NewNode.ImageIndex := NewShellFolder.ImageIndex(false);
+      NewNode.SelectedIndex := NewNode.ImageIndex;
+    end;
+
     // Assume the node has Children. Will be set later correctly.
     // Needed for SetPathFromId to work
     NewNode.HasChildren := true;
 
+    // Call OnAddFolder.
+    // Note: HasChildren has not been set correctly.
     CanAdd := True;
     if Assigned(OnAddFolder) then
        OnAddFolder(Self, NewShellFolder, CanAdd);
@@ -148,6 +164,7 @@ begin
 
 end;
 
+// Do the check for children deferred. Only when scrolled in view.
 function TShellTreeView.CustomDrawItem(Node: TTreeNode; State: TCustomDrawState;
   Stage: TCustomDrawStage; var PaintImages: Boolean): Boolean;
 var
@@ -167,17 +184,9 @@ begin
       // Get Folder
       AFolder := TShellFolder(Node.Data);
 
-      // Image and selected index
-      // Dont care for SHGFI_OPENICON, rarely used
-      if UseShellImages and
-         not Assigned(Images) then
-      begin
-        Node.ImageIndex := AFolder.ImageIndex(false);
-        Node.SelectedIndex := AFolder.ImageIndex(false);
-      end;
-
       // Has subfoldere?
-      Node.HasChildren := TShellFolder(Node.Data).SubFolders;
+      if (otFolders in ObjectTypes) then
+        Node.HasChildren := AFolder.SubFolders;
 
       // Dont care if the folder is shared, or has non folder subitems
     end;
