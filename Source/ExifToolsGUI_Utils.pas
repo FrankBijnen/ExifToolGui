@@ -232,28 +232,31 @@ end;
 // Version
 function GetFileVersionNumber(FName: string): string;
 var
-  V, VerInfoSize, VerValueSize: cardinal;
-  VerInfo: pointer;
+  V, VerInfoSize, VerValueSize: DWORD;
+  VerInfo: Pointer;
   VerValue: PVSFixedFileInfo;
 begin
   result := 'No version info';
-  VerInfoSize := GetFileVersionInfoSize(@Fname[1], V);
+  VerInfoSize := GetFileVersionInfoSize(PChar(Fname), V);
   if VerInfoSize = 0 then
     exit;
 
   GetMem(VerInfo, VerInfoSize);
-  GetFileVersionInfo(@Fname[1], 0, VerInfoSize, VerInfo);
-  VerQueryValue(VerInfo, '\', pointer(VerValue), VerValueSize);
-  with VerValue^ do
-  begin
-    result := 'V' + IntToStr(dwFileVersionMS shr 16);
-    result := result + '.' + IntToStr(dwFileVersionMS and $FFFF);
-    result := result + '.' + IntToStr(dwFileVersionLS shr 16);
-    result := result + '.' + IntToStr(dwFileVersionLS and $FFFF);
-    if (dwFileFlags and VS_FF_PRERELEASE <> 0) then
-      result := result + ' Pre.';
+  try
+    GetFileVersionInfo(PChar(Fname), 0, VerInfoSize, VerInfo);
+    VerQueryValue(VerInfo, '\', Pointer(VerValue), VerValueSize);
+    with VerValue^ do
+    begin
+      result := 'V' + IntToStr(dwFileVersionMS shr 16);
+      result := result + '.' + IntToStr(dwFileVersionMS and $FFFF);
+      result := result + '.' + IntToStr(dwFileVersionLS shr 16);
+      result := result + '.' + IntToStr(dwFileVersionLS and $FFFF);
+      if (dwFileFlags and VS_FF_PRERELEASE <> 0) then
+        result := result + ' Pre.';
+    end;
+  finally
+    FreeMem(VerInfo, VerInfoSize);
   end;
-  FreeMem(VerInfo, VerInfoSize);
 end;
 
 function GetFileVersionNumberPlatForm(FName: string): string;
