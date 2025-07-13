@@ -4195,7 +4195,7 @@ end;
 procedure TFMain.ShellTreeCustomDrawItem(Sender: TCustomTreeView; Node: TTreeNode; State: TCustomDrawState;
   var DefaultDraw: Boolean);
 begin
-  if (Node.Selected ) then
+  if (Node.Selected) then
     Sender.Canvas.Font.Style := Sender.Canvas.Font.Style + [fsBold];
 end;
 
