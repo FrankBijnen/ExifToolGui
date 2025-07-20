@@ -2748,6 +2748,9 @@ begin
       else
         SelectedFiles := GetSelectedFiles;
 
+      if (ArgsList.IndexOf('-execute') > -1) then
+        ETprm := ET.EmbeddedExecute(ETprm, SelectedFiles);
+
       // Call TExifTool.ExecET or ET.OpenExec
       case CmbETDirectMode.ItemIndex of
         0: ETResult := ET.OpenExec(ArgsFromDirectCmd(ETprm), SelectedFiles, ETout, ETerr);

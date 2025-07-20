@@ -95,6 +95,7 @@ type
     class function ExecET(ETcmd, FNames, WorkingDir: string; var ETouts, ETErrs: string): boolean; overload;
     class function ExecET(ETcmd, FNames, WorkingDir: string; var ETouts: string): boolean; overload;
 
+    function EmbeddedExecute(const Args, FNames: string): string;
     procedure SetCounter(ACounterETEvent: TCounterETEvent; ACounter: integer);
     property ETWorkingDir: string read FETWorkingDir;
     property ETValidWorkingDir: boolean read FETValidWorkingDir;
@@ -337,6 +338,28 @@ begin
               FinalCmd +
               // '-executexx CRLF'               The same for STDout.
               Format('-execute%u%s', [FExecNum, CRLF]);
+end;
+
+
+function TExifTool.EmbeddedExecute(const Args, FNames: string): string;
+const
+  ExecuteCmd = ' -execute';
+var
+  LwCase: string;
+  NamesCmd, OptionsCmd: string;
+begin
+  result := '';
+
+  NamesCmd := DirectCmdFromArgs(FNames);
+  OptionsCmd := DirectCmdFromArgs(Options.GetOptions);
+  // Only lowercase -execute. For NextField
+  LwCase := ReplaceAll(Args, [ExecuteCmd], [ExecuteCmd], [rfReplaceAll, rfIgnoreCase]);
+  repeat
+    result := result + NextField(LwCase, ExecuteCmd);
+    if (LwCase = '') then
+      break;
+    result := result + ' ' + NamesCmd + ExecuteCmd + ' ' + OptionsCmd
+   until false;
 end;
 
 procedure TExifTool.SetCounter(ACounterETEvent: TCounterETEvent; ACounter: integer);
