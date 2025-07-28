@@ -905,21 +905,19 @@ begin
         if (pos('.', DefGMapHome) = 0) or (pos(',', DefGMapHome) = 0) then
           DefGMapHome := '46.55738,15.64608';
         GuiStyle := ReadString(Ini_Settings, 'GUIStyle', 'Silver');
+
+        DetailsSel := 0;  // Will be read in UnitColumnDefs
+        MetadataSel := 0;
+        FilterSel := 0;
         UseExitDetails := ReadBool(Ini_Settings, 'UseExitDetails', false);
         if UseExitDetails then
         begin
-          DetailsSel := ReadInteger(Ini_Settings, 'DetailsSel', 0);
           MetadataSel := ReadInteger(Ini_Settings, 'MetadataSel', 0);
           FilterSel := FilterStartup;
-          FMain.ShellList.ViewStyle := TviewStyle(ReadInteger(Ini_Settings, 'ViewStyle', 3));
+          FMain.ShellList.ViewStyle := TViewStyle(ReadInteger(Ini_Settings, 'ViewStyle', 3));
         end
         else
-        begin
-          DetailsSel := 0;
-          MetadataSel := 0;
-          FilterSel := 0;
           FMain.ShellList.ViewStyle := TViewStyle.vsReport;
-        end;
         AutoIncLine := ReadBool(Ini_Settings, 'AutoIncLine', True);
         EditLine := ReadBool(Ini_Settings, 'EditLine', False);
         DblClickUpdTags := ReadBool(Ini_Settings, 'DblClickUpdTags', False);
@@ -1137,7 +1135,6 @@ begin
           WriteString(Ini_Settings, 'GUIStyle', GuiStyle);
 
           WriteBool(Ini_Settings, 'UseExitDetails', UseExitDetails);
-          WriteInteger(Ini_Settings, 'DetailsSel', DetailsSel);
           WriteInteger(Ini_Settings, 'MetadataSel', MetadataSel);
           WriteInteger(Ini_Settings, 'ViewStyle', Ord(Fmain.ShellList.ViewStyle));
           WriteBool(Ini_Settings, 'AutoIncLine', AutoIncLine);

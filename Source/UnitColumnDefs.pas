@@ -144,6 +144,7 @@ const
     (Command: '-XMP-iptcExt:PersonInImage';                                     XlatedCaption: @StrFLPersonInImage)
   );
 
+  DetailSel = 'DetailSel';                // Selected detail
   UserDefLists = 'UserDefLists';          // List with userdefined names
   OldUserDefTags = 'FListUserDefColumn';  // Pre 6.3.6
   DefaultUserDef: array [0..2] of TFileListColumn =
@@ -484,6 +485,8 @@ begin
 
   ReadTags := (ReadUserDefTags(LVHandle, GUIini) > 0);
   result := result or ReadTags;
+  if (GUIsettings.UseExitDetails) then
+    GUIsettings.DetailsSel := GUIini.ReadInteger(DetailSel, 'DetailsSel', 0);
 end;
 
 procedure WriteFileLists(GUIini: TMemIniFile);
@@ -523,6 +526,7 @@ begin
       end;
       WriteColumnDefs(GUIini, ColDefName, AColumnSet.ReadMode, AColumnSet.ColumnDefs);
     end;
+    GUIini.WriteInteger(DetailSel, 'DetailsSel', GUIsettings.DetailsSel);
     for Index := 0 to UserDefList.Count -1 do
       GUIini.WriteString(UserDefLists, Format('%d', [Index]), UserDefList[Index]);
   finally
