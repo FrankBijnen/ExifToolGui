@@ -36,6 +36,15 @@ div.olLayerDiv {
 }
 .olControlAttribution {
     font-size: smaller;
+    background-color: rgba(255, 255, 255, 0.5);
+    right: 0em;
+    bottom: 0em;
+    position: absolute;
+    display: block;
+    float: right;
+}
+.olControlAttributionOriginal {
+    font-size: smaller;
     right: 3px;
     bottom: 4.5em;
     position: absolute;
