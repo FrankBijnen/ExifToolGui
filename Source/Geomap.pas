@@ -652,6 +652,17 @@ begin
   Html.Add('           displayProjection:new OpenLayers.Projection("EPSG:4326")});');
   Html.Add('');
   Html.Add('     map.addLayer(new OpenLayers.Layer.OSM.Mapnik("Mapnik"));');
+
+  // Satellite images
+  Html.Add('     map.addLayer(new OpenLayers.Layer.XYZ(');
+  Html.Add('         "ESRI Satellite", ');
+  Html.Add('         "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/${z}/${y}/${x}",');
+  Html.Add('         { sphericalMercator: true,');
+  Html.Add('           attribution: "&copy; <a href=''https://www.esri.com/en-us/home''>Powered by Esri</a>&nbsp;' +
+                                    'Sources: Esri, DigitalGlobe, GeoEye, i-cubed, USDA FSA, USGS, AEX, Getmapping,' +
+                                    'Aerogrid, IGN, IGP, swisstopo, and the GIS User Community"');
+  Html.Add('         } ))');
+
   Html.Add('     po = map.getProjectionObject();');
   Html.Add('     op = new OpenLayers.Projection("EPSG:4326");');
 
