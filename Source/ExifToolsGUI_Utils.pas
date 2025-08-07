@@ -1737,7 +1737,7 @@ begin
         AdjustLatLon(ALat, ALon, Coord_Decimals);
         Inc(result);
         Inc(PointNum);
-        Writeln(F, 'AddTrkPoint(', PointNum, ',', ALat, ',', ALon, ');');
+        Writeln(F, '     AddTrkPoint(', ALat, ',', ALon, ');');
       end;
     end;
   finally

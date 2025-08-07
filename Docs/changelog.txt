@@ -171,3 +171,16 @@ Version:        Description             Issue
                 Fix Issue #847          GeoTagged? in Workspace produces unpredictable results
                 Fix Issue #848          Fix issues for V6.3.9
                 Fix Issue #857          Various/Show diff metadata not enabled correctly
+6.3.10.0        Fix Issue #879          Menu commands not executable when selecting files with CTRL+A in File list
+                Fix Issue #880          Crash when clicking with right mouse button on tag name in workspace
+                Fix Issue #884          [feature request] different selection behaviour in workspace editing
+                Fix Issue #886          Query time for GeoCode and OverPass should include execution time of query
+                Fix Issue #889          Fix possible crash in ShellListView OwnerDataFind
+                Fix Issue #895          Unexpected behavior when using renaming Filename function (V6.3.9.0)
+                Fix Issue #896          [feature request] Being able to save the default import/export location for specific .ini files
+                Fix Issue #897          [feature request] Include the default startup file list file filter in the                   
+                Fix Issue #905          Use local copy of OpenLayers II. Add more base layers.
+                Fix Issue #911          Better cut and paste support ("Auto refresh for file manager" rejected)
+                Fix Issue #917          "exiftool direct" command with -execute always fails
+                Fix Issue #921          File list handling improvements
+                Fix Issue #923          Fix issues for V6.3.10
