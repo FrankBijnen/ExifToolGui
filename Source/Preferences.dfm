@@ -3,7 +3,7 @@ object FPreferences: TFPreferences
   Top = 0
   BorderStyle = bsDialog
   Caption = 'Preferences'
-  ClientHeight = 413
+  ClientHeight = 442
   ClientWidth = 700
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
@@ -37,8 +37,8 @@ object FPreferences: TFPreferences
     Left = 0
     Top = 0
     Width = 606
-    Height = 413
-    ActivePage = AdvTabGeneral
+    Height = 442
+    ActivePage = TabGeoCoding
     Align = alLeft
     DoubleBuffered = True
     ParentDoubleBuffered = False
@@ -146,7 +146,7 @@ object FPreferences: TFPreferences
         Top = 71
         Width = 521
         Height = 17
-        Caption = '-enable internet access for OSM Map (requires restart)'
+        Caption = '-enable internet access for OSM Map'
         Constraints.MinWidth = 450
         TabOrder = 9
       end
@@ -450,7 +450,7 @@ object FPreferences: TFPreferences
         Left = 19
         Top = 13
         Width = 565
-        Height = 372
+        Height = 400
         Caption = 'GeoCoding'
         TabOrder = 0
         object ChkGeoCodeDialog: TCheckBox
@@ -516,9 +516,9 @@ object FPreferences: TFPreferences
       end
       object GrpGeoCode: TGroupBox
         Left = 24
-        Top = 180
+        Top = 170
         Width = 545
-        Height = 108
+        Height = 101
         Caption = 'GeoCode Maps:'
         TabOrder = 1
         object Label3: TLabel
@@ -581,14 +581,14 @@ object FPreferences: TFPreferences
       end
       object GrpOverPass: TGroupBox
         Left = 24
-        Top = 294
+        Top = 272
         Width = 545
-        Height = 80
+        Height = 75
         Caption = 'OverPass Api'
         TabOrder = 2
         object Label4: TLabel
           Left = 160
-          Top = 54
+          Top = 49
           Width = 350
           Height = 13
           AutoSize = False
@@ -596,7 +596,7 @@ object FPreferences: TFPreferences
         end
         object EdThrottleOverPass: TLabeledEdit
           Left = 80
-          Top = 50
+          Top = 45
           Width = 49
           Height = 21
           EditLabel.Width = 38
@@ -608,7 +608,7 @@ object FPreferences: TFPreferences
         end
         object UpdThrottleOverpass: TUpDown
           Left = 129
-          Top = 50
+          Top = 45
           Width = 17
           Height = 21
           Associate = EdThrottleOverPass
@@ -620,7 +620,7 @@ object FPreferences: TFPreferences
         end
         object EdOverPassUrl: TLabeledEdit
           Left = 80
-          Top = 23
+          Top = 18
           Width = 430
           Height = 21
           EditLabel.Width = 19
@@ -628,6 +628,26 @@ object FPreferences: TFPreferences
           EditLabel.Caption = 'URL'
           LabelPosition = lpLeft
           TabOrder = 2
+          Text = ''
+        end
+      end
+      object GrpMapTiler: TGroupBox
+        Left = 24
+        Top = 353
+        Width = 545
+        Height = 49
+        Caption = 'MapTiler Map layers (https://www.maptiler.com/)'
+        TabOrder = 3
+        object EdMapTilerApiKey: TLabeledEdit
+          Left = 80
+          Top = 20
+          Width = 430
+          Height = 21
+          EditLabel.Width = 36
+          EditLabel.Height = 21
+          EditLabel.Caption = 'Api Key'
+          LabelPosition = lpLeft
+          TabOrder = 0
           Text = ''
         end
       end

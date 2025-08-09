@@ -1,7 +1,7 @@
 ETD_Latest_Gui=https://api.github.com/repos/FrankBijnen/ExifToolGui/releases/latest
 ETD_Latest_PH=https://exiftool.org/ver.txt
 ETD_Latest_OBetz=https://oliverbetz.de/cms/files/Artikel/ExifTool-for-Windows/exiftool_latest_version.txt
-ETD_Credits_GUI=by Bogdan Hrastnik\nAdapted for RAD11 by Frank B
+ETD_Credits_GUI=by Bogdan Hrastnik\nAdapted for RAD11/RAD12 by Frank B
 ETD_Credits_ET=ExifTool by Phil Harvey
 ETD_GNUGPL=http://www.gnu.org/copyleft/gpl.html
 ETD_Home_Gui=https://github.com/FrankBijnen/ExifToolGui

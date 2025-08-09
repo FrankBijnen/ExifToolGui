@@ -38,6 +38,8 @@ type
     GeoTagMode: TGeoTagMode;
     GeoCodeDialog: boolean;
     ReverseGeoCodeDialog: boolean;
+    BaseLayer: string;
+    MapTilerKey: string;
     procedure CheckProvider(const GeoCheckMode: TGeoCheckMode);
     procedure SetGeoLocation500(ADir: string);
   end;
@@ -108,6 +110,18 @@ procedure GetCoordsOfPlace(const Place, Bounds: string; var Lat, Lon: string);
 procedure ReadGeoCodeSettings(GUIini: TMemIniFile);
 procedure WriteGeoCodeSettings(GUIini: TMemIniFile);
 
+type
+  TMapLayer = record
+    ClassName: string;
+    Description: string;
+  end;
+
+  TMapTilerLayer = record
+    Resource: string;
+    Style: string;
+    Description: string;
+  end;
+
 const
   Coord_Decimals = 6;
   Place_Decimals = 4;
@@ -117,11 +131,25 @@ const
   OSMGetLocation = 'Get Location';
   OSMGetBounds = 'Get Bounds';
   Geo_Settings = 'GeoSettings';
+  BaseLayer = 'BaseLayer';
   Geo_City = 'GeoCity';
   Geo_Province = 'GeoProvince';
   InitialZoom_Out = '16';
   InitialZoom_In = '20';
 
+  OSMMapLayer: TMapLayer
+                    =   (ClassName: 'OSM.Mapnik';         Description: 'Mapnik');
+
+  XYZMapLayers:  array[0..0] of TMapLayer
+                    = ( (ClassName: 'XYZ.OpenTopoMap';    Description: 'Open Topo Map')
+                      );
+
+  MapTilerLayers:  array[0..3] of TMapTilerLayer
+                    = ( (Resource: 'tiles'; Style: 'satellite-v2';  Description: 'Map Tiler Satellite'),
+                        (Resource: 'maps';  Style: 'streets-v2';    Description: 'Map Tiler Streets'),
+                        (Resource: 'maps';  Style: 'topo-v2';       Description: 'Map Tiler Topo'),
+                        (Resource: 'maps';  Style: 'bright-v2';     Description: 'Map Tiler Bright')
+                      );
 type
 
   TOSMHelper = class(TObject)
@@ -611,6 +639,9 @@ begin
 end;
 
 procedure TOSMHelper.WriteHeader;
+var
+  AMapLayer: TMapLayer;
+  AMapTilerLayer: TMapTilerLayer;
 begin
   Html.Clear;
 
@@ -620,7 +651,7 @@ begin
   if (UseOl2Local) then
   begin
     Html.Add('<script type="text/javascript" src="OpenLayers.js"></script>');
-    Html.Add('<script type="text/javascript" src="OpenStreetMap.js"></script>');
+    Html.Add('<script type="text/javascript" src="BaseLayers.js"></script>');
   end
   else
   begin
@@ -651,17 +682,32 @@ begin
   Html.Add('           projection:       new OpenLayers.Projection("EPSG:900913"),');
   Html.Add('           displayProjection:new OpenLayers.Projection("EPSG:4326")});');
   Html.Add('');
-  Html.Add('     map.addLayer(new OpenLayers.Layer.OSM.Mapnik("Mapnik"));');
+  // Add Mapnik layer
+  Html.Add('     var BaseLayers = new Array();');
+  Html.Add(Format('     map.addLayer(BaseLayers[BaseLayers.push(new OpenLayers.Layer.%s("%s")) -1]);',
+           [OSMMapLayer.ClassName, OSMMapLayer.Description]));
 
-  // Satellite images
-  Html.Add('     map.addLayer(new OpenLayers.Layer.XYZ(');
-  Html.Add('         "ESRI Satellite", ');
-  Html.Add('         "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/${z}/${y}/${x}",');
-  Html.Add('         { sphericalMercator: true,');
-  Html.Add('           attribution: "&copy; <a href=''https://www.esri.com/en-us/home''>Powered by Esri</a>&nbsp;' +
-                                    'Sources: Esri, DigitalGlobe, GeoEye, i-cubed, USDA FSA, USGS, AEX, Getmapping,' +
-                                    'Aerogrid, IGN, IGP, swisstopo, and the GIS User Community"');
-  Html.Add('         } ))');
+  if (UseOl2Local) then
+  begin
+    // Add all Base layers
+    for AMapLayer in XYZMapLayers do
+      Html.Add(Format('     map.addLayer(BaseLayers[BaseLayers.push(new OpenLayers.Layer.%s("%s")) -1]);',
+               [AMapLayer.ClassName, AMapLayer.Description]));
+
+    if (GEOsettings.MapTilerKey <> '') then
+      for AMapTilerLayer in MapTilerLayers do
+        Html.Add(Format('     map.addLayer(BaseLayers[BaseLayers.push(new OpenLayers.Layer.XYZ.MapTiler("%s", "%s", "%s", "%s")) -1]);',
+                 [AMapTilerLayer.Description, AMapTilerLayer.Resource, AMapTilerLayer.Style, GEOsettings.MapTilerKey]));
+
+    // Select Base layer
+    Html.Add(Format('     map.setBaseLayer(map.getLayersBy("name", "%s")[0]);',
+                    [GEOsettings.BaseLayer]));
+
+    // base layer changed event
+    Html.Add('     map.events.register("changebaselayer", map, function(event) {');
+    Html.Add('       SendMessage("' + BaseLayer + '", event.layer.name, "");');
+    Html.Add('     });');
+  end;
 
   Html.Add('     po = map.getProjectionObject();');
   Html.Add('     op = new OpenLayers.Projection("EPSG:4326");');
@@ -717,17 +763,16 @@ begin
   Html.Add('  }');
 
   // OpenLayers uses LonLat, not LatLon. Confusing maybe,
-  Html.Add('  function AddImagePoint(Id, PointLat, PointLon, Href){');
-  Html.Add('     var lonlat;');
-  Html.Add('     lonlat = new OpenLayers.LonLat(PointLon, PointLat).transform(op, po);');
-  Html.Add('     imagepoints[Id] = new OpenLayers.Geometry.Point(lonlat.lon, lonlat.lat);');
-  Html.Add('     imagecoords[Id] = [lonlat, Href];');
+  Html.Add('  function AddImagePoint(PointLat, PointLon, Href){');
+  Html.Add('     var lonlat = new OpenLayers.LonLat(PointLon, PointLat).transform(op, po);');
+  Html.Add('     imagepoints.push(new OpenLayers.Geometry.Point(lonlat.lon, lonlat.lat));');
+  Html.Add('     imagecoords.push([lonlat, Href]);');
   Html.Add('  }');
 
-  Html.Add('  function AddTrkPoint(Id, PointLat, PointLon){');
+  Html.Add('  function AddTrkPoint(PointLat, PointLon){');
   Html.Add('     var lonlat;');
   Html.Add('     lonlat = new OpenLayers.LonLat(PointLon, PointLat).transform(op, po);');
-  Html.Add('     trackpoints[Id] = new OpenLayers.Geometry.Point(lonlat.lon, lonlat.lat);');
+  Html.Add('     trackpoints.push(new OpenLayers.Geometry.Point(lonlat.lon, lonlat.lat));');
   Html.Add('  }');
 
   Html.Add('  function SendMessage(msg, parm1, parm2){');
@@ -773,11 +818,9 @@ procedure TOSMHelper.WritePointsEnd(const GetPlace: boolean);
 var
   Place: TPair<string, TStringList>;
   PlaceLoc: TPlace;
-  PointCnt: integer;
   PlaceCnt: integer;
   ImgName, Href, Lat, Lon: string;
 begin
-  PointCnt := 0;
   for Place in PlacesDict do
   begin
     Href := '';
@@ -803,8 +846,7 @@ begin
       if (Assigned(PlaceLoc)) then
         Href := Href + GetHyperLink + PlaceLoc.HtmlSearchResult + '</a>';
     end;
-    Html.Add(Format('     AddImagePoint(%d, %s, ''%s'');', [PointCnt, Place.Key, Href]));
-    inc(PointCnt);
+    Html.Add(Format('     AddImagePoint(%s, ''%s'');', [Place.Key, Href]));
   end;
   Html.Add('  }');
 end;
@@ -846,7 +888,7 @@ end;
 function InstallOpenLayers2: boolean;
 const Ol2Files: array[0..14,0..1] of string  = (
     ('OL2_OpenLayers',      'OpenLayers.js'),
-    ('OL2_OpenStreetMap',   'OpenStreetMap.js'),
+    ('OL2_BaseLayers',      'BaseLayers.js'),
     ('OL2_img_cpr',         'img\cloud-popup-relative.png'),
     ('OL2_img_em',          'img\east-mini.png'),
     ('OL2_img_lsmax',       'img\layer-switcher-maximize.png'),
@@ -1741,6 +1783,8 @@ begin
   GeoSettings.GeoTagMode := TGeoTagMode(GUIini.ReadInteger(Geo_Settings, 'GeoTagMode', 1));
   GeoSettings.GeoCodeDialog := GUIini.ReadBool(Geo_Settings, 'GeoCodeDialog', true);
   GeoSettings.ReverseGeoCodeDialog := GUIini.ReadBool(Geo_Settings, 'ReverseGeoCodeDialog', true);
+  GeoSettings.BaseLayer := GUIini.ReadString(Geo_Settings, 'BaseLayer', OSMMapLayer.Description);
+  GeoSettings.MapTilerKey := GUIini.ReadString(Geo_Settings, 'MapTilerKey', '');
   GeoSettings.GeoCodingEnable := TGeoCodeEnable(GUIini.ReadInteger(Geo_Settings, 'GeoCodingEnable', 0));
 
   GUIini.ReadSectionValues(Geo_Province, GeoProvinceList);
@@ -1769,6 +1813,8 @@ begin
   GUIini.WriteInteger(Geo_Settings, 'GeotagMode', Ord(GeoSettings.GeoTagMode));
   GUIini.WriteBool(Geo_Settings, 'GeoCodeDialog', GeoSettings.GeoCodeDialog);
   GUIini.WriteBool(Geo_Settings, 'ReverseGeoCodeDialog', GeoSettings.ReverseGeoCodeDialog);
+  GUIini.WriteString(Geo_Settings, 'BaseLayer', GeoSettings.BaseLayer);
+  GUIini.WriteString(Geo_Settings, 'MapTilerKey', GeoSettings.MapTilerKey);
   GUIini.WriteInteger(Geo_Settings, 'GeoCodingEnable', Ord(GeoSettings.GeoCodingEnable));
 
   TmpItems := TStringList.Create;

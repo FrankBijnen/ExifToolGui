@@ -194,6 +194,8 @@ are essential for majority of users.<br>
     <li>Added Hash functions. Available in the <a href="#m_workspace">Workspace</a>, the <a href="#p_config_file_list">File list</a>,
     and a menu function to create <a href="#create_hash_files">Hash files</a>.</li>
     <li>Added support for displaying and editing <a href="#p_preview_regions">regions</a> in the preview window.</li>
+    <li>Added more Base layers in the OSM map. See Preferences<a href="#m_prog_prefs_geocoding"> GeoCoding settings tab</a><br>
+    Requires registering at <a href="https://www.maptiler.com">https://www.maptiler.com</a>.</li>
 </ul>
 <br>
 <a href="changelog.txt"><b>See changelog.txt for a complete list of issues.</b></a>
@@ -327,7 +329,6 @@ If checked, GUI will only rotate image in the <font class="blue">Preview</font> 
 <b>Enabling internet access</b><br>
 By default, this option is unchecked and if you are a bit paranoid, then keep it that way. In that case however,
 you won't be able to use GUI's <font class="blue">OSM Map</font> feature for geotagging your images manually.
-After changing this option, you'll need to close and reopen GUI, to make this feature available.
 You have to enable this option also if you want to use GeoCoding.<br>
 <br>
 <b>Default Startup &amp; Export folder</b><br>
@@ -368,13 +369,19 @@ For your convenience you can start that program here.<br>
 </ul>
 <br><br>
 
-<img src="ExifToolGUI_V6_files/preferences_geocoding.jpg"><br>
+<a name="m_prog_prefs_geocoding">
+<img src="ExifToolGUI_V6_files/preferences_geocoding.jpg"></a><br>
 <br><br>
 <b><u>GeoCoding</u></b> settings tab<br>
 <br>
 Here you can setup the GeoCoding parameters.<br>
 Getting started: <a href="Readme GeoCoding Getting started.txt"><b>Readme GeoCoding Getting started.txt</b></a><br>
 For an in-depth explanation see <a href="Readme GeoCoding.txt"><b>Readme GeoCoding.txt</b></a>
+<br><br>
+<b>MapTiler Api Key</b><br><br>
+If you register at <a href="https://www.maptiler.com"><b>https://www.maptiler.com</b></a> you will receive an <b>Api Key</b>.
+Enter your <b>Api Key</b> here to choose additional Base layers in the OSM map, besides the standard <b>Mapnik</b> and <b>Open Topo Map</b>.<br>
+<img src="ExifToolGUI_V6_files/preferences_maptiler.jpg"><br>
 <br><br>
 
 <img src="ExifToolGUI_V6_files/preferences_shell.jpg"><br>
@@ -1449,7 +1456,8 @@ By clicking on <font class="blue">ExifTool direct</font> button, you get an inpu
 <b>Notes:</b>
 <ul>
     <li>Don't need to type "exiftool" here -GUI will take care of calling ExifTool for executing commands you have entered.</li>
-    <li>Don't type the file names, GUI passes all selected file names to ExifTool after the command.<br>
+    <li>Don't type the file names, GUI passes all selected file names to ExifTool after the command and <br>
+    before all <b>-execute</b> commands found.<br>
     If <b>-r</b> is found in the command, the current directory is passed.<br>
     For commands that don't need file names (EG <b>-ver</b>) use Select None first.<br>
     </li>
@@ -1722,6 +1730,12 @@ If selected images are geo-tagged (contain GPS data), clicking this button will 
 Starting with version V6.3.1 you can also show track logs on the map, if the selected files(s) contain(s) track logs.<br><br>
 <u>Notes:</u>
 <ul>
+    <li>You can select a different Base layer, by clicking on the plus sign at the right.<br>
+    Default Base layers are Mapnik and Open Topo Map. By registering at
+    <a href="https://www.maptiler.com">https://www.maptiler.com</a> you will receive an <b>Api Key</b>.
+    Enter that Api Key in Preferences<a href="#m_prog_prefs_geocoding"> GeoCoding settings tab</a> to add addional base layers.<br>
+    <img src="ExifToolGUI_V6_files/preferences_maptiler.jpg"><br>
+    </li>
     <li>You can increase/decrease the font size used in the map by holding the CTRL key and using the mouse wheel.<br> </li>
     <li>If you setup both <font class="blue">Province and City</font> to <font class="blue">None</font> in the <font class="blue">Setup Geo</font> parameters only the filenames will be shown.<br> </li>
 </ul>
@@ -1813,7 +1827,7 @@ P.S.: Don't blame me for my English grammar -it's not my native language.<br>
 </em>
 
 <br>Frank<br>
-Modified on May, 2025<br>
+Modified on August, 2025<br>
 <br>
 
 <u>You may find additional info in the ReadMe files:</u>

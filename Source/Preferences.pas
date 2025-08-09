@@ -82,6 +82,8 @@ type
     GrpETAutoComplete: TGroupBox;
     CmbETAutoCompleteMode: TComboBox;
     ChkDefAutoCorrect: TCheckBox;
+    GrpMapTiler: TGroupBox;
+    EdMapTilerApiKey: TLabeledEdit;
     procedure FormShow(Sender: TObject);
     procedure BtnSaveClick(Sender: TObject);
     procedure BtnBrowseFolder(Sender: TObject);
@@ -175,6 +177,7 @@ begin
   GeoSettings.GeoCodingEnable := TGeoCodeEnable(CmbGeoCodingEnable.ItemIndex);
   GeoSettings.ReverseGeoCodeDialog := ChkReverseGeoCodeDialog.Checked;
   GeoSettings.CountryCodeLocation := ChkCountryLocation.Checked;
+  GeoSettings.MapTilerKey := EdMapTilerApiKey.Text;
 
   GeoSettings.CheckProvider(TGeoCheckMode.cmAll);
 
@@ -361,6 +364,7 @@ begin
   ChkGeoCodeDialog.Checked := GeoSettings.GeoCodeDialog;
   ChkReverseGeoCodeDialog.Checked := GeoSettings.ReverseGeoCodeDialog;
   ChkCountryLocation.Checked := GeoSettings.CountryCodeLocation;
+  EdMapTilerApiKey.Text := GeoSettings.MapTilerKey;
 
   AdvPageControl1.ActivePage := AdvTabGeneral;
 

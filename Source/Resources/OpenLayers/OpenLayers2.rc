@@ -1,5 +1,5 @@
 OL2_OpenLayers          RCDATA "OpenLayers.js"
-OL2_OpenStreetMap       RCDATA "OpenStreetMap.js"
+OL2_BaseLayers          RCDATA "BaseLayers.js"
 OL2_img_cpr             RCDATA "img\cloud-popup-relative.png"
 OL2_img_em              RCDATA "img\east-mini.png"
 OL2_img_lsmax           RCDATA "img\layer-switcher-maximize.png"

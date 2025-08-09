@@ -208,4 +208,7 @@ Version 6.3.9
 - Added THashMD5.GetHashStringFromFile, THashSHA1, ThashSHA2 to compute hashes.
 - Added rectangle selection to TImage in ExifToolsGui_Image.pas
 
+Version 6.3.10
+- Added the OpenLayers II (JavaScript) library as a resource. Allowing more customizations, like adding base layers.
+
 Frank

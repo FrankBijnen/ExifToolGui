@@ -442,6 +442,7 @@ type
     procedure ShellListSetFolders;
     procedure RefreshSelected(Sender: TObject);
     procedure SelectAll;
+    procedure EnableMap;
     procedure EnableMenus(Enable: boolean);
     procedure EnableMenuItems;
     procedure SetupCustomTabStops;
@@ -1978,6 +1979,7 @@ begin
     InstallAutoComp;
     ET.OpenExit(true); // Force restart of ExifTool. CustomConfig could have changed
     EnableMenus(ET.StayOpen(ShellList.Path)); // Recheck Exiftool.exe.
+    EnableMap;
     SetGridEditor(SpeedBtnQuick.Down);
     ShellListSetFolders;
     ShellList.Refresh;
@@ -2577,6 +2579,27 @@ begin
   StatusBar.Panels[0].Text := Format(StrFiles, [ShellList.Items.Count]);
 end;
 
+procedure TFMain.EnableMap;
+var
+  Lat, Lon: string;
+begin
+  MaUpdateLocationfromGPScoordinates.Enabled := GUIsettings.EnableGMap;
+  AdvTabOSMMap.Enabled := GUIsettings.EnableGMap;
+  EdgeBrowser1.Visible := GUIsettings.EnableGMap;
+
+  if GUIsettings.EnableGMap then
+  begin
+    try
+      ParseLatLon(GUIsettings.DefGMapHome, Lat, Lon);
+      OSMMapInit(EdgeBrowser1, Lat, Lon, OSMHome, InitialZoom_Out);
+    except
+      on E:Exception do
+        MessageDlgEx(E.Message, StrErrorPositioningHo, TMsgDlgType.mtWarning, [TMsgDlgBtn.mbOK]);
+    end;
+  end;
+
+end;
+
 procedure TFMain.EdgeBrowser1CreateWebViewCompleted(Sender: TCustomEdgeBrowser; AResult: HRESULT);
 var Url: string;
 begin
@@ -2629,6 +2652,13 @@ begin
     ParseLatLon(Parm2, Lat, Lon);
     AdjustLatLon(Lat, Lon, Coord_Decimals);
     EditMapFind.Text := Lat + ', ' + Lon;
+
+    exit;
+  end;
+
+  if (Msg = BaseLayer) then
+  begin
+    GEOsettings.BaseLayer := Parm1;
 
     exit;
   end;
@@ -3647,7 +3677,6 @@ end;
 procedure TFMain.FormShow(Sender: TObject);
 var
   Param: string;
-  Lat, Lon: string;
   Index: integer;
 begin
 
@@ -3670,23 +3699,6 @@ begin
   AdvPageFilelist.ActivePage := AdvTabFilelist;
   AdvPagePreviewChange(AdvPagePreview);
 
-  MaUpdateLocationfromGPScoordinates.Enabled := false;
-  AdvTabOSMMap.Enabled := false;
-  EdgeBrowser1.Visible := false;
-  if GUIsettings.EnableGMap then
-  begin
-    try
-      MaUpdateLocationfromGPScoordinates.Enabled := true;
-      ParseLatLon(GUIsettings.DefGMapHome, Lat, Lon);
-      OSMMapInit(EdgeBrowser1, Lat, Lon, OSMHome, InitialZoom_Out);
-      AdvTabOSMMap.Enabled := true;
-      EdgeBrowser1.Visible := true;
-    except
-      on E:Exception do
-        MessageDlgEx(E.Message, StrErrorPositioningHo, TMsgDlgType.mtWarning, [TMsgDlgBtn.mbOK]);
-    end;
-  end;
-
   // Init Chart
   AdvRadioGroup2Click(Sender);
 
@@ -3699,6 +3711,9 @@ begin
       GUIsettings.WrkIniDir := GetINIPath(false);
   end;
   DontSaveIni := FindCmdLineSwitch('DontSaveIni', true);
+
+  // Enable map
+  EnableMap;
 
   // The shellList is initially disabled. Now enable and refresh
   SetColorsFromStyle;

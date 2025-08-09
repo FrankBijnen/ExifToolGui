@@ -210,4 +210,11 @@ Changed with version 6.3.9
 - Added computing a Hash of selected files in the filelist and Workspace. Added menu item in Various to create Hash files.
 - Added support for displaying and editing regions in the preview.
 
+Changed with version 6.3.10
+- You can now export the 'File filters' together with other settings in an ini file. Drag and drop is supported for ini files.
+- Multiple selection has changed. Fixed a few bugs with Ctrl/A. The 'First selected file' now is the file that you selected first, not the file on top of the list.
+- Embedded '-execute' in ExifTool Direct are now handled better. Before the '-execute' the selected files are added, after '-execute' the options are repeated. 
+  This should be more intuitive.
+- Added more Base layers to the OSM map. If you register at https://www.maptiler.com and enter your Api Key in preferences/GeoCoding you get even more.
+
 Frank

@@ -3,12 +3,14 @@
 
 This is an updated version of the ExifToolGui program created by Bogdan Hrastnik. Many thanks go out to him.
 
-<b>Released version: <b>V6.3.9</b> updated May 9, 2025</b><br>
+<b>Released version: <b>V6.3.10</b> updated Aug 9, 2025</b><br>
 
-- Support tagging facial regions (RegionPersonDisplayName)<br>
-- Hash functions. (MD5, SHA1, SHA2)<br>
-- Various bugfixes.<br>
-- For the complete info see the [changelog](Docs/changelog.txt).<br>
+This is a maintenance release. Fixes include:
+
+- Adding more Base layers to the OSM map.
+- Multi-selecting files
+- Exporting settings
+- For the complete info see the [changelog](../../blob/main/Docs/changelog.txt).<br>
 
 [Download Release](https://github.com/FrankBijnen/ExifToolGui/releases/latest)<br>
 
