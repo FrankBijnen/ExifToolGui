@@ -42,6 +42,7 @@ procedure NoBell(var Key: Char);
 // Version
 function GetFileVersionNumber(FName: string): string;
 function GetFileVersionNumberPlatForm(FName: string): string;
+function UserAgent: string;
 
 // FileSystem
 function GetIShellFolder(IFolder: IShellFolder; PIDL: PItemIDList): IShellFolder;
@@ -237,13 +238,13 @@ var
   VerValue: PVSFixedFileInfo;
 begin
   result := 'No version info';
-  VerInfoSize := GetFileVersionInfoSize(PChar(Fname), V);
+  VerInfoSize := GetFileVersionInfoSize(PChar(FName), V);
   if VerInfoSize = 0 then
     exit;
 
   GetMem(VerInfo, VerInfoSize);
   try
-    GetFileVersionInfo(PChar(Fname), 0, VerInfoSize, VerInfo);
+    GetFileVersionInfo(PChar(FName), 0, VerInfoSize, VerInfo);
     VerQueryValue(VerInfo, '\', Pointer(VerValue), VerValueSize);
     with VerValue^ do
     begin
@@ -269,6 +270,33 @@ begin
     ' 64 Bits'
 {$ENDIF}
   ;
+end;
+
+function QueryItem(Buf: PByte; Item: string): PChar;
+var
+  Len: DWORD;
+begin
+  if not VerQueryValue(Buf, PChar('stringFileInfo\040904E4\' + Item), Pointer(result), Len) then
+     result := '';
+end;
+
+function UserAgent: string;
+var
+  Buf: PByte;
+  Len: DWORD;
+begin
+  result := '';
+  Len := GetFileVersionInfoSize(PChar(Application.ExeName), Len);
+  if (Len > 0) then
+  begin
+    Buf := AllocMem(Len);
+    try
+      GetFileVersionInfo(PChar(Application.ExeName), 0, Len, Buf);
+      result := QueryItem(Buf, 'ProductName') + '/' + QueryItem(Buf, 'ProductVersion') + ' (https://github.com/)';
+    finally
+      FreeMem(Buf, Len);
+    end;
+  end
 end;
 
 // Directories

@@ -144,8 +144,9 @@ const
                     = ( (ClassName: 'XYZ.OpenTopoMap';    Description: 'Open Topo Map')
                       );
 
-  MapTilerLayers:  array[0..3] of TMapTilerLayer
+  MapTilerLayers:  array[0..4] of TMapTilerLayer
                     = ( (Resource: 'tiles'; Style: 'satellite-v2';  Description: 'Map Tiler Satellite'),
+                        (Resource: 'maps';  Style: 'openstreetmap'; Description: 'Map Tiler OpenStreetMap'),
                         (Resource: 'maps';  Style: 'streets-v2';    Description: 'Map Tiler Streets'),
                         (Resource: 'maps';  Style: 'topo-v2';       Description: 'Map Tiler Topo'),
                         (Resource: 'maps';  Style: 'bright-v2';     Description: 'Map Tiler Bright')
@@ -655,8 +656,8 @@ begin
   end
   else
   begin
-    Html.Add('<script type="text/javascript" src="http://openlayers.org/api/OpenLayers.js"></script>');
-    Html.Add('<script type="text/javascript" src="http://www.openstreetmap.org/openlayers/OpenStreetMap.js"></script>');
+    Html.Add('<script type="text/javascript" src="https://openlayers.org/api/OpenLayers.js"></script>');
+    Html.Add('<script type="text/javascript" src="https://www.openstreetmap.org/openlayers/OpenStreetMap.js"></script>');
   end;
   Html.Add('<script type="text/javascript">');
   Html.Add('var map;');
@@ -776,7 +777,8 @@ begin
   Html.Add('  }');
 
   Html.Add('  function SendMessage(msg, parm1, parm2){');
-  Html.Add('     window.chrome.webview.postMessage({ msg: msg, parm1: parm1, parm2: parm2});');
+  Html.Add('     if (window && window.chrome)');
+  Html.Add('        window.chrome.webview.postMessage({ msg: msg, parm1: parm1, parm2: parm2});');
   Html.Add('  }');
 
   Html.Add('  function CreatePopups(){');
