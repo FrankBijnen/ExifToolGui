@@ -2601,7 +2601,9 @@ begin
 end;
 
 procedure TFMain.EdgeBrowser1CreateWebViewCompleted(Sender: TCustomEdgeBrowser; AResult: HRESULT);
-var Url: string;
+var
+  Url: string;
+  Settings: ICoreWebView2Settings;
 begin
   if (AResult <> S_OK) then
   begin
@@ -2622,8 +2624,12 @@ begin
     end;
     if (Url <> '') then
       ShellExecute(0, 'Open', PWideChar(StringResource(ETD_Online_Doc)  + Url), '', '', SW_SHOWNORMAL);
+
+    exit;
   end;
 
+  if Succeeded(EdgeBrowser1.DefaultInterface.Get_Settings(Settings)) then
+    ICoreWebView2Settings2(Settings).Set_UserAgent(PWideChar(UserAgent));
 end;
 
 // Retain zoomfactor
@@ -4088,6 +4094,9 @@ end;
 
 procedure TFMain.ShellListKeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
 begin
+  if ShellList.IsEditing then
+    exit;
+
   case Key of
     VK_HOME,
     VK_END,
