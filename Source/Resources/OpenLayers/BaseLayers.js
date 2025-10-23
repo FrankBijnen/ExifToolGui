@@ -64,3 +64,21 @@ OpenLayers.Layer.XYZ.MapTiler = OpenLayers.Class(OpenLayers.Layer.XYZ, {
     },
     CLASS_NAME: "OpenLayers.Layer.XYZ.MapTiler"
 });
+
+OpenLayers.Layer.OSM.SelfHosted = OpenLayers.Class(OpenLayers.Layer.OSM, {
+    initialize: function(name, localUrls, localMaxZoom, options) {
+        var url = localUrls;
+        options = OpenLayers.Util.extend({
+            numZoomLevels: localMaxZoom,
+            maxZoom: localMaxZoom,
+            attribution: "&copy; <a href='https://www.openstreetmap.org/copyright'>OpenStreetMap</a> contributors",
+            buffer: 1,
+            transitionEffect: "resize"
+        }, options);
+        var newArguments = [name, url, options];
+        OpenLayers.Layer.OSM.prototype.initialize.apply(this, newArguments);
+    },
+
+    CLASS_NAME: "OpenLayers.Layer.OSM.SelfHosted"
+});
+
