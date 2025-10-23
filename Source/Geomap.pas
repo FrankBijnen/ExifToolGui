@@ -133,6 +133,7 @@ const
   Geo_Settings = 'GeoSettings';
   BaseLayer = 'BaseLayer';
   Geo_City = 'GeoCity';
+  CustomBaseLayers = 'CustomBaseLayers';
   Geo_Province = 'GeoProvince';
   InitialZoom_Out = '16';
   InitialZoom_In = '20';
@@ -180,6 +181,7 @@ var
   GeoSettings: GEOsettingsRec;
   GeoProvinceList: TStringList;
   GeoCityList: TStringList;
+  CustomBaseLayersList: TStringList;
   ExecRestEvent: TExecRestEvent;
 
 type
@@ -643,6 +645,8 @@ procedure TOSMHelper.WriteHeader;
 var
   AMapLayer: TMapLayer;
   AMapTilerLayer: TMapTilerLayer;
+  CustomLayerDesc, CustomLayerUrls, CustomLayerZoom: string;
+  Index: integer;
 begin
   Html.Clear;
 
@@ -690,6 +694,26 @@ begin
 
   if (UseOl2Local) then
   begin
+    // Self Hosted
+    if (CustomBaseLayersList.Count > 0) then
+    begin
+      Html.Add('    var localDesc;');
+      Html.Add('    var localUrls;');
+      Html.Add('    var localMaxZoom;');
+    end;
+    for Index := 0 to CustomBaseLayersList.Count -1 do
+    begin
+      CustomLayerDesc := CustomBaseLayersList.KeyNames[Index];
+      CustomLayerZoom := CustomBaseLayersList.ValueFromIndex[Index];
+      CustomLayerUrls := NextField(CustomLayerZoom, '^');
+      if (CustomLayerZoom = '') then
+        CustomLayerZoom := InitialZoom_In;
+      Html.Add(Format('    localDesc = "%s";', [CustomLayerDesc]));
+      Html.Add(Format('    localUrls = %s;', [CustomLayerUrls]));
+      Html.Add(Format('    localMaxZoom = %s;', [CustomLayerZoom]));
+      Html.Add('    map.addLayer(BaseLayers[BaseLayers.push(new OpenLayers.Layer.OSM.SelfHosted(localDesc, localUrls, localMaxZoom)) -1]);');
+    end;
+
     // Add all Base layers
     for AMapLayer in XYZMapLayers do
       Html.Add(Format('     map.addLayer(BaseLayers[BaseLayers.push(new OpenLayers.Layer.%s("%s")) -1]);',
@@ -1792,6 +1816,9 @@ begin
   GUIini.ReadSectionValues(Geo_Province, GeoProvinceList);
 
   GUIini.ReadSectionValues(Geo_City, GeoCityList);
+
+  GUIini.ReadSectionValues(CustomBaseLayers, CustomBaseLayersList);
+
 end;
 
 procedure WriteGeoCodeSettings(GUIini: TMemIniFile);
@@ -1826,6 +1853,8 @@ begin
     TmpItems.AddStrings(GeoProvinceList);
     TmpItems.Add(Format('[%s]', [Geo_City]));
     TmpItems.AddStrings(GeoCityList);
+    TmpItems.Add(Format('[%s]', [CustomBaseLayers]));
+    TmpItems.AddStrings(CustomBaseLayersList);
     GUIini.SetStrings(TmpItems);
   finally
     TmpItems.Free;
@@ -1840,6 +1869,7 @@ begin
   IgnoreGeoProvider := false;
   GeoCityList := TStringList.Create;
   GeoProvinceList := TStringList.Create;
+  CustomBaseLayersList := TStringList.Create;
   CoordCache := TObjectDictionary<string, TPlace>.Create([doOwnsValues]);
   LastQuery := 0;
 end;
@@ -1849,6 +1879,7 @@ begin
   CoordCache.Free;
   GeoCityList.Free;
   GeoProvinceList.Free;
+  CustomBaseLayersList.Free;
   if (Assigned(CountryList)) then
     CountryList.Free;
 end;
