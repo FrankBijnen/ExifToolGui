@@ -143,6 +143,7 @@ Source: "..\Translation\ExifToolGui_X64.FRA"; DestDir: "{app}";   Components: La
 Source: "..\Translation\ExifToolGui_X64.ITA"; DestDir: "{app}";   Components: LanguagesWin64; flags: replacesameversion;
 Source: "..\Translation\ExifToolGui_X64.NLD"; DestDir: "{app}";   Components: LanguagesWin64; flags: replacesameversion;
 Source: "..\Translation\ExifToolGui_X64.PTB"; DestDir: "{app}";   Components: LanguagesWin64; flags: replacesameversion;
+Source: "..\Translation\ExifToolGui_X64.JPN"; DestDir: "{app}";   Components: LanguagesWin64; flags: replacesameversion;
 
 Source: "..\Translation\ExifToolGui.CHS";     DestDir: "{app}";   Components: LanguagesWin32; flags: replacesameversion;
 Source: "..\Translation\ExifToolGui.DEU";     DestDir: "{app}";   Components: LanguagesWin32; flags: replacesameversion;
@@ -152,6 +153,7 @@ Source: "..\Translation\ExifToolGui.FRA";     DestDir: "{app}";   Components: La
 Source: "..\Translation\ExifToolGui.ITA";     DestDir: "{app}";   Components: LanguagesWin32; flags: replacesameversion;
 Source: "..\Translation\ExifToolGui.NLD";     DestDir: "{app}";   Components: LanguagesWin32; flags: replacesameversion;
 Source: "..\Translation\ExifToolGui.PTB";     DestDir: "{app}";   Components: LanguagesWin32; flags: replacesameversion;
+Source: "..\Translation\ExifToolGui.JPN";     DestDir: "{app}";   Components: LanguagesWin32; flags: replacesameversion;
 
 ; These files will be downloaded
 Source: "{code:EtZipFile|{tmp}}\*";     DestDir: "{app}";                                     flags: external skipifsourcedoesntexist replacesameversion recursesubdirs;
