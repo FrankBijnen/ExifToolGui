@@ -6,7 +6,7 @@ ExifIFD:DateTimeOriginal
 ExifIFD:ExposureCompensation
 ExifIFD:ExposureProgram
 ExifIFD:ExposureTime
-ExifIFD:FLin35mm
+ExifIFD:FocalLengthIn35mmFormat
 ExifIFD:FNumber
 ExifIFD:Flash
 ExifIFD:FlashValue
