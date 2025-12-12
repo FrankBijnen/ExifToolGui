@@ -1377,13 +1377,22 @@ begin
           AddExifIFDData('ColorSpace', ColorSpace);
         end;
       $A002:
-        ExifImageWidth := AddExifIFDData('ExifImageWidth', DecodeWord(IFDentry));
+        if (IFDentry.FieldType = 4) then
+          ExifImageWidth := AddExifIFDData('ExifImageWidth', IFDentry.ValueOffs)
+        else
+          ExifImageWidth := AddExifIFDData('ExifImageWidth', DecodeWord(IFDentry));
       $A003:
-        ExifImageHeight := AddExifIFDData('ExifImageHeight', DecodeWord(IFDentry));
+        if (IFDentry.FieldType = 4) then
+          ExifImageHeight := AddExifIFDData('ExifImageHeight', IFDentry.ValueOffs)
+        else
+          ExifImageHeight := AddExifIFDData('ExifImageHeight', DecodeWord(IFDentry));
       $A005:
         InteropOffset := IFDentry.ValueOffs;
       $A405:
-        FLin35mm := AddExifIFDData('FLin35mm', IntToStr(DecodeWord(IFDentry)));
+        begin
+          FLin35mm := AddExifIFDData('FocalLengthIn35mmFormat', IntToStr(DecodeWord(IFDentry)));
+          AddExifIFDData('FLin35mm', IntToStr(DecodeWord(IFDentry)));
+        end;
       $A432:
         LensInfo := AddExifIFDData('LensInfo', DecodeExifLens(IFDentry));
       $A433:
