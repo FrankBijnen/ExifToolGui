@@ -258,7 +258,8 @@ begin
   if (IgnoreGeoProvider) then
     exit;
 
-  CheckFailed := ((GeoSettings.GeoCodeApiKey = '') or
+  CheckFailed := (GeoSettings.GeoCodingEnable = TGeoCodeEnable.geAll) and
+                  ((GeoSettings.GeoCodeApiKey = '') or
                   (GeoSettings.ThrottleGeoCode < 1000));
   case GeoCheckMode of
     TGeoCheckMode.cmPlaceProvider:
@@ -1789,8 +1790,8 @@ end;
 
 procedure ReadGeoCodeSettings(GUIini: TMemIniFile);
 begin
-  GeoSettings.GetCoordProvider := TGeoCodeProvider(GUIini.ReadInteger(Geo_Settings, 'GetCoordProvider', 0));
-  GeoSettings.GetPlaceProvider := TGeoCodeProvider(GUIini.ReadInteger(Geo_Settings, 'GetPlaceProvider', 1));
+  GeoSettings.GetCoordProvider := TGeoCodeProvider(GUIini.ReadInteger(Geo_Settings, 'GetCoordProvider', 2));
+  GeoSettings.GetPlaceProvider := TGeoCodeProvider(GUIini.ReadInteger(Geo_Settings, 'GetPlaceProvider', 2));
   GeoSettings.GeoCodeUrl := GUIini.ReadString(Geo_Settings, 'GeoCodeUrl', StringResource(ETD_GeoCode));
   GeoSettings.GeoCodeApiKey := GUIini.ReadString(Geo_Settings, 'GeoCodeApiKey', '');
 
@@ -1811,7 +1812,7 @@ begin
   GeoSettings.ReverseGeoCodeDialog := GUIini.ReadBool(Geo_Settings, 'ReverseGeoCodeDialog', true);
   GeoSettings.BaseLayer := GUIini.ReadString(Geo_Settings, 'BaseLayer', OSMMapLayer.Description);
   GeoSettings.MapTilerKey := GUIini.ReadString(Geo_Settings, 'MapTilerKey', '');
-  GeoSettings.GeoCodingEnable := TGeoCodeEnable(GUIini.ReadInteger(Geo_Settings, 'GeoCodingEnable', 0));
+  GeoSettings.GeoCodingEnable := TGeoCodeEnable(GUIini.ReadInteger(Geo_Settings, 'GeoCodingEnable', 2));
 
   GUIini.ReadSectionValues(Geo_Province, GeoProvinceList);
 
