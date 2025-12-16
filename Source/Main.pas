@@ -4223,7 +4223,7 @@ end;
 procedure TFMain.ShellTreeCustomDrawItem(Sender: TCustomTreeView; Node: TTreeNode; State: TCustomDrawState;
   var DefaultDraw: Boolean);
 begin
-  if ((Node.StateIndex and TVIS_BOLD) = TVIS_BOLD) then
+  if (Node.Selected) then
     Sender.Canvas.Font.Style := Sender.Canvas.Font.Style + [fsBold];
 end;
 

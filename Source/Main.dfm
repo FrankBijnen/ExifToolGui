@@ -1321,7 +1321,7 @@ object FMain: TFMain
     ActionManager = MainActionManager
     Caption = 'ActionMainMenuBar'
     Color = clMenuBar
-    ColorMap.DisabledFontColor = 7171437
+    ColorMap.DisabledFontColor = 10461087
     ColorMap.HighlightColor = clWhite
     ColorMap.BtnSelectedFont = clBlack
     ColorMap.UnusedColor = clWhite
