@@ -176,7 +176,9 @@ begin
      (Node.Data <> nil) and
      (Node.StateIndex = sfsNeedsCheck) then
   begin
-    if TreeView_GetItemRect(Handle, Node.ItemId, prc, false) then // Only check items in view
+    if (TreeView_GetItemRect(Handle, Node.ItemId, prc, false)) and
+       ((prc.Top + prc.Height) >= Self.Top) and
+       ((Prc.Bottom - Prc.Height) <= (Self.Top + Self.Height)) then // Only check items in view
     begin
       // Only do the check 1 time.
       Node.StateIndex := Node.StateIndex + 1;
