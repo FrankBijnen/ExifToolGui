@@ -12,7 +12,7 @@ uses System.Classes, System.SysUtils,
      ExifToolsGUI_MultiContextMenu;
 
 const
-  sfsNeedsCheck = -2;
+  sfsNeedsCheck = TVIS_USERMASK;
 
 type
   TShellTreeView = class(Vcl.Shell.ShellCtrls.TShellTreeView, IShellCommandVerbExifTool)
@@ -161,7 +161,6 @@ begin
     if not CanAdd then
       NewNode.Delete;
   end;
-
 end;
 
 // Do the check for children deferred. Only when scrolled in view.
@@ -170,29 +169,34 @@ function TShellTreeView.CustomDrawItem(Node: TTreeNode; State: TCustomDrawState;
 var
   prc: Trect;
   AFolder: TShellFolder;
+  NewStateIndex: Integer;
 begin
+  NewStateIndex := (Node.StateIndex or TVIS_BOLD) xor TVIS_BOLD;
   if not (otNonFolders in ObjectTypes) and // Performance optimization only for directories.
      (Stage = TCustomDrawStage.cdPrePaint) and
      (Node.Data <> nil) and
-     (Node.StateIndex = sfsNeedsCheck) then
+     ((NewStateIndex and sfsNeedsCheck) = sfsNeedsCheck) then
   begin
     if (TreeView_GetItemRect(Handle, Node.ItemId, prc, false)) and
        ((prc.Top + prc.Height) >= Self.Top) and
        ((Prc.Bottom - Prc.Height) <= (Self.Top + Self.Height)) then // Only check items in view
     begin
-      // Only do the check 1 time.
-      Node.StateIndex := Node.StateIndex + 1;
-
       // Get Folder
       AFolder := TShellFolder(Node.Data);
 
       // Has subfoldere?
-      if (otFolders in ObjectTypes) then
-        Node.HasChildren := AFolder.SubFolders;
+      Node.HasChildren := AFolder.SubFolders;
+
+      // Only do the check 1 time.
+      NewStateIndex := NewStateIndex xor sfsNeedsCheck;
 
       // Dont care if the folder is shared, or has non folder subitems
     end;
   end;
+
+  if (Node.Selected) then
+    NewStateIndex := NewStateIndex or TVIS_BOLD;
+  Node.StateIndex := NewStateIndex;
 
   result := inherited CustomDrawItem(Node, State, Stage, PaintImages);
 end;
