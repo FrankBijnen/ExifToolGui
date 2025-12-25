@@ -1222,7 +1222,7 @@ end;
 
 function TFMain.GetSelectedFile(FileName: string): string;
 begin
-  result := GetSelectedFile(FileName, ET.Options.ETAPIWindowsWideFile = '');
+  result := GetSelectedFile(FileName, ET.Options.ETAPIWindowsWideFile <> '');
 end;
 
 function TFMain.GetSelectedFiles(MustExpandPath: boolean): string;
@@ -1249,7 +1249,7 @@ end;
 
 function TFMain.GetSelectedFiles: string;
 begin
-  result := GetSelectedFiles(ET.Options.ETAPIWindowsWideFile = '');
+  result := GetSelectedFiles(ET.Options.ETAPIWindowsWideFile <> '');
 end;
 
 procedure TFMain.EditMapFindKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
@@ -1686,7 +1686,7 @@ var
   Indx: integer;
   ETcmd, XDir, ETout, ETerr: string;
 begin
-  if (ET.Options.ETAPIWindowsWideFile <> '') then
+  if (ET.Options.ETAPIWindowsWideFile = '') then
     XDir := '.\%d\'
   else
     XDir := '%d\';

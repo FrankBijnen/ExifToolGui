@@ -229,23 +229,23 @@ begin
   if UseWide then
     ETAPIWindowsWideFile := '-API' + CRLF + 'WindowsWideFile=1' + CRLF
   else
-    ETAPIWindowsWideFile := '';
+    ETAPIWindowsWideFile := '-API' + CRLF + 'WindowsWideFile=0' + CRLF;
 end;
 
 procedure TET_OptionsRec.SetApiWindowsLongPath(UseLong: boolean);
 begin
   if UseLong then
-    ETAPIWindowsLongPath := '-API' + CRLF + 'WindowsLongPath=1' + CRLF
+    ETAPIWindowsLongPath := ''
   else
-    ETAPIWindowsLongPath := '';
+    ETAPIWindowsLongPath := '-API' + CRLF + 'WindowsLongPath=0' + CRLF;
 end;
 
 procedure TET_OptionsRec.SetApiLargeFileSupport(UseLarge: boolean);
 begin
   if UseLarge then
-    ETAPILargeFileSupport  := '-API' + CRLF + 'LargeFileSupport=1' + CRLF
+    ETAPILargeFileSupport  := ''
   else
-    ETAPILargeFileSupport := '';
+    ETAPILargeFileSupport := '-API' + CRLF + 'LargeFileSupport=0' + CRLF;
 end;
 
 procedure TET_OptionsRec.SetGeoDir(GeoDir: string);
@@ -288,8 +288,9 @@ begin
   result := result + ETSeparator;
   result := result + ETMinorError + ETFileDate;
   result := result + ETGpsFormat + ETShowNumber;
-  result := result + ETAPIWindowsWideFile;
   result := result + ETAPIWindowsLongPath;
+  if (ETAPIWindowsLongPath <> '') then
+    result := result + ETAPIWindowsWideFile;
   result := result + ETAPILargeFileSupport;
   result := result + GetGeoDir;
   result := result + GetCustomOptions;

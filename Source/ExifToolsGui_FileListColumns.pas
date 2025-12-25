@@ -296,7 +296,7 @@ begin
         AET.StayOpen(AWorkingDir);
 
       // Get Path and Ext for ExifTool. ET will prepend if needed.
-      if (AET.Options.ETAPIWindowsWideFile = '') then
+      if (AET.Options.ETAPIWindowsWideFile <> '') then
         APath := IncludeTrailingPathDelimiter(AWorkingDir)
       else
         APath := '';

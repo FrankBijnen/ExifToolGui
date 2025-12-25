@@ -960,11 +960,11 @@ begin
         MaShowSorted.Checked := ReadBool(Ini_Options, 'ShowSorted', false);
         MaShowComposite.Checked := ReadBool(Ini_Options, 'ShowComposite', false);
         MaNotDuplicated.Checked := ReadBool(Ini_Options, 'NotDuplicated', false);
-        MaAPIWindowsWideFile.Checked := ReadBool(Ini_Options, 'APIWindowsWideFile', true);
+        MaAPIWindowsWideFile.Checked := ReadBool(Ini_Options, 'APIWindowsWideFileV6', true);
         SetApiWindowsWideFile(MaAPIWindowsWideFile.Checked);
-        MaAPIWindowsLongPath.Checked := ReadBool(Ini_Options, 'APIWindowsLongPath', true);
+        MaAPIWindowsLongPath.Checked := ReadBool(Ini_Options, 'APIWindowsLongPathV63', true);
         SetApiWindowsLongPath(MaAPIWindowsLongPath.Checked);
-        MaAPILargeFileSupport.Checked := ReadBool(Ini_Options, 'APILargeFileSupport', false);
+        MaAPILargeFileSupport.Checked := ReadBool(Ini_Options, 'APILargeFileSupportV6', true);
         SetApiLargeFileSupport(MaAPILargeFileSupport.Checked);
         SetCustomOptions(ReadString(Ini_Options, 'CustomOptions', ''));
       end;
@@ -1168,9 +1168,9 @@ begin
         WriteBool(Ini_Options, 'ShowSorted', MaShowSorted.Checked);
         WriteBool(Ini_Options, 'ShowComposite', MaShowComposite.Checked);
         WriteBool(Ini_Options, 'NotDuplicated', MaNotDuplicated.Checked);
-        WriteBool(Ini_Options, 'APIWindowsWideFile', MaAPIWindowsWideFile.Checked);
-        WriteBool(Ini_Options, 'APIWindowsLongPath', MaAPIWindowsLongPath.Checked);
-        WriteBool(Ini_Options, 'APILargeFileSupport', MaAPILargeFileSupport.Checked);
+        WriteBool(Ini_Options, 'APIWindowsWideFileV6', MaAPIWindowsWideFile.Checked);
+        WriteBool(Ini_Options, 'APIWindowsLongPathV6', MaAPIWindowsLongPath.Checked);
+        WriteBool(Ini_Options, 'APILargeFileSupportV6', MaAPILargeFileSupport.Checked);
         WriteString(Ini_Options, 'CustomOptions', ET.Options.ETCustomOptions);
 
         // Standard, Camera, Location, About and UserDef settings
