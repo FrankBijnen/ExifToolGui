@@ -145,11 +145,12 @@ const
                     = ( (ClassName: 'XYZ.OpenTopoMap';    Description: 'Open Topo Map')
                       );
 
-  MapTilerLayers:  array[0..4] of TMapTilerLayer
+  MapTilerLayers:  array[0..5] of TMapTilerLayer
                     = ( (Resource: 'tiles'; Style: 'satellite-v2';  Description: 'Map Tiler Satellite'),
+                        (Resource: 'maps';  Style: 'base-v4';       Description: 'Map Tiler Base'),
                         (Resource: 'maps';  Style: 'openstreetmap'; Description: 'Map Tiler OpenStreetMap'),
-                        (Resource: 'maps';  Style: 'streets-v2';    Description: 'Map Tiler Streets'),
-                        (Resource: 'maps';  Style: 'topo-v2';       Description: 'Map Tiler Topo'),
+                        (Resource: 'maps';  Style: 'streets-v4';    Description: 'Map Tiler Streets'),
+                        (Resource: 'maps';  Style: 'topo-v4';       Description: 'Map Tiler Topo'),
                         (Resource: 'maps';  Style: 'bright-v2';     Description: 'Map Tiler Bright')
                       );
 type
@@ -1055,7 +1056,7 @@ begin
     while (ETout <> '') do
     begin
       FileName := AnalyzeGPSCoords(ETOut, Lat, Lon, MIMEType, IsQuickTime);
-      if (ET.Options.ETAPIWindowsWideFile <> '') then
+      if (ET.Options.ETAPIWindowsWideFile = '') then
         Filename := IncludeTrailingPathDelimiter(APath) + Filename;
       if ((Pos('image', MIMEType) > 0) or
           (Pos('video', MIMEType) > 0) or
