@@ -1460,6 +1460,10 @@ object FMain: TFMain
                 Caption = 'API &LargeFileSupport (Requires Exiftool V12.88)'
               end
               item
+                Action = MaExpandFilename
+                Caption = '&Expand file names'
+              end
+              item
                 Caption = '-'
               end
               item
@@ -1908,7 +1912,14 @@ object FMain: TFMain
       Category = 'Options'
       AutoCheck = True
       Caption = 'API LargeFileSupport (Requires Exiftool V12.88)'
+      Checked = True
       OnExecute = MaAPILargeFileSupportExecute
+    end
+    object MaExpandFilename: TAction
+      Category = 'Options'
+      AutoCheck = True
+      Caption = 'Expand file names'
+      OnExecute = MaExpandFilenameExecute
     end
     object MaCustomOptions: TAction
       Tag = 10

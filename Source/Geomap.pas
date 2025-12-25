@@ -1056,7 +1056,7 @@ begin
     while (ETout <> '') do
     begin
       FileName := AnalyzeGPSCoords(ETOut, Lat, Lon, MIMEType, IsQuickTime);
-      if (ET.Options.ETAPIWindowsWideFile = '') then
+      if (ET.Options.ETMustExpandPath = false) then
         Filename := IncludeTrailingPathDelimiter(APath) + Filename;
       if ((Pos('image', MIMEType) > 0) or
           (Pos('video', MIMEType) > 0) or

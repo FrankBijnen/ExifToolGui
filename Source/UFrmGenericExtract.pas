@@ -117,7 +117,7 @@ begin
     else
       ETcmd := ETcmd  + '-W' + CRLF;
 
-    if (ET.Options.ETAPIWindowsWideFile <> '') then
+    if (ET.Options.ETMustExpandPath = false) then
       ETcmd := ETcmd + '.\%d\'
     else
       ETcmd := ETcmd + '%d\';
