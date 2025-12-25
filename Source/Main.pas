@@ -242,6 +242,7 @@ type
     EdRegionName: ExifToolsGui_AutoEdit.TLabeledEdit;  // Need our own
     PnlRegionData: TPanel;
     BtnRegionMaximize: TSpeedButton;
+    MaExpandFilename: TAction;
     procedure ShellListClick(Sender: TObject);
     procedure ShellListKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
     procedure SpeedBtnExifClick(Sender: TObject);
@@ -409,6 +410,7 @@ type
     procedure ShellTreeKeyPress(Sender: TObject; var Key: Char);
     procedure MetadataListKeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
     procedure ShellTreeKeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
+    procedure MaExpandFilenameExecute(Sender: TObject);
   private
     { Private declarations }
     ETBarSeriesFocal: TBarSeries;
@@ -1222,7 +1224,7 @@ end;
 
 function TFMain.GetSelectedFile(FileName: string): string;
 begin
-  result := GetSelectedFile(FileName, ET.Options.ETAPIWindowsWideFile <> '');
+  result := GetSelectedFile(FileName, ET.Options.ETMustExpandPath);
 end;
 
 function TFMain.GetSelectedFiles(MustExpandPath: boolean): string;
@@ -1249,7 +1251,7 @@ end;
 
 function TFMain.GetSelectedFiles: string;
 begin
-  result := GetSelectedFiles(ET.Options.ETAPIWindowsWideFile <> '');
+  result := GetSelectedFiles(ET.Options.ETMustExpandPath);
 end;
 
 procedure TFMain.EditMapFindKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
@@ -1306,6 +1308,12 @@ procedure TFMain.MaAPILargeFileSupportExecute(Sender: TObject);
 begin
   with ET.Options do
     SetApiLargeFileSupport(MaAPILargeFileSupport.Checked);
+end;
+
+procedure TFMain.MaExpandFilenameExecute(Sender: TObject);
+begin
+  with ET.Options do
+    SetMustExpandPath(MaExpandFilename.Checked);
 end;
 
 procedure TFMain.MaExportSettingsExecute(Sender: TObject);
@@ -1686,7 +1694,7 @@ var
   Indx: integer;
   ETcmd, XDir, ETout, ETerr: string;
 begin
-  if (ET.Options.ETAPIWindowsWideFile = '') then
+  if (ET.Options.ETMustExpandPath = false) then
     XDir := '.\%d\'
   else
     XDir := '%d\';

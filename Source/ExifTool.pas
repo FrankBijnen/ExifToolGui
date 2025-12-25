@@ -31,6 +31,7 @@ type
     ETShowNumber: string;
     ETCharset: string;
     ETVerbose: integer;
+    ETMustExpandPath: boolean;
     ETAPIWindowsWideFile: string;
     ETAPIWindowsLongPath: string;
     ETAPILargeFileSupport: string;
@@ -47,6 +48,7 @@ type
     procedure SetApiWindowsWideFile(UseWide: boolean);
     procedure SetApiWindowsLongPath(UseLong: boolean);
     procedure SetApiLargeFileSupport(UseLarge: boolean);
+    procedure SetMustExpandPath(ExpandPath: boolean);
     procedure SetGeoDir(GeoDir: string);
     procedure SetCustomOptions(Custom: string);
     procedure SetSeparator(const Sep: string);
@@ -226,10 +228,11 @@ end;
 
 procedure TET_OptionsRec.SetApiWindowsWideFile(UseWide: boolean);
 begin
+  ETAPIWindowsWideFile := '-API' + CRLF + 'WindowsWideFile';
   if UseWide then
-    ETAPIWindowsWideFile := '-API' + CRLF + 'WindowsWideFile=1' + CRLF
+    ETAPIWindowsWideFile := ETAPIWindowsWideFile + '=1' + CRLF
   else
-    ETAPIWindowsWideFile := '-API' + CRLF + 'WindowsWideFile=0' + CRLF;
+    ETAPIWindowsWideFile := ETAPIWindowsWideFile + '=0' + CRLF;
 end;
 
 procedure TET_OptionsRec.SetApiWindowsLongPath(UseLong: boolean);
@@ -246,6 +249,11 @@ begin
     ETAPILargeFileSupport  := ''
   else
     ETAPILargeFileSupport := '-API' + CRLF + 'LargeFileSupport=0' + CRLF;
+end;
+
+procedure TET_OptionsRec.SetMustExpandPath(ExpandPath: boolean);
+begin
+  ETMustExpandPath := ExpandPath;
 end;
 
 procedure TET_OptionsRec.SetGeoDir(GeoDir: string);
