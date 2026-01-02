@@ -167,6 +167,7 @@ are essential for majority of users.<br>
         <li>Español</li>
         <li>Português</li>
         <li>Simplified Chinese</li>
+        <li>Japanese</li>
     </ul>
     <li>Starting with V6.3.0 an installer is provided.</li>
     <li>Support for Exiftool features <u>geolocate</u> and <u>-api geolocation</u>.</li>
@@ -663,13 +664,17 @@ are only temporary (as long GUI is running) and are not checked by default:<br>
 -This can help you to identify duplicated tags when viewing in Metadata panel.<br>
 
 <h4>API WindowsWideFile (requires Exiftool V12.66</h4>
--Force the use of wide-character Windows I/O functions when the CharsetFileName option is used.<br>
+-Force the use of wide-character Windows I/O functions when the CharsetFileName option is used  Default checked.<br>
 
 <h4>API WindowsLongPath (requires Exiftool V13.02)</h4>
--Adds support for Windows Long Path names. File names longer than MAX_PATH (260 chars).<br>
+-Adds support for Windows Long Path names. File names longer than MAX_PATH (260 chars). Default checked.<br>
 
 <h4>API LargeFileSupport (requires Exiftool V12.88)</h4>
--To process files larger than 2GB. Video's for example.<br>
+-To process files larger than 2GB. Video's for example. Default checked.<br><br>
+Link to all ExifTool <a href="https://exiftool.org/ExifTool.html#options">API options</a>
+
+<h4>Expand file names</h4>
+-When checked GUI passes the full path name to ExifTool. Default unchecked.<br>
 
 <h4>Custom options</h4>
 -You can specify additonal options that exiftool should use.
@@ -1827,7 +1832,7 @@ P.S.: Don't blame me for my English grammar -it's not my native language.<br>
 </em>
 
 <br>Frank<br>
-Modified on August, 2025<br>
+Modified on January, 2026<br>
 <br>
 
 <u>You may find additional info in the ReadMe files:</u>
@@ -1845,6 +1850,7 @@ Modified on August, 2025<br>
     <li><a href="Readme Lossless rotate_Import_Export previews.txt">Readme Lossless rotate_Import_Export previews</a></li>
     <li><a href="Readme Portable.txt">Readme Portable</a></li>
     <li><a href="Readme Using Codecs.txt">Readme Using Codecs</a></li>
+    <li><a href="Readme Using a custom Map tiler server.md">Readme Using a custom Map tiler server</a></li>
 </ul>
 </body>
 </html>
