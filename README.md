@@ -6,7 +6,7 @@ This is an updated version of the ExifToolGui program created by Bogdan Hrastnik
 <b>Released version: <b>V6.3.11</b> updated Jan 2, 2026</b><br>
 
 - Added Japanese language. Thanks coolvito!
-- Added export option to use a custom Map tiler server. Thanks InifiteBSOD! [His notes on setting up](../../blob/main/Docs/Readme%20Using%20a%20custom%20Map%20tiler%20server.md)
+- Added expert option to use a custom Map tiler server. Thanks InifiteBSOD! [His notes on setting up](../../blob/main/Docs/Readme%20Using%20a%20custom%20Map%20tiler%20server.md)
 
 Fixes include:
 
