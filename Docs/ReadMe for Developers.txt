@@ -1,4 +1,4 @@
-﻿This source can be compiled with the Delphi Community Edition. (11.3 at the time of writing).
+﻿This source can be compiled with the Delphi Community Edition. (12.1 at the time of writing).
 
 There are 2 steps to take before compiling.
 

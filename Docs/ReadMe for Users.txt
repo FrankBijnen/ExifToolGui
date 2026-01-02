@@ -217,4 +217,10 @@ Changed with version 6.3.10
   This should be more intuitive.
 - Added more Base layers to the OSM map. If you register at https://www.maptiler.com and enter your Api Key in preferences/GeoCoding you get even more.
 
+Changed with version 6.3.11
+- Added Japanese language. Thanks coolvitto
+- Added the expert option to use a custom map tiler server. Thanks InifiteBSOD
+- Fixed Exif:ImageWidth and ImageHeight for certain models. EG IPhone.Thanks steerpike
+- Changed API options Windows defaults.
+
 Frank

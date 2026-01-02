@@ -3,13 +3,18 @@
 
 This is an updated version of the ExifToolGui program created by Bogdan Hrastnik. Many thanks go out to him.
 
-<b>Released version: <b>V6.3.10</b> updated Aug 9, 2025</b><br>
+<b>Released version: <b>V6.3.11</b> updated Jan 2, 2026</b><br>
 
-This is a maintenance release. Fixes include:
+- Added Japanese language. Thanks coolvito!
+- Added export option to use a custom Map tiler server. Thanks InifiteBSOD! [His notes on setting up](../../blob/main/Docs/Readme%20Using%20a%20custom%20Map%20tiler%20server.md)
 
-- Adding more Base layers to the OSM map.
-- Multi-selecting files
-- Exporting settings
+Fixes include:
+
+- Added User-Agent to comply with OpenStreetMap guidelines.
+- Update some MapTiler base layers V2->V4.
+- Fixed Exif:ImageWidth and Exif:ImageHeight for some models. (EG IPhone) Thanks steerpike!
+- Performance fix browsing folders with many sub folders.
+- Changed defaults for API options Windows.
 - For the complete info see the [changelog](../../blob/main/Docs/changelog.txt).<br>
 
 [Download Release](https://github.com/FrankBijnen/ExifToolGui/releases/latest)<br>

@@ -184,3 +184,10 @@ Version:        Description             Issue
                 Fix Issue #917          "exiftool direct" command with -execute always fails
                 Fix Issue #921          File list handling improvements
                 Fix Issue #923          Fix issues for V6.3.10
+6.3.11.0        Fix Issue #928          Add User-Agent to internal web browser. Add OpenStreetMap to MapTiler
+                Fix Issue #939          OpenStreetMap Tile server support
+                Fix Issue #943          Translation into Japanese
+                Fix Issue #945          Exif:ImageWidth and Exif:ImageHeigth issues
+                Fix Issue #948          Performance issue in ShellTreeview, checking for subfolders
+                Fix Issue #953          Change API Windows defaults
+                Fix Issue #956          Fix issues for V6.3.11
