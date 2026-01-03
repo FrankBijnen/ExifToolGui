@@ -15,12 +15,14 @@ type
     BtnOk: TBitBtn;
     BtnCancel: TBitBtn;
     LstStyles: TListBox;
+    StyleTimer: TTimer;
 
     procedure FormCreate(Sender: TObject);
     procedure FormShow(Sender: TObject);
-    procedure LstStylesClick(Sender: TObject);
     procedure BtnOkClick(Sender: TObject);
     procedure BtnCancelClick(Sender: TObject);
+    procedure LstStylesClick(Sender: TObject);
+    procedure StyleTimerTimer(Sender: TObject);
   private
     { Private declarations }
     procedure LoadStyles;
@@ -50,23 +52,32 @@ uses
   Vcl.Themes,
   Vcl.Styles;
 
-
 procedure TFrmStyle.SetNewStyle(Style: string);
 begin
-  GUIsettings.GuiStyle := Style;
-  TStyleManager.TrySetStyle(GUIsettings.GuiStyle, false);
-  FMain.GetColorsFromStyle;
+  LstStyles.Enabled := false;
+  try
+    GUIsettings.GuiStyle := Style;
+    TStyleManager.TrySetStyle(GUIsettings.GuiStyle, false);
+    FMain.GetColorsFromStyle;
 
-  if (GUIsettings.GuiStyle = cSystemStyleName) then // AV unregistering style hooks
-    exit;
+    ProcessMessages;
+  finally
+    SetForegroundWindow(Self.Handle);
+    LstStyles.Enabled := true;
+    LstStyles.SetFocus;
+  end;
+end;
 
-  ProcessMessages;
-  SetForegroundWindow(Self.Handle);
+procedure TFrmStyle.StyleTimerTimer(Sender: TObject);
+begin
+  StyleTimer.Enabled := false;
+  SetNewStyle(LstStyles.Items[LstStyles.ItemIndex]);
 end;
 
 procedure TFrmStyle.RequestClose;
 begin
   Close; // First close this form, so items can be added again to the shellist
+
   FMain.ShellTree.Path := CurPath; // restore path
 end;
 
@@ -90,7 +101,8 @@ end;
 
 procedure TFrmStyle.LstStylesClick(Sender: TObject);
 begin
-  SetNewStyle(LstStyles.Items[LstStyles.ItemIndex]);
+  StyleTimer.Enabled := false;
+  StyleTimer.Enabled := true;
 end;
 
 procedure TFrmStyle.BtnOkClick(Sender: TObject);

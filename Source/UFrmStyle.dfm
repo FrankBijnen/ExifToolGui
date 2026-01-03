@@ -1,7 +1,7 @@
 object FrmStyle: TFrmStyle
   Left = 0
   Top = 0
-  ActiveControl = Panel1
+  ActiveControl = LstStyles
   Caption = 'Available styles'
   ClientHeight = 402
   ClientWidth = 389
@@ -34,6 +34,7 @@ object FrmStyle: TFrmStyle
       Height = 25
       Anchors = [akRight, akBottom]
       Caption = 'OK'
+      Default = True
       Glyph.Data = {
         DE010000424DDE01000000000000760000002800000024000000120000000100
         0400000000006801000000000000000000001000000000000000000000000000
@@ -98,5 +99,12 @@ object FrmStyle: TFrmStyle
     Sorted = True
     TabOrder = 1
     OnClick = LstStylesClick
+  end
+  object StyleTimer: TTimer
+    Enabled = False
+    Interval = 400
+    OnTimer = StyleTimerTimer
+    Left = 160
+    Top = 96
   end
 end
