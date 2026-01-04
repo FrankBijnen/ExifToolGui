@@ -98,7 +98,8 @@ object FrmStyle: TFrmStyle
     ItemHeight = 13
     Sorted = True
     TabOrder = 1
-    OnClick = LstStylesClick
+    OnKeyUp = LstStylesKeyUp
+    OnMouseUp = LstStylesMouseUp
   end
   object StyleTimer: TTimer
     Enabled = False

@@ -16,26 +16,24 @@ type
     BtnCancel: TBitBtn;
     LstStyles: TListBox;
     StyleTimer: TTimer;
-
     procedure FormCreate(Sender: TObject);
     procedure FormShow(Sender: TObject);
     procedure BtnOkClick(Sender: TObject);
     procedure BtnCancelClick(Sender: TObject);
-    procedure LstStylesClick(Sender: TObject);
     procedure StyleTimerTimer(Sender: TObject);
+    procedure LstStylesMouseUp(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
+    procedure LstStylesKeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
   private
     { Private declarations }
     procedure LoadStyles;
     procedure RequestClose;
     procedure SetNewStyle(Style: string);
-
+    procedure ResetTimer;
   public
     { Public declarations }
-  var
-    CurPath: string;
-
-  var
-    CurStyle: string;
+    var
+      CurPath: string;
+      CurStyle: string;
   end;
 
 var
@@ -59,11 +57,9 @@ begin
     GUIsettings.GuiStyle := Style;
     TStyleManager.TrySetStyle(GUIsettings.GuiStyle, false);
     FMain.GetColorsFromStyle;
-
-    ProcessMessages;
   finally
-    SetForegroundWindow(Self.Handle);
     LstStyles.Enabled := true;
+    ProcessMessages;
     LstStyles.SetFocus;
   end;
 end;
@@ -72,6 +68,12 @@ procedure TFrmStyle.StyleTimerTimer(Sender: TObject);
 begin
   StyleTimer.Enabled := false;
   SetNewStyle(LstStyles.Items[LstStyles.ItemIndex]);
+end;
+
+procedure TFrmStyle.ResetTimer;
+begin
+  StyleTimer.Enabled := false;
+  StyleTimer.Enabled := true;
 end;
 
 procedure TFrmStyle.RequestClose;
@@ -85,6 +87,8 @@ procedure TFrmStyle.FormShow(Sender: TObject);
 var
   Indx: integer;
 begin
+  StyleTimer.Enabled := false;
+
   Indx := LstStyles.Items.IndexOf(GUIsettings.GuiStyle);
   if (Indx > -1) then
     LstStyles.ItemIndex := Indx;
@@ -99,10 +103,14 @@ begin
     LstStyles.Items.Add(TStyleManager.StyleNames[Indx])
 end;
 
-procedure TFrmStyle.LstStylesClick(Sender: TObject);
+procedure TFrmStyle.LstStylesKeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
 begin
-  StyleTimer.Enabled := false;
-  StyleTimer.Enabled := true;
+  ResetTimer;
+end;
+
+procedure TFrmStyle.LstStylesMouseUp(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
+begin
+  ResetTimer;
 end;
 
 procedure TFrmStyle.BtnOkClick(Sender: TObject);
