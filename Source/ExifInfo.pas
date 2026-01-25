@@ -626,6 +626,10 @@ begin
   ICC.Clear;
 
   Self := Default(FotoRec);
+
+  //TODO
+  IFD0.OrientationValue := $ffff;
+
   SetLength(XmpSize, 0);
   SetLength(XMPoffset, 0);
 end;

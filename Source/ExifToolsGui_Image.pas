@@ -84,6 +84,15 @@ function TImage.CorrectRotation(const ARegionRect: TRegionRect; Rot: Integer): T
 begin
   result := ARegionRect;
 
+  // No orientation available. Guess from imagesize
+  if (Rot = -1) then
+  begin
+    if (FImageDimensions.X < FImageDimensions.Y) then
+      Rot := 90
+    else
+      Rot := 0;
+  end;
+
   case Rot of
     -270, 90:
       begin

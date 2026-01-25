@@ -2975,6 +2975,8 @@ begin
     begin
       Foto := GetMetadata(FPath, []);
       case Foto.IFD0.OrientationValue of
+        $ffff:
+          RotateImg.Rotate := -1;
         0, 1:
           RotateImg.Rotate := 0; // no tag or don't rotate
         3:
