@@ -2959,6 +2959,7 @@ var
   FPath: string;
   ABitMap: TBitmap;
   ThumbType: TThumbType;
+  WicRotate: Integer;
   CrWait, CrNormal: HCURSOR;
 begin
   RotateImg.Picture.Bitmap := nil;
@@ -2971,6 +2972,7 @@ begin
   try
     FPath := ShellList.FilePath;
     RotateImg.Rotate := 0;
+    WicRotate :=  RotateImg.Rotate;
     if GUIsettings.AutoRotatePreview then
     begin
       Foto := GetMetadata(FPath, []);
@@ -2986,10 +2988,12 @@ begin
         8:
           RotateImg.Rotate := 270;
       end;
+      if (not (TSupportedType.SupHEIC in Foto.Supported)) then
+        WicRotate :=  RotateImg.Rotate;
     end;
     RotateImg.ImageDimensions := Point(RotateImg.Width, RotateImg.Height);
     if (FPath <> '') then // Directory?
-      ABitMap := GetBitmapFromWic(WicPreview(FPath, RotateImg.Rotate, RotateImg.Width, RotateImg.Height));
+      ABitMap := GetBitmapFromWic(WicPreview(FPath, WicRotate, RotateImg.Width, RotateImg.Height));
     if (ABitMap <> nil) then
     begin
       RotateImg.ImageDimensions := Point(ABitMap.Width, ABitMap.Height);
