@@ -1053,6 +1053,8 @@ begin
   end;
 end;
 
+// Dont rotate the HEIC container format.
+// The Codec does that automatically based on 'irot'.
 function HeicContainerGuid: TGuid;
 begin
   result := StringToGuid('{E1E62521-6787-405B-A339-500715B5763F}');
@@ -1081,7 +1083,7 @@ begin
      (IwD = nil) then
     exit;
 
-  Iwd.GetContainerFormat(ContainerFormat);
+  Iwd.GetContainerFormat(ContainerFormat); // For capabilities
   IwD.GetPreview(result);
   if (result = nil) then // Preview not supported, get real
     IwD.GetFrame(0, IWICBitmapFrameDecode(result));
@@ -1096,8 +1098,8 @@ begin
   if (W = 0) or (H = 0) then
     exit;
 
-  Portrait :=(Rotate = 90) or
-             (Rotate = 270);
+  Portrait := (ContainerFormat <> HeicContainerGuid) and
+              ( (Rotate = 90) or (Rotate = 270));
 
   NewSizeRetainRatio(W, H, MaxW, MaxH, NewW, NewH, Portrait);
 
