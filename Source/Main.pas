@@ -2959,7 +2959,6 @@ var
   FPath: string;
   ABitMap: TBitmap;
   ThumbType: TThumbType;
-  WicRotate: Integer;
   CrWait, CrNormal: HCURSOR;
 begin
   RotateImg.Picture.Bitmap := nil;
@@ -2972,13 +2971,13 @@ begin
   try
     FPath := ShellList.FilePath;
     RotateImg.Rotate := 0;
-    WicRotate :=  RotateImg.Rotate;
     if GUIsettings.AutoRotatePreview then
     begin
       Foto := GetMetadata(FPath, []);
       case Foto.IFD0.OrientationValue of
         $ffff:
-          RotateImg.Rotate := -1;
+          if (Foto.Supported <> []) then // The file type is supported, but no orientation was found
+            RotateImg.Rotate := -1;      // Do it based on image dimensions. Width <=> Height
         0, 1:
           RotateImg.Rotate := 0; // no tag or don't rotate
         3:
@@ -2988,12 +2987,10 @@ begin
         8:
           RotateImg.Rotate := 270;
       end;
-      if (not (TSupportedType.SupHEIC in Foto.Supported)) then
-        WicRotate :=  RotateImg.Rotate;
     end;
     RotateImg.ImageDimensions := Point(RotateImg.Width, RotateImg.Height);
     if (FPath <> '') then // Directory?
-      ABitMap := GetBitmapFromWic(WicPreview(FPath, WicRotate, RotateImg.Width, RotateImg.Height));
+      ABitMap := GetBitmapFromWic(WicPreview(FPath, RotateImg.Rotate, RotateImg.Width, RotateImg.Height));
     if (ABitMap <> nil) then
     begin
       RotateImg.ImageDimensions := Point(ABitMap.Width, ABitMap.Height);

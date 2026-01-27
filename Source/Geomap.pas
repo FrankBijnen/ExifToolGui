@@ -5,6 +5,9 @@ interface
 uses
   System.Classes, System.SysUtils, System.Generics.Collections, System.IniFiles,
   Vcl.Edge,
+  {$IFDEF VER350}
+  Winapi.WebView2,
+  {$ENDIF}
   ExifToolsGUI_StringList;
 
 const
@@ -14,6 +17,15 @@ const
   PlaceNone    = 'None';
 
 type
+
+{$IFDEF VER350}
+  ICoreWebView2Settings2 = interface(ICoreWebView2Settings)
+    ['{EE9A0F68-F46C-4E32-AC23-EF8CAC224D2A}']
+    function Get_UserAgent(out UserAgent: PWideChar): HResult; stdcall;
+    function Set_UserAgent(UserAgent: PWideChar): HResult; stdcall;
+  end;
+{$ENDIF}
+
   TExecRestEvent = procedure(Url, Response: string; Succes: boolean) of object;
   TGeoCodeEnable = (geNone, geAll, geOffline);
   TGeoCodeProvider = (gpGeoName, gpOverPass, gpExifTool);

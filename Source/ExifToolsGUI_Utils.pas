@@ -1053,6 +1053,11 @@ begin
   end;
 end;
 
+function HeicContainerGuid: TGuid;
+begin
+  result := StringToGuid('{E1E62521-6787-405B-A339-500715B5763F}');
+end;
+
 function WicPreview(AImg: string; Rotate, MaxW, MaxH: cardinal): IWICBitmapSource;
 var
   Hr: HRESULT;
@@ -1062,6 +1067,7 @@ var
   W, H: cardinal;
   NewW, NewH: integer;
   Portrait: boolean;
+  ContainerFormat: TGUID;
 begin
   result := nil;
 
@@ -1075,6 +1081,7 @@ begin
      (IwD = nil) then
     exit;
 
+  Iwd.GetContainerFormat(ContainerFormat);
   IwD.GetPreview(result);
   if (result = nil) then // Preview not supported, get real
     IwD.GetFrame(0, IWICBitmapFrameDecode(result));
@@ -1102,7 +1109,8 @@ begin
   IwdS.Initialize(result, NewW, NewH, WICBitmapInterpolationModeNearestNeighbor);
   result := IwdS;
 
-  if (Rotate <> 0) then
+  if (ContainerFormat <> HeicContainerGuid) and
+     (Rotate <> 0) then
   begin
     GlobalImgFact.CreateBitmapFlipRotator(IwdR);
     if (IwdR = nil) then
