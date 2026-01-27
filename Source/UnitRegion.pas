@@ -63,7 +63,7 @@ var
 implementation
 
 uses
-  System.SysUtils,
+  System.SysUtils, System.StrUtils,
   ExifTool, ExifToolsGUI_Utils, ExifToolsGUI_StringList;
 
 // Dont want a separator char that can be in a string. Like *, or :, #255 is unlikely
@@ -211,10 +211,11 @@ begin
              '-RegionAreaH' + CRLF +
              '-RegionAreaX' + CRLF +
              '-RegionAreaY' + CRLF +
-             '-RegionRectangle' + CRLF;           // Fallback
+             '-RegionRectangle' + CRLF +          // Fallback
+             '-SubjectArea' + CRLF;               // Fallback
     if (not ET.OpenExec(ETcmd, AFile, ETouts, false)) then
       exit;
-    if (Etouts.Count < 15) then
+    if (Etouts.Count < 16) then
       exit;
 
     // Create
@@ -229,6 +230,31 @@ begin
       ETOuts.Delete(5)
     else
       ETOuts.Delete(6);
+
+//TODO: SubjectArea and RegionType=Focus should show the same rectangle.
+//      Decide if both should be shown
+    if //not ContainsText(ETouts[7], 'Focus') and     // RegionType
+       (ETouts[14] <> '-') and                      // SubjectArea
+       (result.FDimW > 0) and
+       (result.FDimH > 0) then
+    begin
+      // Fallback to SubjectArea
+      AUnit := 'Pixels';
+      AName := 'SubjectArea';
+      ADescription := '';
+      ARegionType := 'Focus';
+      RegionRectangle := ETouts[14];
+      ARegion.X       := StrToFloatDef(NextField(RegionRectangle, ' '), -1, ExifToolsGUI_Utils.FloatFormatSettings) / (result.FDimW);
+      ARegion.Y       := StrToFloatDef(NextField(RegionRectangle, ' '), -1, ExifToolsGUI_Utils.FloatFormatSettings) / (result.FDimH);
+      ARegion.W       := StrToFloatDef(NextField(RegionRectangle, ' '), -1, ExifToolsGUI_Utils.FloatFormatSettings) / (result.FDimW);
+      ARegion.H       := StrToFloatDef(RegionRectangle, -1, ExifToolsGUI_Utils.FloatFormatSettings) / (result.FDimH);
+      ARegion.SetFromCenterX(ARegion.X);
+      ARegion.SetFromCenterY(ARegion.Y );
+
+      // Add Region
+      if (ARegion.IsEmpty = false) then
+        result.Add(TRegion.Create(ARegion, AUnit, AName, ADescription, ARegionType));
+    end;
 
     Cnt := 0;
     while (ETouts[7] <> '') do // RegionType is mandatory. For us.
