@@ -264,7 +264,7 @@ type
 
     procedure ReadTIFF;
     procedure ReadJPEG;
-    procedure ReadXMP(MergeBlocks: boolean);
+    procedure ReadXMP;
     procedure ReadCr3OrHeic;
     function ReadFtyp(StartOffs: int64 = 0): word;
     function SkipFujiHeader: word;
@@ -1160,7 +1160,6 @@ begin
   end;
   FotoF.Seek(SavePos, TSeekOrigin.soBeginning);
 end;
-
 
 procedure FotoRec.ParseMakerNotes(Offset: int64);
 var
@@ -2242,7 +2241,7 @@ begin
   end;
 end;
 
-procedure FotoRec.ReadXMP(MergeBlocks: boolean);
+procedure FotoRec.ReadXMP;
 const
   XMPMINSIZE = 25; // Minimum size needed to read the xpacket stuff.
 var
@@ -2258,8 +2257,10 @@ begin
       Setlength(Bytes, XMPsize[Index]);
       FotoF.Read(Bytes[0], XMPsize[Index]);
       TmpStream.WriteData(Bytes, XMPsize[Index]);
-      if ((Index = 0) or (MergeBlocks = false)) and
-         (TmpStream.Size > XMPMINSIZE)then // Process standard XMP
+      // XMP blocks from HEIC are complete XML docs.
+      // Others need to be merged to one XML doc. (EG Standard + Extended)
+      if ( (Index = 0) or (Supported = [SupHEIC]) ) and
+         (TmpStream.Size > XMPMINSIZE) then // Process standard XMP
       begin
 {$IFDEF DEBUG_XMP}
         TmpStream.SaveToFile(ChangeFileExt(Self.FileName, '.XML'));
@@ -2282,23 +2283,26 @@ begin
   end;
 end;
 
-// https://github.com/lclevy/canon_cr3/blob/master/readme.md
-// If it's a CR3, skip until we see a CMT1. Thats the IFD0
-// Common code for CR3 and HEIC
+// Common code for CR3 and HEIC.
+// If it's a CR3, skip until we see a CMT1. Thats the IFD0. https://github.com/lclevy/canon_cr3/blob/master/readme.md
+// For Heic look in the iloc, if there's Exif or XMP data.
+// Returns $4d4d (IsMM = true), or $4949 (IsMM = false)
 function FotoRec.ReadFtyp(StartOffs: int64 = 0): word;
 type
+
   TFtypTag = packed record
     TagLen: DWORD;
     TagName:array[0..3] of AnsiChar;
   end;
+
   TExifOrXMpTag = packed record
     case boolean of
-    true:
+    true:  // 0x00 00 00 06 'Exif'
       (
         TagLen: DWORD;
         TagName:array[0..3] of AnsiChar;
       );
-    false:
+    false: // '<x:xmpmeta'
       (
         XMpName:array[0..9] of AnsiChar;
       );
@@ -2326,18 +2330,18 @@ type
     FotoF.Seek(StartOffs, TSeekOrigin.soBeginning);
     FotoF.Read(Version, SizeOf(Version));
 
-    // Cant handle version 2
+    // Can't handle version 2
     if (Version > 1) then
       exit;
 
     FotoF.Read(Flags, SizeOf(Flags));
-    FotoF.Read(ItemCnt, SizeOf(ItemCnt));
     FotoF.Read(SizeSpecifiers, SizeOf(SizeSpecifiers));
 
     // Sizes must be as expected
-    if (SizeSpecifiers[1] <> $42) then
+    if (SizeSpecifiers[0] <> $44) then
       exit;
 
+    FotoF.Read(ItemCnt, SizeOf(ItemCnt));
     for Item := 1 to ItemCnt do
     begin
       FotoF.Read(ItemLoc, SizeOf(ItemLoc));
@@ -2381,60 +2385,64 @@ type
 
 var
   Tag: TFtypTag;
-  SavePos, EndPos: Int64;
+  Version: byte;
+  Flags: array[0..2] of byte;
+  EndPos: Int64;
+
 const
   MoovSize = 24;
-  VersionSize = 1;
-  FlagsSize = 3;
 
 begin
   result := WordData;
-  SavePos := FotoF.Position;
   FotoF.Seek(StartOffs, TSeekOrigin.soBeginning);
   Fillchar(Tag, Sizeof(tag), 0);
+
   if (StartOffs = 0) then
   begin
     FotoF.Read(Tag, SizeOf(Tag));
     Tag.TagLen := SwapL(Tag.TagLen) - SizeOf(Tag);
+    if (Tag.TagName <> 'ftyp') then
+      exit;
   end;
 
-  if (Tag.TagName = 'ftyp') or
-     (StartOffs <> 0) then
+  FotoF.Seek(Tag.TagLen, TSeekOrigin.soCurrent);
+  EndPos := FileSize;
+  while (FotoF.Position + SizeOf(Tag) <  EndPos) do
   begin
-    FotoF.Seek(Tag.TagLen, TSeekOrigin.soCurrent);
-    EndPos := FileSize;
-    while (FotoF.Position + SizeOf(Tag) <  EndPos) do
+    FotoF.Read(Tag, SizeOf(Tag));
+    Tag.TagLen := SwapL(Tag.TagLen) - SizeOf(Tag);
+    if (Tag.TagName = 'moov') then
     begin
-      FotoF.Read(Tag, SizeOf(Tag));
-      Tag.TagLen := SwapL(Tag.TagLen) - SizeOf(Tag);
-      if (Tag.TagName = 'moov') then
-      begin
-        EndPos := Fotof.Position + Tag.TagLen;
-        Fotof.Seek(MoovSize, TSeekOrigin.soCurrent);
-        continue;
-      end
-      else if (Tag.TagName = 'CMT1') then
-      begin
-        Include(Supported,  TSupportedType.supCR3);
-        FotoF.Read(result, SizeOf(result)); // Return first word.
-        result := Swap(result);
-        break;
-      end
-      else if (Tag.TagName = 'meta') then
-      begin
-        result := ReadFtyp(FotoF.Position + VersionSize + FlagsSize);
-        break;
-      end
-      else if (Tag.TagName = 'iloc') then
-      begin
-        result := FindExifAndXmp(FotoF.Position);
-        break;
-      end;
-      FotoF.Seek(Tag.TagLen, TSeekOrigin.soCurrent);
+      EndPos := Fotof.Position + Tag.TagLen;
+      Fotof.Seek(MoovSize, TSeekOrigin.soCurrent);
+      continue;
+    end
+    else if (Tag.TagName = 'CMT1') then
+    begin
+      Include(Supported,  TSupportedType.supCR3);
+      FotoF.Read(result, SizeOf(result)); // Return first word.
+      result := Swap(result);
+      break;
+    end
+    else if (Tag.TagName = 'meta') then
+    begin
+      // Version and Flags are future use
+      FotoF.Read(Version, SizeOf(Version));
+      FotoF.Read(Flags, SizeOf(Flags));
+      result := ReadFtyp(FotoF.Position);
+      break;
+    end
+    else if (Tag.TagName = 'iloc') then
+    begin
+      result := FindExifAndXmp(FotoF.Position);
+      break;
     end;
-  end
-  else
-    FotoF.Seek(SavePos, TSeekOrigin.soBeginning); // No Ftyp
+    FotoF.Seek(Tag.TagLen, TSeekOrigin.soCurrent);
+  end;
+
+  // No Ftyp
+  if (result = 0) then
+    FotoF.Seek(0, TSeekOrigin.soBeginning);
 end;
 
 // Loop thru the tag names
@@ -2457,12 +2465,15 @@ begin
     TIFFoffset := ExifIFDoffset;
     ParseIfd(TIFFoffset + TiffHeaderLen, ParseIFD0);
 
+    // ParseIFD0 can set ExifIFDoffset/GPSoffset
     if ExifIFDoffset > 0 then
       ParseIFD(TIFFoffset + ExifIFDoffset, ParseExifIFD);
 
     if (TGetOption.gmGPS in GetOptions) and
        (GPSoffset > 0) then
       ParseIFD(TIFFoffset + GPSoffset, ParseGPS);
+
+    // ReadXMP is handled in GetMetadata
   end
   else if (Supported = [TSupportedType.supCR3]) then
   begin
@@ -2620,7 +2631,7 @@ begin
               (Length(XMPoffset) > 0) and
               (Length(XMPsize) > 0) then
           begin
-            ReadXMP(not (TSupportedType.SupHEIC in Supported));
+            ReadXMP;
             // Add a dummy GPSPosition if no GPS was found, but something is in XMP
             if (GPS.HasData = false) and
                 (Assigned(VarData)) then
