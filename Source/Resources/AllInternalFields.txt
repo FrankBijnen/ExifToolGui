@@ -34,6 +34,7 @@ ICC_Profile:ProfileDescription
 IFD0:Artist
 IFD0:Copyright
 IFD0:DateTimeModify
+IFD0:ImageDescription
 IFD0:Make
 IFD0:Model
 IFD0:Orientation
