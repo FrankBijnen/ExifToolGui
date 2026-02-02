@@ -69,7 +69,7 @@ type
 
   IFD0rec = packed record
     HasData: boolean;
-    Make, Model: string;
+    Make, Model, ImageDescription: string;
     PreviewOffset, PreviewSize: integer;
     OrientationValue: word; // 1=Normal, 3=180, 6=90right, 8=90left, else=Mirror
     Orientation: string[4];
@@ -1220,6 +1220,8 @@ begin
     case IFDentry.Tag of
       $002E:
         JPGfromRAWoffset := IFDentry.ValueOffs; // Panasonic RW2
+      $010E:
+        ImageDescription := AddIfd0Data('ImageDescription', DecodeASCII(IFDentry, 64));
       $010F:
         Make := AddIfd0Data('Make', DecodeASCII(IFDentry, 64));
       $0110:
