@@ -283,6 +283,7 @@ type
     function FieldData(FieldName: string): string;
     class function AllInternalFields: TStrings;
     class function PentaxLenses: TStrings;
+    class function AddFamily0GroupName(const ATag: string): string;
   end;
 
 function GetMetadata(AName: string; AGetOptions: TGetOptions; VarData: TVarData = nil; FieldNames: TStrings = nil): FotoRec;
@@ -339,18 +340,9 @@ end;
 function TMetaData.FieldData(FieldName: string): string;
 var
   LowerFieldName: string;
-  P: integer;
 begin
   result := '';
-
-  LowerFieldName := LowerCase(FieldName);
-  P := Pos('#', LowerFieldName);
-  if (P > 0) then
-    SetLength(LowerFieldName, P -1);
-
-  if (LeftStr(LowerFieldName, 1) = '-') then
-    LowerFieldName := Copy(LowerFieldName, 2);
-
+  LowerFieldName := TMetaData.AddFamily0GroupName(FieldName);
   if (VarData.ContainsKey(LowerFieldName)) then
     result := VarData[LowerFieldName];
 end;
@@ -373,6 +365,24 @@ begin
     LoadResourceList(ETD_PentaxLenses, FPentaxLenses);
   end;
   result := FPentaxLenses;
+end;
+
+class function TMetaData.AddFamily0GroupName(const ATag: string): string;
+begin
+  result := LowerCase(ATag);
+  if EndsText('#', result) then
+    SetLength(result, Length(result) -1);
+
+  if StartsText('-gps:', result) then
+    result := 'exif:' + Copy(result, 2)
+  else if StartsText('-exififd:', result) then
+    result := 'exif:' + Copy(result, 2)
+  else if StartsText('-ifd0:', result) then
+    result := 'exif:' + Copy(result, 2)
+  else if StartsText('-xmp-', result) then
+    result := 'xmp:' + Copy(result, 2)
+  else if StartsText('-', result) then
+    result := Copy(result, 2);
 end;
 
 function XMPrec.GetRDF(const Xml: TXmlVerySimple): TXmlNode;
@@ -743,7 +753,7 @@ end;
 
 function FotoRec.AddGpsData(const AKey: string; AValue: TMetaInfo): TMetaInfo;
 begin
-  result := AddVarData('GPS:', AKey, AValue, false);
+  result := AddVarData('EXIF:GPS:', AKey, AValue, false);
 end;
 
 function FotoRec.AddIptcData(const AKey: string; AValue: TMetaInfo; AllowBag: boolean = false): TMetaInfo;
@@ -758,12 +768,12 @@ end;
 
 function FotoRec.AddIfd0Data(const AKey: string; AValue: TMetaInfo): TMetaInfo;
 begin
-  result := AddVarData('IFD0:', AKey, AValue, false);
+  result := AddVarData('EXIF:IFD0:', AKey, AValue, false);
 end;
 
 function FotoRec.AddExifIFDData(const AKey: string; AValue: TMetaInfo): TMetaInfo;
 begin
-  result := AddVarData('ExifIFD:', AKey, AValue, false);
+  result := AddVarData('EXIF:ExifIFD:', AKey, AValue, false);
 end;
 
 function FotoRec.AddInterOpData(const AKey: string; AValue: TMetaInfo): TMetaInfo;
@@ -783,7 +793,7 @@ end;
 
 function FotoRec.AddXmp_Data(const AKey: string; AValue: TMetaInfo): TMetaInfo;
 begin
-  result := AddVarData('XMP-', AKey, AValue, true);
+  result := AddVarData('XMP:XMP-', AKey, AValue, true);
 end;
 
 function FotoRec.AdvanceNull: string;
@@ -1995,10 +2005,10 @@ begin
           end;
           with IPTC do
           begin
-            I := length(Keywords);
+            I := Length(Keywords);
             if I > 1 then
               SetLength(Keywords, I - 1); // delete last separator
-            if length(Keywords) = 127 then
+            if Length(Keywords) = 127 then
               Keywords[127] := '…';
             I := length(SuppCategories);
             if I > 1 then

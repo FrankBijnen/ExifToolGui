@@ -2165,9 +2165,8 @@ end;
 
 function TFMain.TagCmd: string;
 var
-  Index, X: integer;
+  Index: integer;
   GroupName: string;
-  IsVRD: boolean;
 begin
   Index := MetadataList.Row;
   if (Index < MetadataList.FixedRows) then
@@ -2187,36 +2186,18 @@ begin
 
   result := TrimRight(result);
 
-  // Get group name
-  if SpeedBtnExif.Down then
-    GroupName := '-Exif:'
-  else if SpeedBtnXmp.Down then
-    GroupName := '-Xmp:'
-  else if SpeedBtnIptc.Down then
-    GroupName := '-Iptc:'
-  else if SpeedBtnMaker.Down then
-  begin
-    // Canon hack ?
-    repeat
-      dec(Index);
-      IsVRD := (pos('CanonVRD', MetadataList.Cells[1, Index]) > 0);
-    until IsVRD or (Index = 0);
-    if IsVRD then
-      GroupName := '-CanonVRD:'
-    else
-      GroupName := '-Makernotes:';
-  end
-  else if (MaGroup_g4.Checked) then // There are no reliable groupnames with -g4
+  // Get group name by scanning up.
+  // A group name has the first cell blank, the group name is in the 2nd
+  if (MaGroup_g4.Checked) then // There are no reliable groupnames with -g4
     GroupName := '-'
   else
   begin
     // Find group by moving up until the group heading
-    X := Index;
     repeat
-      Dec(X);
-      GroupName := MetadataList.Keys[X];
-    until (X < 1) or (Trim(GroupName) = '');
-    GroupName := ReplaceAll(MetadataList.Cells[1, X], ['---- ', ' ----'], ['-',':']); // eg '---- IFD0 ----' => 'IFD0:'
+      Dec(Index);
+      GroupName := MetadataList.Keys[Index];
+    until (Index < 1) or (Trim(GroupName) = '');
+    GroupName := ReplaceAll(MetadataList.Cells[1, Index], ['---- ', ' ----'], ['-',':']); // eg '---- IFD0 ----' => '-IFD0:'
   end;
 
   result := GroupName + TranslateTagName(GroupName, result);
