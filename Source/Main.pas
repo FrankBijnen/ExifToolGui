@@ -454,7 +454,8 @@ type
     procedure CMMaximizeWindow(var Message: TMessage); message CM_MaximizeWindow;
     procedure WMEndSession(var Msg: TWMEndSession); message WM_ENDSESSION;
     function TranslateTagName(xMeta, xName: string): string;
-    function TagCmd: string;
+    procedure GetGroupNames(ARow: integer; var Group0: string; var Group1: string);
+    function GetTagCmd: string;
 
     procedure BreadCrumbClick(Sender: TObject);
     procedure BreadCrumbHome(Sender: TObject);
@@ -675,7 +676,7 @@ end;
 
 procedure TFMain.QuickPopUp_CopyTagNameClick(Sender: TObject);
 begin
-  Clipboard.AsText := TagCmd;
+  Clipboard.AsText := GetTagCmd;
 end;
 
 procedure TFMain.AdvRadioGroup1Click(Sender: TObject);
@@ -1391,21 +1392,6 @@ var
   NewColor, TxtColor: TColor;
   Group0, Group1: string;
 
-  procedure GetGroupNames;
-  var
-    GroupNr: integer;
-  begin
-    Group0 := '';
-    Group1 := '';
-    GroupNr := Integer(MetadataList.Strings.Objects[ARow -1]);
-    if (GroupNr > -1) and
-       (GroupNr < MetadataList.Strings.Count) then
-    begin
-      Group1 := ReplaceAll(MetadataList.Strings.ValueFromIndex[GroupNr], ['---- ', ' ----'], ['', '']);
-      Group0 := NextField(Group1, ':');
-    end;
-  end;
-
 begin
   if (ARow < 1) or
      ((State <> []) and (not (gdSelected in State))) then
@@ -1452,7 +1438,7 @@ begin
       else
       begin
         Delete(KeyTx, 1, Pos(' ', KeyTx)); // -in case of Show HexID prefix
-        GetGroupNames;
+        GetGroupNames(ARow, Group0, Group1);
 
         TxtColor := clWindowText;
         if Pos(KeyTx + ' ', MarkedTagList) > 0 then
@@ -2163,10 +2149,25 @@ begin
   end;
 end;
 
-function TFMain.TagCmd: string;
+procedure TFMain.GetGroupNames(ARow: integer; var Group0: string; var Group1: string);
+var
+  GroupNr: integer;
+begin
+  Group0 := '';
+  Group1 := '';
+  GroupNr := Integer(MetadataList.Strings.Objects[ARow -1]);
+  if (GroupNr > -1) and
+     (GroupNr < MetadataList.Strings.Count) then
+  begin
+    Group1 := ReplaceAll(MetadataList.Strings.ValueFromIndex[GroupNr], ['---- ', ' ----'], ['', '']);
+    Group0 := NextField(Group1, ':');
+  end;
+end;
+
+function TFMain.GetTagCmd: string;
 var
   Index: integer;
-  GroupName: string;
+  GroupName, Group0, Group1: string;
 begin
   Index := MetadataList.Row;
   if (Index < MetadataList.FixedRows) then
@@ -2177,11 +2178,9 @@ begin
     Exit(QuickTags[Index -1].Command);
 
   result := MetadataList.Keys[Index];
+  Delete(result, 1, Pos(' ', result)); // -in case of Show HexID prefix
 
-  // If  Prefix tags with ID number is checked
-  if LeftStr(result, 2) = '0x' then
-    Delete(result, 1, 7)
-  else if LeftStr(result, 2) = '- ' then
+  if LeftStr(result, 2) = '- ' then
     Delete(result, 1, 2);
 
   result := TrimRight(result);
@@ -2189,18 +2188,16 @@ begin
   // Get group name by scanning up.
   // A group name has the first cell blank, the group name is in the 2nd
   if (MaGroup_g4.Checked) then // There are no reliable groupnames with -g4
-    GroupName := '-'
+    Group0 := '-'
   else
-  begin
-    // Find group by moving up until the group heading
-    repeat
-      Dec(Index);
-      GroupName := MetadataList.Keys[Index];
-    until (Index < 1) or (Trim(GroupName) = '');
-    GroupName := ReplaceAll(MetadataList.Cells[1, Index], ['---- ', ' ----'], ['-',':']); // eg '---- IFD0 ----' => '-IFD0:'
-  end;
+    GetGroupNames(Index, Group0, Group1);
 
-  result := GroupName + TranslateTagName(GroupName, result);
+  if (Group1 <> '') then
+    GroupName := Format('-%s:', [Group1])
+  else
+    GroupName := Format('-%s:', [Group0]);
+
+  result := Format('%s%s', [GroupName, TranslateTagName(GroupName, result)]);
 end;
 
 procedure TFMain.RestoreGUI;
@@ -2234,7 +2231,7 @@ procedure TFMain.QuickPopUp_AddCustomClick(Sender: TObject);
 var
   Tx: string;
 begin
-  Tx := TagCmd;
+  Tx := GetTagCmd;
   if Pos(Tx, CustomViewTagList) > 0 then
     ShowMessage(StrTagAlreadyExistsI)
   else
@@ -2254,7 +2251,7 @@ begin
   SetLength(FListUserDef, I + 1);
 
   FListUserDef[I].SetCaption(MetadataList.Keys[MetadataList.Row]);
-  FListUserDef[I].Command := TagCmd;
+  FListUserDef[I].Command := GetTagCmd;
   FListUserDef[I].Width := 96;
   FListUserDef[I].AlignR := 0;
 
@@ -2290,7 +2287,7 @@ begin
     with QuickTags[I] do
     begin
       Caption := MetadataList.Keys[MetadataList.Row];
-      Command := TagCmd;
+      Command := GetTagCmd;
       Help := 'No Hint defined';
     end;
 
@@ -2383,7 +2380,7 @@ end;
 procedure TFMain.QuickPopUp_InsertETDirectClick(Sender: TObject);
 begin
   if (TMenuItem(Sender).Visible) then
-    EditETdirect.Text := EditETdirect.Text + TagCmd + ' ';
+    EditETdirect.Text := EditETdirect.Text + GetTagCmd + ' ';
 end;
 
 procedure TFMain.QuickPopUp_MarkTagClick(Sender: TObject);

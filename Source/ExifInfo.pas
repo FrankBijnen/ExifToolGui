@@ -283,7 +283,10 @@ type
     function FieldData(FieldName: string): string;
     class function AllInternalFields: TStrings;
     class function PentaxLenses: TStrings;
-    class function AddFamily0GroupName(const ATag: string): string;
+    class function Groups0: TStrings;
+    class function RemoveHyphen(const ATag: string): string;
+    class function ToLowerStripNr(const ATag: string): string;
+    class function RemoveFamily0GroupName(const ATag: string): string;
   end;
 
 function GetMetadata(AName: string; AGetOptions: TGetOptions; VarData: TVarData = nil; FieldNames: TStrings = nil): FotoRec;
@@ -306,6 +309,7 @@ var
   GpsFormatSettings: TFormatSettings;  // for StrToFloatDef -see Initialization
   FAllInterFields: TStringList;
   FPentaxLenses: TStringList;
+  FGroups0: TStringList;
 
 const
   LensSpecsZoom         = '%s-%smm f/%s-%s';
@@ -342,7 +346,10 @@ var
   LowerFieldName: string;
 begin
   result := '';
-  LowerFieldName := TMetaData.AddFamily0GroupName(FieldName);
+
+  LowerFieldName := ToLowerStripNr(FieldName);
+  LowerFieldName := RemoveFamily0GroupName(LowerFieldName);
+  LowerFieldName := RemoveHyphen(LowerFieldName);
   if (VarData.ContainsKey(LowerFieldName)) then
     result := VarData[LowerFieldName];
 end;
@@ -367,22 +374,50 @@ begin
   result := FPentaxLenses;
 end;
 
-class function TMetaData.AddFamily0GroupName(const ATag: string): string;
+class function TMetaData.Groups0: TStrings;
+var
+  Index: integer;
+begin
+  if not Assigned(FGroups0) then
+  begin
+    FGroups0 := TStringList.Create;
+    FillGroupsInStrings('', FGroups0, '0');
+    for Index := 0 to FGroups0.Count -1 do
+      FGroups0[Index] := '-' + LowerCase(FGroups0[Index]) + ':';
+  end;
+  result := FGroups0;
+end;
+
+class function TMetaData.RemoveHyphen(const ATag: string): string;
+begin
+  result := ATag;
+  if (LeftStr(result, 1) = '-') then
+    result := Copy(result, 2);
+end;
+
+class function TMetaData.ToLowerStripNr(const ATag: string): string;
 begin
   result := LowerCase(ATag);
+
   if EndsText('#', result) then
     SetLength(result, Length(result) -1);
+end;
 
-  if StartsText('-gps:', result) then
-    result := 'exif:' + Copy(result, 2)
-  else if StartsText('-exififd:', result) then
-    result := 'exif:' + Copy(result, 2)
-  else if StartsText('-ifd0:', result) then
-    result := 'exif:' + Copy(result, 2)
-  else if StartsText('-xmp-', result) then
-    result := 'xmp:' + Copy(result, 2)
-  else if StartsText('-', result) then
-    result := Copy(result, 2);
+class function TMetaData.RemoveFamily0GroupName(const ATag: string): string;
+var
+  G0: string;
+  L: integer;
+begin
+  result := ATag;
+  for G0 in Groups0 do
+  begin
+    L := Length(G0);
+    if (StartsText(G0, result)) then
+    begin
+      Delete(result, 2, L -1);
+      break;
+    end;
+  end;
 end;
 
 function XMPrec.GetRDF(const Xml: TXmlVerySimple): TXmlNode;
@@ -753,7 +788,7 @@ end;
 
 function FotoRec.AddGpsData(const AKey: string; AValue: TMetaInfo): TMetaInfo;
 begin
-  result := AddVarData('EXIF:GPS:', AKey, AValue, false);
+  result := AddVarData('GPS:', AKey, AValue, false);
 end;
 
 function FotoRec.AddIptcData(const AKey: string; AValue: TMetaInfo; AllowBag: boolean = false): TMetaInfo;
@@ -768,12 +803,12 @@ end;
 
 function FotoRec.AddIfd0Data(const AKey: string; AValue: TMetaInfo): TMetaInfo;
 begin
-  result := AddVarData('EXIF:IFD0:', AKey, AValue, false);
+  result := AddVarData('IFD0:', AKey, AValue, false);
 end;
 
 function FotoRec.AddExifIFDData(const AKey: string; AValue: TMetaInfo): TMetaInfo;
 begin
-  result := AddVarData('EXIF:ExifIFD:', AKey, AValue, false);
+  result := AddVarData('ExifIFD:', AKey, AValue, false);
 end;
 
 function FotoRec.AddInterOpData(const AKey: string; AValue: TMetaInfo): TMetaInfo;
@@ -793,7 +828,7 @@ end;
 
 function FotoRec.AddXmp_Data(const AKey: string; AValue: TMetaInfo): TMetaInfo;
 begin
-  result := AddVarData('XMP:XMP-', AKey, AValue, true);
+  result := AddVarData('XMP-', AKey, AValue, true);
 end;
 
 function FotoRec.AdvanceNull: string;
@@ -2758,6 +2793,7 @@ begin
   Encoding.Free;
   FAllInterFields.Free;
   FPentaxLenses.Free;
+  FGroups0.Free;
 end;
 
 end.

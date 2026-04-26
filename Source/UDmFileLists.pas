@@ -220,7 +220,8 @@ function TDmFileLists.GetSampleValue(Command: string; var Value: string): boolea
 var
   LowerCommand: string;
 begin
-  LowerCommand := '-' + TMetaData.AddFamily0GroupName(Command);
+  LowerCommand := TMetaData.ToLowerStripNr(Command);
+  LowerCommand := TMetaData.RemoveFamily0GroupName(LowerCommand);
   result := FSampleValues.TryGetValue(LowerCommand, Value);
 end;
 
