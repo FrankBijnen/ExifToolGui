@@ -69,7 +69,7 @@ OpenLayers.Layer.XYZ.TOPPlusOpen = OpenLayers.Class(OpenLayers.Layer.XYZ, {
 OpenLayers.Layer.XYZ.MapTiler = OpenLayers.Class(OpenLayers.Layer.XYZ, {
     initialize: function(name, resource, style, key, options) {
         var url = [
-           "https://api.maptiler.com/" + resource + "/" + style + "/256/${z}/${x}/${y}.jpg?key=" + key
+           "https://api.maptiler.com/" + resource + "/" + style + "/${z}/${x}/${y}.jpg?key=" + key
         ];
         options = OpenLayers.Util.extend({
             numZoomLevels: 22,
