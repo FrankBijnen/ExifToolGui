@@ -218,14 +218,10 @@ end;
 
 function TDmFileLists.GetSampleValue(Command: string; var Value: string): boolean;
 var
-  P: integer;
   LowerCommand: string;
 begin
-  LowerCommand := LowerCase(Command);
-  P := Pos('#', LowerCommand);
-  if (P > 1) then
-    SetLength(LowerCommand, P -1);
-
+  LowerCommand := TMetaData.ToLowerStripNr(Command);
+  LowerCommand := TMetaData.RemoveFamily0GroupName(LowerCommand);
   result := FSampleValues.TryGetValue(LowerCommand, Value);
 end;
 

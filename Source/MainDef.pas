@@ -1470,6 +1470,8 @@ begin
     exit(true);
   if (QuickGroupTagNames.IndexOf(Group0 + ':' + Tag) > -1) then
     exit(true);
+  if (QuickGroupTagNames.IndexOf(Group0 + ':' + Group1 + ':' + Tag) > -1) then
+    exit(true);
   if (QuickTagNames.IndexOf(Tag) > -1) then
     exit(true);
 end;

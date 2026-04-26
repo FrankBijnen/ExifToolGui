@@ -283,6 +283,10 @@ type
     function FieldData(FieldName: string): string;
     class function AllInternalFields: TStrings;
     class function PentaxLenses: TStrings;
+    class function Groups0: TStrings;
+    class function RemoveHyphen(const ATag: string): string;
+    class function ToLowerStripNr(const ATag: string): string;
+    class function RemoveFamily0GroupName(const ATag: string): string;
   end;
 
 function GetMetadata(AName: string; AGetOptions: TGetOptions; VarData: TVarData = nil; FieldNames: TStrings = nil): FotoRec;
@@ -305,6 +309,7 @@ var
   GpsFormatSettings: TFormatSettings;  // for StrToFloatDef -see Initialization
   FAllInterFields: TStringList;
   FPentaxLenses: TStringList;
+  FGroups0: TStringList;
 
 const
   LensSpecsZoom         = '%s-%smm f/%s-%s';
@@ -339,18 +344,12 @@ end;
 function TMetaData.FieldData(FieldName: string): string;
 var
   LowerFieldName: string;
-  P: integer;
 begin
   result := '';
 
-  LowerFieldName := LowerCase(FieldName);
-  P := Pos('#', LowerFieldName);
-  if (P > 0) then
-    SetLength(LowerFieldName, P -1);
-
-  if (LeftStr(LowerFieldName, 1) = '-') then
-    LowerFieldName := Copy(LowerFieldName, 2);
-
+  LowerFieldName := ToLowerStripNr(FieldName);
+  LowerFieldName := RemoveFamily0GroupName(LowerFieldName);
+  LowerFieldName := RemoveHyphen(LowerFieldName);
   if (VarData.ContainsKey(LowerFieldName)) then
     result := VarData[LowerFieldName];
 end;
@@ -373,6 +372,52 @@ begin
     LoadResourceList(ETD_PentaxLenses, FPentaxLenses);
   end;
   result := FPentaxLenses;
+end;
+
+class function TMetaData.Groups0: TStrings;
+var
+  Index: integer;
+begin
+  if not Assigned(FGroups0) then
+  begin
+    FGroups0 := TStringList.Create;
+    FillGroupsInStrings('', FGroups0, '0');
+    for Index := 0 to FGroups0.Count -1 do
+      FGroups0[Index] := '-' + LowerCase(FGroups0[Index]) + ':';
+  end;
+  result := FGroups0;
+end;
+
+class function TMetaData.RemoveHyphen(const ATag: string): string;
+begin
+  result := ATag;
+  if (LeftStr(result, 1) = '-') then
+    result := Copy(result, 2);
+end;
+
+class function TMetaData.ToLowerStripNr(const ATag: string): string;
+begin
+  result := LowerCase(ATag);
+
+  if EndsText('#', result) then
+    SetLength(result, Length(result) -1);
+end;
+
+class function TMetaData.RemoveFamily0GroupName(const ATag: string): string;
+var
+  G0: string;
+  L: integer;
+begin
+  result := ATag;
+  for G0 in Groups0 do
+  begin
+    L := Length(G0);
+    if (StartsText(G0, result)) then
+    begin
+      Delete(result, 2, L -1);
+      break;
+    end;
+  end;
 end;
 
 function XMPrec.GetRDF(const Xml: TXmlVerySimple): TXmlNode;
@@ -1995,10 +2040,10 @@ begin
           end;
           with IPTC do
           begin
-            I := length(Keywords);
+            I := Length(Keywords);
             if I > 1 then
               SetLength(Keywords, I - 1); // delete last separator
-            if length(Keywords) = 127 then
+            if Length(Keywords) = 127 then
               Keywords[127] := '…';
             I := length(SuppCategories);
             if I > 1 then
@@ -2748,6 +2793,7 @@ begin
   Encoding.Free;
   FAllInterFields.Free;
   FPentaxLenses.Free;
+  FGroups0.Free;
 end;
 
 end.
