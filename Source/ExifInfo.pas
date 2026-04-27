@@ -41,6 +41,15 @@ type
   TMakerNotes = (None, Cr2, Pentax, Nikon);
   TMetaInfo = variant;
   TVarData = TObjectDictionary<string, TMetaInfo>;
+  TMapGroups = TObjectDictionary<string, string>;
+
+  TTagSpec = record
+    Group0: string;
+    Group1: string;
+    Tag: string;
+    procedure GetKeyList(const AKeyList: TStringList;
+                         const AMapGroups: TMapGroups);
+  end;
 
   IFDentryRec = packed record
     Tag: word;
@@ -196,6 +205,7 @@ type
     XMP: XMPrec;
     ICC: ICCrec;
     VarData: TVarData;
+    MapGroups: TMapGroups;
     FieldNames: TStrings;
     Supported: TSupportedTypes;
     ErrNotOpen: boolean;
@@ -216,9 +226,9 @@ type
     FileSize: int64;
     procedure Clear;
     procedure AddXmpBlock(AnOffset, ASize: int64);
-    procedure SetVarData(const InVarData: TVarData; InFieldNames: TStrings);
+    procedure SetVarData(const InVarData: TVarData; InMapgroups: TMapGroups; InFieldNames: TStrings);
     procedure AddBag(var BagData: TMetaInfo; const ANode: TMetaInfo);
-    function AddVarData(const AGroup, AKey: string; AValue: TMetaInfo; AllowBag: boolean): TMetaInfo;
+    function AddVarData(const AGroup0, AGroup1, AKey: string; AValue: TMetaInfo; AllowBag: boolean): TMetaInfo;
 
     function AddGpsData(const AKey: string; AValue: TMetaInfo): TMetaInfo;
     function AddIptcData(const AKey: string; AValue: TMetaInfo; AllowBag: boolean = false): TMetaInfo;
@@ -272,8 +282,10 @@ type
   end;
 
   TMetaData = class(TObject)
+    KeyList: TStringList;
     FieldNames: TStringList;
     VarData: TVarData;
+    MapGroups: TMapGroups;
     FileName: string;
     Foto: Fotorec;
   public
@@ -287,9 +299,15 @@ type
     class function RemoveHyphen(const ATag: string): string;
     class function ToLowerStripNr(const ATag: string): string;
     class function RemoveFamily0GroupName(const ATag: string): string;
+    class function Family0GroupLength(const ATag: string): integer;
+    class function GetTagSpec(const Tag: string): TTagSpec;
   end;
 
-function GetMetadata(AName: string; AGetOptions: TGetOptions; VarData: TVarData = nil; FieldNames: TStrings = nil): FotoRec;
+function GetMetadata(AName: string;
+                     AGetOptions: TGetOptions;
+                     VarData: TVarData = nil;
+                     MapGroups: TMapGroups = nil;
+                     FieldNames: TStrings = nil): FotoRec;
 procedure ChartFindFiles(StartDir, FileMask: string;
                          SubDirs, Zeroes: boolean;
                          var ETFocal, ETFnum, ETIso: TNrSortedStringList);
@@ -317,10 +335,32 @@ const
   ETD_AllInternalFields = 'ETD_AllInternalFields';
   ETD_PentaxLenses      = 'ETD_PentaxLenses';
 
+
+procedure TTagSpec.GetKeyList(const AKeyList: TStringList;
+                              const AMapGroups: TMapGroups);
+var
+  AMapKey: string;
+begin
+  AKeyList.Clear;
+  if (Group1 <> '') then
+    AKeyList.Add(Group1 + ':' + Tag)
+  else
+  begin
+    for AMapKey in AMapGroups.Keys do
+    begin
+      if (Group0 = '') or
+         (SameText(Group0, AMapGroups[AMapKey])) then
+        AKeyList.Add(AMapKey + ':' + Tag);
+    end;
+  end;
+end;
+
 constructor TMetaData.Create;
 begin
   inherited Create;
+  KeyList := TStringList.Create;
   VarData := TVarData.Create;
+  MapGroups := TMapGroups.Create;
   FieldNames := TStringList.Create;
   FieldNames.Sorted := true;
   FieldNames.Duplicates := TDuplicates.dupIgnore;
@@ -328,7 +368,9 @@ end;
 
 destructor TMetaData.Destroy;
 begin
+  KeyList.Free;
   VarData.Free;
+  MapGroups.Free;
   FieldNames.Free;
 
   inherited Destroy;
@@ -337,21 +379,31 @@ end;
 procedure TMetaData.ReadMeta(const AName: string; AGetOptions: TGetOptions);
 begin
   VarData.Clear;
+  MapGroups.Clear;
   FieldNames.Clear;
-  Foto := GetMetadata(AName, AGetOptions, VarData, FieldNames);
+  Foto := GetMetadata(AName, AGetOptions, VarData, MapGroups, FieldNames);
 end;
 
 function TMetaData.FieldData(FieldName: string): string;
 var
-  LowerFieldName: string;
+  KeyName: string;
+  TagSpec: TTagSpec;
 begin
   result := '';
+  TagSpec := GetTagSpec(ToLowerStripNr(FieldName));
+  TagSpec.GetKeyList(KeyList, MapGroups);
 
-  LowerFieldName := ToLowerStripNr(FieldName);
-  LowerFieldName := RemoveFamily0GroupName(LowerFieldName);
-  LowerFieldName := RemoveHyphen(LowerFieldName);
-  if (VarData.ContainsKey(LowerFieldName)) then
-    result := VarData[LowerFieldName];
+  for KeyName in KeyList do
+  begin
+    if (VarData.ContainsKey(KeyName)) then
+      exit(VarData[KeyName]);
+  end;
+
+//  LowerFieldName := ToLowerStripNr(FieldName);
+//  LowerFieldName := RemoveFamily0GroupName(LowerFieldName);
+//  LowerFieldName := RemoveHyphen(LowerFieldName);
+//  if (VarData.ContainsKey(LowerFieldName)) then
+//    result := VarData[LowerFieldName];
 end;
 
 class function TMetaData.AllInternalFields: TStrings;
@@ -403,21 +455,45 @@ begin
     SetLength(result, Length(result) -1);
 end;
 
-class function TMetaData.RemoveFamily0GroupName(const ATag: string): string;
+class function TMetaData.Family0GroupLength(const ATag: string): integer;
 var
   G0: string;
+begin
+  result := -1;
+  for G0 in Groups0 do
+  begin
+    if (StartsText(G0, ATag)) then
+      exit(Length(G0));
+  end;
+end;
+
+class function TMetaData.RemoveFamily0GroupName(const ATag: string): string;
+var
   L: integer;
 begin
   result := ATag;
-  for G0 in Groups0 do
+  L := Family0GroupLength(result);
+  if (L > -1) then
+    Delete(result, 2, L -1);
+end;
+
+class function TMetaData.GetTagSpec(const Tag: string): TTagSpec;
+var
+  L: integer;
+begin
+  result.Tag := Tag;
+  result.Group0 := '';
+  result.Group1 := '';
+  L := Family0GroupLength(result.Tag);
+  if (L > -1) then
   begin
-    L := Length(G0);
-    if (StartsText(G0, result)) then
-    begin
-      Delete(result, 2, L -1);
-      break;
-    end;
+    result.Group0 := RemoveHyphen(Copy(result.Tag, 1, L -1));
+    Delete(result.Tag, 1, L);
   end;
+  if (Pos(':', result.Tag) > 0)  then
+    result.Group1 := RemoveHyphen(NextField(result.Tag, ':'))
+  else
+    result.Tag := RemoveHyphen(result.Tag);
 end;
 
 function XMPrec.GetRDF(const Xml: TXmlVerySimple): TXmlNode;
@@ -683,11 +759,15 @@ begin
   XmpSize := XmpSize + [ASize];
 end;
 
-procedure FotoRec.SetVarData(const InVarData: TVarData; InFieldNames: TStrings);
+procedure FotoRec.SetVarData(const InVarData: TVarData; InMapGroups: TMapGroups; InFieldNames: TStrings);
 begin
   VarData := InVarData;
   if (Assigned(VarData)) then
     VarData.Clear;
+
+  MapGroups := InMapGroups;
+  if (Assigned(MapGroups)) then
+    MapGroups.Clear;
 
   FieldNames := InFieldNames;
   if (Assigned(FieldNames)) then
@@ -751,13 +831,18 @@ begin
   end;
 end;
 
-function FotoRec.AddVarData(const AGroup, AKey: string; AValue: TMetaInfo; AllowBag: boolean): TMetaInfo;
+function FotoRec.AddVarData(const AGroup0, AGroup1, AKey: string; AValue: TMetaInfo; AllowBag: boolean): TMetaInfo;
 var
   KeyName: string;
 begin
   if Assigned(VarData) then
   begin
-    KeyName := AGroup + AKey;
+    KeyName := AGroup1 + ':' + AKey;
+
+    if (Assigned(MapGroups)) and
+       not MapGroups.ContainsKey(LowerCase(AGroup1)) then
+      MapGroups.Add(LowerCase(AGroup1), AGroup0);
+
     if (Assigned(FieldNames)) then
       FieldNames.Add(KeyName);
     KeyName := LowerCase(KeyName);
@@ -788,47 +873,51 @@ end;
 
 function FotoRec.AddGpsData(const AKey: string; AValue: TMetaInfo): TMetaInfo;
 begin
-  result := AddVarData('GPS:', AKey, AValue, false);
+  result := AddVarData('EXIF', 'GPS', AKey, AValue, false);
 end;
 
 function FotoRec.AddIptcData(const AKey: string; AValue: TMetaInfo; AllowBag: boolean = false): TMetaInfo;
 begin
-  result := AddVarData('IPTC:', AKey, AValue, AllowBag);
+  result := AddVarData('IPTC', 'IPTC', AKey, AValue, AllowBag);
 end;
 
 function FotoRec.AddMakerNotesData(const AKey: string; AValue: TMetaInfo): TMetaInfo;
 begin
-  result := AddVarData('MakerNotes:', AKey, AValue, false);
+  result := AddVarData('MakerNotes', 'MakerNotes', AKey, AValue, false);
 end;
 
 function FotoRec.AddIfd0Data(const AKey: string; AValue: TMetaInfo): TMetaInfo;
 begin
-  result := AddVarData('IFD0:', AKey, AValue, false);
+  result := AddVarData('EXIF', 'IFD0', AKey, AValue, false);
 end;
 
 function FotoRec.AddExifIFDData(const AKey: string; AValue: TMetaInfo): TMetaInfo;
 begin
-  result := AddVarData('ExifIFD:', AKey, AValue, false);
+  result := AddVarData('EXIF', 'ExifIFD', AKey, AValue, false);
 end;
 
 function FotoRec.AddInterOpData(const AKey: string; AValue: TMetaInfo): TMetaInfo;
 begin
-  result := AddVarData('InteropIFD:', AKey, AValue, false);
+  result := AddVarData('InteropIFD', 'InteropIFD', AKey, AValue, false);
 end;
 
 function FotoRec.AddCompositeData(const AKey: string; AValue: TMetaInfo): TMetaInfo;
 begin
-  result := AddVarData('Composite:', AKey, AValue, false);
+  result := AddVarData('Composite', 'Composite', AKey, AValue, false);
 end;
 
 function FotoRec.AddICCProfileData(const AKey: string; AValue: TMetaInfo): TMetaInfo;
 begin
-  result := AddVarData('ICC_Profile:', AKey, AValue, false);
+  result := AddVarData('ICC_Profile', 'ICC_Profile', AKey, AValue, false);
 end;
 
 function FotoRec.AddXmp_Data(const AKey: string; AValue: TMetaInfo): TMetaInfo;
+var
+  Group0, XmpKey: string;
 begin
-  result := AddVarData('XMP-', AKey, AValue, true);
+  XmpKey := 'XMP-' + AKey;
+  Group0 := NextField(XmpKey, ':');
+  result := AddVarData('XMP', Group0, XmpKey, AValue, true);
 end;
 
 function FotoRec.AdvanceNull: string;
@@ -2627,13 +2716,17 @@ begin
 end;
 
 // ======================================== MAIN ==============================================
-function GetMetadata(AName: string; AGetOptions: TGetOptions; VarData: TVarData = nil; FieldNames: TStrings = nil): FotoRec;
+function GetMetadata(AName: string;
+                     AGetOptions: TGetOptions;
+                     VarData: TVarData = nil;
+                     MapGroups: TMapGroups = nil;
+                     FieldNames: TStrings = nil): FotoRec;
 var
   Lat, Lon: variant;
 begin
   result.Clear;  // Clear all variables
   result.FileName := AName;
-  result.SetVarData(VarData, FieldNames);
+  result.SetVarData(VarData, MapGroups, FieldNames);
 
   if (result.FileName = '') then
     exit;
@@ -2794,6 +2887,7 @@ begin
   FAllInterFields.Free;
   FPentaxLenses.Free;
   FGroups0.Free;
+
 end;
 
 end.
