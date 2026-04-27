@@ -9,7 +9,7 @@ uses
   ExifToolsGui_ShellList;
 
 type
-  TSampleData = TDictionary<string, string>;
+  TStringDict = TDictionary<string, string>;
 
   TDmFileLists = class(TDataModule)
     DsFileListDef: TDataSource;
@@ -66,7 +66,9 @@ type
     { Private declarations }
     FListReadMode: integer;
     FSample: TShellFolder;
-    FSampleValues: TSampleData;
+    FKeyList: TStringList;
+    FSampleValues: TStringDict;
+    FMapGroups: TStringDict;
     FSystemTagNames: TStringlist;
     FOnSetEditMode: TNotifyEvent;
     FOnFilterTag: TFilterRecordEvent;
@@ -218,11 +220,29 @@ end;
 
 function TDmFileLists.GetSampleValue(Command: string; var Value: string): boolean;
 var
-  LowerCommand: string;
+  TagSpec: TTagSpec;
+  KeyName: string;
 begin
-  LowerCommand := TMetaData.ToLowerStripNr(Command);
-  LowerCommand := TMetaData.RemoveFamily0GroupName(LowerCommand);
-  result := FSampleValues.TryGetValue(LowerCommand, Value);
+  result := false;
+  Value := '';
+
+  // System field?
+  if (LeftStr(Command, 1) <> '-') then
+  begin
+    result := FSampleValues.TryGetValue(Command, Value);
+    exit;
+  end;
+
+  TagSpec := TMetaData.GetTagSpec(TMetaData.ToLowerStripNr(Command));
+  TagSpec.GetKeyList(FKeyList, FMapGroups, true);
+  for KeyName in FKeyList do
+  begin
+    if (FSampleValues.ContainsKey(KeyName)) then
+    begin
+      Value := FSampleValues[KeyName];
+      exit(true);
+    end;
+  end;
 end;
 
 function TDmFileLists.ShowFieldExists(AField: string; AButtons: TMsgDlgButtons = [TMsgDlgBtn.mbOK]): integer;
@@ -269,7 +289,9 @@ end;
 
 procedure TDmFileLists.DataModuleCreate(Sender: TObject);
 begin
-  FSampleValues := TSampleData.Create;
+  FSampleValues := TStringDict.Create;
+  FMapGroups := TStringDict.Create;
+  FKeyList := TStringList.Create;
   FSystemTagNames := TStringList.Create;
   SetupLookUps;
 end;
@@ -277,6 +299,8 @@ end;
 procedure TDmFileLists.DataModuleDestroy(Sender: TObject);
 begin
   FSampleValues.Free;
+  FMapGroups.Free;
+  FKeyList.Free;
   FSystemTagNames.Free;
 end;
 
@@ -301,8 +325,10 @@ var
   MetaData: TMetaData;
   Index: integer;
   KeyName: string;
+  LowerKeyName: string;
   ETLine: string;
-  GroupName: string;
+  Group0: string;
+  Group1: string;
   TagName: string;
   Sample: string;
   ETcmd: string;
@@ -317,6 +343,7 @@ begin
   // Clear
   PrepTagNames;
   FSampleValues.Clear;
+  FMapGroups.Clear;
 
   if not Assigned(FSample) then   // Need a ShellFolder
     exit;
@@ -341,7 +368,6 @@ begin
             KeyName := '-' + TagName;
             AddTagName(KeyName, false);
           end;
-
           // Load sample values found in file. Can be XMP!
           MetaData := TMetaData.Create;
           try
@@ -349,40 +375,55 @@ begin
             for TagName in MetaData.FieldNames do
             begin
               KeyName := '-' + TagName;
-              if (FSampleValues.ContainsKey(LowerCase(KeyName))) then
+              LowerKeyName := LowerCase(KeyName);
+              if (FSampleValues.ContainsKey(LowerKeyName)) then
                 continue;
-              FSampleValues.Add(LowerCase(KeyName), MetaData.FieldData(TagName));
+              FSampleValues.Add(LowerKeyName, MetaData.FieldData(TagName));
               AddTagName(KeyName, true);
             end;
+            FMapGroups.Free;
+            FMapGroups := TDictionary<string, string>.Create(MetaData.MapGroups);
           finally
             MetaData.Free;
           end;
-
         end
       else
       begin
         if (TSubShellFolder.GetIsFolder(FSample)) then
           exit;
+
         // All ExifTool tags.
         ETOut := TStringList.Create;
         try
-          ETCmd := '-G1' + CRLF + '-s' + CRLF + '-a';
+          ETCmd := '-G0:1' + CRLF + '-s' + CRLF + '-a';
           ET.OpenExec(Etcmd, FSample.PathName, EtOut);
           for Index := 0 to ETOut.Count -1 do
           begin
             ETLine    := ETOut[Index];
-            GroupName := NextField(ETLine, '[');             // Strip Leading [
-            GroupName := NextField(ETLine, ']');             // Group name
-            TagName   := Trim(NextField(ETLine, ':'));       // Tag Name
-            KeyName := '-' + GroupName + ':' + TagName;
-            if (FSampleValues.ContainsKey(LowerCase(KeyName))) then
+
+            Group1 := NextField(ETLine, '[');                 // Strip Leading [
+            Group1 := NextField(ETLine, ']');                 // Group name
+            if (Pos(':', Group1) > 0) then                    // Have Grp0:Grp1 ?
+              Group0 := NextField(Group1, ':')
+            else
+              Group0 := '';
+            TagName   := Trim(NextField(ETLine, ':'));        // Tag Name
+            KeyName   := '-' + Group1 + ':' + TagName;
+            LowerKeyName := LowerCase(KeyName);
+            if (FSampleValues.ContainsKey(LowerKeyName)) then
               continue;
-            FSampleValues.Add(LowerCase(KeyName), Trim(ETLine));
+            FSampleValues.Add(LowerKeyName, Trim(ETLine));
             AddTagName(KeyName, true);
+
+            Group1 := LowerCase(Group1);
+            if not FMapGroups.ContainsKey(Group1) then
+              FMapGroups.Add(Group1, Group0);
+
           end;
         finally
           ETOut.Free;
         end;
+
       end;
     end;
   finally
