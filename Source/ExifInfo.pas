@@ -40,15 +40,16 @@ uses System.Classes, System.SysUtils, System.Generics.Collections, System.Types,
 type
   TMakerNotes = (None, Cr2, Pentax, Nikon);
   TMetaInfo = variant;
-  TVarData = TObjectDictionary<string, TMetaInfo>;
-  TMapGroups = TObjectDictionary<string, string>;
+  TVarData = TDictionary<string, TMetaInfo>;
+  TMapGroups = TDictionary<string, string>;
 
   TTagSpec = record
     Group0: string;
     Group1: string;
     Tag: string;
     procedure GetKeyList(const AKeyList: TStringList;
-                         const AMapGroups: TMapGroups);
+                         const AMapGroups: TMapGroups;
+                         const IncludeHyphen: boolean = false);
   end;
 
   IFDentryRec = packed record
@@ -298,7 +299,6 @@ type
     class function Groups0: TStrings;
     class function RemoveHyphen(const ATag: string): string;
     class function ToLowerStripNr(const ATag: string): string;
-    class function RemoveFamily0GroupName(const ATag: string): string;
     class function Family0GroupLength(const ATag: string): integer;
     class function GetTagSpec(const Tag: string): TTagSpec;
   end;
@@ -337,20 +337,23 @@ const
 
 
 procedure TTagSpec.GetKeyList(const AKeyList: TStringList;
-                              const AMapGroups: TMapGroups);
+                              const AMapGroups: TMapGroups;
+                              const IncludeHyphen: boolean = false);
 var
   AMapKey: string;
+const
+  Hyphens: array[boolean] of string = ('', '-');
 begin
   AKeyList.Clear;
   if (Group1 <> '') then
-    AKeyList.Add(Group1 + ':' + Tag)
+    AKeyList.Add(Hyphens[IncludeHyphen] + Group1 + ':' + Tag)
   else
   begin
     for AMapKey in AMapGroups.Keys do
     begin
       if (Group0 = '') or
          (SameText(Group0, AMapGroups[AMapKey])) then
-        AKeyList.Add(AMapKey + ':' + Tag);
+        AKeyList.Add(Hyphens[IncludeHyphen] + AMapKey + ':' + Tag);
     end;
   end;
 end;
@@ -398,12 +401,6 @@ begin
     if (VarData.ContainsKey(KeyName)) then
       exit(VarData[KeyName]);
   end;
-
-//  LowerFieldName := ToLowerStripNr(FieldName);
-//  LowerFieldName := RemoveFamily0GroupName(LowerFieldName);
-//  LowerFieldName := RemoveHyphen(LowerFieldName);
-//  if (VarData.ContainsKey(LowerFieldName)) then
-//    result := VarData[LowerFieldName];
 end;
 
 class function TMetaData.AllInternalFields: TStrings;
@@ -465,16 +462,6 @@ begin
     if (StartsText(G0, ATag)) then
       exit(Length(G0));
   end;
-end;
-
-class function TMetaData.RemoveFamily0GroupName(const ATag: string): string;
-var
-  L: integer;
-begin
-  result := ATag;
-  L := Family0GroupLength(result);
-  if (L > -1) then
-    Delete(result, 2, L -1);
 end;
 
 class function TMetaData.GetTagSpec(const Tag: string): TTagSpec;
