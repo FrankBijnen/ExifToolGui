@@ -48,6 +48,7 @@ uses
   ExifToolsGui_Listview in 'ExifToolsGui_Listview.pas',
   ExifToolsGui_Image in 'ExifToolsGui_Image.pas',
   ExifToolsGui_AutoEdit in 'ExifToolsGui_AutoEdit.pas',
+  ExifToolsGui_Dictionary in 'ExifToolsGui_Dictionary.pas',
   ExifInfo in 'ExifInfo.pas',
   ExifTool in 'ExifTool.pas',
   ExifTool_PipeStream in 'ExifTool_PipeStream.pas',

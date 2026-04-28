@@ -6,11 +6,9 @@ uses
   System.SysUtils, System.Classes, System.Generics.Collections, System.UITypes,
   vcl.Shell.ShellCtrls,
   Data.DB, Datasnap.DBClient,
-  ExifToolsGui_ShellList;
+  ExifToolsGui_ShellList, ExifToolsGui_Dictionary;
 
 type
-  TStringDict = TDictionary<string, string>;
-
   TDmFileLists = class(TDataModule)
     DsFileListDef: TDataSource;
     CdsFileListDef: TClientDataSet;
@@ -325,7 +323,6 @@ var
   MetaData: TMetaData;
   Index: integer;
   KeyName: string;
-  LowerKeyName: string;
   ETLine: string;
   Group0: string;
   Group1: string;
@@ -375,10 +372,8 @@ begin
             for TagName in MetaData.FieldNames do
             begin
               KeyName := '-' + TagName;
-              LowerKeyName := LowerCase(KeyName);
-              if (FSampleValues.ContainsKey(LowerKeyName)) then
+              if not FSampleValues.AddLowerCase(KeyName, MetaData.FieldData(TagName)) then
                 continue;
-              FSampleValues.Add(LowerKeyName, MetaData.FieldData(TagName));
               AddTagName(KeyName, true);
             end;
             FMapGroups.Free;
@@ -409,21 +404,14 @@ begin
               Group0 := '';
             TagName   := Trim(NextField(ETLine, ':'));        // Tag Name
             KeyName   := '-' + Group1 + ':' + TagName;
-            LowerKeyName := LowerCase(KeyName);
-            if (FSampleValues.ContainsKey(LowerKeyName)) then
+            if not FSampleValues.AddLowerCase(KeyName, Trim(ETLine)) then
               continue;
-            FSampleValues.Add(LowerKeyName, Trim(ETLine));
             AddTagName(KeyName, true);
-
-            Group1 := LowerCase(Group1);
-            if not FMapGroups.ContainsKey(Group1) then
-              FMapGroups.Add(Group1, Group0);
-
+            FMapGroups.AddLowerCase(Group1, Group0);
           end;
         finally
           ETOut.Free;
         end;
-
       end;
     end;
   finally
