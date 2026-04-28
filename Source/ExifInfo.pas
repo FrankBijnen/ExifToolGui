@@ -35,13 +35,13 @@ interface
 uses System.Classes, System.SysUtils, System.Generics.Collections, System.Types,
      Vcl.StdCtrls,
      Xml.VerySimple,    // XML parsing for XMP
-     ExifToolsGUI_StringList;
+     ExifToolsGUI_StringList, ExifToolsGui_Dictionary;
 
 type
   TMakerNotes = (None, Cr2, Pentax, Nikon);
   TMetaInfo = variant;
   TVarData = TDictionary<string, TMetaInfo>;
-  TMapGroups = TDictionary<string, string>;
+  TMapGroups = TStringDict;
 
   TTagSpec = record
     Group0: string;
@@ -826,9 +826,8 @@ begin
   begin
     KeyName := AGroup1 + ':' + AKey;
 
-    if (Assigned(MapGroups)) and
-       not MapGroups.ContainsKey(LowerCase(AGroup1)) then
-      MapGroups.Add(LowerCase(AGroup1), AGroup0);
+    if (Assigned(MapGroups)) then
+      MapGroups.AddLowerCase(AGroup1, AGroup0);
 
     if (Assigned(FieldNames)) then
       FieldNames.Add(KeyName);
