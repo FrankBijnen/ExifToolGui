@@ -1,34 +1,70 @@
 unit UnitStackTrace;
 
+// Enabling this will give a detailed stack trace in the event of an exception.
+// JEDI-JCL should be installed. https://github.com/project-jedi/jcl
+// Enable Debug_CallStack in the DPR
 interface
 
-uses System.SysUtils;
+uses
+  System.SysUtils;
 
 type
   TLog_StackTrace = class
-    private
-      procedure HandleAppException(Sender: TObject; E: Exception);
+  private
+    procedure HandleAppException(Sender: TObject; E: Exception);
   end;
+
+function GetCurrentStack: string;
 
 implementation
 
-uses Winapi.Windows, System.Variants, System.Classes, Vcl.Clipbrd, System.UITypes,
-     Vcl.Forms, Vcl.Dialogs, JclDebug;
+uses
+  Winapi.Windows, System.Variants, System.Classes, Vcl.Clipbrd, System.UITypes,
+  Vcl.Forms, Vcl.Dialogs, JclDebug;
 
-var Log_StackTrace: TLog_StackTrace;
+var
+  Log_StackTrace: TLog_StackTrace;
+
+function GetCurrentStack: string;
+var
+  StackList: TJclStackInfoList; //JclDebug.pas
+  Sl: TStringList;
+begin
+  result := '';
+  StackList := JclCreateStackList(False, 0, Caller(0, False));
+  try
+    Sl := TStringList.Create;
+    try
+      StackList.AddToStrings(sl, True, True, True, True);
+      result := Sl.Text;
+    finally
+      Sl.Free;
+    end;
+  finally
+    Stacklist.Free;
+  end;
+end;
 
 procedure TLog_StackTrace.HandleAppException(Sender: TObject; E: Exception);
-var StackTrace: TStringList;
-    ModuleName: string;
+var
+  StackTrace: TStringList;
+  ModuleName: string;
 begin
   ModuleName := ExtractFilename(ParamStr(0));
   StackTrace := TStringList.Create;
   try
     StackTrace.Add(Format('{%s} %s %s %s', [ModuleName, '*************************************',
                                             E.Message,  '*************************************']));
-    JclLastExceptStackListToStrings(StackTrace, True, True, True, True);
+    // If an error occurs getting the stack trace, show as much as possible.
+    // EG: On Wine 64 bits the last 2 lines (not important) are missing.
+    try
+      JclLastExceptStackListToStrings(StackTrace, True, True, True, True);
+    except
+      StackTrace.Add('Error getting stack trace!');
+    end;
+
     OutputDebugString(PChar(StackTrace.Text));
-    if (MessageDlg(Format('Exception: %s occurred.%s%s', [E.Message, #10#10, 'Copy stacktrace to ClipBoard?']), mtError, [mbYes, mbNo], 0) = ID_Yes) then
+    if (MessageDlg(Format('Exception: %s occurred.%s%s', [E.Message, #10#10, 'Copy stack trace to clipBoard?']), mtError, [mbYes, mbNo], 0) = ID_Yes) then
       Clipboard.AsText := StackTrace.Text;
   finally
     StackTrace.Free;
