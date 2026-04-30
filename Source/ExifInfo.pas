@@ -157,6 +157,7 @@ type
 const
   RDFLI = 'rdf:li';
   RDFBAG = 'rdf:Bag';
+  RDFSEQ = 'rdf:Seq';
 
 type
   XMPrec = packed record
@@ -640,7 +641,8 @@ begin
   else if (ParmIsList) then
   begin
     if (SubNode <> RDFBAG) and
-       (SubNode <> RDFLI) then
+       (SubNode <> RDFLI) and
+       (SubNode <> RDFSEQ) then
     begin
       P := Pos(':', SubNode);
       if (P > 0) then
@@ -2414,7 +2416,7 @@ begin
          (TmpStream.Size > XMPMINSIZE) then // Process standard XMP
       begin
 {$IFDEF DEBUG_XMP}
-        TmpStream.SaveToFile(ChangeFileExt(Self.FileName, '.XML'));
+        TmpStream.SaveToFile(ChangeFileExt(Self.FileName, Format('.%d.XML', [Index])));
 {$ENDIF}
         ParseXMPBlock(TmpStream);
         TmpStream.Clear;
