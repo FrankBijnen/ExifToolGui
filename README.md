@@ -3,21 +3,37 @@
 
 This is an updated version of the ExifToolGui program created by Bogdan Hrastnik. Many thanks go out to him.
 
-<b>Released version: <b>V6.3.11</b> updated Jan 2, 2026</b><br>
+<b>Released version: <b>V6.3.12</b> updated May 8, 2026</b><br>
 
-- Added Japanese language. Thanks coolvito!
-- Added expert option to use a custom Map tiler server. Thanks InifiteBSOD! [His notes on setting up](../../blob/main/Docs/Readme%20Using%20a%20custom%20Map%20tiler%20server.md)
+- Updated Japanese language. Thanks coolvito!
+- Improved support for HEIC images.
+  - Exif and XMP tags can now be used in the filelist with readmode=internal.
+  - Fixed issue with auto rotating previews.
+  - Note: Windows 11 comes standard with the needed codec.
+- Added SubjectArea in the Regions tab. Thanks Steerpike!
+- Update MapTiler baselayers to V4, added Hybrid satellite, and fixed label sizes.
+- In the field definitions for the Filelist and the Workspace you can now specify the tags like this:
+<table>
+<tr><td>G0:G1:Tag</td><td>Exif:Ifd0:Make</td></tr>
+<tr><td>G1:Tag</td><td>Ifd0:Make</td></tr>
+<tr><td>G0:Tag</td><td>Exif:Make</td></tr>
+<tr><td>Tag</td><td>Make</td></tr>
+</table>
+
+- When adding a field to the FileList, or WorkSpace from the Metadata tab using right click it is always added as:<br>
+Thanks KarenBbla!
+<table>
+<tr><td>G1:Tag</td><td>Ifd0:Make</td></tr>
+</table>
 
 Fixes include:
 
-- Added User-Agent to comply with OpenStreetMap guidelines.
-- Update some MapTiler base layers V2->V4.
-- Fixed Exif:ImageWidth and Exif:ImageHeight for some models. (EG IPhone) Thanks steerpike!
-- Performance fix browsing folders with many sub folders.
-- Changed defaults for API options Windows.
+- Fixed Access violation error when changing styles. Thanks Gitoffthelawn!
 - For the complete info see the [changelog](../../blob/main/Docs/changelog.txt).<br>
 
-[Download Release](https://github.com/FrankBijnen/ExifToolGui/releases/latest)<br>
+# Download
+
+[Latest release](https://github.com/FrankBijnen/ExifToolGui/releases/latest)<br>
 
 <h4>Important</h4>
 

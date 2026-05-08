@@ -223,4 +223,22 @@ Changed with version 6.3.11
 - Fixed Exif:ImageWidth and ImageHeight for certain models. EG IPhone.Thanks steerpike
 - Changed API options Windows defaults.
 
+Changed with version 6.3.12
+- Updated Japanese translations. Thanks coolvitto
+- Better support of HEIC images. Note that the codec is only available by default in Windows 11. The codec needs substantial time to render the image, 
+  and rotates automatically according to the orientation. This is different behaviour from most codecs.
+  Metadata from HEIC images will now display in the user defined filelists with readmode=internal. (the fastest readmode)
+- Added support for the SujectArea in the regions tab. 
+- File list columns - unexpected behaviour. To make the behaviour more predictable this was changed for Readmode=Internal:
+  - When adding a tag, from the Metadata panel to a user defined file list it is always added as 'Group1:Tag' (Eg Ifd0:Make)
+  - In the user defined file list definitions you can now use.
+    - Group0:Group1:Tag (Eg Exif:Ifd0:Make)
+    - Group1:Tag        (Eg Ifd0:Make)
+    - Group0:Tag        (Eg Exif:Make)
+    - Tag               (Eg Make) 
+  - Specifying a Group, especially Group1, makes the Tag more unique.
+- Base layers updates. Add TopPlusOpen and MapTiler Hybrid. Fix scaling. The MapTiler layers suffered from small labels, making the maps less usable. This has been fixed.
+  The added MapTiler Hybrid layer add labels (town, street names etc) to the satellite layer. 
+  The added TopPlusOpen layer, requires no api_key and is a nice Topo layer.
+ 
 Frank

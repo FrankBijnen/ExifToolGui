@@ -211,4 +211,15 @@ Version 6.3.9
 Version 6.3.10
 - Added the OpenLayers II (JavaScript) library as a resource. Allowing more customizations, like adding base layers.
 
+Version 6.3.12
+- Have a look at ExifInfo.pas and the code added to read metadata from HEIC images.
+  procedure FotoRec.ReadCr3OrHeic; 
+  function FotoRec.ReadFtyp(StartOffs: int64 = 0): word; 
+  function FotoRec.FindExifAndXmp(StartOffs: int64): WORD; 
+- The scaling for the MapTiler layers was fixed by using the property 'map.tileSize' in Geomap.pas.
+  Turns out the MapTiler tiles are 512x512 and not 256x256 like the others.
+  It could also have been fixed by using an other URL in BaseLayer.js but 512 is recommended.
+  https://api.maptiler.com/maps/hybrid-v4/{z}/{x}/{y}.jpg ==> https://api.maptiler.com/maps/hybrid-v4/256/{z}/{x}/{y}.jpg
+  
+
 Frank
