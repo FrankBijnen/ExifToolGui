@@ -191,3 +191,10 @@ Version:        Description             Issue
                 Fix Issue #948          Performance issue in ShellTreeview, checking for subfolders
                 Fix Issue #953          Change API Windows defaults
                 Fix Issue #956          Fix issues for V6.3.11
+6.3.12.0        Fix Issue #943          Updated Japanese translations
+                Fix Issue #960          Access violation error when changing styles
+                Fix Issue #968          Better support of HEIC images
+                Fix Issue #969          Add support for SubjectArea in Region tab
+                Fix Issue #974          File list columns - unexpected behaviour
+                Fix Issue #981          Base layers updates. Add TopPlusOpen and MapTiler Hybrid. Fix scaling
+                Fix Issue #990          Fix issues for V6.3.12
