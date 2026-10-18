@@ -168,7 +168,7 @@ end;
 function TShellTreeView.CustomDrawItem(Node: TTreeNode; State: TCustomDrawState;
   Stage: TCustomDrawStage; var PaintImages: Boolean): Boolean;
 var
-  prc: Trect;
+  Prc: TRect;
   AFolder: TShellFolder;
 begin
   if not (otNonFolders in ObjectTypes) and // Performance optimization only for directories.
@@ -176,8 +176,8 @@ begin
      (Node.Data <> nil) and
      ((Node.StateIndex and sfsNeedsCheck) = sfsNeedsCheck) then
   begin
-    if (TreeView_GetItemRect(Handle, Node.ItemId, prc, false)) and
-       ((prc.Top + prc.Height) >= Self.Top) and
+    if (TreeView_GetItemRect(Handle, Node.ItemId, Prc, false)) and
+       (Prc.Top >= 0) and
        ((Prc.Bottom - Prc.Height) <= (Self.Top + Self.Height)) then // Only check items in view
     begin
       // Only do the check 1 time.

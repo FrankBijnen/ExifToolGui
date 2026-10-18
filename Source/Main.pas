@@ -2063,10 +2063,14 @@ begin
 end;
 
 procedure TFMain.MCustomOptionsClick(Sender: TObject);
+var
+  OldOptions: string;
 begin
+  OldOptions := ET.Options.ETCustomOptions;
   ET.Options.SetCustomOptions(InputBox(StrSpecifyCustomOptio,
                                        StrCustomOptions,
                                        ET.Options.ETCustomOptions));
+  ET.Options.SetWarnCustomOptions(OldOptions <> ET.Options.ETCustomOptions);
 end;
 
 procedure TFMain.OnlineDocumentation1Click(Sender: TObject);
