@@ -37,6 +37,7 @@ type
     ETAPILargeFileSupport: string;
     ETGeoDir: string;
     ETCustomOptions: string;
+    ETWarnCustomOptions: boolean;
     class operator Initialize (out ET_Options: TET_OptionsRec);
     procedure SetLangDef(UseLangDef: string);
     procedure SetBackupMode(UseBackUpMode: boolean);
@@ -50,6 +51,7 @@ type
     procedure SetApiLargeFileSupport(UseLarge: boolean);
     procedure SetMustExpandPath(ExpandPath: boolean);
     procedure SetGeoDir(GeoDir: string);
+    procedure SetWarnCustomOptions(WarnCustom: boolean);
     procedure SetCustomOptions(Custom: string);
     procedure SetSeparator(const Sep: string);
 
@@ -115,12 +117,12 @@ function CmdModifyDate(const Group: string): string;
 function ReplaceVetoTag(ATag: string): string;
 
 var
-   ET: TExifTool;
+  ET: TExifTool;
 
 implementation
 
 uses
-  System.SysUtils, System.IOUtils,
+  System.SysUtils, System.IOUtils, System.UITypes,
   Main, MainDef, ExifToolsGUI_Utils,
   UnitLangResources;
 
@@ -264,9 +266,17 @@ begin
     ETGeoDir := '';
 end;
 
+procedure TET_OptionsRec.SetWarnCustomOptions(WarnCustom: boolean);
+begin
+  ETWarnCustomOptions := WarnCustom;
+end;
+
 procedure TET_OptionsRec.SetCustomOptions(Custom: string);
 begin
   ETCustomOptions := Custom;
+  if (ETWarnCustomOptions) and
+     (Trim(ETCustomOptions) <> '') then
+    ETWarnCustomOptions := (MessageDlgEx(Format('%s: %s', [StrCustomOptions, ETCustomOptions]), '', TMsgDlgType.mtWarning, [TMsgDlgBtn.mbOK, TMsgDlgBtn.mbIgnore]) <> idIgnore);
 end;
 
 function TET_OptionsRec.GetVerbose: integer;

@@ -968,6 +968,7 @@ begin
         SetApiLargeFileSupport(MaAPILargeFileSupport.Checked);
         MaExpandFilename.Checked := ReadBool(Ini_Options, 'ExpandFilenameV6', false);
         SetMustExpandPath(MaExpandFilename.Checked);
+        SetWarnCustomOptions(ReadBool(Ini_Options, 'WarnCustomOptions', True));
         SetCustomOptions(ReadString(Ini_Options, 'CustomOptions', ''));
       end;
 
@@ -1174,6 +1175,7 @@ begin
         WriteBool(Ini_Options, 'APIWindowsLongPathV6', MaAPIWindowsLongPath.Checked);
         WriteBool(Ini_Options, 'APILargeFileSupportV6', MaAPILargeFileSupport.Checked);
         WriteBool(Ini_Options, 'ExpandFileNameV6', MaExpandFilename.Checked);
+        WriteBool(Ini_Options, 'WarnCustomOptions', ET.Options.ETWarnCustomOptions);
         WriteString(Ini_Options, 'CustomOptions', ET.Options.ETCustomOptions);
 
         // Standard, Camera, Location, About and UserDef settings
