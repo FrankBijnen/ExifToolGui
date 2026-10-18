@@ -19,6 +19,13 @@ uses
   System.Contnrs, System.SysUtils;
 
 type
+
+  {$IFDEF VER350}
+  TSdListIndex = integer;     // Delphi 11 uses integer
+  {$ELSE}
+  TSdListIndex = NativeInt;   // Delphi 12 and up uses NativeInt in TLis and TObjectList
+  {$ENDIF}
+
   TItemCompareEvent = function(Item1, Item2: TObject; Info: pointer): integer of object;
   TItemCompareMethod = function(Item1, Item2: TObject; Info: pointer): integer;
   TPointerCompareMethod = function(Ptr1, Ptr2: pointer): integer;
@@ -32,11 +39,11 @@ type
   protected
     // Override this method to implement the object comparison between two
     // items. The default just compares the item pointers
-    function DoCompare(Item1, Item2: TObject): integer; virtual;
+    function DoCompare(Item1, Item2: TObject): TSdListIndex; virtual;
   public
     constructor Create(AOwnsObjects: boolean = true);
-    function Add(AItem: TObject): integer;
-    function Find(Item: TObject; out Index: integer): boolean; virtual;
+    function Add(AItem: TObject): TSdListIndex;
+    function Find(Item: TObject; out Index: TSdListIndex): boolean; virtual;
     procedure Sort; virtual;
     property Sorted: boolean read FSorted write SetSorted default true;
   end;
@@ -51,7 +58,7 @@ type
     FOnCompare: TItemCompareEvent;
     FCompareMethod: TItemCompareMethod;
   protected
-    function DoCompare(Item1, Item2: TObject): integer; override;
+    function DoCompare(Item1, Item2: TObject): TSdListIndex; override;
   public
     property CompareInfo: pointer read FCompareInfo write FCompareInfo;
     // Use CompareMethod if you want to specify a compare method as stand-alone method
@@ -77,7 +84,7 @@ begin
 end;
 
 { TCustomSortedList }
-function TCustomSortedList.Add(AItem: TObject): integer;
+function TCustomSortedList.Add(AItem: TObject): TSdListIndex;
 begin
   if Sorted then
   begin
@@ -93,14 +100,14 @@ begin
   FSorted := True;
 end;
 
-function TCustomSortedList.DoCompare(Item1, Item2: TObject): integer;
+function TCustomSortedList.DoCompare(Item1, Item2: TObject): TSdListIndex;
 begin
   Result := ComparePointer(Item1, Item2);
 end;
 
-function TCustomSortedList.Find(Item: TObject; out Index: integer): boolean;
+function TCustomSortedList.Find(Item: TObject; out Index: TSdListIndex): boolean;
 var
-  AMin, AMax: integer;
+  AMin, AMax: TSdListIndex;
 begin
   Result := False;
   if Sorted then
@@ -149,9 +156,9 @@ end;
 procedure TCustomSortedList.Sort;
 
   //local
-  procedure QuickSort(iLo, iHi: Integer);
+  procedure QuickSort(iLo, iHi: TSdListIndex);
   var
-    Lo, Hi, Mid: longint;
+    Lo, Hi, Mid: TSdListIndex;
   begin
     Lo := iLo;
     Hi := iHi;
@@ -190,7 +197,7 @@ begin
 end;
 
 { TSortedList }
-function TSortedList.DoCompare(Item1, Item2: TObject): integer;
+function TSortedList.DoCompare(Item1, Item2: TObject): TSdListIndex;
 begin
   if Assigned(FOnCompare) then
     Result := FOnCompare(Item1, Item2, FCompareInfo)
