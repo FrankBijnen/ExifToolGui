@@ -31,9 +31,9 @@ type
 
   TsdHuffmanTableList = class(TObjectList)
   private
-    function GetItems(Index: integer): TsdHuffmanTable;
+    function GetItems(Index: TSdListIndex): TsdHuffmanTable;
   public
-    property Items[Index: integer]: TsdHuffmanTable read GetItems; default;
+    property Items[Index: TSdListIndex]: TsdHuffmanTable read GetItems; default;
   end;
 
   TsdEntropyCoder = class(TPersistent)
@@ -43,10 +43,10 @@ type
 
   TsdEntropyCoderList = class(TObjectList)
   private
-    function GetItems(Index: integer): TsdEntropyCoder;
-    procedure SetItems(Index: integer; const Value: TsdEntropyCoder);
+    function GetItems(Index: TSdListIndex): TsdEntropyCoder;
+    procedure SetItems(Index: TSdListIndex; const Value: TsdEntropyCoder);
   public
-    property Items[Index: integer]: TsdEntropyCoder read GetItems write SetItems; default;
+    property Items[Index: TSdListIndex]: TsdEntropyCoder read GetItems write SetItems; default;
   end;
 
   // Generic Huffman coder implementing shared methods
@@ -97,11 +97,11 @@ type
 
   TsdHuffmanNodeList = class(TCustomSortedList)
   private
-    function GetItems(Index: integer): TsdHuffmanNode;
+    function GetItems(Index: TSdListIndex): TsdHuffmanNode;
   protected
-    function DoCompare(Item1, Item2: TObject): integer; override;
+    function DoCompare(Item1, Item2: TObject): TSdListIndex; override;
   public
-    property Items[Index: integer]: TsdHuffmanNode read GetItems; default;
+    property Items[Index: TSdListIndex]: TsdHuffmanNode read GetItems; default;
   end;
 
   // General 8-bit huffman encoder
@@ -186,7 +186,7 @@ end;
 
 { TsdHuffmanTableList }
 
-function TsdHuffmanTableList.GetItems(Index: integer): TsdHuffmanTable;
+function TsdHuffmanTableList.GetItems(Index: TSdListIndex): TsdHuffmanTable;
 begin
   if Index >= Count then Count := Index + 1;
   Result := Get(Index);
@@ -206,13 +206,13 @@ end;
 
 { TsdEntropyCoderList }
 
-function TsdEntropyCoderList.GetItems(Index: integer): TsdEntropyCoder;
+function TsdEntropyCoderList.GetItems(Index: TSdListIndex): TsdEntropyCoder;
 begin
   if Index >= Count then Count := Index + 1;
   Result := Get(Index);
 end;
 
-procedure TsdEntropyCoderList.SetItems(Index: integer;
+procedure TsdEntropyCoderList.SetItems(Index: TSdListIndex;
   const Value: TsdEntropyCoder);
 begin
   if Index >= Count then Count := Index + 1;
@@ -337,7 +337,7 @@ end;
 
 { TsdHuffmanNodeList }
 
-function TsdHuffmanNodeList.DoCompare(Item1, Item2: TObject): integer;
+function TsdHuffmanNodeList.DoCompare(Item1, Item2: TObject): TSdListIndex;
 var
   L1, L2: TsdHuffmanNode;
 begin
@@ -354,7 +354,7 @@ begin
   end;
 end;
 
-function TsdHuffmanNodeList.GetItems(Index: integer): TsdHuffmanNode;
+function TsdHuffmanNodeList.GetItems(Index: TSdListIndex): TsdHuffmanNode;
 begin
   Result := Get(Index);
 end;

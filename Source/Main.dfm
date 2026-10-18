@@ -1296,8 +1296,8 @@ object FMain: TFMain
           15)
         ColorPaletteIndex = 13
         object Series1: TBarSeries
-          HoverElement = []
           Marks.Visible = False
+          Marks.OnTop = True
           XValues.Name = 'X'
           XValues.Order = loAscending
           YValues.Name = 'Bar'
@@ -1307,7 +1307,6 @@ object FMain: TFMain
             0000322E380000000000002040FF03000000342E300000000000002040FF0300
             0000352E360000000000001040FF03000000382E300000000000001040FF0400
             000031312E30}
-          Detail = {0000000000}
         end
       end
     end
@@ -1317,7 +1316,6 @@ object FMain: TFMain
     Top = 0
     Width = 980
     Height = 25
-    UseSystemFont = False
     ActionManager = MainActionManager
     Caption = 'ActionMainMenuBar'
     Color = clMenuBar
@@ -1326,7 +1324,7 @@ object FMain: TFMain
     ColorMap.BtnSelectedFont = clBlack
     ColorMap.UnusedColor = clWhite
     Font.Charset = DEFAULT_CHARSET
-    Font.Color = clBlack
+    Font.Color = clWindowText
     Font.Height = -12
     Font.Name = 'Segoe UI'
     Font.Style = []

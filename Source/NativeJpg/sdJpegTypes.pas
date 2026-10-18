@@ -17,7 +17,8 @@ unit sdJpegTypes;
 interface
 
 uses
-  System.Classes, System.SysUtils, System.Contnrs;
+  System.Classes, System.SysUtils, System.Contnrs,
+  sdSortedLists;
 
 type
 
@@ -131,9 +132,9 @@ type
 
   TsdQuantizationTableList = class(TObjectList)
   private
-    function GetItems(Index: integer): TsdQuantizationTable;
+    function GetItems(Index: TSdListIndex): TsdQuantizationTable;
   public
-    property Items[Index: integer]: TsdQuantizationTable read GetItems; default;
+    property Items[Index: TSdListIndex]: TsdQuantizationTable read GetItems; default;
   end;
 
   // Frame component specified in SOF marker
@@ -151,9 +152,9 @@ type
 
   TsdFrameComponentList = class(TObjectList)
   private
-    function GetItems(Index: integer): TsdFrameComponent;
+    function GetItems(Index: TSdListIndex): TsdFrameComponent;
   public
-    property Items[Index: integer]: TsdFrameComponent read GetItems; default;
+    property Items[Index: TSdListIndex]: TsdFrameComponent read GetItems; default;
   end;
 
   // Scan component specified in SOS marker
@@ -171,9 +172,9 @@ type
 
   TsdScanComponentList = class(TObjectList)
   private
-    function GetItems(Index: integer): TsdScanComponent;
+    function GetItems(Index: TSdListIndex): TsdScanComponent;
   public
-    property Items[Index: integer]: TsdScanComponent read GetItems; default;
+    property Items[Index: TSdListIndex]: TsdScanComponent read GetItems; default;
   end;
 
   // Holds data for one image component in the frame, provides method
@@ -217,9 +218,9 @@ type
 
   TsdBlockMapList = class(TObjectList)
   private
-    function GetItems(Index: integer): TsdJpegBlockMap;
+    function GetItems(Index: TSdListIndex): TsdJpegBlockMap;
   public
-    property Items[Index: integer]: TsdJpegBlockMap read GetItems; default;
+    property Items[Index: TSdListIndex]: TsdJpegBlockMap read GetItems; default;
   end;
 
   TsdJpegTile = class
@@ -233,10 +234,10 @@ type
 
   TsdJpegTileList = class(TObjectList)
   private
-    function GetItems(Index: integer): TsdJpegTile;
+    function GetItems(Index: TSdListIndex): TsdJpegTile;
   public
-    function IndexByMcuIndex(AMcuIndex: integer): integer;
-    property Items[Index: integer]: TsdJpegTile read GetItems; default;
+    function IndexByMcuIndex(AMcuIndex: TSdListIndex): TSdListIndex;
+    property Items[Index: TSdListIndex]: TsdJpegTile read GetItems; default;
   end;
 
   // Collected component data from markers
@@ -338,7 +339,7 @@ type
   TsdJpegMarkerList = class(TObjectList)
   private
     FOwner: TComponent;// Reference to owner TsdJpegFormat
-    function GetItems(Index: integer): TsdJpegMarker;
+    function GetItems(Index: TSdListIndex): TsdJpegMarker;
   public
     constructor Create(AOwner: TComponent);
     function ByTag(AMarkerTag: byte): TsdJpegMarker;
@@ -347,7 +348,7 @@ type
     procedure RemoveMarkers(ASet: TsdJpegMarkerSet);
     procedure InsertAfter(ASet: TsdJpegMarkerSet; AMarker: TsdJpegMarker);
     procedure Add(AItem: TObject);
-    property Items[Index: integer]: TsdJpegMarker read GetItems; default;
+    property Items[Index: TSdListIndex]: TsdJpegMarker read GetItems; default;
   end;
 
   TsdAPPnMarker = class(TsdJpegMarker)
@@ -706,10 +707,10 @@ resourcestring
 
 // general functions
 
-function IntMin(i1, i2: integer): integer;
+function IntMin(i1, i2: TSdListIndex): TSdListIndex;
 
 // comparison function
-function CompareInteger(Int1, Int2: integer): integer;
+function CompareInteger(Int1, Int2: TSdListIndex): TSdListIndex;
 
 // divisor based on scale
 function sdGetDivisor(AScale: TsdJpegScale): integer;
@@ -737,7 +738,7 @@ end;
 
 { TsdQuantizationTableList }
 
-function TsdQuantizationTableList.GetItems(Index: integer): TsdQuantizationTable;
+function TsdQuantizationTableList.GetItems(Index: TSdListIndex): TsdQuantizationTable;
 begin
   if Index >= Count then Count := Index + 1;
   Result := Get(Index);
@@ -750,7 +751,7 @@ end;
 
 { TsdFrameComponentList }
 
-function TsdFrameComponentList.GetItems(Index: integer): TsdFrameComponent;
+function TsdFrameComponentList.GetItems(Index: TSdListIndex): TsdFrameComponent;
 begin
   if Index >= Count then Count := Index + 1;
   Result := Get(Index);
@@ -763,7 +764,7 @@ end;
 
 { TsdScanComponentList }
 
-function TsdScanComponentList.GetItems(Index: integer): TsdScanComponent;
+function TsdScanComponentList.GetItems(Index: TSdListIndex): TsdScanComponent;
 begin
   if Index >= Count then Count := Index + 1;
   Result := Get(Index);
@@ -966,7 +967,7 @@ end;
 
 { TsdBlockMapList }
 
-function TsdBlockMapList.GetItems(Index: integer): TsdJpegBlockMap;
+function TsdBlockMapList.GetItems(Index: TSdListIndex): TsdJpegBlockMap;
 begin
   if Index >= Count then
     Count := Index + 1;
@@ -980,14 +981,14 @@ end;
 
 { TsdJpegTileList }
 
-function TsdJpegTileList.GetItems(Index: integer): TsdJpegTile;
+function TsdJpegTileList.GetItems(Index: TSdListIndex): TsdJpegTile;
 begin
   Result := Get(Index);
 end;
 
-function TsdJpegTileList.IndexByMcuIndex(AMcuIndex: integer): integer;
+function TsdJpegTileList.IndexByMcuIndex(AMcuIndex: TSdListIndex): TSdListIndex;
 var
-  Min, Max: integer;
+  Min, Max: TSdListIndex;
 begin
   // Find position for insert - binary method
   Min := 0;
@@ -1234,7 +1235,7 @@ begin
   FOwner := AOwner;
 end;
 
-function TsdJpegMarkerList.GetItems(Index: integer): TsdJpegMarker;
+function TsdJpegMarkerList.GetItems(Index: TSdListIndex): TsdJpegMarker;
 begin
   Result := Get(Index);
 end;
@@ -1513,7 +1514,7 @@ begin
     AList.Insert(Base, Markers[i]);
 end;
 
-function IntMin(i1, i2: integer): integer;
+function IntMin(i1, i2: TSdListIndex): TSdListIndex;
 begin
   if i1 < i2 then
     Result := i1
@@ -1521,7 +1522,7 @@ begin
     Result := i2;
 end;
 
-function CompareInteger(Int1, Int2: integer): integer;
+function CompareInteger(Int1, Int2: TSdListIndex): TSdListIndex;
 begin
   if Int1 < Int2 then
     Result := -1

@@ -15,6 +15,7 @@ ExifIFD:ISO
 ExifIFD:LensInfo
 ExifIFD:LensMake
 ExifIFD:LensModel
+ExifIFD:UserComment
 GPS:GeoLat
 GPS:GeoLon
 GPS:GpsAltitude
