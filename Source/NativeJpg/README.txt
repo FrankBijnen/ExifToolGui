@@ -19,6 +19,8 @@ Changes to the original library:
 
 - Added blank lines before procedures/functions to improve readability.
 
+- Added sdListIndex to accomodate for NativeInt in Tlist/TObjectList in Delphi 12/13
+
 Changes to ExifToolGui.
 
 - If jhead and jpegtran are found they will still be used. For compatibility reasons. But the Menu items are marked 'Deprecated'.

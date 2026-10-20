@@ -18,7 +18,7 @@ interface
 
 uses
   System.Classes, System.SysUtils, System.Contnrs,
-  sdSortedLists;
+  sdListIndex;
 
 type
 

@@ -16,15 +16,10 @@ unit sdSortedLists;
 interface
 
 uses
-  System.Contnrs, System.SysUtils;
+  System.Contnrs, System.SysUtils,
+  sdListIndex;
 
 type
-
-  {$IFDEF VER350}
-  TSdListIndex = integer;     // Delphi 11 uses integer
-  {$ELSE}
-  TSdListIndex = NativeInt;   // Delphi 12 and up uses NativeInt in TLis and TObjectList
-  {$ENDIF}
 
   TItemCompareEvent = function(Item1, Item2: TObject; Info: pointer): integer of object;
   TItemCompareMethod = function(Item1, Item2: TObject; Info: pointer): integer;

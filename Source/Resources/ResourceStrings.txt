@@ -8,6 +8,7 @@ ETD_Home_Gui=https://github.com/FrankBijnen/ExifToolGui
 ETD_Home_PH=https://exiftool.org
 ETD_Home_OBetz=https://oliverbetz.de/pages/Artikel/ExifTool-for-Windows
 ETD_Online_Doc=https://github.com/FrankBijnen/ExifToolGui/blob/main/Docs/ExifToolGUI_V6.md
+ETD_Online_Doc_Flist=https://github.com/FrankBijnen/ExifToolGui/blob/main/Docs/ExifToolGUI_V6.md#p_config_file_list
 ETD_Edge_Dll=/#m_edge_dll
 ETD_Edge_Runtime=/#m_edge_runtime
 ETD_Reqs=/#m_reqs_exiftool

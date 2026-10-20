@@ -13,7 +13,7 @@ interface
 
 uses
   System.Classes, System.Contnrs, System.SysUtils,
-  sdJpegTypes, sdJpegBitstream, sdSortedLists;
+  sdListIndex, sdJpegTypes, sdJpegBitstream, sdSortedLists;
 
 type
 
