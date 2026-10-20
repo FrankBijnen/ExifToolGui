@@ -17,6 +17,7 @@ const
   Chr_Pause   = Chr(VK_PAUSE);  // Ctrl/S
 
 type
+
   TPreviewInfo = record
     GroupName: string;
     TagName: string;
@@ -175,11 +176,13 @@ var
   FloatFormatSettings: TFormatSettings; // for StrToFloatDef -see Initialization
   IsElevated: boolean;
   IsAdminUser: boolean;
+  ButtonCaptions: array[TMsgDlgBtn] of string;
 
 implementation
 
 uses
   Winapi.ShellAPI, Winapi.KnownFolders, System.Win.Registry, System.UITypes, System.Types, System.DateUtils,
+  Vcl.Consts,
   MainDef, ExifTool, ExifInfo, UnitLangResources, UFrmDiff,
   ExifToolsGui_AutoComplete;
 
@@ -187,6 +190,13 @@ var
   GlobalImgFact: IWICImagingFactory;
   TempDirectory: string;
   UTF8Encoding: TEncoding;
+
+  User32Dll: THandle;
+  MB_GetString: function(wBtn: UINT): LPCWSTR; stdcall;
+  ButtonCaptionsVCL: array[TMsgDlgBtn] of Pointer = (
+    @SMsgDlgYes, @SMsgDlgNo, @SMsgDlgOK, @SMsgDlgCancel, @SMsgDlgAbort,
+    @SMsgDlgRetry, @SMsgDlgIgnore, @SMsgDlgAll, @SMsgDlgNoToAll, @SMsgDlgYesToAll,
+    @SMsgDlgHelp, @SMsgDlgClose);
 
 const
   TempPrefix = 'ExT';
@@ -198,6 +208,11 @@ const
   GeoLocation500 = 'GeoLocation500';
   EmptyList = '[empty list]';
   AllGroupTag = 'All';
+  User32Lib = 'user32.dll';
+
+  MapButtons2Ids: array[TMsgDlgBtn] of integer =
+    (idYes, idNo, idOk, idCancel, idAbort, idRetry, idIgnore,
+      mrAll, mrNoToAll, mrYesToAll, idHelp, idClose);
 
 procedure BreakPoint;
 {$IFDEF DEBUG}
@@ -1191,6 +1206,8 @@ function MessageDlgEx(const AMsg, ACaption: string; ADlgType: TMsgDlgType; AButt
 var
   MsgFrm: TForm;
   NCaption: string;
+  AButton, DefaultButton: TMsgDlgBtn;
+  CustomButtonCaptions: array of string;
 begin
   if (ACaption = '') then
     NCaption := Application.Title
@@ -1200,7 +1217,16 @@ begin
     result := TaskMessageDlg(NCaption, AMsg, ADlgType, AButtons, 0)
   else
   begin
-    MsgFrm := CreateMessageDialog(AMsg, ADlgType, AButtons);
+    if mbOk in AButtons then DefaultButton := mbOk else
+      if mbYes in AButtons then DefaultButton := mbYes else
+        DefaultButton := mbRetry;
+    SetLength(CustomButtonCaptions, 0);
+    for AButton := Low(TMsgDlgBtn) to High(TMsgDlgBtn) do
+    begin
+      if AButton in AButtons then
+        CustomButtonCaptions := CustomButtonCaptions + [ButtonCaptions[AButton]];
+    end;
+    MsgFrm := CreateMessageDialog(AMsg, ADlgType, AButtons, DefaultButton, CustomButtonCaptions);
     try
       MsgFrm.Caption := NCaption;
       MsgFrm.Position := poDefaultSizeOnly;
@@ -2274,6 +2300,21 @@ begin
   end;
 end;
 
+// Loads the resource string from the VCL.
+// Overwrites the Windows localized strings if avail
+procedure LoadButtonCaptions;
+var
+  Index: TMsgDlgBtn;
+begin
+  for Index := Low(ButtonCaptions) to High(ButtonCaptions) do
+    ButtonCaptions[Index] := LoadResString(ButtonCaptionsVCL[Index]);
+  if not Assigned(MB_GetString) then
+    exit;
+  for Index := Low(ButtonCaptions) to High(ButtonCaptions) do
+    if (MB_GetString(MapButtons2Ids[Index] -1) <> '') then
+      ButtonCaptions[Index] := MB_GetString(MapButtons2Ids[Index] -1);
+end;
+
 initialization
 
 begin
@@ -2294,7 +2335,13 @@ begin
 {$ENDIF}
   FloatFormatSettings.ThousandSeparator := ',';
   FloatFormatSettings.DecimalSeparator := '.';
-
+  MB_GetString := nil;
+  User32Dll := LoadLibrary(User32Lib);
+  if (User32Dll <> 0) then
+  begin
+    MB_GetString := GetProcAddress(User32Dll, 'MB_GetString');
+    LoadButtonCaptions;
+  end;
 end;
 
 finalization
@@ -2302,6 +2349,8 @@ finalization
 begin
   UTF8Encoding.Free;
   RemovePath(TempDirectory);
+  if (User32Dll <> 0) then
+    FreeLibrary(User32Dll);
 end;
 
 end.
