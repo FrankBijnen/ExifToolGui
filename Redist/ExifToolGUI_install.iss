@@ -69,11 +69,8 @@ OutputBaseFilename={#ExifToolGuiInstaller}
 UsePreviousTasks=No
 UsePreviousSetupType=No
 UsePreviousLanguage=No
-;Change compression to zip? An effort to please Windows Defender.
 Compression=lzma2/normal
 LZMANumBlockThreads=16
-LZMAUseSeparateProcess=yes
-;Compression=zip/9
 SolidCompression=no
 RestartIfNeededByRun=no
 ArchitecturesInstallIn64BitMode=x64compatible
