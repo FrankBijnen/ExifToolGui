@@ -46,6 +46,7 @@ type
     BtnFileDown: TButton;
     BtnColumnUp: TButton;
     BtnColumnDown: TButton;
+    SpbHelp: TSpeedButton;
     procedure FormCreate(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure EdSearchTagKeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
@@ -67,6 +68,7 @@ type
     procedure BtnColumnUpClick(Sender: TObject);
     procedure BtnFileDownClick(Sender: TObject);
     procedure BtnColumnDownClick(Sender: TObject);
+    procedure SpbHelpClick(Sender: TObject);
   private
     { Private declarations }
     FSample: TShellFolder;
@@ -93,9 +95,10 @@ implementation
 
 uses
   System.StrUtils, System.IniFiles, System.SysUtils,
+  Winapi.ShellAPI,
   Vcl.Dialogs,
   UDmFileLists, UFrmTagNames,
-  Main, ExifToolsGUI_Utils, MainDef, UnitColumnDefs, UnitLangResources;
+  Main, ExifToolsGUI_Utils, MainDef, UnitColumnDefs, UnitLangResources, ExifToolsGui_ResourceStrings;
 
 function TFEditFColumn.GetDefWindowSizes: TRect;
 begin
@@ -375,6 +378,11 @@ end;
 procedure TFEditFColumn.SpbEditTagClick(Sender: TObject);
 begin
   DmFileLists.CdsColumnSet.Edit;
+end;
+
+procedure TFEditFColumn.SpbHelpClick(Sender: TObject);
+begin
+  ShellExecute(0, 'Open', PWideChar(StringResource(ETD_Online_Doc_Flist)), '', '', SW_SHOWNORMAL);
 end;
 
 end.

@@ -67,7 +67,7 @@ object FEditFColumn: TFEditFColumn
         OnClick = SpbDelPredClick
       end
       object SpbEditPred: TSpeedButton
-        Left = 265
+        Left = 266
         Top = 3
         Width = 100
         Height = 25
@@ -75,7 +75,7 @@ object FEditFColumn: TFEditFColumn
         OnClick = SpbEditPredClick
       end
       object SpbDuplicate: TSpeedButton
-        Left = 367
+        Left = 369
         Top = 3
         Width = 100
         Height = 25
@@ -83,12 +83,20 @@ object FEditFColumn: TFEditFColumn
         OnClick = SpbDuplicateClick
       end
       object SpbDefaults: TSpeedButton
-        Left = 470
+        Left = 472
         Top = 3
         Width = 100
         Height = 25
         Caption = 'Defaults'
         OnClick = SpbDefaultsClick
+      end
+      object SpbHelp: TSpeedButton
+        Left = 575
+        Top = 3
+        Width = 100
+        Height = 25
+        Caption = 'Help'
+        OnClick = SpbHelpClick
       end
       object DBNavFileList: TDBNavigator
         Left = 1
@@ -410,8 +418,6 @@ object FEditFColumn: TFEditFColumn
       Height = 266
       Align = alLeft
       TabOrder = 5
-      ExplicitLeft = -5
-      ExplicitTop = 270
       object BtnColumnUp: TButton
         Left = 7
         Top = 6

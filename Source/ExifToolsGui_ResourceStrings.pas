@@ -20,6 +20,7 @@ const
   ETD_Home_OBetz        = 'ETD_Home_OBetz';
 
   ETD_Online_Doc        = 'ETD_Online_Doc';
+  ETD_Online_Doc_Flist  = 'ETD_Online_Doc_Flist';
   ETD_Edge_Dll          = 'ETD_Edge_Dll';
   ETD_Edge_Runtime      = 'ETD_Edge_Runtime';
   ETD_Reqs              = 'ETD_Reqs';
