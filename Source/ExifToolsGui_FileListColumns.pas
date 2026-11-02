@@ -62,7 +62,10 @@ type
 procedure SetupCountry(ColumnDefs: TColumnsArray; CountryCode: boolean);
 procedure GetFileListColumns(AShellList: ExifToolsGui_ShellList.TShellListView;
                              ET: TExifTool;
-                             ItemIndex: integer);
+                             AFolder: TShellFolder); overload;
+procedure GetFileListColumns(AShellList: ExifToolsGui_ShellList.TShellListView;
+                             ET: TExifTool;
+                             ItemIndex: integer); overload;
 procedure GetAllFileListColumns(AShellList: ExifToolsGui_ShellList.TShellListView;
                                 TFrmGenerate: TFrmGenerate);
 procedure ExportToCsv(AShellList: ExifToolsGui_ShellList.TShellListView;
@@ -327,17 +330,14 @@ end;
 
 procedure GetFileListColumns(AShellList: ExifToolsGui_ShellList.TShellListView;
                              ET: TExifTool;
-                             ItemIndex: integer);
+                             AFolder: TShellFolder);
 var
   MetaData: TMetaData;
-  AFolder: TShellFolder;
   AColumnDefs: TColumnsArray;
   AOptions: TReadModeOptions;
 begin
   if not AShellList.DetailsNeeded then
     exit;
-
-  AFolder := AShellList.Folders[ItemIndex];
   if (AFolder = nil) then
     exit;
 
@@ -356,6 +356,13 @@ begin
   finally
     MetaData.Free;
   end;
+end;
+
+procedure GetFileListColumns(AShellList: ExifToolsGui_ShellList.TShellListView;
+                             ET: TExifTool;
+                             ItemIndex: integer);
+begin
+  GetFileListColumns(AShellList, ET, AShellList.Folders[ItemIndex]);
 end;
 
 { TMetaDataGetController }
