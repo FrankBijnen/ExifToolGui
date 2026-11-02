@@ -85,6 +85,7 @@ type
     MemoQuick: TMemo;
     SpeedBtnLarge: TSpeedButton;
     EditQuick: ExifToolsGui_AutoEdit.TEdit;  // Need our own version
+    EditFilterFiles: ExifToolsGui_AutoEdit.TEdit;  // Need our own version
     SpeedBtnShowLog: TSpeedButton;
     SpeedBtnQuickSave: TSpeedButton;
     SpeedBtnETdirectDel: TSpeedButton;
@@ -243,6 +244,8 @@ type
     PnlRegionData: TPanel;
     BtnRegionMaximize: TSpeedButton;
     MaExpandFilename: TAction;
+    Splitter4: TSplitter;
+    SpbFilterFiles: TSpeedButton;
     procedure ShellListClick(Sender: TObject);
     procedure ShellListKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
     procedure SpeedBtnExifClick(Sender: TObject);
@@ -411,6 +414,9 @@ type
     procedure MetadataListKeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
     procedure ShellTreeKeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
     procedure MaExpandFilenameExecute(Sender: TObject);
+    procedure EditFilterFilesKeyDown(Sender: TObject; var Key: Word;
+      Shift: TShiftState);
+    procedure SpbFilterFilesClick(Sender: TObject);
   private
     { Private declarations }
     ETBarSeriesFocal: TBarSeries;
@@ -426,6 +432,9 @@ type
     Regions: TRegions;
     CurRegion: integer;
     RegionAutoComp: TAutoCompRec;
+    FilterAutoComp: TAutoCompRec;
+    FilterList: TStringList;
+    FilterFiles: string;
     procedure AlignStatusBar;
     procedure ImageDrop(var Msg: TWMDROPFILES); message WM_DROPFILES;
     procedure SetCaption(AnItem: string = '');
@@ -589,7 +598,7 @@ begin
   CustomTabStops := CustomTabStops + [LvRegions, EdRegionName, EdRegionDescription, CmbRegionType];
   CustomTabStops := CustomTabStops + [NumBoxX, NumBoxY, NumBoxW, NumBoxH];
 
-  CustomTabStops := CustomTabStops + [ShellList];
+  CustomTabStops := CustomTabStops + [ShellList, EditFilterFiles];
   CustomTabStops := CustomTabStops + [EditETdirect];
   CustomTabStops := CustomTabStops + [CBoxETdirect];
   CustomTabStops := CustomTabStops + [MetadataList];
@@ -760,6 +769,13 @@ begin
   ShowMetadata;
 end;
 
+procedure TFMain.EditFilterFilesKeyDown(Sender: TObject; var Key: Word;
+  Shift: TShiftState);
+begin
+  if (Key = vkReturn) then
+    SpbFilterFilesClick(Sender);
+end;
+
 procedure TFMain.SetupWSAutoComp(ARow: integer);
 var
   CurrentAutoComp: PAutoCompRec;
@@ -783,6 +799,11 @@ begin
   GUIsettings.ETDAutoComp.SetAcList(ETdirectCmdList);
   if (Supports(EditETdirect, IAutoCompleteEdit)) then
     (EditETdirect as IAutoCompleteEdit).SetAutoCompOptions(GUIsettings.ETDAutoComp);
+
+  FilterAutoComp.SetAcOptions(TAutoCompleteMode.acAutoSuggestAppend, true, true);
+  FilterAutoComp.SetAcList(FilterList);
+  if (Supports(EditFilterFiles, IAutoCompleteEdit)) then
+    (EditFilterFiles as IAutoCompleteEdit).SetAutoCompOptions(FilterAutoComp);
 
   RegionAutoComp.SetAcOptions(TAutoCompleteMode.acAutoSuggest, true, false);
   RegionAutoComp.SetAcList(RegionNameList);
@@ -3396,10 +3417,12 @@ begin
 
   ET.ExecETEvent := ExecETEvent_Done;
   Geomap.ExecRestEvent := ExecRestEvent_Done;
+  FilterList := TStringList.Create;
 end;
 
 procedure TFMain.FormDestroy(Sender: TObject);
 begin
+  FilterList.Free;
   if Assigned(Regions) then
     FreeAndNil(Regions);
 end;
@@ -3786,6 +3809,7 @@ end;
 
 procedure TFMain.ShellListAddItem(Sender: TObject; AFolder: TShellFolder; var CanAdd: boolean);
 var
+  Index: integer;
   FolderName: string;
   FilterItem, Filter: string;
   FilterMatches: boolean;
@@ -3816,6 +3840,24 @@ begin
       FilterItem := NextField(Filter, ';');
       if (LeftStr(FilterItem, 1) <> '/') then
         FilterMatches := MatchesMask(FolderName, FilterItem);
+    end;
+    CanAdd := CanAdd and FilterMatches;
+  end;
+
+  if (CanAdd) and
+     (Trim(FilterFiles) <> '') then
+  begin
+    FilterMatches := (ContainsText(FolderName, FilterFiles) or MatchesMask(FolderName, FilterFiles));
+    if (FilterMatches = false) then
+    begin
+      if (AFolder.DetailStrings.Count = 0) then
+        GetFileListColumns(TShellListView(Sender), ET, AFolder);
+      for Index := 0 to AFolder.DetailStrings.Count -1 do
+      begin
+        FilterMatches := ContainsText(AFolder.DetailStrings[Index], FilterFiles);
+        if (FilterMatches) then
+          break;
+      end;
     end;
     CanAdd := CanAdd and FilterMatches;
   end;
@@ -4769,6 +4811,12 @@ begin
 end;
 
 // ==============================================================================
+procedure TFMain.SpbFilterFilesClick(Sender: TObject);
+begin
+  FilterFiles := FilterAutoComp.ProcessResult(EditFilterFiles.Text);
+  ShellList.Refresh;
+end;
+
 procedure TFMain.SpbRecordClick(Sender: TObject);
 begin
   if (ET.RecordingFile <> '') then
