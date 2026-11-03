@@ -246,6 +246,7 @@ type
     MaExpandFilename: TAction;
     Splitter4: TSplitter;
     SpbFilterFiles: TSpeedButton;
+    FilterTimer: TTimer;
     procedure ShellListClick(Sender: TObject);
     procedure ShellListKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
     procedure SpeedBtnExifClick(Sender: TObject);
@@ -417,6 +418,8 @@ type
     procedure EditFilterFilesKeyDown(Sender: TObject; var Key: Word;
       Shift: TShiftState);
     procedure SpbFilterFilesClick(Sender: TObject);
+    procedure EditFilterFilesChange(Sender: TObject);
+    procedure FilterTimerTimer(Sender: TObject);
   private
     { Private declarations }
     ETBarSeriesFocal: TBarSeries;
@@ -434,7 +437,6 @@ type
     RegionAutoComp: TAutoCompRec;
     FilterAutoComp: TAutoCompRec;
     FilterList: TStringList;
-    FilterFiles: string;
     procedure AlignStatusBar;
     procedure ImageDrop(var Msg: TWMDROPFILES); message WM_DROPFILES;
     procedure SetCaption(AnItem: string = '');
@@ -450,6 +452,8 @@ type
     procedure ShowMetadata;
     procedure ShowPreview;
     procedure RestoreGUI;
+    procedure FindMatches;
+    function MatchesFilter(FolderName: string; AFolder: TShellFolder; Filter: string): boolean;
     procedure ShellListSetFolders;
     procedure RefreshSelected(Sender: TObject);
     procedure SelectAll;
@@ -769,9 +773,66 @@ begin
   ShowMetadata;
 end;
 
+procedure TFMain.FindMatches;
+var
+  Index: integer;
+  AFolder: TShellFolder;
+  FolderName: string;
+  CrWait, CrNormal: HCURSOR;
+  First: boolean;
+begin
+  CrWait := LoadCursor(0, IDC_WAIT);
+  CrNormal := SetCursor(CrWait);
+  try
+    ShellList.ClearSelection;
+    if (Trim(EditFilterFiles.Text) = '') then
+      exit;
+
+    First := true;
+    for Index := 0 to ShellList.Items.count -1 do
+    begin
+      AFolder := ShellList.Folders[Index];
+      FolderName := TSubShellFolder.GetRelativeFileName(AFolder);
+
+      if MatchesFilter(FolderName, AFolder, Trim(EditFilterFiles.Text)) then
+      begin
+        ListView_SetItemState(ShellList.Handle, Index, LVIS_SELECTED, LVIS_SELECTED);
+        if (First) then
+        begin
+          First := false;
+          ShellList.Items[Index].Focused := true;
+          ShellList.Items[Index].MakeVisible(false);
+        end;
+      end;
+    end;
+  finally
+    SetCursor(CrNormal);
+  end;
+end;
+
+procedure TFMain.EditFilterFilesChange(Sender: TObject);
+begin
+  if (Trim(EditFilterFiles.Text) = '') then
+    ShellList.Refresh
+  else
+  begin
+    FilterTimer.Enabled := false;
+    FilterTimer.Enabled := true;
+  end;
+end;
+
 procedure TFMain.EditFilterFilesKeyDown(Sender: TObject; var Key: Word;
   Shift: TShiftState);
 begin
+  if (ssCtrl in Shift) then
+  begin
+    case Key of
+      VK_UP:
+        SelectPrevNext(false);
+      VK_DOWN:
+        SelectPrevNext(true);
+    end;
+  end;
   if (Key = vkReturn) then
     SpbFilterFilesClick(Sender);
 end;
@@ -800,7 +861,7 @@ begin
   if (Supports(EditETdirect, IAutoCompleteEdit)) then
     (EditETdirect as IAutoCompleteEdit).SetAutoCompOptions(GUIsettings.ETDAutoComp);
 
-  FilterAutoComp.SetAcOptions(TAutoCompleteMode.acAutoSuggestAppend, true, true);
+  FilterAutoComp.SetAcOptions(TAutoCompleteMode.acAutoSuggest, false, true);
   FilterAutoComp.SetAcList(FilterList);
   if (Supports(EditFilterFiles, IAutoCompleteEdit)) then
     (EditFilterFiles as IAutoCompleteEdit).SetAutoCompOptions(FilterAutoComp);
@@ -820,24 +881,24 @@ begin
   CrWait := LoadCursor(0, IDC_WAIT);
   CrNormal := SetCursor(CrWait);
   try
-  for Index := 0 to ShellList.Items.Count -1 do
-  begin
-    if (ListView_GetItemState(ShellList.Handle, Index, LVIS_SELECTED) = LVIS_SELECTED) then
+    for Index := 0 to ShellList.Items.Count -1 do
     begin
-      Org := ShellList.Folders[Index].PathName;
-      Ext := ExtractFileExt(Org);
-      if (SameText(Ext, '.md5')) or
-         (SameText(Ext, '.sha1')) or
-         (SameText(Ext, '.sha2')) then
-        continue;   // Dont create Hashes on HasFiles
+      if (ListView_GetItemState(ShellList.Handle, Index, LVIS_SELECTED) = LVIS_SELECTED) then
+      begin
+        Org := ShellList.Folders[Index].PathName;
+        Ext := ExtractFileExt(Org);
+        if (SameText(Ext, '.md5')) or
+           (SameText(Ext, '.sha1')) or
+           (SameText(Ext, '.sha2')) then
+          continue;   // Dont create Hashes on HasFiles
 
-      case HashType of
-        0: TFile.WriteAllText(ChangeFileExt(Org, '.md5'),   THashMD5.GetHashStringFromFile(Org));
-        1: TFile.WriteAllText(ChangeFileExt(Org, '.sha1'), THashSHA1.GetHashStringFromFile(Org));
-        2: TFile.WriteAllText(ChangeFileExt(Org, '.sha2'), THashSHA2.GetHashStringFromFile(Org));
+        case HashType of
+          0: TFile.WriteAllText(ChangeFileExt(Org, '.md5'),   THashMD5.GetHashStringFromFile(Org));
+          1: TFile.WriteAllText(ChangeFileExt(Org, '.sha1'), THashSHA1.GetHashStringFromFile(Org));
+          2: TFile.WriteAllText(ChangeFileExt(Org, '.sha2'), THashSHA2.GetHashStringFromFile(Org));
+        end;
       end;
     end;
-  end;
   finally
     ShellList.Refresh;
     SetCursor(CrNormal);
@@ -3039,6 +3100,7 @@ begin
         EditFileLists(Sender);
       exit;
     end;
+    EditFilterFiles.Text := '';
     SavedPath := ShellTree.Path;
     ShellList.Enabled := false;
     try
@@ -3070,6 +3132,12 @@ begin
                      FStyleServices, GUIsettings.GuiStyle <> cSystemStyleName, VirtualImageListFileList);
 end;
 
+procedure TFMain.FilterTimerTimer(Sender: TObject);
+begin
+  TTimer(Sender).Enabled := false;
+  FindMatches;
+end;
+
 procedure TFMain.FilterPopupClick(Sender: TObject);
 begin
   with TMenuItem(Sender) do
@@ -3079,6 +3147,7 @@ begin
       EditFileFilter(Sender);
       exit;
     end;
+    EditFilterFiles.Text := '';
     GUIsettings.FilterSel := Tag;
     Shelllist.IncludeSubFolders := ContainsText(GUIsettings.FileFilter, '/s');
     SetCaptionAndImage;
@@ -3396,6 +3465,7 @@ begin
   ShellList.OnPathChange := ShellListPathChange;
   ShellList.OnItemsLoaded := ShellListItemsLoaded;
   ShellList.OnOwnerDataFetchEvent := ShellListOwnerDataFetch;
+
   ShellList.OnColumnResized := ShellListColumnResized;
   ShellList.OnThumbGenerate := ShellistThumbGenerate;
   ShellList.OnThumbError := ShellistThumbError;
@@ -3577,32 +3647,38 @@ end;
 
 procedure TFMain.SelectPrevNext(const Down: boolean);
 var
-  Old: integer;
   New: integer;
-
-  function CheckIndex(var Indx: integer): boolean;
-  begin
-    result := (ShellList.Items.Count > 0);
-    if (Indx < 0) then
-      Indx := 0;
-    if (Indx > ShellList.Items.Count -1) then
-      Indx := ShellList.Items.Count -1;
-  end;
+  MatchFound: boolean;
+  AFolderName: string;
+  AFolder: TShellFolder;
 
 begin
-  // Current
-  if Assigned(ShellList.Selected) then
-    Old := ShellList.Selected.Index
-  else
-    Old := ShellList.ItemIndex;
-  if not CheckIndex(Old) then
+  if (ShellList.Items.Count = 0) then
     exit;
 
-  If (Down) then
-    New := Old + 1
+  // Current
+  if Assigned(ShellList.Selected) then
+    New := ShellList.Selected.Index
   else
-    New := Old - 1;
-  if not CheckIndex(New) then
+    New := ShellList.ItemIndex;
+
+  MatchFound := false;
+  while (MatchFound = false) do
+  begin
+    if (Down) then
+      New := New + 1
+    else
+      New := New - 1;
+    if (New < 0) or
+       (New > ShellList.Items.Count -1) then
+      break;
+
+    AFolder := ShellList.Folders[New];
+    AFolderName := TSubShellFolder.GetRelativeFileName(AFolder);
+    MatchFound := MatchesFilter(AFolderName, AFolder, EditFilterFiles.Text);
+  end;
+
+  if (MatchFound = false) then
     exit;
 
   // Select only the item, and make that visible
@@ -3614,7 +3690,6 @@ begin
   // Simulate a click on the new item, will load Metadata etc.
   ShellListClick(ShellList);
 end;
-
 
 // ---------------Drag_Drop procs --------------------
 procedure TFMain.CreateWnd;
@@ -3807,9 +3882,43 @@ begin
 
 end;
 
-procedure TFMain.ShellListAddItem(Sender: TObject; AFolder: TShellFolder; var CanAdd: boolean);
+function TFMain.MatchesFilter(FolderName: string; AFolder: TShellFolder; Filter: string): boolean;
 var
   Index: integer;
+  MaxCol: integer;
+begin
+  result := true;
+
+  if (Filter <> '') then
+  begin
+    if (AFolder.IsFolder) then
+      exit(false);
+
+    result := ContainsText(FolderName, Filter);
+    try
+      result := result or MatchesMask(FolderName, Filter);
+    except
+      // MatchesMask can throw on [ for example
+    end;
+
+    //TODO Filter on details?
+    if (result = false) then
+    begin
+      if (AFolder.DetailStrings.Count = 0) then
+        GetFileListColumns(ShellList, ET, AFolder);
+      MaxCol := Min(AFolder.DetailStrings.Count -1, ShellList.Columns.Count -2);
+      for Index := 0 to MaxCol do
+      begin
+        result := ContainsText(AFolder.DetailStrings[Index], Filter);
+        if (result) then
+          break;
+      end;
+    end;
+  end;
+end;
+
+procedure TFMain.ShellListAddItem(Sender: TObject; AFolder: TShellFolder; var CanAdd: boolean);
+var
   FolderName: string;
   FilterItem, Filter: string;
   FilterMatches: boolean;
@@ -3844,23 +3953,8 @@ begin
     CanAdd := CanAdd and FilterMatches;
   end;
 
-  if (CanAdd) and
-     (Trim(FilterFiles) <> '') then
-  begin
-    FilterMatches := (ContainsText(FolderName, FilterFiles) or MatchesMask(FolderName, FilterFiles));
-    if (FilterMatches = false) then
-    begin
-      if (AFolder.DetailStrings.Count = 0) then
-        GetFileListColumns(TShellListView(Sender), ET, AFolder);
-      for Index := 0 to AFolder.DetailStrings.Count -1 do
-      begin
-        FilterMatches := ContainsText(AFolder.DetailStrings[Index], FilterFiles);
-        if (FilterMatches) then
-          break;
-      end;
-    end;
-    CanAdd := CanAdd and FilterMatches;
-  end;
+  CanAdd := CanAdd and
+            (MatchesFilter(FolderName, AFolder, Trim(EditFilterFiles.Text)));
 end;
 
 procedure TFMain.ShellListChange(Sender: TObject; Item: TListItem; Change: TItemChange);
@@ -4253,6 +4347,7 @@ begin
     ETBarSeriesFnum.Clear;
   if Assigned(ETBarSeriesIso) then
     ETBarSeriesIso.Clear;
+  EditFilterFiles.Text := '';
 end;
 
 procedure TFMain.ShellTreeCustomDrawItem(Sender: TCustomTreeView; Node: TTreeNode; State: TCustomDrawState;
@@ -4813,7 +4908,7 @@ end;
 // ==============================================================================
 procedure TFMain.SpbFilterFilesClick(Sender: TObject);
 begin
-  FilterFiles := FilterAutoComp.ProcessResult(EditFilterFiles.Text);
+  FilterAutoComp.ProcessResult(EditFilterFiles.Text);
   ShellList.Refresh;
 end;
 
