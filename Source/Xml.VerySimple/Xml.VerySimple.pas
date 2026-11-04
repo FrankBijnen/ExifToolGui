@@ -20,8 +20,10 @@
   * rights and limitations under the License.                         *
 }
 
+//FB
 // Changed for ExifToolGUI
 // - Add utf16
+//FB_X
 
 unit Xml.VerySimple;
 
@@ -41,7 +43,7 @@ type
   TXmlNodeList = class;
   TXmlAttributeType = (atValue, atSingle);
   TXmlOptions = set of (doNodeAutoIndent, doCompact, doParseProcessingInstr, doPreserveWhiteSpace, doCaseInsensitive,
-    doWriteBOM);
+    doWriteBOM, doNoHeader); //FB. Add doNoHeader
   TExtractTextOptions = set of (etoDeleteStopChar, etoStopString);
 
   {$IFNDEF AUTOREFCOUNT}
@@ -56,19 +58,19 @@ type
     FNoDataInStream: PBoolean;
     FFillBuffer: TStreamReaderFillBuffer;
     procedure FillBuffer;
-    ///	<summary> Call to FillBuffer method of TStreamreader </summary>
+    /// <summary> Call to FillBuffer method of TStreamreader </summary>
   public
-    ///	<summary> Extend the TStreamReader with RTTI pointers </summary>
+    /// <summary> Extend the TStreamReader with RTTI pointers </summary>
     constructor Create(Stream: TStream; Encoding: TEncoding; DetectBOM: Boolean = False; BufferSize: Integer = 4096);
-    ///	<summary> Assures the read buffer holds at least Value characters </summary>
+    /// <summary> Assures the read buffer holds at least Value characters </summary>
     function PrepareBuffer(Value: Integer): Boolean;
-    ///	<summary> Extract text until chars found in StopChars </summary>
+    /// <summary> Extract text until chars found in StopChars </summary>
     function ReadText(const StopChars: String; Options: TExtractTextOptions): String; virtual;
-    ///	<summary> Returns fist char but does not removes it from the buffer </summary>
+    /// <summary> Returns fist char but does not removes it from the buffer </summary>
     function FirstChar: String;
-    ///	<summary> Proceed with the next character(s) (value optional, default 1) </summary>
+    /// <summary> Proceed with the next character(s) (value optional, default 1) </summary>
     procedure IncCharPos(Value: Integer = 1); virtual;
-    ///	<summary> Returns True if the first uppercased characters at the current position match Value </summary>
+    /// <summary> Returns True if the first uppercased characters at the current position match Value </summary>
     function IsUppercaseText(const Value: String): Boolean; virtual;
   end;
 
@@ -79,37 +81,37 @@ type
   protected
     procedure SetValue(const Value: String); virtual;
   public
-    ///	<summary> Attribute name </summary>
+    /// <summary> Attribute name </summary>
     Name: String;
-    ///	<summary> Attributes without values are set to atSingle, else to atValue </summary>
+    /// <summary> Attributes without values are set to atSingle, else to atValue </summary>
     AttributeType: TXmlAttributeType;
-    ///	<summary> Create a new attribute </summary>
+    /// <summary> Create a new attribute </summary>
     constructor Create; virtual;
-    ///	<summary> Return the attribute as a String </summary>
+    /// <summary> Return the attribute as a String </summary>
     function AsString: String;
     /// <summary> Escapes XML control characters </summar>
     class function Escape(const Value: String): String; virtual;
-    ///	<summary> Assign attribute values from source attribute </summary>
+    /// <summary> Assign attribute values from source attribute </summary>
     procedure Assign(Source: TXmlAttribute); virtual;
-    ///	<summary> Attribute value (always a String) </summary>
+    /// <summary> Attribute value (always a String) </summary>
     property Value: String read FValue write SetValue;
   end;
 
   TXmlAttributeList = class(TObjectList<TXmlAttribute>)
   public
-    ///	<summary> The xml document of the attribute list of the node</summary>
+    /// <summary> The xml document of the attribute list of the node</summary>
     [Weak] Document: TXmlVerySimple;
-    ///	<summary> Add a name only attribute </summary>
+    /// <summary> Add a name only attribute </summary>
     function Add(const Name: String): TXmlAttribute; overload; virtual;
-    ///	<summary> Returns the attribute given by name (case insensitive), NIL if no attribute found </summary>
+    /// <summary> Returns the attribute given by name (case insensitive), NIL if no attribute found </summary>
     function Find(const Name: String): TXmlAttribute; virtual;
-    ///	<summary> Deletes an attribute given by name (case insensitive) </summary>
+    /// <summary> Deletes an attribute given by name (case insensitive) </summary>
     procedure Delete(const Name: String); overload; virtual;
-    ///	<summary> Returns True if an attribute with the given name is found (case insensitive) </summary>
+    /// <summary> Returns True if an attribute with the given name is found (case insensitive) </summary>
     function HasAttribute(const AttrName: String): Boolean; virtual;
-    ///	<summary> Returns the attributes in string representation </summary>
+    /// <summary> Returns the attributes in string representation </summary>
     function AsString: String; virtual;
-    ///	<summary> Clears current attributes and assigns all attributes from source attributes </summary>
+    /// <summary> Clears current attributes and assigns all attributes from source attributes </summary>
     procedure Assign(Source: TXmlAttributeList); virtual;
   end;
 
@@ -120,65 +122,73 @@ type
     function GetAttr(const AttrName: String): String; virtual;
     procedure SetAttr(const AttrName: String; const AttrValue: String); virtual;
   public
-    ///	<summary> All attributes of the node </summary>
+    /// <summary> All attributes of the node </summary>
     AttributeList: TXmlAttributeList;
-    ///	<summary> List of child nodes, never NIL </summary>
+    /// <summary> List of child nodes, never NIL </summary>
     ChildNodes: TXmlNodeList;
-    ///	<summary> Name of the node </summary>
+    /// <summary> Name of the node </summary>
     Name: String; // Node name
-    ///	<summary> The node type, see TXmlNodeType </summary>
+    /// <summary> The node type, see TXmlNodeType </summary>
     NodeType: TXmlNodeType;
-    ///	<summary> Parent node, may be NIL </summary>
+    /// <summary> Parent node, may be NIL </summary>
     [Weak] Parent: TXmlNode;
-    ///	<summary> Text value of the node </summary>
+    /// <summary> Text value of the node </summary>
     Text: String;
     /// <summary> Creates a new XML node </summary>
     constructor Create(ANodeType: TXmlNodeType = ntElement); virtual;
-    ///	<summary> Removes the node from its parent and frees all of its childs </summary>
+    /// <summary> Removes the node from its parent and frees all of its childs </summary>
     destructor Destroy; override;
-    ///	<summary> Clears the attributes, the text and all of its child nodes (but not the name) </summary>
+    /// <summary> Clears the attributes, the text and all of its child nodes (but not the name) </summary>
     procedure Clear;
-    ///	<summary> Find a child node by its name </summary>
+//FB
+    /// <summary> Find position of a node, returns -1 if no node is found </summary>
+    function FindPos(Node: TXmlNode): Integer; overload; virtual;
+    /// <summary> Find position of a node by its name (case sensitive), returns -1 if no node is found </summary>
+    function FindPos(const Name: String; NodeTypes: TXmlNodeTypes = [ntElement]): Integer; overload; virtual;
+    /// <summary> Find a child node by name and node value </summary>
+    function FindPos(const Name, NodeValue: String; NodeTypes: TXmlNodeTypes = [ntElement]): Integer; overload; virtual;
+//FB_X
+    /// <summary> Find a child node by its name </summary>
     function Find(const Name: String; NodeTypes: TXmlNodeTypes = [ntElement]): TXmlNode; overload; virtual;
-    ///	<summary> Find a child node by name and attribute name </summary>
+    /// <summary> Find a child node by name and attribute name </summary>
     function Find(const Name, AttrName: String; NodeTypes: TXmlNodeTypes = [ntElement]): TXmlNode; overload; virtual;
-    ///	<summary> Find a child node by name, attribute name and attribute value </summary>
+    /// <summary> Find a child node by name, attribute name and attribute value </summary>
     function Find(const Name, AttrName, AttrValue: String; NodeTypes: TXmlNodeTypes = [ntElement]): TXmlNode; overload; virtual;
-    ///	<summary> Return a list of child nodes with the given name and (optional) node types </summary>
+    /// <summary> Return a list of child nodes with the given name and (optional) node types </summary>
     function FindNodes(const Name: String; NodeTypes: TXmlNodeTypes = [ntElement]): TXmlNodeList; virtual;
-    ///	<summary> Returns True if the attribute exists </summary>
+    /// <summary> Returns True if the attribute exists </summary>
     function HasAttribute(const AttrName: String): Boolean; virtual;
-    ///	<summary> Returns True if a child node with that name exits </summary>
+    /// <summary> Returns True if a child node with that name exits </summary>
     function HasChild(const Name: String; NodeTypes: TXmlNodeTypes = [ntElement]): Boolean; virtual;
-    ///	<summary> Add a child node with an optional NodeType (default: ntElement)</summary>
+    /// <summary> Add a child node with an optional NodeType (default: ntElement)</summary>
     function AddChild(const AName: String; ANodeType: TXmlNodeType = ntElement): TXmlNode; virtual;
-    ///	<summary> Insert a child node at a specific position with a (optional) NodeType (default: ntElement)</summary>
+    /// <summary> Insert a child node at a specific position with a (optional) NodeType (default: ntElement)</summary>
     function InsertChild(const Name: String; Position: Integer; NodeType: TXmlNodeType = ntElement): TXmlNode; virtual;
-    ///	<summary> Fluent interface for setting the text of the node </summary>
+    /// <summary> Fluent interface for setting the text of the node </summary>
     function SetText(const Value: String): TXmlNode; virtual;
-    ///	<summary> Fluent interface for setting the node attribute given by attribute name and attribute value </summary>
+    /// <summary> Fluent interface for setting the node attribute given by attribute name and attribute value </summary>
     function SetAttribute(const AttrName, AttrValue: String): TXmlNode; virtual;
-    ///	<summary> Returns first child or NIL if there aren't any child nodes </summary>
+    /// <summary> Returns first child or NIL if there aren't any child nodes </summary>
     function FirstChild: TXmlNode; virtual;
-    ///	<summary> Returns last child node or NIL if there aren't any child nodes </summary>
+    /// <summary> Returns last child node or NIL if there aren't any child nodes </summary>
     function LastChild: TXmlNode; virtual;
-    ///	<summary> Returns next sibling </summary>
+    /// <summary> Returns next sibling </summary>
     function NextSibling: TXmlNode; overload; virtual;
-    ///	<summary> Returns previous sibling </summary>
+    /// <summary> Returns previous sibling </summary>
     function PreviousSibling: TXmlNode; overload; virtual;
-    ///	<summary> Returns True if the node has at least one child node </summary>
+    /// <summary> Returns True if the node has at least one child node </summary>
     function HasChildNodes: Boolean; virtual;
-    ///	<summary> Returns True if the node has a text content and no child nodes </summary>
+    /// <summary> Returns True if the node has a text content and no child nodes </summary>
     function IsTextElement: Boolean; virtual;
-    ///	<summary> Fluent interface for setting the node type </summary>
+    /// <summary> Fluent interface for setting the node type </summary>
     function SetNodeType(Value: TXmlNodeType): TXmlNode; virtual;
-    ///	<summary> Attributes of a node, accessible by attribute name (case insensitive) </summary>
+    /// <summary> Attributes of a node, accessible by attribute name (case insensitive) </summary>
     property Attributes[const AttrName: String]: String read GetAttr write SetAttr;
-    ///	<summary> The xml document of the node </summary>
+    /// <summary> The xml document of the node </summary>
     property Document: TXmlVerySimple read FDocument write SetDocument;
-    ///	<summary> The node name, same as property Name </summary>
+    /// <summary> The node name, same as property Name </summary>
     property NodeName: String read Name write Name;
-    ///	<summary> The node text, same as property Text </summary>
+    /// <summary> The node text, same as property Text </summary>
     property NodeValue: String read Text write Text;
   end;
 
@@ -186,37 +196,45 @@ type
   protected
     function IsSame(const Value1, Value2: String): Boolean; virtual;
   public
-    ///	<summary> The xml document of the node list </summary>
+    /// <summary> The xml document of the node list </summary>
     [Weak] Document: TXmlVerySimple;
-    ///	<summary> The parent node of the node list </summary>
+    /// <summary> The parent node of the node list </summary>
     [Weak] Parent: TXmlNode;
-    ///	<summary> Adds a node and sets the parent of the node to the parent of the list </summary>
+    /// <summary> Adds a node and sets the parent of the node to the parent of the list </summary>
     function Add(Value: TXmlNode): Integer; overload; virtual;
-    ///	<summary> Creates a new node of type NodeType (default ntElement) and adds it to the list </summary>
+    /// <summary> Creates a new node of type NodeType (default ntElement) and adds it to the list </summary>
     function Add(NodeType: TXmlNodeType = ntElement): TXmlNode; overload; virtual;
-    ///	<summary> Add a child node with an optional NodeType (default: ntElement)</summary>
+    /// <summary> Add a child node with an optional NodeType (default: ntElement)</summary>
     function Add(const Name: String; NodeType: TXmlNodeType = ntElement): TXmlNode; overload; virtual;
-    ///	<summary> Find a node by its name (case sensitive), returns NIL if no node is found </summary>
+//FB
+    /// <summary> Find position of a node, returns -1 if no node is found </summary>
+    function FindPos(Node: TXmlNode): Integer; overload; virtual;
+    /// <summary> Find position of a node by its name (case sensitive), returns -1 if no node is found </summary>
+    function FindPos(const Name: String; NodeTypes: TXmlNodeTypes = [ntElement]): Integer; overload; virtual;
+    /// <summary> Find position of a child node by name and node value </summary>
+    function FindPos(const Name, NodeValue: String; NodeTypes: TXmlNodeTypes = [ntElement]): Integer; overload; virtual;
+//FB_X
+    /// <summary> Find a node by its name (case sensitive), returns NIL if no node is found </summary>
     function Find(const Name: String; NodeTypes: TXmlNodeTypes = [ntElement]): TXmlNode; overload; virtual;
-    ///	<summary> Same as Find(), returnsa a node by its name (case sensitive) </summary>
+    /// <summary> Same as Find(), returnsa a node by its name (case sensitive) </summary>
     function FindNode(const Name: String; NodeTypes: TXmlNodeTypes = [ntElement]): TXmlNode; virtual;
-    ///	<summary> Find a node that has the the given attribute, returns NIL if no node is found </summary>
+    /// <summary> Find a node that has the the given attribute, returns NIL if no node is found </summary>
     function Find(const Name, AttrName: String; NodeTypes: TXmlNodeTypes = [ntElement]): TXmlNode; overload; virtual;
-    ///	<summary> Find a node that as the given attribute name and value, returns NIL otherwise </summary>
+    /// <summary> Find a node that as the given attribute name and value, returns NIL otherwise </summary>
     function Find(const Name, AttrName, AttrValue: String; NodeTypes: TXmlNodeTypes = [ntElement]): TXmlNode; overload; virtual;
-    ///	<summary> Return a list of child nodes with the given name and (optional) node types </summary>
+    /// <summary> Return a list of child nodes with the given name and (optional) node types </summary>
     function FindNodes(const Name: String; NodeTypes: TXmlNodeTypes = [ntElement]): TXmlNodeList; virtual;
-    ///	<summary> Returns True if the list contains a node with the given name </summary>
+    /// <summary> Returns True if the list contains a node with the given name </summary>
     function HasNode(const Name: String; NodeTypes: TXmlNodeTypes = [ntElement]): Boolean; virtual;
-    ///	<summary> Inserts a node at the given position </summary>
+    /// <summary> Inserts a node at the given position </summary>
     function Insert(const Name: String; Position: Integer; NodeType: TXmlNodeType = ntElement): TXmlNode; overload; virtual;
-    ///	<summary> Returns the first child node, same as .First </summary>
+    /// <summary> Returns the first child node, same as .First </summary>
     function FirstChild: TXmlNode; virtual;
-    ///	<summary> Returns next sibling node </summary>
+    /// <summary> Returns next sibling node </summary>
     function NextSibling(Node: TXmlNode): TXmlNode; virtual;
-    ///	<summary> Returns previous sibling node </summary>
+    /// <summary> Returns previous sibling node </summary>
     function PreviousSibling(Node: TXmlNode): TXmlNode; virtual;
-    ///	<summary> Returns the node at the given position </summary>
+    /// <summary> Returns the node at the given position </summary>
     function Get(Index: Integer): TXmlNode; virtual;
   end;
 
@@ -252,53 +270,53 @@ type
     function GetPreserveWhitespace: Boolean;
     function IsSame(const Value1, Value2: String): Boolean;
   public
-    ///	<summary> Indent used for the xml output </summary>
+    /// <summary> Indent used for the xml output </summary>
     NodeIndentStr: String;
-    ///	<summary> LineBreak used for the xml output, default set to sLineBreak which is OS dependent </summary>
+    /// <summary> LineBreak used for the xml output, default set to sLineBreak which is OS dependent </summary>
     LineBreak: String;
-    ///	<summary> Options for xml output like indentation type </summary>
+    /// <summary> Options for xml output like indentation type </summary>
     Options: TXmlOptions;
-    ///	<summary> Creates a new XML document parser </summary>
+    /// <summary> Creates a new XML document parser </summary>
     constructor Create; virtual;
-    ///	<summary> Destroys the XML document parser </summary>
+    /// <summary> Destroys the XML document parser </summary>
     destructor Destroy; override;
-    ///	<summary> Deletes all nodes </summary>
+    /// <summary> Deletes all nodes </summary>
     procedure Clear; virtual;
-    ///	<summary> Adds a new node to the document, if it's the first ntElement then sets it as .DocumentElement </summary>
+    /// <summary> Adds a new node to the document, if it's the first ntElement then sets it as .DocumentElement </summary>
     function AddChild(const Name: String; NodeType: TXmlNodeType = ntElement): TXmlNode; virtual;
-    ///	<summary> Creates a new node but doesn't adds it to the document nodes </summary>
+    /// <summary> Creates a new node but doesn't adds it to the document nodes </summary>
     function CreateNode(const Name: String; NodeType: TXmlNodeType = ntElement): TXmlNode; virtual;
     /// <summary> Escapes XML control characters </summar>
     class function Escape(const Value: String): String; virtual;
     /// <summary> Translates escaped characters back into XML control characters </summar>
     class function Unescape(const Value: String): String; virtual;
-    ///	<summary> Loads the XML from a file </summary>
+    /// <summary> Loads the XML from a file </summary>
     function LoadFromFile(const FileName: String; BufferSize: Integer = 4096): TXmlVerySimple; virtual;
-    ///	<summary> Loads the XML from a stream </summary>
+    /// <summary> Loads the XML from a stream </summary>
     function LoadFromStream(const Stream: TStream; BufferSize: Integer = 4096): TXmlVerySimple; virtual;
-    ///	<summary> Parse attributes into the attribute list for a given string </summary>
+    /// <summary> Parse attributes into the attribute list for a given string </summary>
     procedure ParseAttributes(const AttribStr: String; AttributeList: TXmlAttributeList); virtual;
-    ///	<summary> Saves the XML to a file </summary>
+    /// <summary> Saves the XML to a file </summary>
     function SaveToFile(const FileName: String): TXmlVerySimple; virtual;
-    ///	<summary> Saves the XML to a stream, the encoding is specified in the .Encoding property </summary>
+    /// <summary> Saves the XML to a stream, the encoding is specified in the .Encoding property </summary>
     function SaveToStream(const Stream: TStream): TXmlVerySimple; virtual;
-    ///	<summary> A list of all root nodes of the document </summary>
+    /// <summary> A list of all root nodes of the document </summary>
     property ChildNodes: TXmlNodeList read GetChildNodes;
-    ///	<summary> Returns the first element node </summary>
+    /// <summary> Returns the first element node </summary>
     property DocumentElement: TXmlNode read FDocumentElement write SetDocumentElement;
-    ///	<summary> Specifies the encoding of the XML file, anything else then 'utf-8' is considered as ANSI </summary>
+    /// <summary> Specifies the encoding of the XML file, anything else then 'utf-8' is considered as ANSI </summary>
     property Encoding: String read GetEncoding write SetEncoding;
-    ///	<summary> XML declarations are stored in here as Attributes </summary>
+    /// <summary> XML declarations are stored in here as Attributes </summary>
     property Header: TXmlNode read FHeader;
-    ///	<summary> Set to True if all spaces and linebreaks should be included as a text node, same as doPreserve option </summary>
+    /// <summary> Set to True if all spaces and linebreaks should be included as a text node, same as doPreserve option </summary>
     property PreserveWhitespace: Boolean read GetPreserveWhitespace write SetPreserveWhitespace;
-    ///	<summary> Defines the xml declaration property "StandAlone", set it to "yes" or "no" </summary>
+    /// <summary> Defines the xml declaration property "StandAlone", set it to "yes" or "no" </summary>
     property StandAlone: String read GetStandAlone write SetStandAlone;
-    ///	<summary> The XML as a string representation </summary>
+    /// <summary> The XML as a string representation </summary>
     property Text: String read GetText write SetText;
-    ///	<summary> Defines the xml declaration property "Version", default set to "1.0" </summary>
+    /// <summary> Defines the xml declaration property "Version", default set to "1.0" </summary>
     property Version: String read GetVersion write SetVersion;
-    ///	<summary> The XML as a string representation, same as .Text </summary>
+    /// <summary> The XML as a string representation, same as .Text </summary>
     property Xml: String read GetText write SetText;
   end;
 
@@ -482,9 +500,11 @@ end;
 
 function TXmlVerySimple.LoadFromFile(const FileName: String; BufferSize: Integer = 4096): TXmlVerySimple;
 var
-  Stream: TFileStream;
+//FB
+  Stream: TBufferedFileStream;
 begin
-  Stream := TFileStream.Create(FileName, fmOpenRead + fmShareDenyWrite);
+  Stream := TBufferedFileStream.Create(FileName, fmOpenRead + fmShareDenyWrite);
+//FB_X
   try
     LoadFromStream(Stream, BufferSize);
   finally
@@ -537,6 +557,11 @@ begin
         Break;
     end;
     FirstChar := Reader.FirstChar;
+//FB Dont add last empty node. If the XML File ends with 0x0a, or 0x0d0a for example.
+    if ((FirstChar = #10) or (FirstChar = #13)) and
+        not Reader.PrepareBuffer(3) then // At least 3 more chars should be available
+      Continue;
+//FB_X
     if FirstChar = '!' then
       if Reader.IsUppercaseText('!--') then  // check for a comment node
         ParseComment(Reader, Parent)
@@ -742,12 +767,13 @@ begin
   Node.Name := Tag;
 end;
 
-
 function TXmlVerySimple.SaveToFile(const FileName: String): TXmlVerySimple;
 var
-  Stream: TFileStream;
+//FB
+  Stream: TBufferedFileStream;
 begin
-  Stream := TFileStream.Create(FileName, fmCreate);
+  Stream := TBufferedFileStream.Create(FileName, fmCreate);
+//FB_X  
   try
     SaveToStream(Stream);
   finally
@@ -878,7 +904,10 @@ begin
       end;
     ntXmlDecl:
       begin
-        Writer.Write(Line + '?' + Node.Name + Node.AttributeList.AsString + '?>');
+//FB
+        if not (doNoHeader in Options) then
+//FB_X
+          Writer.Write(Line + '?' + Node.Name + Node.AttributeList.AsString + '?>');
         Exit;
       end;
   end;
@@ -986,6 +1015,23 @@ begin
   AttributeList.Free;
   inherited;
 end;
+
+//FB
+function TXmlNode.FindPos(Node: TXmlNode): Integer;
+begin
+  Result := ChildNodes.FindPos(Node);
+end;
+
+function TXmlNode.FindPos(const Name: String; NodeTypes: TXmlNodeTypes = [ntElement]): Integer;
+begin
+  Result := ChildNodes.FindPos(Name, NodeTypes);
+end;
+
+function TXmlNode.FindPos(const Name, NodeValue: String; NodeTypes: TXmlNodeTypes = [ntElement]): Integer;
+begin
+  Result := ChildNodes.FindPos(Name, NodeValue, NodeTypes);
+end;
+//FB_X
 
 function TXmlNode.Find(const Name: String; NodeTypes: TXmlNodeTypes = [ntElement]): TXmlNode;
 begin
@@ -1177,6 +1223,33 @@ end;
 
 { TXmlNodeList }
 
+//FB
+function TXmlNodeList.FindPos(Node: TXmlNode): Integer;
+begin
+  Result := Self.IndexOf(Node);
+end;
+
+function TXmlNodeList.FindPos(const Name: String; NodeTypes: TXmlNodeTypes = [ntElement]): Integer;
+begin
+  Result := Self.IndexOf(Find(Name, NodeTypes));
+end;
+
+function TXmlNodeList.FindPos(const Name, NodeValue: String; NodeTypes: TXmlNodeTypes = [ntElement]): Integer;
+var
+  Node: TXmlNode;
+begin
+  Result := -1;
+  for Node in Self do
+    if ((NodeTypes = []) or (Node.NodeType in NodeTypes)) and
+      (IsSame(Node.Name, Name) and (IsSame(Node.NodeValue, NodeValue))) then
+    begin
+      Result := Self.IndexOf(Node);
+      Break;
+    end;
+end;
+
+//FB_X
+
 function TXmlNodeList.Find(const Name: String; NodeTypes: TXmlNodeTypes = [ntElement]): TXmlNode;
 var
   Node: TXmlNode;
@@ -1272,7 +1345,6 @@ function TXmlNodeList.FirstChild: TXmlNode;
 begin
   Result := First;
 end;
-
 
 function TXmlNodeList.Get(Index: Integer): TXmlNode;
 begin
