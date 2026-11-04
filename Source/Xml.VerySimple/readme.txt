@@ -19,5 +19,4 @@ This text must be present without changes in all modifications of library.
   * implied. See the License for the specific language governing      *
   * rights and limitations under the License.                         *
 
-// Changed for ExifToolGUI
-// - Add utf16
+// Changes marked with //FB

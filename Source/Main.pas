@@ -824,17 +824,13 @@ end;
 procedure TFMain.EditFilterFilesKeyDown(Sender: TObject; var Key: Word;
   Shift: TShiftState);
 begin
-  if (ssCtrl in Shift) then
-  begin
-    case Key of
-      VK_UP:
-        SelectPrevNext(false);
-      VK_DOWN:
-        SelectPrevNext(true);
-    end;
+  case Key of
+    VK_UP, VK_DOWN:
+      if (ssCtrl in Shift) then
+        SelectPrevNext(Key = VK_DOWN);
+    VK_RETURN:
+      SelectPrevNext(true);
   end;
-  if (Key = vkReturn) then
-    SpbFilterFilesClick(Sender);
 end;
 
 procedure TFMain.SetupWSAutoComp(ARow: integer);
@@ -3651,7 +3647,6 @@ var
   MatchFound: boolean;
   AFolderName: string;
   AFolder: TShellFolder;
-
 begin
   if (ShellList.Items.Count = 0) then
     exit;
@@ -3681,8 +3676,9 @@ begin
   if (MatchFound = false) then
     exit;
 
-  // Select only the item, and make that visible
+  // Select the item, and make that visible.
   ShellList.ClearSelection;
+
   ShellList.Items[New].Selected := true;
   ShellList.Items[New].Focused := true;
   ShellList.Items[New].MakeVisible(false);
@@ -4198,33 +4194,50 @@ procedure TFMain.ShellListKeyDown(Sender: TObject; var Key: Word; Shift: TShiftS
   end;
 
 begin
-  if (Key = Ord('A')) and (ssCTRL in Shift) then // Ctrl+A
-    SelectAll;
-  if (Key = Ord('C')) and (ssCTRL in Shift) then // Ctrl+C
-    ShellList.FileNamesToClipboard;
-  if (Key = Ord('X')) and (ssCTRL in Shift) then // Ctrl+X
-    ShellList.FileNamesToClipboard(True);
-  if (Key = Ord('V')) and (ssCTRL in Shift) then // Ctrl+V
-    ShellList.PasteFilesFromClipboard;
-
-  if (Key = VK_ADD) and (ssCtrl in Shift) then
-    ShellList.SetIconSpacing(1, 0);
-  if (Key = VK_SUBTRACT) and (ssCtrl in Shift) then
-    ShellList.SetIconSpacing(-1, 0);
-  if ((Key = Ord('0')) or (Key = VK_NUMPAD0)) and (ssCtrl in Shift) then
-    ShellList.SetIconSpacing(0, 0);
-  if (Key = VK_F2) and (ShellList.Selected <> nil) then
-    ShellList.Selected.EditCaption;
+  if (ssCtrl in Shift) then
+  case Key of
+    Ord('A'):
+      SelectAll;
+    Ord('C'):
+      ShellList.FileNamesToClipboard;
+    Ord('X'):
+      ShellList.FileNamesToClipboard(True);
+    Ord('V'):
+      ShellList.PasteFilesFromClipboard;
+    VK_ADD:
+      ShellList.SetIconSpacing(1, 0);
+    VK_SUBTRACT:
+      ShellList.SetIconSpacing(-1, 0);
+    Ord('0'),
+    VK_NUMPAD0:
+      ShellList.SetIconSpacing(0, 0);
+    VK_UP,
+    VK_DOWN:
+      Key := 0; // Dont want focus rectangle drawn. See Key up
 {$IFDEF NOTYET}
-  if (Key = VK_DELETE) and (ssCtrl in Shift) then
-    DeleteSelected;
+    VK_DELETE:
+      DeleteSelected;
 {$ENDIF}
+  end;
+  if (Key = VK_F2) and
+     (ShellList.Selected <> nil) then
+    ShellList.Selected.EditCaption;
 end;
 
 procedure TFMain.ShellListKeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
 begin
   if ShellList.IsEditing then
     exit;
+
+  if (ssCtrl in Shift) then
+  begin
+    case Key of
+      VK_UP,
+      VK_DOWN:
+        SelectPrevNext(Key= VK_DOWN);
+    end;
+    exit;
+  end;
 
   case Key of
     VK_HOME,
