@@ -108,7 +108,7 @@ type
 
 procedure OsmMapInit(Browser: TEdgeBrowser;
                      const Lat, Lon, Desc, InitialZoom: string);
-procedure ShowImagesOnMap(Browser: TEdgeBrowser; APath, ETOuts: string);
+procedure ShowImagesOnMap(Browser: TEdgeBrowser; APath, ETOuts: string; IncludeTrkLogs: boolean);
 procedure MapGetLocation(Browser: TEdgeBrowser);
 function MapGoToPlace(Browser: TEdgeBrowser; Place, Bounds, Desc, InitialZoom: string): string;
 procedure ParseJsonMessage(const Message: string; var Msg, Parm1, Parm2: string);
@@ -1070,11 +1070,11 @@ begin
 end;
 
 // ==============================================================================
-procedure ShowImagesOnMap(Browser: TEdgeBrowser; APath, ETOuts: string);
+procedure ShowImagesOnMap(Browser: TEdgeBrowser; APath, ETOuts: string; IncludeTrkLogs: boolean);
 var
   OsmHelper: TOSMHelper;
   ETout, Lat, Lon, MIMEType, Filename, LastCoord: string;
-  FirstGpx, IsQuickTime: boolean;
+  FirstGpx, IsQuickTime, HasPoints: boolean;
 begin
   OsmHelper := TOSMHelper.Create(GetHtmlTmp, InitialZoom_Out);
   try
@@ -1091,26 +1091,28 @@ begin
         Filename := IncludeTrailingPathDelimiter(APath) + Filename;
       if ((Pos('image', MIMEType) > 0) or
           (Pos('video', MIMEType) > 0) or
-          (Pos('application/rdf+xml', MIMEType) > 0)  // XMP side car
-         )
-         and
-         ((Lat <> '-') and // Need Lat
-          (Lon <> '-')     // and Lon
-         ) then
+          (Pos('application/rdf+xml', MIMEType) > 0)) then  // XMP side car
+      begin
+        if ((Lat <> '-') and      // Need Lat
+            (Lon <> '-')) then    // and Lon
           OsmHelper.WritePoint(Lat, Lon, Filename, true)
+      end
       else
       begin
-        if (CreateTrkPoints(FileName, FirstGpx, LastCoord) > 0) then
+        if (IncludeTrkLogs) and
+           (CreateTrkPoints(FileName, FirstGpx, LastCoord) > 0) then
           FirstGpx := false;
       end;
     end;
-
     OsmHelper.WritePointsEnd(GeoSettings.GeoCodingEnable <> TGeoCodeEnable.geNone);
     OsmHelper.WriteFooter;
+    HasPoints := (FirstGpx = false) or
+                 (OsmHelper.PlacesDict.Count > 0);
   finally
     OsmHelper.Free;
   end;
-  Browser.Navigate(GetHtmlTmp);
+  if (HasPoints) then
+    Browser.Navigate(GetHtmlTmp);
 end;
 
 // Find default lang, and Country code

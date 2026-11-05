@@ -26,9 +26,9 @@ object FMain: TFMain
   TextHeight = 13
   object Splitter1: TSplitter
     Left = 282
-    Top = 25
+    Top = 27
     Width = 5
-    Height = 509
+    Height = 507
     AutoSnap = False
     Color = clBtnFace
     MinSize = 160
@@ -42,9 +42,9 @@ object FMain: TFMain
   end
   object Splitter2: TSplitter
     Left = 655
-    Top = 25
+    Top = 27
     Width = 5
-    Height = 509
+    Height = 507
     Align = alRight
     AutoSnap = False
     MinSize = 320
@@ -70,12 +70,14 @@ object FMain: TFMain
       item
         Width = 50
       end>
+    ExplicitTop = 533
+    ExplicitWidth = 976
   end
   object AdvPanelBrowse: TPanel
     Left = 0
-    Top = 25
+    Top = 27
     Width = 282
-    Height = 509
+    Height = 507
     Align = alLeft
     DoubleBuffered = True
     Font.Charset = DEFAULT_CHARSET
@@ -86,9 +88,10 @@ object FMain: TFMain
     ParentDoubleBuffered = False
     ParentFont = False
     TabOrder = 1
+    ExplicitHeight = 506
     object Splitter3: TSplitter
       Left = 1
-      Top = 215
+      Top = 213
       Width = 280
       Height = 4
       Cursor = crVSplit
@@ -104,17 +107,18 @@ object FMain: TFMain
       Left = 1
       Top = 1
       Width = 280
-      Height = 214
+      Height = 212
       ActivePage = AdvTabBrowse
       Align = alClient
       TabOrder = 0
+      ExplicitHeight = 211
       object AdvTabBrowse: TTabSheet
         Caption = 'Folders'
         object ShellTree: TShellTreeView
           Left = 0
           Top = 0
           Width = 272
-          Height = 186
+          Height = 184
           ObjectTypes = [otFolders]
           Root = 'rfDesktop'
           ShellListView = ShellList
@@ -139,12 +143,13 @@ object FMain: TFMain
           OnKeyUp = ShellTreeKeyUp
           OnChanging = ShellTreeChanging
           OnEdited = ShellTreeEdited
+          ExplicitHeight = 183
         end
       end
     end
     object AdvPagePreview: TTabControl
       Left = 1
-      Top = 219
+      Top = 217
       Width = 280
       Height = 289
       Align = alBottom
@@ -158,6 +163,7 @@ object FMain: TFMain
       TabIndex = 0
       OnChange = AdvPagePreviewChange
       OnResize = AdvPagePreviewResize
+      ExplicitTop = 216
       object RotateImg: TImage
         Left = 4
         Top = 24
@@ -486,14 +492,16 @@ object FMain: TFMain
   end
   object AdvPageMetadata: TPageControl
     Left = 660
-    Top = 25
+    Top = 27
     Width = 320
-    Height = 509
-    ActivePage = AdvTabMetadata
+    Height = 507
+    ActivePage = AdvTabOSMMap
     Align = alRight
     DoubleBuffered = True
     ParentDoubleBuffered = False
     TabOrder = 2
+    ExplicitLeft = 656
+    ExplicitHeight = 506
     object AdvTabMetadata: TTabSheet
       Caption = 'Metadata'
       object AdvPanelMetaTop: TPanel
@@ -592,7 +600,7 @@ object FMain: TFMain
       end
       object AdvPanelMetaBottom: TPanel
         Left = 0
-        Top = 375
+        Top = 373
         Width = 312
         Height = 106
         Align = alBottom
@@ -670,7 +678,7 @@ object FMain: TFMain
         Left = 0
         Top = 57
         Width = 312
-        Height = 318
+        Height = 316
         Align = alClient
         BorderStyle = bsNone
         DefaultRowHeight = 19
@@ -711,7 +719,7 @@ object FMain: TFMain
         Left = 0
         Top = 57
         Width = 312
-        Height = 392
+        Height = 390
         Align = alClient
         Caption = 'Internet access not enabled in preferences'
         Font.Charset = DEFAULT_CHARSET
@@ -721,25 +729,25 @@ object FMain: TFMain
         Font.Style = []
         ParentFont = False
         TabOrder = 1
+        ExplicitHeight = 389
         object EdgeBrowser1: TEdgeBrowser
           Left = 1
           Top = 1
           Width = 310
-          Height = 390
+          Height = 388
           Align = alClient
           TabOrder = 0
-          AllowSingleSignOnUsingOSPrimaryAccount = False
-          TargetCompatibleBrowserVersion = '137.0.3296.44'
           UserDataFolder = '%LOCALAPPDATA%\bds.exe.WebView2'
           OnCreateWebViewCompleted = EdgeBrowser1CreateWebViewCompleted
           OnNavigationStarting = EdgeBrowser1NavigationStarting
           OnWebMessageReceived = EdgeBrowser1WebMessageReceived
           OnZoomFactorChanged = EdgeBrowser1ZoomFactorChanged
+          ExplicitHeight = 387
         end
       end
       object AdvPanel_MapBottom: TPanel
         Left = 0
-        Top = 449
+        Top = 447
         Width = 312
         Height = 32
         Align = alBottom
@@ -751,6 +759,7 @@ object FMain: TFMain
         Font.Style = []
         ParentFont = False
         TabOrder = 2
+        ExplicitTop = 446
         object SpeedBtn_Geotag: TSpeedButton
           AlignWithMargins = True
           Left = 1
@@ -878,15 +887,17 @@ object FMain: TFMain
   end
   object AdvPageFilelist: TPageControl
     Left = 287
-    Top = 25
+    Top = 27
     Width = 368
-    Height = 509
+    Height = 507
     ActivePage = AdvTabFilelist
     Align = alClient
     Constraints.MinWidth = 364
     DoubleBuffered = True
     ParentDoubleBuffered = False
     TabOrder = 3
+    ExplicitWidth = 364
+    ExplicitHeight = 506
     object AdvTabFilelist: TTabSheet
       Caption = 'File list'
       object TbFileList: TToolBar
@@ -902,6 +913,7 @@ object FMain: TFMain
         List = True
         AllowTextButtons = True
         TabOrder = 0
+        ExplicitWidth = 356
         object TbFlRefresh: TToolButton
           Left = 0
           Top = 0
@@ -956,7 +968,7 @@ object FMain: TFMain
       end
       object AdvPanelETdirect: TPanel
         Left = 0
-        Top = 297
+        Top = 295
         Width = 360
         Height = 184
         Align = alBottom
@@ -968,6 +980,8 @@ object FMain: TFMain
         Font.Style = []
         ParentFont = False
         TabOrder = 3
+        ExplicitTop = 294
+        ExplicitWidth = 356
         DesignSize = (
           360
           184)
@@ -1043,7 +1057,7 @@ object FMain: TFMain
           OnClick = SpeedBtn_ETclearClick
         end
         object SpbRecord: TSpeedButton
-          Left = 319
+          Left = 315
           Top = 50
           Width = 22
           Height = 22
@@ -1074,7 +1088,7 @@ object FMain: TFMain
         object EditETdirect: TLabeledEdit
           Left = 1
           Top = 50
-          Width = 312
+          Width = 308
           Height = 23
           Hint = 
             'Spaces in data require double quotes, double quotes in data requ' +
@@ -1098,6 +1112,7 @@ object FMain: TFMain
           OnChange = EditETdirectChange
           OnKeyDown = EditETdirectKeyDown
           OnKeyPress = EditETdirectKeyPress
+          ExplicitWidth = 304
         end
         object CBoxETdirect: TComboBox
           Left = 1
@@ -1134,7 +1149,7 @@ object FMain: TFMain
         Left = 0
         Top = 50
         Width = 360
-        Height = 247
+        Height = 245
         ObjectTypes = [otNonFolders]
         Root = 'rfDesktop'
         ShellTreeView = ShellTree
@@ -1174,6 +1189,7 @@ object FMain: TFMain
         BevelOuter = bvNone
         ShowCaption = False
         TabOrder = 1
+        ExplicitWidth = 356
         object Splitter4: TSplitter
           Left = 204
           Top = 0
@@ -1204,6 +1220,7 @@ object FMain: TFMain
           TabOrder = 0
           OnChange = EditFilterFilesChange
           OnKeyDown = EditFilterFilesKeyDown
+          ExplicitLeft = 203
           ExplicitHeight = 21
         end
       end
@@ -1308,7 +1325,7 @@ object FMain: TFMain
         Left = 0
         Top = 121
         Width = 360
-        Height = 360
+        Height = 358
         Legend.Visible = False
         Title.Font.Color = clBlack
         Title.Font.Height = -19
@@ -1328,8 +1345,8 @@ object FMain: TFMain
           15)
         ColorPaletteIndex = 13
         object Series1: TBarSeries
+          HoverElement = []
           Marks.Visible = False
-          Marks.OnTop = True
           XValues.Name = 'X'
           XValues.Order = loAscending
           YValues.Name = 'Bar'
@@ -1347,20 +1364,22 @@ object FMain: TFMain
     Left = 0
     Top = 0
     Width = 980
-    Height = 25
+    Height = 27
+    UseSystemFont = False
     ActionManager = MainActionManager
     Caption = 'ActionMainMenuBar'
     Color = clMenuBar
-    ColorMap.DisabledFontColor = 10461087
+    ColorMap.DisabledFontColor = 7171437
     ColorMap.HighlightColor = clWhite
     ColorMap.BtnSelectedFont = clBlack
     ColorMap.UnusedColor = clWhite
     Font.Charset = DEFAULT_CHARSET
-    Font.Color = clWindowText
+    Font.Color = clBlack
     Font.Height = -12
     Font.Name = 'Segoe UI'
     Font.Style = []
     Spacing = 0
+    ExplicitWidth = 976
   end
   object OpenPictureDlg: TOpenPictureDialog
     Filter = 

@@ -38,11 +38,12 @@ object FPreferences: TFPreferences
     Top = 0
     Width = 606
     Height = 442
-    ActivePage = TabGeoCoding
+    ActivePage = AdvTabGeneral
     Align = alLeft
     DoubleBuffered = True
     ParentDoubleBuffered = False
     TabOrder = 0
+    ExplicitHeight = 441
     object AdvTabGeneral: TTabSheet
       Caption = 'General'
       object Label1: TLabel
@@ -78,7 +79,7 @@ object FPreferences: TFPreferences
         Items.Strings = (
           '-start in last visited folder'
           '-start in:')
-        TabOrder = 2
+        TabOrder = 3
         OnClick = RadioGroupClick
       end
       object EdStartupFolder: TEdit
@@ -86,7 +87,7 @@ object FPreferences: TFPreferences
         Top = 145
         Width = 333
         Height = 21
-        TabOrder = 3
+        TabOrder = 4
       end
       object BtnStartupFolder: TButton
         Left = 500
@@ -94,7 +95,7 @@ object FPreferences: TFPreferences
         Width = 28
         Height = 22
         Caption = '...'
-        TabOrder = 4
+        TabOrder = 5
         OnClick = BtnBrowseFolder
       end
       object RgExportMetaFolder: TRadioGroup
@@ -107,7 +108,7 @@ object FPreferences: TFPreferences
         Items.Strings = (
           '-working folder'
           '-save in:')
-        TabOrder = 5
+        TabOrder = 6
         OnClick = RadioGroupClick
       end
       object EdExportMetaFolder: TEdit
@@ -115,7 +116,7 @@ object FPreferences: TFPreferences
         Top = 236
         Width = 333
         Height = 21
-        TabOrder = 6
+        TabOrder = 7
       end
       object BtnExportMetaFolder: TButton
         Left = 500
@@ -123,7 +124,7 @@ object FPreferences: TFPreferences
         Width = 28
         Height = 22
         Caption = '...'
-        TabOrder = 7
+        TabOrder = 8
         OnClick = BtnBrowseFolder
       end
       object LabeledEdit1: TLabeledEdit
@@ -138,7 +139,7 @@ object FPreferences: TFPreferences
           'tc)'
         LabelPosition = lpRight
         MaxLength = 1
-        TabOrder = 8
+        TabOrder = 9
         Text = ''
       end
       object CheckBox2: TCheckBox
@@ -148,7 +149,7 @@ object FPreferences: TFPreferences
         Height = 17
         Caption = '-enable internet access for OSM Map'
         Constraints.MinWidth = 450
-        TabOrder = 9
+        TabOrder = 2
       end
       object CheckBox3: TCheckBox
         Left = 16
@@ -168,7 +169,7 @@ object FPreferences: TFPreferences
         Width = 547
         Height = 115
         Caption = 'Cleanup Thumbnails (Admin required)'
-        TabOrder = 4
+        TabOrder = 3
         object Label2: TLabel
           Left = 290
           Top = 35
@@ -259,7 +260,7 @@ object FPreferences: TFPreferences
           6464646464646464646464646464646464646464646464646464646464646464
           6464646464646464646464646464646464646464646464646464646464646464
           6464646464646464646464646464646464646464646464646464}
-        TabOrder = 1
+        TabOrder = 4
         OnClick = BtnSetupCleanClick
       end
       object EdThumbCleanset: TMaskEdit
@@ -274,7 +275,7 @@ object FPreferences: TFPreferences
         MaxLength = 4
         ParentShowHint = False
         ShowHint = True
-        TabOrder = 2
+        TabOrder = 5
         Text = '    '
       end
       object BtnClean: TBitBtn
@@ -350,7 +351,7 @@ object FPreferences: TFPreferences
           3030303030303030303030303030303030303030303030303030303030303030
           3030303030303030303030303030303030303030303030303030303030303030
           3030303030303030303030303030303030303030303030303030}
-        TabOrder = 3
+        TabOrder = 6
         OnClick = BtnCleanClick
       end
       object BtnGenThumbs: TBitBtn
@@ -431,7 +432,7 @@ object FPreferences: TFPreferences
           7777777777777777777777777777777777777777777777777777}
         ParentShowHint = False
         ShowHint = True
-        TabOrder = 5
+        TabOrder = 2
         OnClick = BtnGenThumbsClick
       end
       object ChkAllowNonMSWicCodec: TCheckBox
@@ -440,7 +441,7 @@ object FPreferences: TFPreferences
         Width = 539
         Height = 17
         Caption = 'Allow Non Microsoft Wic codecs'
-        TabOrder = 6
+        TabOrder = 1
       end
     end
     object TabGeoCoding: TTabSheet
@@ -459,7 +460,7 @@ object FPreferences: TFPreferences
           Width = 450
           Height = 17
           Caption = 'Enable Geocode dialog (Get coordinates of location)'
-          TabOrder = 0
+          TabOrder = 1
         end
         object ChkReverseGeoCodeDialog: TCheckBox
           Left = 67
@@ -467,7 +468,7 @@ object FPreferences: TFPreferences
           Width = 450
           Height = 17
           Caption = 'Enable reverse Geocode dialog (Get location of coordinates)'
-          TabOrder = 1
+          TabOrder = 2
         end
         object ChkCountryLocation: TCheckBox
           Left = 67
@@ -475,14 +476,14 @@ object FPreferences: TFPreferences
           Width = 450
           Height = 17
           Caption = 'Show CountryCode in File list'
-          TabOrder = 2
+          TabOrder = 3
         end
         object CmbGeoCodingEnable: TComboBox
           Left = 67
           Top = 18
           Width = 450
           Height = 21
-          TabOrder = 3
+          TabOrder = 0
           Text = 'CmbGeoCodingEnable'
           Items.Strings = (
             'Disable GeoCoding'
@@ -551,7 +552,7 @@ object FPreferences: TFPreferences
           Max = 10000
           Increment = 50
           Position = 1000
-          TabOrder = 1
+          TabOrder = 2
           Thousands = False
         end
         object EdThrottleGeoCode: TLabeledEdit
@@ -563,7 +564,7 @@ object FPreferences: TFPreferences
           EditLabel.Height = 21
           EditLabel.Caption = 'Throttle'
           LabelPosition = lpLeft
-          TabOrder = 2
+          TabOrder = 3
           Text = '1000'
         end
         object EdGeoCodeApiKey: TLabeledEdit
@@ -575,7 +576,7 @@ object FPreferences: TFPreferences
           EditLabel.Height = 21
           EditLabel.Caption = 'Api Key'
           LabelPosition = lpLeft
-          TabOrder = 3
+          TabOrder = 1
           Text = ''
         end
       end
@@ -603,7 +604,7 @@ object FPreferences: TFPreferences
           EditLabel.Height = 21
           EditLabel.Caption = 'Throttle'
           LabelPosition = lpLeft
-          TabOrder = 0
+          TabOrder = 1
           Text = '10'
         end
         object UpdThrottleOverpass: TUpDown
@@ -615,7 +616,7 @@ object FPreferences: TFPreferences
           Min = 10
           Max = 10000
           Position = 10
-          TabOrder = 1
+          TabOrder = 2
           Thousands = False
         end
         object EdOverPassUrl: TLabeledEdit
@@ -627,7 +628,7 @@ object FPreferences: TFPreferences
           EditLabel.Height = 21
           EditLabel.Caption = 'URL'
           LabelPosition = lpLeft
-          TabOrder = 2
+          TabOrder = 0
           Text = ''
         end
       end
@@ -670,7 +671,7 @@ object FPreferences: TFPreferences
         Width = 540
         Height = 220
         Caption = 'Register ExiftoolGui in Contextmenu (Requires elevation)'
-        TabOrder = 1
+        TabOrder = 2
         object BtnAdd2Context: TBitBtn
           Left = 5
           Top = 43
@@ -820,7 +821,7 @@ object FPreferences: TFPreferences
             6464646464646464646464646464646464646464646464646464646464646464
             6464646464646464646464646464646464646464646464646464646464646464
             6464646464646464646464646464646464646464646464646464}
-          TabOrder = 1
+          TabOrder = 2
           OnClick = BtnRemoveFromContextMenuClick
         end
         object EdCommand: TLabeledEdit
@@ -832,7 +833,7 @@ object FPreferences: TFPreferences
           EditLabel.Height = 13
           EditLabel.Caption = 'Installed as:'
           ReadOnly = True
-          TabOrder = 2
+          TabOrder = 1
           Text = ''
         end
         object MemoWin11: TMemo
@@ -863,7 +864,7 @@ object FPreferences: TFPreferences
         Width = 500
         Height = 17
         Caption = '-application Single instance'
-        TabOrder = 2
+        TabOrder = 1
       end
     end
     object AdvTabOther: TTabSheet
@@ -886,7 +887,7 @@ object FPreferences: TFPreferences
         Items.Strings = (
           '-Default search (See Windows documentation on CreateProcess)'
           '-Specify')
-        TabOrder = 2
+        TabOrder = 3
         OnClick = RadioGroupClick
       end
       object ChkWorkNextLine: TCheckBox
@@ -902,7 +903,7 @@ object FPreferences: TFPreferences
         Top = 124
         Width = 349
         Height = 21
-        TabOrder = 3
+        TabOrder = 4
       end
       object BtnETOverride: TButton
         Left = 514
@@ -910,7 +911,7 @@ object FPreferences: TFPreferences
         Width = 28
         Height = 22
         Caption = '...'
-        TabOrder = 4
+        TabOrder = 5
         OnClick = BtnBrowseFolder
       end
       object ChkWorkAddRem: TCheckBox
@@ -927,14 +928,14 @@ object FPreferences: TFPreferences
         Width = 565
         Height = 17
         Caption = '-File list: Show Folders in File list'
-        TabOrder = 5
+        TabOrder = 7
       end
       object HintPause: TEdit
         Left = 16
         Top = 276
         Width = 66
         Height = 21
-        TabOrder = 8
+        TabOrder = 10
         Text = '0'
       end
       object UpDHintPause: TUpDown
@@ -945,7 +946,7 @@ object FPreferences: TFPreferences
         Associate = HintPause
         Max = 10000
         Increment = 10
-        TabOrder = 9
+        TabOrder = 11
       end
       object ChkFileListBreadCrumb: TCheckBox
         Left = 16
@@ -953,7 +954,7 @@ object FPreferences: TFPreferences
         Width = 565
         Height = 17
         Caption = '-File list: Show Breadcrumb (Address Bar) in File list'
-        TabOrder = 7
+        TabOrder = 9
       end
       object ChkFileListHidden: TCheckBox
         Left = 16
@@ -963,7 +964,7 @@ object FPreferences: TFPreferences
         Caption = 
           '-File list: Show Hidden Folders and Files in File list (Admin re' +
           'quired)'
-        TabOrder = 6
+        TabOrder = 8
       end
       object GrpConfig: TGroupBox
         Left = 16
@@ -971,7 +972,7 @@ object FPreferences: TFPreferences
         Width = 562
         Height = 44
         Caption = 'Exiftool config (-config CFGFILE)'
-        TabOrder = 10
+        TabOrder = 6
         object EdETCustomConfig: TEdit
           Left = 141
           Top = 16
@@ -995,7 +996,7 @@ object FPreferences: TFPreferences
         Width = 556
         Height = 17
         Caption = '-Workspace: Enable line editing'
-        TabOrder = 11
+        TabOrder = 2
       end
       object GrpETAutoComplete: TGroupBox
         Left = 16
