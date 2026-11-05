@@ -3966,6 +3966,12 @@ begin
 
   EnableMenuItems;
 
+  if (GUIsettings.EnableGMap) and
+     (GUIsettings.DetailsSel = Det_LocationId) and
+     (AdvPageMetadata.ActivePage = AdvTabOSMMap) and
+     (ShellList.SelectedFolder <> nil) then
+    ShowImagesOnMap(EdgeBrowser1, ShellList.Path, GetGpsCoordinates(GetSelectedFiles), false);
+
   if (ShellList.IncludeSubFolders) then
     ShellTree.SyncShellTreeFromShellList;
 end;
@@ -5148,7 +5154,7 @@ end;
 procedure TFMain.SpeedBtn_ShowOnMapClick(Sender: TObject);
 begin
   if ShellList.SelectedFolder <> nil then
-    ShowImagesOnMap(EdgeBrowser1, ShellList.Path, GetGpsCoordinates(GetSelectedFiles))
+    ShowImagesOnMap(EdgeBrowser1, ShellList.Path, GetGpsCoordinates(GetSelectedFiles), true)
   else
     ShowMessage(StrNoFilesSelected);
 end;

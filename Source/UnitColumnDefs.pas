@@ -28,6 +28,11 @@ const
   Img_Filter = 12;
   Img_Configure = 13;
 
+  Det_StandardId = 0;
+  Det_CameraId = 1;
+  Det_LocationId = 2;
+  Det_AboutId = 3;
+
 type
 
   TFileListOptions = (floSystem, floInternal, floUserDef);
@@ -97,7 +102,6 @@ const
   UsrColDef = 'UsrColDef_';
 
   // This definition is used only to store the Widths
-  StandardId = '0';
   StandardDefaults: array [0..4] of TFileListColumn =
   (
     (Command: '0';                              Width: 200; Options: toSys),            // Name
@@ -107,7 +111,6 @@ const
     (Command: '4';                              Width: 120; Options: toSys)             // Date created
   );
 
-  CameraId = '1';
   CameraDefaults: array [0..9] of TFileListColumn =
   (
     (Command: '-IFD0:Model';                                                    XlatedCaption: @StrFLModel),
@@ -122,7 +125,6 @@ const
     (Command: '-IFD0:Orientation#';                         Options: toHorVer;  XlatedCaption: @StrFLOrientation)
   );
 
-  LocationId = '2';
   LocationDefaults: array [0..6] of TFileListColumn =
   (
     (Command: '-ExifIFD:DateTimeOriginal';                                      XlatedCaption: @StrFLDateTime),
@@ -134,7 +136,6 @@ const
     (Command: '-XMP-iptcExt:LocationShownSublocation';                          XlatedCaption: @StrFLLocation)
   );
 
-  AboutId = '3';
   AboutDefaults: array [0..4] of TFileListColumn =
   (
     (Command: '-IFD0:Artist';                                                   XlatedCaption: @StrFLArtist),
@@ -348,9 +349,9 @@ var
   ReadMode: TReadModeOptions;
   ColumnsRead: TColumnsArray;
 begin
-  result := GUIini.SectionExists(StdColDef + StandardId);
+  result := GUIini.SectionExists(Format('%s%d', [StdColDef, Det_StandardId]));
   ReadMode := [];
-  ColumnsRead := ReadColumnDefs(LVHandle, GUIini, StdColDef + StandardId, StandardDefaults, ReadMode);
+  ColumnsRead := ReadColumnDefs(LVHandle, GUIini, Format('%s%d', [StdColDef, Det_StandardId]), StandardDefaults, ReadMode);
   FColumnSetList.Add(TColumnSet.Create(StrStandardList,
                                        floSystem,
                                        ReadMode,
@@ -362,9 +363,9 @@ var
   ReadMode: TReadModeOptions;
   ColumnsRead: TColumnsArray;
 begin
-  result := GUIini.SectionExists(StdColDef + CameraId);
+  result := GUIini.SectionExists(Format('%s%d', [StdColDef, Det_CameraId]));
   ReadMode := DefInternalMode;
-  ColumnsRead := ReadColumnDefs(LVHandle, GUIini, StdColDef + CameraId, CameraDefaults, ReadMode);
+  ColumnsRead := ReadColumnDefs(LVHandle, GUIini, Format('%s%d', [StdColDef, Det_CameraId]), CameraDefaults, ReadMode);
   FColumnSetList.Add(TColumnSet.Create(StrCameraList,
                                        floInternal,
                                        ReadMode,
@@ -376,9 +377,9 @@ var
   ReadMode: TReadModeOptions;
   ColumnsRead: TColumnsArray;
 begin
-  result := GUIini.SectionExists(StdColDef + LocationId);
+  result := GUIini.SectionExists(Format('%s%d', [StdColDef, Det_LocationId]));
   ReadMode := DefInternalMode;
-  ColumnsRead := ReadColumnDefs(LVHandle, GUIini, StdColDef + LocationId, LocationDefaults, ReadMode);
+  ColumnsRead := ReadColumnDefs(LVHandle, GUIini, Format('%s%d', [StdColDef, Det_LocationId]), LocationDefaults, ReadMode);
   FColumnSetList.Add(TColumnSet.Create(StrLocationList,
                                        floInternal,
                                        ReadMode,
@@ -390,9 +391,9 @@ var
   ReadMode: TReadModeOptions;
   ColumnsRead: TColumnsArray;
 begin
-  result := GUIini.SectionExists(StdColDef + AboutId);
+  result := GUIini.SectionExists(Format('%s%d', [StdColDef, Det_AboutId]));
   ReadMode := DefInternalMode;
-  ColumnsRead := ReadColumnDefs(LVHandle, GUIini, StdColDef + AboutId, AboutDefaults, ReadMode);
+  ColumnsRead := ReadColumnDefs(LVHandle, GUIini, Format('%s%d', [StdColDef, Det_AboutId]), AboutDefaults, ReadMode);
   FColumnSetList.Add(TColumnSet.Create(StrAboutList,
                                        floInternal,
                                        ReadMode,
@@ -467,7 +468,7 @@ begin
   result := false;
 
   if (not CreateEmpty) and
-     (not GUIini.SectionExists(StdColDef + StandardId)) then // Only Check for standard tags in INI. Should always be there.
+     (not GUIini.SectionExists(Format('%s%d', [StdColDef, Det_StandardId]))) then // Only Check for standard tags in INI. Should always be there.
     exit;
 
   FColumnSetList.Clear;
