@@ -108,10 +108,10 @@ type
 
 procedure OsmMapInit(Browser: TEdgeBrowser;
                      const Lat, Lon, Desc, InitialZoom: string);
-procedure ShowImagesOnMap(Browser: TEdgeBrowser; APath, ETOuts: string; IncludeTrkLogs: boolean);
+procedure ShowImagesOnMap(Browser: TEdgeBrowser; APath, ETOuts, InitialZoom: string; IncludeTrkLogs: boolean);
 procedure MapGetLocation(Browser: TEdgeBrowser);
 function MapGoToPlace(Browser: TEdgeBrowser; Place, Bounds, Desc, InitialZoom: string): string;
-procedure ParseJsonMessage(const Message: string; var Msg, Parm1, Parm2: string);
+procedure ParseJsonMessage(const Message: string; var Msg, Parm1, Parm2, Parm3, Parm4: string);
 function GetCountryList: TStringList;
 function ValidLatLon(const Lat, Lon: string): boolean;
 procedure ParseLatLon(const LatLon: string; var Lat, Lon: string);
@@ -147,7 +147,6 @@ const
   Geo_City = 'GeoCity';
   CustomBaseLayers = 'CustomBaseLayers';
   Geo_Province = 'GeoProvince';
-  InitialZoom_Out = '16';
   InitialZoom_In = '20';
 
   OSMMapLayer: TMapLayer
@@ -763,7 +762,7 @@ begin
 
     // base layer changed event
     Html.Add('     map.events.register("changebaselayer", map, function(event) {');
-    Html.Add('       SendMessage("' + BaseLayer + '", event.layer.name, "");');
+    Html.Add('       SendMessage("' + BaseLayer + '", event.layer.name, "", "", "");');
     Html.Add('     });');
   end;
 
@@ -774,7 +773,7 @@ begin
   Html.Add('        func: function(e){');
   Html.Add('           if (e.ctrlKey) {');
   Html.Add('              var lonlat = map.getLonLatFromViewPortPx(e.xy).transform(po, op);');
-  Html.Add('              SendMessage("' + OSMCtrlClick + '", lonlat.lat, lonlat.lon);');
+  Html.Add('              SendMessage("' + OSMCtrlClick + '", lonlat.lat, lonlat.lon, "", "");');
   Html.Add('            }');
   Html.Add('        }');
   Html.Add('     });');
@@ -797,27 +796,27 @@ begin
   Html.Add('  function GetLocation(Func){');
   Html.Add('     var bounds = map.getExtent();');
   Html.Add('     var lonlat = bounds.getCenterLonLat().transform(po, op);');
-  Html.Add('     SendMessage(Func, lonlat.lat, lonlat.lon);');
+  Html.Add('     SendMessage(Func, lonlat.lat, lonlat.lon, "", "");');
   Html.Add('  }');
 
   Html.Add('  function GetBounds(Func){');
   Html.Add('     var bounds = map.getExtent();');
   Html.Add('     bounds.transform(po, op);');
   Html.Add('     var lonlat = bounds.getCenterLonLat();');
-  Html.Add('     SendMessage(Func, bounds.toBBOX(' + IntToStr(Place_Decimals) + ', true), lonlat.lat + ", " + lonlat.lon);');
+  Html.Add('     SendMessage(Func, map.getZoom(), bounds.toBBOX(' + IntToStr(Place_Decimals) + ', true), lonlat.lat, lonlat.lon);');
   Html.Add('  }');
 
   Html.Add('  function CreateExtent(ZoomLevel){');
   Html.Add('     allpoints = allpoints.concat(imagepoints);');  // allpoints contains all the track points, add the image points
   Html.Add('     var line_string = new OpenLayers.Geometry.LineString(allpoints);');
-  Html.Add('     allpoints = new Array();'); // Remove from memory
   Html.Add('     var bounds = new OpenLayers.Bounds();');
   Html.Add('     line_string.calculateBounds();');
   Html.Add('     bounds.extend(line_string.bounds);');
   Html.Add('     map.zoomToExtent(bounds);');
-  Html.Add('     if (map.getZoom() > ZoomLevel){');
+  Html.Add('     if (allpoints.length < 2){');
   Html.Add('       map.zoomTo(ZoomLevel);');
   Html.Add('     }');
+  Html.Add('     allpoints = new Array();'); // Remove from memory
   Html.Add('  }');
 
   // OpenLayers uses LonLat, not LatLon. Confusing maybe,
@@ -833,9 +832,9 @@ begin
   Html.Add('     trackpoints.push(new OpenLayers.Geometry.Point(lonlat.lon, lonlat.lat));');
   Html.Add('  }');
 
-  Html.Add('  function SendMessage(msg, parm1, parm2){');
+  Html.Add('  function SendMessage(msg, parm1, parm2, parm3, parm4){');
   Html.Add('     if (window && window.chrome)');
-  Html.Add('        window.chrome.webview.postMessage({ msg: msg, parm1: parm1, parm2: parm2});');
+  Html.Add('        window.chrome.webview.postMessage({ msg: msg, parm1: parm1, parm2: parm2, parm3: parm3, parm4: parm4});');
   Html.Add('  }');
 
   Html.Add('  function CreatePopups(){');
@@ -1043,6 +1042,7 @@ begin
   result := true;
   try
     try
+      RESTRequest.Client.UserAgent := UserAgent;
       RESTRequest.Execute;
       LastQuery := Now;
       if (RESTRequest.Response.StatusCode >= 400) then
@@ -1070,13 +1070,13 @@ begin
 end;
 
 // ==============================================================================
-procedure ShowImagesOnMap(Browser: TEdgeBrowser; APath, ETOuts: string; IncludeTrkLogs: boolean);
+procedure ShowImagesOnMap(Browser: TEdgeBrowser; APath, ETOuts, InitialZoom: string; IncludeTrkLogs: boolean);
 var
   OsmHelper: TOSMHelper;
   ETout, Lat, Lon, MIMEType, Filename, LastCoord: string;
   FirstGpx, IsQuickTime, HasPoints: boolean;
 begin
-  OsmHelper := TOSMHelper.Create(GetHtmlTmp, InitialZoom_Out);
+  OsmHelper := TOSMHelper.Create(GetHtmlTmp, InitialZoom);
   try
     OsmHelper.Scaled := Browser.ScaleValue(100);
     OsmHelper.WriteHeader;
@@ -1778,7 +1778,7 @@ begin
   OsmMapInit(Browser, Lat, Lon, Desc, InitialZoom);
 end;
 
-procedure ParseJsonMessage(const Message: string; var Msg, Parm1, Parm2: string);
+procedure ParseJsonMessage(const Message: string; var Msg, Parm1, Parm2, Parm3, Parm4: string);
 var
   JSONValue: TJSONValue;
 begin
@@ -1787,6 +1787,8 @@ begin
     Msg := JSONValue.GetValue<string>('msg');
     Parm1 := JSONValue.GetValue<string>('parm1');
     Parm2 := JSONValue.GetValue<string>('parm2');
+    Parm3 := JSONValue.GetValue<string>('parm3');
+    Parm4 := JSONValue.GetValue<string>('parm4');
   finally
     JSONValue.Free;
   end;

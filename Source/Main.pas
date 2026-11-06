@@ -426,6 +426,7 @@ type
     ETBarSeriesFnum: TBarSeries;
     ETBarSeriesIso: TBarSeries;
     BreadcrumbBar: TDirBreadcrumbBar;
+    FMapZoom: string;
     EdgeZoom: double;
     MinFileListWidth: integer;
     MenusEnabled: boolean;
@@ -1337,7 +1338,7 @@ procedure TFMain.EditMapFindKeyDown(Sender: TObject; var Key: Word; Shift: TShif
 begin
   if (Key = VK_Return) and
      (EditMapFind.Text <> '') then
-    EditMapFind.Text := MapGotoPlace(EdgeBrowser1, EditMapFind.Text, EditMapBounds.Text, '', InitialZoom_Out);
+    EditMapFind.Text := MapGotoPlace(EdgeBrowser1, EditMapFind.Text, EditMapBounds.Text, '', GUIsettings.DefGMapZoom);
 end;
 
 procedure TFMain.EditMapFindKeyPress(Sender: TObject; var Key: Char);
@@ -2659,7 +2660,7 @@ begin
   begin
     try
       ParseLatLon(GUIsettings.DefGMapHome, Lat, Lon);
-      OSMMapInit(EdgeBrowser1, Lat, Lon, OSMHome, InitialZoom_Out);
+      OSMMapInit(EdgeBrowser1, Lat, Lon, OSMHome, GUIsettings.DefGMapZoom);
     except
       on E:Exception do
         MessageDlgEx(E.Message, StrErrorPositioningHo, TMsgDlgType.mtWarning, [TMsgDlgBtn.mbOK]);
@@ -2714,16 +2715,17 @@ end;
 procedure TFMain.EdgeBrowser1WebMessageReceived(Sender: TCustomEdgeBrowser; Args: TWebMessageReceivedEventArgs);
 var
   Message: PChar;
-  Msg, Parm1, Parm2, Lat, Lon: string;
+  Msg, Parm1, Parm2, Parm3, Parm4, Lat, Lon: string;
 begin
   Args.ArgsInterface.Get_webMessageAsJson(Message);
-  ParseJsonMessage(Message, Msg, Parm1, Parm2);
+  ParseJsonMessage(Message, Msg, Parm1, Parm2, Parm3, Parm4);
 
   if (Msg = OSMGetBounds) then
   begin
-    EditMapBounds.Text := Parm1;
-
-    ParseLatLon(Parm2, Lat, Lon);
+    FMapZoom := Parm1;
+    EditMapBounds.Text := Format('%s (%s)', [Parm2, Parm1]);
+    Lat := Parm3;
+    Lon := Parm4;
     AdjustLatLon(Lat, Lon, Coord_Decimals);
     EditMapFind.Text := Lat + ', ' + Lon;
 
@@ -2748,7 +2750,7 @@ begin
 
   if (Msg = OSMGetLocation) then
   begin
-    MapGotoPlace(EdgeBrowser1, EditMapFind.Text, '', OSMGetLocation, InitialZoom_Out);
+    MapGotoPlace(EdgeBrowser1, EditMapFind.Text, '', OSMGetLocation, GUIsettings.DefGMapZoom);
 
     exit;
   end;
@@ -3970,7 +3972,7 @@ begin
      (GUIsettings.DetailsSel = Det_LocationId) and
      (AdvPageMetadata.ActivePage = AdvTabOSMMap) and
      (ShellList.SelectedFolder <> nil) then
-    ShowImagesOnMap(EdgeBrowser1, ShellList.Path, GetGpsCoordinates(GetSelectedFiles), false);
+    ShowImagesOnMap(EdgeBrowser1, ShellList.Path, GetGpsCoordinates(GetSelectedFiles), GUIsettings.DefGMapZoom, false);
 
   if (ShellList.IncludeSubFolders) then
     ShellTree.SyncShellTreeFromShellList;
@@ -5143,18 +5145,19 @@ end;
 procedure TFMain.SpeedBtn_MapHomeClick(Sender: TObject);
 begin
   System.SysUtils.DeleteFile(GetTrackTmp);
-  MapGotoPlace(EdgeBrowser1, GUIsettings.DefGMapHome, '', OSMHome, InitialZoom_Out);
+  MapGotoPlace(EdgeBrowser1, GUIsettings.DefGMapHome, '', OSMHome, GUIsettings.DefGMapZoom);
 end;
 
 procedure TFMain.SpeedBtn_MapSetHomeClick(Sender: TObject);
 begin
   GUIsettings.DefGMapHome := EditMapFind.Text;
+  GUIsettings.DefGMapZoom := FMapZoom;
 end;
 
 procedure TFMain.SpeedBtn_ShowOnMapClick(Sender: TObject);
 begin
   if ShellList.SelectedFolder <> nil then
-    ShowImagesOnMap(EdgeBrowser1, ShellList.Path, GetGpsCoordinates(GetSelectedFiles), true)
+    ShowImagesOnMap(EdgeBrowser1, ShellList.Path, GetGpsCoordinates(GetSelectedFiles), GUIsettings.DefGMapZoom, true)
   else
     ShowMessage(StrNoFilesSelected);
 end;

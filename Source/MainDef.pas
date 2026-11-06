@@ -109,7 +109,8 @@ type
     EditLine: boolean;
     DblClickUpdTags: boolean;
     EnableGMap: boolean;
-    DefGMapHome: string[23];
+    DefGMapHome: string;
+    DefGMapZoom: string;
     GuiStyle: string;
     ETdirDefCmd: integer;
     ETdirMode: integer;
@@ -904,6 +905,7 @@ begin
         DefGMapHome := ReadString(Ini_Settings, 'DefGMapHome', '46.55738,15.64608');
         if (pos('.', DefGMapHome) = 0) or (pos(',', DefGMapHome) = 0) then
           DefGMapHome := '46.55738,15.64608';
+        DefGMapZoom := ReadString(Ini_Settings, 'DefGMapZoom', '15');
         GuiStyle := ReadString(Ini_Settings, 'GUIStyle', 'Silver');
 
         DetailsSel := 0;  // Will be read in UnitColumnDefs
@@ -1135,6 +1137,7 @@ begin
 
           WriteBool(Ini_Settings, 'EnableGMap', EnableGMap);
           WriteString(Ini_Settings, 'DefGMapHome', DefGMapHome);
+          WriteString(Ini_Settings, 'DefGMapZoom', DefGMapZoom);
           WriteString(Ini_Settings, 'GUIStyle', GuiStyle);
 
           WriteBool(Ini_Settings, 'UseExitDetails', UseExitDetails);
