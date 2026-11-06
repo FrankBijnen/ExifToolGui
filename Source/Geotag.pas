@@ -121,7 +121,7 @@ begin
   if (CreateTrkPoints(LogPath, true, LastCoord) > 0) then
   begin
     Fmain.AdvPageMetadata.ActivePage := FMain.AdvTabOSMMap;
-    MapGotoPlace(FMain.EdgeBrowser1, LastCoord, '', '', InitialZoom_Out);
+    MapGotoPlace(FMain.EdgeBrowser1, LastCoord, '', '', GUIsettings.DefGMapZoom);
   end;
 end;
 
