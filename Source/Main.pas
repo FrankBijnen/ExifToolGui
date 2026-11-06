@@ -3969,6 +3969,7 @@ begin
   EnableMenuItems;
 
   if (GUIsettings.EnableGMap) and
+     (ShellList.ViewStyle = vsReport) and
      (GUIsettings.DetailsSel = Det_LocationId) and
      (AdvPageMetadata.ActivePage = AdvTabOSMMap) and
      (ShellList.SelectedFolder <> nil) then
