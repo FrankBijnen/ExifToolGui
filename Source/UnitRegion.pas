@@ -231,10 +231,7 @@ begin
     else
       ETOuts.Delete(6);
 
-//TODO: SubjectArea and RegionType=Focus should show the same rectangle.
-//      Decide if both should be shown
-    if //not ContainsText(ETouts[7], 'Focus') and     // RegionType
-       (ETouts[14] <> '-') and                      // SubjectArea
+    if (ETouts[14] <> '-') and                      // SubjectArea
        (result.FDimW > 0) and
        (result.FDimH > 0) then
     begin

@@ -489,7 +489,7 @@ object FMain: TFMain
     Top = 25
     Width = 320
     Height = 509
-    ActivePage = AdvTabOSMMap
+    ActivePage = AdvTabMetadata
     Align = alRight
     DoubleBuffered = True
     ParentDoubleBuffered = False
@@ -1362,7 +1362,6 @@ object FMain: TFMain
     Font.Name = 'Segoe UI'
     Font.Style = []
     Spacing = 0
-
   end
   object OpenPictureDlg: TOpenPictureDialog
     Filter = 

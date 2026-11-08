@@ -540,6 +540,9 @@ begin
      (not GUIini.ValueExists(TagList, MarkedTags)) then
     exit(0);
   MarkedTagList := ReplaceLastChar(GUIini.ReadString(TagList, MarkedTags, '<'), '<', ' ');
+  if (MarkedTagList <> ' ') and
+     (MarkedTagList[1] <> '-') then
+    MarkedTagList := ' ';
   result := Length(MarkedTagList);
 end;
 
@@ -1484,7 +1487,7 @@ end;
 procedure UpdateQuickTagsLists;
 var
   Tag: string;
-  Index: integer;
+  P, Index: integer;
 begin
   QuickGroupTagNames.Clear;
   QuickTagNames.Clear;
@@ -1494,7 +1497,8 @@ begin
       continue;
 
     Tag := Copy(QuickTags[Index].Command, 2);
-    if (Pos(':', Tag) > 0) then
+    P := Pos(':', Tag);
+    if (P > 0) then
       QuickGroupTagNames.Add(Tag)
     else
       QuickTagNames.Add(Tag);
