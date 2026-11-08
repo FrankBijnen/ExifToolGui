@@ -171,6 +171,9 @@ procedure LoadResourceList(Resource: string; List: TStringList);
 // Process message Queue. (No need for Vcl.Forms)
 procedure ProcessMessages;
 
+// Translated Tags to Short
+function TranslateTagName(xMeta, xFile, xName: string): string;
+
 // Running elevated or admin?
 var
   FloatFormatSettings: TFormatSettings; // for StrToFloatDef -see Initialization
@@ -183,6 +186,7 @@ implementation
 uses
   Winapi.ShellAPI, Winapi.KnownFolders, System.Win.Registry, System.UITypes, System.Types, System.DateUtils,
   Vcl.Consts,
+  Xml.VerySimple, // XML parsing
   MainDef, ExifTool, ExifInfo, UnitLangResources, UFrmDiff,
   ExifToolsGui_AutoComplete;
 
@@ -1674,7 +1678,7 @@ begin
      (Pos('-', Tag) = 1) then
      Delete(result, 1, 1);
 
-  result := ReplaceAll(result, [' ', '<', '='], ['', '', '']);
+  result := ReplaceAll(result, [' ', '<', '=', '%'], ['', '', '', '']);
 
   if result <> Tag then
     MessageDlgEx(Format(StrInvalidCharsRemoved, [Tag]), '', TMsgDlgType.mtError, [TMsgDlgBtn.mbOK]);
@@ -2297,6 +2301,72 @@ begin
   begin
     TranslateMessage(pmMsg);
     DispatchMessage(pmMsg);
+  end;
+end;
+
+function FindSubNodeValue(ANode: TXmlNode; SubName: string): string;
+var
+  SubNode: TXmlNode;
+begin
+  Result := '';
+  SubNode := ANode.Find(SubName);
+  if (SubNode <> nil) then
+  begin
+    Result := SubNode.NodeValue;
+    if (Result = '') and
+       (SubNode.HasChildNodes) and
+       (SubNode.FirstChild.NodeType = TXmlNodeType.ntCData) then
+      Result := SubNode.FirstChild.NodeValue;
+  end;
+end;
+
+procedure LoadXmlFromString(const Xml: TXmlVerySimple; const AString: string);
+var
+  TmpStream: TStringStream;
+begin
+  TmpStream := TStringStream.Create(AString, TEncoding.UTF8); // utf-8 is default for TXmlVerySimple
+  try
+    TmpStream.Position := 0;
+    Xml.LoadFromStream(TmpStream);
+  finally
+    TmpStream.Free;
+  end;
+end;
+
+function TranslateTagName(xMeta, xFile, xName: string): string;
+var
+  ETouts, ETErrs: string;
+  Xml: TXmlVerySimple;
+  RDFDescNodes: TXmlNode;
+  RDFDescNode: TXmlNode;
+const
+  RDFDESC = 'rdf:Description';
+  RDF = 'rdf:RDF';
+begin
+  result := xName;
+  if (ET.Options.ETLangDef <> '') then
+  begin
+    ET.OpenExec('-X' + CRLF + '-l' + CRLF + xMeta + 'All', xFile, ETouts, ETErrs);
+    Xml := TXmlVerySimple.Create;
+    try
+      LoadXmlFromString(Xml, ETouts);
+      RDFDescNodes := Xml.ChildNodes.Find(RDF);
+      if (RDFDescNodes = nil) then
+        exit;
+      RDFDescNodes := RDFDescNodes.Find(RDFDESC);
+      if (RDFDescNodes = nil) then
+        exit;
+      for RDFDescNode in RDFDescNodes.ChildNodes do
+      begin
+        if (FindSubNodeValue(RDFDescNode, 'et:desc') <> xName) then
+          continue;
+        result := RDFDescNode.Name;
+        Delete(result, 1, Pos(':', result)); // Remove group 1 name
+        break;
+      end;
+    finally
+      Xml.Free;
+    end;
   end;
 end;
 

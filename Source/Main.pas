@@ -443,6 +443,7 @@ type
     procedure SetCaption(AnItem: string = '');
     procedure AutoIncLine(const LineNum: integer; const Advance: boolean = true);
     procedure MarkLineModified(const LineNum: integer);
+    procedure SetupWSEditing(ARow: integer);
     procedure InstallAutoComp;
     procedure SetupWSAutoComp(ARow: integer);
     function ActiveAutoComp(ARow: integer): PAutoCompRec;
@@ -467,7 +468,6 @@ type
     procedure CMActivateWindow(var Message: TMessage); message CM_ActivateWindow;
     procedure CMMaximizeWindow(var Message: TMessage); message CM_MaximizeWindow;
     procedure WMEndSession(var Msg: TWMEndSession); message WM_ENDSESSION;
-    function TranslateTagName(xMeta, xName: string): string;
     procedure GetGroupNames(ARow: integer; var Group0: string; var Group1: string);
     function GetTagCmd: string;
 
@@ -832,6 +832,18 @@ begin
     VK_RETURN:
       SelectPrevNext(true);
   end;
+end;
+
+procedure TFMain.SetupWSEditing(ARow: integer);
+var
+  Opt: TGridOptions;
+begin
+  Opt := MetadataList.Options;
+  if (QuickTags[ARow].NoEdit) then
+    Exclude(Opt, goEditing)
+  else
+    Include(Opt, goEditing);
+  MetadataList.Options := Opt;
 end;
 
 procedure TFMain.SetupWSAutoComp(ARow: integer);
@@ -1516,11 +1528,12 @@ begin
       end
       else
       begin
-        Delete(KeyTx, 1, Pos(' ', KeyTx)); // -in case of Show HexID prefix
+        if MaShowHexID.Checked then
+          Delete(KeyTx, 1, Pos(' ', KeyTx)); // -in case of Show HexID prefix
         GetGroupNames(ARow, Group0, Group1);
 
         TxtColor := clWindowText;
-        if Pos(KeyTx + ' ', MarkedTagList) > 0 then
+        if Pos('-' + KeyTx + ' ', MarkedTagList) > 0 then
           TxtColor := $0000FF; // tag is marked
 
         if (TagInWorkSpace(Group0, Group1, KeyTx)) then
@@ -1687,22 +1700,25 @@ begin
   MemoQuick.Text := '';
   if (ARow - 1 > High(QuickTags)) then
     exit;
-
-  if SpeedBtnQuick.Down and
-     not(QuickTags[ARow - 1].NoEdit) then
+  if SpeedBtnQuick.Down then
   begin
-    SetupWSAutoComp(ARow - 1);
+    SetupWSEditing(ARow - 1);
 
-    if RightStr(TValueListEditor(Sender).Keys[ARow], 1) = #177 then
-      EditText := '+'
-    else
-      EditText := TValueListEditor(Sender).Cells[1, ARow];
-    if SpeedBtnLarge.Down then
-      MemoQuick.Text := EditText
-    else
-      EditQuick.Text := EditText;
+    if (QuickTags[ARow -1].NoEdit = false) then
+    begin
+      SetupWSAutoComp(ARow - 1);
 
-    StatusBar.Panels[2].Text := QuickTags[ARow - 1].Help;
+      if RightStr(TValueListEditor(Sender).Keys[ARow], 1) = #177 then
+        EditText := '+'
+      else
+        EditText := TValueListEditor(Sender).Cells[1, ARow];
+      if SpeedBtnLarge.Down then
+        MemoQuick.Text := EditText
+      else
+        EditQuick.Text := EditText;
+
+      StatusBar.Panels[2].Text := QuickTags[ARow - 1].Help;
+    end;
   end;
 end;
 
@@ -2199,39 +2215,6 @@ begin
   ShellList.SetFocus;
 end;
 
-function TFMain.TranslateTagName(xMeta, xName: string): string;
-var
-  Indx: integer; // xMeta~'-Exif:' or '-IFD0:' or ...
-  ETout: TStringList;
-begin
-  ETout := TStringList.Create;
-  try
-    if ET.Options.ETLangDef <> '' then
-    begin
-      ET.OpenExec('-X' + CRLF + '-l' + CRLF + xMeta + 'All', GetSelectedFile(ShellList.RelFileName), ETout);
-      Indx := ETout.Count;
-      while Indx > 1 do
-      begin
-        dec(Indx);
-        if pos('desc>' + xName + '</et:', ETout[Indx]) > 0 then
-          break;
-      end;
-      dec(Indx);
-      if Indx >= 0 then
-      begin
-        xName := ETout[Indx];
-        Indx := pos(':', xName);
-        Delete(xName, 1, Indx);
-        Indx := pos(' ', xName);
-        SetLength(xName, Indx - 1);
-      end;
-    end;
-    result := xName;
-  finally
-    ETout.Free;
-  end;
-end;
-
 procedure TFMain.GetGroupNames(ARow: integer; var Group0: string; var Group1: string);
 var
   GroupNr: integer;
@@ -2261,7 +2244,8 @@ begin
     Exit(QuickTags[Index -1].Command);
 
   result := MetadataList.Keys[Index];
-  Delete(result, 1, Pos(' ', result)); // -in case of Show HexID prefix
+  if MaShowHexID.Checked then
+    Delete(result, 1, Pos(' ', result)); // -in case of Show HexID prefix
 
   if LeftStr(result, 2) = '- ' then
     Delete(result, 1, 2);
@@ -2280,7 +2264,7 @@ begin
   else
     GroupName := Format('-%s:', [Group0]);
 
-  result := Format('%s%s', [GroupName, TranslateTagName(GroupName, result)]);
+  result := RemoveInvalidTags(Format('%s%s', [GroupName, TranslateTagName(GroupName, ShellList.RelFileName, result)]), true);
 end;
 
 procedure TFMain.RestoreGUI;
@@ -2468,28 +2452,20 @@ end;
 
 procedure TFMain.QuickPopUp_MarkTagClick(Sender: TObject);
 var
-  I, J: integer;
+  Index: integer;
   Tx: string;
 begin
-  with MetadataList do
-    Tx := Keys[Row];
-  I := pos(' ', Tx);
-  if I > 0 then
-    Delete(Tx, 1, I); // if Show HexID exist
-  if Length(Tx) > 0 then
-  begin
-    I := pos(Tx, MarkedTagList);
-    if I > 0 then
-    begin // tag allready marked: unmark it
-      J := I;
-      repeat
-        inc(J);
-      until MarkedTagList[J] = ' ';
-      Delete(MarkedTagList, I, J - I + 1);
-    end
-    else
-      MarkedTagList := MarkedTagList + Tx + ' '; // mark tag
-  end;
+  Tx := MetadataList.Keys[MetadataList.Row];
+  if MaShowHexID.Checked then
+    Delete(Tx, 1, Pos(' ', Tx)); // -in case of Show HexID prefix
+  if (Length(Tx) = 0) then
+    exit;
+
+  Index := Pos('-' + Tx + ' ', MarkedTagList);
+  if (Index > 0) then
+    Delete(MarkedTagList, Index, Length(Tx) + 2) // Unmark tag
+  else
+    MarkedTagList := MarkedTagList + '-' + Tx + ' '; // Mark tag
 end;
 
 procedure TFMain.QuickPopUp_UndoEditClick(Sender: TObject);
@@ -4736,7 +4712,7 @@ procedure TFMain.ShowMetadata;
 var
   E, N: integer;
   CurrentGroup: integer;
-  ETcmd, Item, Value, Tx: string;
+  ETcmd, Item, Value, ETValue, Tx: string;
   ETResult: TStringList;
   NoChars:  TSysCharSet;
 {$IFDEF DEBUG_META}
@@ -4796,21 +4772,22 @@ begin
             Tx := QuickTags[E].Caption + '=' + THashSHA2.GetHashStringFromFile(ShellList.FilePath)
           else
           begin
+            ETValue := ETResult[E];
             Tx := QuickTags[E].Caption;
             if (EndsText('?', Tx)) then
             begin
               NoChars := ['-'];
               if (EndsText('??', Tx)) then    // '0', also means NO
                 Include(NoChars, '0');
-              if (Length(ETResult[E]) = 0) or // Because of -f this should never happen.
-                 ((Length(ETResult[E]) = 1) and
-                  (CharInSet(ETResult[E][1], NoChars))) then
+              if (Length(ETValue) = 0) or // Because of -f this should never happen.
+                 ((Length(ETValue) = 1) and
+                  (CharInSet(ETValue[1], NoChars))) then
                 Tx := Tx + '=' + StrNOAst
               else
                 Tx := Tx + '=' + StrYESAst;
             end
             else
-              Tx := QuickTags[E].Caption + '=' + ETResult[E];
+              Tx := Tx + '=' + ETValue;
           end;
           MetadataList.Strings[E] := Tx;
           if (QuickTags[E].NoEdit) then
