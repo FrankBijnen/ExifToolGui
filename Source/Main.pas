@@ -427,6 +427,7 @@ type
     ETBarSeriesIso: TBarSeries;
     BreadcrumbBar: TDirBreadcrumbBar;
     FMapZoom: string;
+    FMapBounds: string;
     EdgeZoom: double;
     MinFileListWidth: integer;
     MenusEnabled: boolean;
@@ -826,11 +827,11 @@ procedure TFMain.EditFilterFilesKeyDown(Sender: TObject; var Key: Word;
   Shift: TShiftState);
 begin
   case Key of
-    VK_UP, VK_DOWN:
-      if (ssCtrl in Shift) then
-        SelectPrevNext(Key = VK_DOWN);
     VK_RETURN:
-      SelectPrevNext(true);
+      begin
+        SelectPrevNext(true);
+        Key := 0;
+      end;
   end;
 end;
 
@@ -839,9 +840,9 @@ var
   Opt: TGridOptions;
 begin
   Opt := MetadataList.Options;
-  if (QuickTags[ARow].NoEdit) then
-    Exclude(Opt, goEditing)
-  else
+  Exclude(Opt, goEditing);
+  if (GUIsettings.EditLine) and
+     (QuickTags[ARow].NoEdit = false) then
     Include(Opt, goEditing);
   MetadataList.Options := Opt;
 end;
@@ -1350,7 +1351,7 @@ procedure TFMain.EditMapFindKeyDown(Sender: TObject; var Key: Word; Shift: TShif
 begin
   if (Key = VK_Return) and
      (EditMapFind.Text <> '') then
-    EditMapFind.Text := MapGotoPlace(EdgeBrowser1, EditMapFind.Text, EditMapBounds.Text, '', GUIsettings.DefGMapZoom);
+    EditMapFind.Text := MapGotoPlace(EdgeBrowser1, EditMapFind.Text, FMapBounds, '', GUIsettings.DefGMapZoom);
 end;
 
 procedure TFMain.EditMapFindKeyPress(Sender: TObject; var Key: Char);
@@ -2691,7 +2692,7 @@ end;
 procedure TFMain.EdgeBrowser1WebMessageReceived(Sender: TCustomEdgeBrowser; Args: TWebMessageReceivedEventArgs);
 var
   Message: PChar;
-  Msg, Parm1, Parm2, Parm3, Parm4, Lat, Lon: string;
+  Msg, Parm1, Parm2, Parm3, Parm4: string;
 begin
   Args.ArgsInterface.Get_webMessageAsJson(Message);
   ParseJsonMessage(Message, Msg, Parm1, Parm2, Parm3, Parm4);
@@ -2699,11 +2700,10 @@ begin
   if (Msg = OSMGetBounds) then
   begin
     FMapZoom := Parm1;
-    EditMapBounds.Text := Format('%s (%s)', [Parm2, Parm1]);
-    Lat := Parm3;
-    Lon := Parm4;
-    AdjustLatLon(Lat, Lon, Coord_Decimals);
-    EditMapFind.Text := Lat + ', ' + Lon;
+    FMapBounds := Parm2;
+    EditMapBounds.Text := Format('%s (%s)', [FMapBounds, FMapZoom]);
+    AdjustLatLon(Parm3, Parm4, Coord_Decimals);
+    EditMapFind.Text := Parm3 + ', ' + Parm4;
 
     exit;
   end;
@@ -3515,12 +3515,6 @@ begin
           MaximizeState := false;
           Key := 0;
         end;
-      VK_UP, VK_DOWN:
-        if (ssCTRL in Shift) then
-        begin
-          SelectPrevNext(Key = VK_DOWN);
-          Key := 0;
-        end;
     end;
   end;
 
@@ -3536,6 +3530,14 @@ begin
   if (ssCTRL in Shift) then
   begin
     case Key of
+  // Select prev, next file
+      VK_UP, VK_DOWN:
+      begin
+        SelectPrevNext(Key = VK_DOWN);
+        Key := 0;
+      end;
+
+  // CTRL Key handlers for setting focus
       Ord('A'):
       begin
         ShellListKeyDown(Sender, Key, Shift);
@@ -4196,9 +4198,6 @@ begin
     Ord('0'),
     VK_NUMPAD0:
       ShellList.SetIconSpacing(0, 0);
-    VK_UP,
-    VK_DOWN:
-      Key := 0; // Dont want focus rectangle drawn. See Key up
 {$IFDEF NOTYET}
     VK_DELETE:
       DeleteSelected;
@@ -4213,16 +4212,6 @@ procedure TFMain.ShellListKeyUp(Sender: TObject; var Key: Word; Shift: TShiftSta
 begin
   if ShellList.IsEditing then
     exit;
-
-  if (ssCtrl in Shift) then
-  begin
-    case Key of
-      VK_UP,
-      VK_DOWN:
-        SelectPrevNext(Key= VK_DOWN);
-    end;
-    exit;
-  end;
 
   case Key of
     VK_HOME,
