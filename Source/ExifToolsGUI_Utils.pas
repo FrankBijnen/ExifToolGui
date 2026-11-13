@@ -48,9 +48,10 @@ function UserAgent: string;
 // FileSystem
 function GetIShellFolder(IFolder: IShellFolder; PIDL: PItemIDList): IShellFolder;
 function GetPidlFromName(const Name: string): PItemIDList;
-function ValidFolder(ADir: string): boolean;
+function ValidFolderName(ADir: string): boolean;
+function ValidFolder(ADir: string): boolean;  overload;
+function ValidFolder(AFolder: TShellFolder): boolean; overload;
 function ValidFile(AFolder: TShellFolder): boolean;
-function HasDirAttribute(ADir: string): boolean;
 function GetINIPath(AllowCreate: boolean = false): string;
 function GetAppPath: string;
 function GetGeoPath: string;
@@ -332,8 +333,8 @@ begin
     IFolder.BindToObject(PIDL, nil, IID_IShellFolder, Pointer(Result));
 end;
 
-// Can we use ADir as Path for the ShellTree?
-function ValidFolder(ADir: string): boolean;
+// Can we use ADir as a valid Pathname for the ShellTree?
+function ValidFolderName(ADir: string): boolean;
 var
   AShell: IShellFolder;
   P: PWideChar;
@@ -348,6 +349,30 @@ begin
   CoTaskMemFree(PIDL);
 end;
 
+// Is it a real folder? EG: No Archive.
+// Check via FileAttributes
+function ValidFolder(ADir: string): boolean;
+var
+  Attrs: DWORD;
+begin
+  Attrs := GetFileAttributes(PChar(ADir));
+  result := ((Attrs and FILE_ATTRIBUTE_DIRECTORY) <> 0);
+end;
+
+// Check via ShellFolder
+function ValidFolder(AFolder: TShellFolder): boolean;
+var
+  Flags: LongWord;
+  PIDL: PItemIDList;
+begin
+  PIDL := AFolder.RelativeID;
+  Flags := SFGAO_FILESYSTEM;
+  AFolder.ParentShellFolder.GetAttributesOf(1, PIDL, Flags);
+  result := (SFGAO_FILESYSTEM and Flags <> 0) and
+            (SFGAO_FOLDER and Flags <> 0) and
+            (SFGAO_COMPRESSED and Flags = 0);
+end;
+
 function ValidFile(AFolder: TShellFolder): boolean;
 var
   Flags: LongWord;
@@ -357,14 +382,6 @@ begin
   Flags := SFGAO_FILESYSTEM;
   AFolder.ParentShellFolder.GetAttributesOf(1, PIDL, Flags);
   result := SFGAO_FILESYSTEM and Flags <> 0;
-end;
-
-function HasDirAttribute(ADir: string): boolean;
-var
-  Attrs: DWORD;
-begin
-  Attrs := GetFileAttributes(PChar(ADir));
-  result := ((Attrs and FILE_ATTRIBUTE_DIRECTORY) <> 0);
 end;
 
 function GetINIPath(AllowCreate: boolean = false): string;

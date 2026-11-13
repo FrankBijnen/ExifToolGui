@@ -336,9 +336,10 @@ end;
 // Safe version of IsFolder. (Prevent Access Violations)
 class function TSubShellFolder.GetIsFolder(Folder: TShellFolder): boolean;
 begin
-  result := true; // Assume a folder, if ParentShellFolder = nil
+  // Assume a folder
+  result := true;
   if (TSubShellFolder.HasParentShellFolder(Folder)) then
-    result := Folder.IsFolder;
+    result := ValidFolder(Folder);
 end;
 
 class function TSubShellFolder.GetName(Folder: TShellFolder;
@@ -389,8 +390,8 @@ begin
   result := TSubShellFolder.GetName(Folder, RelativeNameType);
 
   // Prepend (relative) directory name?
-  if (Folder.IsFolder = false) and    // Folders? Dont add RelativePath
-     (Folder is TSubShellFolder) then // The RelativePath needs a TSubShellFolder
+  if (Folder is TSubShellFolder) and                      // The RelativePath needs a TSubShellFolder
+     (TSubShellFolder.GetIsFolder(Folder) = false) then   // Folders? Dont add RelativePath
     result := TSubShellFolder(Folder).RelativePath + result;
 end;
 

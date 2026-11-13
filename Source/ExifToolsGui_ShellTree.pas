@@ -129,7 +129,7 @@ begin
 
   // Archives (TAR, ZIP TGZ etc.) may be reported as folders in TCustomShellTreeView.PopulateNode
   // Resulting in needlessly scanning large files
-  if (HasDirAttribute(NewShellFolder.PathName) = false) then
+  if (ValidFolder(NewShellFolder.PathName) = false) then
     NewNode.Delete // AFolder does not have Directory Attribute. Dont show in Treeview
   else
   begin
@@ -384,7 +384,7 @@ end;
 procedure TShellTreeView.SetPath(APath: string);
 begin
   if (TPath.IsUNCPath(APath)) and
-     (ValidFolder(Path)) then
+     (ValidFolderName(Path)) then
     Root := APath
   else
   begin
@@ -392,7 +392,7 @@ begin
       (Root <> FPreferredRoot) then
     Root := FPreferredRoot;
   end;
-  if (ValidFolder(APath)) then
+  if (ValidFolderName(APath)) then
     inherited Path := APath;
 end;
 
