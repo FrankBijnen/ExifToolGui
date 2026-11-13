@@ -3803,7 +3803,7 @@ begin
     ShellTree.Path := GUIsettings.InitialDir
   else
   begin
-    if HasDirAttribute(Param) then
+    if ValidFolder(Param) then
       ShellTree.Path := Param // directory only
     else
     begin // file specified
@@ -3877,7 +3877,6 @@ begin
       // MatchesMask can throw on [ for example
     end;
 
-    //TODO Filter on details?
     if (result = false) then
     begin
       if (AFolder.DetailStrings.Count = 0) then
