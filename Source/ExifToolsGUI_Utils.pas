@@ -51,7 +51,7 @@ function GetPidlFromName(const Name: string): PItemIDList;
 function ValidFolderName(ADir: string): boolean;
 function ValidFolder(ADir: string): boolean;  overload;
 function ValidFolder(AFolder: TShellFolder): boolean; overload;
-function ValidFile(AFolder: TShellFolder): boolean;
+function ValidFile(AFolder: TShellFolder; var IsFolder: boolean): boolean;
 function GetINIPath(AllowCreate: boolean = false): string;
 function GetAppPath: string;
 function GetGeoPath: string;
@@ -373,7 +373,7 @@ begin
             (SFGAO_COMPRESSED and Flags = 0);
 end;
 
-function ValidFile(AFolder: TShellFolder): boolean;
+function ValidFile(AFolder: TShellFolder; var IsFolder: boolean): boolean;
 var
   Flags: LongWord;
   PIDL: PItemIDList;
@@ -382,6 +382,11 @@ begin
   Flags := SFGAO_FILESYSTEM;
   AFolder.ParentShellFolder.GetAttributesOf(1, PIDL, Flags);
   result := SFGAO_FILESYSTEM and Flags <> 0;
+
+  IsFolder := (SFGAO_FILESYSTEM and Flags <> 0) and
+              (SFGAO_FOLDER and Flags <> 0) and
+              (SFGAO_COMPRESSED and Flags = 0);
+
 end;
 
 function GetINIPath(AllowCreate: boolean = false): string;

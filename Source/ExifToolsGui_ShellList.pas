@@ -124,8 +124,10 @@ type
     procedure DestroyWnd; override;
     procedure EnumColumns; override;
     procedure GetThumbNails; virtual;
+    procedure DblClick; override;
     procedure DoContextPopup(MousePos: TPoint; var Handled: boolean); override;
     procedure Edit(const Item: TLVItem); override;
+    procedure KeyDown(var Key: Word; Shift: TShiftState); override;
     procedure Populate; override;
     function OwnerDataFetch(Item: TListItem; Request: TItemRequest): boolean; override;
     function OwnerDataFind(Find: TItemFind; const FindString: string;
@@ -166,6 +168,7 @@ type
     procedure FileNamesToClipboard(Cut: boolean = false);
     procedure PasteFilesFromClipboard;
     procedure PopulateSubDirs(FRelativeFolder: TSubShellFolder);
+    procedure AddSubFolder(ASubFolder: TShellFolder; ShowFolder: boolean);
     procedure ExecuteCommandExif(Verb: string; var Handled: boolean);
     procedure CommandCompletedExif(Verb: String; Succeeded: Boolean);
     procedure ShellListOnGenerateReady(Sender: TObject);
@@ -203,10 +206,11 @@ type
 
 implementation
 
-uses System.Win.ComObj, System.UITypes, System.StrUtils, System.Math,
-     Vcl.ImgList,
-     ExifToolsGUI_Utils, ExifToolsGui_ThreadPool, ExifToolsGui_FileListColumns,
-     UnitFilesOnClipBoard, UnitLangResources, UFrmGenerate;
+uses
+  System.Win.ComObj, System.UITypes, System.StrUtils, System.Math,
+  Vcl.ImgList,
+  ExifToolsGUI_Utils, ExifToolsGui_ThreadPool, ExifToolsGui_FileListColumns,
+  UnitFilesOnClipBoard, UnitLangResources, UFrmGenerate;
 
 // res file contains the Hourglass
 
@@ -1043,7 +1047,24 @@ begin
         Result.AddObject(RelFileName(Index), Folders[Index]);
     end;
   end;
+end;
 
+procedure TShellListView.DblClick;
+var
+  APathName: string;
+begin
+  if (AutoNavigate) and
+     (ShellTreeView <> nil) and
+     (SelectedFolder <> nil) then
+  begin
+    APathName := SelectedFolder.PathName;
+    if (TSubShellFolder.GetIsFolder(SelectedFolder)) then
+      ShellTreeView.Path := APathName
+    else
+      SelectedFolder.ExecuteDefault;
+    exit;
+  end;
+  inherited DblClick;
 end;
 
 procedure TShellListView.DoContextPopup(MousePos: TPoint; var Handled: boolean);
@@ -1062,6 +1083,27 @@ begin
      Assigned(ShellTreeView.Selected) and
      TSubShellFolder.GetIsFolder(Folders[Item.iItem]) then
     ShellTreeView.Refresh(ShellTreeView.Selected);
+end;
+
+procedure TShellListView.KeyDown(var Key: Word; Shift: TShiftState);
+begin
+  if (AutoNavigate) and
+     ((ssAlt in Shift) = false) then
+  begin
+    case Key of
+      VK_RETURN:
+        begin
+          if (Assigned(ShellTreeView)) and
+             TSubShellFolder.GetIsFolder(SelectedFolder) then
+            ShellTreeView.Path :=  SelectedFolder.PathName
+          else
+            SelectedFolder.ExecuteDefault;
+           exit;
+        end;
+    end;
+  end;
+
+  inherited;
 end;
 
 procedure TShellListView.PopulateSubDirs(FRelativeFolder: TSubShellFolder);
@@ -1113,6 +1155,14 @@ begin
     else
       NewRelativeFolder.Free;
   end;
+end;
+
+procedure TShellListView.AddSubFolder(ASubFolder: TShellFolder; ShowFolder: boolean);
+begin
+  if (ShowFolder) then
+    FoldersList.Add(ASubFolder)
+  else
+    FHiddenFolders.Add(ASubFolder);
 end;
 
 procedure TShellListView.Populate;

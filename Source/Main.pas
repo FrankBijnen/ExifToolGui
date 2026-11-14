@@ -3867,7 +3867,7 @@ begin
 
   if (Filter <> '') then
   begin
-    if (AFolder.IsFolder) then
+    if (TSubShellFolder.GetIsFolder(AFolder)) then
       exit(false);
 
     result := ContainsText(FolderName, Filter);
@@ -3894,21 +3894,26 @@ end;
 
 procedure TFMain.ShellListAddItem(Sender: TObject; AFolder: TShellFolder; var CanAdd: boolean);
 var
+  IsFolder: boolean;
   FolderName: string;
   FilterItem, Filter: string;
   FilterMatches: boolean;
   CopyFolder: TSubShellFolder;
 begin
-  CanAdd := TShellListView(Sender).Enabled and not FrmStyle.Showing and ValidFile(AFolder);
+  CanAdd := TShellListView(Sender).Enabled and
+            not FrmStyle.Showing and
+            ValidFile(AFolder, IsFolder);
+
+  CanAdd := CanAdd and
+            (GUIsettings.ShowFolders or (IsFolder = false));
 
   if (TShellListView(Sender).IncludeSubFolders) and
-     (TSubShellFolder.GetIsFolder(AFolder)) then
+     (IsFolder) then
   begin
     CanAdd := false;
     CopyFolder := TSubShellFolder.Create(AFolder.Parent, AFolder.RelativeID, AFolder.ShellFolder);
     CopyFolder.FRelativePath := TSubShellFolder.GetRelativeFileName(AFolder);
-
-    TShellListView(Sender).FoldersList.Add(CopyFolder);
+    TShellListView(Sender).AddSubFolder(CopyFolder, GUIsettings.ShowFolders);
     TShellListView(Sender).PopulateSubDirs(CopyFolder);
     exit;
   end;
@@ -3918,7 +3923,7 @@ begin
   if (GUIsettings.FileFilter <> StrShowAllFiles) then
   begin
     Filter := GUIsettings.FileFilter;
-    FilterMatches := TSubShellFolder.GetIsFolder(AFolder);
+    FilterMatches := IsFolder;
     while (FilterMatches = false) and (Filter <> '') do
     begin
       FilterItem := NextField(Filter, ';');
@@ -4232,17 +4237,14 @@ var Value: TShellObjectTypes;
   begin
     result := ObjectTypes;
     if GUIsettings.CanShowHidden then
-      include(result, TShellObjectType.otHidden)
+      Include(result, TShellObjectType.otHidden)
     else
-      exclude(result, TShellObjectType.otHidden);
+      Exclude(result, TShellObjectType.otHidden);
   end;
 
 begin
   Value := AddHiddenIfAllowed(ShellList.ObjectTypes);
-  if (GUIsettings.ShowFolders) then
-    include(Value, TShellObjectType.otFolders)
-  else
-    exclude(Value, TShellObjectType.otFolders);
+  Include(Value, TShellObjectType.otFolders); // Allways need folders. Will be excluded in ShellListAddItem
   if (Value <> ShellList.ObjectTypes) then
     ShellList.ObjectTypes := Value;
 
