@@ -108,10 +108,7 @@ begin
 {$IFNDEF DEBUG}
       AnItem.SubItems[2] := GetLatestVersion(TETGuiProduct(Indx));
 {$ENDIF}
-      if (Pos(AnItem.SubItems[2], AnItem.SubItems[1]) = 1) then
-        AnItem.ImageIndex := 1
-      else
-        AnItem.ImageIndex := 0;
+      AnItem.ImageIndex := CompareVersions(AnItem.SubItems[1], AnItem.SubItems[2]);
     end;
   finally
     LvVersions.Items.EndUpdate;
