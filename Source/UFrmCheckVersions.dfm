@@ -68,8 +68,6 @@ object FrmCheckVersions: TFrmCheckVersions
     Height = 29
     Align = alBottom
     TabOrder = 0
-    ExplicitTop = 214
-    ExplicitWidth = 670
     object BtnClose: TBitBtn
       Left = 585
       Top = 2

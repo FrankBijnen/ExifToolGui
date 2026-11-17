@@ -3,13 +3,14 @@ unit ExifToolsGui_Versions;
 interface
 
 uses
-  System.Classes, System.SysUtils;
+  System.Classes, System.SysUtils, System.StrUtils;
 
 type
 
 TETGuiProduct = (etGUI = 0, etPH = 1, etOBetz = 2);
 
 function GetLatestVersion(ETGuiProduct: TETGuiProduct): string;
+function CompareVersions(Installed, Available: string): integer;
 
 implementation
 
@@ -91,5 +92,63 @@ begin
   result := ExecuteRest(ETGuiProduct, URL);
 end;
 
+procedure ParseVersion(const Version: string;
+                       out Major: integer;
+                       out Minor: integer;
+                       out SubMinor: integer);
+var
+  MajorVer, MinorVer, SubMinorVer: string;
+  P: integer;
+begin
+//For ET this is XX.YY
+//For GUI this VX.Y.ZZ.s (ss can be '0', '1 Pre')
+  SubMinorVer := Version;
+  MajorVer := NextField(SubMinorVer, '.');
+  MajorVer := ReplaceAll(MajorVer, ['V'], ['']);
+
+  MinorVer := NextField(SubMinorVer, '.');
+
+  P := Pos('.', SubMinorVer);
+  if (P > 0) then
+    SubMinorVer := LeftStr(SubMinorVer, P -1);
+
+  Major := StrToIntDef(MajorVer, 0);
+  Minor := StrToIntDef(MinorVer, 0);
+  SubMinor := StrToIntDef(SubMinorVer, 0);
+end;
+
+// Returns the ImageIndex. 0=NOK or 1=OK
+function CompareVersions(Installed, Available: string): integer;
+var
+  MajorInstalled, MinorInstalled, SubMinorInstalled: integer;
+  MajorAvailable, MinorAvailable, SubMinorAvailable: integer;
+begin
+  ParseVersion(Installed, MajorInstalled, MinorInstalled, SubMinorInstalled);
+  ParseVersion(Available, MajorAvailable, MinorAvailable, SubMinorAvailable);
+
+  // No version available?
+  if (MajorAvailable = 0) and
+     (MinorAvailable = 0) and
+     (SubMinorAvailable = 0) then
+    exit(0);
+
+  if (MajorInstalled < MajorAvailable) then
+    exit(0)
+  else if (MajorInstalled > MajorAvailable) then
+    exit(1);
+
+  if (MinorInstalled < MinorAvailable) then
+    exit(0)
+  else if (MinorInstalled > MinorAvailable) then
+    exit(1);
+
+  if (SubMinorInstalled < SubMinorAvailable) then
+    exit(0)
+  else if (SubMinorInstalled > SubMinorAvailable) then
+    exit(1);
+
+  // All OK
+  result := 1;
+end;
 
 end.
