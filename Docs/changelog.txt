@@ -198,3 +198,15 @@ Version:        Description             Issue
                 Fix Issue #974          File list columns - unexpected behaviour
                 Fix Issue #981          Base layers updates. Add TopPlusOpen and MapTiler Hybrid. Fix scaling
                 Fix Issue #990          Fix issues for V6.3.12
+6.3.13.0        Fix Issue #995          [Suggestion] Real-time File List filtering
+                Fix Issue #996          About Photo not displaying -XMP-exif:UserComment
+                Fix Issue #1000         Exiftool site temporarily served from sourceforge (Installer updated)
+                Fix Issue #1004         Fix for ShellTreeview (Performance)
+                Fix Issue #1005         Risks of Hidden Custom Options Setting
+                Fix Issue #1008         Update Compiler to Delphi 13 Community Edition and InnoSetup to 7.1.0
+                Fix Issue #1010         Use standard Windows translation for buttons used in MessageDlgEx
+                Fix Issue #1011         Add help button to configure file lists
+                Fix Issue #1015         Map is not updated when new media is selected and does not remember zoom settings
+                Fix Issue #1020         Right-click to add to workspace leads to error.
+                Fix Issue #1025         Archive files do not show metadata.
+                Fix Issue #1029         Check versions dialog should show checkmark if installed version is newer.
