@@ -221,5 +221,9 @@ Version 6.3.12
   It could also have been fixed by using an other URL in BaseLayer.js but 512 is recommended.
   https://api.maptiler.com/maps/hybrid-v4/{z}/{x}/{y}.jpg ==> https://api.maptiler.com/maps/hybrid-v4/256/{z}/{x}/{y}.jpg
   
+Version 6.3.13
+- Updated to Delphi Rad 13 Community Edition and InnoSetup 7.1.0
+- For issue 1025 it was necessary to check all parts of the code that tested for 'Folder'. 
+  Windows (IShellFolder.GetAttributesOf) reports zip files as folder, so (SFGAO_COMPRESSED and Flags = 0); was added to filter out archives
 
 Frank

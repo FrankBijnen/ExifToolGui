@@ -76,9 +76,15 @@ Line editing enabled in Preferences
 - CTRL Cursor L/R       Moves to the previous/next word.
 - CTRL SHIFT Cursor L/R Moves and selects the previous/next word.
 
-In the OSM map holding the Ctrl key together with
+In the Filter box right of the Breadcrumb bar.
+- Enter                 Moves to the first/next file matching the text.
+- CTRL Cursor Up/Down   Moves to the previous/next file matching the text.
+
+In the OSM map 
+Holding the Ctrl key together with
 - Left click            Sets the exact location
 - Mouse wheel           To (in)(de)crease the font the map uses.
+Holding the Shift key and selecting a rectangles zooms in on that rectangle
 
 In the Regions panel of the preview
 - CTRL R          	Switches between the Preview and the Region panel.

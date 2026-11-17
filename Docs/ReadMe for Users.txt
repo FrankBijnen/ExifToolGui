@@ -241,4 +241,18 @@ Changed with version 6.3.12
   The added MapTiler Hybrid layer add labels (town, street names etc) to the satellite layer. 
   The added TopPlusOpen layer, requires no api_key and is a nice Topo layer.
  
+Changed with version 6.3.13
+- A warning message pops up when custom options are in effect. You can ignore them!
+- Filtering was added, on top of the existing filtering that works on file names. 
+  On the right side of the Bread crumb bar (that needs to be enabled) an edit box is added. Typing a search text starts selecting the files that match.
+  Matching is done on all columns, not only the file name.
+  Pressing Enter moves to the first/next file that matches. Pressing Ctrl+Cursor Up/Down move to the previous/next file.
+  Clicking on the filter icon will only show the files matching.
+- Use the standard Windows translation for Message boxes. (EG OK, Cancel, Yes, Yes to all etc.)
+- When the file list details are set to 'Location info', and the OSM Map is selected, selecting one or more files will display their location on the map.
+  Without the need to click 'Show on map'.
+- When a file filter is selected that contains ';/s' (for scanning sub files) it is no longer needed to 'Enable folders in the file list' (Preferences)
+  This results in a 'cleaner' overview in the file list.
+- Selecting archives (zip files) will now show their metadata.
+
 Frank

@@ -129,7 +129,7 @@ are essential for majority of users.<br>
 <h2><a name="m_changesv6">Major changes with ExifToolGUI v6.xx</a></h2>
 <br>
 <ul>
-    <li>The source code now compiles with Delphi Community Edition. Version used, as of writing, Rad 12.1.</li>
+    <li>The source code now compiles with Delphi Community Edition. Version used, as of writing, Rad 13.</li>
     <li>No (closed source) 3rd party libraries needed.</li>
     <li>All source code provided on GitHub.</li>
     <li>Added styles.</li>
@@ -197,6 +197,7 @@ are essential for majority of users.<br>
     <li>Added support for displaying and editing <a href="#p_preview_regions">regions</a> in the preview window.</li>
     <li>Added more Base layers in the OSM map. See Preferences<a href="#m_prog_prefs_geocoding"> GeoCoding settings tab</a><br>
     Requires registering at <a href="https://www.maptiler.com">https://www.maptiler.com</a>.</li>
+    <li>Additional filtering possible in file list, on any column.</li>
 </ul>
 <br>
 <a href="changelog.txt"><b>See changelog.txt for a complete list of issues.</b></a>
@@ -381,7 +382,7 @@ For an in-depth explanation see <a href="Readme GeoCoding.txt"><b>Readme GeoCodi
 <br><br>
 <b>MapTiler Api Key</b><br><br>
 If you register at <a href="https://www.maptiler.com"><b>https://www.maptiler.com</b></a> you will receive an <b>Api Key</b>.
-Enter your <b>Api Key</b> here to choose additional Base layers in the OSM map, besides the standard <b>Mapnik</b> and <b>Open Topo Map</b>.<br>
+Enter your <b>Api Key</b> here to choose additional Base layers in the OSM map, besides the standard <b>Mapnik</b>, <b>Open Topo Map</b> and <b>Topo Plus Open</b>.<br>
 <img src="ExifToolGUI_V6_files/preferences_maptiler.jpg"><br>
 <br><br>
 
@@ -679,6 +680,7 @@ Link to all ExifTool <a href="https://exiftool.org/ExifTool.html#options">API op
 <h4>Custom options</h4>
 -You can specify additonal options that exiftool should use.
 Expert option. Normally used with the Log Window.<br>
+Because of possible unwanted side effect, GUI will warn you when Custom options are in effect.<br>
 Possible use case is adding an API option <b>-API WindowsLongPath=1</b><br>
 <br>
 
@@ -963,7 +965,7 @@ are capable of:<br>
 <img src="ExifToolGUI_V6_files/metadatapreview.jpg"><br><br>
 <br>
 
-<h3><a name="p_predefined_lists">Managing pre defined lists</a></h3>
+<h3><a name="p_predefined_lists">Managing predefined lists</a></h3>
 <ul>
     <li>You can customize the tags, by clicking on the button <b>Predefined</b>.<br>
     This will open the form <b>Predefined Tags</b>.</li>
@@ -1088,7 +1090,7 @@ The <b>Show diff metadata</b> form has these options:<br>
 <li>Include/Exclude the tags to compare, and save them as default.<br>
 The list of tags is shared with the lists used for removing and copying metadata,<br>
 and can be saved and loaded using <b>Program/Predefined tags definition file</b>.<br>
-See <a href="#p_predefined_lists">Managing pre defined lists</a> how to customize these lists.<br>
+See <a href="#p_predefined_lists">Managing predefined lists</a> how to customize these lists.<br>
 
 <br></li>
 <li>Formatting options. (-v, -n, -g, specify the family group name)</li>
@@ -1192,7 +1194,16 @@ The (dropdown) buttons on top of the file list replace the previous combo boxes.
 <br>
 <b>Notes:</b><br><br>
 <li>The text 'Standard file list', and 'Show All Files' will change if you select an other option.</li>
-<li>The Breadcrumb bar is shown only when enabled in Preferences/Other.<br> </li>
+<li>The Breadcrumb bar is shown only when enabled in Preferences/Other.
+Besides easier navigating in your directories, it allows for filtering the files shown.<br>
+<ul>
+    <li>Adding a search text will highlite all matching files.</li>
+    <li>Press <b>Enter</b> to select the first occurence. Pressing Enter again moves to the next.</li>
+    <li>Use CTRL+Cursor Up/Down to move to the previous/next occurence.</li>
+    <li>Click on the <b>Filter</b> icon to reload the file list, with only the matching files.</li>
+    <li>Matching is performed on every column shown. Not only the file name.</li><br>
+</ul>
+</li>
 <br>
 
 <li><b>Refresh button</b></li><br>
@@ -1732,11 +1743,12 @@ Copy the Tag name of the selected line to the ExifTool direct command.<br>
 
 <b>Show on map</b> button<br>
 If selected images are geo-tagged (contain GPS data), clicking this button will display their geo-position on the map.<br>
-Starting with version V6.3.1 you can also show track logs on the map, if the selected files(s) contain(s) track logs.<br><br>
+Starting with version V6.3.1 you can also show track logs on the map, if the selected files(s) contain(s) track logs.<br>
+When <b>Location info</b> is selected in the filelist and the selected images/videos are geo-tagged their geo-position is automatically displayed on the map.<br><br>
 <u>Notes:</u>
 <ul>
     <li>You can select a different Base layer, by clicking on the plus sign at the right.<br>
-    Default Base layers are Mapnik and Open Topo Map. By registering at
+    Default Base layers are Mapnik, Open Topo Map and Top Plus Open. By registering at
     <a href="https://www.maptiler.com">https://www.maptiler.com</a> you will receive an <b>Api Key</b>.
     Enter that Api Key in Preferences<a href="#m_prog_prefs_geocoding"> GeoCoding settings tab</a> to add addional base layers.<br>
     <img src="ExifToolGUI_V6_files/preferences_maptiler.jpg"><br>
@@ -1786,12 +1798,12 @@ For finding places easier...<br>
 <br>
 
 <b>Home</b> button<br>
-Moves the map cursor to your predefined position.<br>
+Moves the map cursor to your predefined position using the predefined zoom-level.<br>
 Clears any tracks shown on the map.<br>
 <br>
 
 <b>Set^</b> button<br>
-Current map cursor position becomes <font class="blue">Home</font> position.<br>
+The current map cursor position is stored as your <font class="blue">Home</font> position. The currently used zoom level is stored as default.<br>
 <br>
 
 <b>Geotag files</b> button<br>
@@ -1832,7 +1844,7 @@ P.S.: Don't blame me for my English grammar -it's not my native language.<br>
 </em>
 
 <br>Frank<br>
-Modified on January, 2026<br>
+Modified on November, 2026<br>
 <br>
 
 <u>You may find additional info in the ReadMe files:</u>
