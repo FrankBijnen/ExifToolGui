@@ -6,7 +6,8 @@ uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants,
   System.Classes, Vcl.Graphics,
   Vcl.Controls, Vcl.Forms, UnitScaleForm, Vcl.Dialogs, Vcl.StdCtrls,
-  Vcl.ComCtrls, Vcl.ExtCtrls, Vcl.Mask, Vcl.Buttons;
+  Vcl.ComCtrls, Vcl.ExtCtrls, Vcl.Mask, Vcl.Buttons,
+  ExifToolsGui_AutoComplete, ExifToolsGui_AutoEdit;
 
 type
   TFPreferences = class(TScaleForm)
@@ -41,7 +42,7 @@ type
     BtnGenThumbs: TBitBtn;
     ChkWorkAddRem: TCheckBox;
     GrpGeoCode: TGroupBox;
-    EdGeoCodeUrl: TLabeledEdit;
+    EdGeoCodeUrl: ExifToolsGui_AutoEdit.TLabeledEdit;
     UpdThrottleGeoCode: TUpDown;
     EdThrottleGeoCode: TLabeledEdit;
     GrpOverPass: TGroupBox;
@@ -53,7 +54,7 @@ type
     EdThrottleOverPass: TLabeledEdit;
     Label4: TLabel;
     UpdThrottleOverpass: TUpDown;
-    EdOverPassUrl: TLabeledEdit;
+    EdOverPassUrl: ExifToolsGui_AutoEdit.TLabeledEdit;
     ChkFileListFolders: TCheckBox;
     Label5: TLabel;
     HintPause: TEdit;
@@ -94,9 +95,15 @@ type
     procedure BtnAdd2ContextClick(Sender: TObject);
     procedure BtnRemoveFromContextMenuClick(Sender: TObject);
     procedure CheckBox9Click(Sender: TObject);
+    procedure FormCreate(Sender: TObject);
+    procedure FormDestroy(Sender: TObject);
   private
     { Private declarations }
-    var InstalledContext: boolean;
+    InstalledContext: boolean;
+    GeoCodeAutoComp: TAutoCompRec;
+    GeoCodeAutoList: TStringList;
+    OvpAutoComp: TAutoCompRec;
+    OvpAutoList: TStringList;
     procedure SetContextButtons;
   public
     { Public declarations }
@@ -107,8 +114,10 @@ var
 
 implementation
 
-uses Main, ExifTool, MainDef, GeoMap,
-     ExifToolsGUI_Utils, ExifToolsGUI_Thumbnails, ExifToolsGui_AutoComplete, UnitLangResources;
+uses
+  Main, ExifTool, MainDef, GeoMap,
+  ExifToolsGUI_Utils, ExifToolsGUI_Thumbnails, UnitLangResources,
+  ExifToolsGui_ResourceStrings;
 
 {$R *.dfm}
 
@@ -287,6 +296,32 @@ begin
         EdETCustomConfig.Text := XDir;
     end;
   end;
+end;
+
+procedure TFPreferences.FormCreate(Sender: TObject);
+begin
+  OvpAutoList := TStringList.Create;
+  OvpAutoList.Add(StringResource(ETD_OverPass));
+  OvpAutoList.Add(StringResource(ETD_OverPass_Dresel));
+  OvpAutoList.Add(StringResource(ETD_OverPass_Dresel_NA));
+  OvpAutoComp.SetAcOptions(TAutoCompleteMode.acAutoSuggest, true, false);
+  OvpAutoComp.SetAcList(OvpAutoList);
+  if (Supports(EdOverPassUrl, IAutoCompleteEdit)) then
+    (EdOverPassUrl as IAutoCompleteEdit).SetAutoCompOptions(OvpAutoComp);
+
+  GeoCodeAutoList := TStringList.Create;
+  GeoCodeAutoList.Add(StringResource(ETD_GeoCode));
+  GeoCodeAutoList.Add(StringResource(ETD_GeoCode_Dresel));
+  GeoCodeAutoComp.SetAcOptions(TAutoCompleteMode.acAutoSuggest, true, false);
+  GeoCodeAutoComp.SetAcList(GeoCodeAutoList);
+  if (Supports(EdGeoCodeUrl, IAutoCompleteEdit)) then
+    (EdGeoCodeUrl as IAutoCompleteEdit).SetAutoCompOptions(GeoCodeAutoComp);
+end;
+
+procedure TFPreferences.FormDestroy(Sender: TObject);
+begin
+  OvpAutoList.Free;
+  GeoCodeAutoList.Free;
 end;
 
 procedure TFPreferences.FormShow(Sender: TObject);

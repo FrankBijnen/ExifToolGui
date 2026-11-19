@@ -14,3 +14,6 @@ ETD_Edge_Runtime=/#m_edge_runtime
 ETD_Reqs=/#m_reqs_exiftool
 ETD_GeoCode=https://geocode.maps.co
 ETD_OverPass=https://overpass-api.de/api
+ETD_GeoCode_Dresel=https://nominatim.dresel.systems
+ETD_OverPass_Dresel=https://ovp.dresel.systems/api
+ETD_OverPass_Dresel_NA=https://ovp.dresel.systems/api-na
