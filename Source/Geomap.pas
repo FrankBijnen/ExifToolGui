@@ -1240,6 +1240,7 @@ begin
   RESTRequest.Response := RESTResponse;
   try
     RESTRequest.params.Clear;
+    RESTRequest.params.AddItem('format', 'json', TRESTRequestParameterKind.pkGETorPOST);
     RESTRequest.params.AddItem('lat', LatE, TRESTRequestParameterKind.pkGETorPOST);
     RESTRequest.params.AddItem('lon', LonE, TRESTRequestParameterKind.pkGETorPOST);
 
@@ -1605,6 +1606,7 @@ begin
   RESTRequest.Response := RESTResponse;
   try
     RESTRequest.params.Clear;
+    RESTRequest.params.AddItem('format', 'json', TRESTRequestParameterKind.pkGETorPOST);
     if (Country <> '') then
     begin
       RESTRequest.params.AddItem('city', City, TRESTRequestParameterKind.pkGETorPOST);
@@ -1832,11 +1834,11 @@ begin
   GeoSettings.GeoCodeApiKey := GUIini.ReadString(Geo_Settings, 'GeoCodeApiKey', '');
 
   GeoSettings.ThrottleGeoCode := GUIini.ReadInteger(Geo_Settings, 'ThrottleGeoCode', 1000);
-  GeoSettings.OverPassUrl := GUIini.ReadString(Geo_Settings, 'OverPassUrl', StringResource(ETD_OverPass));
+  GeoSettings.OverPassUrl := GUIini.ReadString(Geo_Settings, 'OverPassUrl', StringResource(ETD_OverPass_Dresel));
 
   GeoSettings.SetGeoLocation500(GUIini.ReadString(Geo_Settings, 'GeoLocation500Dir', ''));
 
-  GeoSettings.ThrottleOverPass := GUIini.ReadInteger(Geo_Settings, 'ThrottleOverPass', 10);
+  GeoSettings.ThrottleOverPass := GUIini.ReadInteger(Geo_Settings, 'ThrottleOverPass', 50);
   GeoSettings.CaseSensitive := GUIini.ReadBool(Geo_Settings, 'OverPassCaseSensitive', True);
   GeoSettings.OverPassCompleteWord := GUIini.ReadBool(Geo_Settings, 'OverPassCompleteWord', True);
   GeoSettings.OverPassCompleteWord := GUIini.ReadBool(Geo_Settings, 'OverPassCompleteWord', True);

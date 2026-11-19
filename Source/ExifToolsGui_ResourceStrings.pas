@@ -28,6 +28,10 @@ const
   ETD_GeoCode           = 'ETD_GeoCode';
   ETD_OverPass          = 'ETD_OverPass';
 
+  ETD_GeoCode_Dresel    = 'ETD_GeoCode_Dresel';
+  ETD_OverPass_Dresel   = 'ETD_OverPass_Dresel';
+  ETD_OverPass_Dresel_NA= 'ETD_OverPass_Dresel_NA';
+
 function StringResource(const Id: string): string;
 
 implementation

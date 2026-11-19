@@ -11,6 +11,8 @@ object FPreferences: TFPreferences
   Font.Height = -11
   Font.Name = 'Tahoma'
   Font.Style = []
+  OnCreate = FormCreate
+  OnDestroy = FormDestroy
   OnShow = FormShow
   TextHeight = 13
   object BtnCancel: TButton
@@ -43,7 +45,6 @@ object FPreferences: TFPreferences
     DoubleBuffered = True
     ParentDoubleBuffered = False
     TabOrder = 0
-    ExplicitHeight = 441
     object AdvTabGeneral: TTabSheet
       Caption = 'General'
       object Label1: TLabel
