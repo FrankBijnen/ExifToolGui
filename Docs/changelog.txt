@@ -209,4 +209,6 @@ Version:        Description             Issue
                 Fix Issue #1015         Map is not updated when new media is selected and does not remember zoom settings
                 Fix Issue #1020         Right-click to add to workspace leads to error.
                 Fix Issue #1025         Archive files do not show metadata.
-                Fix Issue #1029         Check versions dialog should show checkmark if installed version is newer.
+                Fix Issue #1029         Check versions dialog should show checkmark if installed version is newer.             
+                Fix Issue #1032         Add dresel.systems as a primary server for Overpass.
+                Fix Issue #1034         Fix issues for V6.3.13

@@ -1,3 +1,24 @@
+V6.3.13
+
+Probably because of high-load the Overpass webservice at https://overpass-api.de/api did not always work well. 
+(Note: Using GeoCoding from ExifTool locally, or https://geocode.maps.co is not affected)
+
+Alternative servers are available at:
+- https://ovp.dresel.systems/api (For Europe)
+- https://ovp.dresel.systems/api-na (For North-America)
+You can setup these servers in ExifToolGui via Program/Preferences/Tab Geocoding. (Group Overpass Api)
+
+Have a look at https://ovp.dresel.systems/ for more info.
+
+For Geocoding there is an alternative at:
+- https://nominatim.dresel.systems
+This server requires no Api Key, but coverage is limited to DACH (Germany, Austria, Switzerland and Lichtenstein)
+You can setup this servers in ExifToolGui via Program/Preferences/Tab Geocoding. (Group Geocoding Map)
+
+Have a look at https://nominatim.dresel.systems/ for more info.
+
+Many thanks to Christian for his cooperation.
+
 V6.3.6
 
 Did you know that using the 'GeoCode' provider you can search for streetnames, or POI's within a city?
