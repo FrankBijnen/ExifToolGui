@@ -254,5 +254,6 @@ Changed with version 6.3.13
 - When a file filter is selected that contains ';/s' (for scanning sub files) it is no longer needed to 'Enable folders in the file list' (Preferences)
   This results in a 'cleaner' overview in the file list.
 - Selecting archives (zip files) will now show their metadata.
+- Added alternative servers for GeoCoding using OverPass. Selectable in Preferences.
 
 Frank
