@@ -3,32 +3,33 @@
 
 This is an updated version of the ExifToolGui program created by Bogdan Hrastnik. Many thanks go out to him.
 
-<b>Released version: <b>V6.3.12</b> updated May 8, 2026</b><br>
+<b>Free Software, Hope for the Future</b>
+This project is freely available to everyone. If you appreciate it, you might consider supporting research into cancer or Alzheimer’s disease by donating to your local charity organisation.
 
-- Updated Japanese language. Thanks coolvito!
-- Improved support for HEIC images.
-  - Exif and XMP tags can now be used in the filelist with readmode=internal.
-  - Fixed issue with auto rotating previews.
-  - Note: Windows 11 comes standard with the needed codec.
-- Added SubjectArea in the Regions tab. Thanks Steerpike!
-- Update MapTiler baselayers to V4, added Hybrid satellite, and fixed label sizes.
-- In the field definitions for the Filelist and the Workspace you can now specify the tags like this:
-<table>
-<tr><td>G0:G1:Tag</td><td>Exif:Ifd0:Make</td></tr>
-<tr><td>G1:Tag</td><td>Ifd0:Make</td></tr>
-<tr><td>G0:Tag</td><td>Exif:Make</td></tr>
-<tr><td>Tag</td><td>Make</td></tr>
-</table>
+<h4>Released version: V6.3.13 updated November 20, 2026</h4>
 
-- When adding a field to the FileList, or WorkSpace from the Metadata tab using right click it is always added as:<br>
-Thanks KarenBbla!
-<table>
-<tr><td>G1:Tag</td><td>Ifd0:Make</td></tr>
-</table>
+- A warning message pops up when custom options are in effect. You can ignore them!<br>
+- Filtering was added, on top of the existing filtering that works on file names.<br>
+  On the right side of the Bread crumb bar (that needs to be enabled) an edit box is added. Typing a search text starts selecting the files that match.
+  Matching is done on all columns, not only the file name.<br>
+  Pressing Enter moves to the first/next file that matches. Pressing Ctrl+Cursor Up/Down move to the previous/next file.<br>
+  Clicking on the filter icon will only show the files matching.<br>
+- Use the standard Windows translation for Message boxes. (EG OK, Cancel, Yes, Yes to all etc.)<br>
+- When the file list details are set to 'Location info', and the OSM Map is selected, selecting one or more files will display their location on the map.
+  Without the need to click 'Show on map'.<br>
+- When a file filter is selected that contains ';/s' (for scanning sub files) it is no longer needed to 'Enable folders in the file list' (Preferences)
+  This results in a 'cleaner' overview in the file list.<br>
+- Add dresel.systems as a primary server for OverPass. [Readme GeoCoding](../../blob/main/Docs/Readme%20GeoCoding.txt)<br>
+  Thanks to Christian! https://ovp.dresel.systems and https://nominatim.dresel.systems
 
-Fixes include:
+Fixes included:
 
-- Fixed Access violation error when changing styles. Thanks Gitoffthelawn!
+- Check versions dialog should show checkmark if installed version is newer.<br>
+- Archive files do not show metadata.<br>
+- Right-click to add to workspace leads to error.<br>
+- Add help button to configure file lists.<br>
+- Fix for ShellTreeview (Performance)<br>
+- Check versions dialog should show checkmark if installed version is newer<br>
 - For the complete info see the [changelog](../../blob/main/Docs/changelog.txt).<br>
 
 # Download
